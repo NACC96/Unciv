@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://unciv-agent.local/schemas/error-envelope.schema.json",
+  "title": "ErrorEnvelope",
+  "description": "Structured rejection for failed tool calls (plan §5.1). Hidden and nonexistent entities return the same externally safe response. INTERNAL_ERROR pauses the match with a diagnostic ID; never serialize stack traces or raw engine objects.",
+  "type": "object",
+  "required": ["protocolVersion", "status", "code"],
+  "properties": {
+    "protocolVersion": { "type": "integer", "const": 1 },
+    "status": {
+      "type": "string",
+      "enum": ["rejected", "pending"],
+      "description": "rejected = terminal failure (correct and resubmit); pending = long engine work still running, poll game.action_result."
+    },
+    "code": {
+      "type": "string",
+      "enum": [
+        "STALE_STATE",
+        "NOT_YOUR_TURN",
+        "MATCH_PAUSED",
+        "AUTHORITY_REVOKED",
+        "INVALID_ARGUMENT",
+        "ILLEGAL_ACTION",
+        "DECISIONS_PENDING",
+        "UNSUPPORTED_RULESET",
+        "ACTION_ID_CONFLICT",
+        "MUTATION_IN_PROGRESS",
+        "INTERNAL_ERROR"
+      ]
+    },
+    "message": {
+      "type": "string",
+      "description": "Human/model-readable explanation obeying visibility rules (no hidden-state leakage, e.g. in movement-preview rejection reasons)."
+    },
+    "actionId": {
+      "type": "string",
+      "description": "Echo of the request actionId when the error is tied to a specific submission."
+    },
+    "currentRevision": {
+      "type": "integer",
+      "description": "Committed revision the client should re-observe from (present for STALE_STATE)."
+    },
+    "diagnosticId": {
+      "type": "string",
+      "description": "Log correlation ID for INTERNAL_ERROR (present only for that code)."
+    }
+  },
+  "additionalProperties": false
+}

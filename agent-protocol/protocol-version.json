@@ -1,0 +1,1 @@
+{"description": "Identifies the agent-protocol schema bundle. Reject any peer whose protocolVersion != 1 (plan §5.1).", "protocolVersion": 1}

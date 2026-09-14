@@ -187,6 +187,17 @@ package.json
 # Detekt
 detekt/reports.html
 
+# Agent-match runtime and build artifacts (AI_AGENT_PLAN.md §7.4)
+.agent-data/
+*.unciv-agent
+agent-runner/node_modules/
+agent-runner/dist/
+agent-protocol/*.local.json
+
+# ...but the supervisor's own manifests are committed sources (un-ignore them)
+!agent-runner/package.json
+!agent-runner/package-lock.json
+
 # When you test the wiki by running mkdocs locally:
 /site/
 

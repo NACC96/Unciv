@@ -1,0 +1,90 @@
+# Agent Build Checkpoints — Unciv with Agent-Controlled Civilizations
+
+**Purpose:** running context log for AI agents working through `AI_AGENT_PLAN.md`.
+Each entry records a decision, problem, or proof-gate outcome with enough detail
+that a future agent (no prior conversation memory) can pick up the work without
+re-deriving it. Newest entries go at the **bottom**. Keep entries short and factual.
+
+**Conventions:**
+- `CP-NNN` monotonically increasing checkpoint IDs.
+- Status: `decision` | `problem` | `gate-pass` | `gate-fail` | `note`.
+- Always name exact file paths, revisions, and versions.
+- The plan (`AI_AGENT_PLAN.md`) is the contract; this file records what actually happened.
+
+**Starting revision:** `518daddf0a06b273f16b481a0464626889307df7` (matches plan §intro table).
+**Feature branch:** `agent-match-foundation` (branched from `518daddf...`, upstream history untouched).
+**Plan status line at start:** fork/clone/planning doc complete; no gameplay code yet.
+
+---
+
+## W0 — Reproducible baseline and development environment
+
+### CP-001 (note) — Repo state on first agent session, 2026-09-14
+- `origin = https://github.com/NACC96/Unciv.git`, `upstream = https://github.com/yairm210/Unciv.git`. Both remotes verified via `git remote -v`.
+- `HEAD = 518daddf0a06b273f16b481a0464626889307df7`, exactly the plan's inspected revision. `git log` confirms `4.22.0` tag context.
+- `AI_AGENT_PLAN.md` was **untracked** (`??` in `git status`), not committed. Future agents: it must be committed on this branch as part of W0 exit evidence.
+- Working branch for all implementation: `agent-match-foundation`.
+
+### CP-002 (problem) — Lexar volume is ExFAT; AppleDouble `._` files pollute the repo and `.git`
+- `diskutil info /Volumes/Lexar` → File System Personality `exfat`, Partition Type `Windows_NTFS`, 1 TB USB, ~154 GiB free.
+- The checkout is full of macOS AppleDouble files (`._AI_AGENT_PLAN.md`, `docs/._*.md`, `.git/objects/pack/._pack-*.idx`, …). Every git command prints `error: non-monotonic index .git/objects/pack/._pack-…idx` (non-fatal warnings, commands still succeed).
+- Consequences (already anticipated by plan §7.3/§10.1, now confirmed on this machine):
+  1. ExFAT file-permission bits are not an isolation boundary — never rely on them.
+  2. Atomic-move durability for the checkpoint store (§10.1 step 3–4) must be **proven** on this filesystem; assume the immutable-generations fallback until measured.
+  3. Always export `COPYFILE_DISABLE=1` before git/tar operations on this volume to avoid creating new `._` files.
+  4. Do **not** run `dot_clean` on `.git/` or delete `._` files inside `.git/` without a backup — pack `._` shadows could confuse git if removed mid-operation. Cosmetic cleanup only outside `.git/`.
+- Decision: live with the warnings for W0; add `._*` handling to `.gitignore` only if it does not mask real files (git already ignores `._` inside `.git` for content purposes — the errors are just noise).
+
+### CP-003 (decision) — Toolchain versions pinned for W0
+- JDK: **missing** (`java -version` → "Unable to locate a Java Runtime"). Plan §2/§12 require JDK 21 (CI uses Temurin 21). Action: `brew install openjdk@21` (Homebrew formula, not cask; casks present are unrelated). Set `JAVA_HOME=$(brew --prefix openjdk@21)` per-shell; do not change global defaults.
+- Node: default shell node is `v22.22.3`, but Node **v24.13.1 already installed** via nvm (`~/.nvm/versions/node/v24.13.1/`). Plan §7.4 targets Node 24 — use `nvm use 24` / absolute path, no reinstall needed. Record arch: **arm64** (`uname -m`).
+- Provider CLIs match the plan's candidate baselines **exactly**: `codex-cli 0.154.0`, `claude 2.1.270 (Claude Code)`, `opencode 1.18.31`. These are compatibility baselines only (plan §7.1) — W1 must still prove isolation/event parsing per provider.
+- Gradle wrapper present (`gradlew`); baseline build not yet run (blocked on JDK install).
+
+### CP-004 (note) — Where this log lives and how to extend it
+- This file: `docs/agent-build-checkpoints.md`, committed on `agent-match-foundation`.
+- Sibling deliverable required by plan §6: `docs/agent-action-coverage.md` (action coverage table; stub created in W0, filled through W4).
+- Protocol schemas: `agent-protocol/` (W1). Engine code: `core/src/com/unciv/logic/agents/`. Coordinator: `desktop/src/com/unciv/app/desktop/agents/`. Supervisor: `agent-runner/`. None of these exist yet — planned locations, do not assume them.
+- Rule for future agents: append a `CP-NNN` entry for every important decision, failure, or gate result; never rewrite history above — supersede with a new entry.
+
+### CP-005 (note) — Toolchain ready; unchanged-baseline build started, 2026-09-14
+- `JAVA_HOME=/opt/homebrew/opt/openjdk@21` → `openjdk 21.0.11 (2026-04-21)`. Gradle wrapper `gradle-9.4.1-bin.zip`. Node for supervisor work: `/Users/noahkenny/.nvm/versions/node/v24.13.1/bin/node` → `v24.13.1` (plan §7.4 target met, no install needed).
+- Created project-owned data dir `/Volumes/Lexar/Unciv/.agent-data/` (plan §7.4 `--data-dir=` target; gitignored).
+- `.gitignore` += `.agent-data/`, `*.unciv-agent`, `agent-runner/node_modules/`, `agent-runner/dist/`, `agent-protocol/*.local.json`.
+- Created `docs/agent-action-coverage.md` W0 stub: all 13 plan-§6 families listed, every row `not started`, command names marked *(proposed)* until W1 pins schemas in `agent-protocol/`.
+- Baseline command (plan §13.1) launched in background with JDK 21: `./gradlew :tests:test :desktop:dist`, log `/tmp/unciv-baseline.log`. No source changes exist yet on `agent-match-foundation`, so this doubles as the clean-baseline gate. Desktop-open + ordinary-save-load checks still pending after the build.
+- Verified while waiting (no JDK needed, plan §2 constraints confirmed against `518daddf`):
+  - `desktop/.../DesktopLauncher.kt:88` — `--data-dir=` flag exists as planned.
+  - `tests/.../TestGame.kt:67` — helper defaults to **G&K** (`Civ_V_GnK`); all agent fixtures must explicitly construct **Vanilla** (`Civ_V_Vanilla`), per plan §13.1.
+  - `core/.../PlayerType.kt` — enum is only `{AI, Human}`; external agents stay `Human` for rules with a separate controller category (plan §2 row 2, §4.1 `ControllerKind`).
+
+### CP-006 (problem→decision) — Gradle builds fail on ExFAT; fixed with local-only env workaround, 2026-09-14
+- Symptom 1: wrapper JVM crash `UnsatisfiedLinkError: no management in system library path .../Cellar/openjdk@21/21.0.11/...` — transient: Homebrew was still swapping `21.0.11 → 21.0.12.1` while the first build started. Self-resolved once install settled (`openjdk 21.0.12.1`, `libmanagement.dylib` present). Lesson: after `brew install`, confirm `java -version` is stable before building.
+- Symptom 2 (real gate): `Execution failed for InstrumentationAnalysisTransform: .../buildSrc/build/classes/kotlin/main` + bare `IllegalArgumentException`, plus wrapper `Could not set executable permissions` on first download. Root cause: macOS writes AppleDouble `._` sidecars into build outputs on ExFAT (`buildSrc/build/classes/kotlin/main/._META-INF`, `._com`, plus dozens under `buildSrc/build/kotlin/...`), and Gradle 9.4.1's instrumentation transform chokes scanning them. Confirmed by `find buildSrc/build -name '._*'`; also `:jar: No valid plugin descriptors` is benign (buildSrc holds only `AndroidImagePacker.kt`, `BuildConfig.kt` — no plugins).
+- Decision (local-only, NOT committed): `export GRADLE_USER_HOME=/Users/noahkenny/.gradle-unciv` (internal APFS SSD), `./gradlew --stop`, `find buildSrc .gradle -name '._*' -delete`, rebuild with `--no-build-cache` once. Result: `./gradlew help` → **BUILD SUCCESSFUL**. No `._` files reappeared under `buildSrc/build` after the clean build.
+- Standing rule for this project: every Gradle invocation on this machine must set `JAVA_HOME=/opt/homebrew/opt/openjdk@21`, `GRADLE_USER_HOME=/Users/noahkenny/.gradle-unciv`, `COPYFILE_DISABLE=1`. Full baseline (`:tests:test :desktop:dist`) relaunched as `/tmp/unciv-baseline4.log`.
+- Open risk: if `._` sidecars reappear inside `build/` outputs during normal compilation, per-project `buildDir` relocation to APFS (via local `~/.gradle` init script) is the next step. Do not commit any such workaround to the repo — CI builds on ext4 and must stay untouched.
+
+### CP-007 (gate-fail→gate-pass) — Unchanged baseline: 848 tests, 2 environmental failures, both fixed, 2026-09-14
+- First full run (`:tests:test :desktop:dist`, log `/tmp/unciv-baseline4.log`): 77 suites, 848 tests, 15 skipped, **2 failures, 0 errors**. `:desktop:dist` succeeded in the same run (`desktop/build/libs/Unciv.jar`, 57 MB, plus a harmless `._Unciv.jar` sidecar).
+- Failure 1 — `BasicTests.baseRulesetHasNoBugs` (`expected:<0> but was:<2>`): test enumerates `android/assets/jsons/TileSets/` and tried to load `._FantasyHex.json`, `._HexaRealm.json`, `._Minimal.json` AppleDouble sidecars as tileset configs. Environmental, not upstream.
+- Failure 2 — `UniqueErrorTests.testPromotionCircularReferenceWithoutAcyclicAlternativeIsWarned` (`expected:<1> but was:<4>`): same root cause (extra ruleset-load errors from `._` pollution); passed after cleanup with no test/code change, so also environmental.
+- Fix: `find android/assets core/src -name '._*' -delete` removed **953 sidecars**; rerun of exactly those 2 classes → **BUILD SUCCESSFUL** (BasicTests 20/20, UniqueErrorTests 9/9, fresh XMLs in `tests/build/test-results/test/`). Full all-green rerun launched as `/tmp/unciv-baseline5.log`; its report is the W0 exit evidence.
+- Durable consequences:
+  1. `.git/info/exclude` already contains `._*` (line 9, set at clone time) — git stays clean, but the **game and its tests see** these files. Any future unexplained asset/ruleset failure → first suspect `._` sidecars; recount with `find android/assets -name '._*' | wc -l`.
+  2. Do NOT "fix" by changing game asset loading in W0 — upstream behavior on normal filesystems is correct; hardening loaders to skip `._*` is an optional later task (it would also silence the in-game tileset warnings on ExFAT).
+  3. `LoadGameTest` (ordinary-save loading) passed in the full run — covers the W0 "ordinary save loads" gate headlessly. Interactive "desktop window opens" remains a manual check (deferred: popping the game GUI unprompted is intrusive; the dist jar existing + headless engine init passing is the automated proxy).
+
+### CP-008 (decision) — agent-runner skeleton + ExFAT rules for JS tooling, 2026-09-14
+- `agent-runner/` created with Node 24 (`v24.13.1`): `package.json` (`@modelcontextprotocol/sdk 1.18.2`, `typescript 5.9.2`, `vitest 3.2.4`, `@types/node`), `tsconfig.json` + `tsconfig.build.json` (both exclude `**/._*`), `vitest.config.ts` (excludes `**/._*`).
+- Why the vitest config: vitest's glob picked up `test/._fake-game-mcp.test.ts` (AppleDouble sidecar of the real test) and esbuild crashed on its binary header (`Unexpected "\x00"`). Real suite: **8/8 pass**; `tsc --noEmit` and `tsc -p tsconfig.build.json` clean.
+- `src/adapter.ts` = provider-adapter contract (discover/validate/start/resume/liveness/cancel, exact-session-ID identity rule). `src/fake-game-mcp.ts` = deterministic in-memory fake of the 8-tool surface; `test/fake-game-mcp.test.ts` pins §5.1 behaviors (duplicate-ID replay vs conflict wins over STALE_STATE, unknown types rejected without dispatch, end_turn never auto-resolves decisions, MATCH_PAUSED).
+- Gotcha fixed: root `.gitignore` ignored `package.json`/`package-lock.json` **at any depth** (release-build leftovers), which would have silently excluded the supervisor manifests. Added `!agent-runner/package.json` / `!agent-runner/package-lock.json` negations; `node_modules/` stays ignored. Verified via `git check-ignore` (no output = tracked).
+- `agent-protocol/` (v1): README + `protocol-version.json` + 4 draft-2020-12 schemas (envelope, receipt, error codes incl. ACTION_ID_CONFLICT/MUTATION_IN_PROGRESS, supervisor/engine event namespaces). All parse as JSON; semantic test-binding (Kotlin/TS generation) is W1/W2 work.
+
+### CP-009 (gate-pass) — W0 exit: unchanged baseline fully green, 2026-09-14
+- After `rm -rf tests/build` (works around the ExFAT stale-`binary`-dir deletion failure): `./gradlew :tests:test :desktop:dist` → **BUILD SUCCESSFUL**; 77 suites, **848 tests, 15 skipped, 0 failures, 0 errors**; `desktop/build/libs/Unciv.jar` present.
+- Standing ExFAT rules (all local-only, never committed): `JAVA_HOME=/opt/homebrew/opt/openjdk@21`, `GRADLE_USER_HOME=/Users/noahkenny/.gradle-unciv`, `COPYFILE_DISABLE=1`; `rm -rf tests/build` before a from-scratch `:tests:test`; `find <dir> -name '._*' -delete` when asset/ruleset tests fail mysteriously; never `dot_clean .git/`.
+- Pinned versions for the record: engine `518daddf0a06b273f16b481a0464626889307df7`, Gradle 9.4.1, JDK 21.0.12.1 (Homebrew openjdk@21), Node v24.13.1, codex-cli 0.154.0, claude 2.1.270, opencode 1.18.31, @modelcontextprotocol/sdk 1.18.2, typescript 5.9.2, vitest 3.2.4, arm64 macOS.
+- W0 committed on `agent-match-foundation` as \"W0: reproducible baseline…\" including the plan doc itself (was untracked), `.gitignore`, `agent-protocol/`, `agent-runner/`, coverage stub, and this log.
+- Next (W1): MCP transport (Streamable HTTP + per-invocation bearer) in front of the fake, then the three real-CLI capability probes (allowed tools, exact session resume, restricted effective config, auth reuse, stream parsing) with hostile-config fixtures. No paid/model side effects in CI — scripted providers only.

@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://unciv-agent.local/schemas/action-receipt.schema.json",
+  "title": "ActionReceipt",
+  "description": "Terminal success receipt for an applied mutation, returned by game.act and re-readable via game.action_result (plan §5.1). Committed event IDs let the client correlate with observations.",
+  "type": "object",
+  "required": ["protocolVersion", "actionId", "status", "revision", "result", "pendingDecisions"],
+  "properties": {
+    "protocolVersion": { "type": "integer", "const": 1 },
+    "actionId": {
+      "type": "string",
+      "description": "Echo of the request envelope's actionId."
+    },
+    "status": {
+      "type": "string",
+      "const": "applied",
+      "description": "Terminal success. Non-terminal/failed outcomes use error-envelope or result-status pending/rejected."
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "New committed state revision after this mutation."
+    },
+    "result": {
+      "type": "object",
+      "description": "Sanitized command-specific outcome. Only information the acting civ is permitted to know post-action (a legal move may reveal tiles or change ownership).",
+      "additionalProperties": true
+    },
+    "pendingDecisions": {
+      "type": "array",
+      "description": "Recomputed decision queue after this mutation. Listing is not reservation; options are revalidated before application.",
+      "items": { "type": "object", "additionalProperties": true }
+    },
+    "committedEventIds": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Authoritative engine event IDs committed with this action (action_committed et al.)."
+    }
+  },
+  "additionalProperties": false,
+  "examples": [
+    {
+      "protocolVersion": 1,
+      "actionId": "unique-client-action-id",
+      "status": "applied",
+      "revision": 43,
+      "result": { "unitId": 17, "position": { "x": 2, "y": -1 } },
+      "pendingDecisions": []
+    }
+  ]
+}
