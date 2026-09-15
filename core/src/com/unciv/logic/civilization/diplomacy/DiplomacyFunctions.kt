@@ -35,7 +35,7 @@ class DiplomacyFunctions(val civInfo: Civilization) {
         if (!otherCiv.isSpectator())
             otherCiv.popupAlerts.add(PopupAlert(AlertType.FirstContact, civInfo.civID))
 
-        if (civInfo.isCurrentPlayer())
+        if (civInfo.isCurrentPlayer() && UncivGame.Current.worldScreen != null)
             UncivGame.Current.settings.addCompletedTutorialTask("Meet another civilization")
 
 

@@ -2,8 +2,33 @@ package com.unciv.logic.agents
 
 import com.unciv.json.json
 import com.unciv.logic.GameInfo
+import com.unciv.logic.battle.AttackableTile
+import com.unciv.logic.battle.Battle
+import com.unciv.logic.battle.CityCombatant
+import com.unciv.logic.battle.MapUnitCombatant
+import com.unciv.logic.battle.TargetHelper
+import com.unciv.logic.city.City
+import com.unciv.logic.civilization.Civilization
+import com.unciv.logic.civilization.PopupAlert
+import com.unciv.logic.civilization.diplomacy.DeclareWarReason
+import com.unciv.logic.civilization.diplomacy.DiplomaticStatus
+import com.unciv.logic.civilization.diplomacy.WarType
 import com.unciv.logic.civilization.managers.TurnManager
+import com.unciv.logic.civilization.AlertType
 import com.unciv.logic.map.HexCoord
+import com.unciv.logic.map.mapunit.MapUnit
+import com.unciv.logic.map.tile.Tile
+import com.unciv.logic.trade.Trade
+import com.unciv.logic.trade.TradeEvaluation
+import com.unciv.logic.trade.TradeLogic
+import com.unciv.logic.trade.TradeOffer
+import com.unciv.logic.trade.TradeRequest
+import com.unciv.models.UnitActionType
+import com.unciv.models.ruleset.Building
+import com.unciv.models.ruleset.INonPerpetualConstruction
+import com.unciv.models.ruleset.unique.UniqueTarget
+import com.unciv.models.ruleset.unique.UniqueType
+import com.unciv.models.stats.Stat
 
 /**
  * Single-writer owner of one agent-enabled match (AI_AGENT_PLAN.md §3.2).
@@ -81,6 +106,53 @@ class MatchCoordinator(
             (committedMatch.notesRevisions[civId] ?: 0)
     }
 
+    /** Committed pending decisions for one civ (copies; mutating them affects nothing). */
+    fun getPendingDecisions(civId: String): List<PendingDecision> {
+        requireController(civId)
+        return committedMatch.pendingDecisions.filter { it.owningCivId == civId }.map { it.copy() }
+    }
+
+    /** Owner civ ID of a city in COMMITTED state, null when the city is gone. */
+    fun getCityOwner(cityId: String): String? =
+        committedGame.getCities().firstOrNull { it.id == cityId }?.civ?.civID
+
+    fun isCityPuppet(cityId: String): Boolean =
+        committedGame.getCities().firstOrNull { it.id == cityId }?.isPuppet == true
+
+    fun isCityBeingRazed(cityId: String): Boolean =
+        committedGame.getCities().firstOrNull { it.id == cityId }?.isBeingRazed == true
+
+    /** Diplomatic status name toward another civ, null without contact. */
+    fun getDiplomaticStatus(civId: String, otherCivId: String): String? {
+        requireController(civId)
+        val civ = committedGame.getCivilizationOrNull(civId) ?: return null
+        return civ.getDiplomacyManager(otherCivId)?.diplomaticStatus?.name
+    }
+
+    /** Civ IDs with a queued proposal awaiting this civ's answer. */
+    fun getIncomingTradeRequests(civId: String): List<String> {
+        requireController(civId)
+        return committedGame.getCivilizationOrNull(civId)
+            ?.tradeRequests?.map { it.requestingCiv } ?: emptyList()
+    }
+
+    fun getGold(civId: String): Int {
+        requireController(civId)
+        return committedGame.getCivilizationOrNull(civId)?.gold ?: 0
+    }
+
+    /** Unit health in COMMITTED state, null when absent/destroyed. */
+    fun getUnitHealth(civId: String, unitId: Int): Int? {
+        val unit = committedGame.getCivilizationOrNull(civId)
+            ?.units?.getCivUnits()?.firstOrNull { it.id == unitId }
+            ?: return null
+        return if (unit.isDestroyed) null else unit.health
+    }
+
+    /** City health in COMMITTED state, null when the city is gone. */
+    fun getCityHealth(cityId: String): Int? =
+        committedGame.getCities().firstOrNull { it.id == cityId }?.health
+
     /** Civ ID whose turn is currently awaiting decisions (empty unless AWAITING). */
     fun getCurrentCivId(): String = committedGame.currentPlayer
 
@@ -118,6 +190,16 @@ class MatchCoordinator(
             is UpdateNotesCommand -> executeNotes(command)
             is MoveUnitCommand -> executeMove(command)
             is EndTurnCommand -> executeEndTurn(command)
+            is SelectResearchCommand -> executeResearch(command)
+            is CityProductionCommand -> executeProduction(command)
+            is FoundCityCommand -> executeFound(command)
+            is UnitOrderCommand -> executeOrder(command)
+            is AttackCommand -> executeAttack(command)
+            is ResolveConquestCommand -> executeResolveConquest(command)
+            is DeclareWarCommand -> executeDeclareWar(command)
+            is MakePeaceCommand -> executeMakePeace(command)
+            is ProposeTradeCommand -> executeProposeTrade(command)
+            is RespondTradeCommand -> executeRespondTrade(command)
         }
     }
 
@@ -144,74 +226,597 @@ class MatchCoordinator(
         return NotesUpdatedResult(command.actorCivId, current + 1)
     }
 
-    private fun executeMove(command: MoveUnitCommand): UnitMovedResult {
-        val fingerprint = moveFingerprint(command)
-        actionReceipts[command.actionId]?.let { prior ->
-            if (prior.requestFingerprint == fingerprint) {
-                val (x, y) = prior.resultJson.split(",")
-                return UnitMovedResult(
-                    command.actorCivId, prior, command.unitId, HexCoord(x.toInt(), y.toInt())
-                )
-            }
+    /**
+     * Shared gameplay-mutation path: duplicate/revision gates, unpublished
+     * candidate, [apply] on the candidate returning the sanitized result
+     * payload, atomic commit, hot-index registration. Replays return the
+     * ORIGINAL receipt (with its recorded result) without touching state.
+     */
+    private fun runGameplayMutation(
+        actorCivId: String,
+        actionId: String,
+        expectedRevision: Int,
+        fingerprint: String,
+        apply: (candidateGame: GameInfo, candidateMatch: AgentMatchState) -> String
+    ): ActionReceipt {
+        actionReceipts[actionId]?.let { prior ->
+            if (prior.requestFingerprint == fingerprint) return prior
             throw AgentCommandException(
                 AgentCommandError.ACTION_ID_CONFLICT,
-                "actionId ${command.actionId} reused with a different request"
+                "actionId $actionId reused with a different request"
             )
         }
-        if (command.expectedRevision != committedMatch.stateRevision)
+        if (expectedRevision != committedMatch.stateRevision)
             throw AgentCommandException(
                 AgentCommandError.STALE_STATE,
-                "Expected revision ${command.expectedRevision} but committed is ${committedMatch.stateRevision}",
+                "Expected revision $expectedRevision but committed is ${committedMatch.stateRevision}",
                 currentRevision = committedMatch.stateRevision
             )
-
-        mutationInFlight = command.actionId
+        mutationInFlight = actionId
         try {
             val candidateGame = deserializeGame(json.toJson(committedGame))
             val candidateMatch = committedMatch.deepCopy()
-
-            val civ = candidateGame.getCivilizationOrNull(command.actorCivId)
-                ?: throw AgentCommandException(
-                    AgentCommandError.INVALID_ARGUMENT, "Unknown civilization ${command.actorCivId}"
-                )
-            // Hidden and nonexistent units share one externally safe response.
-            val unit = civ.units.getCivUnits().firstOrNull { it.id == command.unitId }
-            if (unit == null || unit.owner != command.actorCivId || unit.isDestroyed)
-                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "No such visible unit")
-            val tile = try {
-                candidateGame.tileMap[command.destination]
-            } catch (ex: Exception) {
-                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Destination is not a tile of this map")
-            }
-            if (!unit.movement.canMoveTo(tile))
-                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Unit cannot move there")
-
-            @Suppress("UNUSED_VARIABLE") // policy hook: automation flags are read by rule code from here in W4
-            val executionPolicy = policy
-            unit.movement.moveToTile(tile)
-            val finalPosition = unit.getTile().position
-
+            val resultJson = apply(candidateGame, candidateMatch)
             val before = committedMatch.stateRevision
             candidateMatch.stateRevision = before + 1
             val receipt = ActionReceipt(
-                actionId = command.actionId,
-                actorCivId = command.actorCivId,
+                actionId = actionId,
+                actorCivId = actorCivId,
                 timelineId = committedMatch.timelineId,
                 requestFingerprint = fingerprint,
                 beforeRevision = before,
                 afterRevision = before + 1,
                 outcome = "applied",
                 committedEventIds = ArrayList(),
-                resultJson = "${finalPosition.x},${finalPosition.y}"
+                resultJson = resultJson
             )
             candidateMatch.currentTurnReceipts.add(receipt)
-
             commit(candidateGame = candidateGame, candidateMatch = candidateMatch)
-            actionReceipts[command.actionId] = receipt
-            return UnitMovedResult(command.actorCivId, receipt, command.unitId, finalPosition)
+            actionReceipts[actionId] = receipt
+            return receipt
         } finally {
             mutationInFlight = null
         }
+    }
+
+    /** Hidden and nonexistent units share one externally safe response. */
+    private fun requireOwnUnit(candidateGame: GameInfo, actorCivId: String, unitId: Int): MapUnit {
+        val civ = candidateGame.getCivilizationOrNull(actorCivId)
+            ?: throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Unknown civilization $actorCivId")
+        val unit = civ.units.getCivUnits().firstOrNull { it.id == unitId }
+        if (unit == null || unit.owner != actorCivId || unit.isDestroyed)
+            throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "No such visible unit")
+        return unit
+    }
+
+    /** Opponent cities must not be enumerable through IDs: one safe response. */
+    private fun requireOwnCity(candidateGame: GameInfo, actorCivId: String, cityId: String): City {
+        val city = candidateGame.getCities().firstOrNull { it.id == cityId }
+        if (city == null || city.civ.civID != actorCivId)
+            throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "No such city under your control")
+        return city
+    }
+
+    private fun resolveTile(candidateGame: GameInfo, pos: HexCoord): Tile {
+        return try {
+            candidateGame.tileMap[pos]
+        } catch (ex: Exception) {
+            throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Destination is not a tile of this map")
+        }
+    }
+
+    private fun executeMove(command: MoveUnitCommand): UnitMovedResult {
+        val receipt = runGameplayMutation(
+            command.actorCivId, command.actionId, command.expectedRevision,
+            "unit.move|${command.unitId}|${command.destination.x},${command.destination.y}"
+        ) { candidateGame, _ ->
+            val unit = requireOwnUnit(candidateGame, command.actorCivId, command.unitId)
+            val tile = resolveTile(candidateGame, command.destination)
+            val start = unit.getTile().position
+            if (start == command.destination)
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Unit is already there")
+            if (!unit.hasMovement())
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Unit has no movement left")
+
+            @Suppress("UNUSED_VARIABLE") // policy hook: automation flags are read by rule code from here in W4
+            val executionPolicy = policy
+            // Like a human map click, the engine walks as far as legally
+            // possible within this turn; hidden blockage is resolved by the
+            // engine mid-path, never by a global destination oracle.
+            // getTileToMoveToThisTurn is the engine's own resolver (far goals
+            // stage through the closest reachable step; blocked goals stage
+            // through an adjacent tile); multi-turn treks are re-issued per
+            // turn, one mutation at a time.
+            val step = try {
+                unit.movement.getTileToMoveToThisTurn(tile)
+            } catch (ex: Exception) {
+                throw AgentCommandException(
+                    AgentCommandError.ILLEGAL_ACTION,
+                    "Cannot make progress toward destination: ${ex.message}"
+                )
+            }
+            if (step.position == start)
+                throw AgentCommandException(
+                    AgentCommandError.ILLEGAL_ACTION, "Cannot make progress toward destination"
+                )
+            unit.movement.moveToTile(step)
+            val finalPosition = unit.getTile().position
+            if (finalPosition == start)
+                throw AgentCommandException(
+                    AgentCommandError.ILLEGAL_ACTION, "Cannot make progress toward destination"
+                )
+            "${finalPosition.x},${finalPosition.y}"
+        }
+        val (x, y) = receipt.resultJson.split(",")
+        return UnitMovedResult(command.actorCivId, receipt, command.unitId, HexCoord(x.toInt(), y.toInt()))
+    }
+
+    private fun executeResearch(command: SelectResearchCommand): ResearchSelectedResult {
+        val receipt = runGameplayMutation(
+            command.actorCivId, command.actionId, command.expectedRevision,
+            "research.select|${command.techName}|${command.queue}|${command.useFreeTech}"
+        ) { candidateGame, _ ->
+            val civ = candidateGame.getCivilizationOrNull(command.actorCivId)
+                ?: throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Unknown civilization")
+            val tech = candidateGame.ruleset.technologies[command.techName]
+                ?: throw AgentCommandException(
+                    AgentCommandError.INVALID_ARGUMENT, "Unknown technology ${command.techName}"
+                )
+            if (command.useFreeTech) {
+                if (civ.tech.freeTechs <= 0)
+                    throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "No free technologies available")
+                if (!civ.tech.canBeResearched(command.techName))
+                    throw AgentCommandException(
+                        AgentCommandError.ILLEGAL_ACTION, "${command.techName} cannot be researched now"
+                    )
+                civ.tech.getFreeTechnology(command.techName)
+            } else {
+                val path = civ.tech.getRequiredTechsToDestination(tech)
+                if (path.isEmpty())
+                    throw AgentCommandException(
+                        AgentCommandError.ILLEGAL_ACTION, "${command.techName} cannot be researched now"
+                    )
+                if (command.queue) {
+                    for (step in path.map { it.name })
+                        if (step !in civ.tech.techsToResearch) civ.tech.techsToResearch.add(step)
+                } else {
+                    civ.tech.techsToResearch = ArrayList(path.map { it.name })
+                }
+                civ.tech.updateResearchProgress()
+            }
+            civ.tech.currentTechnologyName() ?: ""
+        }
+        val current = receipt.resultJson.ifEmpty { null }
+        return ResearchSelectedResult(command.actorCivId, receipt, current)
+    }
+
+    private fun executeProduction(command: CityProductionCommand): CityProductionResult {
+        val receipt = runGameplayMutation(
+            command.actorCivId, command.actionId, command.expectedRevision,
+            "city.produce|${command.cityId}|${command.op}|${command.name}|${command.index}|${command.tilePos}"
+        ) { candidateGame, _ ->
+            val city = requireOwnCity(candidateGame, command.actorCivId, command.cityId)
+            val constructions = city.cityConstructions
+            when (command.op) {
+                ProductionOp.ADD_TOP, ProductionOp.ADD_BOTTOM -> {
+                    val construction = try {
+                        constructions.getConstruction(command.name)
+                    } catch (ex: Exception) {
+                        throw AgentCommandException(
+                            AgentCommandError.INVALID_ARGUMENT, "Unknown construction ${command.name}"
+                        )
+                    }
+                    val tile = ((construction as? Building)
+                        ?.getImprovementToCreate(city.getRuleset(), city.civ))
+                        ?.let {
+                            val pos = command.tilePos
+                                ?: throw AgentCommandException(
+                                    AgentCommandError.INVALID_ARGUMENT,
+                                    "${command.name} needs a target tile"
+                                )
+                            resolveTile(candidateGame, pos)
+                        }
+                    if (!constructions.canAddToQueue(construction))
+                        throw AgentCommandException(
+                            AgentCommandError.ILLEGAL_ACTION, "${command.name} cannot be queued now"
+                        )
+                    constructions.addToQueue(construction, addToTop = command.op == ProductionOp.ADD_TOP, tile = tile)
+                }
+                ProductionOp.REMOVE -> {
+                    if (command.index !in 0 until constructions.constructionQueue.size)
+                        throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Queue index out of range")
+                    constructions.removeFromQueue(command.index, automatic = false)
+                }
+                ProductionOp.RAISE -> {
+                    if (command.index !in 0 until constructions.constructionQueue.size)
+                        throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Queue index out of range")
+                    constructions.raisePriority(command.index)
+                }
+                ProductionOp.LOWER -> {
+                    if (command.index !in 0 until constructions.constructionQueue.size)
+                        throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Queue index out of range")
+                    constructions.lowerPriority(command.index)
+                }
+                ProductionOp.PURCHASE -> {
+                    val construction = try {
+                        constructions.getConstruction(command.name)
+                    } catch (ex: Exception) {
+                        throw AgentCommandException(
+                            AgentCommandError.INVALID_ARGUMENT, "Unknown construction ${command.name}"
+                        )
+                    } as? INonPerpetualConstruction
+                        ?: throw AgentCommandException(
+                            AgentCommandError.ILLEGAL_ACTION, "${command.name} cannot be purchased"
+                        )
+                    val cost = construction.getStatBuyCost(city, Stat.Gold)
+                        ?: throw AgentCommandException(
+                            AgentCommandError.ILLEGAL_ACTION, "${command.name} cannot be purchased"
+                        )
+                    if (!constructions.isConstructionPurchaseAllowed(construction, Stat.Gold, cost))
+                        throw AgentCommandException(
+                            AgentCommandError.ILLEGAL_ACTION, "${command.name} cannot be purchased now"
+                        )
+                    val tile = (construction as? Building)
+                        ?.getImprovementToCreate(city.getRuleset(), city.civ)
+                        ?.let { command.tilePos?.let { resolveTile(candidateGame, it) } }
+                    if (!constructions.purchaseConstruction(
+                            construction, command.index, automatic = true, stat = Stat.Gold, tile = tile
+                        )
+                    )
+                        throw AgentCommandException(
+                            AgentCommandError.ILLEGAL_ACTION, "${command.name} purchase failed"
+                        )
+                }
+            }
+            constructions.constructionQueue.joinToString("")
+        }
+        return CityProductionResult(command.actorCivId, receipt, receipt.resultJson.split(""))
+    }
+
+    private fun executeFound(command: FoundCityCommand): CityFoundedResult {
+        val receipt = runGameplayMutation(
+            command.actorCivId, command.actionId, command.expectedRevision,
+            "unit.found|${command.unitId}"
+        ) { candidateGame, _ ->
+            val unit = requireOwnUnit(candidateGame, command.actorCivId, command.unitId)
+            val civ = candidateGame.getCivilization(command.actorCivId)
+            val tile = unit.getTile()
+            val unique = unit.getMatchingUniques(UniqueType.FoundCity).firstOrNull()
+                ?: unit.getMatchingUniques(UniqueType.FoundPuppetCity).firstOrNull()
+                ?: throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Unit cannot found cities")
+            if (unique.modifiers.any {
+                    it.type?.targetTypes?.contains(UniqueTarget.UnitActionModifier) == true
+                        && it.type != UniqueType.UnitActionConsumeUnit
+                })
+                throw AgentCommandException(
+                    AgentCommandError.ILLEGAL_ACTION, "Complex founding rites are unsupported in v1"
+                )
+            if (tile.isWater || tile.isImpassible())
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Cannot found a city here")
+            if (civ.isOneCityChallenger() && civ.hasEverOwnedOriginalCapital)
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Cannot found another city")
+            if (!unit.hasMovement())
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Unit has no movement left")
+            if (!tile.canBeSettled(civ))
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Too close to another city")
+            // Engine path mirrors UnitActionsFromUniques without its tutorial/
+            // render side effects (those belong to snapshot publication).
+            // "By consuming this unit" is the standard modifier and maps to
+            // consume(); anything else was rejected above.
+            val city = civ.addCity(tile.position, unit)
+            if (unique.type == UniqueType.FoundPuppetCity) city.isPuppet = true
+            unit.consume()
+            city.id
+        }
+        return CityFoundedResult(command.actorCivId, receipt, receipt.resultJson)
+    }
+
+    private fun executeOrder(command: UnitOrderCommand): UnitOrderResult {
+        val receipt = runGameplayMutation(
+            command.actorCivId, command.actionId, command.expectedRevision,
+            "unit.order|${command.unitId}|${command.order}"
+        ) { candidateGame, _ ->
+            val unit = requireOwnUnit(candidateGame, command.actorCivId, command.unitId)
+            var disbanded = false
+            when (command.order) {
+                UnitOrder.FORTIFY -> {
+                    if (!unit.canFortify() || !unit.hasMovement())
+                        throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Unit cannot fortify now")
+                    unit.fortify()
+                }
+                UnitOrder.FORTIFY_UNTIL_HEALED -> {
+                    if (unit.isFortifyingUntilHealed() || !unit.canHealInCurrentTile())
+                        throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Unit cannot fortify-heal now")
+                    unit.fortifyUntilHealed()
+                }
+                UnitOrder.SLEEP -> {
+                    if (unit.isFortified() || unit.canFortify() || unit.isGuarding() || !unit.hasMovement())
+                        throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Unit cannot sleep now")
+                    unit.action = UnitActionType.Sleep.value
+                }
+                UnitOrder.SLEEP_UNTIL_HEALED -> {
+                    if (unit.isSleepingUntilHealed() || !unit.canHealInCurrentTile())
+                        throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Unit cannot sleep-heal now")
+                    unit.action = UnitActionType.SleepUntilHealed.value
+                }
+                UnitOrder.WAKE -> {
+                    unit.action = null
+                }
+                UnitOrder.DISBAND -> {
+                    unit.disband()
+                    disbanded = true
+                }
+            }
+            "${unit.action ?: ""}|$disbanded"
+        }
+        val (action, disbanded) = receipt.resultJson.split("|")
+        return UnitOrderResult(
+            command.actorCivId, receipt,
+            action = action.ifEmpty { null }, disbanded = disbanded.toBoolean()
+        )
+    }
+
+    private fun executeAttack(command: AttackCommand): AttackResult {
+        if ((command.attackerUnitId == null) == (command.attackerCityId == null))
+            throw AgentCommandException(
+                AgentCommandError.INVALID_ARGUMENT, "Exactly one attacker (unit or city) is required"
+            )
+        val receipt = runGameplayMutation(
+            command.actorCivId, command.actionId, command.expectedRevision,
+            "unit.attack|${command.attackerUnitId}|${command.attackerCityId}|${command.target.x},${command.target.y}"
+        ) { candidateGame, candidateMatch ->
+            val civ = candidateGame.getCivilizationOrNull(command.actorCivId)
+                ?: throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Unknown civilization")
+            val targetTile = resolveTile(candidateGame, command.target)
+            // Safe response whether the target hides units or nothing at all.
+            val defenderBefore = Battle.getMapCombatantOfTile(targetTile)
+                ?: throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "No attackable target there")
+
+            val knownAlerts = civ.popupAlerts
+                .filter { it.type == AlertType.CityConquered }.map { it.value }.toSet()
+
+            val attackerAlive: Boolean
+            val damage: Battle.DamageDealt
+            if (command.attackerUnitId != null) {
+                val unit = requireOwnUnit(candidateGame, command.actorCivId, command.attackerUnitId)
+                if (!unit.canAttack())
+                    throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Unit cannot attack now")
+                val candidate = TargetHelper.getAttackableEnemies(unit, unit.movement.getDistanceToTiles())
+                    .firstOrNull { it.tileToAttack.position == targetTile.position }
+                    ?: throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "No legal attack on that tile")
+                val attacker = MapUnitCombatant(unit)
+                if (!Battle.movePreparingAttack(attacker, candidate, tryHealPillage = false))
+                    throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Cannot reach attack position")
+                damage = Battle.attackOrNuke(attacker, candidate)
+                attackerAlive = !unit.isDestroyed
+            } else {
+                val city = requireOwnCity(candidateGame, command.actorCivId, command.attackerCityId!!)
+                if (!city.canBombard())
+                    throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "City cannot bombard now")
+                if (TargetHelper.getBombardableTiles(city).none { it.position == targetTile.position })
+                    throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "No legal bombardment of that tile")
+                damage = Battle.attackOrNuke(
+                    CityCombatant(city),
+                    AttackableTile(city.getCenterTile(), targetTile, 0f, defenderBefore)
+                )
+                attackerAlive = candidateGame.getCities().any { it.id == city.id }
+            }
+
+            val defenderAlive = when (defenderBefore) {
+                is MapUnitCombatant -> !defenderBefore.unit.isDestroyed
+                is CityCombatant -> candidateGame.getCities().any { it.id == defenderBefore.city.id }
+                else -> true
+            }
+
+            // Conquest raises a MANDATORY decision; nothing is auto-selected.
+            for (alert in civ.popupAlerts.filter {
+                it.type == AlertType.CityConquered && it.value !in knownAlerts
+            }) {
+                val cityId = alert.value
+                val conquered = candidateGame.getCities().firstOrNull { it.id == cityId }
+                    ?: continue
+                raiseConquestDecision(candidateMatch, civ, conquered)
+            }
+            "${damage.attackerDealt},${damage.defenderDealt}|$attackerAlive|$defenderAlive"
+        }
+        val parts = receipt.resultJson.split("|")
+        val (attDealt, defDealt) = parts[0].split(",")
+        return AttackResult(
+            command.actorCivId, receipt,
+            parts[1].toBoolean(), parts[2].toBoolean(), attDealt.toInt(), defDealt.toInt()
+        )
+    }
+
+    /** Computes the UI-equivalent legal dispositions (AlertPopup.addCityConquered). */
+    private fun legalDispositions(
+        conqueringCiv: Civilization,
+        city: City
+    ): List<ConquestDisposition> {
+        if (conqueringCiv.isOneCityChallenger()) return listOf(ConquestDisposition.DESTROY)
+        val options = ArrayList<ConquestDisposition>()
+        options.add(ConquestDisposition.PUPPET)
+        if (!conqueringCiv.hasUnique(UniqueType.MayNotAnnexCities)) options.add(ConquestDisposition.ANNEX)
+        if (city.canBeDestroyed(justCaptured = true)) options.add(ConquestDisposition.RAZE)
+        if (city.foundingCivObject != null
+            && city.civ != city.foundingCivObject
+            && conqueringCiv != city.foundingCivObject
+        ) options.add(ConquestDisposition.LIBERATE)
+        return options
+    }
+
+    private fun raiseConquestDecision(
+        candidateMatch: AgentMatchState,
+        conqueringCiv: Civilization,
+        city: City
+    ) {
+        val decisionId = "conquest:${city.id}"
+        if (candidateMatch.pendingDecisions.any { it.decisionId == decisionId }) return
+        val options = legalDispositions(conqueringCiv, city).map {
+            hashMapOf("optionId" to it.name, "label" to it.name.lowercase().replaceFirstChar { c -> c.uppercase() })
+        }
+        candidateMatch.pendingDecisions.add(
+            PendingDecision(
+                decisionId, "conquest-disposition", conqueringCiv.civID,
+                "city:${city.id}", DecisionClassification.MANDATORY, ArrayList(options)
+            )
+        )
+    }
+
+    private fun executeResolveConquest(command: ResolveConquestCommand): ConquestResolvedResult {
+        val receipt = runGameplayMutation(
+            command.actorCivId, command.actionId, command.expectedRevision,
+            "conquest.resolve|${command.decisionId}|${command.disposition}"
+        ) { candidateGame, candidateMatch ->
+            val decision = candidateMatch.pendingDecisions.firstOrNull { it.decisionId == command.decisionId }
+                ?: throw AgentCommandException(
+                    AgentCommandError.INVALID_ARGUMENT, "Unknown decision ${command.decisionId}"
+                )
+            if (decision.owningCivId != command.actorCivId
+                || decision.decisionType != "conquest-disposition"
+                || decision.classification != DecisionClassification.MANDATORY
+            )
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Decision cannot be resolved this way")
+            val cityId = decision.sourceRef.removePrefix("city:")
+            val city = candidateGame.getCities().firstOrNull { it.id == cityId }
+                ?: throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "City no longer available")
+            val conqueringCiv = candidateGame.getCivilizationOrNull(command.actorCivId)
+                ?: throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Unknown civilization")
+            if (city.civ == conqueringCiv)
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "City is already yours")
+            // Revalidate: listing was never a reservation.
+            if (command.disposition !in legalDispositions(conqueringCiv, city))
+                throw AgentCommandException(
+                    AgentCommandError.ILLEGAL_ACTION, "${command.disposition} is not available for this city"
+                )
+            when (command.disposition) {
+                ConquestDisposition.PUPPET -> city.puppetCity(conqueringCiv)
+                ConquestDisposition.ANNEX -> {
+                    city.puppetCity(conqueringCiv)
+                    city.annexCity()
+                }
+                ConquestDisposition.RAZE -> {
+                    city.puppetCity(conqueringCiv)
+                    if (!conqueringCiv.hasUnique(UniqueType.MayNotAnnexCities)) city.annexCity()
+                    city.isBeingRazed = true
+                }
+                ConquestDisposition.LIBERATE -> city.liberateCity(conqueringCiv)
+                ConquestDisposition.DESTROY -> {
+                    city.puppetCity(conqueringCiv)
+                    city.destroyCity()
+                }
+            }
+            candidateMatch.pendingDecisions.remove(decision)
+            "${city.id}|${command.disposition}"
+        }
+        val (cityId, disposition) = receipt.resultJson.split("|")
+        return ConquestResolvedResult(
+            command.actorCivId, receipt, cityId, ConquestDisposition.valueOf(disposition)
+        )
+    }
+
+    private fun executeDeclareWar(command: DeclareWarCommand): DiplomacyResult {
+        val receipt = runGameplayMutation(
+            command.actorCivId, command.actionId, command.expectedRevision,
+            "diplomacy.declareWar|${command.targetCivId}"
+        ) { candidateGame, _ ->
+            val civ = candidateGame.getCivilizationOrNull(command.actorCivId)
+                ?: throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Unknown civilization")
+            candidateGame.getCivilizationOrNull(command.targetCivId)
+                ?: throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Unknown civilization")
+            val diplomacy = civ.getDiplomacyManager(command.targetCivId)
+                ?: throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "No diplomatic contact")
+            if (!diplomacy.canDeclareWar())
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Cannot declare war now")
+            diplomacy.declareWar(DeclareWarReason(WarType.DirectWar))
+            diplomacy.diplomaticStatus.name
+        }
+        return DiplomacyResult(command.actorCivId, receipt, receipt.resultJson)
+    }
+
+    private fun executeMakePeace(command: MakePeaceCommand): DiplomacyResult {
+        val receipt = runGameplayMutation(
+            command.actorCivId, command.actionId, command.expectedRevision,
+            "diplomacy.makePeace|${command.targetCivId}"
+        ) { candidateGame, _ ->
+            val civ = candidateGame.getCivilizationOrNull(command.actorCivId)
+                ?: throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Unknown civilization")
+            candidateGame.getCivilizationOrNull(command.targetCivId)
+                ?: throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Unknown civilization")
+            val diplomacy = civ.getDiplomacyManager(command.targetCivId)
+                ?: throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "No diplomatic contact")
+            if (diplomacy.diplomaticStatus != DiplomaticStatus.War)
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Not at war")
+            // Direct peace without a treaty cooldown (plan §6 diplomacy row):
+            // timed treaties arrive through accepted trade, as in human play.
+            diplomacy.makePeace()
+            diplomacy.diplomaticStatus.name
+        }
+        return DiplomacyResult(command.actorCivId, receipt, receipt.resultJson)
+    }
+
+    private fun buildTrade(
+        candidateGame: GameInfo,
+        actor: Civilization,
+        command: ProposeTradeCommand
+    ): Trade {
+        val trade = Trade()
+        for (offer in command.ourOffers)
+            trade.ourOffers.add(TradeOffer(offer.name, offer.type, offer.amount, candidateGame.speed))
+        for (offer in command.theirOffers)
+            trade.theirOffers.add(TradeOffer(offer.name, offer.type, offer.amount, candidateGame.speed))
+        return trade
+    }
+
+    private fun executeProposeTrade(command: ProposeTradeCommand): TradeProposedResult {
+        val fingerprint = "diplomacy.proposeTrade|${command.targetCivId}|" +
+            command.ourOffers.joinToString(";") { "${it.name}:${it.type}:${it.amount}" } + "|" +
+            command.theirOffers.joinToString(";") { "${it.name}:${it.type}:${it.amount}" }
+        val receipt = runGameplayMutation(
+            command.actorCivId, command.actionId, command.expectedRevision, fingerprint
+        ) { candidateGame, _ ->
+            val civ = candidateGame.getCivilizationOrNull(command.actorCivId)
+                ?: throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Unknown civilization")
+            val target = candidateGame.getCivilizationOrNull(command.targetCivId)
+                ?: throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Unknown civilization")
+            if (civ.getDiplomacyManager(command.targetCivId) == null)
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "No diplomatic contact")
+            val trade = buildTrade(candidateGame, civ, command)
+            if (!TradeEvaluation().isTradeValid(trade, civ, target))
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Offer is not valid")
+            // Stored recipient-perspective, mirroring TradeView proposals.
+            target.tradeRequests.add(TradeRequest(command.actorCivId, trade.reverse()))
+            target.tradeRequests.count { it.requestingCiv == command.actorCivId }.toString()
+        }
+        return TradeProposedResult(command.actorCivId, receipt, receipt.resultJson.toInt())
+    }
+
+    private fun executeRespondTrade(command: RespondTradeCommand): TradeRespondedResult {
+        val receipt = runGameplayMutation(
+            command.actorCivId, command.actionId, command.expectedRevision,
+            "diplomacy.respondTrade|${command.requestingCivId}|${command.accept}"
+        ) { candidateGame, _ ->
+            val civ = candidateGame.getCivilizationOrNull(command.actorCivId)
+                ?: throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Unknown civilization")
+            val requester = candidateGame.getCivilizationOrNull(command.requestingCivId)
+                ?: throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Unknown civilization")
+            val request = civ.tradeRequests.firstOrNull { it.requestingCiv == command.requestingCivId }
+                ?: throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "No such trade request")
+            if (!command.accept) {
+                request.decline(civ)
+                civ.tradeRequests.remove(request)
+                return@runGameplayMutation "declined"
+            }
+            // Revalidate immediately before applying: offers expire as the
+            // game moves (plan §6.1); never apply a stale proposal.
+            if (!TradeEvaluation().isTradeValid(request.trade, civ, requester))
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Offer is no longer valid")
+            val logic = TradeLogic(civ, requester)
+            logic.currentTrade.set(request.trade)
+            logic.acceptTrade()
+            civ.tradeRequests.remove(request)
+            "accepted"
+        }
+        return TradeRespondedResult(command.actorCivId, receipt, receipt.resultJson == "accepted")
     }
 
     //endregion
@@ -491,9 +1096,6 @@ class MatchCoordinator(
     private fun requireController(civId: String): CivilizationController =
         committedMatch.controllers[civId]
             ?: throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Unknown civilization $civId")
-
-    private fun moveFingerprint(command: MoveUnitCommand): String =
-        "unit.move|${command.unitId}|${command.destination.x},${command.destination.y}"
 
     private fun deserializeGame(gameJson: String): GameInfo {
         val game = json.fromJson(GameInfo::class.java, gameJson)
