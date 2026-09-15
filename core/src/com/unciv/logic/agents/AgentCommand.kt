@@ -38,6 +38,21 @@ class MoveUnitCommand(
     val destination: HexCoord
 ) : AgentCommand
 
+/**
+ * End the acting civ's turn (game.end_turn). Never auto-resolves missing
+ * mandatory decisions — those reject with DECISIONS_PENDING. On success the
+ * command atomically applies end-turn effects, rotates through built-in
+ * automation inline, applies the next commandable civ's start-turn effects,
+ * and lands in AWAITING_DECISIONS (or COMPLETED). Crash-safe by construction:
+ * either the whole transition commits or nothing does, and the revision
+ * gate makes retries safe.
+ */
+class EndTurnCommand(
+    override val actorCivId: String,
+    val actionId: String,
+    val expectedRevision: Int
+) : AgentCommand
+
 /** Terminal outcome of [MatchCoordinator.execute]. */
 sealed interface CommandResult {
     val actorCivId: String
@@ -53,4 +68,13 @@ class UnitMovedResult(
     val receipt: ActionReceipt,
     val unitId: Int,
     val finalPosition: HexCoord
+) : CommandResult
+
+class TurnEndedResult(
+    override val actorCivId: String,
+    val receipt: ActionReceipt,
+    /** Civ now awaiting decisions, or null when the match COMPLETED. */
+    val nextCivId: String?,
+    val wrappedToNewRound: Boolean,
+    val gameTurns: Int
 ) : CommandResult
