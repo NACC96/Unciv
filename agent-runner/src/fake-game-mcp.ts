@@ -10,28 +10,25 @@
 export interface GameObserveResult {
   revision: number;
   activeTurn: boolean;
+  turnEnded: boolean;
   requiredDecisions: string[];
   recentEvents: string[];
 }
 
 export interface IGameService {
-  observe(): GameObserveResult;
-  inspect(unitId: number): FakeUnit | FakeError;
+  observe(): Promise<GameObserveResult>;
+  inspect(unitId: number): Promise<FakeUnit | FakeError>;
   act(envelope: {
     protocolVersion: number;
     actionId: string;
     expectedRevision: number;
     type: string;
     args: Record<string, unknown>;
-  }): FakeReceipt | FakeError;
-  actionResult(actionId: string): FakeReceipt | { status: "pending" | "rejected"; actionId: string };
-  updateNotes(notes: string, expectedNotesRevision: number): { notesRevision: number } | FakeError;
-  endTurn(): { turnEnded: boolean } | FakeError;
-  readonly revision: number;
-  readonly notes: string;
-  readonly notesRevision: number;
-  /** True once game.end_turn commits. Engine receipts govern; this is the signal. */
-  readonly turnEnded: boolean;
+  }): Promise<FakeReceipt | FakeError>;
+  actionResult(actionId: string): Promise<FakeReceipt | { status: "pending" | "rejected"; actionId: string }>;
+  readNotes(): Promise<{ notes: string; notesRevision: number }>;
+  updateNotes(notes: string, expectedNotesRevision: number): Promise<{ notesRevision: number } | FakeError>;
+  endTurn(): Promise<{ turnEnded: boolean } | FakeError>;
 }
 
 export interface FakeUnit {
@@ -81,16 +78,21 @@ export class FakeGameService implements IGameService {
   notesRevision = 0;
   turnEnded = false;
 
-  observe(): { revision: number; activeTurn: boolean; requiredDecisions: string[]; recentEvents: string[] } {
+  async observe(): Promise<GameObserveResult> {
     return {
       revision: this.revision,
       activeTurn: !this.turnEnded,
+      turnEnded: this.turnEnded,
       requiredDecisions: [...this.decisionsPending],
       recentEvents: [`rev-${this.revision}-committed`],
     };
   }
 
-  inspect(unitId: number): FakeUnit | FakeError {
+  async readNotes(): Promise<{ notes: string; notesRevision: number }> {
+    return { notes: this.notes, notesRevision: this.notesRevision };
+  }
+
+  async inspect(unitId: number): Promise<FakeUnit | FakeError> {
     const unit = this.units.find((u) => u.id === unitId);
     if (!unit) {
       // Externally safe response: hidden and nonexistent are identical.
@@ -99,13 +101,13 @@ export class FakeGameService implements IGameService {
     return { ...unit, position: { ...unit.position } };
   }
 
-  act(envelope: {
+  async act(envelope: {
     protocolVersion: number;
     actionId: string;
     expectedRevision: number;
     type: string;
     args: Record<string, unknown>;
-  }): FakeReceipt | FakeError {
+  }): Promise<FakeReceipt | FakeError> {
     if (envelope.protocolVersion !== 1)
       return { protocolVersion: 1, status: "rejected", code: "INVALID_ARGUMENT", message: "unsupported protocolVersion" };
     if (this.paused)
@@ -149,14 +151,14 @@ export class FakeGameService implements IGameService {
     }
   }
 
-  actionResult(actionId: string): FakeReceipt | { status: "pending" | "rejected"; actionId: string } {
+  async actionResult(actionId: string): Promise<FakeReceipt | { status: "pending" | "rejected"; actionId: string }> {
     const prior = this.receipts.get(actionId);
     if (prior) return prior.receipt;
     if (this.mutationInFlight === actionId) return { status: "pending", actionId };
     return { status: "rejected", actionId };
   }
 
-  updateNotes(notes: string, expectedNotesRevision: number): { notesRevision: number } | FakeError {
+  async updateNotes(notes: string, expectedNotesRevision: number): Promise<{ notesRevision: number } | FakeError> {
     if (expectedNotesRevision !== this.notesRevision)
       return { protocolVersion: 1, status: "rejected", code: "STALE_STATE", message: "notes changed; re-read" };
     this.notes = notes;
@@ -164,7 +166,7 @@ export class FakeGameService implements IGameService {
     return { notesRevision: this.notesRevision };
   }
 
-  endTurn(): { turnEnded: boolean } | FakeError {
+  async endTurn(): Promise<{ turnEnded: boolean } | FakeError> {
     if (this.paused)
       return { protocolVersion: 1, status: "rejected", code: "MATCH_PAUSED", message: "match is paused" };
     // Never auto-choose missing decisions (plan §5.1 game.end_turn).

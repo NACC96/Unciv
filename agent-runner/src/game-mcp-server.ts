@@ -63,13 +63,13 @@ function registerGameTools(mcp: McpServer, game: IGameService): void {
   mcp.registerTool("game.observe", {
     description: "Permitted overview: revision, active-turn status, required decisions, recent visible events.",
     inputSchema: {},
-  }, async () => ok(game.observe()));
+  }, async () => ok(await game.observe()));
 
   mcp.registerTool("game.inspect", {
     description: "Permitted detail for one visible entity. Hidden and nonexistent IDs get the same safe response.",
     inputSchema: { unitId: z.number().int() },
   }, async ({ unitId }) => {
-    const res = game.inspect(unitId);
+    const res = await game.inspect(unitId);
     return "position" in res ? ok(res) : err(res.code, res.message);
   });
 
@@ -82,7 +82,7 @@ function registerGameTools(mcp: McpServer, game: IGameService): void {
     description: "Typed legal actions for one entity (fake service: movement stub).",
     inputSchema: { unitId: z.number().int() },
   }, async ({ unitId }) => {
-    const seen = game.inspect(unitId);
+    const seen = await game.inspect(unitId);
     if (!("position" in seen)) return err("ILLEGAL_ACTION", "no such visible entity");
     return ok({ unitId, actions: [{ type: "unit.move", costs: { movement: 1 }, targets: "adjacent-explored-tiles" }] });
   });
@@ -96,7 +96,7 @@ function registerGameTools(mcp: McpServer, game: IGameService): void {
       args: z.record(z.unknown()),
     },
   }, async (params) => {
-    const res = game.act({ protocolVersion: 1, ...params, args: params.args as Record<string, unknown> });
+    const res = await game.act({ protocolVersion: 1, ...params, args: params.args as Record<string, unknown> });
     if ("revision" in res) {
       const body = JSON.stringify(res);
       if (body.length > MAX_TOOL_RESPONSE_BYTES)
@@ -112,7 +112,7 @@ function registerGameTools(mcp: McpServer, game: IGameService): void {
   mcp.registerTool("game.action_result", {
     description: "Look up a prior receipt by actionId. Never resubmit an uncertain mutation.",
     inputSchema: { actionId: z.string().min(1).max(128) },
-  }, async ({ actionId }) => ok(game.actionResult(actionId)));
+  }, async ({ actionId }) => ok(await game.actionResult(actionId)));
 
   mcp.registerTool("game.notes", {
     description: "Read/replace the acting leader's private strategy notes with a notes revision.",
@@ -121,8 +121,8 @@ function registerGameTools(mcp: McpServer, game: IGameService): void {
       notes: z.string().max(16 * 1024).optional(),
     },
   }, async ({ expectedNotesRevision, notes }) => {
-    if (notes === undefined) return ok({ notes: game.notes, notesRevision: game.notesRevision });
-    const res = game.updateNotes(notes, expectedNotesRevision);
+    if (notes === undefined) return ok(await game.readNotes());
+    const res = await game.updateNotes(notes, expectedNotesRevision);
     return "notesRevision" in res ? ok(res) : err(res.code, res.message);
   });
 
@@ -130,7 +130,7 @@ function registerGameTools(mcp: McpServer, game: IGameService): void {
     description: "Verify completion requirements and commit end-turn. Never auto-chooses missing decisions.",
     inputSchema: {},
   }, async () => {
-    const res = game.endTurn();
+    const res = await game.endTurn();
     return "turnEnded" in res ? ok(res) : err(res.code, res.message);
   });
 }

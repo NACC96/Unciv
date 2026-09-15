@@ -34,7 +34,10 @@ function parseScripted(stream: string): NormalizedRun {
 }
 
 /** Spawns the scripted provider with the per-invocation bearer. */
-function scriptedBuild(prompt: string, resumeId: string | undefined, serverUrl: string, bearer: string): SpawnSpec {
+function scriptedBuild(prompt: string, resumeId: string | undefined, serverUrl: string, bearer: string): {
+  spec: SpawnSpec;
+  env: NodeJS.ProcessEnv;
+} {
   void prompt;
   const argv = [
     join(repoRoot, "probes", "scripted-provider.mjs"),
@@ -42,7 +45,7 @@ function scriptedBuild(prompt: string, resumeId: string | undefined, serverUrl: 
     "--bearer", bearer,
   ];
   if (resumeId) argv.push("--resume", resumeId);
-  return { executable: process.execPath, argv, cwd: repoRoot };
+  return { spec: { executable: process.execPath, argv, cwd: repoRoot }, env: {} };
 }
 
 const binding = (runId: string) => ({
@@ -95,9 +98,12 @@ describe("supervisor turn loop with a scripted provider", () => {
   it("tool-call guard pauses runaway providers", async () => {
     const engine = new FakeGameService();
     const supervisor = new Supervisor(scriptedBuild, parseScripted, undefined, 5, 60000);
-    const loopBuild = (prompt: string, resumeId: string | undefined, serverUrl: string, bearer: string): SpawnSpec => {
-      const spec = scriptedBuild(prompt, resumeId, serverUrl, bearer);
-      return { ...spec, argv: [...spec.argv, "--plan", "loop"] };
+    const loopBuild = (prompt: string, resumeId: string | undefined, serverUrl: string, bearer: string): {
+      spec: SpawnSpec;
+      env: NodeJS.ProcessEnv;
+    } => {
+      const built = scriptedBuild(prompt, resumeId, serverUrl, bearer);
+      return { spec: { ...built.spec, argv: [...built.spec.argv, "--plan", "loop"] }, env: {} };
     };
     const loopSupervisor = new Supervisor(loopBuild, parseScripted, undefined, 5, 60000);
     const outcome = await loopSupervisor.runLeaderTurn({

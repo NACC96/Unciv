@@ -99,7 +99,7 @@ export class Supervisor {
       resumeId: string | undefined,
       serverUrl: string,
       bearer: string,
-    ) => SpawnSpec,
+    ) => { spec: SpawnSpec; env: NodeJS.ProcessEnv },
     private readonly parseStream: (jsonl: string) => NormalizedRun,
     private readonly runner: ProviderRunner = new NodeRunner(),
     private readonly maxToolCallsPerTurn = 500,
@@ -116,7 +116,9 @@ export class Supervisor {
     cwd: string;
     extraEnv?: NodeJS.ProcessEnv;
   }): Promise<TurnOutcome> {
-    const revisionBefore = args.engine.revision;
+    const preFlight = await args.engine.observe();
+    const revisionBefore = preFlight.revision;
+    const storedNotes = await args.engine.readNotes();
     const prompt = buildTurnPrompt({
       displayName: args.profile.displayName,
       personality: args.profile.personality,
@@ -125,17 +127,17 @@ export class Supervisor {
       civId: args.context.civId,
       turnSerial: args.context.turnSerial,
       stateRevision: revisionBefore,
-      notes: args.engine.notes,
-      recentEvents: args.engine.observe().recentEvents,
-      pendingDecisions: args.engine.observe().requiredDecisions.map((d) => ({ id: d, type: "decision", summary: d })),
+      notes: storedNotes.notes,
+      recentEvents: preFlight.recentEvents,
+      pendingDecisions: preFlight.requiredDecisions.map((d) => ({ id: d, type: "decision", summary: d })),
       guidance: args.guidance,
       continuityNote: args.resumeId ? `Resumed provider session ${args.resumeId}.` : args.context.continuityNote,
     });
 
     const server = await startGameMcpServer(args.engine, args.binding);
     try {
-      const spec = this.buildSpawn(prompt, args.resumeId, server.url, server.bearer);
-      const child = this.runner.spawn(spec, { ...process.env, ...args.extraEnv });
+      const built = this.buildSpawn(prompt, args.resumeId, server.url, server.bearer);
+      const child = this.runner.spawn(built.spec, { ...process.env, ...built.env, ...args.extraEnv });
       const lines: string[] = [];
       let toolCallCount = 0;
       let guardHit: string | null = null;
@@ -161,14 +163,16 @@ export class Supervisor {
       clearTimeout(timeout);
 
       const run = this.parseStream(lines.join("\n"));
-      const revision = args.engine.revision;
+      const postFlight = await args.engine.observe().catch(() => null);
+      const revision = postFlight?.revision ?? revisionBefore;
+      const turnEnded = postFlight?.turnEnded ?? false;
       if (guardHit) {
         return { status: "guard_paused", revision, turnEnded: false, run, detail: guardHit };
       }
       // Engine state governs: end_turn committed means a completed turn even
       // if the provider's own stream is ambiguous; without it the turn is
       // incomplete (moves retained) or failed.
-      if (args.engine.turnEnded) {
+      if (turnEnded) {
         return { status: "completed_turn", revision, turnEnded: true, run, detail: "engine committed end_turn" };
       }
       if (exit.code === 0 && !run.errorText) {
