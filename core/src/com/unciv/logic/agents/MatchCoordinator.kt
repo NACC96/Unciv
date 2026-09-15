@@ -8,6 +8,7 @@ import com.unciv.logic.battle.CityCombatant
 import com.unciv.logic.battle.MapUnitCombatant
 import com.unciv.logic.battle.TargetHelper
 import com.unciv.logic.city.City
+import com.unciv.logic.city.CityFocus
 import com.unciv.logic.civilization.Civilization
 import com.unciv.logic.civilization.PopupAlert
 import com.unciv.logic.civilization.diplomacy.DeclareWarReason
@@ -141,6 +142,28 @@ class MatchCoordinator(
         return committedGame.getCivilizationOrNull(civId)?.gold ?: 0
     }
 
+    /** Adopted policy names in COMMITTED state. */
+    fun getAdoptedPolicies(civId: String): List<String> {
+        requireController(civId)
+        return committedGame.getCivilizationOrNull(civId)
+            ?.policies?.getAdoptedPolicies()?.toList() ?: emptyList()
+    }
+
+    /** Owner civ ID of a map tile in COMMITTED state, null when unowned/absent. */
+    fun getTileOwnerCiv(x: Int, y: Int): String? {
+        return try {
+            committedGame.tileMap[x, y].getOwner()?.civID
+        } catch (ex: Exception) {
+            null
+        }
+    }
+
+    /** Worked tile positions of a city in COMMITTED state. */
+    fun getWorkedTiles(cityId: String): List<HexCoord> {
+        return committedGame.getCities().firstOrNull { it.id == cityId }
+            ?.getWorkedTiles()?.map { it.position }?.toList() ?: emptyList()
+    }
+
     /** Unit health in COMMITTED state, null when absent/destroyed. */
     fun getUnitHealth(civId: String, unitId: Int): Int? {
         val unit = committedGame.getCivilizationOrNull(civId)
@@ -200,6 +223,14 @@ class MatchCoordinator(
             is MakePeaceCommand -> executeMakePeace(command)
             is ProposeTradeCommand -> executeProposeTrade(command)
             is RespondTradeCommand -> executeRespondTrade(command)
+            is AdoptPolicyCommand -> executeAdoptPolicy(command)
+            is CityCitizensCommand -> executeCitizens(command)
+            is BuyTileCommand -> executeBuyTile(command)
+            is BuildImprovementCommand -> executeBuildImprovement(command)
+            is PromoteUnitCommand -> executePromote(command)
+            is UpgradeUnitCommand -> executeUpgrade(command)
+            is GreatPersonCommand -> executeGreatPerson(command)
+            is GiftGoldToCityStateCommand -> executeGiftGold(command)
         }
     }
 
@@ -790,8 +821,7 @@ class MatchCoordinator(
         return TradeProposedResult(command.actorCivId, receipt, receipt.resultJson.toInt())
     }
 
-    private fun executeRespondTrade(command: RespondTradeCommand): TradeRespondedResult {
-        val receipt = runGameplayMutation(
+    private fun executeRespondTrade(command: RespondTradeCommand): TradeRespondedResult {        val receipt = runGameplayMutation(
             command.actorCivId, command.actionId, command.expectedRevision,
             "diplomacy.respondTrade|${command.requestingCivId}|${command.accept}"
         ) { candidateGame, _ ->
@@ -817,6 +847,321 @@ class MatchCoordinator(
             "accepted"
         }
         return TradeRespondedResult(command.actorCivId, receipt, receipt.resultJson == "accepted")
+    }
+
+    private fun executeAdoptPolicy(command: AdoptPolicyCommand): PolicyAdoptedResult {
+        val receipt = runGameplayMutation(
+            command.actorCivId, command.actionId, command.expectedRevision,
+            "civics.adopt|${command.policyName}"
+        ) { candidateGame, _ ->
+            val civ = candidateGame.getCivilizationOrNull(command.actorCivId)
+                ?: throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Unknown civilization")
+            val policy = candidateGame.ruleset.policies[command.policyName]
+                ?: throw AgentCommandException(
+                    AgentCommandError.INVALID_ARGUMENT, "Unknown policy ${command.policyName}"
+                )
+            if (!civ.policies.isAdoptable(policy) || !civ.policies.canAdoptPolicy())
+                throw AgentCommandException(
+                    AgentCommandError.ILLEGAL_ACTION, "${command.policyName} cannot be adopted now"
+                )
+            val before = civ.policies.getAdoptedPolicies().toSet()
+            civ.policies.adopt(policy)
+            (civ.policies.getAdoptedPolicies().toSet() - before).joinToString("")
+        }
+        val adopted = receipt.resultJson.split("").filter { it.isNotEmpty() }
+        return PolicyAdoptedResult(command.actorCivId, receipt, adopted)
+    }
+
+    private inline fun <T> illegalFromEngine(block: () -> T): T {
+        try {
+            return block()
+        } catch (ex: IllegalArgumentException) {
+            throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, ex.message ?: "Illegal city order")
+        }
+    }
+
+    private fun executeCitizens(command: CityCitizensCommand): CityCitizensResult {
+        val receipt = runGameplayMutation(
+            command.actorCivId, command.actionId, command.expectedRevision,
+            "city.citizens|${command.cityId}|${command.op}|${command.tilePos}|${command.specialist}|${command.focus}|${command.flag}"
+        ) { candidateGame, _ ->
+            val city = requireOwnCity(candidateGame, command.actorCivId, command.cityId)
+            when (command.op) {
+                CitizenOp.WORK_TILE -> {
+                    val tile = command.tilePos?.let { resolveTile(candidateGame, it) }
+                        ?: throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Tile required")
+                    if (city.population.getFreePopulation() <= 0)
+                        throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "No free population")
+                    illegalFromEngine { city.workTile(tile) }
+                    city.cityStats.update()
+                }
+                CitizenOp.STOP_TILE -> {
+                    val tile = command.tilePos?.let { resolveTile(candidateGame, it) }
+                        ?: throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Tile required")
+                    illegalFromEngine { city.stopWorkingTile(tile) }
+                    city.cityStats.update()
+                }
+                CitizenOp.LOCK_TILE -> {
+                    val tile = command.tilePos?.let { resolveTile(candidateGame, it) }
+                        ?: throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Tile required")
+                    illegalFromEngine { city.lockTile(tile) }
+                }
+                CitizenOp.UNLOCK_TILE -> {
+                    val tile = command.tilePos?.let { resolveTile(candidateGame, it) }
+                        ?: throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Tile required")
+                    illegalFromEngine { city.unlockTile(tile) }
+                }
+                CitizenOp.ASSIGN_SPECIALIST -> {
+                    if (command.specialist.isEmpty())
+                        throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Specialist required")
+                    if (city.isPuppet)
+                        throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Puppet cities assign no specialists")
+                    if (city.population.getFreePopulation() <= 0)
+                        throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "No free population")
+                    city.manualSpecialists = true
+                    illegalFromEngine {
+                        city.population.specialistAllocations.add(command.specialist, 1)
+                        if ((city.population.specialistAllocations[command.specialist] ?: 0) >
+                            (city.population.getMaxSpecialists()[command.specialist] ?: 0)
+                        ) {
+                            city.population.specialistAllocations.add(command.specialist, -1)
+                            throw IllegalArgumentException("No ${command.specialist} slots available")
+                        }
+                    }
+                    city.cityStats.update()
+                }
+                CitizenOp.UNASSIGN_SPECIALIST -> {
+                    if (command.specialist.isEmpty())
+                        throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Specialist required")
+                    if ((city.population.specialistAllocations[command.specialist] ?: 0) <= 0)
+                        throw AgentCommandException(
+                            AgentCommandError.ILLEGAL_ACTION, "No ${command.specialist} assigned"
+                        )
+                    city.manualSpecialists = true
+                    city.population.specialistAllocations.add(command.specialist, -1)
+                    city.cityStats.update()
+                }
+                CitizenOp.SET_FOCUS -> {
+                    val focus = try {
+                        CityFocus.valueOf(command.focus)
+                    } catch (ex: Exception) {
+                        throw AgentCommandException(
+                            AgentCommandError.INVALID_ARGUMENT, "Unknown focus ${command.focus}"
+                        )
+                    }
+                    city.setCityFocus(focus)
+                    city.reassignPopulation()
+                }
+                CitizenOp.SET_MANUAL_SPECIALISTS -> {
+                    city.manualSpecialists = command.flag
+                    city.reassignPopulation()
+                }
+                CitizenOp.SET_AVOID_GROWTH -> {
+                    city.avoidGrowth = command.flag
+                    city.reassignPopulation()
+                }
+                CitizenOp.REASSIGN -> city.reassignPopulation()
+            }
+            city.population.getFreePopulation().toString()
+        }
+        return CityCitizensResult(command.actorCivId, receipt, receipt.resultJson.toInt())
+    }
+
+    private fun executeBuyTile(command: BuyTileCommand): TileBoughtResult {
+        val receipt = runGameplayMutation(
+            command.actorCivId, command.actionId, command.expectedRevision,
+            "city.buyTile|${command.cityId}|${command.tilePos.x},${command.tilePos.y}"
+        ) { candidateGame, _ ->
+            val city = requireOwnCity(candidateGame, command.actorCivId, command.cityId)
+            val tile = resolveTile(candidateGame, command.tilePos)
+            if (!city.expansion.canBuyTile(tile))
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Tile cannot be bought")
+            val cost = city.expansion.getGoldCostOfTile(tile)
+            if (city.civ.gold < cost)
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Insufficient gold")
+            illegalFromEngine { city.expansion.buyTile(tile) }
+            "${command.tilePos.x},${command.tilePos.y}"
+        }
+        val (x, y) = receipt.resultJson.split(",")
+        return TileBoughtResult(command.actorCivId, receipt, HexCoord(x.toInt(), y.toInt()))
+    }
+
+    private fun executeBuildImprovement(command: BuildImprovementCommand): ImprovementStartedResult {
+        val receipt = runGameplayMutation(
+            command.actorCivId, command.actionId, command.expectedRevision,
+            "unit.build|${command.unitId}|${command.improvementName}"
+        ) { candidateGame, _ ->
+            val unit = requireOwnUnit(candidateGame, command.actorCivId, command.unitId)
+            val improvement = candidateGame.ruleset.tileImprovements[command.improvementName]
+                ?: throw AgentCommandException(
+                    AgentCommandError.INVALID_ARGUMENT, "Unknown improvement ${command.improvementName}"
+                )
+            if (!unit.canBuildImprovement(improvement))
+                throw AgentCommandException(
+                    AgentCommandError.ILLEGAL_ACTION, "${command.improvementName} cannot be built here now"
+                )
+            val tile = unit.getTile()
+            tile.startWorkingOnImprovement(improvement, unit.civ, unit)
+            improvement.getTurnsToBuild(unit.civ, unit).toString()
+        }
+        return ImprovementStartedResult(command.actorCivId, receipt, receipt.resultJson.toInt())
+    }
+
+    private fun executePromote(command: PromoteUnitCommand): UnitPromotedResult {
+        val receipt = runGameplayMutation(
+            command.actorCivId, command.actionId, command.expectedRevision,
+            "unit.promote|${command.unitId}|${command.promotionName}"
+        ) { candidateGame, _ ->
+            val unit = requireOwnUnit(candidateGame, command.actorCivId, command.unitId)
+            if (!unit.promotions.canBePromoted())
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Unit cannot be promoted now")
+            if (unit.promotions.getAvailablePromotions().none { it.name == command.promotionName })
+                throw AgentCommandException(
+                    AgentCommandError.ILLEGAL_ACTION, "${command.promotionName} is not available"
+                )
+            unit.promotions.addPromotion(command.promotionName)
+            command.promotionName
+        }
+        return UnitPromotedResult(command.actorCivId, receipt, receipt.resultJson)
+    }
+
+    private fun executeUpgrade(command: UpgradeUnitCommand): UnitUpgradedResult {
+        val receipt = runGameplayMutation(
+            command.actorCivId, command.actionId, command.expectedRevision,
+            "unit.upgrade|${command.unitId}"
+        ) { candidateGame, _ ->
+            val unit = requireOwnUnit(candidateGame, command.actorCivId, command.unitId)
+            val civ = candidateGame.getCivilization(command.actorCivId)
+            val upgradesTo = unit.baseUnit.upgradesTo
+            if (upgradesTo.isNullOrEmpty())
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Unit has no upgrade path")
+            val target = civ.getEquivalentUnit(upgradesTo)
+            if (!unit.upgrade.canUpgrade(target))
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Upgrade requirements unmet")
+            val cost = unit.upgrade.getCostOfUpgrade(target)
+            if (civ.gold < cost)
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Insufficient gold")
+            unit.upgrade.performUpgrade(target, isFree = false)
+            target.name
+        }
+        return UnitUpgradedResult(command.actorCivId, receipt, receipt.resultJson)
+    }
+
+    private fun executeGreatPerson(command: GreatPersonCommand): GreatPersonResult {
+        val receipt = runGameplayMutation(
+            command.actorCivId, command.actionId, command.expectedRevision,
+            "unit.great|${command.unitId}|${command.action}"
+        ) { candidateGame, _ ->
+            val unit = requireOwnUnit(candidateGame, command.actorCivId, command.unitId)
+            if (!unit.hasMovement())
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Unit has no movement left")
+            val civ = candidateGame.getCivilization(command.actorCivId)
+            val tile = unit.getTile()
+            when (command.action) {
+                GreatPersonAction.HURRY_RESEARCH -> {
+                    if (!unit.getMatchingUniques(UniqueType.CanHurryResearch).any())
+                        throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Unit cannot hurry research")
+                    val current = civ.tech.currentTechnology()
+                        ?: throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "No research in progress")
+                    if (current.hasUnique(UniqueType.CannotBeHurried))
+                        throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Research cannot be hurried")
+                    civ.tech.addScience(civ.tech.getScienceFromGreatScientist())
+                    unit.consume()
+                    current.name
+                }
+                GreatPersonAction.HURRY_POLICY -> {
+                    if (!unit.getMatchingUniques(UniqueType.CanHurryPolicy).any())
+                        throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Unit cannot hurry policies")
+                    civ.policies.addCulture(civ.policies.getCultureFromGreatWriter())
+                    unit.consume()
+                    "culture"
+                }
+                GreatPersonAction.HURRY_WONDER -> {
+                    if (!unit.getMatchingUniques(UniqueType.CanSpeedupWonderConstruction).any())
+                        throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Unit cannot hurry wonders")
+                    if (!tile.isCityCenter() || !tile.getCity()!!.cityConstructions.isBuildingWonder()
+                        || !tile.getCity()!!.cityConstructions.canBeHurried()
+                    )
+                        throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "No hurriable wonder here")
+                    tile.getCity()!!.cityConstructions.apply {
+                        addProductionPoints(
+                            ((300 + 30 * tile.getCity()!!.population.population) *
+                                unit.civ.gameInfo.speed.productionCostModifier).toInt()
+                        )
+                        constructIfEnough()
+                    }
+                    unit.consume()
+                    "wonder"
+                }
+                GreatPersonAction.HURRY_BUILDING -> {
+                    if (!unit.getMatchingUniques(UniqueType.CanSpeedupConstruction).any())
+                        throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Unit cannot hurry construction")
+                    if (!tile.isCityCenter()) throw AgentCommandException(
+                        AgentCommandError.ILLEGAL_ACTION, "Unit must be in a city"
+                    )
+                    val constructions = tile.getCity()!!.cityConstructions
+                    val current = constructions.getCurrentConstruction()
+                    if (current !is Building || !constructions.canBeHurried())
+                        throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "No hurriable building here")
+                    val points = minOf(
+                        (300 + 30 * tile.getCity()!!.population.population) *
+                            unit.civ.gameInfo.speed.productionCostModifier,
+                        constructions.getRemainingWork(constructions.currentConstructionName()).toFloat() - 1
+                    ).toInt()
+                    if (points <= 0) throw AgentCommandException(
+                        AgentCommandError.ILLEGAL_ACTION, "Nothing worth hurrying here"
+                    )
+                    constructions.apply {
+                        addProductionPoints(points)
+                        constructIfEnough()
+                    }
+                    unit.consume()
+                    "building"
+                }
+                GreatPersonAction.TRADE_MISSION -> {
+                    val tradeUnique = unit.getMatchingUniques(
+                        UniqueType.CanTradeWithCityStateForGoldAndInfluence
+                    ).firstOrNull()
+                        ?: throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Unit cannot trade-mission")
+                    val host = tile.owningCity?.civ
+                    if (host == null || !host.isCityState || host == civ || host.isAtWarWith(civ))
+                        throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "No friendly city-state here")
+                    var gold = (350 + 50 * civ.getEraNumber()) * civ.gameInfo.speed.goldCostModifier
+                    for (goldUnique in unit.getMatchingUniques(
+                        UniqueType.PercentGoldFromTradeMissions, checkCivInfoUniques = true
+                    )) gold *= goldUnique.params[0].toFloat() / 100f
+                    civ.addGold(gold.toInt())
+                    host.getDiplomacyManager(civ)
+                        ?: throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "No diplomatic contact")
+                    host.getDiplomacyManager(civ)!!.addInfluence(tradeUnique.params[0].toFloat())
+                    unit.consume()
+                    "trade"
+                }
+            }
+        }
+        return GreatPersonResult(command.actorCivId, receipt, command.action)
+    }
+
+    private fun executeGiftGold(command: GiftGoldToCityStateCommand): GoldGiftedResult {
+        val receipt = runGameplayMutation(
+            command.actorCivId, command.actionId, command.expectedRevision,
+            "citystate.giftGold|${command.cityStateId}|${command.amount}"
+        ) { candidateGame, _ ->
+            val civ = candidateGame.getCivilizationOrNull(command.actorCivId)
+                ?: throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Unknown civilization")
+            val cityState = candidateGame.getCivilizationOrNull(command.cityStateId)
+                ?: throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Unknown civilization")
+            if (!cityState.isCityState)
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Target is not a city-state")
+            if (command.amount <= 0)
+                throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Amount must be positive")
+            if (civ.gold < command.amount)
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Insufficient gold")
+            val influence = cityState.cityStateFunctions.influenceGainedByGift(civ, command.amount)
+            cityState.cityStateFunctions.receiveGoldGift(civ, command.amount)
+            influence.toString()
+        }
+        return GoldGiftedResult(command.actorCivId, receipt, receipt.resultJson.toInt())
     }
 
     //endregion

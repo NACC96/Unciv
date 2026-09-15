@@ -264,3 +264,144 @@ class TradeRespondedResult(
     val receipt: ActionReceipt,
     val accepted: Boolean
 ) : CommandResult
+
+/**
+ * Policy adoption (game.act type `civics.adopt`). Branch openers and members
+ * share the call (branches subclass policies); free picks spend freePolicies
+ * automatically, exactly like PolicyPickerScreen.
+ */
+class AdoptPolicyCommand(
+    override val actorCivId: String,
+    val actionId: String,
+    val expectedRevision: Int,
+    val policyName: String
+) : AgentCommand
+
+class PolicyAdoptedResult(
+    override val actorCivId: String,
+    val receipt: ActionReceipt,
+    /** Names adopted by this command (member + auto-completed finisher). */
+    val adopted: List<String>
+) : CommandResult
+
+enum class CitizenOp {
+    WORK_TILE, STOP_TILE, LOCK_TILE, UNLOCK_TILE,
+    ASSIGN_SPECIALIST, UNASSIGN_SPECIALIST,
+    SET_FOCUS, SET_MANUAL_SPECIALISTS, SET_AVOID_GROWTH, REASSIGN
+}
+
+/**
+ * Citizen management (game.act type `city.citizens`). [tilePos] selects the
+ * tile for tile ops; [specialist] names the specialist type; [focus] names a
+ * CityFocus; [flag] drives the boolean ops. Gates mirror the city-screen
+ * predicates; engine `require` violations map to ILLEGAL_ACTION.
+ */
+class CityCitizensCommand(
+    override val actorCivId: String,
+    val actionId: String,
+    val expectedRevision: Int,
+    val cityId: String,
+    val op: CitizenOp,
+    val tilePos: HexCoord? = null,
+    val specialist: String = "",
+    val focus: String = "",
+    val flag: Boolean = false
+) : AgentCommand
+
+class CityCitizensResult(
+    override val actorCivId: String,
+    val receipt: ActionReceipt,
+    val freePopulation: Int
+) : CommandResult
+
+/** City tile purchase with gold (game.act type `city.buyTile`). */
+class BuyTileCommand(
+    override val actorCivId: String,
+    val actionId: String,
+    val expectedRevision: Int,
+    val cityId: String,
+    val tilePos: HexCoord
+) : AgentCommand
+
+class TileBoughtResult(
+    override val actorCivId: String,
+    val receipt: ActionReceipt,
+    val tilePos: HexCoord
+) : CommandResult
+
+/** Worker improvement construction (game.act type `unit.build`). Multi-turn progress runs through endTurn. */
+class BuildImprovementCommand(
+    override val actorCivId: String,
+    val actionId: String,
+    val expectedRevision: Int,
+    val unitId: Int,
+    val improvementName: String
+) : AgentCommand
+
+class ImprovementStartedResult(
+    override val actorCivId: String,
+    val receipt: ActionReceipt,
+    /** Turns the improvement will take. */
+    val turnsToBuild: Int
+) : CommandResult
+
+/** Promotion adoption for experienced units (game.act type `unit.promote`). */
+class PromoteUnitCommand(
+    override val actorCivId: String,
+    val actionId: String,
+    val expectedRevision: Int,
+    val unitId: Int,
+    val promotionName: String
+) : AgentCommand
+
+class UnitPromotedResult(
+    override val actorCivId: String,
+    val receipt: ActionReceipt,
+    val promotionName: String
+) : CommandResult
+
+/** Unit upgrade to its equivalent (game.act type `unit.upgrade`). */
+class UpgradeUnitCommand(
+    override val actorCivId: String,
+    val actionId: String,
+    val expectedRevision: Int,
+    val unitId: Int
+) : AgentCommand
+
+class UnitUpgradedResult(
+    override val actorCivId: String,
+    val receipt: ActionReceipt,
+    val newUnitName: String
+) : CommandResult
+
+enum class GreatPersonAction { HURRY_RESEARCH, HURRY_POLICY, HURRY_WONDER, HURRY_BUILDING, TRADE_MISSION }
+
+/** Great-person special actions (game.act type `unit.great`). Gates mirror UnitActionsGreatPerson. */
+class GreatPersonCommand(
+    override val actorCivId: String,
+    val actionId: String,
+    val expectedRevision: Int,
+    val unitId: Int,
+    val action: GreatPersonAction
+) : AgentCommand
+
+class GreatPersonResult(
+    override val actorCivId: String,
+    val receipt: ActionReceipt,
+    val action: GreatPersonAction
+) : CommandResult
+
+/** Gold gift to a city-state (game.act type `citystate.giftGold`). */
+class GiftGoldToCityStateCommand(
+    override val actorCivId: String,
+    val actionId: String,
+    val expectedRevision: Int,
+    val cityStateId: String,
+    val amount: Int
+) : AgentCommand
+
+class GoldGiftedResult(
+    override val actorCivId: String,
+    val receipt: ActionReceipt,
+    val influenceGained: Int
+) : CommandResult
