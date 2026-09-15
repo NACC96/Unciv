@@ -142,6 +142,24 @@ class MatchCoordinator(
         return committedGame.getCivilizationOrNull(civId)?.gold ?: 0
     }
 
+    /**
+     * Permitted overview for one civ (game.observe). Pure read of committed
+     * state: allowed in any phase, never mutates, never touches candidates.
+     */
+    fun observe(actorCivId: String): ObservationDto {
+        requireController(actorCivId)
+        return buildObservation(committedGame, committedMatch, actorCivId)
+    }
+
+    /** Gated per-entity actions (game.legal_actions). Pure read, same guarantees. */
+    fun legalActions(actorCivId: String, unitId: Int? = null, cityId: String? = null): LegalActionsDto {
+        requireController(actorCivId)
+        return buildLegalActions(committedGame, actorCivId, unitId, cityId)
+    }
+
+    /** Static rules summary (game.rules). Safe to cache by ruleset identity. */
+    fun rules(): RulesSummaryDto = buildRulesSummary(committedGame)
+
     /** Adopted policy names in COMMITTED state. */
     fun getAdoptedPolicies(civId: String): List<String> {
         requireController(civId)
