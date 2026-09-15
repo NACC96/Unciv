@@ -1506,8 +1506,12 @@ class MatchCoordinator(
         var wrapped = false
         val cap = civs.size * 2 + 8
         repeat(cap) {
+            // A wrap crosses the list end (new index at/below the previous
+            // one). Landing on index 0 from the virtual pre-start position
+            // (fromIndex < 0) is initial placement, not a round rollover.
+            val previous = index
             index = (index + 1) % civs.size
-            if (index == 0) {
+            if (index <= previous && previous >= 0) {
                 wrapped = true
                 // Round rollover, mirroring GameInfo.nextTurn order minus the
                 // ranking-history snapshot (deferred to the victory pass).
