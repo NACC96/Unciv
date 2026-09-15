@@ -14,6 +14,7 @@ import com.unciv.logic.civilization.PopupAlert
 import com.unciv.logic.civilization.diplomacy.DeclareWarReason
 import com.unciv.logic.civilization.diplomacy.DiplomaticStatus
 import com.unciv.logic.civilization.diplomacy.WarType
+import com.unciv.logic.civilization.diplomacy.DiplomaticModifiers
 import com.unciv.logic.civilization.managers.TurnManager
 import com.unciv.logic.civilization.AlertType
 import com.unciv.logic.map.HexCoord
@@ -330,6 +331,13 @@ class MatchCoordinator(
             is AnnexCityCommand -> executeAnnexCity(command)
             is SetRazingCommand -> executeSetRazing(command)
             is StopImprovementCommand -> executeStopImprovement(command)
+            is SwapUnitsCommand -> executeSwapUnits(command)
+            is RenameUnitCommand -> executeRenameUnit(command)
+            is ConnectRoadCommand -> executeConnectRoad(command)
+            is TributeCommand -> executeTribute(command)
+            is ProtectionCommand -> executeProtection(command)
+            is DiplomaticMarriageCommand -> executeDiplomaticMarriage(command)
+            is GiftUnitCommand -> executeGiftUnit(command)
             is SetControllerCommand -> executeSetController(command)
         }
     }
@@ -736,6 +744,53 @@ class MatchCoordinator(
                     if (unit.hasUnitMovedThisTurn())
                         throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Unit has already moved this turn")
                     unit.action = UnitActionType.Paradrop.value
+                }
+                UnitOrder.EXPLORE -> {
+                    if (unit.baseUnit.isAirUnit() || unit.isExploring())
+                        throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Unit cannot explore now")
+                    unit.action = UnitActionType.Explore.value
+                }
+                UnitOrder.STOP_EXPLORATION -> {
+                    if (!unit.isExploring())
+                        throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Unit is not exploring")
+                    unit.action = null
+                }
+                UnitOrder.AUTOMATE -> {
+                    if (unit.isAutomated())
+                        throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Unit is already automated")
+                    unit.action = UnitActionType.Automate.value
+                }
+                UnitOrder.STOP_AUTOMATION -> {
+                    if (!unit.isAutomated())
+                        throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Unit is not automated")
+                    unit.action = null
+                    unit.automated = false
+                }
+                UnitOrder.GUARD -> {
+                    if (unit.isGuarding())
+                        throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Unit is already guarding")
+                    unit.action = UnitActionType.Guard.value
+                }
+                UnitOrder.SET_UP -> {
+                    if (!unit.hasMovement() || unit.isSetUpForSiege())
+                        throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Unit cannot set up now")
+                    unit.action = UnitActionType.SetUp.value
+                }
+                UnitOrder.AIR_SWEEP -> {
+                    if (!unit.canAttack())
+                        throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Unit cannot air-sweep now")
+                    unit.action =
+                        if (unit.isPreparingAirSweep()) null else UnitActionType.AirSweep.value
+                }
+                UnitOrder.ESCORT_FORMATION -> {
+                    if (unit.isEscorting())
+                        throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Unit is already escorting")
+                    unit.startEscorting()
+                }
+                UnitOrder.STOP_ESCORT_FORMATION -> {
+                    if (!unit.isEscorting())
+                        throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Unit is not escorting")
+                    unit.stopEscorting()
                 }
             }
             "${unit.action ?: ""}|$disbanded"
@@ -1609,6 +1664,178 @@ class MatchCoordinator(
             "stopped"
         }
         return ImprovementStoppedResult(command.actorCivId, receipt)
+    }
+
+    private fun executeSwapUnits(command: SwapUnitsCommand): UnitsSwappedResult {
+        val receipt = runGameplayMutation(
+            command.actorCivId, command.actionId, command.expectedRevision,
+            "unit.swap|${command.unitId}|${command.destination.x},${command.destination.y}"
+        ) { candidateGame, _ ->
+            val unit = requireOwnUnit(candidateGame, command.actorCivId, command.unitId)
+            val tile = resolveTile(candidateGame, command.destination)
+            if (!unit.movement.canUnitSwapTo(tile))
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Cannot swap to that tile")
+            val start = unit.getTile().position
+            unit.movement.swapMoveToTile(tile)
+            val finalPosition = unit.getTile().position
+            if (finalPosition == start)
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Swap did not move the unit")
+            "${finalPosition.x},${finalPosition.y}"
+        }
+        val (x, y) = receipt.resultJson.split(",")
+        return UnitsSwappedResult(command.actorCivId, receipt, HexCoord(x.toInt(), y.toInt()))
+    }
+
+    private fun executeRenameUnit(command: RenameUnitCommand): UnitRenamedResult {
+        val receipt = runGameplayMutation(
+            command.actorCivId, command.actionId, command.expectedRevision,
+            "unit.rename|${command.unitId}|${command.newName}"
+        ) { candidateGame, _ ->
+            val unit = requireOwnUnit(candidateGame, command.actorCivId, command.unitId)
+            // UI parity: an empty input clears back to the base name.
+            unit.instanceName = command.newName.trim().ifEmpty { null }
+            unit.instanceName ?: ""
+        }
+        return UnitRenamedResult(command.actorCivId, receipt, receipt.resultJson)
+    }
+
+    private fun executeConnectRoad(command: ConnectRoadCommand): RoadConnectionStartedResult {
+        val receipt = runGameplayMutation(
+            command.actorCivId, command.actionId, command.expectedRevision,
+            "unit.connectRoad|${command.unitId}|${command.destination.x},${command.destination.y}"
+        ) { candidateGame, _ ->
+            val unit = requireOwnUnit(candidateGame, command.actorCivId, command.unitId)
+            val tile = resolveTile(candidateGame, command.destination)
+            // Mirrors OverlayButtonData.connectRoadToTargetTile.
+            if (!tile.isLand || tile.isImpassible())
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Cannot connect a road there")
+            if (unit.movement.getRoadPath(tile) == null)
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "No road path to that tile")
+            unit.automatedRoadConnectionDestination = tile.position
+            unit.automatedRoadConnectionPath = null
+            unit.action = UnitActionType.ConnectRoad.value
+            unit.automated = true
+            com.unciv.logic.automation.unit.UnitAutomation.automateUnitMoves(unit)
+            "connecting"
+        }
+        return RoadConnectionStartedResult(command.actorCivId, receipt)
+    }
+
+    private fun executeTribute(command: TributeCommand): TributeTakenResult {
+        val receipt = runGameplayMutation(
+            command.actorCivId, command.actionId, command.expectedRevision,
+            "citystate.tribute|${command.cityStateId}|${command.demandWorker}"
+        ) { candidateGame, _ ->
+            val civ = candidateGame.getCivilizationOrNull(command.actorCivId)
+                ?: throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Unknown civilization")
+            val cityState = candidateGame.getCivilizationOrNull(command.cityStateId)
+                ?: throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Unknown civilization")
+            if (!cityState.isCityState)
+                throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Not a city-state")
+            if (civ.isAtWarWith(cityState))
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Cannot demand tribute at war")
+            if (cityState.cityStateFunctions.getTributeWillingness(civ, command.demandWorker) < 0)
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "City-state would refuse")
+            if (command.demandWorker) cityState.cityStateFunctions.tributeWorker(civ)
+            else cityState.cityStateFunctions.tributeGold(civ)
+            command.demandWorker.toString()
+        }
+        return TributeTakenResult(command.actorCivId, receipt, receipt.resultJson.toBoolean())
+    }
+
+    private fun executeProtection(command: ProtectionCommand): ProtectionSetResult {
+        val receipt = runGameplayMutation(
+            command.actorCivId, command.actionId, command.expectedRevision,
+            "citystate.protection|${command.cityStateId}|${command.pledge}"
+        ) { candidateGame, _ ->
+            val civ = candidateGame.getCivilizationOrNull(command.actorCivId)
+                ?: throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Unknown civilization")
+            val cityState = candidateGame.getCivilizationOrNull(command.cityStateId)
+                ?: throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Unknown civilization")
+            if (!cityState.isCityState)
+                throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Not a city-state")
+            if (command.pledge) {
+                if (!cityState.cityStateFunctions.otherCivCanPledgeProtection(civ))
+                    throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Cannot pledge protection now")
+                cityState.cityStateFunctions.addProtectorCiv(civ)
+            } else {
+                if (!cityState.cityStateFunctions.otherCivCanWithdrawProtection(civ))
+                    throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Cannot revoke protection now")
+                cityState.cityStateFunctions.removeProtectorCiv(civ)
+            }
+            command.pledge.toString()
+        }
+        return ProtectionSetResult(command.actorCivId, receipt, receipt.resultJson.toBoolean())
+    }
+
+    private fun executeDiplomaticMarriage(command: DiplomaticMarriageCommand): CityStateMarriedResult {
+        val receipt = runGameplayMutation(
+            command.actorCivId, command.actionId, command.expectedRevision,
+            "citystate.marry|${command.cityStateId}"
+        ) { candidateGame, _ ->
+            val civ = candidateGame.getCivilizationOrNull(command.actorCivId)
+                ?: throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Unknown civilization")
+            val cityState = candidateGame.getCivilizationOrNull(command.cityStateId)
+                ?: throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Unknown civilization")
+            if (!civ.hasUnique(UniqueType.CityStateCanBeBoughtForGold))
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Civilization cannot marry city-states")
+            if (!cityState.cityStateFunctions.canBeMarriedBy(civ))
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Cannot marry this city-state")
+            cityState.cityStateFunctions.diplomaticMarriage(civ)
+            "married"
+        }
+        return CityStateMarriedResult(command.actorCivId, receipt)
+    }
+
+    private fun executeGiftUnit(command: GiftUnitCommand): UnitGiftedResult {
+        val receipt = runGameplayMutation(
+            command.actorCivId, command.actionId, command.expectedRevision,
+            "unit.gift|${command.unitId}"
+        ) { candidateGame, _ ->
+            val unit = requireOwnUnit(candidateGame, command.actorCivId, command.unitId)
+            val tile = unit.getTile()
+            val recipient = tile.getOwner()
+                ?: throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Unit must be in another civilization's territory to gift")
+            if (recipient == unit.civ)
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Cannot gift unit to own civilization")
+            if (unit.civ.isAtWarWith(recipient))
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Cannot gift unit to an enemy at war")
+            if (unit.isTransported)
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Transported units cannot be gifted")
+            if (!unit.hasMovement())
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Unit has no movement left")
+
+            if (recipient.isCityState) {
+                if (!unit.isMilitary() && unit.getMatchingUniques(
+                    UniqueType.GainInfluenceWithUnitGiftToCityState, checkCivInfoUniques = true
+                ).none { unit.matchesFilter(it.params[1]) })
+                    throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "City-states only accept military units or gift-enabled units")
+                val diplomacy = recipient.getDiplomacyManager(unit.civ)
+                    ?: throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "No diplomacy with city-state")
+                for (unique in unit.getMatchingUniques(
+                    UniqueType.GainInfluenceWithUnitGiftToCityState,
+                    checkCivInfoUniques = true
+                )) {
+                    if (unit.matchesFilter(unique.params[1])) {
+                        diplomacy.addInfluence(unique.params[0].toFloat() - 5f)
+                        break
+                    }
+                }
+                diplomacy.addInfluence(5f)
+            } else {
+                if (!tile.isFriendlyTerritory(unit.civ))
+                    throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Major civ territory must be friendly to gift unit")
+                recipient.getDiplomacyManager(unit.civ)?.addModifier(DiplomaticModifiers.GaveUsUnits, 5f)
+            }
+
+            if (recipient.isCityState && unit.isGreatPerson()) {
+                unit.destroy()
+            } else {
+                unit.gift(recipient)
+            }
+            recipient.civID
+        }
+        return UnitGiftedResult(command.actorCivId, receipt, receipt.resultJson)
     }
 
     private fun executeCastVote(command: CastVoteCommand): VoteCastResult {

@@ -2,6 +2,7 @@ package com.unciv.ui.screens.worldscreen.worldmap
 
 import com.unciv.logic.agents.AttackCommand
 import com.unciv.logic.agents.MoveUnitCommand
+import com.unciv.logic.agents.SwapUnitsCommand
 import java.util.UUID
 
 import com.badlogic.gdx.Application
@@ -457,6 +458,19 @@ class WorldMapHolder(
 
     internal fun swapMoveUnitToTargetTile(selectedUnitView: MapUnitView, targetTileView: TileView) {
         markUnitMoveTutorialComplete(selectedUnitView)
+        // Agent matches route swaps through the coordinator (§3.2).
+        if (worldScreen.routeThroughAgentSession {
+                listOf({ r: Int ->
+                    SwapUnitsCommand(
+                        worldScreen.viewingCiv.civID, "ui-${UUID.randomUUID()}", r,
+                        selectedUnitView.id, targetTileView.position()
+                    )
+                })
+            }) {
+            worldScreen.shouldUpdate = true
+            removeUnitActionOverlay()
+            return
+        }
         selectedUnitView.trySwapMoveToTile(targetTileView, keepEscorting = true)
 
         if (selectedUnitView.isExploring() || selectedUnitView.isMoving())

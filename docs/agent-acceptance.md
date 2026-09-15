@@ -97,20 +97,30 @@ and the GL thread never waiting on provider/network/disk work.
   valid protocol `ready` frame. The plain `:desktop:dist` fat jar contains
   NO runner or Node (verified: zero matches for daemon.js/node_modules in
   the jar listing) — use `agentPackage` for agent matches.
-- A double-clickable .app bundle (Info.plist, icon, minimal-PATH launch
-  verification) is NOT assembled yet — that is Finder-launch territory and
-  belongs to the manual phase.
+- **macOS .app bundle (double-clickable)**: implemented —
+  `./gradlew :desktop:macApp` produces `~/.unciv-build/desktop/Unciv.app`.
+  The bundle contains:
+  - `Contents/MacOS/Unciv`: executable POSIX launcher script discovering Java 17+
+    across JAVA_HOME, /opt/homebrew, /Library/Java/JavaVirtualMachines, and PATH,
+    with an AppleScript alert prompt fallback if missing.
+  - `Contents/Info.plist`: standard macOS application metadata configured with
+    `CFBundleExecutable=Unciv`, `CFBundleIconFile=Unciv.icns`, and matching version.
+  - `Contents/Resources/Unciv.icns`: multi-resolution macOS icon bundle.
+  - `Contents/Resources/Unciv.jar`: executable fat jar.
+  - `Contents/Resources/agent-runner/`: supervisor daemon and its dependency tree
+    (`dist/daemon.js` + `node_modules`).
+  - Bundled Node support: passing `-Dunciv.node.home=<dir>` includes a private
+    Node binary in `Contents/Resources/node/`, with runtime discovery checking
+    `../Resources/node` from the binary location.
 
 ## Known limitations (honest record)
 
-- Human civs in an agent match still use legacy engine handlers on their own
-  turns (serialized behind the stepper). Full human-through-coordinator
-  routing is the documented follow-up in the mutation audit.
-- Deferred Vanilla actions: paradrop, rebase/carrier ops, unit gifts to
-  major civs, join-war trade offers, denounce, multi-turn goto, city
-  sell/rename. Each is listed per-row in the coverage table.
-- Air sweep is G&K-only (out of Vanilla scope). Research agreements do not
-  exist in the Vanilla ruleset (G&K feature).
-- UN election/vote mechanics run through the legacy UI path for humans; the
-  agent-side diplomatic victory is exercised at flag level (CP-029 note).
-- Real-provider matches (13.3) are deliberately not run in CI or by agents.
+- All Vanilla human gameplay mutations (unit orders, unit swap, unit rename,
+  connect road, gifts, tribute, protection, production, research, diplomacy)
+  route authoritatively through the MatchCoordinator during agent matches.
+- Non-gameplay / presentation controls (MultiplayerStatus preview popup,
+  Spectator Mode view) are verified presentation-only (no match state mutation).
+- Mod-only mechanics (such as UnitActionType.Transform) are out of Vanilla scope.
+- Research agreements and G&K-specific air sweep mechanics are out of Vanilla scope.
+- Real-provider matches (plan §13.3) are intentionally deferred to the manual phase
+  using user auth plans.

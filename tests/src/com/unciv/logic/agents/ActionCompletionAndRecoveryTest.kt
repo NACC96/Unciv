@@ -2,6 +2,7 @@ package com.unciv.logic.agents
 
 import com.unciv.logic.map.HexCoord
 import com.unciv.logic.trade.TradeOfferType
+import com.unciv.logic.civilization.diplomacy.DiplomacyFlags
 import com.unciv.models.metadata.BaseRuleset
 import com.unciv.testing.BaseTestRunner
 import com.unciv.testing.TestGame
@@ -342,6 +343,156 @@ class ActionCompletionAndRecoveryTest {
         Assert.assertTrue(
             "staged unit should persist the goal as a moveTo action",
             moved.isMoving()
+        )
+    }
+
+    @Test
+    fun `swap and rename commands`() {
+        val f = Fixture()
+        val source = f.testGame.gameInfo.getCivilization(f.romeId)
+        // Swap partners must share the unit category (military/military).
+        val other = f.testGame.addUnit("Warrior", source, f.testGame.getTile(-2, 1))
+        f.rebuild()
+
+        val warrior = f.coordinator.observe(f.romeId).ownUnits
+            .first { it.name == "Warrior" }
+        f.coordinator.execute(SwapUnitsCommand(f.romeId, "sw1", f.rev(),
+            warrior.unitId, HexCoord(-2, 1))) as UnitsSwappedResult
+        val payload = AgentSnapshotPublication.buildPayload(f.coordinator, f.romeId)
+        val snapshot = MatchCoordinator.deserializeForPublication(payload.serializedGame)
+        val swapped = snapshot.getCivilization(f.romeId).units.getCivUnits()
+            .first { it.id == warrior.unitId }
+        Assert.assertEquals(HexCoord(-2, 1), swapped.getTile().position)
+        Assert.assertEquals(HexCoord(-2, 0), snapshot.getCivilization(f.romeId)
+            .units.getCivUnits().first { it.id == other.id }.getTile().position)
+
+        // Swap where no eligible partner exists is rejected.
+        try {
+            f.coordinator.execute(SwapUnitsCommand(f.romeId, "sw2", f.rev(),
+                warrior.unitId, HexCoord(0, 2)))
+            Assert.fail("expected ILLEGAL_ACTION")
+        } catch (ex: AgentCommandException) {
+            Assert.assertEquals(AgentCommandError.ILLEGAL_ACTION, ex.code)
+        }
+
+        f.coordinator.execute(RenameUnitCommand(f.romeId, "rn1", f.rev(),
+            warrior.unitId, "First Legion"))
+        val payload2 = AgentSnapshotPublication.buildPayload(f.coordinator, f.romeId)
+        val snapshot2 = MatchCoordinator.deserializeForPublication(payload2.serializedGame)
+        Assert.assertEquals("First Legion", snapshot2.getCivilization(f.romeId)
+            .units.getCivUnits().first { it.id == warrior.unitId }.instanceName)
+    }
+
+    @Test
+    fun `explore and guard orders set the engine actions`() {
+        val f = Fixture()
+        val source = f.testGame.gameInfo.getCivilization(f.romeId)
+        val scout = f.testGame.addUnit("Scout", source, f.testGame.getTile(0, 0))
+        f.rebuild()
+
+        f.coordinator.execute(UnitOrderCommand(f.romeId, "ex1", f.rev(), scout.id, UnitOrder.EXPLORE))
+        var payload = AgentSnapshotPublication.buildPayload(f.coordinator, f.romeId)
+        var snapshot = MatchCoordinator.deserializeForPublication(payload.serializedGame)
+        Assert.assertTrue(snapshot.getCivilization(f.romeId).units.getCivUnits()
+            .first { it.id == scout.id }.isExploring())
+
+        f.coordinator.execute(UnitOrderCommand(f.romeId, "ex2", f.rev(), scout.id, UnitOrder.STOP_EXPLORATION))
+        payload = AgentSnapshotPublication.buildPayload(f.coordinator, f.romeId)
+        snapshot = MatchCoordinator.deserializeForPublication(payload.serializedGame)
+        Assert.assertFalse(snapshot.getCivilization(f.romeId).units.getCivUnits()
+            .first { it.id == scout.id }.isExploring())
+
+        // Guard on a warrior.
+        val warrior = f.coordinator.observe(f.romeId).ownUnits
+            .first { it.name == "Warrior" }
+        f.coordinator.execute(UnitOrderCommand(f.romeId, "gd1", f.rev(), warrior.unitId, UnitOrder.GUARD))
+        payload = AgentSnapshotPublication.buildPayload(f.coordinator, f.romeId)
+        snapshot = MatchCoordinator.deserializeForPublication(payload.serializedGame)
+        Assert.assertTrue(snapshot.getCivilization(f.romeId).units.getCivUnits()
+            .first { it.id == warrior.unitId }.isGuarding())
+    }
+
+    @Test
+    fun `city-state tribute and protection cycle with gates`() {
+        val f = Fixture()
+        val genoa = f.testGame.addCiv(f.testGame.ruleset.nations["Genoa"]!!)
+        f.testGame.addCity(genoa, f.testGame.getTile(2, 2))
+        val monaco = f.testGame.addCiv(f.testGame.ruleset.nations["Monaco"]!!)
+        f.testGame.addCity(monaco, f.testGame.getTile(-4, -4))
+
+        val rome = f.testGame.gameInfo.getCivilization(f.romeId)
+        rome.diplomacyFunctions.makeCivilizationsMeet(genoa)
+        rome.diplomacyFunctions.makeCivilizationsMeet(monaco)
+
+        monaco.cityStateFunctions.addProtectorCiv(rome)
+        monaco.getDiplomacyManager(rome)!!.removeFlag(DiplomacyFlags.RecentlyPledgedProtection)
+
+        for (pos in listOf(HexCoord(5, 1), HexCoord(5, 3), HexCoord(4, 4),
+                HexCoord(3, 5), HexCoord(4, 3)))
+            f.testGame.addUnit("Warrior", rome, f.testGame.getTile(pos))
+        f.rebuild()
+
+        val genoaId = genoa.civID
+        val monacoId = monaco.civID
+
+        try {
+            f.coordinator.execute(ProtectionCommand(f.romeId, "p0", f.rev(), genoaId, pledge = false))
+            Assert.fail("expected ILLEGAL_ACTION")
+        } catch (ex: AgentCommandException) {
+            Assert.assertEquals(AgentCommandError.ILLEGAL_ACTION, ex.code)
+        }
+
+        f.coordinator.execute(ProtectionCommand(f.romeId, "p1", f.rev(), genoaId, pledge = true))
+
+        try {
+            f.coordinator.execute(ProtectionCommand(f.romeId, "p2", f.rev(), genoaId, pledge = true))
+            Assert.fail("expected ILLEGAL_ACTION")
+        } catch (ex: AgentCommandException) {
+            Assert.assertEquals(AgentCommandError.ILLEGAL_ACTION, ex.code)
+        }
+
+        try {
+            f.coordinator.execute(ProtectionCommand(f.romeId, "p3", f.rev(), genoaId, pledge = false))
+            Assert.fail("expected ILLEGAL_ACTION")
+        } catch (ex: AgentCommandException) {
+            Assert.assertEquals(AgentCommandError.ILLEGAL_ACTION, ex.code)
+        }
+
+        f.coordinator.execute(ProtectionCommand(f.romeId, "p4", f.rev(), monacoId, pledge = false))
+
+        try {
+            f.coordinator.execute(ProtectionCommand(f.romeId, "p5", f.rev(), monacoId, pledge = false))
+            Assert.fail("expected ILLEGAL_ACTION")
+        } catch (ex: AgentCommandException) {
+            Assert.assertEquals(AgentCommandError.ILLEGAL_ACTION, ex.code)
+        }
+
+        f.coordinator.execute(TributeCommand(f.romeId, "t1", f.rev(), genoaId, demandWorker = false))
+    }
+
+    @Test
+    fun `gift unit to city-state and major civ`() {
+        val f = Fixture()
+        val cityState = f.testGame.addCiv(f.testGame.ruleset.nations["Genoa"]!!)
+        val csTile = f.testGame.getTile(2, 2)
+        f.testGame.addCity(cityState, csTile)
+        val rome = f.testGame.gameInfo.getCivilization(f.romeId)
+        rome.diplomacyFunctions.makeCivilizationsMeet(cityState)
+        cityState.getDiplomacyManager(rome)!!.setInfluence(10f)
+
+        val warrior = f.testGame.addUnit("Warrior", rome, f.testGame.getTile(2, 3))
+        f.rebuild()
+
+        val result = f.coordinator.execute(GiftUnitCommand(f.romeId, "gu1", f.rev(), warrior.id)) as UnitGiftedResult
+        Assert.assertEquals(cityState.civID, result.recipientCivId)
+        val payload = AgentSnapshotPublication.buildPayload(f.coordinator, f.romeId)
+        val snapshot = MatchCoordinator.deserializeForPublication(payload.serializedGame)
+        val gifted = snapshot.getCivilization(cityState.civID).units.getCivUnits()
+            .firstOrNull { it.id == warrior.id }
+        Assert.assertNotNull("Gifted unit should exist in recipient civ", gifted)
+        Assert.assertNull(
+            "Unit should no longer belong to Rome",
+            snapshot.getCivilization(f.romeId).units.getCivUnits().firstOrNull { it.id == warrior.id }
         )
     }
 }

@@ -1,5 +1,8 @@
 package com.unciv.ui.screens.worldscreen.worldmap
 
+import com.unciv.UncivGame
+import com.unciv.logic.agents.ConnectRoadCommand
+
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.Group
@@ -134,6 +137,19 @@ class ConnectRoadOverlayButtonData(val unitView: MapUnitView, val tile: Tile) : 
     }
 
     private fun connectRoadToTargetTile(worldMapHolder: WorldMapHolder, selectedUnit: MapUnit, targetTile: Tile) {
+        // Agent matches route road connections through the coordinator (§3.2).
+        val worldScreen = UncivGame.Current.worldScreen
+        if (worldScreen != null && worldScreen.routeThroughAgentSession {
+                listOf({ r: Int ->
+                    ConnectRoadCommand(selectedUnit.civ.civID, "ui-${System.nanoTime()}", r,
+                        selectedUnit.id, targetTile.position)
+                })
+            }) {
+            worldScreen.shouldUpdate = true
+            worldMapHolder.removeUnitActionOverlay()
+            worldMapHolder.worldScreen.bottomUnitTable.selectedUnitIsConnectingRoad = false
+            return
+        }
         selectedUnit.automatedRoadConnectionDestination = targetTile.position
         selectedUnit.automatedRoadConnectionPath = null
         selectedUnit.action = UnitActionType.ConnectRoad.value

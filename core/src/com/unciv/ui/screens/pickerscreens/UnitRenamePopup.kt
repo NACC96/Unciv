@@ -1,5 +1,8 @@
 package com.unciv.ui.screens.pickerscreens
 
+import com.unciv.UncivGame
+import com.unciv.logic.agents.RenameUnitCommand
+
 import com.unciv.logic.map.mapunit.MapUnit
 import com.unciv.models.translations.tr
 import com.unciv.ui.components.extensions.surroundWithCircle
@@ -16,6 +19,17 @@ class UnitRenamePopup(val screen: BaseScreen, val unit: MapUnit, val actionOnClo
             defaultText = unit.instanceName ?: unit.baseUnit.name.tr(hideIcons = true),
             validate = { it != unit.name },
             actionOnOk = { userInput ->
+                // Agent matches route renames through the coordinator (§3.2).
+                val worldScreen = UncivGame.Current.worldScreen
+                if (worldScreen != null && worldScreen.routeThroughAgentSession {
+                        listOf({ r: Int ->
+                            RenameUnitCommand(unit.civ.civID, "ui-${System.nanoTime()}", r,
+                                unit.id, userInput)
+                        })
+                    }) {
+                    actionOnClose()
+                    return@AskTextPopup
+                }
                 //If the user inputs an empty string, clear the unit instanceName so the base name is used
                 unit.instanceName = if (userInput == "") null else userInput
                 actionOnClose()

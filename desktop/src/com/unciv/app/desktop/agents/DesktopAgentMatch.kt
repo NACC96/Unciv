@@ -101,6 +101,8 @@ class DesktopAgentMatch(
                     File(appDir, "node/bin/node"), // bundled POSIX layout
                     File(appDir, "node/node.exe"), // bundled Windows layout
                     File(appDir, "node"), // bare binary drop-in
+                    File(appDir, "../Resources/node/bin/node"),
+                    File(appDir, "../Resources/node"),
                 )) {
                     if (candidate.canExecute()) return candidate
                 }

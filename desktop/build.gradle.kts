@@ -97,6 +97,67 @@ tasks.register<Copy>("agentPackage") {
     }
 }
 
+// Assembles a double-clickable macOS Unciv.app bundle containing Unciv.jar,
+// agent runner, launcher script, and Info.plist.
+tasks.register("macApp") {
+    group = "unciv"
+    description = "Assembles a double-clickable macOS Unciv.app bundle containing Unciv.jar, agent runner, launcher script, and Info.plist."
+    dependsOn("dist")
+    val appDir = layout.buildDirectory.dir("Unciv.app")
+    outputs.dir(appDir)
+    doLast {
+        val root = appDir.get().asFile
+        val contents = root.resolve("Contents")
+        val macOs = contents.resolve("MacOS")
+        val resources = contents.resolve("Resources")
+        macOs.mkdirs()
+        resources.mkdirs()
+
+        // 1. Copy Unciv.jar
+        val jarFile = layout.buildDirectory.file("libs/Unciv.jar").get().asFile
+        if (jarFile.isFile) {
+            jarFile.copyTo(resources.resolve("Unciv.jar"), overwrite = true)
+        }
+
+        // 2. Copy agent-runner/dist and node_modules
+        val runnerDist = rootDir.resolve("agent-runner/dist")
+        if (runnerDist.isDirectory) {
+            runnerDist.copyRecursively(resources.resolve("agent-runner/dist"), overwrite = true)
+        }
+        val nodeModules = rootDir.resolve("agent-runner/node_modules")
+        if (nodeModules.isDirectory) {
+            nodeModules.copyRecursively(resources.resolve("agent-runner/node_modules"), overwrite = true)
+        }
+
+        // 3. Copy bundled Node if provided via -Dunciv.node.home
+        val nodeHome = System.getProperty("unciv.node.home")?.let { file(it) }
+        if (nodeHome != null && nodeHome.isDirectory) {
+            nodeHome.copyRecursively(resources.resolve("node"), overwrite = true)
+        }
+
+        // 4. Copy icons
+        for (iconName in listOf("Unciv.icns", "Unciv.ico")) {
+            val icon = rootDir.resolve("extraImages/Icons/$iconName")
+            if (icon.isFile) {
+                icon.copyTo(resources.resolve(iconName), overwrite = true)
+            }
+        }
+
+        // 5. Write Info.plist from template
+        val plistTemplate = file("macos/Info.plist.template").readText()
+        contents.resolve("Info.plist").writeText(
+            plistTemplate.replace("@VERSION@", BuildConfig.appVersion)
+        )
+
+        // 6. Copy launcher script
+        val launcherSrc = file("macos/Unciv")
+        val launcherDest = macOs.resolve("Unciv")
+        launcherSrc.copyTo(launcherDest, overwrite = true)
+        launcherDest.setExecutable(true, false)
+        println("macOS app bundle assembled at: ${root.absolutePath}")
+    }
+}
+
 
 enum class Platform(val desc: String) {
     Windows32("windows32"), Windows64("windows64"), Linux32("linux32"), Linux64("linux64"), MacOS("mac");

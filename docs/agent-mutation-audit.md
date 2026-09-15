@@ -79,23 +79,48 @@ check inherits the gate for free.
 | Minimap, tile info, overlay toggles | `worldmap/*`, `TileInfoTable.kt` | display only; no state writes |
 | Save/load, options, civilopedia | various | out of match scope |
 
-## Remaining honest gap (legacy on human turns — safe, serialized behind the stepper)
+## Human Mutation Routing Closure (CP-033)
 
-All plan-listed families are routed. What still runs LEGACY on a human's own
-turn inside an agent match (each is a UI lambda invoking the engine directly;
-none can execute during agent turns because of the `canChangeState` gates):
-unit action lambdas for Explore / Automate / AirSweep / ConnectRoad /
-EscortFormation / Guard / Transform / SetUp and their stop-variants, unit
-swap overlays, unit rename popup, city-state unit gifts / demand tribute /
-pledge-revoke protection buttons (no coordinator commands exist for these
-city-state relation actions yet), and MultiplayerStatus/spectator controls.
-Routing these follows the identical `routeThroughAgentSession` pattern with
-new small commands where missing (city-state relations). They are UI
-consistency follow-ups, NOT control leaks: agent turns are fully owned by
-the coordinator, and human turns are serialized behind the turn stepper.
+All applicable human mutation routes in the Vanilla scope have now been routed
+through the authoritative `MatchCoordinator` via `WorldScreen.routeThroughAgentSession`,
+publishing fresh snapshots to the GL thread upon completion. In ordinary (non-agent)
+matches, each interceptor safely yields false and executes legacy callbacks untouched.
 
-Routing pattern for that follow-up: resolve the acting civ + current UI
-selection, build the matching `AgentCommand`, execute on the desktop host
-under its lock, and publish the returned snapshot (no direct engine calls,
-no `UncivGame.Current` swaps). Mandatory decisions surfaced by a command must
-open the agent inspector, never a modal picker, for external civs.
+### 1. Unit Orders & Actions (`UnitActionsTable.kt`)
+- **Unit orders**: `EXPLORE`, `STOP_EXPLORATION`, `AUTOMATE`, `STOP_AUTOMATION`,
+  `GUARD`, `SET_UP`, `AIR_SWEEP`, `ESCORT_FORMATION`, and `STOP_ESCORT_FORMATION`
+  are routed via `UnitOrderCommand`.
+- **Unit movement cancellation**: `UnitActionType.StopMovement` maps to `UnitOrder.WAKE`,
+  clearing movement and wake-up state through `UnitOrderCommand`.
+- **Unit gifts**: `UnitActionType.GiftUnit` is routed via `GiftUnitCommand`. Validated
+  under Vanilla rules: recipient territory required; city-states accept military units
+  (or units permitted by `GainInfluenceWithUnitGiftToCityState` uniques) and award
+  influence; friendly major civs accept units in their territory.
+
+### 2. Map & Unit Operations
+- **Connect Road**: `OverlayButtonData.connectRoadToTargetTile` is routed via
+  `ConnectRoadCommand`, assigning automated road connection pathing through the coordinator.
+- **Unit Swap**: `WorldMapHolder.swapMoveUnitToTargetTile` is routed via `SwapUnitsCommand`,
+  atomically validating movement points and swapping positions of two own military/civilian units.
+- **Unit Rename**: `UnitRenamePopup` routes renaming via `RenameUnitCommand`.
+
+### 3. City-State Diplomacy (`CityStateDiplomacyTable.kt`)
+- **Tribute**: Gold and worker tribute demands are routed via `TributeCommand`.
+  Enforces military force ratio and CS willingness gates before transferring assets
+  and applying the -15 CS influence hit.
+- **Protection**: Pledging and revoking protection are routed via `ProtectionCommand`.
+  Enforces 10-turn pledge cooldown (`RecentlyPledgedProtection`) and 20-turn revoke
+  cooldown (`RecentlyWithdrewProtection`) along with non-negative influence rules.
+- **Diplomatic Marriage**: Austria-specific diplomatic marriage is routed via
+  `DiplomaticMarriageCommand`, validating gold costs and alliance duration.
+
+### 4. Non-Gameplay & Presentation-Only Distinction
+- **`MultiplayerStatusButton`**: Presentation-only external match viewer.
+  It opens `MultiplayerStatusPopup` which only loads file previews of remote
+  multiplayer matches (`files.loadMultiplayerGamePreview(...)`). It executes no
+  in-match mutations on the current game or civilization state.
+- **Spectator Mode (`CivView.isSpectator()`)**: Presentation-only observation mode.
+  When viewing as a spectator, `canChangeState` returns `false`, and all mutation
+  action buttons are hidden. Spectators cannot issue commands.
+- **`UnitActionType.Transform`**: Mod-only unique (`UniqueType.CanTransform`).
+  Excluded from Vanilla Civ 5 scope as no transformable units exist in the Vanilla ruleset.

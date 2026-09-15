@@ -143,7 +143,11 @@ class CityFoundedResult(
     val cityId: String
 ) : CommandResult
 
-enum class UnitOrder { FORTIFY, FORTIFY_UNTIL_HEALED, SLEEP, SLEEP_UNTIL_HEALED, WAKE, DISBAND, PARADROP }
+enum class UnitOrder {
+    FORTIFY, FORTIFY_UNTIL_HEALED, SLEEP, SLEEP_UNTIL_HEALED, WAKE, DISBAND, PARADROP,
+    EXPLORE, STOP_EXPLORATION, AUTOMATE, STOP_AUTOMATION, GUARD, SET_UP, AIR_SWEEP,
+    ESCORT_FORMATION, STOP_ESCORT_FORMATION
+}
 
 /** Explicit persistent unit orders (game.act type `unit.order`). Gates mirror the UI action predicates. */
 class UnitOrderCommand(
@@ -488,6 +492,108 @@ class StopImprovementCommand(
 class ImprovementStoppedResult(
     override val actorCivId: String,
     val receipt: ActionReceipt
+) : CommandResult
+
+/** Unit swap with an eligible unit on [destination] (game.act type `unit.swap`). */
+class SwapUnitsCommand(
+    override val actorCivId: String,
+    val actionId: String,
+    val expectedRevision: Int,
+    val unitId: Int,
+    val destination: HexCoord
+) : AgentCommand
+
+class UnitsSwappedResult(
+    override val actorCivId: String,
+    val receipt: ActionReceipt,
+    val finalPosition: HexCoord
+) : CommandResult
+
+/** Rename an own unit (game.act type `unit.rename`). A blank [newName] clears. */
+class RenameUnitCommand(
+    override val actorCivId: String,
+    val actionId: String,
+    val expectedRevision: Int,
+    val unitId: Int,
+    val newName: String
+) : AgentCommand
+
+class UnitRenamedResult(
+    override val actorCivId: String,
+    val receipt: ActionReceipt,
+    val name: String
+) : CommandResult
+
+/** Persistent road connection to [destination] (game.act type `unit.connectRoad`). */
+class ConnectRoadCommand(
+    override val actorCivId: String,
+    val actionId: String,
+    val expectedRevision: Int,
+    val unitId: Int,
+    val destination: HexCoord
+) : AgentCommand
+
+class RoadConnectionStartedResult(
+    override val actorCivId: String,
+    val receipt: ActionReceipt
+) : CommandResult
+
+/** Demand tribute from a city-state: gold or a worker (game.act `citystate.tribute`). */
+class TributeCommand(
+    override val actorCivId: String,
+    val actionId: String,
+    val expectedRevision: Int,
+    val cityStateId: String,
+    val demandWorker: Boolean
+) : AgentCommand
+
+class TributeTakenResult(
+    override val actorCivId: String,
+    val receipt: ActionReceipt,
+    val worker: Boolean
+) : CommandResult
+
+/** Pledge or revoke protection of a city-state (game.act `citystate.protection`). */
+class ProtectionCommand(
+    override val actorCivId: String,
+    val actionId: String,
+    val expectedRevision: Int,
+    val cityStateId: String,
+    val pledge: Boolean
+) : AgentCommand
+
+class ProtectionSetResult(
+    override val actorCivId: String,
+    val receipt: ActionReceipt,
+    val pledged: Boolean
+) : CommandResult
+
+/** Diplomatic marriage of a city-state (game.act `citystate.marry`).
+ *  G&K-unique gated; Vanilla never exposes the button. */
+class DiplomaticMarriageCommand(
+    override val actorCivId: String,
+    val actionId: String,
+    val expectedRevision: Int,
+    val cityStateId: String
+) : AgentCommand
+
+class CityStateMarriedResult(
+    override val actorCivId: String,
+    val receipt: ActionReceipt
+) : CommandResult
+
+/** Gift an own unit to the territory owner (city-state or friendly major civ) (game.act type `unit.gift`). */
+class GiftUnitCommand(
+    override val actorCivId: String,
+    val actionId: String,
+    val expectedRevision: Int,
+    val unitId: Int
+) : AgentCommand
+
+class UnitGiftedResult(
+    override val actorCivId: String,
+    val receipt: ActionReceipt,
+    val recipientCivId: String
 ) : CommandResult
 
 /** Tile pillaging with full loot (game.act type `unit.pillage`). */

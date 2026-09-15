@@ -3,6 +3,7 @@ package com.unciv.ui.screens.worldscreen.unit.actions
 import com.unciv.logic.agents.UnitOrder
 import com.unciv.logic.agents.UnitOrderCommand
 import com.unciv.logic.agents.UpgradeUnitCommand
+import com.unciv.logic.agents.GiftUnitCommand
 import java.util.UUID
 
 import com.badlogic.gdx.graphics.Color
@@ -208,6 +209,16 @@ class UnitActionsTable(val worldScreen: WorldScreen) : Table() {
             UnitActionType.Sleep -> UnitOrder.SLEEP
             UnitActionType.SleepUntilHealed -> UnitOrder.SLEEP_UNTIL_HEALED
             UnitActionType.Paradrop -> UnitOrder.PARADROP
+            UnitActionType.Explore -> UnitOrder.EXPLORE
+            UnitActionType.StopExploration -> UnitOrder.STOP_EXPLORATION
+            UnitActionType.Automate -> UnitOrder.AUTOMATE
+            UnitActionType.StopAutomation -> UnitOrder.STOP_AUTOMATION
+            UnitActionType.Guard -> UnitOrder.GUARD
+            UnitActionType.SetUp -> UnitOrder.SET_UP
+            UnitActionType.AirSweep -> UnitOrder.AIR_SWEEP
+            UnitActionType.EscortFormation -> UnitOrder.ESCORT_FORMATION
+            UnitActionType.StopEscortFormation -> UnitOrder.STOP_ESCORT_FORMATION
+            UnitActionType.StopMovement -> UnitOrder.WAKE
             else -> null
         }
         if (routedOrder != null && worldScreen.routeThroughAgentSession { 
@@ -224,6 +235,15 @@ class UnitActionsTable(val worldScreen: WorldScreen) : Table() {
         if (unitAction is UpgradeUnitAction && worldScreen.routeThroughAgentSession {
                 listOf({ r: Int ->
                     UpgradeUnitCommand(unit.civ.civID, "ui-${UUID.randomUUID()}", r, unit.id)
+                })
+            }) {
+            worldScreen.mapHolder.removeUnitActionOverlay()
+            worldScreen.shouldUpdate = true
+            return
+        }
+        if (unitAction.type == UnitActionType.GiftUnit && worldScreen.routeThroughAgentSession {
+                listOf({ r: Int ->
+                    GiftUnitCommand(unit.civ.civID, "ui-${UUID.randomUUID()}", r, unit.id)
                 })
             }) {
             worldScreen.mapHolder.removeUnitActionOverlay()

@@ -189,6 +189,24 @@ re-deriving it. Newest entries go at the **bottom**. Keep entries short and fact
 - Tests: DomesticOrdersTest golden-age flow (unit consumed, `isGoldenAge` committed-state read added to coordinator) and auto-production suppression with the setting explicitly ON (fails on legacy behavior). Full suite **923/923** (75 agent tests, 18 agent suites), per-file XMLs presence-verified after `:tests:cleanTest`.
 - Coverage table: great people → done for Vanilla specials; civilian roads proven live (partial narrowed to unit gifts).
 
+### CP-033 (gate-pass) — Complete human mutation routing closure and macOS .app bundle packaging, 2026-09-15
+- **Complete human mutation routing**:
+  - Secondary unit orders routed via `UnitOrderCommand`: `EXPLORE`, `STOP_EXPLORATION`, `AUTOMATE`, `STOP_AUTOMATION`, `GUARD`, `SET_UP`, `AIR_SWEEP`, `ESCORT_FORMATION`, `STOP_ESCORT_FORMATION`.
+  - Movement stop/wake routed: `UnitActionType.StopMovement` mapped to `UnitOrder.WAKE`.
+  - Unit gifts routed via `GiftUnitCommand`: enforces recipient territory, military/unique filter for city-states with influence gain, and friendly territory for major civs.
+  - Map actions routed: `OverlayButtonData.connectRoadToTargetTile` via `ConnectRoadCommand`; `WorldMapHolder.swapMoveUnitToTargetTile` via `SwapUnitsCommand`; `UnitRenamePopup` via `RenameUnitCommand`.
+  - City-state diplomacy routed: `CityStateDiplomacyTable` tribute demands (gold/worker) via `TributeCommand`; protection pledge/revoke via `ProtectionCommand` (enforcing 10-turn pledge and 20-turn revoke cooldowns and influence gates); Austrian diplomatic marriage via `DiplomaticMarriageCommand`.
+  - Non-agent safety preserved: all route calls pass through `WorldScreen.routeThroughAgentSession` which evaluates false in normal matches, keeping ordinary engine callbacks unchanged.
+  - Presentation vs out-of-scope clarified: `MultiplayerStatusButton` is presentation-only preview loading; Spectator Mode disables state mutations (`canChangeState == false`); `UnitActionType.Transform` is a mod-only unique.
+- **macOS application bundle (.app) packaging**:
+  - Gradle task `:desktop:macApp` creates a double-clickable `Unciv.app` bundle in `~/.unciv-build/desktop/Unciv.app`.
+  - Layout: `Contents/MacOS/Unciv` (executable POSIX launcher discovering Java 17+ across `JAVA_HOME`, `/opt/homebrew`, `/Library/Java/JavaVirtualMachines`, `/usr/libexec/java_home`, and PATH, with AppleScript alert fallback), `Contents/Info.plist`, `Contents/Resources/Unciv.icns` (multi-resolution macOS icon), `Contents/Resources/Unciv.jar`, `Contents/Resources/agent-runner/dist/`, and `Contents/Resources/agent-runner/node_modules/`.
+  - Bundled Node support: `-Dunciv.node.home=<dir>` bundles Node into `Contents/Resources/node/`; `DesktopAgentMatch.kt` runtime discovery checks `../Resources/node` and `../Resources/agent-runner/dist` from the binary location.
+- **Automated verification**:
+  - Agent-runner vitest: 7 test files, 34/34 passing. TypeScript build clean.
+  - Core + Tests suite: 97 test XML files, 957 tests, 0 failures, 0 errors, 15 skipped.
+  - Package builds verified: `:desktop:agentPackage` and `:desktop:macApp` assemble valid artifacts.
+
 ### CP-032 (note) — Secondary funnel routing, goto persistence, package assembly, 2026-09-14
 - **All five secondary funnels routed** (§3.2): promotions (whole path — one `PromoteUnitCommand` per step), upgrades (button, upgrade menu, and upgrade-all), disband confirm (`UnitOrderCommand` DISBAND), pillage confirm (`PillageCommand`), improvement build/cancel-order/queued-second (`BuildImprovementCommand`/new `StopImprovementCommand`), repair (`RepairCommand`), city sell (`city.produce SELL`), annex (`new AnnexCityCommand`) and raze/stop-raze (`new SetRazingCommand`), queue move-to-top (`new ProductionOp.MOVE_TOP`), and city-state gold gifts (`GiftGoldToCityStateCommand`). Every confirm-popup cancellation routes nothing; guards only activate with a session.
 - **Lesson**: engine WorkerAutomation invokes UI repair lambdas headlessly — the routed lambda must use a null-safe `UncivGame.Current.worldScreen` lookup, not `GUI.getWorldScreen()` (caught by WorkerAutomationTest NPE regression).
