@@ -5,6 +5,7 @@ import com.unciv.logic.civilization.NotificationCategory
 import com.unciv.logic.civilization.NotificationIcon
 import com.unciv.logic.map.mapunit.MapUnit
 import com.unciv.logic.map.tile.Tile
+import com.unciv.logic.map.tile.TilePillage
 import com.unciv.models.UnitAction
 import com.unciv.models.UnitActionType
 import com.unciv.models.ruleset.unique.UniqueType
@@ -79,66 +80,8 @@ object UnitActionsPillage {
         )
     }
 
-    private fun pillageLooting(tile: Tile, unit: MapUnit) {
-        val closestCity = unit.civ.cities.minByOrNull { it.getCenterTile().aerialDistanceTo(tile) }
-        val improvement = tile.getImprovementToPillage()!!
-
-        // Accumulate the loot
-        var pillageYield = Stats()
-        val stateForConditionals = unit.cache.state
-        val random = Random(unit.civ.gameInfo.turns * unit.getTile().position.hashCode().toLong())
-        for (unique in improvement.getMatchingUniques(UniqueType.PillageYieldRandom, stateForConditionals)) {
-            for ((stat, value) in unique.stats) {
-                var yieldsToAdd = Stats()
-                // Unique text says "approximately [X]", so we add 0..X twice - think an RPG's 2d12
-                yieldsToAdd.add(stat, (random.nextInt((value + 1).toInt()) + random.nextInt((value + 1).toInt()).toFloat()))
-                if (unique.isModifiedByGameSpeed())
-                    yieldsToAdd *= unit.civ.gameInfo.speed.modifier
-                if (unique.isModifiedByGameProgress())
-                    yieldsToAdd *= unique.getGameProgressModifier(unit.civ)
-                pillageYield.add(yieldsToAdd)
-            }
-        }
-        for (unique in improvement.getMatchingUniques(UniqueType.PillageYieldFixed, stateForConditionals)) {
-            var yieldsToAdd = unique.stats
-            if (unique.isModifiedByGameSpeed())
-                yieldsToAdd *= unit.civ.gameInfo.speed.modifier
-            if (unique.isModifiedByGameProgress())
-                yieldsToAdd *= unique.getGameProgressModifier(unit.civ)
-            pillageYield.add(yieldsToAdd)
-        }
-
-        //Multiply according to uniques
-        for (unique in unit.getMatchingUniques(UniqueType.PercentYieldFromPillaging, checkCivInfoUniques = true)) {
-            pillageYield *= unique.params[0].toPercent()
-        }
-
-        // Please no notification when there's no loot
-        if (pillageYield.isEmpty()) return
-
-        // Distribute the loot and keep record what went to civ/city for the notification(s)
-        val globalPillageYield = Stats()
-        val toCityPillageYield = Stats()
-        for ((stat, value) in pillageYield) {
-            if (stat in Stat.statsWithCivWideField) {
-                unit.civ.addStat(stat, value.toInt())
-                globalPillageYield[stat] += value
-            }
-            else if (closestCity != null) {
-                closestCity.addStat(stat, value.toInt())
-                toCityPillageYield[stat] += value
-            }
-        }
-
-        // Now tell the user about the swag
-        fun Stats.notify(suffix: String) {
-            if (isEmpty()) return
-            val text = "We have looted [${toStringWithoutIcons()}] from a [${improvement.name}]" + suffix
-            unit.civ.addNotification(text, tile.position, NotificationCategory.War, "ImprovementIcons/${improvement.name}", NotificationIcon.War)
-        }
-        toCityPillageYield.notify(" which has been sent to [${closestCity?.name}]")
-        globalPillageYield.notify("")
-    }
+    private fun pillageLooting(tile: Tile, unit: MapUnit) =
+        TilePillage.pillageLooting(tile, unit)
 
     // Public - used in UnitAutomation
     @Readonly

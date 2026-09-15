@@ -161,4 +161,24 @@ class DiplomacyTradeTest {
             Assert.assertEquals(AgentCommandError.INVALID_ARGUMENT, ex.code)
         }
     }
+
+    @Test
+    fun `friendship signs once, open borders trade through`() {
+        val f = Fixture()
+        f.coordinator.execute(FriendshipCommand(f.romeId, "f1", f.rev(), f.greeceId))
+        try {
+            f.coordinator.execute(FriendshipCommand(f.romeId, "f2", f.rev(), f.greeceId))
+            Assert.fail("expected ILLEGAL_ACTION")
+        } catch (ex: AgentCommandException) {
+            Assert.assertEquals(AgentCommandError.ILLEGAL_ACTION, ex.code)
+        }
+
+        f.coordinator.execute(ProposeTradeCommand(f.romeId, "t1", f.rev(), f.greeceId,
+            ourOffers = listOf(TradeOfferDto("Open Borders", TradeOfferType.Agreement, 1)),
+            theirOffers = listOf(TradeOfferDto("Open Borders", TradeOfferType.Agreement, 1))))
+        val accepted = f.coordinator.execute(
+            RespondTradeCommand(f.greeceId, "r1", f.rev(), f.romeId, accept = true)) as TradeRespondedResult
+        Assert.assertTrue(accepted.accepted)
+        Assert.assertTrue(f.coordinator.hasOpenBorders(f.romeId, f.greeceId))
+    }
 }

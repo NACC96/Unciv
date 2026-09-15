@@ -167,6 +167,13 @@ class MatchCoordinator(
             ?.policies?.getAdoptedPolicies()?.toList() ?: emptyList()
     }
 
+    /** Researched technology names in COMMITTED state. */
+    fun getResearchedTechs(civId: String): List<String> {
+        requireController(civId)
+        return committedGame.getCivilizationOrNull(civId)
+            ?.tech?.techsResearched?.toList() ?: emptyList()
+    }
+
     /** Owner civ ID of a map tile in COMMITTED state, null when unowned/absent. */
     fun getTileOwnerCiv(x: Int, y: Int): String? {
         return try {
@@ -180,6 +187,42 @@ class MatchCoordinator(
     fun getWorkedTiles(cityId: String): List<HexCoord> {
         return committedGame.getCities().firstOrNull { it.id == cityId }
             ?.getWorkedTiles()?.map { it.position }?.toList() ?: emptyList()
+    }
+
+    /** Achieved victory type in COMMITTED state, null while undecided. */
+    fun getVictoryType(): String? = committedGame.victoryData?.victoryType
+
+    /** Whether two civs currently share open borders. */
+    fun hasOpenBorders(civId: String, otherCivId: String): Boolean {
+        val civ = committedGame.getCivilizationOrNull(civId) ?: return false
+        return civ.getDiplomacyManager(otherCivId)?.hasOpenBorders == true
+    }
+
+    /** Improvement name on a tile in COMMITTED state, null when none. */
+    fun getTileImprovement(x: Int, y: Int): String? {
+        return try {
+            committedGame.tileMap[x, y].improvement
+        } catch (ex: Exception) {
+            null
+        }
+    }
+
+    /** Whether a tile's improvement/road is pillaged in COMMITTED state. */
+    fun isTilePillaged(x: Int, y: Int): Boolean {
+        return try {
+            committedGame.tileMap[x, y].isPillaged()
+        } catch (ex: Exception) {
+            false
+        }
+    }
+
+    /** Improvement under construction on a tile, null when idle. */
+    fun getImprovementInProgress(x: Int, y: Int): String? {
+        return try {
+            committedGame.tileMap[x, y].improvementInProgress
+        } catch (ex: Exception) {
+            null
+        }
     }
 
     /** Unit health in COMMITTED state, null when absent/destroyed. */
@@ -249,6 +292,9 @@ class MatchCoordinator(
             is UpgradeUnitCommand -> executeUpgrade(command)
             is GreatPersonCommand -> executeGreatPerson(command)
             is GiftGoldToCityStateCommand -> executeGiftGold(command)
+            is PillageCommand -> executePillage(command)
+            is RepairCommand -> executeRepair(command)
+            is FriendshipCommand -> executeFriendship(command)
         }
     }
 
@@ -681,7 +727,8 @@ class MatchCoordinator(
         conqueringCiv: Civilization,
         city: City
     ): List<ConquestDisposition> {
-        if (conqueringCiv.isOneCityChallenger()) return listOf(ConquestDisposition.DESTROY)
+        // One-city challengers never reach dispositions: the engine destroys
+        // on capture (Battle). Barbarians likewise.
         val options = ArrayList<ConquestDisposition>()
         options.add(ConquestDisposition.PUPPET)
         if (!conqueringCiv.hasUnique(UniqueType.MayNotAnnexCities)) options.add(ConquestDisposition.ANNEX)
@@ -749,10 +796,6 @@ class MatchCoordinator(
                     city.isBeingRazed = true
                 }
                 ConquestDisposition.LIBERATE -> city.liberateCity(conqueringCiv)
-                ConquestDisposition.DESTROY -> {
-                    city.puppetCity(conqueringCiv)
-                    city.destroyCity()
-                }
             }
             candidateMatch.pendingDecisions.remove(decision)
             "${city.id}|${command.disposition}"
@@ -1147,7 +1190,7 @@ class MatchCoordinator(
                     var gold = (350 + 50 * civ.getEraNumber()) * civ.gameInfo.speed.goldCostModifier
                     for (goldUnique in unit.getMatchingUniques(
                         UniqueType.PercentGoldFromTradeMissions, checkCivInfoUniques = true
-                    )) gold *= goldUnique.params[0].toFloat() / 100f
+                    )) gold *= 1 + goldUnique.params[0].toFloat() / 100f
                     civ.addGold(gold.toInt())
                     host.getDiplomacyManager(civ)
                         ?: throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "No diplomatic contact")
@@ -1160,8 +1203,7 @@ class MatchCoordinator(
         return GreatPersonResult(command.actorCivId, receipt, command.action)
     }
 
-    private fun executeGiftGold(command: GiftGoldToCityStateCommand): GoldGiftedResult {
-        val receipt = runGameplayMutation(
+    private fun executeGiftGold(command: GiftGoldToCityStateCommand): GoldGiftedResult {        val receipt = runGameplayMutation(
             command.actorCivId, command.actionId, command.expectedRevision,
             "citystate.giftGold|${command.cityStateId}|${command.amount}"
         ) { candidateGame, _ ->
@@ -1180,6 +1222,112 @@ class MatchCoordinator(
             influence.toString()
         }
         return GoldGiftedResult(command.actorCivId, receipt, receipt.resultJson.toInt())
+    }
+
+    private fun executePillage(command: PillageCommand): PillagedResult {
+        val receipt = runGameplayMutation(
+            command.actorCivId, command.actionId, command.expectedRevision,
+            "unit.pillage|${command.unitId}"
+        ) { candidateGame, _ ->
+            val unit = requireOwnUnit(candidateGame, command.actorCivId, command.unitId)
+            val tile = unit.getTile()
+            // Gates mirror UnitActionsPillage.getPillageAction/canPillage.
+            if (!unit.hasMovement())
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Unit has no movement left")
+            if (unit.isCivilian())
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Civilians cannot pillage")
+            val improvementName = tile.getImprovementToPillageName()
+                ?: throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Nothing to pillage here")
+            if (tile.getOwner() == unit.civ)
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Cannot pillage own lands")
+            if (unit.isTransported)
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Transported units cannot pillage")
+            if (!tile.canPillageTile())
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Tile cannot be pillaged")
+            if (unit.hasUnique(UniqueType.CannotPillage, checkCivInfoUniques = true))
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Unit cannot pillage")
+            val owner = tile.getOwner()
+            if (owner != null && !unit.civ.isAtWarWith(owner))
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Pillaging neutrals is an act of war")
+            owner?.addNotification(
+                "An enemy [${unit.baseUnit.name}] has pillaged our [$improvementName]",
+                tile.position,
+                com.unciv.logic.civilization.NotificationCategory.War,
+                "ImprovementIcons/$improvementName",
+                com.unciv.logic.civilization.NotificationIcon.War,
+                unit.baseUnit.name
+            )
+            com.unciv.logic.map.tile.TilePillage.pillageLooting(tile, unit)
+            val pillagingImprovement = tile.canPillageTileImprovement()
+            tile.setPillaged()
+            if (tile.resource != null) tile.getOwner()?.cache?.updateCivResources()
+            if (!unit.hasUnique(UniqueType.NoMovementToPillage, checkCivInfoUniques = true))
+                unit.useMovementPoints(1f)
+            if (pillagingImprovement) {
+                // Only improvements (not roads) heal the pillager.
+                var healAmount = 25f
+                for (unique in unit.getMatchingUniques(
+                    UniqueType.PercentHealthFromPillaging, checkCivInfoUniques = true
+                )) healAmount *= 1 + unique.params[0].toFloat() / 100f
+                unit.healBy(healAmount.toInt())
+            }
+            if (tile.getImprovementToPillage()?.hasUnique(UniqueType.DestroyedWhenPillaged) == true)
+                tile.removeImprovement()
+            improvementName
+        }
+        return PillagedResult(command.actorCivId, receipt, receipt.resultJson)
+    }
+
+    private fun executeRepair(command: RepairCommand): RepairStartedResult {
+        val receipt = runGameplayMutation(
+            command.actorCivId, command.actionId, command.expectedRevision,
+            "unit.repair|${command.unitId}"
+        ) { candidateGame, _ ->
+            val unit = requireOwnUnit(candidateGame, command.actorCivId, command.unitId)
+            val tile = unit.getTile()
+            // Gates mirror UnitActionsFromUniques.getRepairAction.
+            if (!tile.ruleset.tileImprovements.containsKey(com.unciv.Constants.repair))
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Repair unavailable in this ruleset")
+            if (!unit.cache.hasUniqueToBuildImprovements)
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Unit cannot repair")
+            if (unit.isEmbarked() || tile.isCityCenter() || !tile.isPillaged())
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Nothing to repair here")
+            if (!unit.hasMovement() || tile.improvementInProgress == com.unciv.Constants.repair)
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Repair cannot start now")
+            if (tile.isEnemyTerritory(unit.civ))
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Cannot repair in enemy territory")
+            val repairTurns = minOf(
+                tile.ruleset.tileImprovements[com.unciv.Constants.repair]!!.getTurnsToBuild(unit.civ, unit),
+                tile.getImprovementToRepair()!!.getTurnsToBuild(unit.civ, unit)
+            )
+            tile.queueImprovement(com.unciv.Constants.repair, repairTurns)
+            unit.action = null
+            repairTurns.toString()
+        }
+        return RepairStartedResult(command.actorCivId, receipt, receipt.resultJson.toInt())
+    }
+
+    private fun executeFriendship(command: FriendshipCommand): DiplomacyResult {
+        val receipt = runGameplayMutation(
+            command.actorCivId, command.actionId, command.expectedRevision,
+            "diplomacy.friendship|${command.targetCivId}"
+        ) { candidateGame, _ ->
+            val civ = candidateGame.getCivilizationOrNull(command.actorCivId)
+                ?: throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Unknown civilization")
+            candidateGame.getCivilizationOrNull(command.targetCivId)
+                ?: throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Unknown civilization")
+            val diplomacy = civ.getDiplomacyManager(command.targetCivId)
+                ?: throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "No diplomatic contact")
+            if (civ.isDefeated())
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Defeated civilizations sign nothing")
+            if (diplomacy.diplomaticStatus == DiplomaticStatus.War)
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Cannot befriend wartime enemies")
+            if (diplomacy.hasFlag(com.unciv.logic.civilization.diplomacy.DiplomacyFlags.DeclarationOfFriendship))
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Already friends")
+            diplomacy.signDeclarationOfFriendship()
+            diplomacy.diplomaticStatus.name
+        }
+        return DiplomacyResult(command.actorCivId, receipt, receipt.resultJson)
     }
 
     //endregion

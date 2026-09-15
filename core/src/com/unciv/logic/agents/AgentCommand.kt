@@ -185,7 +185,7 @@ class AttackResult(
     val defenderDamageDealt: Int
 ) : CommandResult
 
-enum class ConquestDisposition { ANNEX, PUPPET, RAZE, LIBERATE, DESTROY }
+enum class ConquestDisposition { ANNEX, PUPPET, RAZE, LIBERATE }
 
 /** Resolves a `conquest-disposition` decision (game.act type `conquest.resolve`). */
 class ResolveConquestCommand(
@@ -405,3 +405,39 @@ class GoldGiftedResult(
     val receipt: ActionReceipt,
     val influenceGained: Int
 ) : CommandResult
+
+/** Tile pillaging with full loot (game.act type `unit.pillage`). */
+class PillageCommand(
+    override val actorCivId: String,
+    val actionId: String,
+    val expectedRevision: Int,
+    val unitId: Int
+) : AgentCommand
+
+class PillagedResult(
+    override val actorCivId: String,
+    val receipt: ActionReceipt,
+    val pillaged: String
+) : CommandResult
+
+/** Pillaged-tile repair queueing (game.act type `unit.repair`). */
+class RepairCommand(
+    override val actorCivId: String,
+    val actionId: String,
+    val expectedRevision: Int,
+    val unitId: Int
+) : AgentCommand
+
+class RepairStartedResult(
+    override val actorCivId: String,
+    val receipt: ActionReceipt,
+    val turnsToRepair: Int
+) : CommandResult
+
+/** Declaration of friendship (game.act type `diplomacy.friendship`). */
+class FriendshipCommand(
+    override val actorCivId: String,
+    val actionId: String,
+    val expectedRevision: Int,
+    val targetCivId: String
+) : AgentCommand
