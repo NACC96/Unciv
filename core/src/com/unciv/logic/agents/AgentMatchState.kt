@@ -76,14 +76,16 @@ class ActionReceipt(
     /** "applied" for terminal success; rejections travel as typed errors, not receipts. */
     var outcome: String = "",
     /** Committed engine event IDs for correlation with observations. */
-    var committedEventIds: ArrayList<String> = ArrayList()
+    var committedEventIds: ArrayList<String> = ArrayList(),
+    /** Sanitized command-specific result (e.g. "x,y" final position); only permitted post-action knowledge. */
+    var resultJson: String = ""
 ) : IsPartOfGameInfoSerialization {
     @Suppress("unused") // used by json serialization
-    constructor() : this("", "", "", "", 0, 0, "", ArrayList())
+    constructor() : this("", "", "", "", 0, 0, "", ArrayList(), "")
 
     fun copy(): ActionReceipt = ActionReceipt(
         actionId, actorCivId, timelineId, requestFingerprint,
-        beforeRevision, afterRevision, outcome, ArrayList(committedEventIds)
+        beforeRevision, afterRevision, outcome, ArrayList(committedEventIds), resultJson
     )
 }
 
@@ -116,12 +118,17 @@ class AgentMatchState(
     var pendingDecisions: ArrayList<PendingDecision> = ArrayList(),
     var guidanceQueue: ArrayList<GuidanceMessage> = ArrayList(),
     /** Current-turn receipts; completed-turn history lives in retained turn checkpoints. */
-    var currentTurnReceipts: ArrayList<ActionReceipt> = ArrayList()
+    var currentTurnReceipts: ArrayList<ActionReceipt> = ArrayList(),
+    /** Coordinator-level pause: while true, no new mutation may commit. */
+    var matchPaused: Boolean = false,
+    /** Why the match paused (failure reason, storage error, user action). */
+    var matchPausedReason: String? = null
 ) : IsPartOfGameInfoSerialization {
     @Suppress("unused") // used by json serialization
     constructor() : this(
         AGENT_MATCH_FORMAT_VERSION, "", "", 0, 0, TurnPhase.READY_TO_START,
-        HashMap(), false, HashMap(), HashMap(), ArrayList(), ArrayList(), ArrayList()
+        HashMap(), false, HashMap(), HashMap(), ArrayList(), ArrayList(), ArrayList(),
+        false, null
     )
 
     /** Rejects incompatible format versions explicitly; never silently converts. */
@@ -139,6 +146,8 @@ class AgentMatchState(
         HashMap(notesRevisions),
         ArrayList(pendingDecisions.map { it.copy() }),
         ArrayList(guidanceQueue.map { it.copy() }),
-        ArrayList(currentTurnReceipts.map { it.copy() })
+        ArrayList(currentTurnReceipts.map { it.copy() }),
+        matchPaused,
+        matchPausedReason
     )
 }
