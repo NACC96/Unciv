@@ -16,6 +16,9 @@ const url = args["mcp-url"];
 const bearer = args["bearer"];
 const plan = (args.plan ?? "observe,act,end").split(",");
 const actionId = args["action-id"] ?? "scripted-1";
+// Real engines assign their own IDs/tiles; the fake uses unit 17 at (2,-1).
+const unitId = Number(args["unit-id"] ?? 17);
+const dest = { x: Number(args["dest-x"] ?? 2), y: Number(args["dest-y"] ?? -1) };
 const sessionId = args.resume ?? `scripted-${Math.random().toString(36).slice(2, 10)}`;
 
 const emit = (obj) => console.log(JSON.stringify(obj));
@@ -40,7 +43,12 @@ const call = async (name, toolArgs) => {
   const res = await client.callTool({ name, arguments: toolArgs });
   const text = res.content?.[0]?.text ?? "";
   emit({ kind: "scripted", event: "tool", tool: name, input: toolArgs, output: text.slice(0, 300) });
-  return text ? JSON.parse(text) : null;
+  if (!text) return null;
+  try {
+    return JSON.parse(text);
+  } catch (parseError) {
+    throw new Error(`tool ${name} returned non-JSON text: ${text.slice(0, 300)}`);
+  }
 };
 
 if (plan.includes("loop")) {
@@ -59,7 +67,7 @@ for (const step of plan) {
       actionId,
       expectedRevision: revision,
       type: "unit.move",
-      args: { unitId: 17, destination: { x: 2, y: -1 } },
+      args: { unitId, destination: dest },
     });
     revision += 1;
   } else if (step === "end") {

@@ -399,7 +399,20 @@ class NewGameScreen(
         }
 
         val worldScreen = game.loadGame(newGame)
-        
+
+        // Agent-enabled matches attach a desktop-owned session (no-op when no
+        // agent slots exist or the platform provides no host). New matches
+        // stay paused until the user presses Run or Step.
+        if (playerPickerTable.collectAgentErrors().isEmpty()) {
+            try {
+                worldScreen.agentSession = com.unciv.logic.agents.AgentMatchSessionFactory.create(
+                    newGame, playerPickerTable.buildAgentMatchSetup())
+            } catch (ex: Exception) {
+                com.unciv.utils.Log.error("Could not start agent match session", ex)
+                worldScreen.agentSession = null
+            }
+        }
+
         worldScreen.autoSave()
 
         if (newGame.gameParameters.isOnlineMultiplayer) {

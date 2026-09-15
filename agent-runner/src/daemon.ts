@@ -83,6 +83,9 @@ export function buildSpawnForProvider(
     }
     case "scripted": {
       const plan = typeof config.extra?.["plan"] === "string" ? (config.extra["plan"] as string) : "observe,act,end";
+      const unitId = typeof config.extra?.["unitId"] === "number" ? String(config.extra["unitId"]) : "17";
+      const destX = typeof config.extra?.["destX"] === "number" ? String(config.extra["destX"]) : "2";
+      const destY = typeof config.extra?.["destY"] === "number" ? String(config.extra["destY"]) : "-1";
       return {
         spec: {
           executable: process.execPath,
@@ -92,6 +95,9 @@ export function buildSpawnForProvider(
             "--bearer", bearer,
             ...(resumeId ? ["--resume", resumeId] : []),
             "--plan", plan,
+            "--unit-id", unitId,
+            "--dest-x", destX,
+            "--dest-y", destY,
           ],
           cwd: scratchCwd,
         },
@@ -135,9 +141,15 @@ function parseForProvider(provider: RunTurnControl["provider"]): (jsonl: string)
 }
 
 export async function main(): Promise<void> {
-  const backend = new StdioEngineBackend((line) => {
-    process.stdout.write(line + "\n");
-  });
+  const backend = new StdioEngineBackend(
+    (line) => {
+      process.stdout.write(line + "\n");
+    },
+    30000,
+    // Actor identity is per-run; rebound for every run_turn below.
+    () => currentActorCiv,
+  );
+  let currentActorCiv = "";
   const scratch = join(tmpdir(), `unciv-supervisor-${process.pid}`);
   mkdirSync(scratch, { recursive: true });
 
@@ -210,6 +222,7 @@ export async function main(): Promise<void> {
   }
 
   async function runTurn(control: RunTurnControl): Promise<void> {
+    currentActorCiv = control.binding.civId;
     const emit = (event: "run_started" | "session_bound" | "tool_activity" | "run_completed" | "run_failed", payload: Record<string, unknown>) => {
       process.stdout.write(encodeFrame({ protocol: 1, kind: "turn_event", runId: control.runId, event, payload }) + "\n");
     };

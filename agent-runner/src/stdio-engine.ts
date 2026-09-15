@@ -31,9 +31,15 @@ export class StdioEngineBackend implements IGameService {
   >();
   private closed = false;
 
+  /**
+   * @param actorCivId supplies the acting civilization for every call: the
+   * supervisor (not the model) asserts identity, per the authenticated
+   * MCP connection. Required — the engine never trusts tool arguments.
+   */
   constructor(
     private readonly sendLine: (line: string) => void,
     private readonly callTimeoutMs = 30000,
+    private readonly actorCivId: () => string = () => "",
   ) {}
 
   get revision(): number {
@@ -112,11 +118,19 @@ export class StdioEngineBackend implements IGameService {
   }
 
   observe(): Promise<GameObserveResult> {
-    return this.call("observe", {});
+    return this.call("observe", { civId: this.actorCivId() });
   }
 
   async inspect(unitId: number): Promise<FakeUnit | FakeError> {
-    return this.call("inspect", { unitId });
+    return this.call("inspect", { civId: this.actorCivId(), unitId });
+  }
+
+  async rules(): Promise<{ ruleset: string; note: string }> {
+    return this.call("rules", {});
+  }
+
+  async legalActions(unitId: number): Promise<{ unitId: number; actions: unknown[] } | FakeError> {
+    return this.call("legal_actions", { civId: this.actorCivId(), unitId });
   }
 
   async act(envelope: {
@@ -126,7 +140,7 @@ export class StdioEngineBackend implements IGameService {
     type: string;
     args: Record<string, unknown>;
   }): Promise<FakeReceipt | FakeError> {
-    return this.call("act", envelope as unknown as Record<string, unknown>);
+    return this.call("act", { ...envelope, actorCivId: this.actorCivId() });
   }
 
   async actionResult(actionId: string): Promise<FakeReceipt | { status: "pending" | "rejected"; actionId: string }> {
@@ -134,14 +148,17 @@ export class StdioEngineBackend implements IGameService {
   }
 
   async updateNotes(notes: string, expectedNotesRevision: number): Promise<{ notesRevision: number } | FakeError> {
-    return this.call("notes_put", { notes, expectedNotesRevision });
+    return this.call("notes_put", { civId: this.actorCivId(), notes, expectedNotesRevision });
   }
 
   async readNotes(): Promise<{ notes: string; notesRevision: number }> {
-    return this.call("notes_get", {});
+    return this.call("notes_get", { civId: this.actorCivId() });
   }
 
   async endTurn(): Promise<{ turnEnded: boolean } | FakeError> {
-    return this.call("end_turn", {});
+    // Action ID is supervisor-generated (idempotency scope per invocation);
+    // the desktop fills the expected revision live under its lock.
+    const actionId = `end-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+    return this.call("end_turn", { civId: this.actorCivId(), actionId });
   }
 }

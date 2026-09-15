@@ -11,6 +11,8 @@ export interface GameObserveResult {
   revision: number;
   activeTurn: boolean;
   turnEnded: boolean;
+  /** Completed end-turn commits, monotonic: invocation completion signal. */
+  endTurnsCommitted: number;
   requiredDecisions: string[];
   recentEvents: string[];
 }
@@ -18,6 +20,8 @@ export interface GameObserveResult {
 export interface IGameService {
   observe(): Promise<GameObserveResult>;
   inspect(unitId: number): Promise<FakeUnit | FakeError>;
+  rules(): Promise<{ ruleset: string; note: string }>;
+  legalActions(unitId: number): Promise<{ unitId: number; actions: unknown[] } | FakeError>;
   act(envelope: {
     protocolVersion: number;
     actionId: string;
@@ -78,11 +82,14 @@ export class FakeGameService implements IGameService {
   notesRevision = 0;
   turnEnded = false;
 
+  endTurnsCommitted = 0;
+
   async observe(): Promise<GameObserveResult> {
     return {
       revision: this.revision,
       activeTurn: !this.turnEnded,
       turnEnded: this.turnEnded,
+      endTurnsCommitted: this.endTurnsCommitted,
       requiredDecisions: [...this.decisionsPending],
       recentEvents: [`rev-${this.revision}-committed`],
     };
@@ -90,6 +97,18 @@ export class FakeGameService implements IGameService {
 
   async readNotes(): Promise<{ notes: string; notesRevision: number }> {
     return { notes: this.notes, notesRevision: this.notesRevision };
+  }
+
+  async rules(): Promise<{ ruleset: string; note: string }> {
+    return { ruleset: "Civ V - Vanilla (fake stub)", note: "static rules may be cached" };
+  }
+
+  async legalActions(unitId: number): Promise<{ unitId: number; actions: unknown[] } | FakeError> {
+    const seen = this.units.find((u) => u.id === unitId);
+    if (!seen) {
+      return { protocolVersion: 1, status: "rejected", code: "ILLEGAL_ACTION", message: "no such visible entity" };
+    }
+    return { unitId, actions: [{ type: "unit.move", costs: { movement: 1 }, targets: "adjacent-explored-tiles" }] };
   }
 
   async inspect(unitId: number): Promise<FakeUnit | FakeError> {
@@ -173,6 +192,7 @@ export class FakeGameService implements IGameService {
     if (this.decisionsPending.length > 0)
       return { protocolVersion: 1, status: "rejected", code: "DECISIONS_PENDING", message: `resolve: ${this.decisionsPending.join(",")}` };
     this.turnEnded = true;
+    this.endTurnsCommitted += 1;
     this.revision += 1;
     return { turnEnded: true };
   }

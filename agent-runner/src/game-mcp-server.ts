@@ -74,17 +74,16 @@ function registerGameTools(mcp: McpServer, game: IGameService): void {
   });
 
   mcp.registerTool("game.rules", {
-    description: "Pinned-ruleset summary (fake service: static stub; engine service serves real Civilopedia excerpts).",
+    description: "Pinned-ruleset summary (static rules may be cached).",
     inputSchema: { section: z.string().max(128).optional() },
-  }, async () => ok({ ruleset: "Civ V - Vanilla (fake stub)", note: "static rules may be cached" }));
+  }, async () => ok(await game.rules()));
 
   mcp.registerTool("game.legal_actions", {
-    description: "Typed legal actions for one entity (fake service: movement stub).",
+    description: "Typed legal actions for one entity.",
     inputSchema: { unitId: z.number().int() },
   }, async ({ unitId }) => {
-    const seen = await game.inspect(unitId);
-    if (!("position" in seen)) return err("ILLEGAL_ACTION", "no such visible entity");
-    return ok({ unitId, actions: [{ type: "unit.move", costs: { movement: 1 }, targets: "adjacent-explored-tiles" }] });
+    const res = await game.legalActions(unitId);
+    return "actions" in res ? ok(res) : err(res.code, res.message);
   });
 
   mcp.registerTool("game.act", {

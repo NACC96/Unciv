@@ -165,13 +165,16 @@ export class Supervisor {
       const run = this.parseStream(lines.join("\n"));
       const postFlight = await args.engine.observe().catch(() => null);
       const revision = postFlight?.revision ?? revisionBefore;
-      const turnEnded = postFlight?.turnEnded ?? false;
+      const endsBefore = preFlight.endTurnsCommitted;
+      const endsAfter = postFlight?.endTurnsCommitted ?? endsBefore;
+      const turnEnded = endsAfter > endsBefore;
       if (guardHit) {
-        return { status: "guard_paused", revision, turnEnded: false, run, detail: guardHit };
+        return { status: "guard_paused", revision, turnEnded, run, detail: guardHit };
       }
-      // Engine state governs: end_turn committed means a completed turn even
-      // if the provider's own stream is ambiguous; without it the turn is
-      // incomplete (moves retained) or failed.
+      // Engine state governs: a completed end-turn commit during THIS
+      // invocation means a completed turn even if the provider's own stream
+      // is ambiguous; otherwise the turn is incomplete (moves retained) or
+      // failed. Counter-based (a sticky boolean lies after the first turn).
       if (turnEnded) {
         return { status: "completed_turn", revision, turnEnded: true, run, detail: "engine committed end_turn" };
       }
