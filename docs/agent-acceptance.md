@@ -39,19 +39,35 @@ present and current, so a plain test/build re-run is equivalent evidence.
 
 ## 13.3 Deliberate manual acceptance (not automatable here — checklist for a human tester)
 
-These require real provider accounts/credits and an interactive desktop
-session; the plan explicitly forbids running them as a side effect of
-ordinary work. Pin: codex-cli 0.154.0, claude 2.1.270, opencode 1.18.31.
+These require the real provider plans and an interactive desktop session;
+the plan explicitly forbids running them as a side effect of ordinary work.
+Provider accounts to be used (record per match: CLI version, exact model,
+outcome, interventions):
 
-1. One small Vanilla match per provider (3 matches) + one 3-provider match.
-   Record outcome + any intervention.
-2. Human+agent match exercising diplomacy, handoffs, pause/retry,
-   save/reopen, both inspection settings — human actions through the real UI.
-3. Later-game fixture (many cities/units) for observation size/UI rebinding.
-4. Finder launch with bundled Node (no dev shell env), path-with-spaces and
-   missing-drive error paths.
-5. Performance sampling: checkpoint duration, tool-response size, GL-thread
-   stall check while providers think.
+| Provider CLI | Auth | Version pin | Notes |
+| --- | --- | --- | --- |
+| `codex` | Noah's OpenAI/ChatGPT plan | 0.154.0 | W1/W3-proven; `danger-full-access` required on macOS (seatbelt blocks loopback MCP) |
+| `claude` | Noah's Anthropic/Claude plan | 2.1.270 | per-invocation temp config, session-id verified in W1 |
+| `opencode` | Noah's z.ai plan; also has free models | 1.18.31 | free models usable for the shakedown run |
+
+Minimal-burn run order (each match: small Vanilla duel, 30–40 turns,
+record outcome + interventions per §13.3):
+
+1. **Shakedown (free)**: opencode with a free model through the real desktop
+   host — proves spawn, loop, checkpoints, and UI refresh end to end at zero
+   quota. Expected issues surface here, not on paid plans.
+2. **Codex match** (paid plan #1).
+3. **Claude match** (paid plan #2).
+4. **Three-provider match**: codex + claude + opencode (z.ai or free model)
+   each controlling one major civ — the §13.3 centerpiece.
+5. Human+agent match: diplomacy, handoffs, pause/retry, save/reopen, both
+   inspection settings; human actions through the real UI.
+6. Later-game fixture (many cities/units) for observation size and UI
+   rebinding; Finder launch with bundled Node, path-with-spaces and
+   missing-drive error paths; GL-thread stall sampling while providers think.
+
+Performance expectations to sample: checkpoint duration, tool-response size,
+and the GL thread never waiting on provider/network/disk work.
 
 ## Known limitations (honest record)
 
