@@ -30,6 +30,7 @@ class DomesticOrdersTest {
         var scientistId: Int = -1
         var engineerId: Int = -1
         var merchantId: Int = -1
+        var artistId: Int = -1
 
         init {
             testGame.gameInfo.gameParameters.baseRuleset = BaseRuleset.Civ_V_Vanilla.fullName
@@ -55,6 +56,7 @@ class DomesticOrdersTest {
             // Engineer must stand on the city center to hurry; scientist works anywhere.
             scientistId = testGame.addUnit("Great Scientist", rome, testGame.getTile(1, 0)).id
             engineerId = testGame.addUnit("Great Engineer", rome, testGame.getTile(0, 0)).id
+            artistId = testGame.addUnit("Great Artist", rome, testGame.getTile(-1, 1)).id
 
             // Maritime city-state with a city, met by Rome. Must be a real
             // ruleset nation: synthetic TestGame nations break candidate
@@ -235,8 +237,48 @@ class DomesticOrdersTest {
     }
 
     @Test
-    fun `gold gift to city-state moves gold and influence`() {
+    fun `golden age and road building`() {
         val f = Fixture()
+        f.coordinator.execute(GreatPersonCommand(f.romeId, "g1", f.rev(), f.artistId,
+            GreatPersonAction.GOLDEN_AGE))
+        Assert.assertNull(f.coordinator.getUnitPosition(f.romeId, f.artistId))
+        Assert.assertTrue(f.coordinator.isGoldenAge(f.romeId))
+
+        // Roads ride the same worker-improvement path once the wheel turns.
+        val rome = f.testGame.gameInfo.getCivilization(f.romeId)
+        if (!rome.tech.isResearched("Animal Husbandry")) rome.tech.addTechnology("Animal Husbandry")
+        if (!rome.tech.isResearched("The Wheel")) rome.tech.addTechnology("The Wheel")
+        // Rebuild the coordinator over the new techs (setup-time change).
+        val match = AgentMatchState(matchId = "m1", timelineId = "t1", turnPhase = TurnPhase.AWAITING_DECISIONS)
+        match.controllers[f.romeId] = CivilizationController(f.romeId, ControllerKind.EXTERNAL_AGENT,
+            AgentProfile("p1", "Ada", "codex", "m", null, "", 1))
+        val coordinator = MatchCoordinator(f.testGame.gameInfo, match, InMemoryCheckpointWriter())
+        val road = coordinator.execute(BuildImprovementCommand(f.romeId, "b1", 0,
+            f.workerId, "Road")) as ImprovementStartedResult
+        Assert.assertTrue(road.turnsToBuild > 0)
+    }
+
+    @Test
+    fun `auto production stays off for agents even when the user setting is on`() {
+        val f = Fixture()
+        val settings = com.unciv.UncivGame.Current.settings
+        val previous = settings.autoAssignCityProduction
+        settings.autoAssignCityProduction = true
+        try {
+            // Empty queue + setting on: legacy behavior would auto-choose.
+            f.coordinator.execute(EndTurnCommand(f.romeId, "e-auto", f.rev()))
+            val queue = f.coordinator.observe(f.romeId).ownCities
+                .first { it.cityId == f.cityId }.productionQueue
+            Assert.assertTrue(
+                "queue must stay empty/idle for agents, was $queue",
+                queue.isEmpty() || queue.all { it.isEmpty() || it == "Idle" })
+        } finally {
+            settings.autoAssignCityProduction = previous
+        }
+    }
+
+    @Test
+    fun `gold gift to city-state moves gold and influence`() {        val f = Fixture()
         val romeBefore = f.coordinator.getGold(f.romeId)
         val csBefore = f.coordinator.getGold(f.csId)
         val gifted = f.coordinator.execute(

@@ -311,8 +311,13 @@ fun buildLegalActions(
                     UniqueType.CanSpeedupConstruction
                 GreatPersonAction.TRADE_MISSION ->
                     UniqueType.CanTradeWithCityStateForGoldAndInfluence
+                GreatPersonAction.GOLDEN_AGE ->
+                    UniqueType.OneTimeEnterGoldenAgeTurns
             }
-            if (unit.getMatchingUniques(unique).any()) dto.greatActions.add(action)
+            if (unit.getMatchingUniques(unique).any()
+                || (action == GreatPersonAction.GOLDEN_AGE
+                    && unit.getMatchingUniques(UniqueType.OneTimeEnterGoldenAge).any())
+            ) dto.greatActions.add(action)
         }
         return dto
     }

@@ -176,6 +176,11 @@ class GameInfo : IsPartOfGameInfoSerialization, HasGameInfoSerializationVersion 
     @Transient
     var isUpToDate = false
 
+    /** Set by restoration hosts (agent match coordinator) that must not let
+     *  [setTransients] make unsolicited strategic choices; reset at its end. */
+    @Transient
+    var suppressAutomationDuringTransients = false
+
     @Transient
     lateinit var ruleset: Ruleset
 
@@ -852,7 +857,7 @@ class GameInfo : IsPartOfGameInfoSerialization, HasGameInfoSerializationVersion 
                  * Also set construction for human players who have automate production turned on
                  */
                 if (city.cityConstructions.constructionQueue.isEmpty())
-                    city.cityConstructions.chooseNextConstruction()
+                    city.cityConstructions.chooseNextConstruction(suppressAutomation = suppressAutomationDuringTransients)
 
                 // We also remove resources that the city may be demanding but are no longer in the ruleset
                 if (!ruleset.tileResources.containsKey(city.demandedResource))
@@ -862,6 +867,7 @@ class GameInfo : IsPartOfGameInfoSerialization, HasGameInfoSerializationVersion 
                 city.cityStats.update()
             }
         }
+        suppressAutomationDuringTransients = false
     }
 
     private fun convertOldSavesToNewSaves() {

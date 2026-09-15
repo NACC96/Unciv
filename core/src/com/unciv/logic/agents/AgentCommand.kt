@@ -374,7 +374,7 @@ class UnitUpgradedResult(
     val newUnitName: String
 ) : CommandResult
 
-enum class GreatPersonAction { HURRY_RESEARCH, HURRY_POLICY, HURRY_WONDER, HURRY_BUILDING, TRADE_MISSION }
+enum class GreatPersonAction { HURRY_RESEARCH, HURRY_POLICY, HURRY_WONDER, HURRY_BUILDING, TRADE_MISSION, GOLDEN_AGE }
 
 /** Great-person special actions (game.act type `unit.great`). Gates mirror UnitActionsGreatPerson. */
 class GreatPersonCommand(

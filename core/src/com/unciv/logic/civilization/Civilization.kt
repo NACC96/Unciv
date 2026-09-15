@@ -1161,9 +1161,9 @@ class Civilization : IsPartOfGameInfoSerialization {
     }
     // endregion
 
-    fun addCity(location: HexCoord, unit: MapUnit? = null): City {
+    fun addCity(location: HexCoord, unit: MapUnit? = null, suppressAutomation: Boolean = false): City {
         val newCity = CityFounder().foundCity(this, location, unit)
-        newCity.cityConstructions.chooseNextConstruction()
+        newCity.cityConstructions.chooseNextConstruction(suppressAutomation)
         return newCity
     }
 

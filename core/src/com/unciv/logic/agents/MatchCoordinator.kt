@@ -144,6 +144,12 @@ class MatchCoordinator(
     fun isCityBeingRazed(cityId: String): Boolean =
         committedGame.getCities().firstOrNull { it.id == cityId }?.isBeingRazed == true
 
+    /** Whether the civ is in a golden age in COMMITTED state. */
+    fun isGoldenAge(civId: String): Boolean {
+        requireController(civId)
+        return committedGame.getCivilizationOrNull(civId)?.goldenAges?.isGoldenAge() == true
+    }
+
     /** Diplomatic status name toward another civ, null without contact. */
     fun getDiplomaticStatus(civId: String, otherCivId: String): String? {
         requireController(civId)
@@ -576,8 +582,11 @@ class MatchCoordinator(
                     val tile = (construction as? Building)
                         ?.getImprovementToCreate(city.getRuleset(), city.civ)
                         ?.let { command.tilePos?.let { resolveTile(candidateGame, it) } }
+                    // automatic=false + suppressed: an emptied queue idles for an
+                    // explicit agent choice instead of settings-driven auto-fill.
                     if (!constructions.purchaseConstruction(
-                            construction, command.index, automatic = true, stat = Stat.Gold, tile = tile
+                            construction, command.index, automatic = false, stat = Stat.Gold, tile = tile,
+                            suppressAutomation = true
                         )
                     )
                         throw AgentCommandException(
@@ -1220,6 +1229,16 @@ class MatchCoordinator(
                     unit.consume()
                     "trade"
                 }
+                GreatPersonAction.GOLDEN_AGE -> {
+                    val timed = unit.getMatchingUniques(UniqueType.OneTimeEnterGoldenAgeTurns).firstOrNull()
+                    val instant = timed
+                        ?: unit.getMatchingUniques(UniqueType.OneTimeEnterGoldenAge).firstOrNull()
+                        ?: throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Unit cannot start a golden age")
+                    val turns = if (timed != null) timed.params[0].toInt() else 10
+                    civ.goldenAges.enterGoldenAge(turns)
+                    unit.consume()
+                    "golden-age"
+                }
             }
         }
         return GreatPersonResult(command.actorCivId, receipt, command.action)
@@ -1666,7 +1685,9 @@ class MatchCoordinator(
         val game = json.fromJson(GameInfo::class.java, gameJson)
         // Controlled transient restoration on the unpublished candidate.
         // Agent policy is installed before restoration (executeMove binds it
-        // above); restoration itself must not make unsolicited choices.
+        // above); restoration itself must not make unsolicited choices -
+        // including the settings-driven queue auto-fill.
+        game.suppressAutomationDuringTransients = true
         game.setTransients()
         return game
     }

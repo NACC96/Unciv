@@ -71,7 +71,7 @@ class TurnManager(val civInfo: Civilization) {
 
         for (city in civInfo.cities) {
             progressBar?.increment()
-            CityTurnManager(city).startTurn()  // Most expensive part of startTurn
+            CityTurnManager(city).startTurn(suppressAutomation)  // Most expensive part of startTurn
         }
 
         for (unit in civInfo.units.getCivUnits()) UnitTurnManager(unit).startTurn()
@@ -345,7 +345,7 @@ class TurnManager(val civInfo: Civilization) {
         // a city can be removed while iterating (if it's being razed) so we need to iterate over a copy - sorting does one
         for (city in civInfo.cities.sortedByDescending { it.isBeingRazed }) {
             progressBar?.increment()
-            CityTurnManager(city).endTurn()
+            CityTurnManager(city).endTurn(suppressAutomation)
         }
 
         civInfo.temporaryUniques.endTurn()

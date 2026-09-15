@@ -20,7 +20,7 @@ import kotlin.math.roundToInt
 class CityTurnManager(val city: City) {
 
 
-    fun startTurn():Unit = timeThis("CityTurnManager.startTurn") {
+    fun startTurn(suppressAutomation: Boolean = false):Unit = timeThis("CityTurnManager.startTurn") {
         city.clearCaches()
         
         for (resource in city.getResourcesGeneratedByCity()) {
@@ -33,7 +33,7 @@ class CityTurnManager(val city: City) {
 
         // Construct units at the beginning of the turn,
         // so they won't be generated out in the open and vulnerable to enemy attacks before you can control them
-        city.cityConstructions.constructIfEnough()
+        city.cityConstructions.constructIfEnough(suppressAutomation)
 
         city.tryUpdateRoadStatus()
         city.attackedThisTurn = false
@@ -157,13 +157,13 @@ class CityTurnManager(val city: City) {
     }
 
 
-    fun endTurn():Unit = timeThis("CityTurnManager.endTurn") {
+    fun endTurn(suppressAutomation: Boolean = false):Unit = timeThis("CityTurnManager.endTurn") {
         for (unique in city.getTriggeredUniques(UniqueType.TriggerUponTurnEnd, includeCivUniques = false).toList()) {
             UniqueTriggerActivation.triggerUnique(unique, city)
         }
         val stats = city.cityStats.currentCityStats
 
-        city.cityConstructions.endTurn(stats)
+        city.cityConstructions.endTurn(stats, suppressAutomation)
         city.expansion.nextTurn(stats.culture)
         if (city.isBeingRazed) {
             val removedPopulation =
