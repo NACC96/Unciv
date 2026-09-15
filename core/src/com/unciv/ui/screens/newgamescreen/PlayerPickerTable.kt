@@ -8,6 +8,9 @@ import com.badlogic.gdx.utils.Align
 import com.unciv.Constants
 import com.unciv.UncivGame
 import com.unciv.logic.IdChecker
+import com.unciv.logic.agents.AgentProfile
+import com.unciv.logic.agents.AgentSlotLogic
+import com.unciv.logic.agents.SlotControl
 import com.unciv.logic.civilization.PlayerType
 import com.unciv.logic.civilization.PlayerType.AI
 import com.unciv.logic.civilization.PlayerType.Human
@@ -63,6 +66,14 @@ class PlayerPickerTable(
     /** Locks player table for editing, currently unused, was previously used for scenarios and could be useful in the future. */
     var locked = false
 
+    /**
+     * External-agent assignments by slot. Presence in this map is the agent
+     * distinction: agent slots stay [Human]-typed for rule parity, and
+     * [AgentSlotLogic] keeps the two in sync. Profiles are edited through
+     * [AgentProfilePopup] and snapshot-copied at match creation.
+     */
+    val agentProfiles = HashMap<Player, AgentProfile>()
+
     /** No random civilization is available, potentially used in the future during map editing. */
     var noRandom = false
 
@@ -96,6 +107,8 @@ class PlayerPickerTable(
 
         if (gameParameters.players.size > newRulesetPlayableCivs)
             gameParameters.players.removeRange(newRulesetPlayableCivs, gameParameters.players.size)
+        // Drop agent profiles of trimmed slots.
+        agentProfiles.keys.retainAll(gameParameters.players.toSet())
 
         if (desiredCiv.isNotEmpty()) assignDesiredCiv(desiredCiv)
 
@@ -134,8 +147,27 @@ class PlayerPickerTable(
         (previousScreen as? PickerScreen)?.setRightSideButtonEnabled(isValid)
     }
 
-    fun updateRandomNumberLabel() {
-        randomNumberLabel?.run {
+    /**
+     * Agent-match readiness errors for [NewGameScreen.getErrorMessage]: slot
+     * structure plus profile/ruleset validation. Empty when no agent slots
+     * exist (ordinary games are unaffected).
+     */
+    fun collectAgentErrors(): List<String> {
+        if (agentProfiles.isEmpty()) return emptyList()
+        val errors = ArrayList(AgentSlotLogic.collectSlotErrors(gameParameters.players, agentProfiles))
+        try {
+            val setup = AgentSlotLogic.buildSetup(gameParameters.players, agentProfiles)
+            errors.addAll(setup.validate(gameParameters))
+        } catch (ex: IllegalArgumentException) {
+            errors.add(ex.message ?: "Invalid agent configuration")
+        }
+        return errors
+    }
+
+    /** Snapshot of the current slot assignment for match creation. */
+    fun buildAgentMatchSetup() = AgentSlotLogic.buildSetup(gameParameters.players, agentProfiles)
+
+    fun updateRandomNumberLabel() {        randomNumberLabel?.run {
             val playerRange = if (gameParameters.minNumberOfPlayers == gameParameters.maxNumberOfPlayers) {
                 gameParameters.minNumberOfPlayers.tr()
             } else {
@@ -198,6 +230,9 @@ class PlayerPickerTable(
         playerTable.add(nationTable).left()
 
         val playerTypeTextButton = player.playerType.name.toTextButton()
+        // Agent slots stay Human-typed (rule parity); the label carries the distinction.
+        if (AgentSlotLogic.controlOf(player, agentProfiles) == SlotControl.AGENT)
+            playerTypeTextButton.setText("Agent")
         playerTable.add(playerTypeTextButton).width(100f).pad(5f).right()
         fun updatePlayerTypeButtonEnabled() {
             // This could be written much shorter with logical operators - I think this is readable
@@ -209,7 +244,7 @@ class PlayerPickerTable(
                 // In randomNumberOfPlayers mode, don't let the user choose random AI's
                 gameParameters.randomNumberOfPlayers && player.chosenCiv == Constants.random -> false
                 else -> true
-            }
+            } && AgentSlotLogic.isSlotEditable(player, gameParameters.randomNumberOfPlayers)
         }
         updatePlayerTypeButtonEnabled()
 
@@ -221,7 +256,12 @@ class PlayerPickerTable(
             updatePlayerTypeButtonEnabled()
         }
         playerTypeTextButton.onClick {
-            player.playerType = if (player.playerType == AI) Human else AI
+            val next = AgentSlotLogic.nextControl(AgentSlotLogic.controlOf(player, agentProfiles))
+            AgentSlotLogic.applyControl(player, next, agentProfiles)
+            if (next == SlotControl.AGENT)
+                AgentProfilePopup(this@PlayerPickerTable, player,
+                    agentProfiles[player]!!,
+                    onSave = { update() })
             update()
         }
 
@@ -230,6 +270,7 @@ class PlayerPickerTable(
                 .surroundWithCircle(40f)
                 .onClick {
                     gameParameters.players.remove(player)
+                    AgentSlotLogic.forgetPlayer(player, agentProfiles)
                     update()
                 }
             ).pad(5f).right()

@@ -189,6 +189,13 @@ class NewGameScreen(
             }) return "No human players selected!"
 
         if (gameSetupInfo.gameParameters.victoryTypes.isEmpty()) return "No victory conditions were selected!"
+
+        // Agent slots stay Human-typed (rule parity), so the human-count gate
+        // above already admits all-agent matches. Their own contract —
+        // Vanilla, no espionage/mods/random counts, configured providers —
+        // is enforced here before creation.
+        val agentErrors = playerPickerTable.collectAgentErrors()
+        if (agentErrors.isNotEmpty()) return agentErrors.joinToString("\n")
         
         if (mapOptionsTable.mapTypeSelectBox.selected.value == MapGeneratedMainType.custom) {
             val map = try {
