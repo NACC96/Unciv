@@ -322,6 +322,8 @@ class MatchCoordinator(
             is PillageCommand -> executePillage(command)
             is RepairCommand -> executeRepair(command)
             is FriendshipCommand -> executeFriendship(command)
+            is DemandCommand -> executeDemand(command)
+            is RespondDemandCommand -> executeRespondDemand(command)
             is SetControllerCommand -> executeSetController(command)
         }
     }
@@ -1372,6 +1374,70 @@ class MatchCoordinator(
         return DiplomacyResult(command.actorCivId, receipt, receipt.resultJson)
     }
 
+    /** Resolves a [com.unciv.logic.civilization.diplomacy.Demand] by enum name. */
+    private fun resolveDemand(civ: Civilization, demandName: String) =
+        com.unciv.logic.civilization.diplomacy.Demand.entries.firstOrNull {
+            it.name.equals(demandName, ignoreCase = true)
+        } ?: throw AgentCommandException(
+            AgentCommandError.INVALID_ARGUMENT, "Unknown demand $demandName"
+        )
+
+    private fun executeDemand(command: DemandCommand): DemandIssuedResult {
+        val receipt = runGameplayMutation(
+            command.actorCivId, command.actionId, command.expectedRevision,
+            "diplomacy.demand|${command.targetCivId}|${command.demandName}"
+        ) { candidateGame, _ ->
+            val civ = candidateGame.getCivilizationOrNull(command.actorCivId)
+                ?: throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Unknown civilization")
+            val target = candidateGame.getCivilizationOrNull(command.targetCivId)
+                ?: throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Unknown civilization")
+            if (civ.getDiplomacyManager(command.targetCivId) == null)
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "No diplomatic contact")
+            if (civ.isDefeated() || target.isDefeated())
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Defeated civilizations demand nothing")
+            val demand = resolveDemand(civ, command.demandName)
+            if (!demand.show(civ))
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "${demand.name} is not available")
+            // agreedToDemand lives on the DEMANDER's manager toward the target
+            // (agreeToDemand mirrors it there from the promisee's side).
+            if (civ.getDiplomacyManager(command.targetCivId)!!.hasFlag(demand.agreedToDemand))
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Demand already agreed to")
+            if (target.popupAlerts.any { it.type == demand.demandAlert && it.value == civ.civID })
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Demand already pending")
+            // Identical to the MajorCivDiplomacyTable demands button.
+            target.popupAlerts.add(PopupAlert(demand.demandAlert, civ.civID))
+            "issued"
+        }
+        return DemandIssuedResult(command.actorCivId, receipt, receipt.resultJson == "issued")
+    }
+
+    private fun executeRespondDemand(command: RespondDemandCommand): DemandRespondedResult {
+        val receipt = runGameplayMutation(
+            command.actorCivId, command.actionId, command.expectedRevision,
+            "diplomacy.respondDemand|${command.requesterCivId}|${command.demandName}|${command.accept}"
+        ) { candidateGame, candidateMatch ->
+            val civ = candidateGame.getCivilizationOrNull(command.actorCivId)
+                ?: throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Unknown civilization")
+            val requester = candidateGame.getCivilizationOrNull(command.requesterCivId)
+                ?: throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Unknown civilization")
+            val demand = resolveDemand(civ, command.demandName)
+            val alert = civ.popupAlerts.firstOrNull {
+                it.type == demand.demandAlert && it.value == requester.civID
+            } ?: throw AgentCommandException(
+                AgentCommandError.INVALID_ARGUMENT, "No such demand pending from ${requester.civID}"
+            )
+            val diplomacy = civ.getDiplomacyManager(command.requesterCivId)!!
+            if (command.accept) diplomacy.agreeToDemand(demand) else diplomacy.refuseDemand(demand)
+            civ.popupAlerts.remove(alert)
+            // Resolution through a command clears its decision, exactly as
+            // conquest disposition does (nothing automatic, ever).
+            val decisionId = "demand-response:${demand.name}:${requester.civID}"
+            candidateMatch.pendingDecisions.removeAll { it.decisionId == decisionId }
+            if (command.accept) "accepted" else "refused"
+        }
+        return DemandRespondedResult(command.actorCivId, receipt, receipt.resultJson == "accepted")
+    }
+
     /**
      * Controller reassignment through the commit discipline. Game state is
      * untouched; only the controller map changes (plus the revision bump
@@ -1619,6 +1685,40 @@ class MatchCoordinator(
         candidateGame.currentTurnStartTime = System.currentTimeMillis()
         candidateMatch.turnPhase = TurnPhase.AWAITING_DECISIONS
         candidateMatch.turnSerial++
+        // Received demands surface as MANDATORY decisions for commandable
+        // civs — the agent inspector path, never a modal popup (plan §11.2).
+        // Built-in AI answers them through its own automation.
+        for (demand in com.unciv.logic.civilization.diplomacy.Demand.entries) {
+            for (alert in civ.popupAlerts.filter {
+                    it.type == demand.demandAlert
+                        && candidateGame.getCivilizationOrNull(it.value) != null
+                }) {
+                val decisionId = "demand-response:${demand.name}:${alert.value}"
+                if (candidateMatch.pendingDecisions.any { it.decisionId == decisionId }) continue
+                val options = ArrayList<HashMap<String, String>>()
+                options.add(
+                    hashMapOf(
+                        "optionId" to "accept", "demand" to demand.name,
+                        "requesterCivId" to alert.value,
+                        "display" to demand.acceptDemandText
+                    )
+                )
+                options.add(
+                    hashMapOf(
+                        "optionId" to "refuse", "demand" to demand.name,
+                        "requesterCivId" to alert.value,
+                        "display" to demand.refuseDemandText
+                    )
+                )
+                candidateMatch.pendingDecisions.add(
+                    PendingDecision(
+                        decisionId, "demand-response", civId,
+                        "alert:${demand.demandAlert.name}:${alert.value}",
+                        DecisionClassification.MANDATORY, options
+                    )
+                )
+            }
+        }
         val before = candidateMatch.stateRevision
         candidateMatch.stateRevision = before + 1
         // New turn, new idempotency scope: the hot index is swapped only after

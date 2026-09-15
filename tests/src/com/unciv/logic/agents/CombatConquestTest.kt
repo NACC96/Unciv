@@ -203,4 +203,87 @@ class CombatConquestTest {
             Assert.assertEquals(AgentCommandError.INVALID_ARGUMENT, ex.code)
         }
     }
+
+    /** Minimal air/nuke fixture: fighter or missile for Rome, target for Greece. */
+    private class AirFixture {
+        val testGame = TestGame(baseRuleset = BaseRuleset.Civ_V_Vanilla)
+        val writer = InMemoryCheckpointWriter()
+        lateinit var coordinator: MatchCoordinator
+        lateinit var romeId: String
+        lateinit var greeceId: String
+        var attackerId = -1
+
+        init {
+            testGame.gameInfo.gameParameters.baseRuleset = BaseRuleset.Civ_V_Vanilla.fullName
+            testGame.gameInfo.gameParameters.nuclearWeaponsEnabled = true
+            testGame.makeHexagonalMap(4)
+            val rome = testGame.addCiv(testGame.ruleset.nations["Rome"]!!, isPlayer = true)
+            romeId = rome.civID
+            val greece = testGame.addCiv(testGame.ruleset.nations["Greece"]!!)
+            greeceId = greece.civID
+            // Air units base in cities: Rome's city hosts the attacker,
+            // Greece's city hosts the bomber target.
+            testGame.addCity(rome, testGame.getTile(-2, 0))
+            testGame.addCity(greece, testGame.getTile(1, 0))
+            attackerId = testGame.addUnit("Fighter", rome, testGame.getTile(-2, 0)).id
+            testGame.addUnit("Bomber", greece, testGame.getTile(1, 0))
+            rome.diplomacyFunctions.makeCivilizationsMeet(greece)
+            rome.getDiplomacyManager(greece)!!
+                .declareWar(DeclareWarReason(WarType.DirectWar))
+
+            val match = AgentMatchState(
+                matchId = "m1", timelineId = "t1", turnPhase = TurnPhase.AWAITING_DECISIONS
+            )
+            match.controllers[romeId] = CivilizationController(
+                romeId, ControllerKind.EXTERNAL_AGENT,
+                AgentProfile("p1", "Ada", "codex", "m", null, "", 1))
+            match.controllers[greeceId] = CivilizationController(greeceId, ControllerKind.BUILTIN_AI, null)
+            coordinator = MatchCoordinator(testGame.gameInfo, match, writer)
+        }
+
+        /** Rebuilds the coordinator to pick up source-game unit additions. */
+        fun rebuild() {
+            val match = AgentMatchState(
+                matchId = "m1", timelineId = "t1", turnPhase = TurnPhase.AWAITING_DECISIONS
+            )
+            match.controllers[romeId] = CivilizationController(
+                romeId, ControllerKind.EXTERNAL_AGENT,
+                AgentProfile("p1", "Ada", "codex", "m", null, "", 1))
+            match.controllers[greeceId] = CivilizationController(greeceId, ControllerKind.BUILTIN_AI, null)
+            coordinator = MatchCoordinator(testGame.gameInfo, match, writer)
+        }
+    }
+
+    @Test
+    fun `air unit strikes from range through the standard attack command`() {
+        val f = AirFixture()
+        val result = f.coordinator.execute(AttackCommand(
+            f.romeId, "air1", f.coordinator.getStateRevision(),
+            attackerUnitId = f.attackerId, target = HexCoord(1, 0))) as AttackResult
+        Assert.assertTrue(result.attackerAlive)
+        Assert.assertEquals("applied", result.receipt.outcome)
+    }
+
+    @Test
+    fun `nuclear missile strike consumes the missile and hits the blast`() {
+        val f = AirFixture()
+        // Swap the fighter for a nuclear missile on the same tile.
+        val source = f.testGame.gameInfo.getCivilization(f.romeId)
+        val missile = f.testGame.addUnit("Nuclear Missile", source, f.testGame.getTile(-2, 0))
+        f.rebuild()
+
+        val result = f.coordinator.execute(AttackCommand(
+            f.romeId, "nuke1", f.coordinator.getStateRevision(),
+            attackerUnitId = missile.id, target = HexCoord(1, 0))) as AttackResult
+        Assert.assertEquals("applied", result.receipt.outcome)
+        // Missiles self-destruct on use.
+        Assert.assertNull(f.coordinator.getUnitPosition(f.romeId, missile.id))
+        // The blast gutted the defender. Rome has no uranium stockpile for
+        // the missile, so the engine halves the blast damage (ground zero
+        // 100 -> 50): the bomber survives, gutted but alive.
+        val bomber = f.coordinator.observe(f.romeId).visibleForeignUnits
+            .firstOrNull { it.name == "Bomber" }
+        Assert.assertNotNull("Bomber should still be observable", bomber)
+        Assert.assertTrue("Bomber should be gutted", bomber!!.health < 100)
+    }
 }

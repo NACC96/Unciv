@@ -57,6 +57,22 @@ class DiplomacyTradeTest {
 
         fun rev() = coordinator.getStateRevision()
         fun goldGift(amount: Int) = TradeOfferDto("Gold", TradeOfferType.Gold, amount)
+
+        /** Rebuilds the coordinator after source-game edits so the committed
+         *  snapshot picks them up (candidates are serialized clones). */
+        fun rebuild() {
+            val match = AgentMatchState(
+                matchId = "m1", timelineId = "t1", turnPhase = TurnPhase.AWAITING_DECISIONS
+            )
+            match.controllers[romeId] = CivilizationController(
+                romeId, ControllerKind.EXTERNAL_AGENT,
+                AgentProfile("p1", "Ada", "codex", "m", null, "", 1))
+            match.controllers[greeceId] = CivilizationController(
+                greeceId, ControllerKind.EXTERNAL_AGENT,
+                AgentProfile("p2", "Bob", "claude", "m", null, "", 1))
+            match.controllers[aztecId] = CivilizationController(aztecId, ControllerKind.BUILTIN_AI, null)
+            coordinator = MatchCoordinator(testGame.gameInfo, match, writer)
+        }
     }
 
     @Test
@@ -180,5 +196,82 @@ class DiplomacyTradeTest {
             RespondTradeCommand(f.greeceId, "r1", f.rev(), f.romeId, accept = true)) as TradeRespondedResult
         Assert.assertTrue(accepted.accepted)
         Assert.assertTrue(f.coordinator.hasOpenBorders(f.romeId, f.greeceId))
+    }
+
+    @Test
+    fun `defensive pact treaty through trade changes status`() {
+        val f = Fixture()
+        // Vanilla gates pacts behind Chivalry (Enables Defensive Pacts).
+        val rome = f.testGame.gameInfo.getCivilization(f.romeId)
+        val greece = f.testGame.gameInfo.getCivilization(f.greeceId)
+        rome.tech.addTechnology("Chivalry")
+        greece.tech.addTechnology("Chivalry")
+        f.rebuild()
+        f.coordinator.execute(FriendshipCommand(f.romeId, "f1", f.rev(), f.greeceId))
+        f.coordinator.execute(ProposeTradeCommand(f.romeId, "t1", f.rev(), f.greeceId,
+            ourOffers = listOf(TradeOfferDto("Defensive Pact", TradeOfferType.Treaty, 1)),
+            theirOffers = listOf(TradeOfferDto("Defensive Pact", TradeOfferType.Treaty, 1))))
+        val accepted = f.coordinator.execute(
+            RespondTradeCommand(f.greeceId, "r1", f.rev(), f.romeId, accept = true)) as TradeRespondedResult
+        Assert.assertTrue(accepted.accepted)
+        Assert.assertEquals("DefensivePact",
+            f.coordinator.getDiplomaticStatus(f.romeId, f.greeceId))
+    }
+
+    @Test
+    fun `counteroffer composes from decline plus richer re-proposal`() {
+        val f = Fixture()
+        f.coordinator.execute(ProposeTradeCommand(f.romeId, "t1", f.rev(), f.greeceId,
+            ourOffers = listOf(f.goldGift(10)), theirOffers = emptyList()))
+        val declined = f.coordinator.execute(
+            RespondTradeCommand(f.greeceId, "r1", f.rev(), f.romeId, accept = false)) as TradeRespondedResult
+        Assert.assertFalse(declined.accepted)
+
+        // The counter: same shape, sweeter terms. Composes from ordinary
+        // commands — no dedicated counteroffer command exists.
+        f.coordinator.execute(ProposeTradeCommand(f.romeId, "t2", f.rev(), f.greeceId,
+            ourOffers = listOf(f.goldGift(150)), theirOffers = emptyList()))
+        val goldBefore = f.coordinator.getGold(f.greeceId)
+        val accepted = f.coordinator.execute(
+            RespondTradeCommand(f.greeceId, "r2", f.rev(), f.romeId, accept = true)) as TradeRespondedResult
+        Assert.assertTrue(accepted.accepted)
+        Assert.assertEquals(goldBefore + 150, f.coordinator.getGold(f.greeceId))
+    }
+
+    @Test
+    fun `demand issue and answer cycle with fences`() {
+        val f = Fixture()
+        val issued = f.coordinator.execute(
+            DemandCommand(f.romeId, "d1", f.rev(), f.greeceId, "DoNotSettleNearUs")) as DemandIssuedResult
+        Assert.assertTrue(issued.issued)
+
+        // A repeat while the demand is still open is rejected.
+        try {
+            f.coordinator.execute(DemandCommand(f.romeId, "d2", f.rev(), f.greeceId, "DoNotSettleNearUs"))
+            Assert.fail("expected ILLEGAL_ACTION")
+        } catch (ex: AgentCommandException) {
+            Assert.assertEquals(AgentCommandError.ILLEGAL_ACTION, ex.code)
+        }
+
+        // Greece answers: agreeing sets the promise flag the fence reads.
+        val answered = f.coordinator.execute(
+            RespondDemandCommand(f.greeceId, "rd1", f.rev(),
+                f.romeId, "DoNotSettleNearUs", accept = true)) as DemandRespondedResult
+        Assert.assertTrue(answered.accepted)
+        try {
+            f.coordinator.execute(DemandCommand(f.romeId, "d3", f.rev(), f.greeceId, "DoNotSettleNearUs"))
+            Assert.fail("expected ILLEGAL_ACTION")
+        } catch (ex: AgentCommandException) {
+            Assert.assertEquals(AgentCommandError.ILLEGAL_ACTION, ex.code)
+        }
+
+        // Answering again is invalid — the demand was consumed.
+        try {
+            f.coordinator.execute(RespondDemandCommand(f.greeceId, "rd2", f.rev(),
+                f.romeId, "DoNotSettleNearUs", accept = false))
+            Assert.fail("expected INVALID_ARGUMENT")
+        } catch (ex: AgentCommandException) {
+            Assert.assertEquals(AgentCommandError.INVALID_ARGUMENT, ex.code)
+        }
     }
 }

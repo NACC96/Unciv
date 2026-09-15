@@ -331,7 +331,10 @@ class WorldScreen(
 
     @Readonly
     fun openDeveloperConsole() {
-        // No cheating unless you're by yourself, ignoring a possible spectator
+        // No cheating unless you're by yourself, ignoring a possible spectator.
+        // Agent matches forbid the console outright: it mutates through the
+        // engine, bypassing the coordinator.
+        if (agentSession != null) return
         if (gameInfo.civilizations.count { it.isHuman() && !it.isSpectator() } > 1) return
         DevConsolePopup(this)
     }
@@ -454,7 +457,10 @@ class WorldScreen(
             autoPlay.stopAutoPlay()
         }
 
-        if (!hasOpenPopups() && !autoPlay.isAutoPlaying() && isPlayersTurn) {
+        // canChangeState (not just isPlayersTurn) keeps agent-owned popup
+        // decisions (AlertPopup/TradePopup) from being answered by the human
+        // viewer while an external agent holds the turn.
+        if (!hasOpenPopups() && !autoPlay.isAutoPlaying() && isPlayersTurn && canChangeState) {
             when {
                 viewingCiv.shouldShowDiplomaticVotingResults() ->
                     UncivGame.Current.pushScreen{ DiplomaticVoteResultScreen(gameInfo.diplomaticVictoryVotesCast, viewingCiv) }

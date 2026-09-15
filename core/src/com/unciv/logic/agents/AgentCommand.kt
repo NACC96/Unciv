@@ -441,6 +441,41 @@ class FriendshipCommand(
     val targetCivId: String
 ) : AgentCommand
 
+/** Issue a diplomatic demand (game.act type `diplomacy.demand`).
+ *  Mirrors the MajorCivDiplomacyTable demands button: places the demand
+ *  alert on the target civ, which must answer on its own turn. */
+class DemandCommand(
+    override val actorCivId: String,
+    val actionId: String,
+    val expectedRevision: Int,
+    val targetCivId: String,
+    val demandName: String
+) : AgentCommand
+
+class DemandIssuedResult(
+    override val actorCivId: String,
+    val receipt: ActionReceipt,
+    val issued: Boolean
+) : CommandResult
+
+/** Answer a received demand (game.act type `diplomacy.respondDemand`).
+ *  The matching pending decision is resolved by accepting or refusing,
+ *  exactly as the AlertPopup accept/refuse buttons do for humans. */
+class RespondDemandCommand(
+    override val actorCivId: String,
+    val actionId: String,
+    val expectedRevision: Int,
+    val requesterCivId: String,
+    val demandName: String,
+    val accept: Boolean
+) : AgentCommand
+
+class DemandRespondedResult(
+    override val actorCivId: String,
+    val receipt: ActionReceipt,
+    val accepted: Boolean
+) : CommandResult
+
 /**
  * Controller reassignment (takeover / return-to-agent / provider switch
  * bookkeeping). Not a gameplay mutation: it changes WHO may act, never game

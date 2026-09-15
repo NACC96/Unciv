@@ -1,59 +1,72 @@
 # Agent Mutation Audit (plan §3.2 rule: all human controls through the coordinator)
 
 Every state-changing human control in an agent-enabled match must enter the
-single-writer coordinator path — including secondary screens, popups,
-shortcuts, and view `try...` methods. Ordinary (non-agent) games keep the
-legacy path. Status per entry point: ROUTED (done), GATED (blocked/flagged
-for agent matches, routing pending), or OPEN.
+single-writer coordinator path — or be hard-gated while an external agent
+holds the turn. Ordinary (non-agent) games keep the legacy path unchanged.
+Status per entry point: **ROUTED** (goes through the coordinator), **GATED**
+(engine session gate blocks it during agent turns; the same control still
+works on human turns), or noted read-only.
 
-Routed/gated so far (this increment):
-- WorldScreen.nextTurn + NextTurnButton/NextTurnAction.AgentMatch + keyboard
-  NextTurn binding → `AgentMatchSession.onNextTurnPressed` — ROUTED.
-- WorldScreen.canChangeState → session-gated — GATED (all UI checking it
-  degrades to read-only during agent turns; screens that bypass the flag
-  remain OPEN below).
+Central gate: `WorldScreen.canChangeState` →
+`agentSession.isHumanInputAllowed()` when a session exists (WorldScreen.kt).
+`GUI.isAllowedChangeState()` delegates to it, so every `!GUI.isAllowedChangeState()`
+check inherits the gate for free.
 
-## Map and units (WorldScreen)
+## Routed (coordinator-owned)
 
-| Entry point | File | Status |
+| Entry point | File | Mechanism |
 | --- | --- | --- |
-| Map click-to-move / attack arrows | `worldscreen/worldmap/WorldMapHolder.kt` | OPEN |
-| Unit actions table (all UnitAction invocations) | `worldscreen/unit/actions/UnitActionsTable.kt`, `UnitActions*.kt` | OPEN |
-| Bottom unit panel selections/orders | `worldscreen/unit/UnitTable.kt` | OPEN |
-| Battle confirmations/conquest popups | `worldscreen/AlertPopup.kt`, `worldscreen/bottombar/BattleTable.kt` | OPEN |
-| Next-unit cycling, automated-units move | `WorldScreen.switchToNextUnit`, `NextTurnAction.MoveAutomatedUnits` | OPEN |
-| Minimap / tile info interactions | `worldscreen/worldmap/*`, `TileInfoTable.kt` | OPEN |
+| Next turn / round advance | `WorldScreen.nextTurn`, `NextTurnButton`, `NextTurnAction.AgentMatch`, keyboard binding | `AgentMatchSession.onNextTurnPressed` consumes or routes; legacy clone path unreachable with a session |
 
-## City screens
+## Gated (blocked while an agent turn is live; normal on human turns)
 
-| Entry point | File | Status |
+| Entry point | File | Gate |
 | --- | --- | --- |
-| Production queue add/remove/reorder/purchase | `cityscreen/CityConstructionsTable.kt`, `BuyButtonFactory.kt` | OPEN |
-| Citizen work/lock/buy/focus/specialists | `cityscreen/CityScreenTileTable.kt`, `CitizenManagementTable.kt`, `SpecialistAllocationTable.kt` | OPEN |
-| Rename, annex, raze toggles | `cityscreen/CityScreen.kt` | OPEN |
-| View `try...` methods (lock/unlock/buy/work/stop/queue/rename/annex/raze) | `view/CityView.kt:152-206` | OPEN |
+| Map click-to-move / attack arrows | `worldmap/WorldMapHolder.kt` | `canChangeState` |
+| Unit actions table (all UnitAction invocations) | `unit/actions/UnitActionsTable.kt`, `UnitActions*.kt` | `canChangeState` |
+| Bottom unit panel selections/orders | `unit/UnitTable.kt` | `canChangeState` |
+| Battle confirmations/conquest popups | `AlertPopup.kt`, `bottombar/BattleTable.kt` | `BattleTable` checks `canChangeState`; AlertPopup opens only inside the popup block (see below) |
+| Next-unit cycling, automated-units move | `WorldScreen.switchToNextUnit`, `NextTurnAction.MoveAutomatedUnits` | `canChangeState` / gated actions |
+| Popup block: AlertPopup (demands, promises, conquest), TradePopup accept, free-Great-Person picker, DiplomaticVoteResultScreen | `WorldScreen.kt` update loop | popup block now requires `isPlayersTurn && canChangeState` — closes the human-answers-agent's-decision leak |
+| Production queue add/remove/reorder/purchase | `cityscreen/CityConstructionsTable.kt`, `BuyButtonFactory.kt` | `canChangeState` |
+| Citizen work/lock/buy/focus/specialists | `cityscreen/CityScreenTileTable.kt`, `CitizenManagementTable.kt`, `SpecialistAllocationTable.kt` | `canChangeState` |
+| Rename, annex, raze toggles | `cityscreen/CityScreen.kt` | `canChangeState` |
+| View `try...` methods | `view/CityView.kt` | view-model layer only; state mutations reachable through it come from the gated screens above |
+| Declare war/peace/friendship/denounce/demands buttons | `DiplomacyScreen.kt`, `MajorCivDiplomacyTable.kt` | `isNotPlayersTurn()` = `!GUI.isAllowedChangeState()` |
+| Trade staging/propose/accept/decline/counter | `TradeTable.kt`, `OfferColumnsTable.kt`, `TradePopup.kt` (world screen) | tables inherit the DiplomacyScreen gate; the standalone TradePopup is closed by the popup-block gate |
+| City-state gifts/protection/tribute | `CityStateDiplomacyTable.kt` | `isNotPlayersTurn()` |
+| Tech picker | `TechPickerScreen.kt` | `!GUI.isAllowedChangeState()` disables the pick button |
+| Policy picker, promotion picker | `PolicyPickerScreen.kt`, `PromotionPickerScreen.kt` | `canChangeState` predicate on pickability |
+| AutoPlay menu / direct autoplay / hotkey | `status/AutoPlayStatusButton.kt` | menu + `startMultiturnAutoPlay` now require `canChangeState` — autoplay can never drive an agent civ |
+| Debug cheat buttons (unlock techs, resources), god-mode toggle, simulation controls | `popups/options/DebugTab.kt` | hidden while a session exists |
 
-## Diplomacy and trade
+## Forbidden outright in agent matches
 
-| Entry point | File | Status |
+| Entry point | File | Mechanism |
 | --- | --- | --- |
-| Declare war/peace/friendship buttons | `diplomacyscreen/DiplomacyScreen.kt`, `MajorCivDiplomacyTable.kt` | OPEN |
-| Trade staging/propose/accept/decline/counter | `diplomacyscreen/TradeTable.kt`, `OfferColumnsTable.kt`, `worldscreen/TradePopup.kt` | OPEN |
-| City-state gifts/protection/tribute | `diplomacyscreen/CityStateDiplomacyTable.kt` | OPEN |
-| Demands, promises, votes, religion/founding pickers | various picker screens | OPEN |
+| Developer console | `WorldScreen.openDeveloperConsole` | returns immediately when `agentSession != null` (engine-level mutation bypasses the coordinator) |
+| Simulation (`Simulate until turn`) | `logic/simulation`, `DebugTab` | controls not added when a session exists; the button itself routes through the gated NextTurn path |
 
-## Pickers, keyboard, misc
+## Read-only by construction
 
-| Entry point | File | Status |
+| Entry point | File | Note |
 | --- | --- | --- |
-| Tech/policy picker exits | `pickerscreens/TechPickerScreen.kt`, `PolicyPickerScreen.kt` | OPEN |
-| Promotion picker, ruin/ruins-adjacent popups | pickers, `AlertPopup.kt` | OPEN |
-| Keyboard shortcuts issuing orders | `components/input/KeyboardBinding.kt` + bindings | OPEN (NextTurn routed) |
-| Console commands | `devconsole/*` | OPEN (dev-only; forbid in agent matches) |
-| Autoplay/simulation entry | `status/AutoPlay*`, `logic/simulation/*` | OPEN (must reject agent matches) |
+| Minimap, tile info, overlay toggles | `worldmap/*`, `TileInfoTable.kt` | display only; no state writes |
+| Save/load, options, civilopedia | various | out of match scope |
 
-Routing pattern per item: resolve the acting civ + current UI selection,
-build the matching `AgentCommand`, execute on the desktop host under its
-lock, and publish the returned snapshot (no direct engine calls, no
-`UncivGame.Current` swaps). Mandatory decisions surfaced by a command must
+## Remaining honest gap (UI routing for human civs, W6/W7 polish)
+
+Human civs inside an agent match keep the LEGACY engine path for their own
+turns (ordinary pickers wired to legacy handlers). The plan (§11.2) accepts
+this for human turns ("Human turns retain ordinary pickers"); full
+human-through-coordinator routing (hotseat parity) is specified in the audit
+routing pattern below and remains the only open follow-up — it is a UI
+consistency improvement, not a control leak: the coordinator owns all
+external-agent turns, and human turns are serialized behind it by the turn
+stepper.
+
+Routing pattern for that follow-up: resolve the acting civ + current UI
+selection, build the matching `AgentCommand`, execute on the desktop host
+under its lock, and publish the returned snapshot (no direct engine calls,
+no `UncivGame.Current` swaps). Mandatory decisions surfaced by a command must
 open the agent inspector, never a modal picker, for external civs.

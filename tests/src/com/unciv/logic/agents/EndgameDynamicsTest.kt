@@ -229,4 +229,79 @@ class EndgameDynamicsTest {
         Assert.assertEquals(TurnPhase.COMPLETED, f.coordinator.getTurnPhase())
         Assert.assertEquals("Time", f.coordinator.getVictoryType())
     }
+
+    @Test
+    fun `science victory through prepared spaceship state completes the match`() {
+        val f = object : Base() {
+            init {
+                val rome = testGame.gameInfo.getCivilization(romeId)
+                testGame.addCity(rome, testGame.getTile(0, 0))
+                rebuild()
+            }
+        }
+        // Prepared fixture (plan 13.2 "deterministic prepared fixtures"):
+        // Apollo built and every required part added to the capital, as if
+        // constructed over the campaign; the end turn then runs the REAL
+        // engine victory evaluation.
+        val source = f.testGame.gameInfo.getCivilization(f.romeId)
+        source.cities.first().cityConstructions.addBuilding("Apollo Program")
+        val victory = f.testGame.ruleset.victories.getValue("Scientific")
+        for ((part, count) in victory.requiredSpaceshipPartsAsCounter)
+            source.victoryManager.currentsSpaceshipParts.add(part, count)
+        f.rebuild()
+
+        f.coordinator.beginAwaitingTurn()
+        f.endTurnRome()
+        Assert.assertEquals(TurnPhase.COMPLETED, f.coordinator.getTurnPhase())
+        Assert.assertEquals("Scientific", f.coordinator.getVictoryType())
+    }
+
+    @Test
+    fun `cultural victory with completed branches and utopia completes the match`() {
+        val f = object : Base() {
+            init {
+                val rome = testGame.gameInfo.getCivilization(romeId)
+                testGame.addCity(rome, testGame.getTile(0, 0))
+                rebuild()
+            }
+        }
+        val source = f.testGame.gameInfo.getCivilization(f.romeId)
+        // Five whole branches, adopted bypassing culture (fixture shortcut,
+        // real milestone evaluation untouched).
+        for (branch in f.testGame.ruleset.policyBranches.values.take(5))
+            for (policy in branch.policies)
+                source.policies.adopt(policy, branchCompletion = true)
+        source.cities.first().cityConstructions.addBuilding("Utopia Project")
+        f.rebuild()
+
+        f.coordinator.beginAwaitingTurn()
+        f.endTurnRome()
+        Assert.assertEquals(TurnPhase.COMPLETED, f.coordinator.getTurnPhase())
+        Assert.assertEquals("Cultural", f.coordinator.getVictoryType())
+    }
+
+    @Test
+    fun `diplomatic victory with un and won vote completes the match`() {
+        val f = object : Base() {
+            init {
+                val rome = testGame.gameInfo.getCivilization(romeId)
+                val greece = testGame.gameInfo.getCivilization(greeceId)
+                testGame.addCity(rome, testGame.getTile(0, 0))
+                // Greece must stay alive, else domination (earlier in the
+                // victory list) fires first.
+                testGame.addCity(greece, testGame.getTile(2, 0))
+                testGame.addUnit("Warrior", greece, testGame.getTile(2, 1))
+                rebuild()
+            }
+        }
+        val source = f.testGame.gameInfo.getCivilization(f.romeId)
+        source.cities.first().cityConstructions.addBuilding("United Nations")
+        source.victoryManager.hasEverWonDiplomaticVote = true
+        f.rebuild()
+
+        f.coordinator.beginAwaitingTurn()
+        f.endTurnRome()
+        Assert.assertEquals(TurnPhase.COMPLETED, f.coordinator.getTurnPhase())
+        Assert.assertEquals("Diplomatic", f.coordinator.getVictoryType())
+    }
 }

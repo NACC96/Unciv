@@ -26,7 +26,7 @@ internal class DebugTab(
     optionsPopup: OptionsPopup
 ): OptionsPopupTab(optionsPopup) {
     override fun lateInitialize() {
-        if (GUI.isWorldLoaded()) addSimulationControls()
+        if (GUI.isWorldLoaded() && GUI.getWorldScreen().agentSession == null) addSimulationControls()
 
         addCheckbox("Supercharged", DebugUtils::SUPERCHARGED)
         addCheckbox("View entire map", DebugUtils::VISIBLE_MAP, updateWorld = true)
@@ -35,7 +35,7 @@ internal class DebugTab(
         addCheckbox("Show tile image locations", DebugUtils::SHOW_TILE_IMAGE_LOCATIONS, updateWorld = true)
 
         val curGameInfo = game.gameInfo
-        if (curGameInfo != null) {
+        if (curGameInfo != null && GUI.getWorldScreen().agentSession == null) {
             addCheckbox("God mode (current game)", curGameInfo.gameParameters::godMode)
         }
 
@@ -52,7 +52,9 @@ internal class DebugTab(
             RulesetCache.uniqueMisspellingThreshold = value.toDouble()
         }
 
-        if (curGameInfo != null) {
+        if (curGameInfo != null && GUI.getWorldScreen().agentSession == null) {
+            // Debug cheat buttons mutate the engine directly — forbidden
+            // while a match coordinator owns the game state.
             val unlockTechsButton = "Unlock all techs".toTextButton()
             unlockTechsButton.onClick { curGameInfo.unlockAllTechs() }
             add(unlockTechsButton).colspan(2).row()

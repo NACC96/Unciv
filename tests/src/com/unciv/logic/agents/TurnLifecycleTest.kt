@@ -69,6 +69,29 @@ class TurnLifecycleTest {
             coordinator = MatchCoordinator(testGame.gameInfo, match, writer)
         }
 
+        /** Rebuilds the coordinator after source-game edits (e.g. contact). */
+        fun rebuild() {
+            val match = AgentMatchState(
+                matchId = "m1", timelineId = "t1", turnPhase = TurnPhase.READY_TO_START
+            )
+            match.controllers[romeId] = CivilizationController(
+                romeId, ControllerKind.EXTERNAL_AGENT,
+                AgentProfile("p1", "Ada", "codex", "m", null, "", 1)
+            )
+            match.controllers[greeceId] = CivilizationController(
+                greeceId, ControllerKind.EXTERNAL_AGENT,
+                AgentProfile("p2", "Bob", "claude", "m", null, "", 1)
+            )
+            aztecId?.let {
+                match.controllers[it] = CivilizationController(it, ControllerKind.BUILTIN_AI, null)
+            }
+            if (mandatoryDecision) match.pendingDecisions.add(
+                PendingDecision("d1", "conquest-disposition", romeId, "city:X",
+                    DecisionClassification.MANDATORY, ArrayList())
+            )
+            coordinator = MatchCoordinator(testGame.gameInfo, match, writer)
+        }
+
         fun endTurn(actor: String, actionId: String) =
             EndTurnCommand(actor, actionId, coordinator.getStateRevision())
     }
@@ -188,5 +211,44 @@ class TurnLifecycleTest {
         val (scoutAuto, scoutAction) = coordinator.getUnitOrder(f.romeId, scout.id)
         Assert.assertFalse(scoutAuto)
         Assert.assertEquals(UnitActionType.Fortify.value, scoutAction)
+    }
+
+    @Test
+    fun `received demand blocks end turn until answered`() {
+        val f = Fixture()
+        f.testGame.gameInfo.getCivilization(f.romeId)
+            .diplomacyFunctions.makeCivilizationsMeet(
+                f.testGame.gameInfo.getCivilization(f.greeceId))
+        f.rebuild()
+        f.coordinator.beginAwaitingTurn()
+
+        // Rome issues the demand; the alert rides on Greece.
+        f.coordinator.execute(DemandCommand(f.romeId, "dm1",
+            f.coordinator.getStateRevision(), f.greeceId, "DoNotSettleNearUs"))
+
+        // Rome ends; Greece begins and the demand is a MANDATORY decision.
+        val turn = f.coordinator.execute(f.endTurn(f.romeId, "e1")) as TurnEndedResult
+        Assert.assertEquals(f.greeceId, turn.nextCivId)
+        val decision = f.coordinator.getPendingDecisions(f.greeceId)
+            .first { it.decisionType == "demand-response" }
+        Assert.assertEquals(
+            "demand-response:DoNotSettleNearUs:${f.romeId}", decision.decisionId)
+        Assert.assertTrue(decision.options.any { it["optionId"] == "accept" })
+        Assert.assertTrue(decision.options.any { it["optionId"] == "refuse" })
+
+        // Greece cannot end the turn with the demand unanswered.
+        try {
+            f.coordinator.execute(f.endTurn(f.greeceId, "e2"))
+            Assert.fail("expected DECISIONS_PENDING")
+        } catch (ex: AgentCommandException) {
+            Assert.assertEquals(AgentCommandError.DECISIONS_PENDING, ex.code)
+        }
+
+        // Answering through the command resolves the decision, then end turn.
+        f.coordinator.execute(RespondDemandCommand(f.greeceId, "rd1",
+            f.coordinator.getStateRevision(), f.romeId, "DoNotSettleNearUs", accept = true))
+        Assert.assertTrue(f.coordinator.getPendingDecisions(f.greeceId).isEmpty())
+        f.coordinator.execute(f.endTurn(f.greeceId, "e3"))
+        Assert.assertEquals(f.romeId, f.coordinator.getCurrentCivId())
     }
 }

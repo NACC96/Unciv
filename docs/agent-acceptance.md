@@ -1,0 +1,68 @@
+# Agent Match — Release Acceptance Evidence (plan §13)
+
+Status as of CP-030 on `agent-match-foundation`. Commands run with the
+standing environment (`JAVA_HOME=/opt/homebrew/opt/openjdk@21`,
+`GRADLE_USER_HOME=/Users/noahkenny/.gradle-unciv`, `COPYFILE_DISABLE=1`,
+build dirs relocated to `~/.unciv-build/` by the local-only init script —
+never committed).
+
+## 13.1 Automated checks — all green
+
+| Check | Result |
+| --- | --- |
+| `./gradlew :tests:test` | **932 tests, 0 failures, 0 errors** (95 suites; 82 agent tests in 18 agent suites), per-file XML presence verified after `cleanTest` (CP-024 rule) |
+| `./gradlew :desktop:dist` | BUILD SUCCESSFUL — runnable jar at `~/.unciv-build/desktop/libs/Unciv.jar` (57 MB; contains all agent classes — spot-checked `DemandCommand`) |
+| `./gradlew check` | BUILD SUCCESSFUL |
+| `npm run typecheck` (agent-runner) | clean (`tsc --noEmit`) |
+| `npm test` (agent-runner) | **34/34** (7 files) |
+| `npm run build` (agent-runner) | clean (`tsc -p tsconfig.build.json` → `dist/`) |
+
+`npm ci` lockfile install was performed at setup (W5); node_modules is
+present and current, so a plain test/build re-run is equivalent evidence.
+
+## 13.2 Scenario matrix — evidence pointers
+
+| Area | Evidence |
+| --- | --- |
+| Controller/rule parity | AgentMatchSetupTest (slot validation, nation-name binding); AgentSlotLogicTest (human rule parity, cycling); built-in AI stays BUILTIN_AI in controllers (all fixtures) |
+| Turn ordering | TurnLifecycleTest (begin once, cycle, rollover wrap, exactly-once end effects, replay/stale fences); AgentMatchRunnerTest (round wrap fix); daemon end-turn census in DaemonLoopTest |
+| Isolation | MatchCoordinatorTest (candidate cannot mutate published state, failed persist never acknowledges); FileCheckpointStoreTest (atomic generations, torn-write recovery on the real Lexar FS); suppression of settings-driven automation (CP-027, DomesticOrdersTest auto-production fence) |
+| Command contract | AgentCommandsTest + suite-wide: illegal owner/phase/action, stale revision (`STALE_STATE`), reused actionId same/different payload (replay vs `ACTION_ID_CONFLICT`), pending-result lookup, removed entity fences |
+| Visibility | ObservationVisibilityTest (hidden units, movement zeroing, no queue oracle, differential-ish gates); CP-018 fixture lessons |
+| Decisions | Conquest decisions (CombatConquestTest/EndgameDynamicsTest: MANDATORY, `DECISIONS_PENDING` block, resolve via command); demand-response decisions (TurnLifecycleTest: raised at beginTurn, block end turn, resolved by `diplomacy.respondDemand`); free tech/policy via research/civics commands |
+| Provider parsing | W1 sanitized fixtures + probes (split/malformed/truncated JSONL, unknown events, duplicate usage, session mismatch — `W1-COMPATIBILITY.md`); daemon second-turn concurrency rejected |
+| Authority/lifecycle | AgentRunControlsTest (pause/step/takeover/stop state machine); daemon shutdown/EOF drain; SetControllerCommand rev discipline |
+| Storage | FileCheckpointStoreTest on the actual ExFAT volume: atomic move, interrupted-write recovery, corruption fallback, missing-volume error surfaced |
+| UI (automated part) | Session gating: `canChangeState` degrades all compliant surfaces to read-only; popup block now requires `canChangeState` (CP-030); DevConsole forbidden; AutoPlay gated (audit doc). Interactive GL-thread checks remain manual (see below) |
+| Victories | EndgameDynamicsTest: **all five** live — Domination (capital capture), Time (max turns), Scientific (Apollo + all parts in capital), Cultural (5 branches + Utopia Project), Diplomatic (UN + won vote). No further agent work after COMPLETED phase |
+| Compatibility | Old saves without runner: legacy `nextTurn` path untouched when no session; unsupported-format refusals in AgentMatchSetup/Session attach (logged, session stays null) |
+
+## 13.3 Deliberate manual acceptance (not automatable here — checklist for a human tester)
+
+These require real provider accounts/credits and an interactive desktop
+session; the plan explicitly forbids running them as a side effect of
+ordinary work. Pin: codex-cli 0.154.0, claude 2.1.270, opencode 1.18.31.
+
+1. One small Vanilla match per provider (3 matches) + one 3-provider match.
+   Record outcome + any intervention.
+2. Human+agent match exercising diplomacy, handoffs, pause/retry,
+   save/reopen, both inspection settings — human actions through the real UI.
+3. Later-game fixture (many cities/units) for observation size/UI rebinding.
+4. Finder launch with bundled Node (no dev shell env), path-with-spaces and
+   missing-drive error paths.
+5. Performance sampling: checkpoint duration, tool-response size, GL-thread
+   stall check while providers think.
+
+## Known limitations (honest record)
+
+- Human civs in an agent match still use legacy engine handlers on their own
+  turns (serialized behind the stepper). Full human-through-coordinator
+  routing is the documented follow-up in the mutation audit.
+- Deferred Vanilla actions: paradrop, rebase/carrier ops, unit gifts to
+  major civs, join-war trade offers, denounce, multi-turn goto, city
+  sell/rename. Each is listed per-row in the coverage table.
+- Air sweep is G&K-only (out of Vanilla scope). Research agreements do not
+  exist in the Vanilla ruleset (G&K feature).
+- UN election/vote mechanics run through the legacy UI path for humans; the
+  agent-side diplomatic victory is exercised at flag level (CP-029 note).
+- Real-provider matches (13.3) are deliberately not run in CI or by agents.
