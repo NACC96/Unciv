@@ -1,8 +1,5 @@
 package com.unciv.logic.agents
 
-import com.badlogic.gdx.utils.JsonReader
-import com.badlogic.gdx.utils.JsonValue
-import com.unciv.logic.map.HexCoord
 import com.unciv.models.metadata.BaseRuleset
 import com.unciv.testing.BaseTestRunner
 import com.unciv.testing.TestGame
@@ -52,44 +49,14 @@ class DaemonLoopTest {
         }
     }
 
-    //region Minimal JSON (no class tags, integral numbers preserved)
+    // Protocol framing shares core AgentJson (single implementation for
+    // tests and the desktop host).
+    private fun emitJson(value: Any?): String = AgentJson.stringify(value)
 
-    private fun emitJson(value: Any?): String = when (value) {
-        null -> "null"
-        is String -> "\"" + value
-            .replace("\\", "\\\\").replace("\"", "\\\"")
-            .replace("\n", "\\n").replace("\r", "\\r").replace("\t", "\\t") + "\""
-        is Boolean -> value.toString()
-        is Number -> {
-            val long = value.toLong()
-            if (long.toDouble() == value.toDouble()) long.toString() else value.toDouble().toString()
-        }
-        is Map<*, *> -> value.entries.joinToString(",", "{", "}") {
-            emitJson(it.key.toString()) + ":" + emitJson(it.value)
-        }
-        is List<*> -> value.joinToString(",", "[", "]") { emitJson(it) }
-        else -> emitJson(value.toString())
+    private fun parseJsonFrame(text: String): Map<String, Any?> {
+        @Suppress("UNCHECKED_CAST")
+        return AgentJson.parse(text) as Map<String, Any?>
     }
-
-    private fun parseJson(value: JsonValue): Any? = when {
-        value.isObject() -> LinkedHashMap<String, Any?>().also { map ->
-            for (child in value) map[child.name] = parseJson(child)
-        }
-        value.isArray() -> ArrayList<Any?>().also { list ->
-            for (child in value) list.add(parseJson(child))
-        }
-        value.isBoolean() -> value.asBoolean()
-        value.isString() -> value.asString()
-        value.isNull() -> null
-        value.isNumber() -> run {
-            val long = value.asLong()
-            if (long.toDouble() == value.asDouble() && long in Int.MIN_VALUE..Int.MAX_VALUE) long.toInt()
-            else value.asDouble()
-        }
-        else -> value.asString()
-    }
-
-    //endregion
 
     @Test
     fun `scripted provider turn completes through the daemon against the real coordinator`() {
@@ -107,7 +74,6 @@ class DaemonLoopTest {
         try {
             val writer = PrintWriter(process.outputStream, true)
             val events = LinkedBlockingQueue<Map<String, Any?>>()
-            val reader = JsonReader()
             val readerThread = Thread({
                 val lines = BufferedReader(InputStreamReader(process.inputStream))
                 while (true) {
@@ -119,7 +85,7 @@ class DaemonLoopTest {
                     if (line.isBlank()) continue
                     @Suppress("UNCHECKED_CAST")
                     val frame = try {
-                        parseJson(reader.parse(line)) as Map<String, Any?>
+                        parseJsonFrame(line)
                     } catch (ex: Exception) {
                         continue
                     }

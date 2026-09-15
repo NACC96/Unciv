@@ -113,6 +113,16 @@ class MatchCoordinator(
         return committedMatch.pendingDecisions.filter { it.owningCivId == civId }.map { it.copy() }
     }
 
+    /** Committed controller assignment, if any. */
+    fun getController(civId: String): CivilizationController? =
+        committedMatch.controllers[civId]?.copy()
+
+    fun getTimelineId(): String = committedMatch.timelineId
+    fun getMatchId(): String = committedMatch.matchId
+
+    /** Pinned ruleset name of the committed game. */
+    fun getRulesetName(): String = committedGame.ruleset.name
+
     /** Committed receipt by action ID (active-turn scope), for result lookup. */
     fun getReceipt(actionId: String): ActionReceipt? {
         return actionReceipts[actionId]?.copy()

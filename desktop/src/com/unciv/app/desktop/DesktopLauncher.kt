@@ -107,6 +107,14 @@ internal object DesktopLauncher {
 
         val dataDirectory = customDataDir ?: "."
 
+        // Agent matches: hosting factory closed over the project-owned data
+        // directory (checkpoints, logs, supervisor runtime live here — never
+        // the ordinary Unciv profile). Null elsewhere (other platforms).
+        com.unciv.logic.agents.AgentMatchSessionFactory.creator = { game, match, setup ->
+            com.unciv.app.desktop.agents.DesktopAgentMatch(
+                game, match, setup, java.io.File(dataDirectory))
+        }
+
         val isRunFromJAR = isRunFromJar(this)
         ImagePacker.packImages(isRunFromJAR, dataDirectory)
 

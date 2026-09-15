@@ -37,35 +37,12 @@ class AgentEngineBridge(val coordinator: MatchCoordinator) {
     }
 
     /**
-     * Converts coordinator DTOs to JSON-compatible primitives/maps/lists via
-     * the JsonValue tree (Gdx Map deserialization drops fields; this keeps
-     * integers integral so revision assertions survive the round trip).
+     * Converts coordinator DTOs to JSON-compatible primitives/maps/lists.
+     * Shared [AgentJson] implementation (tests and the desktop host frame
+     * stdio with the same functions).
      */
     fun toJsonMap(value: Any): Any {
-        return convertValue(jsonReader.parse(wireJson.toJson(value)))!!
-    }
-
-    private fun convertValue(node: com.badlogic.gdx.utils.JsonValue): Any? {
-        if (node.isObject()) {
-            val map = LinkedHashMap<String, Any?>()
-            for (child in node) map[child.name] = convertValue(child)
-            return map
-        }
-        if (node.isArray()) {
-            val list = ArrayList<Any?>()
-            for (child in node) list.add(convertValue(child))
-            return list
-        }
-        if (node.isBoolean()) return node.asBoolean()
-        if (node.isString()) return node.asString()
-        if (node.isNull()) return null
-        if (node.isNumber()) {
-            val long = node.asLong()
-            return if (long.toDouble() == node.asDouble() && long in Int.MIN_VALUE..Int.MAX_VALUE) long.toInt()
-            else node.asDouble()
-        }
-        if (node.isValue()) return node.asString()
-        return null
+        return AgentJson.parse(wireJson.toJson(value))!!
     }
 
     private fun requireString(args: Map<String, Any?>, name: String): String =
