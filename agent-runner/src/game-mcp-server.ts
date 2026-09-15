@@ -29,7 +29,7 @@ import { randomBytes, timingSafeEqual } from "node:crypto";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { z } from "zod";
-import { FakeGameService } from "./fake-game-mcp.js";
+import type { IGameService } from "./fake-game-mcp.js";
 
 export const MAX_TOOL_REQUEST_BYTES = 64 * 1024;
 export const MAX_TOOL_RESPONSE_BYTES = 256 * 1024;
@@ -59,7 +59,7 @@ const err = (code: string, message: string, extra: Record<string, unknown> = {})
   isError: true,
 });
 
-function registerGameTools(mcp: McpServer, game: FakeGameService): void {
+function registerGameTools(mcp: McpServer, game: IGameService): void {
   mcp.registerTool("game.observe", {
     description: "Permitted overview: revision, active-turn status, required decisions, recent visible events.",
     inputSchema: {},
@@ -161,7 +161,7 @@ function dbg(...args: unknown[]): void {
   if (process.env["GAME_MCP_DEBUG"]) console.error("[game-mcp]", ...args);
 }
 
-export async function startGameMcpServer(game: FakeGameService, binding: RunBinding): Promise<StartedGameMcpServer> {
+export async function startGameMcpServer(game: IGameService, binding: RunBinding): Promise<StartedGameMcpServer> {
   const bearer = randomBytes(32).toString("hex");
   const bearerBuf = Buffer.from(`Bearer ${bearer}`);
 

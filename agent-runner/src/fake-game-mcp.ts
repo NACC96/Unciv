@@ -1,14 +1,38 @@
 /**
- * Deterministic fake game service behind the W1 capability gate
- * (AI_AGENT_PLAN.md §12 W1: "fake game MCP service with observe/act/end-turn
- * behavior"). SDK-independent: it implements the 8-tool surface as pure
- * functions so adapter tests run without the engine or the MCP transport.
- * The Streamable-HTTP + bearer-capability transport is W1 follow-up work;
- * this file is the behavior oracle the transport must preserve.
+ * Engine-service seam (AI_AGENT_PLAN.md §3.1, §7).
  *
- * Tool surface (plan §5.1): game.observe, game.inspect, game.rules,
- * game.legal_actions, game.act, game.action_result, game.notes, game.end_turn.
+ * IGameService is the contract the MCP transport serves. The deterministic
+ * fake implements it for W1 gates and supervisor-loop tests; the desktop
+ * bridges the REAL coordinator (MatchCoordinator homeostasis: observe,
+ * act, end_turn, notes) behind the same interface over private stdio.
+ * Transports must program to this interface, never to the fake.
  */
+export interface GameObserveResult {
+  revision: number;
+  activeTurn: boolean;
+  requiredDecisions: string[];
+  recentEvents: string[];
+}
+
+export interface IGameService {
+  observe(): GameObserveResult;
+  inspect(unitId: number): FakeUnit | FakeError;
+  act(envelope: {
+    protocolVersion: number;
+    actionId: string;
+    expectedRevision: number;
+    type: string;
+    args: Record<string, unknown>;
+  }): FakeReceipt | FakeError;
+  actionResult(actionId: string): FakeReceipt | { status: "pending" | "rejected"; actionId: string };
+  updateNotes(notes: string, expectedNotesRevision: number): { notesRevision: number } | FakeError;
+  endTurn(): { turnEnded: boolean } | FakeError;
+  readonly revision: number;
+  readonly notes: string;
+  readonly notesRevision: number;
+  /** True once game.end_turn commits. Engine receipts govern; this is the signal. */
+  readonly turnEnded: boolean;
+}
 
 export interface FakeUnit {
   id: number;
@@ -43,7 +67,7 @@ export interface FakeError {
   currentRevision?: number;
 }
 
-export class FakeGameService {
+export class FakeGameService implements IGameService {
   revision = 42;
   /** actionId -> {requestFingerprint, receipt} for idempotency tests. */
   private receipts = new Map<string, { fingerprint: string; receipt: FakeReceipt }>();
