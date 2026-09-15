@@ -82,6 +82,25 @@ See docs/manual-test-checklist.md for the step-by-step script to execute.
 Performance expectations to sample: checkpoint duration, tool-response size,
 and the GL thread never waiting on provider/network/disk work.
 
+## Packaging: implemented vs assembled (artifact-inspected)
+
+- **Runtime discovery (code)**: implemented — explicit `-Dunciv.node.path`,
+  then `<appDir>/node/{bin/node,node.exe,node}`, then PATH; supervisor-bundle
+  discovery mirrors that layout; failures name every searched location.
+- **Assembled distributable**: implemented this increment —
+  `./gradlew :desktop:agentPackage [-Dunciv.node.home=<node install>]`
+  produces `~/.unciv-build/desktop/agentPackage/` containing **Unciv.jar** +
+  **agent-runner/dist** (daemon.js + JS outputs) + **agent-runner/node_modules**
+  + **node/** (bundled runtime when the property is given). Artifact
+  inspection of the built package confirmed all four parts present, and the
+  packaged node + daemon.js were launched from a path WITH SPACES emitting a
+  valid protocol `ready` frame. The plain `:desktop:dist` fat jar contains
+  NO runner or Node (verified: zero matches for daemon.js/node_modules in
+  the jar listing) — use `agentPackage` for agent matches.
+- A double-clickable .app bundle (Info.plist, icon, minimal-PATH launch
+  verification) is NOT assembled yet — that is Finder-launch territory and
+  belongs to the manual phase.
+
 ## Known limitations (honest record)
 
 - Human civs in an agent match still use legacy engine handlers on their own

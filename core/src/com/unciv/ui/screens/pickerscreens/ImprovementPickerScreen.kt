@@ -1,5 +1,9 @@
 package com.unciv.ui.screens.pickerscreens
 
+import com.unciv.UncivGame
+import com.unciv.logic.agents.BuildImprovementCommand
+import com.unciv.logic.agents.StopImprovementCommand
+
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.InputEvent
@@ -60,6 +64,31 @@ class ImprovementPickerScreen(
 
     fun accept(improvement: TileImprovement?, secondImprovement: TileImprovement? = null) {
         if (improvement == null || tileMarkedForCreatesOneImprovement) return
+        // Agent matches route both the build and the cancel-order through
+        // the coordinator (§3.2).
+        val worldScreen = UncivGame.Current.worldScreen
+        if (worldScreen != null) {
+            if (improvement.name == Constants.cancelImprovementOrder) {
+                if (worldScreen.routeThroughAgentSession {
+                        listOf({ r: Int ->
+                            StopImprovementCommand(unit.civ.civID, "ui-${System.nanoTime()}", r, unit.id)
+                        })
+                    }) { game.popScreen(); return }
+            } else if (worldScreen.routeThroughAgentSession {
+                    buildList {
+                        if (improvement.name != tile.improvementInProgress)
+                            add({ r: Int ->
+                                BuildImprovementCommand(unit.civ.civID, "ui-${System.nanoTime()}", r,
+                                    unit.id, improvement.name)
+                            })
+                        if (secondImprovement != null)
+                            add({ r: Int ->
+                                BuildImprovementCommand(unit.civ.civID, "ui-${System.nanoTime()}", r,
+                                    unit.id, secondImprovement.name)
+                            })
+                    }
+                }) { game.popScreen(); return }
+        }
         if (improvement.name == Constants.cancelImprovementOrder) {
             tile.stopWorkingOnImprovement()
             // no onAccept() - Worker can stay selected

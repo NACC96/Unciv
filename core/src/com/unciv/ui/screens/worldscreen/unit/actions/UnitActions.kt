@@ -1,5 +1,8 @@
 package com.unciv.ui.screens.worldscreen.unit.actions
 
+import com.unciv.logic.agents.UnitOrder
+import com.unciv.logic.agents.UnitOrderCommand
+
 import com.unciv.GUI
 import com.unciv.UncivGame
 import com.unciv.logic.automation.unit.UnitAutomation
@@ -234,6 +237,13 @@ object UnitActions {
                         "Disband this unit for [${unit.baseUnit.getDisbandGold(unit.civ)}] gold?".tr()
                     else "Do you really want to disband this unit?".tr()
                     ConfirmPopup(worldScreen, disbandText, "Disband unit") {
+                        // Agent matches route disband through the coordinator (§3.2).
+                        if (worldScreen.routeThroughAgentSession {
+                                listOf({ r: Int ->
+                                    UnitOrderCommand(unit.civ.civID, "ui-${System.nanoTime()}", r,
+                                        unit.id, UnitOrder.DISBAND)
+                                })
+                            }) return@ConfirmPopup
                         unit.disband()
                         unit.civ.updateStatsForNextTurn() // less upkeep!
                         GUI.setUpdateWorldOnNextRender()

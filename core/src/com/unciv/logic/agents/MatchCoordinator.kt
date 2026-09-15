@@ -327,6 +327,9 @@ class MatchCoordinator(
             is RespondDemandCommand -> executeRespondDemand(command)
             is CastVoteCommand -> executeCastVote(command)
             is RenameCityCommand -> executeRenameCity(command)
+            is AnnexCityCommand -> executeAnnexCity(command)
+            is SetRazingCommand -> executeSetRazing(command)
+            is StopImprovementCommand -> executeStopImprovement(command)
             is SetControllerCommand -> executeSetController(command)
         }
     }
@@ -493,6 +496,11 @@ class MatchCoordinator(
                 throw AgentCommandException(
                     AgentCommandError.ILLEGAL_ACTION, "Cannot make progress toward destination"
                 )
+            // Human-click parity: an unreached destination persists as the
+            // engine's own "moveTo" action, resumed at next turn start
+            // (mirrors MapUnitView.trySetMoveToAction).
+            if (finalPosition != command.destination)
+                unit.action = "moveTo ${command.destination.x},${command.destination.y}"
             "${finalPosition.x},${finalPosition.y}"
         }
         val (x, y) = receipt.resultJson.split(",")
@@ -584,6 +592,11 @@ class MatchCoordinator(
                     if (command.index !in 0 until constructions.constructionQueue.size)
                         throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Queue index out of range")
                     constructions.lowerPriority(command.index)
+                }
+                ProductionOp.MOVE_TOP -> {
+                    if (command.index !in 0 until constructions.constructionQueue.size)
+                        throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Queue index out of range")
+                    constructions.moveEntryToTop(command.index)
                 }
                 ProductionOp.PURCHASE -> {
                     val construction = try {
@@ -1541,6 +1554,61 @@ class MatchCoordinator(
             city.name
         }
         return CityRenamedResult(command.actorCivId, receipt, receipt.resultJson)
+    }
+
+    private fun executeAnnexCity(command: AnnexCityCommand): CityAnnexedResult {
+        val receipt = runGameplayMutation(
+            command.actorCivId, command.actionId, command.expectedRevision,
+            "city.annex|${command.cityId}"
+        ) { candidateGame, _ ->
+            val city = requireOwnCity(candidateGame, command.actorCivId, command.cityId)
+            // Gates mirror CityScreen.updateAnnexAndRazeCityButton.
+            if (!city.isPuppet)
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "City is not a puppet")
+            if (candidateGame.getCivilization(command.actorCivId)
+                    .hasUnique(UniqueType.MayNotAnnexCities))
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Civilization cannot annex cities")
+            city.annexCity()
+            "annexed"
+        }
+        return CityAnnexedResult(command.actorCivId, receipt)
+    }
+
+    private fun executeSetRazing(command: SetRazingCommand): RazingSetResult {
+        val receipt = runGameplayMutation(
+            command.actorCivId, command.actionId, command.expectedRevision,
+            "city.raze|${command.cityId}|${command.raze}"
+        ) { candidateGame, _ ->
+            val city = requireOwnCity(candidateGame, command.actorCivId, command.cityId)
+            val civ = candidateGame.getCivilization(command.actorCivId)
+            if (command.raze) {
+                if (city.isBeingRazed)
+                    throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "City is already being razed")
+                if (!city.canBeDestroyed())
+                    throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "City cannot be destroyed")
+                if (civ.hasUnique(UniqueType.MayNotAnnexCities))
+                    throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Civilization cannot raze cities")
+            } else if (!city.isBeingRazed)
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "City is not being razed")
+            city.isBeingRazed = command.raze
+            command.raze.toString()
+        }
+        return RazingSetResult(command.actorCivId, receipt, receipt.resultJson.toBoolean())
+    }
+
+    private fun executeStopImprovement(command: StopImprovementCommand): ImprovementStoppedResult {
+        val receipt = runGameplayMutation(
+            command.actorCivId, command.actionId, command.expectedRevision,
+            "unit.stopImprovement|${command.unitId}"
+        ) { candidateGame, _ ->
+            val unit = requireOwnUnit(candidateGame, command.actorCivId, command.unitId)
+            val tile = unit.getTile()
+            if (!tile.hasImprovementInProgress())
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "No improvement in progress here")
+            tile.stopWorkingOnImprovement()
+            "stopped"
+        }
+        return ImprovementStoppedResult(command.actorCivId, receipt)
     }
 
     private fun executeCastVote(command: CastVoteCommand): VoteCastResult {

@@ -1,5 +1,7 @@
 package com.unciv.ui.screens.diplomacyscreen
 
+import com.unciv.logic.agents.GiftGoldToCityStateCommand
+
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane
 import com.badlogic.gdx.scenes.scene2d.ui.Table
@@ -339,6 +341,17 @@ class CityStateDiplomacyTable(private val diplomacyScreen: DiplomacyScreen) {
             val giftButton =
                 "Gift [$giftAmount] gold (+[$influenceAmount] influence)".toTextButton()
             giftButton.onClick {
+                // Agent matches route gold gifts through the coordinator (§3.2).
+                if (UncivGame.Current.worldScreen?.routeThroughAgentSession {
+                        listOf({ r: Int ->
+                            GiftGoldToCityStateCommand(viewingCiv.civID, "ui-${System.nanoTime()}", r,
+                                otherCiv.civID, giftAmount)
+                        })
+                    } == true) {
+                    diplomacyScreen.updateLeftSideTable(otherCiv)
+                    diplomacyScreen.updateRightSide(otherCiv)
+                    return@onClick
+                }
                 otherCiv.cityStateFunctions.receiveGoldGift(viewingCiv, giftAmount)
                 diplomacyScreen.updateLeftSideTable(otherCiv)
                 diplomacyScreen.updateRightSide(otherCiv)

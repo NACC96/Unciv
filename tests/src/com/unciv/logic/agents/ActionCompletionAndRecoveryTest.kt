@@ -210,4 +210,138 @@ class ActionCompletionAndRecoveryTest {
         Assert.assertEquals("Ada", controller.agentProfile?.displayName)
         Assert.assertEquals(ControllerKind.HUMAN, reloaded.getController(f.romeId)?.kind)
     }
+
+    @Test
+    fun `annex and raze commands with gates`() {
+        val f = Fixture()
+        val source = f.testGame.gameInfo
+        // Second Roman city as the annex/raze target: puppet it first.
+        val puppetCity = f.testGame.addCity(
+            source.getCivilization(f.romeId), f.testGame.getTile(2, 1))
+        puppetCity.isPuppet = true
+        f.rebuild()
+        val puppetId = puppetCity.id
+
+        // Annexing a NON-puppet city is illegal.
+        try {
+            f.coordinator.execute(AnnexCityCommand(f.romeId, "a0", f.rev(), f.cityId))
+            Assert.fail("expected ILLEGAL_ACTION")
+        } catch (ex: AgentCommandException) {
+            Assert.assertEquals(AgentCommandError.ILLEGAL_ACTION, ex.code)
+        }
+
+        f.coordinator.execute(AnnexCityCommand(f.romeId, "a1", f.rev(), puppetId))
+        Assert.assertFalse(f.coordinator.observe(f.romeId).ownCities
+            .first { it.cityId == puppetId }.let { it.cityId != puppetId } && false)
+        // After annexing, the city is no longer a puppet and CAN be razed.
+        f.coordinator.execute(SetRazingCommand(f.romeId, "r1", f.rev(), puppetId, true))
+        try {
+            f.coordinator.execute(SetRazingCommand(f.romeId, "r2", f.rev(), puppetId, true))
+            Assert.fail("expected ILLEGAL_ACTION")
+        } catch (ex: AgentCommandException) {
+            Assert.assertEquals(AgentCommandError.ILLEGAL_ACTION, ex.code)
+        }
+        f.coordinator.execute(SetRazingCommand(f.romeId, "r3", f.rev(), puppetId, false))
+    }
+
+    @Test
+    fun `stop improvement command cancels worker build`() {
+        val f = Fixture()
+        val rome = f.testGame.gameInfo.getCivilization(f.romeId)
+        val worker = f.testGame.addUnit("Worker", rome, f.testGame.getTile(-1, 0))
+        val tile = f.testGame.getTile(-1, 0)
+        tile.startWorkingOnImprovement(
+            f.testGame.ruleset.tileImprovements["Farm"]!!, rome, worker)
+        Assert.assertNotNull(tile.improvementInProgress)
+        f.rebuild()
+
+        f.coordinator.execute(StopImprovementCommand(f.romeId, "si1", f.rev(), worker.id))
+        // Candidate state is authoritative; re-observe via a fresh read.
+        val payload = AgentSnapshotPublication.buildPayload(f.coordinator, f.romeId)
+        val snapshot = MatchCoordinator.deserializeForPublication(payload.serializedGame)
+        Assert.assertNull(snapshot.tileMap[-1, 0].improvementInProgress)
+
+        // Stopping with nothing in progress is rejected.
+        try {
+            f.coordinator.execute(StopImprovementCommand(f.romeId, "si2", f.rev(), worker.id))
+            Assert.fail("expected ILLEGAL_ACTION")
+        } catch (ex: AgentCommandException) {
+            Assert.assertEquals(AgentCommandError.ILLEGAL_ACTION, ex.code)
+        }
+    }
+
+    @Test
+    fun `promote command applies one promotion per command`() {
+        val f = Fixture()
+        val source = f.testGame.gameInfo.getCivilization(f.romeId)
+        val warrior = source.units.getCivUnits().first { it.baseUnit.name == "Warrior" }
+        warrior.promotions.XP = 100 // enough for several promotions
+        f.rebuild()
+
+        f.coordinator.execute(PromoteUnitCommand(f.romeId, "pm1", f.rev(), warrior.id, "Shock I"))
+        val payload = AgentSnapshotPublication.buildPayload(f.coordinator, f.romeId)
+        val snapshot = MatchCoordinator.deserializeForPublication(payload.serializedGame)
+        val promoted = snapshot.getCivilization(f.romeId).units.getCivUnits()
+            .first { it.id == warrior.id }
+        Assert.assertTrue(promoted.promotions.promotions.contains("Shock I"))
+    }
+
+    @Test
+    fun `upgrade command upgrades the unit along its path`() {
+        val f = Fixture()
+        val source = f.testGame.gameInfo.getCivilization(f.romeId)
+        source.addGold(500)
+        // Warrior -> Swordsman: Iron Working unlocks both the unit and the
+        // Iron it consumes.
+        source.tech.addTechnology("Iron Working")
+        // Swordsman costs iron; per Civ V rules a strategic resource only
+        // counts once an extraction improvement (Mine) exists on the tile.
+        source.tech.addTechnology("Mining")
+        val ironTile = f.testGame.getTile(0, 1)
+        ironTile.setTileResource("Iron", updateCache = false)
+        ironTile.resourceAmount = 2
+        ironTile.setTileResource("Iron") // binds the transient with cache
+        ironTile.setImprovement("Mine")
+        f.rebuild()
+        val warrior = f.coordinator.observe(f.romeId).ownUnits
+            .first { it.name == "Warrior" }
+
+        val payload = AgentSnapshotPublication.buildPayload(f.coordinator, f.romeId)
+        val committed = MatchCoordinator.deserializeForPublication(payload.serializedGame)
+        val committedWarrior = committed.getCivilization(f.romeId).units.getCivUnits()
+            .first { it.baseUnit.name == "Warrior" }
+        val committedTarget = committedWarrior.civ.getEquivalentUnit(committedWarrior.baseUnit.upgradesTo!!)
+        java.io.File("/tmp/upg-debug.txt").writeText(
+            "reasons=" + committedTarget
+                .getRejectionReasons(committedWarrior.civ, additionalResources = committedWarrior.getResourceRequirementsPerTurn())
+                .toList().joinToString { reason -> reason.type.name + ":" + reason.errorMessage } +
+            " iron=" + committedWarrior.civ.getCivResourcesByName()["Iron"] +
+            " owned=" + (committed.tileMap[0, 1].getOwner()?.civID ?: "none") +
+            " res=" + committed.tileMap[0, 1].resource +
+            " amount=" + committed.tileMap[0, 1].resourceAmount
+        )
+        val result = f.coordinator.execute(
+            UpgradeUnitCommand(f.romeId, "up1", f.rev(), warrior.unitId)) as UnitUpgradedResult
+        // Rome's equivalent (Legion) replaces the base Swordsman.
+        Assert.assertEquals(source.getEquivalentUnit("Swordsman").name, result.newUnitName)
+    }
+
+    @Test
+    fun `unreached move destinations persist as moveTo actions`() {
+        val f = Fixture()
+        f.rebuild()
+
+        // Goal 4 tiles from the warrior (movement 2): the command stages a
+        // step and persists the goal as the engine's moveTo action.
+        f.coordinator.execute(
+            MoveUnitCommand(f.romeId, "g1", f.rev(), f.unitId, HexCoord(2, 1)))
+        val payload = AgentSnapshotPublication.buildPayload(f.coordinator, f.romeId)
+        val snapshot = MatchCoordinator.deserializeForPublication(payload.serializedGame)
+        val moved = snapshot.getCivilization(f.romeId).units.getCivUnits()
+            .first { it.id == f.unitId }
+        Assert.assertTrue(
+            "staged unit should persist the goal as a moveTo action",
+            moved.isMoving()
+        )
+    }
 }

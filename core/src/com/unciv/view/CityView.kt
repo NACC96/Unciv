@@ -2,12 +2,14 @@ package com.unciv.view
 
 import com.unciv.UncivGame
 import com.unciv.logic.agents.AgentCommand
+import com.unciv.logic.agents.AnnexCityCommand
 import com.unciv.logic.agents.BuyTileCommand
 import com.unciv.logic.agents.CitizenOp
 import com.unciv.logic.agents.CityCitizensCommand
 import com.unciv.logic.agents.CityProductionCommand
 import com.unciv.logic.agents.ProductionOp
 import com.unciv.logic.agents.RenameCityCommand
+import com.unciv.logic.agents.SetRazingCommand
 import com.unciv.logic.automation.Automation
 import com.unciv.logic.city.City
 import com.unciv.logic.city.CityFlags
@@ -265,11 +267,21 @@ class CityView(city: City,
     }
     fun tryAnnexCity(): Boolean {
         if (!canChangeState()) return false
+        if (routeThroughAgentSession { rev ->
+                listOf({ r: Int ->
+                    AnnexCityCommand(city.civ.civID, "ui-${System.nanoTime()}", r, city.id)
+                })
+            }) return true
         city.annexCity()
         return true
     }
     fun trySetRazing(raze: Boolean): Boolean {
         if (!canChangeState()) return false
+        if (routeThroughAgentSession { rev ->
+                listOf({ r: Int ->
+                    SetRazingCommand(city.civ.civID, "ui-${System.nanoTime()}", r, city.id, raze)
+                })
+            }) return true
         city.isBeingRazed = raze
         return true
     }
@@ -285,11 +297,23 @@ class CityView(city: City,
     }
     fun trySellBuilding(construction: Building): Boolean {
         if (!canChangeState()) return false
+        if (routeThroughAgentSession { rev ->
+                listOf({ r: Int ->
+                    CityProductionCommand(city.civ.civID, "ui-${System.nanoTime()}", r, city.id,
+                        ProductionOp.SELL, name = construction.name)
+                })
+            }) return true
         city.sellBuilding(construction)
         return true
     }
     fun tryMoveEntryToTop(index: Int) {
         if (!canChangeState()) return
+        if (routeThroughAgentSession { rev ->
+                listOf({ r: Int ->
+                    CityProductionCommand(city.civ.civID, "ui-${System.nanoTime()}", r, city.id,
+                        ProductionOp.MOVE_TOP, index = index)
+                })
+            }) return
         city.cityConstructions.moveEntryToTop(index)
     }
     fun tryMoveEntryToEnd(index: Int) {

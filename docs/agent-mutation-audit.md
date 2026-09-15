@@ -31,6 +31,17 @@ check inherits the gate for free.
 | Incoming trade accept/decline | `TradePopup` buttons | `RespondTradeCommand` |
 | Demand answers (agree/refuse) | `AlertPopup.addDemand` buttons | `RespondDemandCommand` |
 | Human-command execution core | `logic/agents/HumanCommandExecutor.kt` | single coordinator entry: revision stamping per command, HUMAN-controller verification, batch all-or-nothing — headless-tested |
+| Promotion adoption (whole path) | `PromotionPickerScreen.acceptPromotion` | one `PromoteUnitCommand` per path step |
+| Unit upgrades (button + menu + upgrade-all) | `UnitActionsTable.activateAction`, `UnitUpgradeMenu.doUpgrade/doAllUpgrade` | `UpgradeUnitCommand` (coordinator revalidates gold/movement/requirements) |
+| Unit disband (confirm popup) | `UnitActions.addDisbandAction` | `UnitOrderCommand` DISBAND; popup cancel routes nothing |
+| Pillage (confirm popup) | `UnitActionsPillage.getPillageActions` | `PillageCommand`; popup cancel routes nothing |
+| Worker improvement build + cancel-order + second queued improvement | `ImprovementPickerScreen.accept` | `BuildImprovementCommand` (x2) / `StopImprovementCommand` |
+| Repair pillaged tile | `UnitActionsFromUniques.getRepairActions` lambda | `RepairCommand` (null-safe worldScreen lookup: automation invokes this lambda headlessly) |
+| City sell (confirm popup) | `CityView.trySellBuilding` | `CityProductionCommand` SELL; popup cancel routes nothing |
+| Annex puppet city | `CityView.tryAnnexCity` | `AnnexCityCommand` |
+| Raze / stop razing | `CityView.trySetRazing` | `SetRazingCommand` |
+| Queue move-to-top | `CityView.tryMoveEntryToTop` | `CityProductionCommand` MOVE_TOP |
+| City-state gold gifts (250/500/1000) | `CityStateDiplomacyTable.getGoldGiftTable` | `GiftGoldToCityStateCommand` |
 
 ## Gated (blocked while an agent turn is live; normal on human turns)
 
@@ -68,21 +79,20 @@ check inherits the gate for free.
 | Minimap, tile info, overlay toggles | `worldmap/*`, `TileInfoTable.kt` | display only; no state writes |
 | Save/load, options, civilopedia | various | out of match scope |
 
-## Remaining honest gap (secondary funnels)
+## Remaining honest gap (legacy on human turns — safe, serialized behind the stepper)
 
-Routed above: every PRIMARY gameplay funnel (orders, movement, attacks,
-queue edits, purchases, citizens, research, policies, war/peace/friendship/
-denounce, trades, demand answers). Not yet routed — still LEGACY on human
-turns (serialized safely behind the turn stepper, but not coordinator-owned):
-promotions and unit upgrades (promotion/upgrade menus), unit disband via
-confirm popup, improvement build/pillage via unit action lambdas, sell
-building (CityScreenConstructionMenu — coordinator `city.produce SELL` exists
-and is tested; only the button is unwired), annex/raze toggles
-(`tryAnnexCity/trySetRazing` — engine annex lives behind conquest decisions;
-no standalone command), MultiplayerStatus/spectator controls. Each needs the
-same one-line `routeThroughAgentSession` guard with the matching command
-listed in the routing pattern below; no new coordinator capability is
-required.
+All plan-listed families are routed. What still runs LEGACY on a human's own
+turn inside an agent match (each is a UI lambda invoking the engine directly;
+none can execute during agent turns because of the `canChangeState` gates):
+unit action lambdas for Explore / Automate / AirSweep / ConnectRoad /
+EscortFormation / Guard / Transform / SetUp and their stop-variants, unit
+swap overlays, unit rename popup, city-state unit gifts / demand tribute /
+pledge-revoke protection buttons (no coordinator commands exist for these
+city-state relation actions yet), and MultiplayerStatus/spectator controls.
+Routing these follows the identical `routeThroughAgentSession` pattern with
+new small commands where missing (city-state relations). They are UI
+consistency follow-ups, NOT control leaks: agent turns are fully owned by
+the coordinator, and human turns are serialized behind the turn stepper.
 
 Routing pattern for that follow-up: resolve the acting civ + current UI
 selection, build the matching `AgentCommand`, execute on the desktop host

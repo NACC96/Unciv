@@ -1,5 +1,7 @@
 package com.unciv.ui.screens.worldscreen.unit.actions
 
+import com.unciv.logic.agents.PillageCommand
+
 import com.unciv.GUI
 import com.unciv.logic.civilization.NotificationCategory
 import com.unciv.logic.civilization.NotificationIcon
@@ -31,6 +33,13 @@ object UnitActionsPillage {
                 "Pillage",
                 true
             ) {
+                // Agent matches route pillage through the coordinator (§3.2).
+                val worldScreen = GUI.getWorldScreen()
+                if (worldScreen.routeThroughAgentSession {
+                        listOf({ r: Int ->
+                            PillageCommand(unit.civ.civID, "ui-${System.nanoTime()}", r, unit.id)
+                        })
+                    }) return@ConfirmPopup
                 (pillageAction.action)()
                 GUI.setUpdateWorldOnNextRender()
             }.open()

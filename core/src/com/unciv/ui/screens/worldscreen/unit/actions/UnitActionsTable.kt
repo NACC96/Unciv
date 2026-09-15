@@ -2,6 +2,7 @@ package com.unciv.ui.screens.worldscreen.unit.actions
 
 import com.unciv.logic.agents.UnitOrder
 import com.unciv.logic.agents.UnitOrderCommand
+import com.unciv.logic.agents.UpgradeUnitCommand
 import java.util.UUID
 
 import com.badlogic.gdx.graphics.Color
@@ -209,9 +210,20 @@ class UnitActionsTable(val worldScreen: WorldScreen) : Table() {
             UnitActionType.Paradrop -> UnitOrder.PARADROP
             else -> null
         }
-        if (routedOrder != null && worldScreen.routeThroughAgentSession { rev ->
+        if (routedOrder != null && worldScreen.routeThroughAgentSession { 
                 listOf({ r: Int ->
                     UnitOrderCommand(unit.civ.civID, "ui-${UUID.randomUUID()}", r, unit.id, routedOrder)
+                })
+            }) {
+            worldScreen.mapHolder.removeUnitActionOverlay()
+            worldScreen.shouldUpdate = true
+            return
+        }
+        // Upgrade actions route through the coordinator; the coordinator
+        // revalidates gold, movement, and requirements on committed state.
+        if (unitAction is UpgradeUnitAction && worldScreen.routeThroughAgentSession {
+                listOf({ r: Int ->
+                    UpgradeUnitCommand(unit.civ.civID, "ui-${UUID.randomUUID()}", r, unit.id)
                 })
             }) {
             worldScreen.mapHolder.removeUnitActionOverlay()

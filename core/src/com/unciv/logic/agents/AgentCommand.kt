@@ -104,7 +104,7 @@ class ResearchSelectedResult(
     val currentTech: String?
 ) : CommandResult
 
-enum class ProductionOp { ADD_TOP, ADD_BOTTOM, REMOVE, RAISE, LOWER, PURCHASE, SELL }
+enum class ProductionOp { ADD_TOP, ADD_BOTTOM, REMOVE, RAISE, LOWER, MOVE_TOP, PURCHASE, SELL }
 
 /**
  * City production-queue edits (game.act type `city.produce`). [name] is the
@@ -447,6 +447,47 @@ class VoteCastResult(
     override val actorCivId: String,
     val receipt: ActionReceipt,
     val targetCivId: String?
+) : CommandResult
+
+/** Annex an own puppet city (game.act type `city.annex`). */
+class AnnexCityCommand(
+    override val actorCivId: String,
+    val actionId: String,
+    val expectedRevision: Int,
+    val cityId: String
+) : AgentCommand
+
+class CityAnnexedResult(
+    override val actorCivId: String,
+    val receipt: ActionReceipt
+) : CommandResult
+
+/** Start or stop razing an own city (game.act type `city.raze`). */
+class SetRazingCommand(
+    override val actorCivId: String,
+    val actionId: String,
+    val expectedRevision: Int,
+    val cityId: String,
+    val raze: Boolean
+) : AgentCommand
+
+class RazingSetResult(
+    override val actorCivId: String,
+    val receipt: ActionReceipt,
+    val razing: Boolean
+) : CommandResult
+
+/** Cancel a worker's improvement-in-progress (game.act type `unit.stopImprovement`). */
+class StopImprovementCommand(
+    override val actorCivId: String,
+    val actionId: String,
+    val expectedRevision: Int,
+    val unitId: Int
+) : AgentCommand
+
+class ImprovementStoppedResult(
+    override val actorCivId: String,
+    val receipt: ActionReceipt
 ) : CommandResult
 
 /** Tile pillaging with full loot (game.act type `unit.pillage`). */

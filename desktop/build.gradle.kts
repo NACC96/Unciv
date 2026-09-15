@@ -73,6 +73,30 @@ tasks.register<Jar>("dist") { // Compiles the jar file
     }
 }
 
+// Assembles the complete agent-match package (AI_AGENT_PLAN.md W6):
+// Unciv.jar + the supervisor runner (agent-runner/dist + its node_modules)
+// and, when -Dunciv.node.home points at a Node install, a bundled Node.
+// The resulting layout matches DesktopAgentMatch discovery: <pkg>/agent-runner/dist
+// and <pkg>/node.
+tasks.register<Copy>("agentPackage") {
+    group = "unciv"
+    description = "Assembles Unciv.jar with the agent supervisor runner (and Node when -Dunciv.node.home is given)."
+    dependsOn("dist")
+    into(layout.buildDirectory.dir("agentPackage"))
+    from(layout.buildDirectory.file("libs/Unciv.jar"))
+    from(rootDir.resolve("agent-runner/dist")) { into("agent-runner/dist") }
+    val nodeModules = rootDir.resolve("agent-runner/node_modules")
+    if (nodeModules.isDirectory) from(nodeModules) { into("agent-runner/node_modules") }
+    doLast {
+        val nodeHome = System.getProperty("unciv.node.home")?.let { file(it) }
+        if (nodeHome != null && nodeHome.isDirectory) {
+            copy { from(nodeHome); into(layout.buildDirectory.dir("agentPackage/node")) }
+        } else {
+            println("NOTE: agentPackage has no bundled Node (pass -Dunciv.node.home=<node install dir>); the app will fall back to PATH discovery.")
+        }
+    }
+}
+
 
 enum class Platform(val desc: String) {
     Windows32("windows32"), Windows64("windows64"), Linux32("linux32"), Linux64("linux64"), MacOS("mac");
