@@ -1,5 +1,8 @@
 package com.unciv.ui.screens.pickerscreens
 
+import com.unciv.logic.agents.SelectResearchCommand
+import com.unciv.UncivGame
+
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.Batch
@@ -126,6 +129,21 @@ class TechPickerScreen(
 
 
     private fun tryExit() {
+        // Agent matches route research through the coordinator (§3.2).
+        val chosenTech = selectedTech?.name ?: tempTechsToResearch.firstOrNull()
+        if (UncivGame.Current.worldScreen?.routeThroughAgentSession { 
+                listOf({ r: Int ->
+                    SelectResearchCommand(
+                        civInfo.civID, "ui-${System.nanoTime()}", r,
+                        chosenTech ?: "",
+                        queue = !freeTechPick && tempTechsToResearch.size > 1,
+                        useFreeTech = freeTechPick
+                    )
+                })
+            } == true) {
+            game.popScreen()
+            return
+        }
         if (freeTechPick) {
             val freeTech = selectedTech!!.name
             // More evil people fast-clicking to cheat - #4977

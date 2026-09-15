@@ -1,5 +1,7 @@
 package com.unciv.ui.screens.worldscreen
 
+import com.unciv.logic.agents.RespondTradeCommand
+
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.unciv.UncivGame
@@ -33,7 +35,7 @@ import com.unciv.ui.components.widgets.AutoScrollPane as ScrollPane
  *
  * @param worldScreen The parent screen
  */
-class TradePopup(worldScreen: WorldScreen) : Popup(worldScreen) {
+class TradePopup(private val worldScreen: WorldScreen) : Popup(worldScreen) {
     val viewingCiv = worldScreen.selectedGameView.civView.getCiv()
     val tradeRequest = viewingCiv.tradeRequests.first()
 
@@ -85,6 +87,17 @@ class TradePopup(worldScreen: WorldScreen) : Popup(worldScreen) {
         addGoodSizedLabel(nation.tradeRequest).pad(15f).row()
 
         addButton("Sounds good!", 'y') {
+            // Agent matches route trade acceptance through the coordinator (§3.2).
+            if (worldScreen.routeThroughAgentSession {
+                    listOf({ r: Int ->
+                        RespondTradeCommand(viewingCiv.civID, "ui-${System.nanoTime()}", r,
+                            requestingCiv.civID, accept = true)
+                    })
+                }) {
+                close()
+                worldScreen.shouldUpdate = true
+                return@addButton
+            }
             val tradeLogic = TradeLogic(viewingCiv, requestingCiv)
             tradeLogic.currentTrade.set(trade)
             tradeLogic.acceptTrade()
@@ -94,6 +107,17 @@ class TradePopup(worldScreen: WorldScreen) : Popup(worldScreen) {
         }.row()
 
         addButton("Not this time.", 'n') {
+            // Agent matches route declines through the coordinator (§3.2).
+            if (worldScreen.routeThroughAgentSession {
+                    listOf({ r: Int ->
+                        RespondTradeCommand(viewingCiv.civID, "ui-${System.nanoTime()}", r,
+                            requestingCiv.civID, accept = false)
+                    })
+                }) {
+                close()
+                worldScreen.shouldUpdate = true
+                return@addButton
+            }
             tradeRequest.decline(viewingCiv)
             close()
             requestingCiv.addNotification("[${viewingCiv.civName}] has denied your trade request", NotificationCategory.Trade, viewingCiv.civName, NotificationIcon.Trade)

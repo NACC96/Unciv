@@ -104,7 +104,7 @@ class ResearchSelectedResult(
     val currentTech: String?
 ) : CommandResult
 
-enum class ProductionOp { ADD_TOP, ADD_BOTTOM, REMOVE, RAISE, LOWER, PURCHASE }
+enum class ProductionOp { ADD_TOP, ADD_BOTTOM, REMOVE, RAISE, LOWER, PURCHASE, SELL }
 
 /**
  * City production-queue edits (game.act type `city.produce`). [name] is the
@@ -143,7 +143,7 @@ class CityFoundedResult(
     val cityId: String
 ) : CommandResult
 
-enum class UnitOrder { FORTIFY, FORTIFY_UNTIL_HEALED, SLEEP, SLEEP_UNTIL_HEALED, WAKE, DISBAND }
+enum class UnitOrder { FORTIFY, FORTIFY_UNTIL_HEALED, SLEEP, SLEEP_UNTIL_HEALED, WAKE, DISBAND, PARADROP }
 
 /** Explicit persistent unit orders (game.act type `unit.order`). Gates mirror the UI action predicates. */
 class UnitOrderCommand(
@@ -403,6 +403,50 @@ class GoldGiftedResult(
     override val actorCivId: String,
     val receipt: ActionReceipt,
     val influenceGained: Int
+) : CommandResult
+
+/** Denounce a known civilization (game.act type `diplomacy.denounce`). */
+class DenounceCommand(
+    override val actorCivId: String,
+    val actionId: String,
+    val expectedRevision: Int,
+    val targetCivId: String
+) : AgentCommand
+
+class DenouncedResult(
+    override val actorCivId: String,
+    val receipt: ActionReceipt
+) : CommandResult
+
+/** Rename an own city (game.act type `city.rename`). */
+class RenameCityCommand(
+    override val actorCivId: String,
+    val actionId: String,
+    val expectedRevision: Int,
+    val cityId: String,
+    val newName: String
+) : AgentCommand
+
+class CityRenamedResult(
+    override val actorCivId: String,
+    val receipt: ActionReceipt,
+    val name: String
+) : CommandResult
+
+/** Cast a diplomatic-victory vote (game.act type `diplomacy.castVote`).
+ *  A null/blank [targetCivId] is an abstention. Resolves the MANDATORY
+ *  `diplomatic-vote` decision raised at turn start. */
+class CastVoteCommand(
+    override val actorCivId: String,
+    val actionId: String,
+    val expectedRevision: Int,
+    val targetCivId: String?
+) : AgentCommand
+
+class VoteCastResult(
+    override val actorCivId: String,
+    val receipt: ActionReceipt,
+    val targetCivId: String?
 ) : CommandResult
 
 /** Tile pillaging with full loot (game.act type `unit.pillage`). */

@@ -1,5 +1,7 @@
 package com.unciv.ui.screens.worldscreen
 
+import com.unciv.logic.agents.RespondDemandCommand
+
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane
 import com.badlogic.gdx.scenes.scene2d.ui.Table
@@ -314,9 +316,22 @@ class AlertPopup(
         addLeaderName(otherciv)
         addGoodSizedLabel(demand.demandText).row()
         addCloseButton(demand.acceptDemandText, KeyboardBinding.Confirm) {
+            // Agent matches route the answer through the coordinator (§3.2).
+            if (worldScreen.routeThroughAgentSession {
+                    listOf({ r: Int ->
+                        RespondDemandCommand(viewingCiv.civID, "ui-${System.nanoTime()}", r,
+                            otherciv.civID, demand.name, accept = true)
+                    })
+                }) return@addCloseButton
             playerDiploManager.agreeToDemand(demand)
         }.row()
         addCloseButton(demand.refuseDemandText, KeyboardBinding.Cancel) {
+            if (worldScreen.routeThroughAgentSession {
+                    listOf({ r: Int ->
+                        RespondDemandCommand(viewingCiv.civID, "ui-${System.nanoTime()}", r,
+                            otherciv.civID, demand.name, accept = false)
+                    })
+                }) return@addCloseButton
             playerDiploManager.refuseDemand(demand)
             if (demand == Demand.DoNotAttackUs)
                 viewingCiv.getDiplomacyManager(otherciv)!!.declareWar()

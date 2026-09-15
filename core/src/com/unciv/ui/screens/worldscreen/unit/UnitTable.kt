@@ -70,6 +70,15 @@ class UnitTable(val worldScreen: WorldScreen) : Table() {
 
     val selectedUnit: MapUnitView?
         get() = (presenter as? UnitPresenter)?.selectedUnit
+
+    /** Snapshot publication: swap the selection for the re-bound view (or
+     *  clear it when the unit no longer exists in the new object graph). */
+    internal fun reselectAfterSnapshot(unitView: MapUnitView?) {
+        (presenter as? UnitPresenter)?.let { presenter ->
+            presenter.selectedUnits.clear()
+            if (unitView != null) presenter.selectedUnits.add(unitView)
+        }
+    }
     val selectedCity: ForeignCityView?
         get() = (presenter as? CityPresenter)?.selectedCity
 

@@ -1,6 +1,7 @@
 package com.unciv.app.desktop.agents
 
 import com.unciv.logic.GameInfo
+import com.unciv.logic.agents.AgentCommand
 import com.unciv.logic.agents.AgentControl
 import com.unciv.logic.agents.AgentEngineBridge
 import com.unciv.logic.agents.AgentGuidanceQueue
@@ -11,10 +12,12 @@ import com.unciv.logic.agents.AgentMatchSetup
 import com.unciv.logic.agents.AgentProfile
 import com.unciv.logic.agents.AgentRunControls
 import com.unciv.logic.agents.AgentRunState
+import com.unciv.logic.agents.AgentSnapshotPublication
 import com.unciv.logic.agents.ControllerKind
 import com.unciv.logic.agents.EndTurnCommand
 import com.unciv.logic.agents.EngineCallException
 import com.unciv.logic.agents.FileCheckpointStore
+import com.unciv.logic.agents.HumanCommandExecutor
 import com.unciv.logic.agents.MatchCoordinator
 import com.unciv.logic.agents.SetControllerCommand
 import com.unciv.logic.agents.TurnPhase
@@ -63,6 +66,7 @@ class DesktopAgentMatch(
     private val lock = Any()
     private val coordinator = MatchCoordinator(game, match, fileStore(dataDir, match.matchId))
     private val bridge = AgentEngineBridge(coordinator)
+    private val humanExecutor = HumanCommandExecutor(coordinator)
     private val guidance = AgentGuidanceQueue()
     private var runState: AgentRunState = AgentRunState.PAUSED
     private var authorityEpoch = 1
@@ -77,9 +81,30 @@ class DesktopAgentMatch(
         private fun fileStore(dataDir: File, matchId: String) =
             FileCheckpointStore(checkpointDir(dataDir, matchId), matchId)
 
-        /** Node discovery: explicit path, then PATH. Null when unavailable. */
+        /**
+         * Node discovery (AI_AGENT_PLAN.md §10): explicit path (system
+         * property), then a Node bundled NEXT TO the application (packaging
+         * layout: `<app dir>/node/bin|node.exe` or `<app dir>/node`), then
+         * PATH as a last resort. Null when all fail — callers report the
+         * searched locations. No shell is ever involved, so paths with
+         * spaces need no quoting.
+         */
         fun findNode(explicit: File? = null): File? {
             if (explicit != null && explicit.canExecute()) return explicit
+            val appDir = try {
+                DesktopAgentMatch::class.java.protectionDomain.codeSource.location.toURI()
+            } catch (ex: Exception) {
+                null
+            }?.let { File(it).parentFile }
+            if (appDir != null) {
+                for (candidate in listOf(
+                    File(appDir, "node/bin/node"), // bundled POSIX layout
+                    File(appDir, "node/node.exe"), // bundled Windows layout
+                    File(appDir, "node"), // bare binary drop-in
+                )) {
+                    if (candidate.canExecute()) return candidate
+                }
+            }
             for (dir in (System.getenv("PATH") ?: "").split(File.pathSeparator)) {
                 for (name in listOf("node", "node.exe")) {
                     val candidate = File(dir, name)
@@ -154,6 +179,7 @@ class DesktopAgentMatch(
                 synchronized(lock) {
                     coordinator.execute(EndTurnCommand(civId, "ui-end-${UUID.randomUUID()}",
                         coordinator.getStateRevision()))
+                    publishSnapshotLocked()
                 }
                 refreshUi()
             } catch (ex: Exception) {
@@ -161,6 +187,40 @@ class DesktopAgentMatch(
             }
         }
         return true
+    }
+
+    override fun executeHumanAction(
+        buildCommands: (expectedRevision: Int) -> List<(Int) -> AgentCommand>
+    ): String? = synchronized(lock) {
+        // Coordinator-side validation is authoritative: not the human's
+        // turn, wrong civ, or an illegal action all land here as errors.
+        val error = humanExecutor.executeAll(null, buildCommands)
+        if (error == null) publishSnapshotLocked()
+        error
+    }.also {
+        if (it == null) refreshUi()
+    }
+
+    /**
+     * Serializes the committed state for presentation (AI_AGENT_PLAN.md §9).
+     * MUST be called under [lock] — and off the GL thread; the desktop loop
+     * only ever calls this from worker threads. [publishToUi] does the GL
+     * scheduling.
+     */
+    private fun publishSnapshotLocked() {
+        val screen = worldScreen ?: return
+        val payload = AgentSnapshotPublication.buildPayload(
+            coordinator,
+            viewerCivId = screen.currentViewerCivId(),
+            selectedUnitId = screen.currentSelectedUnitId(),
+            selectedCityId = screen.currentSelectedCityId(),
+            selectedTile = screen.currentSelectedTilePos()
+        )
+        val snapshot = coordinator.deserializeForPublication(payload.serializedGame)
+        val selection = AgentSnapshotPublication.resolveSelection(snapshot, payload)
+        Concurrency.runOnGLThread {
+            screen.installAgentSnapshot(snapshot, selection)
+        }
     }
 
     override fun close() {
@@ -367,9 +427,18 @@ class DesktopAgentMatch(
     private fun ensureSupervisor(): SupervisorProcess {
         supervisor?.let { if (it.isAlive()) return it }
         val node = findNode(nodeExecutable)
-            ?: throw IllegalStateException("Node.js runtime not found (set -Dunciv.node.path)")
+            ?: throw IllegalStateException(
+                "Node.js runtime not found. Searched: -Dunciv.node.path, " +
+                    "a 'node' directory next to the application, and PATH. " +
+                    "Install Node 24 or set -Dunciv.node.path=/path/to/node"
+            )
         val dist = findSupervisorDist(supervisorDist)
-            ?: throw IllegalStateException("Supervisor bundle not found (set -Dunciv.supervisor.dist)")
+            ?: throw IllegalStateException(
+                "Supervisor bundle not found. Searched: -Dunciv.supervisor.dist, " +
+                    "'agent-runner/dist' next to the application, and 'agent-runner/dist' " +
+                    "in the working directory. Package agent-runner/dist with the app " +
+                    "or set -Dunciv.supervisor.dist=/path/to/dist"
+            )
         val proc = SupervisorProcess(node, File(dist, "daemon.js"),
             answerEngineRequest = this::answerEngineRequest)
         supervisor = proc

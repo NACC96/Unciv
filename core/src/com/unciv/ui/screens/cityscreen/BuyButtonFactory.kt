@@ -1,5 +1,9 @@
 package com.unciv.ui.screens.cityscreen
 
+import com.unciv.UncivGame
+import com.unciv.logic.agents.CityProductionCommand
+import com.unciv.logic.agents.ProductionOp
+
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import com.unciv.Constants
@@ -165,8 +169,24 @@ class BuyButtonFactory(val cityScreen: CityScreen) {
         stat: Stat = Stat.Gold,
         tile: TileView? = null
     ) {
-        SoundPlayer.play(stat.purchaseSound)
         val cityView = cityScreen.cityView
+        // Agent matches route purchases through the coordinator (§3.2).
+        if (UncivGame.Current.worldScreen?.routeThroughAgentSession {
+                listOf({ r: Int ->
+                    CityProductionCommand(
+                        cityView.city.civ.civID, "ui-${System.nanoTime()}", r, cityView.city.id,
+                        ProductionOp.PURCHASE, name = construction.name,
+                        index = cityScreen.selectedQueueEntry,
+                        tilePos = tile?.position()
+                    )
+                })
+            } == true) {
+            cityScreen.selectedQueueEntry = -1
+            cityScreen.clearSelection()
+            cityScreen.updateAsync()
+            return
+        }
+        SoundPlayer.play(stat.purchaseSound)
 
         val inputProcessor = InputDisabling.disableInput()
         Concurrency.run {

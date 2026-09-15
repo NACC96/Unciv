@@ -218,4 +218,51 @@ class DaemonLoopTest {
         events.addAll(seen)
         return null
     }
+
+    @Test
+    fun `daemon launches from a path containing spaces`() {
+        val node = File(System.getenv("UNCIV_TEST_NODE")
+            ?: "/Users/noahkenny/.nvm/versions/node/v24.13.1/bin/node")
+        Assume.assumeTrue("node required", node.canExecute())
+        val built = File("../../agent-runner/dist/daemon.js").canonicalFile
+        Assume.assumeTrue("built runner required (npm run build)", built.isFile)
+
+        // Packaging layout test: the supervisor must launch from a spaced
+        // install path (ProcessBuilder args, no shell -> no quoting issues).
+        val spacedDir = kotlin.io.path.createTempDirectory("unciv agent test dir").toFile()
+        // Copy dist AND node_modules: the daemon is plain ESM, its module
+        // resolution walks up from dist/ - exactly what packaging ships
+        // (agent-runner/dist + agent-runner/node_modules beside the app).
+        built.parentFile.copyRecursively(File(spacedDir, "dist"))
+        val nm = File("../../agent-runner/node_modules").canonicalFile
+        val destNm = File(spacedDir, "node_modules")
+        if (nm.isDirectory) nm.copyRecursively(destNm)
+        val dest = File(spacedDir, "dist/daemon.js")
+        val process = ProcessBuilder(node.absolutePath, dest.absolutePath)
+            .redirectErrorStream(false)
+            .start()
+        try {
+            val events = LinkedBlockingQueue<Map<String, Any?>>()
+            val readerThread = Thread({
+                val lines = BufferedReader(InputStreamReader(process.inputStream))
+                while (true) {
+                    val line = try { lines.readLine() } catch (ex: Exception) { return@Thread } ?: return@Thread
+                    if (line.isBlank()) continue
+                    @Suppress("UNCHECKED_CAST")
+                    val frame = try { parseJsonFrame(line) } catch (ex: Exception) { continue }
+                    if (frame["kind"] == "ready") events.add(frame)
+                }
+            }, "daemon-spaced")
+            readerThread.isDaemon = true
+            readerThread.start()
+            val ready = events.poll(20, TimeUnit.SECONDS)
+            Assert.assertNotNull("daemon in spaced path never signalled ready", ready)
+            PrintWriter(process.outputStream, true).println(
+                emitJson(mapOf("protocol" to 1, "kind" to "control", "op" to "shutdown")))
+            Assert.assertTrue("daemon did not exit", process.waitFor(15, TimeUnit.SECONDS))
+        } finally {
+            process.destroy()
+            spacedDir.deleteRecursively()
+        }
+    }
 }

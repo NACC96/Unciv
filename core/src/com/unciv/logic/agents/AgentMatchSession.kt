@@ -21,6 +21,19 @@ interface AgentMatchSession {
      * its provider (takeover is a separate explicit control).
      */
     fun onNextTurnPressed(): Boolean
+    /**
+     * Human gameplay mutations through the coordinator (plan §3.2): unit
+     * orders, city management, research, policies, diplomacy, trades,
+     * mandatory decisions. Commands execute in order under the host lock,
+     * each stamped with the current revision; the first failure aborts the
+     * rest. Returns null when all applied, or a human-readable error.
+     * When the session is present but the active civ is an agent,
+     * implementations must reject with an error rather than fall through
+     * to the legacy path.
+     */
+    fun executeHumanAction(
+        buildCommands: (expectedRevision: Int) -> List<(Int) -> AgentCommand>
+    ): String?
     /** Detach from the screen; shuts the supervisor down. */
     fun close()
 }

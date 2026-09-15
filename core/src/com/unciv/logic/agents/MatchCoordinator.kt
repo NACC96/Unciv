@@ -322,8 +322,11 @@ class MatchCoordinator(
             is PillageCommand -> executePillage(command)
             is RepairCommand -> executeRepair(command)
             is FriendshipCommand -> executeFriendship(command)
+            is DenounceCommand -> executeDenounce(command)
             is DemandCommand -> executeDemand(command)
             is RespondDemandCommand -> executeRespondDemand(command)
+            is CastVoteCommand -> executeCastVote(command)
+            is RenameCityCommand -> executeRenameCity(command)
             is SetControllerCommand -> executeSetController(command)
         }
     }
@@ -445,6 +448,26 @@ class MatchCoordinator(
 
             @Suppress("UNUSED_VARIABLE") // policy hook: automation flags are read by rule code from here in W4
             val executionPolicy = policy
+            // Paradrop jumps bypass pathing entirely (engine teleports when
+            // preparing); gate on the engine's own canParadropOn.
+            if (unit.isPreparingParadrop()) {
+                // Validate against the paradrop uniques with the unit's
+                // CURRENT tile bound (the cached filters may lack tile
+                // context during candidate restoration).
+                val distance = unit.getTile().aerialDistanceTo(tile)
+                val context = com.unciv.models.ruleset.unique.GameContext(
+                    unit = unit, tile = unit.getTile()
+                )
+                val allowed = unit.getMatchingUniques(UniqueType.MayParadrop, context)
+                    .any { distance <= it.params[1].toInt() && tile.matchesFilter(it.params[0], unit.civ) }
+                if (!allowed)
+                    throw AgentCommandException(
+                        AgentCommandError.ILLEGAL_ACTION, "Cannot paradrop to that tile"
+                    )
+                unit.movement.moveToTile(tile)
+                val landed = unit.getTile()
+                "${landed.position.x},${landed.position.y}"
+            }
             // Like a human map click, the engine walks as far as legally
             // possible within this turn; hidden blockage is resolved by the
             // engine mid-path, never by a global destination oracle.
@@ -595,6 +618,24 @@ class MatchCoordinator(
                             AgentCommandError.ILLEGAL_ACTION, "${command.name} purchase failed"
                         )
                 }
+                ProductionOp.SELL -> {
+                    // Gates mirror ConstructionInfoTable's sell button.
+                    val building = candidateGame.ruleset.buildings[command.name]
+                        ?: throw AgentCommandException(
+                            AgentCommandError.INVALID_ARGUMENT, "Unknown building ${command.name}"
+                        )
+                    if (!building.isSellable())
+                        throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "${command.name} cannot be sold")
+                    if (!city.cityConstructions.isBuilt(command.name))
+                        throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "${command.name} is not built here")
+                    if (city.isPuppet)
+                        throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Puppet cities sell nothing")
+                    if (city.hasSoldBuildingThisTurn)
+                        throw AgentCommandException(
+                            AgentCommandError.ILLEGAL_ACTION, "Already sold a building this turn"
+                        )
+                    city.sellBuilding(building)
+                }
             }
             constructions.constructionQueue.joinToString("")
         }
@@ -673,6 +714,15 @@ class MatchCoordinator(
                 UnitOrder.DISBAND -> {
                     unit.disband()
                     disbanded = true
+                }
+                UnitOrder.PARADROP -> {
+                    // Mirrors UnitActionsFromUniques paradrop toggle: sets the
+                    // preparing action; the actual jump is a unit.move.
+                    if (!unit.hasUnique(UniqueType.MayParadrop))
+                        throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Unit cannot paradrop")
+                    if (unit.hasUnitMovedThisTurn())
+                        throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Unit has already moved this turn")
+                    unit.action = UnitActionType.Paradrop.value
                 }
             }
             "${unit.action ?: ""}|$disbanded"
@@ -906,7 +956,15 @@ class MatchCoordinator(
             if (civ.getDiplomacyManager(command.targetCivId) == null)
                 throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "No diplomatic contact")
             val trade = buildTrade(candidateGame, civ, command)
-            if (!TradeEvaluation().isTradeValid(trade, civ, target))
+            // Engine NPEs on unmet-civ lookups surface as a plain rejection.
+            val valid = try {
+                TradeEvaluation().isTradeValid(trade, civ, target)
+            } catch (ex: Exception) {
+                throw AgentCommandException(
+                    AgentCommandError.ILLEGAL_ACTION, "Offer is not valid: ${ex.message}"
+                )
+            }
+            if (!valid)
                 throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Offer is not valid")
             // Stored recipient-perspective, mirroring TradeView proposals.
             target.tradeRequests.add(TradeRequest(command.actorCivId, trade.reverse()))
@@ -1427,7 +1485,13 @@ class MatchCoordinator(
                 AgentCommandError.INVALID_ARGUMENT, "No such demand pending from ${requester.civID}"
             )
             val diplomacy = civ.getDiplomacyManager(command.requesterCivId)!!
-            if (command.accept) diplomacy.agreeToDemand(demand) else diplomacy.refuseDemand(demand)
+            if (command.accept) diplomacy.agreeToDemand(demand) else {
+                diplomacy.refuseDemand(demand)
+                // UI parity: refusing "Do not attack us" is an immediate
+                // declaration of war (AlertPopup.addDemand).
+                if (demand == com.unciv.logic.civilization.diplomacy.Demand.DoNotAttackUs)
+                    diplomacy.declareWar()
+            }
             civ.popupAlerts.remove(alert)
             // Resolution through a command clears its decision, exactly as
             // conquest disposition does (nothing automatic, ever).
@@ -1436,6 +1500,72 @@ class MatchCoordinator(
             if (command.accept) "accepted" else "refused"
         }
         return DemandRespondedResult(command.actorCivId, receipt, receipt.resultJson == "accepted")
+    }
+
+    private fun executeDenounce(command: DenounceCommand): DenouncedResult {
+        val receipt = runGameplayMutation(
+            command.actorCivId, command.actionId, command.expectedRevision,
+            "diplomacy.denounce|${command.targetCivId}"
+        ) { candidateGame, _ ->
+            val civ = candidateGame.getCivilizationOrNull(command.actorCivId)
+                ?: throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Unknown civilization")
+            candidateGame.getCivilizationOrNull(command.targetCivId)
+                ?: throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Unknown civilization")
+            val diplomacy = civ.getDiplomacyManager(command.targetCivId)
+                ?: throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "No diplomatic contact")
+            if (civ.isDefeated())
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Defeated civilizations denounce no one")
+            if (diplomacy.diplomaticStatus == DiplomaticStatus.War)
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Cannot denounce wartime enemies")
+            if (diplomacy.hasFlag(com.unciv.logic.civilization.diplomacy.DiplomacyFlags.Denunciation))
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Already denounced")
+            diplomacy.denounce()
+            "denounced"
+        }
+        return DenouncedResult(command.actorCivId, receipt)
+    }
+
+    private fun executeRenameCity(command: RenameCityCommand): CityRenamedResult {
+        val receipt = runGameplayMutation(
+            command.actorCivId, command.actionId, command.expectedRevision,
+            "city.rename|${command.cityId}|${command.newName}"
+        ) { candidateGame, _ ->
+            if (command.newName.isBlank())
+                throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Name cannot be empty")
+            val city = candidateGame.getCities().firstOrNull {
+                it.id == command.cityId && it.civ.civID == command.actorCivId
+            } ?: throw AgentCommandException(
+                AgentCommandError.INVALID_ARGUMENT, "Unknown or foreign city ${command.cityId}"
+            )
+            city.name = command.newName.trim()
+            city.name
+        }
+        return CityRenamedResult(command.actorCivId, receipt, receipt.resultJson)
+    }
+
+    private fun executeCastVote(command: CastVoteCommand): VoteCastResult {
+        val receipt = runGameplayMutation(
+            command.actorCivId, command.actionId, command.expectedRevision,
+            "diplomacy.castVote|${command.targetCivId ?: "abstain"}"
+        ) { candidateGame, candidateMatch ->
+            val civ = candidateGame.getCivilizationOrNull(command.actorCivId)
+                ?: throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Unknown civilization")
+            if (!civ.flagsCountdown.containsKey(com.unciv.logic.civilization.CivFlags.TurnsTillNextDiplomaticVote.name)
+                || !civ.mayVoteForDiplomaticVictory())
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "No diplomatic vote is open")
+            val target = command.targetCivId?.takeIf { it.isNotBlank() }
+            if (target != null) {
+                val targetCiv = candidateGame.getCivilizationOrNull(target)
+                    ?: throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Unknown civilization")
+                if (!targetCiv.isMajorCiv() || targetCiv.isDefeated() || targetCiv == civ)
+                    throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Invalid vote target")
+            }
+            civ.diplomaticVoteForCiv(target)
+            val decisionId = "diplomatic-vote:${civ.civID}"
+            candidateMatch.pendingDecisions.removeAll { it.decisionId == decisionId }
+            target ?: "abstain"
+        }
+        return VoteCastResult(command.actorCivId, receipt, receipt.resultJson.takeIf { it != "abstain" })
     }
 
     /**
@@ -1719,6 +1849,33 @@ class MatchCoordinator(
                 )
             }
         }
+        // A due diplomatic vote is MANDATORY for commandable civs: options
+        // cover every living foreign major civ plus abstention. The
+        // TurnsTillNextDiplomaticVote flag must EXIST (UN built, vote cycle
+        // started) — an absent flag reads as 0 and must not imply a due vote.
+        if (civ.flagsCountdown.containsKey(com.unciv.logic.civilization.CivFlags.TurnsTillNextDiplomaticVote.name)
+            && civ.mayVoteForDiplomaticVictory()) {
+            val decisionId = "diplomatic-vote:${civ.civID}"
+            if (candidateMatch.pendingDecisions.none { it.decisionId == decisionId }) {
+                val options = ArrayList<HashMap<String, String>>()
+                options.add(hashMapOf("optionId" to "abstain", "targetCivId" to "", "display" to "Abstain"))
+                for (candidate in candidateGame.civilizations) {
+                    if (!candidate.isMajorCiv() || candidate.isDefeated() || candidate == civ) continue
+                    options.add(
+                        hashMapOf(
+                            "optionId" to "vote", "targetCivId" to candidate.civID,
+                            "display" to "Vote for ${candidate.civName}"
+                        )
+                    )
+                }
+                candidateMatch.pendingDecisions.add(
+                    PendingDecision(
+                        decisionId, "diplomatic-vote", civId, "un-vote",
+                        DecisionClassification.MANDATORY, options
+                    )
+                )
+            }
+        }
         val before = candidateMatch.stateRevision
         candidateMatch.stateRevision = before + 1
         // New turn, new idempotency scope: the hot index is swapped only after
@@ -1792,6 +1949,16 @@ class MatchCoordinator(
         return game
     }
 
+    /**
+     * Serialized committed state for UI publication (AI_AGENT_PLAN.md §9).
+     * Callers hold the host lock — coordinator mutations are single-writer
+     * by contract — and run this OFF the GL thread.
+     */
+    fun serializeCommittedGameForPublication(): String = json.toJson(committedGame)
+
+    /** Restores a publication snapshot; mirrors deserializeGame's no-surprises policy. */
+    fun deserializeForPublication(gameJson: String): GameInfo = deserializeGame(gameJson)
+
     private fun rebuildHotIndex() {
         actionReceipts.clear()
         for (receipt in committedMatch.currentTurnReceipts)
@@ -1799,6 +1966,16 @@ class MatchCoordinator(
     }
 
     companion object {
+        private val publicationJson = json()
+
+        /** Restores a publication snapshot; no-surprises restoration policy. */
+        fun deserializeForPublication(gameJson: String): GameInfo {
+            val game = publicationJson.fromJson(GameInfo::class.java, gameJson)
+            game.suppressAutomationDuringTransients = true
+            game.setTransients()
+            return game
+        }
+
         /** Reloads a coordinator from [saveToJson]; hot dedup scope is restored with it. */
         fun loadFromJson(
             bundleJson: String,

@@ -1,5 +1,9 @@
 package com.unciv.ui.screens.worldscreen.unit.actions
 
+import com.unciv.logic.agents.UnitOrder
+import com.unciv.logic.agents.UnitOrderCommand
+import java.util.UUID
+
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.scenes.scene2d.Touchable
@@ -194,6 +198,26 @@ class UnitActionsTable(val worldScreen: WorldScreen) : Table() {
     }
 
     private fun activateAction(unitAction: UnitAction, unit: MapUnit) {
+        // Agent matches route simple orders through the coordinator (§3.2);
+        // the coordinator validates and republishes state. Other games run
+        // the legacy lambda unchanged.
+        val routedOrder = when (unitAction.type) {
+            UnitActionType.Fortify -> UnitOrder.FORTIFY
+            UnitActionType.FortifyUntilHealed -> UnitOrder.FORTIFY_UNTIL_HEALED
+            UnitActionType.Sleep -> UnitOrder.SLEEP
+            UnitActionType.SleepUntilHealed -> UnitOrder.SLEEP_UNTIL_HEALED
+            UnitActionType.Paradrop -> UnitOrder.PARADROP
+            else -> null
+        }
+        if (routedOrder != null && worldScreen.routeThroughAgentSession { rev ->
+                listOf({ r: Int ->
+                    UnitOrderCommand(unit.civ.civID, "ui-${UUID.randomUUID()}", r, unit.id, routedOrder)
+                })
+            }) {
+            worldScreen.mapHolder.removeUnitActionOverlay()
+            worldScreen.shouldUpdate = true
+            return
+        }
         unitAction.action!!.invoke()
         worldScreen.shouldUpdate = true
         // We keep the unit action/selection overlay from the previous unit open even when already selecting another unit

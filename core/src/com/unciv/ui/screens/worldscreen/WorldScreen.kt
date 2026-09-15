@@ -9,6 +9,9 @@ import com.unciv.Constants
 import com.unciv.UncivGame
 import com.unciv.logic.GameInfo
 import com.unciv.logic.agents.AgentMatchSession
+import com.unciv.logic.agents.AgentCommand
+import com.unciv.logic.agents.AgentSnapshotPublication
+import com.unciv.logic.agents.ResolvedSelection
 import com.unciv.view.GameView
 import com.unciv.logic.UncivShowableException
 import com.unciv.logic.civilization.Civilization
@@ -88,13 +91,25 @@ import kotlin.concurrent.timer
  * @param restoreState
  */
 class WorldScreen(
-    val gameInfo: GameInfo,
+    gameInfo: GameInfo,
     val autoPlay: AutoPlay,
-    private val viewingCiv: Civilization,
+    viewingCiv: Civilization,
     restoreState: RestoreState? = null
 ) : BaseScreen() {
     /** When set, causes the screen to update in the next [render][render] event */
     var shouldUpdate = false
+
+    /**
+     * The game state the screen represents. Agent-match snapshot publication
+     * swaps this to the coordinator's committed snapshot (see
+     * [installAgentSnapshot]); ordinary games never reassign it.
+     */
+    var gameInfo: GameInfo = gameInfo
+        internal set
+
+    /** Active civilization identity — re-pointed into each published snapshot. */
+    var viewingCiv: Civilization = viewingCiv
+        internal set
 
     /** Indicates it's the player's ([viewingCiv]) turn */
     var isPlayersTurn = viewingCiv.isCurrentPlayer()
@@ -140,6 +155,76 @@ class WorldScreen(
     val canChangeState
         get() = if (agentSession != null) agentSession!!.isHumanInputAllowed()
             else isPlayersTurn && !viewingCiv.isSpectator()
+
+    /**
+     * Attempts to route one human gameplay mutation through the agent-match
+     * coordinator (AI_AGENT_PLAN.md §3.2). Returns false when no session is
+     * attached — the caller then proceeds with the LEGACY engine path, so
+     * ordinary games are untouched. When a session exists the action is
+     * consumed either way: success publishes a snapshot, failure surfaces
+     * the coordinator's rejection.
+     */
+    fun routeThroughAgentSession(
+        buildCommands: (expectedRevision: Int) -> List<(Int) -> AgentCommand>
+    ): Boolean {
+        val session = agentSession ?: return false
+        // Never run coordinator mutations on the GL thread (serialization +
+        // checkpoint I/O): dispatch to a worker, report back on the GL thread.
+        Concurrency.runOnNonDaemonThreadPool("HumanAction") {
+            val error = session.executeHumanAction(buildCommands)
+            Concurrency.runOnGLThread {
+                if (error != null) ToastPopup(error, this@WorldScreen).open(force = true)
+                shouldUpdate = true
+            }
+        }
+        return true
+    }
+
+    //region Agent snapshot publication (plan §9) — install runs on the GL thread
+
+    /** Selection handles the host captures before serialization. */
+    fun currentViewerCivId(): String = viewingCiv.civID
+    fun currentSelectedUnitId(): Int? = bottomUnitTable.selectedUnit?.id
+    fun currentSelectedCityId(): String? = null // city screens attach below the session
+    fun currentSelectedTilePos(): HexCoord? = mapHolder.selectedTile?.position()
+
+    /**
+     * Installs a committed coordinator snapshot into this screen. The swap
+     * and map rebinding MUST run on the GL thread (the host schedules it);
+     * serialization/deserialization already happened on the host's worker
+     * thread. Selections re-resolve by stable ID — entities that no longer
+     * exist clear their selection instead of holding orphans.
+     */
+    fun installAgentSnapshot(snapshot: GameInfo, selection: ResolvedSelection) {
+        if (gameInfo === snapshot) return
+        val oldViewerId = viewingCiv.civID
+        val newViewer = snapshot.civilizations.firstOrNull { it.civID == oldViewerId }
+            ?: return // snapshot without the viewer is a host bug; keep current render
+        gameInfo = snapshot
+        viewingCiv = newViewer
+        selectedCiv = snapshot.civilizations.firstOrNull { it.civID == selectedCiv.civID } ?: newViewer
+        selectedGameView = GameView(snapshot, selectedCiv, spectatorMode = viewingCiv.isSpectator())
+        isPlayersTurn = viewingCiv.isCurrentPlayer()
+
+        // Rebind the map layer to the new object graph.
+        mapHolder.rebindToSnapshot(snapshot.tileMap)
+
+        // Re-resolve selections by stable ID; drop removed entities.
+        val unit = selection.unitId?.let { id ->
+            snapshot.civilizations.asSequence().flatMap { it.units.getCivUnits() }
+                .firstOrNull { it.id == id }
+        }
+        val unitView = unit?.let { selectedGameView.getMapUnitView(it) }
+        bottomUnitTable.reselectAfterSnapshot(unitView)
+        selection.tile?.let { pos ->
+            val tile = snapshot.tileMap.values.firstOrNull { it.position == pos }
+            if (tile != null) mapHolder.selectedTile = selectedGameView.getTile(tile)
+            else mapHolder.selectedTile = null
+        }
+        shouldUpdate = true
+    }
+
+    //endregion
 
     val mapHolder = WorldMapHolder(this, gameInfo.tileMap)
 
