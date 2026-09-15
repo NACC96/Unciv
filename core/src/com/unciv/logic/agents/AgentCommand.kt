@@ -392,8 +392,7 @@ class GreatPersonResult(
 ) : CommandResult
 
 /** Gold gift to a city-state (game.act type `citystate.giftGold`). */
-class GiftGoldToCityStateCommand(
-    override val actorCivId: String,
+class GiftGoldToCityStateCommand(    override val actorCivId: String,
     val actionId: String,
     val expectedRevision: Int,
     val cityStateId: String,
@@ -441,3 +440,27 @@ class FriendshipCommand(
     val expectedRevision: Int,
     val targetCivId: String
 ) : AgentCommand
+
+/**
+ * Controller reassignment (takeover / return-to-agent / provider switch
+ * bookkeeping). Not a gameplay mutation: it changes WHO may act, never game
+ * state, and does not consume steps. Committed with the same discipline so
+ * recovery never splits game and controller views. Authority revocation
+ * (process/session teardown, epoch bump) happens in the host BEFORE this
+ * commits; the coordinator records the new assignment.
+ */
+class SetControllerCommand(
+    override val actorCivId: String,
+    val actionId: String,
+    val expectedRevision: Int,
+    val targetCivId: String,
+    val kind: ControllerKind,
+    val profile: AgentProfile? = null
+) : AgentCommand
+
+class ControllerSetResult(
+    override val actorCivId: String,
+    val receipt: ActionReceipt,
+    val targetCivId: String,
+    val kind: ControllerKind
+) : CommandResult

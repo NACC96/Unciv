@@ -8,6 +8,7 @@ import com.badlogic.gdx.utils.Align
 import com.unciv.Constants
 import com.unciv.UncivGame
 import com.unciv.logic.GameInfo
+import com.unciv.logic.agents.AgentMatchSession
 import com.unciv.view.GameView
 import com.unciv.logic.UncivShowableException
 import com.unciv.logic.civilization.Civilization
@@ -126,9 +127,19 @@ class WorldScreen(
      *  (fogged) vision or [spectatorGameView]'s (the spectator's own, unrestricted) vision. */
     var fogOfWar = true
 
-    /** `true` when it's the player's turn unless he is a spectator */
+    /**
+     * Active agent match session, if this screen shows an agent-enabled
+     * match. Routes the end-turn button and gates human input; all other
+     * mutation paths are enumerated in docs/agent-mutation-audit.md (most
+     * still route legacy — full interception is tracked there, not here).
+     */
+    var agentSession: AgentMatchSession? = null
+
+    /** `true` when it's the player's turn unless he is a spectator.
+     *  Agent matches route through the session: only its human turns allow input. */
     val canChangeState
-        get() = isPlayersTurn && !viewingCiv.isSpectator()
+        get() = if (agentSession != null) agentSession!!.isHumanInputAllowed()
+            else isPlayersTurn && !viewingCiv.isSpectator()
 
     val mapHolder = WorldMapHolder(this, gameInfo.tileMap)
 
@@ -603,6 +614,10 @@ class WorldScreen(
     }
 
     fun nextTurn() {
+        // Agent-enabled matches never take the legacy clone/nextTurn path:
+        // the session routes the current civ's end-turn through the match
+        // coordinator (or consumes the press when nothing may act).
+        if (agentSession?.onNextTurnPressed() == true) return
         isPlayersTurn = false
         shouldUpdate = true
         val progressBar = NextTurnProgress(nextTurnButton)

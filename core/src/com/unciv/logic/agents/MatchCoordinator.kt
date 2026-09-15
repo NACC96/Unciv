@@ -306,6 +306,7 @@ class MatchCoordinator(
             is PillageCommand -> executePillage(command)
             is RepairCommand -> executeRepair(command)
             is FriendshipCommand -> executeFriendship(command)
+            is SetControllerCommand -> executeSetController(command)
         }
     }
 
@@ -1214,7 +1215,8 @@ class MatchCoordinator(
         return GreatPersonResult(command.actorCivId, receipt, command.action)
     }
 
-    private fun executeGiftGold(command: GiftGoldToCityStateCommand): GoldGiftedResult {        val receipt = runGameplayMutation(
+    private fun executeGiftGold(command: GiftGoldToCityStateCommand): GoldGiftedResult {
+        val receipt = runGameplayMutation(
             command.actorCivId, command.actionId, command.expectedRevision,
             "citystate.giftGold|${command.cityStateId}|${command.amount}"
         ) { candidateGame, _ ->
@@ -1339,6 +1341,30 @@ class MatchCoordinator(
             diplomacy.diplomaticStatus.name
         }
         return DiplomacyResult(command.actorCivId, receipt, receipt.resultJson)
+    }
+
+    /**
+     * Controller reassignment through the commit discipline. Game state is
+     * untouched; only the controller map changes (plus the revision bump
+     * that forces every observer to re-read). Host-side revocation and epoch
+     * bumps happen BEFORE this commits.
+     */
+    private fun executeSetController(command: SetControllerCommand): ControllerSetResult {
+        if (command.kind == ControllerKind.EXTERNAL_AGENT && command.profile == null)
+            throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "External controllers need a profile")
+        if (command.kind != ControllerKind.EXTERNAL_AGENT && command.profile != null)
+            throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Only external controllers take profiles")
+        val receipt = runGameplayMutation(
+            command.actorCivId, command.actionId, command.expectedRevision,
+            "controller.set|${command.targetCivId}|${command.kind}|${command.profile?.profileRevision ?: "-"}"
+        ) { candidateGame, candidateMatch ->
+            candidateGame.getCivilizationOrNull(command.targetCivId)
+                ?: throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Unknown civilization")
+            candidateMatch.controllers[command.targetCivId] =
+                CivilizationController(command.targetCivId, command.kind, command.profile?.copy())
+            command.kind.name
+        }
+        return ControllerSetResult(command.actorCivId, receipt, command.targetCivId, command.kind)
     }
 
     //endregion
@@ -1468,6 +1494,7 @@ class MatchCoordinator(
                 // Victory achieved: stop scheduling new work, keep the ending
                 // checkpoint inspectable. Existing victory UI reads victoryData.
                 candidateMatch.turnPhase = TurnPhase.COMPLETED
+                candidateMatch.endTurnsCommitted++
                 commit(candidateGame = candidateGame, candidateMatch = candidateMatch)
                 actionReceipts[command.actionId] = endReceipt
                 return TurnEndedResult(command.actorCivId, endReceipt, null, false, candidateGame.turns)
@@ -1477,6 +1504,7 @@ class MatchCoordinator(
             val next = rotateToNextCommandable(candidateGame, candidateMatch, fromIndex)
             if (next == null) {
                 candidateMatch.turnPhase = TurnPhase.COMPLETED
+                candidateMatch.endTurnsCommitted++
                 candidateMatch.matchPaused = true
                 candidateMatch.matchPausedReason = "No eligible civilization to continue the match"
                 commit(candidateGame = candidateGame, candidateMatch = candidateMatch)
@@ -1484,6 +1512,7 @@ class MatchCoordinator(
                 return TurnEndedResult(command.actorCivId, endReceipt, null, false, candidateGame.turns)
             }
             beginTurnOnCandidate(candidateGame, candidateMatch, next.civID)
+            candidateMatch.endTurnsCommitted++
             commit(candidateGame = candidateGame, candidateMatch = candidateMatch)
             actionReceipts.clear()
             actionReceipts[command.actionId] = endReceipt

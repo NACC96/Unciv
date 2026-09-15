@@ -179,6 +179,13 @@ re-deriving it. Newest entries go at the **bottom**. Keep entries short and fact
 - `daemon.ts`: per-match process, per-invocation MCP, all three real providers + scripted wired with correct bearer transports (codex env, claude/opencode temp configs), second-turn concurrency rejected, shutdown/EOF drains. `daemon.test.ts` plays the desktop side (answers RPCs from the fake, sends scripted run_turn): session_bound + completed_turn with rev 44 through the wire. 34/34 runner tests.
 - Remaining integration: desktop Kotlin side (spawn daemon, answer engine RPCs from MatchCoordinator, file checkpoints, run-state UI) and the human-command interception audit.
 
+### CP-025 (gate-pass) — Desktop-side loop through the real daemon, 2026-09-14
+- `DaemonLoopTest` (tests/): spawns the built supervisor daemon, answers engine RPCs from a REAL MatchCoordinator via AgentEngineBridge, drives a scripted observe→act→end_turn: completed_turn, rev 0→3, clean exit 0. Engine-call census per turn: 3 observes + 1 notes_get + 1 act + 1 end_turn.
+- Protocol rule established: identity (`actorCivId`) rides at the ENVELOPE level, never in command args (bridge read it from the wrong level; the daemon test caught it because the TS stub bypassed the bridge).
+- Revision accounting: one atomic end-turn commits TWO receipts (end + next begin), so rev advances by 2 per turn (act +1). Replay/duplicate logic keys on receipts, not on +1 steps — verified in the census.
+- `turnEnded` is a sticky latch and LIES after the first turn: completion now keys on a monotonic `endTurnsCommitted` counter (match state + observe DTO + fake + supervisor). Added `endTurnsCommitted` to AgentMatchState/ObservationDto/FakeGameService with the same commit discipline.
+- Full suite **919/919** (71 agent tests across 17 suites, presence-verified).
+
 ### CP-018 (note) — Observation/visibility layer (game.observe/legal_actions/rules), 2026-09-14
 - New `AgentObservation.kt`: committed-state-only builders with a documented field policy — full own empire (cities+queues, units+movement, research, policies, gold, notifications as recent events); foreign units via engine `isVisibleTo` with movement/orders zeroed (readiness must not leak); foreign cities on viewable tiles with identity/health/pop only (never queues); explored-unseen/remembered state omitted (TileHistory follow-up); movement targets adjacent-enterable only (no destination oracle); attacks reuse the UI-arrow enumeration; researchable/constructions/promotions/upgrade/found/orders gated per entity.
 - Coordinator `observe/legalActions/rules` are pure reads (no phase requirement, no candidates, no mutation).

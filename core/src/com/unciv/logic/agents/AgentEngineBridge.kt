@@ -144,7 +144,9 @@ class AgentEngineBridge(val coordinator: MatchCoordinator) {
         val type = requireString(envelope, "type")
         @Suppress("UNCHECKED_CAST")
         val args = envelope["args"] as? Map<String, Any?> ?: emptyMap()
-        val actorCivId = requireString(args, "actorCivId")
+        // Identity rides at the envelope level (supervisor-supplied, never
+        // model-selected); command arguments carry only game parameters.
+        val actorCivId = requireString(envelope, "actorCivId")
 
         try {
             return when (type) {

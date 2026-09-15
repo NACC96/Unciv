@@ -122,13 +122,19 @@ class AgentMatchState(
     /** Coordinator-level pause: while true, no new mutation may commit. */
     var matchPaused: Boolean = false,
     /** Why the match paused (failure reason, storage error, user action). */
-    var matchPausedReason: String? = null
+    var matchPausedReason: String? = null,
+    /**
+     * Completed end-turn commits, monotonic. An invocation classifies its
+     * turn completed iff this counter advanced during the invocation
+     * (a sticky boolean would stay true forever after the first turn).
+     */
+    var endTurnsCommitted: Int = 0
 ) : IsPartOfGameInfoSerialization {
     @Suppress("unused") // used by json serialization
     constructor() : this(
         AGENT_MATCH_FORMAT_VERSION, "", "", 0, 0, TurnPhase.READY_TO_START,
         HashMap(), false, HashMap(), HashMap(), ArrayList(), ArrayList(), ArrayList(),
-        false, null
+        false, null, 0
     )
 
     /** Rejects incompatible format versions explicitly; never silently converts. */
@@ -148,6 +154,7 @@ class AgentMatchState(
         ArrayList(guidanceQueue.map { it.copy() }),
         ArrayList(currentTurnReceipts.map { it.copy() }),
         matchPaused,
-        matchPausedReason
+        matchPausedReason,
+        endTurnsCommitted
     )
 }

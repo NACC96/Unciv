@@ -83,6 +83,8 @@ class ObservationDto(
     var phase: TurnPhase = TurnPhase.READY_TO_START,
     var activeCivId: String = "",
     var isMyTurn: Boolean = false,
+    /** Completed end-turn commits (monotonic; invocation completion signal). */
+    var endTurnsCommitted: Int = 0,
     var requiredDecisions: ArrayList<PendingDecision> = ArrayList(),
     var recentEvents: ArrayList<String> = ArrayList(),
     var empire: EmpireOverview = EmpireOverview(),
@@ -92,7 +94,7 @@ class ObservationDto(
     var visibleForeignCities: ArrayList<ObservedCity> = ArrayList()
 ) {
     @Suppress("unused")
-    constructor() : this(1, 0, "", "", 0, TurnPhase.READY_TO_START, "", false,
+    constructor() : this(1, 0, "", "", 0, TurnPhase.READY_TO_START, "", false, 0,
         ArrayList(), ArrayList(), EmpireOverview(), ArrayList(), ArrayList(), ArrayList(), ArrayList())
 }
 
@@ -202,6 +204,7 @@ fun buildObservation(
     dto.phase = match.turnPhase
     dto.activeCivId = game.currentPlayer
     dto.isMyTurn = match.turnPhase == TurnPhase.AWAITING_DECISIONS && game.currentPlayer == actorCivId
+    dto.endTurnsCommitted = match.endTurnsCommitted
     dto.requiredDecisions = ArrayList(match.pendingDecisions
         .filter { it.owningCivId == actorCivId }.map { it.copy() })
     dto.recentEvents = ArrayList(civ.notifications.takeLast(20).map { it.text })

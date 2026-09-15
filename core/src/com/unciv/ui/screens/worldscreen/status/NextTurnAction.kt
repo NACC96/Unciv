@@ -21,6 +21,15 @@ import com.unciv.utils.launchOnGLThread
 import yairm210.purity.annotations.Readonly
 
 enum class NextTurnAction(protected val text: String, val color: Color) {
+    AgentMatch("Agent match", Color.GOLD) {
+        override fun getText(worldScreen: WorldScreen) =
+            worldScreen.agentSession?.statusText() ?: text
+        override fun isChoice(worldScreen: WorldScreen) =
+            worldScreen.agentSession != null
+        override fun action(worldScreen: WorldScreen) {
+            worldScreen.agentSession?.onNextTurnPressed()
+        }
+    },
     Default("", ImageGetter.CHARCOAL) {
         override val icon get() = null
         override fun isChoice(worldScreen: WorldScreen) = false

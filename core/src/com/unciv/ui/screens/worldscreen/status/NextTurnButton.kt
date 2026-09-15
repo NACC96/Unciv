@@ -40,6 +40,15 @@ class NextTurnButton(
     fun update() {
         nextTurnAction = getNextTurnAction(worldScreen)
         updateButton(nextTurnAction)
+        val agentSession = worldScreen.agentSession
+        if (agentSession != null) {
+            // Agent matches own the button: status text comes from the match,
+            // and it is enabled only while a human may act.
+            isEnabled = agentSession.isHumanInputAllowed()
+            removeTooltips()
+            worldScreen.smallUnitButton.update()
+            return
+        }
         val autoPlay = worldScreen.autoPlay
         if (autoPlay.shouldContinueAutoPlaying() && worldScreen.isPlayersTurn
             && !worldScreen.waitingForAutosave && !worldScreen.isNextTurnUpdateRunning()) {

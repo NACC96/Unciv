@@ -44,7 +44,8 @@ class AgentEngineBridgeTest {
             actionId: String,
             type: String,
             args: Map<String, Any?>,
-            expectedRevision: Int = rev
+            expectedRevision: Int = rev,
+            actorCivId: String = romeId
         ): Map<String, Any?> {
             @Suppress("UNCHECKED_CAST")
             val receipt = bridge.act(mapOf(
@@ -52,6 +53,7 @@ class AgentEngineBridgeTest {
                 "actionId" to actionId,
                 "expectedRevision" to expectedRevision,
                 "type" to type,
+                "actorCivId" to actorCivId,
                 "args" to args)) as Map<String, Any?>
             rev = receipt["revision"] as Int
             return receipt
@@ -94,7 +96,7 @@ class AgentEngineBridgeTest {
     fun `act envelopes apply with receipt shapes`() {
         val f = Fixture()
         val moved = f.act("a1", "unit.move", mapOf(
-            "actorCivId" to f.romeId, "unitId" to f.warriorId,
+            "unitId" to f.warriorId,
             "destination" to mapOf("x" to 1, "y" to 0)))
         Assert.assertEquals("applied", moved["status"])
         Assert.assertEquals(1, moved["revision"])
@@ -103,22 +105,22 @@ class AgentEngineBridgeTest {
         Assert.assertEquals(1, position["x"])
 
         val ordered = f.act("a2", "unit.order", mapOf(
-            "actorCivId" to f.romeId, "unitId" to f.warriorId, "order" to "FORTIFY"))
+            "unitId" to f.warriorId, "order" to "FORTIFY"))
         Assert.assertEquals("applied", ordered["status"])
 
         // Replay returns the original receipt; conflicts and stale revisions map.
         val replay = f.act("a1", "unit.move", mapOf(
-            "actorCivId" to f.romeId, "unitId" to f.warriorId,
+            "unitId" to f.warriorId,
             "destination" to mapOf("x" to 1, "y" to 0)), expectedRevision = 0)
         Assert.assertEquals(1, replay["revision"])
         Assert.assertEquals("ACTION_ID_CONFLICT", f.errOf {
             f.act("a1", "unit.move", mapOf(
-                "actorCivId" to f.romeId, "unitId" to f.warriorId,
+                "unitId" to f.warriorId,
                 "destination" to mapOf("x" to 2, "y" to 0)))
         }.code)
         val stale = f.errOf {
             f.act("a9", "unit.move", mapOf(
-                "actorCivId" to f.romeId, "unitId" to f.warriorId,
+                "unitId" to f.warriorId,
                 "destination" to mapOf("x" to 2, "y" to 0)), expectedRevision = 0)
         }
         Assert.assertEquals("STALE_STATE", stale.code)
@@ -170,7 +172,7 @@ class AgentEngineBridgeTest {
     fun `action_result looks up without resubmitting`() {
         val f = Fixture()
         f.act("a1", "unit.order", mapOf(
-            "actorCivId" to f.romeId, "unitId" to f.warriorId, "order" to "FORTIFY"))
+            "unitId" to f.warriorId, "order" to "FORTIFY"))
         @Suppress("UNCHECKED_CAST")
         val found = f.bridge.actionResult("a1") as Map<String, Any?>
         Assert.assertEquals("applied", found["status"])
