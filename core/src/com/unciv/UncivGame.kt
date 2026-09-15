@@ -196,7 +196,7 @@ open class UncivGame(val isConsoleMode: Boolean = false) : Game(), PlatformSpeci
      * Sets the returned `WorldScreen` as the only active screen.
      * @param autoPlay pass in the old WorldScreen AutoPlay to retain the state throughout turns. Otherwise leave it is the default.
      */
-    suspend fun loadGame(newGameInfo: GameInfo, autoPlay: AutoPlay = AutoPlay(settings.autoPlay), callFromLoadScreen: Boolean = false): WorldScreen = withThreadPoolContext toplevel@{
+    suspend fun loadGame(newGameInfo: GameInfo, autoPlay: AutoPlay = AutoPlay(settings.autoPlay), callFromLoadScreen: Boolean = false, agentSetup: com.unciv.logic.agents.AgentMatchSetup? = null): WorldScreen = withThreadPoolContext toplevel@{
         val prevGameInfo = gameInfo
         gameInfo = newGameInfo
 
@@ -230,7 +230,25 @@ open class UncivGame(val isConsoleMode: Boolean = false) : Game(), PlatformSpeci
             val newWorldScreen = WorldScreen(newGameInfo, autoPlay, newGameInfo.getPlayerToViewAs(), worldScreenRestoreState)
             worldScreen = newWorldScreen
 
-            val moreThanOnePlayer = newGameInfo.civilizations.count { it.playerType == PlayerType.Human } > 1
+            if (agentSetup != null) {
+                try {
+                    newWorldScreen.agentSession = com.unciv.logic.agents.AgentMatchSessionFactory.create(
+                        newGameInfo, agentSetup
+                    )
+                } catch (ex: Exception) {
+                    Log.error("Could not start agent match session", ex)
+                    newWorldScreen.agentSession = null
+                }
+            }
+
+            val humanCount = if (agentSetup != null) {
+                newGameInfo.civilizations.count {
+                    it.playerType == PlayerType.Human && !agentSetup.slots.containsKey(it.civID)
+                }
+            } else {
+                newGameInfo.civilizations.count { it.playerType == PlayerType.Human }
+            }
+            val moreThanOnePlayer = humanCount > 1
             val isSingleplayer = !newGameInfo.gameParameters.isOnlineMultiplayer
             val screenToShow = if (moreThanOnePlayer && isSingleplayer) {
                 PlayerReadyScreen(newWorldScreen)

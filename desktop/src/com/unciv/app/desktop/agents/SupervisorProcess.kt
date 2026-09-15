@@ -27,7 +27,7 @@ class SupervisorProcess(
     daemonJs: File,
     private val turnTimeoutMinutes: Long = 10,
     private val answerEngineRequest: (method: String, params: Map<String, Any?>) -> Any? = { _, _ -> null }
-) {
+) : SupervisorRunner {
     data class TurnOutcome(
         val status: String,
         val sessionId: String?,
@@ -84,7 +84,7 @@ class SupervisorProcess(
         }, "supervisor-stderr").apply { isDaemon = true; start() }
     }
 
-    fun isAlive(): Boolean = process.isAlive
+    override fun isAlive(): Boolean = process.isAlive
 
     fun millisSinceLastEvent(): Long = System.currentTimeMillis() - lastEventAtMillis
 
@@ -121,7 +121,7 @@ class SupervisorProcess(
      * events until the outcome arrives. Engine RPCs are answered inline on
      * the reader thread (never queued behind the outcome wait).
      */
-    fun runTurn(control: Map<String, Any?>): TurnOutcome {
+    override fun runTurn(control: Map<String, Any?>): TurnOutcome {
         // Drain stale events from any previous run.
         events.clear()
         sendFrame(control)
@@ -151,7 +151,7 @@ class SupervisorProcess(
     }
 
     /** Graceful shutdown: EOF semantics via control, then bounded wait. */
-    fun shutdown() {
+    override fun shutdown() {
         try {
             sendFrame(mapOf("protocol" to 1, "kind" to "control", "op" to "shutdown"))
         } catch (ex: Exception) {
@@ -160,7 +160,7 @@ class SupervisorProcess(
         if (!process.waitFor(15, TimeUnit.SECONDS)) process.destroyForcibly()
     }
 
-    fun kill() {
+    override fun kill() {
         process.destroyForcibly()
     }
 }

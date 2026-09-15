@@ -87,6 +87,13 @@ internal object DesktopLauncher {
 
         val customDataDirPrefix="--data-dir="
         val customDataDir = arg.find { it.startsWith(customDataDirPrefix) }?.removePrefix(customDataDirPrefix)
+            ?: if (System.getProperty("jpackage.app-path") != null) {
+                // Finder/jpackage may start with user.dir=/; never write saves into
+                // the filesystem root or the signed application bundle.
+                File(System.getProperty("user.home"), "Library/Application Support/Unciv").apply {
+                    check(isDirectory || mkdirs()) { "Cannot create Unciv data directory: $absolutePath" }
+                }.absolutePath
+            } else null
 
         // Setup Desktop logging
         Log.backend = DesktopLogBackend()

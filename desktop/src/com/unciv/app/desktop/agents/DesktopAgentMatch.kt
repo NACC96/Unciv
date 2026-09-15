@@ -13,6 +13,7 @@ import com.unciv.logic.agents.AgentProfile
 import com.unciv.logic.agents.AgentRunControls
 import com.unciv.logic.agents.AgentRunState
 import com.unciv.logic.agents.AgentSnapshotPublication
+import com.unciv.logic.agents.CivilizationController
 import com.unciv.logic.agents.ControllerKind
 import com.unciv.logic.agents.EndTurnCommand
 import com.unciv.logic.agents.EngineCallException
@@ -31,6 +32,7 @@ import java.io.PrintWriter
 import java.util.UUID
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  * Desktop-owned agent match host (AI_AGENT_PLAN.md §3.1, §9, §11).
@@ -58,21 +60,24 @@ class DesktopAgentMatch(
     dataDir: File,
     private val worldScreen: WorldScreen? = null,
     private val nodeExecutable: File? = null,
-    private val supervisorDist: File? = null
+    private val supervisorDist: File? = null,
+    /** Injected runner (tests, scripted providers); production spawns `node dist/daemon.js`. */
+    private val supervisorFactory: (() -> SupervisorRunner)? = null
 ) : AgentMatchSession {
 
     override val matchId: String = match.matchId
 
     private val lock = Any()
-    private val coordinator = MatchCoordinator(game, match, fileStore(dataDir, match.matchId))
+    val coordinator = MatchCoordinator(game, match, fileStore(dataDir, match.matchId))
     private val bridge = AgentEngineBridge(coordinator)
     private val humanExecutor = HumanCommandExecutor(coordinator)
     private val guidance = AgentGuidanceQueue()
     private var runState: AgentRunState = AgentRunState.PAUSED
     private var authorityEpoch = 1
     private val sessions = HashMap<String, String>() // civId -> provider session ID
-    private var supervisor: SupervisorProcess? = null
+    private var supervisor: SupervisorRunner? = null
     private var failureReason: String? = null
+    private val isLoopRunning = AtomicBoolean(false)
 
     companion object {
         fun checkpointDir(dataDir: File, matchId: String): File =
@@ -136,28 +141,39 @@ class DesktopAgentMatch(
 
     override fun statusText(): String {
         val state: AgentRunState
-        val current: String?
+        val currentCiv: String?
         val rev: Int
+        val controller: CivilizationController?
+        val failure: String?
         synchronized(lock) {
             state = runState
-            current = if (coordinator.getTurnPhase() != TurnPhase.AWAITING_DECISIONS) null
-            else coordinator.getCurrentCivId()
+            currentCiv = if (coordinator.getTurnPhase() == TurnPhase.AWAITING_DECISIONS) coordinator.getCurrentCivId() else null
             rev = coordinator.getStateRevision()
+            controller = currentCiv?.let { coordinator.getController(it) }
+            failure = failureReason
         }
-        val who = current?.let { civ ->
-            val controller = synchronized(lock) { coordinator.getController(civ) }
-            val detail = controller?.agentProfile?.let { " (${it.provider}/${it.modelId})" } ?: ""
-            "$civ$detail"
-        }
+
+        val civInfo = if (currentCiv != null) {
+            val agent = controller?.agentProfile
+            if (agent != null) {
+                val thinking = agent.reasoning?.let { " [$it]" } ?: ""
+                "${agent.displayName} ($currentCiv · ${agent.provider}/${agent.modelId}$thinking)"
+            } else if (controller?.kind == ControllerKind.HUMAN) {
+                "$currentCiv (Human)"
+            } else {
+                "$currentCiv (AI)"
+            }
+        } else "—"
+
         return when (state) {
-            AgentRunState.PAUSED -> "Paused · ${who ?: "—"} to move · rev $rev"
-            AgentRunState.STARTING -> "Starting provider · ${who ?: "—"} · rev $rev"
-            AgentRunState.AGENT_DECIDING -> "Agent deciding · ${who ?: "—"} · rev $rev"
-            AgentRunState.APPLYING -> "Applying action · rev $rev"
-            AgentRunState.WAITING_HUMAN -> "Waiting human · ${who ?: "—"} · rev $rev"
-            AgentRunState.PAUSING -> "Pausing… · rev $rev"
-            AgentRunState.NEEDS_ATTENTION -> "Needs attention: ${failureReason ?: "unknown"} · rev $rev"
-            AgentRunState.FINISHED -> "Finished · rev $rev"
+            AgentRunState.PAUSED -> "Paused · $civInfo · rev $rev"
+            AgentRunState.STARTING -> "Starting provider · $civInfo · rev $rev"
+            AgentRunState.AGENT_DECIDING -> "Agent deciding · $civInfo · rev $rev"
+            AgentRunState.APPLYING -> "Applying action · $civInfo · rev $rev"
+            AgentRunState.WAITING_HUMAN -> "Waiting for player · $civInfo · rev $rev"
+            AgentRunState.PAUSING -> "Pausing… · $civInfo · rev $rev"
+            AgentRunState.NEEDS_ATTENTION -> "Needs attention: ${failure ?: "unknown"} · $civInfo · rev $rev"
+            AgentRunState.FINISHED -> "Match finished · rev $rev"
         }
     }
 
@@ -182,8 +198,18 @@ class DesktopAgentMatch(
                     coordinator.execute(EndTurnCommand(civId, "ui-end-${UUID.randomUUID()}",
                         coordinator.getStateRevision()))
                     publishSnapshotLocked()
+                    val nextCiv = if (coordinator.getTurnPhase() == TurnPhase.AWAITING_DECISIONS) coordinator.getCurrentCivId() else null
+                    if (nextCiv != null && coordinator.getController(nextCiv)?.kind == ControllerKind.HUMAN) {
+                        runState = AgentRunState.WAITING_HUMAN
+                    } else if (coordinator.getTurnPhase() == TurnPhase.COMPLETED) {
+                        runState = AgentRunState.FINISHED
+                    } else {
+                        runState = AgentRunState.STARTING
+                    }
                 }
                 refreshUi()
+                // If the next turn belongs to an agent, automatically trigger continuous play
+                triggerRunLoop()
             } catch (ex: Exception) {
                 fail(ex.message ?: "end-turn failed")
             }
@@ -194,8 +220,6 @@ class DesktopAgentMatch(
     override fun executeHumanAction(
         buildCommands: (expectedRevision: Int) -> List<(Int) -> AgentCommand>
     ): String? = synchronized(lock) {
-        // Coordinator-side validation is authoritative: not the human's
-        // turn, wrong civ, or an illegal action all land here as errors.
         val error = humanExecutor.executeAll(null, buildCommands)
         if (error == null) publishSnapshotLocked()
         error
@@ -203,12 +227,6 @@ class DesktopAgentMatch(
         if (it == null) refreshUi()
     }
 
-    /**
-     * Serializes the committed state for presentation (AI_AGENT_PLAN.md §9).
-     * MUST be called under [lock] — and off the GL thread; the desktop loop
-     * only ever calls this from worker threads. [publishToUi] does the GL
-     * scheduling.
-     */
     private fun publishSnapshotLocked() {
         val screen = worldScreen ?: return
         val payload = AgentSnapshotPublication.buildPayload(
@@ -236,18 +254,120 @@ class DesktopAgentMatch(
         worldScreen?.agentSession = null
     }
 
+    override fun canPause(): Boolean = synchronized(lock) {
+        runState == AgentRunState.STARTING || runState == AgentRunState.AGENT_DECIDING || runState == AgentRunState.APPLYING
+    }
+
+    override fun canResume(): Boolean = synchronized(lock) {
+        runState == AgentRunState.PAUSED && coordinator.getTurnPhase() != TurnPhase.COMPLETED
+    }
+
+    override fun canRetry(): Boolean = synchronized(lock) {
+        runState == AgentRunState.NEEDS_ATTENTION
+    }
+
+    override fun pause() {
+        synchronized(lock) {
+            when (runState) {
+                AgentRunState.STARTING, AgentRunState.AGENT_DECIDING, AgentRunState.APPLYING -> {
+                    runState = AgentRunState.PAUSING
+                }
+                AgentRunState.WAITING_HUMAN, AgentRunState.PAUSED -> {
+                    runState = AgentRunState.PAUSED
+                }
+                else -> {}
+            }
+        }
+        refreshUi()
+    }
+
+    override fun resume() {
+        run()
+    }
+
+    override fun retry() {
+        synchronized(lock) {
+            if (runState != AgentRunState.NEEDS_ATTENTION) return
+            failureReason = null
+            runState = AgentRunState.STARTING
+        }
+        refreshUi()
+        triggerRunLoop()
+    }
+
+    override fun getRunState(): AgentRunState = synchronized(lock) { runState }
+
+    override fun getActiveCivId(): String? = synchronized(lock) {
+        if (coordinator.getTurnPhase() == TurnPhase.AWAITING_DECISIONS) coordinator.getCurrentCivId() else null
+    }
+
+    override fun getActiveAgentProfile(): AgentProfile? = synchronized(lock) {
+        val civId = if (coordinator.getTurnPhase() == TurnPhase.AWAITING_DECISIONS) coordinator.getCurrentCivId() else null
+        civId?.let { coordinator.getController(it)?.agentProfile }
+    }
+
+    override fun getFailureReason(): String? = synchronized(lock) { failureReason }
+
+    override fun isSpectatorMode(): Boolean = synchronized(lock) {
+        coordinator.getControllers().values.none { it.kind == ControllerKind.HUMAN }
+    }
+
+    override fun startAutomaticPlay() {
+        synchronized(lock) {
+            if (coordinator.getTurnPhase() == TurnPhase.READY_TO_START) {
+                coordinator.beginAwaitingTurn()
+                publishSnapshotLocked()
+            }
+            val current = coordinator.getCurrentCivId()
+            if (coordinator.getController(current)?.kind == ControllerKind.HUMAN) {
+                runState = AgentRunState.WAITING_HUMAN
+                refreshUi()
+                return
+            }
+        }
+        run()
+    }
+
     //endregion
     //region Run controls
 
-    /** UI Run: continuous agent play, pausing at human turns and failures. */
+    /** Continuous agent play, advancing across civs and pausing at human turns or failures. */
     fun run() {
-        if (!transition(AgentControl.RUN)) return
-        Concurrency.runOnNonDaemonThreadPool("AgentMatch") { runLoop() }
+        synchronized(lock) {
+            if (runState == AgentRunState.FINISHED) return
+            if (coordinator.getTurnPhase() == TurnPhase.COMPLETED) {
+                runState = AgentRunState.FINISHED
+                refreshUi()
+                return
+            }
+            if (coordinator.getTurnPhase() == TurnPhase.READY_TO_START) {
+                coordinator.beginAwaitingTurn()
+                publishSnapshotLocked()
+            }
+            val current = coordinator.getCurrentCivId()
+            if (coordinator.getController(current)?.kind == ControllerKind.HUMAN) {
+                runState = AgentRunState.WAITING_HUMAN
+                refreshUi()
+                return
+            }
+            if (runState != AgentRunState.AGENT_DECIDING && runState != AgentRunState.APPLYING) {
+                runState = AgentRunState.STARTING
+            }
+        }
+        refreshUi()
+        triggerRunLoop()
     }
 
-    fun pause() {
-        transition(AgentControl.PAUSE)
-        refreshUi()
+    private fun triggerRunLoop() {
+        if (isLoopRunning.compareAndSet(false, true)) {
+            Concurrency.runOnNonDaemonThreadPool("AgentMatch") {
+                try {
+                    runLoop()
+                } finally {
+                    isLoopRunning.set(false)
+                }
+            }
+        }
     }
 
     fun stop() {
@@ -308,27 +428,58 @@ class DesktopAgentMatch(
 
     private fun runLoop() {
         while (true) {
-            val state = synchronized(lock) { runState }
-            if (state != AgentRunState.STARTING && state != AgentRunState.AGENT_DECIDING
-                && state != AgentRunState.APPLYING
-            ) return
-            val civId = synchronized(lock) { currentCommandable() }
+            val (state, civId) = synchronized(lock) {
+                if (runState == AgentRunState.PAUSING) {
+                    runState = AgentRunState.PAUSED
+                    refreshUi()
+                    return
+                }
+                if (runState != AgentRunState.STARTING && runState != AgentRunState.AGENT_DECIDING
+                    && runState != AgentRunState.APPLYING
+                ) {
+                    return
+                }
+                if (coordinator.getTurnPhase() == TurnPhase.READY_TO_START) {
+                    coordinator.beginAwaitingTurn()
+                    publishSnapshotLocked()
+                }
+                if (coordinator.getTurnPhase() == TurnPhase.COMPLETED) {
+                    runState = AgentRunState.FINISHED
+                    refreshUi()
+                    return
+                }
+                val civ = currentCommandable()
+                Pair(runState, civ)
+            }
+
             if (civId == null) {
                 fail("No eligible civilization to continue the match")
                 return
             }
-            when (synchronized(lock) { coordinator.getController(civId)?.kind }) {
-                ControllerKind.HUMAN -> {
-                    synchronized(lock) { runState = AgentRunState.WAITING_HUMAN }
+
+            val controllerKind = synchronized(lock) { coordinator.getController(civId)?.kind }
+            if (controllerKind == ControllerKind.HUMAN) {
+                synchronized(lock) {
+                    runState = AgentRunState.WAITING_HUMAN
+                    publishSnapshotLocked()
+                }
+                refreshUi()
+                return
+            }
+
+            runAgentTurn(civId)
+
+            synchronized(lock) {
+                if (runState == AgentRunState.PAUSING || runState == AgentRunState.PAUSED) {
+                    if (runState == AgentRunState.PAUSING) runState = AgentRunState.PAUSED
                     refreshUi()
                     return
                 }
-                else -> runAgentTurn(civId)
-            }
-            if (synchronized(lock) { coordinator.getTurnPhase() } == TurnPhase.COMPLETED) {
-                synchronized(lock) { runState = AgentRunState.FINISHED }
-                refreshUi()
-                return
+                if (coordinator.getTurnPhase() == TurnPhase.COMPLETED) {
+                    runState = AgentRunState.FINISHED
+                    refreshUi()
+                    return
+                }
             }
         }
     }
@@ -340,8 +491,6 @@ class DesktopAgentMatch(
     }
 
     private fun stepSingleTurn() {
-        // Scripted single step: end the current turn through the coordinator.
-        // Provider-driven steps arrive via runAgentTurn instead.
         synchronized(lock) {
             if (coordinator.getTurnPhase() == TurnPhase.READY_TO_START)
                 coordinator.beginAwaitingTurn()
@@ -382,6 +531,7 @@ class DesktopAgentMatch(
                 "provider" to profile.provider,
                 "providerConfig" to mapOf(
                     "model" to profile.modelId,
+                    "reasoning" to profile.reasoning,
                     "resumeId" to sessions[civId]),
                 "binding" to mapOf("matchId" to matchId,
                     "timelineId" to coordinator.getTimelineId(),
@@ -400,21 +550,21 @@ class DesktopAgentMatch(
             val session = outcome.sessionId
             if (session != null) sessions[civId] = session
             if (outcome.status == "completed_turn") {
-                runState = AgentRunState.APPLYING
+                publishSnapshotLocked()
+                if (runState == AgentRunState.PAUSING) {
+                    runState = AgentRunState.PAUSED
+                } else {
+                    runState = AgentRunState.STARTING
+                }
             } else {
                 fail(outcome.detail)
                 return
             }
         }
         refreshUi()
-        synchronized(lock) {
-            if (runState == AgentRunState.APPLYING) runState = AgentRunState.AGENT_DECIDING
-        }
     }
 
     private fun reassign(civId: String, kind: ControllerKind, profile: AgentProfile?) {
-        // Host-side revocation (process/session teardown, epoch bump) lands
-        // here with the real supervisor; the coordinator records the rest.
         synchronized(lock) {
             authorityEpoch = AgentRunControls.nextEpoch(authorityEpoch)
             sessions.remove(civId)
@@ -426,8 +576,12 @@ class DesktopAgentMatch(
         refreshUi()
     }
 
-    private fun ensureSupervisor(): SupervisorProcess {
+    private fun ensureSupervisor(): SupervisorRunner {
         supervisor?.let { if (it.isAlive()) return it }
+        supervisorFactory?.invoke()?.let {
+            supervisor = it
+            return it
+        }
         val node = findNode(nodeExecutable)
             ?: throw IllegalStateException(
                 "Node.js runtime not found. Searched: -Dunciv.node.path, " +

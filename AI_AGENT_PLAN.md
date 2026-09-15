@@ -414,15 +414,22 @@ A plain game export, if offered, must be labeled as losing agent profiles/memory
 
 ### 11.1 Setup
 
-New Game → choose supported ruleset/map options → assign controllers → configure each external leader → validate → create paused match → Run/Step.
+New Game -> choose supported ruleset/map options -> assign controllers -> configure each external leader -> validate -> Start Game initiates automated play.
 
-Show per-slot provider executable, version, model, supported reasoning choices, personality, and errors. Custom agent display name is separate from the selected civilization's historical leader identity. Changing a slot to Human/Built-in hides its agent editor without reassigning another slot's profile.
-
-Separate “executable found” from “connection verified.” A user-triggered connection test may make a provider request and must say so. Runtime checks revalidate compatibility; cached success is not proof of current authentication. Missing executable/auth/model/MCP support blocks that slot's execution with an actionable reason.
+- **Start Notice**: Start Game includes an explicit notice: "Starting an agent game begins automated play immediately using the selected provider account."
+- **Spectator Preset**: "Watch agents play (Spectator)" button in player picker automatically configures a Spectator human slot plus two external agent slots (defaulting to Codex `gpt-5.6-luna` with low reasoning), bypassing manual multi-slot configuration.
+- **Agent Model Catalog**: Maintained provider-scoped catalogs for Codex (`gpt-5.6-luna` default target, `o3-mini`, `o3`, `gpt-4o`), Claude (`claude-3-7-sonnet`, `claude-3-5-sonnet`, `claude-3-5-haiku`), and OpenCode. Supports background model discovery while preserving uncataloged saved models without silent substitution.
+- **Thinking / Reasoning Level Selector**: Models with thinking capabilities support user-selectable thinking levels (Provider Default, Off, Low, Medium, High, Max) mapped to provider-specific CLI flags (`--reasoning-effort`). Non-thinking models disable the picker and default cleanly.
+- **Profile Caching & Nation Renaming**: Profile edits are cached per slot so cycling a slot (AI -> Human -> Agent) restores previous configuration without data loss. Changing a civilization nation updates the default agent display name automatically while preserving custom names.
+- **Validation**: Bounded, scrollable profile popup validates required display name, valid model ID, and permitted thinking levels before saving, preventing malformed configurations.
 
 ### 11.2 Watching and playing
 
-- Keep active civ, round, provider/model, current status, and last confirmed action visible before optional logs.
+- **Match Controls Table**: Dedicated `AgentMatchControlTable` in the world screen status area displays:
+  - Match status text showing current civilization, agent name, provider, model, reasoning level, and phase.
+  - Interactive match controls: Pause (initiates graceful pause draining in-flight atomic mutations to a safe turn-completion boundary), Resume (continues from authoritative state without replay), Retry (re-observes state and restarts after confirmed termination).
+  - Next Turn button decoupling: Next Turn button is hidden during spectator-only play; spectator never presses Next Turn or Run between civilizations. In human-plus-agent matches, Next Turn functions strictly for human turns.
+- **Spectator Flow**: A spectator occupies no playable major civ slot, makes no gameplay decisions for agents, and bypasses hotseat handoff / `PlayerReadyScreen` transitions.
 - Add a collapsible agent inspector with decisions/actions, profile/notes, guidance, and usage sections. The map remains usable while a provider thinks.
 - Selecting another civ's object does not switch the pinned perspective or grant its controls. Use existing spectator infrastructure, with explicit viewer policy throughout map, city, diplomacy, overview, notifications, and victory screens.
 - Ordinary human mode hides opponent private notes, decision summaries, guidance, and unobserved action details. Full-inspection mode is visibly marked and saved with the match.

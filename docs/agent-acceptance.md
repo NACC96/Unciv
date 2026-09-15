@@ -1,6 +1,6 @@
 # Agent Match — Release Acceptance Evidence (plan §13)
 
-Status as of CP-030 on `agent-match-foundation`. Commands run with the
+Status as of CP-034 on `agent-match-foundation`. Commands run with the
 standing environment (`JAVA_HOME=/opt/homebrew/opt/openjdk@21`,
 `GRADLE_USER_HOME=/Users/noahkenny/.gradle-unciv`, `COPYFILE_DISABLE=1`,
 build dirs relocated to `~/.unciv-build/` by the local-only init script —
@@ -10,7 +10,7 @@ never committed).
 
 | Check | Result |
 | --- | --- |
-| `./gradlew :tests:test` | **932 tests, 0 failures, 0 errors** (95 suites; 82 agent tests in 18 agent suites), per-file XML presence verified after `cleanTest` (CP-024 rule) |
+| `./gradlew :tests:test` | **975 tests, 0 failures, 0 errors** (100 suites; 127 agent tests across 23 agent suites, incl. AgentOrchestrationLoopTest 8/8 stable over 3 runs), per-file XML presence verified after `cleanTest` |
 | `./gradlew :desktop:dist` | BUILD SUCCESSFUL — runnable jar at `~/.unciv-build/desktop/libs/Unciv.jar` (57 MB; contains all agent classes — spot-checked `DemandCommand`) |
 | `./gradlew check` | BUILD SUCCESSFUL |
 | `npm run typecheck` (agent-runner) | clean (`tsc --noEmit`) |
@@ -31,7 +31,7 @@ present and current, so a plain test/build re-run is equivalent evidence.
 | Visibility | ObservationVisibilityTest (hidden units, movement zeroing, no queue oracle, differential-ish gates); CP-018 fixture lessons |
 | Decisions | Conquest decisions (CombatConquestTest/EndgameDynamicsTest: MANDATORY, `DECISIONS_PENDING` block, resolve via command); demand-response decisions (TurnLifecycleTest: raised at beginTurn, block end turn, resolved by `diplomacy.respondDemand`); free tech/policy via research/civics commands |
 | Provider parsing | W1 sanitized fixtures + probes (split/malformed/truncated JSONL, unknown events, duplicate usage, session mismatch — `W1-COMPATIBILITY.md`); daemon second-turn concurrency rejected |
-| Authority/lifecycle | AgentRunControlsTest (pause/step/takeover/stop state machine); daemon shutdown/EOF drain; SetControllerCommand rev discipline |
+| Authority/lifecycle | AgentRunControlsTest (pause/step/takeover/stop state machine); AgentOrchestrationLoopTest (scripted-supervisor full loop: sequential rotation, single-invocation invariant, pause-drain, resume without duplicates, failure→retry, human handoff); supervisorFactory injection + run-state observers on DesktopAgentMatch; daemon shutdown/EOF drain; SetControllerCommand rev discipline |
 | Storage | FileCheckpointStoreTest on the actual ExFAT volume: atomic move, interrupted-write recovery, corruption fallback, missing-volume error surfaced |
 | UI (automated part) | Session gating: `canChangeState` degrades all compliant surfaces to read-only; popup block now requires `canChangeState` (CP-030); DevConsole forbidden; AutoPlay gated (audit doc). Interactive GL-thread checks remain manual (see below) |
 | Victories | EndgameDynamicsTest: **all five** live — Domination (capital capture), Time (max turns), Scientific (Apollo + all parts in capital), Cultural (5 branches + Utopia Project), Diplomatic (UN + won vote). No further agent work after COMPLETED phase |
@@ -97,27 +97,54 @@ and the GL thread never waiting on provider/network/disk work.
   valid protocol `ready` frame. The plain `:desktop:dist` fat jar contains
   NO runner or Node (verified: zero matches for daemon.js/node_modules in
   the jar listing) — use `agentPackage` for agent matches.
-- **macOS .app bundle (double-clickable)**: implemented —
-  `./gradlew :desktop:macApp` produces `~/.unciv-build/desktop/Unciv.app`.
-  The bundle contains:
-  - `Contents/MacOS/Unciv`: executable POSIX launcher script discovering Java 17+
-    across JAVA_HOME, /opt/homebrew, /Library/Java/JavaVirtualMachines, and PATH,
-    with an AppleScript alert prompt fallback if missing.
-  - `Contents/Info.plist`: standard macOS application metadata configured with
-    `CFBundleExecutable=Unciv`, `CFBundleIconFile=Unciv.icns`, and matching version.
-  - `Contents/Resources/Unciv.icns`: multi-resolution macOS icon bundle.
-  - `Contents/Resources/Unciv.jar`: executable fat jar.
-  - `Contents/Resources/agent-runner/`: supervisor daemon and its dependency tree
-    (`dist/daemon.js` + `node_modules`).
-  - Bundled Node support: passing `-Dunciv.node.home=<dir>` includes a private
-    Node binary in `Contents/Resources/node/`, with runtime discovery checking
-    `../Resources/node` from the binary location.
+- **Native macOS .app bundle**: `./gradlew :desktop:macApp` now produces
+  `~/.unciv-build/desktop/native/Unciv.app` with the local build relocation.
+  It uses JDK `jpackage`, a native launcher, and a private Java runtime.
+  The former shell launcher became generic Java at runtime, preventing
+  Computer Use from resolving the running application by its bundle ID.
+  - `Contents/MacOS/Unciv`: native launcher (`com.unciv.app`).
+  - `Contents/runtime/`: bundled Java runtime; no installed Java needed to run.
+  - `Contents/app/Unciv.jar` and `Contents/app/agent-runner/`: game and runner.
+  - `-Dunciv.node.home=<dir>` bundles Node beside the jar in `Contents/app/node/`.
+  - Packaged launches store data in `~/Library/Application Support/Unciv`;
+    explicit `--data-dir=...` takes precedence. Existing legacy bundle data
+    is left untouched and is not automatically migrated.
+  - Earlier native builds are preserved beside the output with a timestamp.
+  - This is a local app image, not a notarized distribution release.
+  - Verified 2026-09-15: `:desktop:macApp` built successfully; Computer Use
+    attached to the native bundle, captured screenshots, selected English
+    through mouse input, and reached the normal main menu. This verifies
+    launch/control only, not agent gameplay. The first prototype exposed
+    `user.dir=/` and failed writing `/GameSettings.json`; the packaged data
+    directory fix above resolved that startup failure.
+
+## Deliverable reconciliation (CP-034): which .app to test
+
+- **Test this bundle:** `~/.unciv-build/desktop/native/Unciv.app`, built
+  reproducibly by `./gradlew :desktop:macApp
+  -Dunciv.node.home=/Users/noahkenny/.nvm/versions/node/v24.13.1` from current
+  sources (rebuilt 2026-09-15 with the run-control + routing code in this
+  report). Artifact-inspected: bundle id `com.unciv.app`, executable native
+  launcher, private jlink runtime, `Contents/app/Unciv.jar` (57 MB, contains
+  DesktopAgentMatch/MatchCoordinator/SupervisorRunner classes), `Contents/app/
+  agent-runner/dist/daemon.js`, `node_modules` (incl. @modelcontextprotocol/sdk),
+  bundled `node/` answering `v24.13.1`. Discovery paths align: the jar's
+  directory is `Contents/app`, so `agent-runner/dist` and `node/bin/node`
+  resolve exactly where `findSupervisorDist`/`findNode` look.
+- **Do NOT test this one:** `~/.unciv-build/desktop/Unciv.app` (Resources
+  layout) is a stale manual assembly from 2026-09-15 00:54, built by no
+  committed task, with an older jar and NO bundled Node. It is superseded by
+  the jpackage bundle above.
 
 ## Known limitations (honest record)
 
-- All Vanilla human gameplay mutations (unit orders, unit swap, unit rename,
-  connect road, gifts, tribute, protection, production, research, diplomacy)
-  route authoritatively through the MatchCoordinator during agent matches.
+- All Vanilla human gameplay mutations (unit orders incl. explore/automate/
+  guard/escort/connect-road/sweep, unit swap, unit rename, gifts, tribute,
+  protection, marriage, production, research, policies, diplomacy incl. trade
+  propose/retract, demands, protector-alert and friendship-offer answers,
+  conquest dispositions, diplomatic votes) route authoritatively through the
+  MatchCoordinator during agent matches — see the audit; no gameplay control
+  bypasses it.
 - Non-gameplay / presentation controls (MultiplayerStatus preview popup,
   Spectator Mode view) are verified presentation-only (no match state mutation).
 - Mod-only mechanics (such as UnitActionType.Transform) are out of Vanilla scope.

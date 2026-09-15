@@ -1,5 +1,6 @@
 
 import com.google.common.io.Files
+import java.nio.file.Files as NioFiles
 import com.unciv.build.BuildConfig
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
@@ -97,64 +98,44 @@ tasks.register<Copy>("agentPackage") {
     }
 }
 
-// Assembles a double-clickable macOS Unciv.app bundle containing Unciv.jar,
-// agent runner, launcher script, and Info.plist.
+// A native jpackage launcher keeps the running process associated with the
+// app's bundle identity. A shell script exec'ing external java does not.
 tasks.register("macApp") {
     group = "unciv"
-    description = "Assembles a double-clickable macOS Unciv.app bundle containing Unciv.jar, agent runner, launcher script, and Info.plist."
-    dependsOn("dist")
-    val appDir = layout.buildDirectory.dir("Unciv.app")
-    outputs.dir(appDir)
+    description = "Builds a native macOS app with a private Java runtime and agent runner."
+    dependsOn("agentPackage")
+    val destination = layout.buildDirectory.dir("native")
+    // jpackage requires a fresh output directory. Keep previous bundles intact.
+    outputs.upToDateWhen { false }
     doLast {
-        val root = appDir.get().asFile
-        val contents = root.resolve("Contents")
-        val macOs = contents.resolve("MacOS")
-        val resources = contents.resolve("Resources")
-        macOs.mkdirs()
-        resources.mkdirs()
-
-        // 1. Copy Unciv.jar
-        val jarFile = layout.buildDirectory.file("libs/Unciv.jar").get().asFile
-        if (jarFile.isFile) {
-            jarFile.copyTo(resources.resolve("Unciv.jar"), overwrite = true)
-        }
-
-        // 2. Copy agent-runner/dist and node_modules
-        val runnerDist = rootDir.resolve("agent-runner/dist")
-        if (runnerDist.isDirectory) {
-            runnerDist.copyRecursively(resources.resolve("agent-runner/dist"), overwrite = true)
-        }
-        val nodeModules = rootDir.resolve("agent-runner/node_modules")
-        if (nodeModules.isDirectory) {
-            nodeModules.copyRecursively(resources.resolve("agent-runner/node_modules"), overwrite = true)
-        }
-
-        // 3. Copy bundled Node if provided via -Dunciv.node.home
-        val nodeHome = System.getProperty("unciv.node.home")?.let { file(it) }
-        if (nodeHome != null && nodeHome.isDirectory) {
-            nodeHome.copyRecursively(resources.resolve("node"), overwrite = true)
-        }
-
-        // 4. Copy icons
-        for (iconName in listOf("Unciv.icns", "Unciv.ico")) {
-            val icon = rootDir.resolve("extraImages/Icons/$iconName")
-            if (icon.isFile) {
-                icon.copyTo(resources.resolve(iconName), overwrite = true)
+        check(System.getProperty("os.name").contains("Mac")) { "macApp must run on macOS" }
+        val jpackage = File(System.getProperty("java.home"), "bin/jpackage")
+        check(jpackage.canExecute()) { "macApp requires a JDK containing jpackage" }
+        val input = layout.buildDirectory.dir("agentPackage").get().asFile
+        check(input.resolve("Unciv.jar").isFile) { "Missing Unciv.jar" }
+        check(input.resolve("agent-runner/dist/daemon.js").isFile) { "Build agent-runner before macApp" }
+        check(input.resolve("agent-runner/node_modules").isDirectory) { "Install agent-runner dependencies before macApp" }
+        val dest = destination.get().asFile.apply { mkdirs() }
+        val staging = NioFiles.createTempDirectory(dest.toPath(), ".unciv-native-app-").toFile()
+        val result = ProcessBuilder(
+            jpackage.absolutePath, "--type", "app-image", "--name", "Unciv",
+            "--app-version", BuildConfig.appVersion,
+            "--mac-package-identifier", "com.unciv.app",
+            "--input", input.absolutePath, "--main-jar", "Unciv.jar",
+            "--main-class", mainClassName, "--dest", staging.absolutePath,
+            "--java-options", "-Xmx4G",
+            "--icon", rootDir.resolve("extraImages/Icons/Unciv.icns").absolutePath
+        ).inheritIO().start().waitFor()
+        check(result == 0) { "jpackage failed ($result); staging retained at $staging" }
+        val app = dest.resolve("Unciv.app")
+        if (app.exists()) {
+            check(app.renameTo(dest.resolve("Unciv-previous-${System.currentTimeMillis()}.app"))) {
+                "Cannot preserve previous app at $app"
             }
         }
-
-        // 5. Write Info.plist from template
-        val plistTemplate = file("macos/Info.plist.template").readText()
-        contents.resolve("Info.plist").writeText(
-            plistTemplate.replace("@VERSION@", BuildConfig.appVersion)
-        )
-
-        // 6. Copy launcher script
-        val launcherSrc = file("macos/Unciv")
-        val launcherDest = macOs.resolve("Unciv")
-        launcherSrc.copyTo(launcherDest, overwrite = true)
-        launcherDest.setExecutable(true, false)
-        println("macOS app bundle assembled at: ${root.absolutePath}")
+        check(staging.resolve("Unciv.app").renameTo(app)) { "Cannot move staged app from $staging to $app" }
+        staging.delete() // now-empty temporary directory only
+        println("Native macOS app: ${app.absolutePath}")
     }
 }
 

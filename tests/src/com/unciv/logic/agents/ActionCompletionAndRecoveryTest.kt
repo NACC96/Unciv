@@ -495,4 +495,94 @@ class ActionCompletionAndRecoveryTest {
             snapshot.getCivilization(f.romeId).units.getCivUnits().firstOrNull { it.id == warrior.id }
         )
     }
+
+    @Test
+    fun `retract removes the pending offer`() {
+        val f = Fixture()
+        val rome = f.testGame.gameInfo.getCivilization(f.romeId)
+        val greece = f.testGame.gameInfo.getCivilization(f.greeceId)
+        rome.diplomacyFunctions.makeCivilizationsMeet(greece)
+        rome.addGold(200)
+        f.rebuild()
+
+        f.coordinator.execute(ProposeTradeCommand(f.romeId, "pt1", f.rev(), f.greeceId,
+            ourOffers = listOf(TradeOfferDto("Gold", TradeOfferType.Gold, 10)),
+            theirOffers = emptyList()))
+        f.coordinator.execute(RetractTradeCommand(f.romeId, "rt1", f.rev(), f.greeceId))
+        // Retracting again finds nothing to retract.
+        try {
+            f.coordinator.execute(RetractTradeCommand(f.romeId, "rt2", f.rev(), f.greeceId))
+            Assert.fail("expected ILLEGAL_ACTION")
+        } catch (ex: AgentCommandException) {
+            Assert.assertEquals(AgentCommandError.ILLEGAL_ACTION, ex.code)
+        }
+    }
+
+    @Test
+    fun `protector alert answers mutate through the coordinator`() {
+        val f = Fixture()
+        val rome = f.testGame.gameInfo.getCivilization(f.romeId)
+        val cityState = f.testGame.addCiv(f.testGame.ruleset.nations["Genoa"]!!)
+        f.testGame.addCity(cityState, f.testGame.getTile(2, 2))
+        rome.diplomacyFunctions.makeCivilizationsMeet(cityState)
+        rome.diplomacyFunctions.makeCivilizationsMeet(
+            f.testGame.gameInfo.getCivilization(f.aztecId))
+        f.rebuild()
+        val csId = cityState.civID
+
+        f.coordinator.execute(ProtectionCommand(f.romeId, "pp1", f.rev(), csId, pledge = true))
+
+        // SIDE_WITH records the diplomatic memory without war.
+        f.coordinator.execute(RespondProtectorAlertCommand(f.romeId, "pa1", f.rev(),
+            csId, f.aztecId, ProtectorAlertChoice.SIDE_WITH))
+        val payload = AgentSnapshotPublication.buildPayload(f.coordinator, f.romeId)
+        val snapshot = MatchCoordinator.deserializeForPublication(payload.serializedGame)
+        // sideWithCityState records on the ATTACKER's view of us.
+        val diplo = snapshot.getCivilization(f.aztecId).getDiplomacyManager(f.romeId)!!
+        Assert.assertTrue(diplo.hasModifier(
+            com.unciv.logic.civilization.diplomacy.DiplomaticModifiers.SidedWithProtectedMinor))
+
+        // BREAK_PLEDGE removes the protector.
+        f.coordinator.execute(RespondProtectorAlertCommand(f.romeId, "pa2", f.rev(),
+            csId, f.aztecId, ProtectorAlertChoice.BREAK_PLEDGE))
+        val payload2 = AgentSnapshotPublication.buildPayload(f.coordinator, f.romeId)
+        val snapshot2 = MatchCoordinator.deserializeForPublication(payload2.serializedGame)
+        Assert.assertFalse(snapshot2.getCivilization(csId).cityStateFunctions
+            .getProtectorCivs().contains(snapshot2.getCivilization(f.romeId)))
+
+        // Without a pledge there is nothing to answer.
+        try {
+            f.coordinator.execute(RespondProtectorAlertCommand(f.romeId, "pa3", f.rev(),
+                csId, f.aztecId, ProtectorAlertChoice.SIDE_WITH))
+            Assert.fail("expected ILLEGAL_ACTION")
+        } catch (ex: AgentCommandException) {
+            Assert.assertEquals(AgentCommandError.ILLEGAL_ACTION, ex.code)
+        }
+    }
+
+    @Test
+    fun `friendship offer answers sign or record the decline`() {
+        val f = Fixture()
+        val rome = f.testGame.gameInfo.getCivilization(f.romeId)
+        val greece = f.testGame.gameInfo.getCivilization(f.greeceId)
+        rome.diplomacyFunctions.makeCivilizationsMeet(greece)
+        f.rebuild()
+
+        f.coordinator.execute(RespondFriendshipOfferCommand(f.romeId, "fo1", f.rev(),
+            f.greeceId, accept = true))
+        var payload = AgentSnapshotPublication.buildPayload(f.coordinator, f.romeId)
+        var snapshot = MatchCoordinator.deserializeForPublication(payload.serializedGame)
+        Assert.assertTrue(snapshot.getCivilization(f.romeId)
+            .getDiplomacyManager(f.greeceId)!!
+            .hasFlag(com.unciv.logic.civilization.diplomacy.DiplomacyFlags.DeclarationOfFriendship))
+
+        // A fresh offer declined records the refusal on the other side.
+        f.coordinator.execute(RespondFriendshipOfferCommand(f.greeceId, "fo2", f.rev(),
+            f.romeId, accept = false))
+        payload = AgentSnapshotPublication.buildPayload(f.coordinator, f.romeId)
+        snapshot = MatchCoordinator.deserializeForPublication(payload.serializedGame)
+        Assert.assertTrue(snapshot.getCivilization(f.romeId)
+            .getDiplomacyManager(f.greeceId)!!
+            .hasFlag(com.unciv.logic.civilization.diplomacy.DiplomacyFlags.DeclinedDeclarationOfFriendship))
+    }
 }

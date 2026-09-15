@@ -2,6 +2,7 @@ package com.unciv.ui.screens.newgamescreen
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup
 import com.unciv.Constants
 import com.unciv.UncivGame
@@ -119,6 +120,13 @@ class NewGameScreen(
             }
             horizontalGroup.addActor(resetToDefaultsButton)
         }
+
+        val agentNoticeLabel = "Starting an agent game begins automated play immediately using the selected provider account.".toLabel(Color.SKY, 12).apply {
+            wrap = true
+            setAlignment(Align.right)
+            width = 260f
+        }
+        horizontalGroup.addActor(agentNoticeLabel)
 
         val startGameButton = "Start game!".toTextButton().apply { color = Color.GREEN }        
         startGameButton.onClick(this::startGameAvoidANRs)
@@ -398,19 +406,14 @@ class NewGameScreen(
             }
         }
 
-        val worldScreen = game.loadGame(newGame)
+        val agentSetup = if (playerPickerTable.collectAgentErrors().isEmpty() && playerPickerTable.agentProfiles.isNotEmpty()) {
+            playerPickerTable.buildAgentMatchSetup()
+        } else null
 
-        // Agent-enabled matches attach a desktop-owned session (no-op when no
-        // agent slots exist or the platform provides no host). New matches
-        // stay paused until the user presses Run or Step.
-        if (playerPickerTable.collectAgentErrors().isEmpty()) {
-            try {
-                worldScreen.agentSession = com.unciv.logic.agents.AgentMatchSessionFactory.create(
-                    newGame, playerPickerTable.buildAgentMatchSetup())
-            } catch (ex: Exception) {
-                com.unciv.utils.Log.error("Could not start agent match session", ex)
-                worldScreen.agentSession = null
-            }
+        val worldScreen = game.loadGame(newGame, agentSetup = agentSetup)
+
+        if (agentSetup != null) {
+            worldScreen.agentSession?.startAutomaticPlay()
         }
 
         worldScreen.autoSave()

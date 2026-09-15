@@ -1,6 +1,7 @@
 package com.unciv.ui.screens.diplomacyscreen
 
 import com.unciv.logic.agents.DenounceCommand
+import com.unciv.logic.agents.DemandCommand
 import com.unciv.logic.agents.FriendshipCommand
 
 import com.badlogic.gdx.graphics.Color
@@ -252,6 +253,16 @@ class MajorCivDiplomacyTable(private val diplomacyScreen: DiplomacyScreen) {
                 button.disable()
             } else {
                 button.onClick {
+                    // Agent matches issue demands through the coordinator (§3.2).
+                    if (UncivGame.Current.worldScreen?.routeThroughAgentSession {
+                            listOf({ r: Int ->
+                                DemandCommand(viewingCiv.civID, "ui-${System.nanoTime()}", r,
+                                    otherCiv.civID, demand.name)
+                            })
+                        } == true) {
+                        button.disable()
+                        return@onClick
+                    }
                     otherCiv.popupAlerts.add(PopupAlert(demand.demandAlert, viewingCiv.civID))
                     button.disable()
                 }

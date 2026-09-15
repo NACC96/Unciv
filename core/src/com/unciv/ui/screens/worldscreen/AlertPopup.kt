@@ -1,6 +1,12 @@
 package com.unciv.ui.screens.worldscreen
 
+import com.unciv.logic.agents.ConquestDisposition
+import com.unciv.logic.agents.DeclareWarCommand
+import com.unciv.logic.agents.ProtectorAlertChoice
+import com.unciv.logic.agents.ResolveConquestCommand
 import com.unciv.logic.agents.RespondDemandCommand
+import com.unciv.logic.agents.RespondFriendshipOfferCommand
+import com.unciv.logic.agents.RespondProtectorAlertCommand
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane
@@ -181,20 +187,47 @@ class AlertPopup(
         
         if (!player.isAtWarWith(bullyOrAttacker)) {
             addCloseButton("THIS MEANS WAR!", KeyboardBinding.Confirm) {
-            player.getDiplomacyManager(bullyOrAttacker)!!.sideWithCityState()
-            val warReason = if (popupAlert.type == AlertType.AttackedAllyMinor) WarType.AlliedCityStateWar else WarType.ProtectedCityStateWar
-            player.getDiplomacyManager(bullyOrAttacker)!!.declareWar(DeclareWarReason(warReason, cityState))
-            cityState.getDiplomacyManager(player)!!.influence += 20f // You went to war for us!!
+            // Agent matches answer protector alerts through the coordinator (§3.2).
+            val routed = worldScreen.routeThroughAgentSession {
+                listOf({ r: Int ->
+                    RespondProtectorAlertCommand(viewingCiv.civID, "ui-${System.nanoTime()}", r,
+                        cityState.civID, bullyOrAttacker.civID,
+                        ProtectorAlertChoice.DECLARE_WAR,
+                        popupAlert.type == AlertType.AttackedAllyMinor)
+                })
+            }
+            if (!routed) {
+                player.getDiplomacyManager(bullyOrAttacker)!!.sideWithCityState()
+                val warReason = if (popupAlert.type == AlertType.AttackedAllyMinor) WarType.AlliedCityStateWar else WarType.ProtectedCityStateWar
+                player.getDiplomacyManager(bullyOrAttacker)!!.declareWar(DeclareWarReason(warReason, cityState))
+                cityState.getDiplomacyManager(player)!!.influence += 20f // You went to war for us!!
+            }
         }.row()}
 
         addCloseButton("You'll pay for this!", KeyboardBinding.Confirm) {
-            player.getDiplomacyManager(bullyOrAttacker)!!.sideWithCityState()
+            val routed = worldScreen.routeThroughAgentSession {
+                listOf({ r: Int ->
+                    RespondProtectorAlertCommand(viewingCiv.civID, "ui-${System.nanoTime()}", r,
+                        cityState.civID, bullyOrAttacker.civID,
+                        ProtectorAlertChoice.SIDE_WITH, false)
+                })
+            }
+            if (!routed) player.getDiplomacyManager(bullyOrAttacker)!!.sideWithCityState()
         }.row()
 
         addCloseButton("Very well.", KeyboardBinding.Cancel) {
-            player.addNotification("You have broken your Pledge to Protect [${cityState.civName}]!",
-                cityState.cityStateFunctions.getNotificationActions(), NotificationCategory.Diplomacy, cityState.civName)
-            cityState.cityStateFunctions.removeProtectorCiv(player, forced = true)
+            val routed = worldScreen.routeThroughAgentSession {
+                listOf({ r: Int ->
+                    RespondProtectorAlertCommand(viewingCiv.civID, "ui-${System.nanoTime()}", r,
+                        cityState.civID, bullyOrAttacker.civID,
+                        ProtectorAlertChoice.BREAK_PLEDGE, false)
+                })
+            }
+            if (!routed) {
+                player.addNotification("You have broken your Pledge to Protect [${cityState.civName}]!",
+                    cityState.cityStateFunctions.getNotificationActions(), NotificationCategory.Diplomacy, cityState.civName)
+                cityState.cityStateFunctions.removeProtectorCiv(player, forced = true)
+            }
         }.row()
         
         return true
@@ -264,10 +297,23 @@ class AlertPopup(
                 if (otherciv.nation.declaringFriendship.isNotEmpty()) otherciv.nation.declaringFriendship else "My friend, shall we declare our friendship to the world?"
         ).row()
         addCloseButton("Declare Friendship ([30] turns)", KeyboardBinding.Confirm) {
-            playerDiploManager.signDeclarationOfFriendship()
+            // Agent matches answer friendship offers through the coordinator (§3.2).
+            val routed = worldScreen.routeThroughAgentSession {
+                listOf({ r: Int ->
+                    RespondFriendshipOfferCommand(viewingCiv.civID, "ui-${System.nanoTime()}", r,
+                        otherciv.civID, accept = true)
+                })
+            }
+            if (!routed) playerDiploManager.signDeclarationOfFriendship()
         }.row()
         addCloseButton("We are not interested.", KeyboardBinding.Cancel) {
-            playerDiploManager.otherCivDiplomacy().setFlag(DiplomacyFlags.DeclinedDeclarationOfFriendship, 20)
+            val routed = worldScreen.routeThroughAgentSession {
+                listOf({ r: Int ->
+                    RespondFriendshipOfferCommand(viewingCiv.civID, "ui-${System.nanoTime()}", r,
+                        otherciv.civID, accept = false)
+                })
+            }
+            if (!routed) playerDiploManager.otherCivDiplomacy().setFlag(DiplomacyFlags.DeclinedDeclarationOfFriendship, 20)
         }.row()
         val music = UncivGame.Current.musicController
         music.playVoice("${otherciv.nation.name}.declaringFriendship")
@@ -292,7 +338,12 @@ class AlertPopup(
         val diplomacy = viewingCiv.getDiplomacyManager(denouncer)!!
         if (diplomacy.canDeclareWar()) {
             addCloseButton("THIS MEANS WAR! (Declare war)") {
-                diplomacy.declareWar()
+                val routed = worldScreen.routeThroughAgentSession {
+                    listOf({ r: Int ->
+                        DeclareWarCommand(viewingCiv.civID, "ui-${System.nanoTime()}", r, denouncer.civID)
+                    })
+                }
+                if (!routed) diplomacy.declareWar()
             }.row()
         }
         addCloseButton("Very well.", KeyboardBinding.Cancel).row()
@@ -595,8 +646,18 @@ class AlertPopup(
         button.apply {
             if (!mayAnnex) disable() else {
                 button.onActivation {
-                    annexAction()
-                    city.annexCity()
+                    // Agent matches resolve the conquest decision through the
+                    // coordinator (§3.2); decision id is "conquest:<cityId>".
+                    val routed = worldScreen.routeThroughAgentSession {
+                        listOf({ r: Int ->
+                            ResolveConquestCommand(viewingCiv.civID, "ui-${System.nanoTime()}", r,
+                                "conquest:${city.id}", ConquestDisposition.ANNEX)
+                        })
+                    }
+                    if (!routed) {
+                        annexAction()
+                        city.annexCity()
+                    }
                     close()
                 }
                 button.keyShortcuts.add('a')
@@ -615,7 +676,14 @@ class AlertPopup(
     private fun addPuppetOption(mayAnnex: Boolean, puppetAction: () -> Unit) {
         val button = "Puppet".toTextButton()
         button.onActivation {
-            puppetAction()
+            val city = getCity(popupAlert.value)
+            val routed = worldScreen.routeThroughAgentSession {
+                listOf({ r: Int ->
+                    ResolveConquestCommand(viewingCiv.civID, "ui-${System.nanoTime()}", r,
+                        "conquest:${city.id}", ConquestDisposition.PUPPET)
+                })
+            }
+            if (!routed) puppetAction()
             close()
         }
         button.keyShortcuts.add('p')
@@ -629,7 +697,13 @@ class AlertPopup(
     private fun addLiberateOption(city: City, conqueringCiv: Civilization) {
         val button = "Liberate (city returns to [originalOwner])".fillPlaceholders(city.foundingCivObject!!.civName).toTextButton()
         button.onActivation {
-            city.liberateCity(conqueringCiv)
+            val routed = worldScreen.routeThroughAgentSession {
+                listOf({ r: Int ->
+                    ResolveConquestCommand(viewingCiv.civID, "ui-${System.nanoTime()}", r,
+                        "conquest:${city.id}", ConquestDisposition.LIBERATE)
+                })
+            }
+            if (!routed) city.liberateCity(conqueringCiv)
             close()
         }
         button.keyShortcuts.add('l')
@@ -644,9 +718,17 @@ class AlertPopup(
             if (!canRaze) disable()
             else {
                 onActivation {
-                    city.puppetCity(conqueringCiv)
-                    if (mayAnnex) { city.annexCity() }
-                    city.isBeingRazed = true
+                    val routed = worldScreen.routeThroughAgentSession {
+                        listOf({ r: Int ->
+                            ResolveConquestCommand(viewingCiv.civID, "ui-${System.nanoTime()}", r,
+                                "conquest:${city.id}", ConquestDisposition.RAZE)
+                        })
+                    }
+                    if (!routed) {
+                        city.puppetCity(conqueringCiv)
+                        if (mayAnnex) { city.annexCity() }
+                        city.isBeingRazed = true
+                    }
                     close()
                 }
                 keyShortcuts.add('r')

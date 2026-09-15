@@ -6,7 +6,7 @@ verified. Execute top to bottom; stop at the first failure and record it.
 
 ## 0. Build & launch (no provider needed)
 
-1. `./gradlew :desktop:dist` → run `java -jar ~/.unciv-build/desktop/libs/Unciv.jar`
+1. Build `:desktop:macApp` with `-Dunciv.node.home=<Node install directory>`, then open `~/.unciv-build/desktop/native/Unciv.app`. This native bundle includes Java; its data lives in `~/Library/Application Support/Unciv`.
 2. Ordinary (non-agent) game: create, play 3 turns, save, load — confirm
    nothing regressed without a session.
 3. Path with spaces: copy the jar + `agent-runner/dist` + `agent-runner/node_modules`
@@ -15,11 +15,20 @@ verified. Execute top to bottom; stop at the first failure and record it.
    match must show a CLEAR error naming the searched locations.
 5. Finder launch (double-click, no dev shell): agent match finds bundled Node.
 
-## 1. Agent-match setup (no provider: use the shakedown first)
+## 1. Agent-match setup & controls (no provider: use the shakedown first)
 
-6. New game → set one slot to Agent → start gate accepts; invalid combos
-   (mods, espionage, random count) are rejected with the new-game message.
-7. Spectator + agent civs; spectator view works without input authority.
+6. New game → Note explicit notice banner near Start Game: "Starting an agent game begins automated play immediately using the selected provider account."
+7. "Watch agents play (Spectator)" preset button in player picker:
+   - Configures Spectator slot + 2 agent slots (defaulting to Codex gpt-5.6-luna with low reasoning).
+   - Start game enters match directly into automated play without hotseat "America ready?" handoff screens.
+   - Next Turn button is hidden for spectators; AgentMatchControlTable displays active civilization, agent name, model, reasoning level, and match controls (Pause, Resume, Retry).
+8. Agent Profile Editor:
+   - Click "Edit" on an agent slot: popup opens with bounded dimensions and scrollable content.
+   - Provider-scoped model selector (Codex: gpt-5.6-luna default; Claude; OpenCode).
+   - Thinking level selector dynamically updates supported levels based on selected model (e.g. gpt-5.6-luna supports Off/Low/Med/High with Low default; gpt-4o disables thinking).
+   - Validation prevents saving blank names or invalid thinking levels; Cancel discards edits without mutating the profile in the player list.
+   - Slot cycling (AI → Human → Agent) retains previously configured profiles in profile cache.
+   - Civilization nation switch updates default agent display name automatically while keeping custom names.
 
 ## 2. Provider shakedown (free OpenCode model — short is fine)
 

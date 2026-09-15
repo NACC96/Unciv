@@ -17,7 +17,8 @@ check inherits the gate for free.
 | Entry point | File | Mechanism |
 | --- | --- | --- |
 | Next turn / round advance | `WorldScreen.nextTurn`, `NextTurnButton`, `NextTurnAction.AgentMatch`, keyboard binding | `AgentMatchSession.onNextTurnPressed` consumes or routes; legacy clone path unreachable with a session |
-| Unit orders: fortify, fortify-until-healed, sleep, sleep-healed, paradrop | `UnitActionsTable.activateAction` | `routeThroughAgentSession` → `UnitOrderCommand`; legacy lambda only without a session |
+| Unit orders: fortify, fortify-until-healed, sleep, sleep-healed, paradrop, explore/stop, automate/stop, guard, set-up, air-sweep, escort/stop | `UnitActionsTable.activateAction` | `routeThroughAgentSession` → `UnitOrderCommand`; legacy lambda only without a session |
+| Movement stop (button) | `UnitActionsTable.activateAction` | `UnitActionType.StopMovement` → `UnitOrder.WAKE` |
 | Unit movement (right-click, move-here button, single-tap, multi-unit) | `WorldMapHolder.moveUnitToTargetTile`, single-tap branch | `MoveUnitCommand` per unit, batch factories with fresh revisions |
 | Unit attacks incl. nukes (right-click path) | `WorldMapHolder.onTileRightClicked` | `AttackCommand` |
 | City production queue add/remove/raise/lower | `CityView.tryAddToQueue/tryRemoveFromQueue/tryRaisePriority/tryLowerPriority` | `CityProductionCommand` (ADD_BOTTOM/REMOVE/RAISE/LOWER) |
@@ -42,6 +43,15 @@ check inherits the gate for free.
 | Raze / stop razing | `CityView.trySetRazing` | `SetRazingCommand` |
 | Queue move-to-top | `CityView.tryMoveEntryToTop` | `CityProductionCommand` MOVE_TOP |
 | City-state gold gifts (250/500/1000) | `CityStateDiplomacyTable.getGoldGiftTable` | `GiftGoldToCityStateCommand` |
+| City-state tribute (gold/worker) | `CityStateDiplomacyTable` tribute buttons | `TributeCommand` (willingness gates mirror the disabled buttons) |
+| City-state protection pledge/revoke | `CityStateDiplomacyTable` confirm popups | `ProtectionCommand` (pledge/withdraw gates mirror the disabled buttons) |
+| City-state diplomatic marriage | `CityStateDiplomacyTable` marriage button | `DiplomaticMarriageCommand` (unique + canBeMarriedBy gates; cities auto-puppet, annex via routed conquest options) |
+| Trade propose/retract (trade screen) | `TradeTable.offerButton` | `ProposeTradeCommand` (staged offers mapped to DTOs) / `RetractTradeCommand` |
+| Conquest dispositions (annex/puppet/raze/liberate) | `AlertPopup` conquest options (also used by the marriage city-choice popup) | `ResolveConquestCommand` with `conquest:<cityId>`; challenger instant-destroy never reaches a decision (engine destroys on capture) |
+| Friendship offer accept/decline | `AlertPopup` friendship buttons | `RespondFriendshipOfferCommand` (decline records the refusal flag, mirroring legacy) |
+| Denouncement retaliation ("THIS MEANS WAR!") | `AlertPopup.addDenouncement` | `DeclareWarCommand` |
+| Protected-minor alert (war / side-with / break pledge) | `AlertPopup.addBulliedOrAttackedProtectedOrAlliedMinor` | `RespondProtectorAlertCommand` (war type follows allied-vs-protected; break-pledge forces withdrawal with notification, mirroring legacy) |
+| Diplomatic vote (picker) | `DiplomaticVotePickerScreen.voteAndClose` | `CastVoteCommand` (incl. abstain) |
 
 ## Gated (blocked while an agent turn is live; normal on human turns)
 
@@ -51,7 +61,8 @@ check inherits the gate for free.
 | Unit actions table (all UnitAction invocations) | `unit/actions/UnitActionsTable.kt`, `UnitActions*.kt` | `canChangeState` |
 | Bottom unit panel selections/orders | `unit/UnitTable.kt` | `canChangeState` |
 | Battle confirmations/conquest popups | `AlertPopup.kt`, `bottombar/BattleTable.kt` | `BattleTable` checks `canChangeState`; AlertPopup opens only inside the popup block (see below) |
-| Next-unit cycling, automated-units move | `WorldScreen.switchToNextUnit`, `NextTurnAction.MoveAutomatedUnits` | `canChangeState` / gated actions |
+| Next-unit cycling | `WorldScreen.switchToNextUnit` | selection only; no state mutation |
+| Automated-units move (banner action) | `NextTurnAction.MoveAutomatedUnits` | disabled while a session exists — automated-unit processing runs inside the coordinator's turn processing |
 | Popup block: AlertPopup (demands, promises, conquest), TradePopup accept, free-Great-Person picker, DiplomaticVoteResultScreen | `WorldScreen.kt` update loop | popup block now requires `isPlayersTurn && canChangeState` — closes the human-answers-agent's-decision leak |
 | Production queue add/remove/reorder/purchase | `cityscreen/CityConstructionsTable.kt`, `BuyButtonFactory.kt` | `canChangeState` |
 | Citizen work/lock/buy/focus/specialists | `cityscreen/CityScreenTileTable.kt`, `CitizenManagementTable.kt`, `SpecialistAllocationTable.kt` | `canChangeState` |
@@ -59,7 +70,7 @@ check inherits the gate for free.
 | View `try...` methods | `view/CityView.kt` | view-model layer only; state mutations reachable through it come from the gated screens above |
 | Declare war/peace/friendship/denounce/demands buttons | `DiplomacyScreen.kt`, `MajorCivDiplomacyTable.kt` | `isNotPlayersTurn()` = `!GUI.isAllowedChangeState()` |
 | Trade staging/propose/accept/decline/counter | `TradeTable.kt`, `OfferColumnsTable.kt`, `TradePopup.kt` (world screen) | tables inherit the DiplomacyScreen gate; the standalone TradePopup is closed by the popup-block gate |
-| City-state gifts/protection/tribute | `CityStateDiplomacyTable.kt` | `isNotPlayersTurn()` |
+| City-state gifts/protection/tribute/marriage | `CityStateDiplomacyTable.kt` | all mutation buttons routed (see Routed table); `isNotPlayersTurn()` remains as the agent-turn block |
 | Tech picker | `TechPickerScreen.kt` | `!GUI.isAllowedChangeState()` disables the pick button |
 | Policy picker, promotion picker | `PolicyPickerScreen.kt`, `PromotionPickerScreen.kt` | `canChangeState` predicate on pickability |
 | AutoPlay menu / direct autoplay / hotkey | `status/AutoPlayStatusButton.kt` | menu + `startMultiturnAutoPlay` now require `canChangeState` — autoplay can never drive an agent civ |
@@ -124,3 +135,47 @@ matches, each interceptor safely yields false and executes legacy callbacks unto
   action buttons are hidden. Spectators cannot issue commands.
 - **`UnitActionType.Transform`**: Mod-only unique (`UniqueType.CanTransform`).
   Excluded from Vanilla Civ 5 scope as no transformable units exist in the Vanilla ruleset.
+
+### 5. Popup Decisions, Trade Screen & Remaining Closures (CP-034)
+
+- **Conquest dispositions** (`AlertPopup.addCityConquered` via `addAnnexOption /
+  addPuppetOption / addRazeOption / addLiberateOption`): each button resolves
+  `ResolveConquestCommand` with decision id `conquest:<cityId>`. The challenger
+  instant-destroy branch is unreachable in agent matches (the engine destroys
+  on capture with no decision raised). Resolving also clears the CityConquered
+  alert (AlertPopup.close parity, added to `executeResolveConquest`).
+- **Friendship offers** (`AlertPopup` accept/decline): `RespondFriendshipOfferCommand`
+  (accept signs; decline records the refusal flag, mirroring legacy).
+- **Denouncement retaliation** (`AlertPopup.addDenouncement` "THIS MEANS WAR!"):
+  `DeclareWarCommand`.
+- **Protected-minor alerts** (war / side-with / break-pledge):
+  `RespondProtectorAlertCommand` with the allied-vs-protected war type; break-pledge
+  forces withdrawal with the legacy notification text.
+- **Diplomatic vote picker** (`DiplomaticVotePickerScreen.voteAndClose`):
+  `CastVoteCommand` (incl. abstain).
+- **Trade screen** (`TradeTable.offerButton`): propose maps staged offers to
+  `ProposeTradeCommand`; retract maps to the new `RetractTradeCommand`.
+- **Demands table** (`MajorCivDiplomacyTable` demands buttons): `DemandCommand`.
+- **Move-automated-units banner** (`NextTurnAction.MoveAutomatedUnits`): disabled
+  while a session exists — automated-unit processing runs inside the
+  coordinator's turn processing, never as a mid-turn bypass.
+
+## Remaining: genuinely out-of-scope (no gameplay mutation in Vanilla agent matches)
+
+Each entry was inspected against the Vanilla ruleset and the plan scope;
+none of them can change match state in an agent-enabled match:
+
+| Entry point | Reason it is out of scope |
+| --- | --- |
+| Espionage screens and spy actions (`EspionageOverviewScreen`) | Vanilla has no espionage; `AgentMatchSetup.validate` locks espionage/mods for agent matches, so these screens are unreachable |
+| Religion screens/pickers/founding | Vanilla has no religion; ruleset-gated, unreachable |
+| `UnitActionType.Transform` | mod-only unique (`UniqueType.CanTransform`); no transformable unit exists in the Vanilla ruleset |
+| Unit gifts to major civilizations | no such control exists: the engine has no major-civ unit-gift function and `TradeOfferType` has no unit type (unit gifts exist only toward city-states, which are routed) |
+| Dev console, debug cheats, god-mode toggle, simulation controls | forbidden outright while a session exists (see above), not merely gated |
+| Multiplayer status popup (`MultiplayerStatusButton`) | presentation-only: loads file previews of remote multiplayer matches, never writes to the current game |
+| Spectator perspective controls | presentation-only observation; `canChangeState` is false for spectators so no mutation control is reachable |
+| Minimap, tile info, overlay toggles, save/load, options, civilopedia | read-only or out of match scope |
+
+There is no residual list of gameplay controls bypassing the coordinator:
+every entry point that can mutate match state in a Vanilla agent match is
+either ROUTED above or FORBIDDEN above.

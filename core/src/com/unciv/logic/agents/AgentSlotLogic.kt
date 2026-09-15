@@ -36,30 +36,60 @@ object AgentSlotLogic {
         SlotControl.AGENT -> SlotControl.AI
     }
 
-    /** Applies a control state: rule type on the player, profile presence in the map. */
+    /** Applies a control state: rule type on the player, profile presence in the map. Preserves profiles via [profileCache]. */
     fun applyControl(
         player: Player,
         control: SlotControl,
-        agentProfiles: MutableMap<Player, AgentProfile>
+        agentProfiles: MutableMap<Player, AgentProfile>,
+        profileCache: MutableMap<Player, AgentProfile>? = null
     ) {
         when (control) {
             SlotControl.AI -> {
                 player.playerType = PlayerType.AI
-                agentProfiles.remove(player)
+                val existing = agentProfiles.remove(player)
+                if (existing != null && profileCache != null) {
+                    profileCache[player] = existing
+                }
             }
             SlotControl.HUMAN -> {
                 player.playerType = PlayerType.Human
-                agentProfiles.remove(player)
+                val existing = agentProfiles.remove(player)
+                if (existing != null && profileCache != null) {
+                    profileCache[player] = existing
+                }
             }
             SlotControl.AGENT -> {
                 player.playerType = PlayerType.Human
-                agentProfiles.getOrPut(player) { AgentProfile() }
+                val restored = profileCache?.get(player)?.copy() ?: AgentProfile.defaultFor(player.chosenCiv)
+                agentProfiles[player] = restored
+                profileCache?.put(player, restored)
             }
         }
     }
 
-    fun forgetPlayer(player: Player, agentProfiles: MutableMap<Player, AgentProfile>) {
+    fun forgetPlayer(
+        player: Player,
+        agentProfiles: MutableMap<Player, AgentProfile>,
+        profileCache: MutableMap<Player, AgentProfile>? = null
+    ) {
         agentProfiles.remove(player)
+        profileCache?.remove(player)
+    }
+
+    /** Updates default agent display names when the civilization choice changes. */
+    fun onCivChanged(
+        player: Player,
+        oldCiv: String,
+        newCiv: String,
+        agentProfiles: MutableMap<Player, AgentProfile>,
+        profileCache: MutableMap<Player, AgentProfile>? = null
+    ) {
+        val profile = agentProfiles[player] ?: profileCache?.get(player) ?: return
+        val model = AgentModelCatalog.findModel(profile.provider, profile.modelId)
+        val oldDefault = if (oldCiv.isNotBlank()) "${model.label} $oldCiv" else model.label
+        if (profile.displayName.isBlank() || profile.displayName == oldDefault) {
+            profile.displayName = if (newCiv.isNotBlank()) "${model.label} $newCiv" else model.label
+        }
     }
 
     /** Structural slot errors (duplicates, non-fixed picks); profile/rule validation lives in [AgentMatchSetup.validate]. */

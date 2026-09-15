@@ -189,6 +189,49 @@ re-deriving it. Newest entries go at the **bottom**. Keep entries short and fact
 - Tests: DomesticOrdersTest golden-age flow (unit consumed, `isGoldenAge` committed-state read added to coordinator) and auto-production suppression with the setting explicitly ON (fails on legacy behavior). Full suite **923/923** (75 agent tests, 18 agent suites), per-file XMLs presence-verified after `:tests:cleanTest`.
 - Coverage table: great people → done for Vanilla specials; civilian roads proven live (partial narrowed to unit gifts).
 
+### CP-034 (gate-pass) — Orchestration loop suite, popup/trade routing closure, package reconciliation, 2026-09-15
+- **AgentOrchestrationLoopTest green (8/8, stable over 3 runs)**: the file
+  existed but referenced a run-control API that did not (`supervisorFactory`
+  with no args, `coordinator.getMatchState()`). Closed by (a) changing
+  `DesktopAgentMatch.supervisorFactory` to `(() -> SupervisorRunner)?`
+  (production passes none; tests inject the scripted runner — the existing
+  observers `getRunState/getActiveCivId/getFailureReason/canPause/canResume/
+  canRetry/startAutomaticPlay/resume/retry` needed no changes), (b) a narrow
+  documented seam `MatchCoordinator.forcePhaseForTest`, (c)
+  `testImplementation(project(":desktop"))` in tests, (d) an `onTurnCompleted`
+  hook on the fake (two failures were start-vs-completion races in the test,
+  not the loop), (e) gating one pause behind turn-start to remove a
+  startAutomaticPlay/pause race. Suite covers: sequential rotation, the
+  single-invocation invariant, pause-drain, resume without duplicates,
+  failure→retry, human handoff resuming the loop, completion→FINISHED.
+- **Routing closure**: conquest popup options (annex/puppet/raze/liberate via
+  `ResolveConquestCommand` with `conquest:<cityId>`; destroy branch unreachable
+  in agent matches since Battle auto-destroys), friendship offer accept/decline
+  (`RespondFriendshipOfferCommand`), denouncement retaliation
+  (`DeclareWarCommand`), protector-alert answers
+  (`RespondProtectorAlertCommand` with allied/protected war type; break-pledge
+  forces withdrawal with legacy notification), vote picker (`CastVoteCommand`),
+  trade-screen propose/retract (`ProposeTradeCommand` from staged offers +
+  new `RetractTradeCommand`), demands-table buttons (`DemandCommand`),
+  MoveAutomatedUnits banner disabled with a session (automation belongs to
+  turn processing). `executeResolveConquest` now clears the CityConquered
+  alert (AlertPopup.close parity). Marriage auto-puppets — no decision gap.
+- **Lessons**: non-local `return@enclosingFun` is illegal inside button
+  lambdas — route-first must be `val routed` + `if (!routed)`; automation
+  invokes UI lambdas headlessly (null-safe worldScreen lookups only).
+- **Regression tests**: retract / protector-alert (side-with modifier on the
+  attacker's view, break-pledge removal, no-pledge fence) / friendship-offer
+  (sign + decline-flag) — ActionCompletionAndRecoveryTest now 19.
+- **Package reconciliation**: `:desktop:macApp` rebuilt from current sources;
+  `native/Unciv.app` artifact-inspected (com.unciv.app, native launcher,
+  private jlink runtime, 57 MB jar with the new code, daemon.js,
+  node_modules, node v24.13.1; discovery paths align on `Contents/app`).
+  `~/.unciv-build/desktop/Unciv.app` (Resources layout) is a STALE 00:54
+  manual assembly built by no committed task, with an older jar and no
+  bundled Node — superseded; manual phase must use the jpackage bundle.
+- Full suite **975/975** (100 suites; 23 agent suites), agent-runner 34/34,
+  `./gradlew check` green, `agentPackage` + `macApp` green.
+
 ### CP-033 (gate-pass) — Complete human mutation routing closure and macOS .app bundle packaging, 2026-09-15
 - **Complete human mutation routing**:
   - Secondary unit orders routed via `UnitOrderCommand`: `EXPLORE`, `STOP_EXPLORATION`, `AUTOMATE`, `STOP_AUTOMATION`, `GUARD`, `SET_UP`, `AIR_SWEEP`, `ESCORT_FORMATION`, `STOP_ESCORT_FORMATION`.

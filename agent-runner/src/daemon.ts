@@ -19,8 +19,6 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-const log = (...args: unknown[]) => console.error("[supervisor]", ...args);
-
 export function buildSpawnForProvider(
   provider: RunTurnControl["provider"],
   prompt: string,
@@ -40,6 +38,8 @@ export function buildSpawnForProvider(
           bearerEnvVar: "GAME_MCP_BEARER",
           cwd: scratchCwd,
           sandboxDangerous: true,
+          model: config.model,
+          reasoning: config.reasoning,
         }),
         // Bearer travels by environment; only the var NAME is in argv/config.
         env: { GAME_MCP_BEARER: bearer },
@@ -57,7 +57,14 @@ export function buildSpawnForProvider(
         { mode: 0o600 },
       );
       return {
-        spec: claudeSpawn({ prompt, resumeId, mcpConfigPath: configPath, cwd: scratchCwd }),
+        spec: claudeSpawn({
+          prompt,
+          resumeId,
+          mcpConfigPath: configPath,
+          cwd: scratchCwd,
+          model: config.model,
+          reasoning: config.reasoning,
+        }),
         env: {},
       };
     }
@@ -77,7 +84,13 @@ export function buildSpawnForProvider(
         }),
       );
       return {
-        spec: opencodeSpawn({ prompt, resumeId, dir: scratchCwd }),
+        spec: opencodeSpawn({
+          prompt,
+          resumeId,
+          dir: scratchCwd,
+          model: config.model,
+          reasoning: config.reasoning,
+        }),
         env: { OPENCODE_GAME_MCP_BEARER: bearer },
       };
     }
@@ -163,7 +176,7 @@ export async function main(): Promise<void> {
     finish();
   });
 
-  process.stdout.write(encodeFrame({ protocol: 1, kind: "ready" }) + "\n");
+  process.stdout.write(JSON.stringify({ protocol: 1, kind: "ready" }) + "\n");
 
   let buffer = "";
   process.stdin.setEncoding("utf-8");

@@ -19,6 +19,8 @@ dependencies {
     testImplementation(libs.mockito)
     @Suppress("AvoidDuplicateDependencies")
     mockitoAgent(libs.mockito) { isTransitive = false }
+    // Agent orchestration loop tests drive DesktopAgentMatch with scripted runners.
+    testImplementation(project(":desktop"))
 }
 
 tasks {

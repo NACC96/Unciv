@@ -34,6 +34,8 @@ export function codexSpawn(args: {
   bearerEnvVar: string;
   cwd: string;
   sandboxDangerous: true;
+  model?: string;
+  reasoning?: string;
 }): SpawnSpec {
   // macOS seatbelt blocks loopback for sandboxed MCP; danger-full-access is
   // required on this platform (CP-010). Shell restriction for Codex comes
@@ -44,9 +46,17 @@ export function codexSpawn(args: {
     "--ignore-user-config",
     "--skip-git-repo-check",
     "-s", "danger-full-access",
+  ];
+  if (args.model) {
+    argv.push("-m", args.model);
+  }
+  if (args.reasoning) {
+    argv.push("-c", `model_reasoning_effort="${args.reasoning}"`);
+  }
+  argv.push(
     "-c",
     `mcp_servers.game={url="${args.mcpUrl}", bearer_token_env_var="${args.bearerEnvVar}", required=true, startup_timeout_sec=20, tool_timeout_sec=30, default_tools_approval_mode="auto", enabled_tools=${JSON.stringify(GAME_TOOL_ALLOWLIST)}}`,
-  ];
+  );
   if (args.resumeId) argv.push("resume", args.resumeId);
   argv.push(args.prompt);
   return { executable: CODEX_EXECUTABLE, argv, cwd: args.cwd };
@@ -57,6 +67,8 @@ export function claudeSpawn(args: {
   resumeId?: string;
   mcpConfigPath: string;
   cwd: string;
+  model?: string;
+  reasoning?: string;
 }): SpawnSpec {
   // MCP tool names normalize dots to underscores (mcp__game__game_observe).
   const allowedTools = GAME_TOOL_ALLOWLIST.map((t) => `mcp__game__${t.replaceAll(".", "_")}`).join(" ");
@@ -69,6 +81,12 @@ export function claudeSpawn(args: {
     "--permission-mode", "dontAsk",
     "--disable-slash-commands",
   ];
+  if (args.model) {
+    argv.push("--model", args.model);
+  }
+  if (args.reasoning) {
+    argv.push("--effort", args.reasoning);
+  }
   if (args.resumeId) argv.push("--resume", args.resumeId);
   argv.push(args.prompt);
   return { executable: CLAUDE_EXECUTABLE, argv, cwd: args.cwd };
@@ -78,9 +96,17 @@ export function opencodeSpawn(args: {
   prompt: string;
   resumeId?: string;
   dir: string;
+  model?: string;
+  reasoning?: string;
 }): SpawnSpec {
   // Game-owned opencode.json in dir carries MCP + tools + share config.
   const argv = ["run", "--format", "json", "--pure", "--dir", args.dir];
+  if (args.model) {
+    argv.push("-m", args.model);
+  }
+  if (args.reasoning) {
+    argv.push("--variant", args.reasoning);
+  }
   if (args.resumeId) argv.push("--session", args.resumeId);
   argv.push(args.prompt);
   return { executable: OPENCODE_EXECUTABLE, argv, cwd: args.dir };

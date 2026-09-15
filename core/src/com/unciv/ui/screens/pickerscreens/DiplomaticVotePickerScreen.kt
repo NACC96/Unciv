@@ -1,5 +1,7 @@
 package com.unciv.ui.screens.pickerscreens
 
+import com.unciv.logic.agents.CastVoteCommand
+
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.unciv.UncivGame
 import com.unciv.logic.civilization.Civilization
@@ -37,6 +39,15 @@ class DiplomaticVotePickerScreen(private val votingCiv: Civilization) : PickerSc
     }
 
     private fun voteAndClose() {
+        // Agent matches cast votes through the coordinator (§3.2).
+        if (UncivGame.Current.worldScreen?.routeThroughAgentSession {
+                listOf({ r: Int ->
+                    CastVoteCommand(votingCiv.civID, "ui-${System.nanoTime()}", r, chosenCiv)
+                })
+            } == true) {
+            UncivGame.Current.popScreen()
+            return
+        }
         votingCiv.diplomaticVoteForCiv(chosenCiv)
         UncivGame.Current.popScreen()
     }

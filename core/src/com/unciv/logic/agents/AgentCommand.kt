@@ -582,6 +582,56 @@ class CityStateMarriedResult(
     val receipt: ActionReceipt
 ) : CommandResult
 
+/** Retract our pending trade offer (game.act type `diplomacy.retractTrade`). */
+class RetractTradeCommand(
+    override val actorCivId: String,
+    val actionId: String,
+    val expectedRevision: Int,
+    val targetCivId: String
+) : AgentCommand
+
+class TradeRetractedResult(
+    override val actorCivId: String,
+    val receipt: ActionReceipt
+) : CommandResult
+
+enum class ProtectorAlertChoice { DECLARE_WAR, SIDE_WITH, BREAK_PLEDGE }
+
+/** Answer a bullied/attacked-protected-minor alert
+ *  (game.act type `diplomacy.respondProtectorAlert`). */
+class RespondProtectorAlertCommand(
+    override val actorCivId: String,
+    val actionId: String,
+    val expectedRevision: Int,
+    val cityStateId: String,
+    val attackerCivId: String,
+    val choice: ProtectorAlertChoice,
+    /** True when the war is for an allied (not merely protected) city-state. */
+    val alliedCityState: Boolean = false
+) : AgentCommand
+
+class ProtectorAlertAnsweredResult(
+    override val actorCivId: String,
+    val receipt: ActionReceipt,
+    val choice: ProtectorAlertChoice
+) : CommandResult
+
+/** Answer an incoming declaration-of-friendship offer
+ *  (game.act type `diplomacy.respondFriendshipOffer`). */
+class RespondFriendshipOfferCommand(
+    override val actorCivId: String,
+    val actionId: String,
+    val expectedRevision: Int,
+    val requesterCivId: String,
+    val accept: Boolean
+) : AgentCommand
+
+class FriendshipOfferAnsweredResult(
+    override val actorCivId: String,
+    val receipt: ActionReceipt,
+    val accepted: Boolean
+) : CommandResult
+
 /** Gift an own unit to the territory owner (city-state or friendly major civ) (game.act type `unit.gift`). */
 class GiftUnitCommand(
     override val actorCivId: String,

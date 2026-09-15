@@ -83,6 +83,15 @@ class MatchCoordinator(
 
     fun getStateRevision(): Int = committedMatch.stateRevision
     fun getTurnPhase(): TurnPhase = committedMatch.turnPhase
+
+    /**
+     * Testing seam: overwrite the committed match phase (e.g. simulate
+     * COMPLETED without playing out turns). Never used by production paths;
+     * receipts, revisions, and game state are untouched.
+     */
+    fun forcePhaseForTest(phase: TurnPhase) {
+        committedMatch.turnPhase = phase
+    }
     fun isPaused(): Boolean = committedMatch.matchPaused
     fun getPausedReason(): String? = committedMatch.matchPausedReason
 
@@ -117,6 +126,9 @@ class MatchCoordinator(
     /** Committed controller assignment, if any. */
     fun getController(civId: String): CivilizationController? =
         committedMatch.controllers[civId]?.copy()
+
+    fun getControllers(): Map<String, CivilizationController> =
+        committedMatch.controllers.mapValues { it.value.copy() }
 
     fun getTimelineId(): String = committedMatch.timelineId
     fun getMatchId(): String = committedMatch.matchId
@@ -337,6 +349,9 @@ class MatchCoordinator(
             is TributeCommand -> executeTribute(command)
             is ProtectionCommand -> executeProtection(command)
             is DiplomaticMarriageCommand -> executeDiplomaticMarriage(command)
+            is RetractTradeCommand -> executeRetractTrade(command)
+            is RespondProtectorAlertCommand -> executeRespondProtectorAlert(command)
+            is RespondFriendshipOfferCommand -> executeRespondFriendshipOffer(command)
             is GiftUnitCommand -> executeGiftUnit(command)
             is SetControllerCommand -> executeSetController(command)
         }
@@ -949,6 +964,10 @@ class MatchCoordinator(
                 ConquestDisposition.LIBERATE -> city.liberateCity(conqueringCiv)
             }
             candidateMatch.pendingDecisions.remove(decision)
+            // AlertPopup.close parity: the answered alert leaves with the decision.
+            conqueringCiv.popupAlerts.removeAll {
+                it.type == AlertType.CityConquered && it.value == city.id
+            }
             "${city.id}|${command.disposition}"
         }
         val (cityId, disposition) = receipt.resultJson.split("|")
@@ -1836,6 +1855,92 @@ class MatchCoordinator(
             recipient.civID
         }
         return UnitGiftedResult(command.actorCivId, receipt, receipt.resultJson)
+    }
+
+    private fun executeRetractTrade(command: RetractTradeCommand): TradeRetractedResult {
+        val receipt = runGameplayMutation(
+            command.actorCivId, command.actionId, command.expectedRevision,
+            "diplomacy.retractTrade|${command.targetCivId}"
+        ) { candidateGame, _ ->
+            val civ = candidateGame.getCivilizationOrNull(command.actorCivId)
+                ?: throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Unknown civilization")
+            val target = candidateGame.getCivilizationOrNull(command.targetCivId)
+                ?: throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Unknown civilization")
+            val removed = target.tradeRequests.removeAll { it.requestingCiv == civ.civID }
+            if (!removed)
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "No pending offer to retract")
+            "retracted"
+        }
+        return TradeRetractedResult(command.actorCivId, receipt)
+    }
+
+    private fun executeRespondProtectorAlert(command: RespondProtectorAlertCommand): ProtectorAlertAnsweredResult {
+        val receipt = runGameplayMutation(
+            command.actorCivId, command.actionId, command.expectedRevision,
+            "diplomacy.respondProtectorAlert|${command.cityStateId}|${command.attackerCivId}|${command.choice}"
+        ) { candidateGame, _ ->
+            val civ = candidateGame.getCivilizationOrNull(command.actorCivId)
+                ?: throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Unknown civilization")
+            val cityState = candidateGame.getCivilizationOrNull(command.cityStateId)
+                ?: throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Unknown civilization")
+            val attacker = candidateGame.getCivilizationOrNull(command.attackerCivId)
+                ?: throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Unknown civilization")
+            // The alert only exists while the pledge does.
+            if (!cityState.cityStateFunctions.getProtectorCivs().contains(civ))
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "No protection pledge to answer for")
+            val diplomacy = civ.getDiplomacyManager(command.attackerCivId)!!
+            when (command.choice) {
+                ProtectorAlertChoice.SIDE_WITH -> diplomacy.sideWithCityState()
+                ProtectorAlertChoice.DECLARE_WAR -> {
+                    if (civ.isAtWarWith(attacker))
+                        throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Already at war")
+                    diplomacy.sideWithCityState()
+                    val warType = if (command.alliedCityState) WarType.AlliedCityStateWar
+                    else WarType.ProtectedCityStateWar
+                    diplomacy.declareWar(DeclareWarReason(warType, cityState))
+                    cityState.getDiplomacyManager(civ)!!.influence += 20f
+                }
+                ProtectorAlertChoice.BREAK_PLEDGE -> {
+                    civ.addNotification(
+                        "You have broken your Pledge to Protect [${cityState.civName}]!",
+                        cityState.cityStateFunctions.getNotificationActions(),
+                        com.unciv.logic.civilization.NotificationCategory.Diplomacy, cityState.civName)
+                    cityState.cityStateFunctions.removeProtectorCiv(civ, forced = true)
+                }
+            }
+            // AlertPopup.close parity.
+            civ.popupAlerts.removeAll {
+                (it.type == AlertType.BulliedProtectedMinor
+                    || it.type == AlertType.AttackedProtectedMinor
+                    || it.type == AlertType.AttackedAllyMinor)
+                    && it.value == "${attacker.civID}@${cityState.civID}"
+            }
+            command.choice.name
+        }
+        return ProtectorAlertAnsweredResult(
+            command.actorCivId, receipt, ProtectorAlertChoice.valueOf(receipt.resultJson))
+    }
+
+    private fun executeRespondFriendshipOffer(command: RespondFriendshipOfferCommand): FriendshipOfferAnsweredResult {
+        val receipt = runGameplayMutation(
+            command.actorCivId, command.actionId, command.expectedRevision,
+            "diplomacy.respondFriendshipOffer|${command.requesterCivId}|${command.accept}"
+        ) { candidateGame, _ ->
+            val civ = candidateGame.getCivilizationOrNull(command.actorCivId)
+                ?: throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Unknown civilization")
+            candidateGame.getCivilizationOrNull(command.requesterCivId)
+                ?: throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Unknown civilization")
+            val diplomacy = civ.getDiplomacyManager(command.requesterCivId)
+                ?: throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "No diplomatic contact")
+            if (command.accept) diplomacy.signDeclarationOfFriendship()
+            else diplomacy.otherCivDiplomacy().setFlag(
+                com.unciv.logic.civilization.diplomacy.DiplomacyFlags.DeclinedDeclarationOfFriendship, 20)
+            civ.popupAlerts.removeAll {
+                it.type == AlertType.DeclarationOfFriendship && it.value == command.requesterCivId
+            }
+            if (command.accept) "accepted" else "declined"
+        }
+        return FriendshipOfferAnsweredResult(command.actorCivId, receipt, receipt.resultJson == "accepted")
     }
 
     private fun executeCastVote(command: CastVoteCommand): VoteCastResult {

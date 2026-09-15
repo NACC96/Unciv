@@ -28,4 +28,20 @@ class AgentProfile(
     fun copy(): AgentProfile = AgentProfile(
         profileId, displayName, provider, modelId, reasoning, personality, profileRevision
     )
+
+    companion object {
+        fun defaultFor(civName: String = "", provider: String = "codex"): AgentProfile {
+            val model = AgentModelCatalog.getDefaultModel(provider)
+            val name = if (civName.isNotBlank()) "${model.label} $civName" else model.label
+            return AgentProfile(
+                profileId = java.util.UUID.randomUUID().toString(),
+                displayName = name,
+                provider = provider,
+                modelId = model.id,
+                reasoning = model.defaultThinkingLevel.wireValue,
+                personality = "",
+                profileRevision = 1
+            )
+        }
+    }
 }

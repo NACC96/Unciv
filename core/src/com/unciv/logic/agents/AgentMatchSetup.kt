@@ -51,12 +51,10 @@ class AgentMatchSetup(
         if (slots.keys.any { it == Constants.random || it == Constants.spectator })
             errors.add("Agent slots need fixed civilizations (no Random, no Spectator)")
         for ((nation, config) in slots) {
-            if (config.profile.provider.isBlank() || config.profile.modelId.isBlank())
-                errors.add("$nation: select a provider and model before first execution")
-            if (config.profile.displayName.isBlank())
-                errors.add("$nation: agent display name is required")
-            if (config.profile.provider !in setOf("codex", "claude", "opencode"))
-                errors.add("$nation: unknown provider ${config.profile.provider}")
+            val profileErrors = AgentModelCatalog.validateProfile(config.profile)
+            for (err in profileErrors) {
+                errors.add("$nation: $err")
+            }
         }
         return errors
     }

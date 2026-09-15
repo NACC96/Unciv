@@ -58,6 +58,7 @@ export interface RunTurnControl {
   provider: "scripted" | "codex" | "claude" | "opencode";
   providerConfig: {
     model?: string;
+    reasoning?: string;
     resumeId?: string;
     /** Provider-specific extras (cwd override, scripted plan, bearer env name). */
     extra?: Record<string, unknown>;

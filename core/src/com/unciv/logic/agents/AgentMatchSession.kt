@@ -10,10 +10,13 @@ import com.unciv.logic.GameInfo
  */
 interface AgentMatchSession {
     val matchId: String
+
     /** One-line status for the turn button: phase, active civ/provider, revision. */
     fun statusText(): String
+
     /** Whether human map/unit controls may act right now. */
     fun isHumanInputAllowed(): Boolean
+
     /**
      * End-turn button/keyboard pressed. Returns true when consumed by the
      * match (human turn end routed to the coordinator); false to fall
@@ -21,6 +24,7 @@ interface AgentMatchSession {
      * its provider (takeover is a separate explicit control).
      */
     fun onNextTurnPressed(): Boolean
+
     /**
      * Human gameplay mutations through the coordinator (plan §3.2): unit
      * orders, city management, research, policies, diplomacy, trades,
@@ -34,8 +38,26 @@ interface AgentMatchSession {
     fun executeHumanAction(
         buildCommands: (expectedRevision: Int) -> List<(Int) -> AgentCommand>
     ): String?
+
     /** Detach from the screen; shuts the supervisor down. */
     fun close()
+
+    // Platform-independent match controls (AI_AGENT_PLAN.md §9, §11)
+    fun canPause(): Boolean
+    fun canResume(): Boolean
+    fun canRetry(): Boolean
+
+    fun pause()
+    fun resume()
+    fun retry()
+
+    // Status inspection
+    fun getRunState(): AgentRunState
+    fun getActiveCivId(): String?
+    fun getActiveAgentProfile(): AgentProfile?
+    fun getFailureReason(): String?
+    fun isSpectatorMode(): Boolean
+    fun startAutomaticPlay()
 }
 
 object AgentMatchSessionFactory {

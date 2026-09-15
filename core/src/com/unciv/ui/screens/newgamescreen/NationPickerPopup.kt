@@ -141,8 +141,10 @@ internal class NationPickerPopup(
 
         UncivGame.Current.musicController.chooseTrack(selectedNation.name, MusicMood.themeOrPeace, MusicTrackChooserFlags.setSelectNation)
 
+        val oldCiv = player.chosenCiv
         player.chosenCiv = selectedNation.name
         player.chosenNation = selectedNation
+        playerPicker.onCivChanged(player, oldCiv, selectedNation.name)
         
         close()
         playerPicker.update()
