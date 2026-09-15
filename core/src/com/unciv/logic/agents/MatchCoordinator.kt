@@ -113,6 +113,17 @@ class MatchCoordinator(
         return committedMatch.pendingDecisions.filter { it.owningCivId == civId }.map { it.copy() }
     }
 
+    /** Committed receipt by action ID (active-turn scope), for result lookup. */
+    fun getReceipt(actionId: String): ActionReceipt? {
+        return actionReceipts[actionId]?.copy()
+    }
+
+    /** Single-unit inspection with visibility policy (null = hidden/nonexistent). */
+    fun inspectUnit(actorCivId: String, unitId: Int): ObservedUnit? {
+        requireController(actorCivId)
+        return buildUnitInspection(committedGame, actorCivId, unitId)
+    }
+
     /** Owner civ ID of a city in COMMITTED state, null when the city is gone. */
     fun getCityOwner(cityId: String): String? =
         committedGame.getCities().firstOrNull { it.id == cityId }?.civ?.civID

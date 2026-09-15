@@ -142,6 +142,28 @@ private fun MapUnit.toObserved() = ObservedUnit(
     health, currentMovement, action
 )
 
+/**
+ * Single-entity inspection (game.inspect): own units in full; foreign units
+ * only when visible (identity + position; movement/orders zeroed); hidden
+ * and nonexistent IDs share the null response (no oracle).
+ */
+fun buildUnitInspection(game: GameInfo, actorCivId: String, unitId: Int): ObservedUnit? {
+    val civ = game.getCivilizationOrNull(actorCivId) ?: return null
+    val own = civ.units.getCivUnits().firstOrNull { it.id == unitId }
+    if (own != null && !own.isDestroyed) return own.toObserved()
+    for (other in game.civilizations) {
+        if (other.civID == actorCivId || other.isSpectator()) continue
+        val foreign = other.units.getCivUnits().firstOrNull { it.id == unitId }
+        if (foreign != null && !foreign.isDestroyed && foreign.isVisibleTo(civ)) {
+            val observed = foreign.toObserved()
+            observed.movementLeft = 0f
+            observed.action = null
+            return observed
+        }
+    }
+    return null
+}
+
 private fun City.toObservedOwn(): ObservedCity {
     val pos = getCenterTile().position
     return ObservedCity(

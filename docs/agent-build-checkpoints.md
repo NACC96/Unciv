@@ -169,6 +169,10 @@ re-deriving it. Newest entries go at the **bottom**. Keep entries short and fact
 - WRAP BUG (found by the runner's exact accounting, invisible to all earlier tests): rotation counted landing on index 0 from the virtual pre-start position as a round rollover, doubling the turn counter (trace: every endTurn wrapped). Fixed by crossing-detection (`index <= previous && previous >= 0`); single-civ wrap and pre-start placement verified by the trace. Lesson: turn-counter assertions need exact multi-round traces, not single-wrap checks.
 - Full suite **910/910** (62 agent tests).
 
+### CP-024 (problem) — Phantom green: up-to-date skips hide new tests, 2026-09-14
+- `AgentRunControlsTest` shipped with a failing assertion (`"Revoke"` vs `"revoke"`) and NO full-suite run ever executed it: `:tests:test` reported UP-TO-DATE while its XML was absent, and totals math silently agreed. Caught only when a later change forced re-execution.
+- Standing rule, hardened: after adding or touching ANY test, run `:tests:cleanTest :tests:test` (filtered or full) and then VERIFY the new XML exists with the expected test count — never trust totals alone. Count math (`848 + agent tests`) is necessary but not sufficient; per-file presence is required.
+
 ### CP-023 (note) — Supervisor daemon over stdio + async engine seam, 2026-09-14
 - `engine-protocol.ts`: versioned JSONL stdio (stdout = engine requests + turn events, stdin = responses + run_turn/shutdown, stderr = logs only; EOF = graceful drain). `StdioEngineBackend` implements `IGameService` with correlation IDs, timeouts, and disconnect rejection.
 - `IGameService` is now fully async (stdio cannot be sync). Fake + MCP transport + supervisor + all tests migrated; `readNotes` added, `turnEnded` rides on observe results, outcomes read post-run engine state. Lesson: mechanical `async` migrations still need a clean `tsc` + full vitest pass — two tests silently compared Promises until fixed.

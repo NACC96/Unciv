@@ -30,7 +30,7 @@ class AgentRunControlsTest {
         Assert.assertTrue(retry.guarantee.contains("exact identity"))
         val takeover = AgentRunControls.transition(AgentRunState.PAUSED, AgentControl.TAKEOVER)!!
         Assert.assertEquals(AgentRunState.WAITING_HUMAN, takeover.to)
-        Assert.assertTrue(takeover.guarantee.contains("Revoke old authority first"))
+        Assert.assertTrue(takeover.guarantee.contains("revoke old authority first", ignoreCase = true))
     }
 
     @Test
