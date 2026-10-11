@@ -1,7 +1,5 @@
 package com.unciv.ui.screens.newgamescreen
 
-import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.scenes.scene2d.ui.SelectBox
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.utils.Align
 import com.unciv.logic.agents.AgentModelCatalog
@@ -9,6 +7,7 @@ import com.unciv.logic.agents.AgentProfile
 import com.unciv.logic.agents.ModelSpec
 import com.unciv.logic.agents.ThinkingLevel
 import com.unciv.models.metadata.Player
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.extensions.addSeparator
 import com.unciv.ui.components.extensions.toLabel
 import com.unciv.ui.components.input.KeyCharAndCode
@@ -50,6 +49,7 @@ class AgentProfilePopup(
     }
 
     init {
+        innerTable.background = GameUiStyle.background("NewGameScreen/AgentProfilePopup")
         // Initialize working profile with Luna defaults if blank
         if (workingProfile.provider.isBlank()) {
             workingProfile.provider = AgentModelCatalog.PROVIDER_CODEX
@@ -70,55 +70,55 @@ class AgentProfilePopup(
         // Title
         val title = if (profile.displayName.isBlank()) "Configure Agent for ${player.chosenCiv}"
         else "Edit Agent: ${profile.displayName} (${player.chosenCiv})"
-        val titleLabel = title.toLabel(fontSize = 22)
+        val titleLabel = title.toLabel(GameUiStyle.ink, 22)
         titleLabel.wrap = true
         titleLabel.setAlignment(Align.center)
         formTable.add(titleLabel).width(contentWidth).center().padBottom(10f).row()
-        formTable.addSeparator(Color.DARK_GRAY)
+        formTable.addSeparator(GameUiStyle.hover)
 
         // Error Banner
-        val errorLabel = "".toLabel(Color.RED, 16)
+        val errorLabel = "".toLabel(GameUiStyle.error, 16)
         errorLabel.wrap = true
         formTable.add(errorLabel).width(contentWidth).padBottom(6f).row()
 
         // Display Name
-        formTable.add("Display Name:".toLabel(Color.WHITE, 16)).row()
-        val nameField = UncivTextField("Display name", workingProfile.displayName)
+        formTable.add("Display Name:".toLabel(GameUiStyle.ink, 16)).row()
+        val nameField = UncivTextField("Display name", workingProfile.displayName).apply { polishSetupField() }
         formTable.add(nameField).width(contentWidth).row()
 
         // Provider Selector
-        formTable.add("Provider:".toLabel(Color.WHITE, 16)).padTop(6f).row()
-        val providerBox = SelectBox<String>(skin)
+        formTable.add("Provider:".toLabel(GameUiStyle.ink, 16)).padTop(6f).row()
+        val providerBox = SetupSelectBox<String>().apply { polishSetupSelect() }
         providerBox.setItems(com.badlogic.gdx.utils.Array(AgentModelCatalog.SUPPORTED_PROVIDERS.toTypedArray()))
         providerBox.selected = workingProfile.provider
         formTable.add(providerBox).width(contentWidth).row()
 
         // Model Selector
-        formTable.add("Model:".toLabel(Color.WHITE, 16)).padTop(6f).row()
-        val modelBox = SelectBox<ModelChoice>(skin)
+        formTable.add("Model:".toLabel(GameUiStyle.ink, 16)).padTop(6f).row()
+        val modelBox = SetupSelectBox<ModelChoice>().apply { polishSetupSelect() }
         formTable.add(modelBox).width(contentWidth).row()
 
         // Custom Model Field (hidden unless custom selected)
-        val customModelLabel = "Custom Model ID:".toLabel(Color.LIGHT_GRAY, 14)
-        val customModelField = UncivTextField("e.g. gpt-6-luna", workingProfile.modelId)
+        val customModelLabel = "Custom Model ID:".toLabel(GameUiStyle.muted, 14)
+        val customModelField = UncivTextField("e.g. gpt-6-luna", workingProfile.modelId).apply { polishSetupField() }
         val customModelRowLabel = formTable.add(customModelLabel).padTop(2f)
         customModelRowLabel.row()
         val customModelRowField = formTable.add(customModelField).width(contentWidth)
         customModelRowField.row()
 
         // Thinking Level Selector
-        val thinkingHeaderLabel = "Thinking Level / Reasoning Effort:".toLabel(Color.WHITE, 16)
-        formTable.add(thinkingHeaderLabel).padTop(6f).row()
-        val thinkingBox = SelectBox<ThinkingChoice>(skin)
+        val thinkingHeaderLabel = "Thinking Level / Reasoning Effort:".toLabel(GameUiStyle.ink, 16).apply { wrap = true }
+        formTable.add(thinkingHeaderLabel).width(contentWidth).padTop(6f).row()
+        val thinkingBox = SetupSelectBox<ThinkingChoice>().apply { polishSetupSelect() }
         val thinkingRow = formTable.add(thinkingBox).width(contentWidth)
         thinkingRow.row()
-        val thinkingUnsupportedLabel = "Thinking setting is not supported for this model.".toLabel(Color.GRAY, 14)
+        val thinkingUnsupportedLabel = "Thinking setting is not supported for this model.".toLabel(GameUiStyle.muted, 14).apply { wrap = true }
         val unsupportedRow = formTable.add(thinkingUnsupportedLabel).width(contentWidth)
         unsupportedRow.row()
 
         // Personality Instructions
-        formTable.add("Personality Instructions:".toLabel(Color.WHITE, 16)).padTop(6f).row()
-        val personalityField = UncivTextField("Optional strategic personality instructions", workingProfile.personality)
+        formTable.add("Personality Instructions:".toLabel(GameUiStyle.ink, 16)).padTop(6f).row()
+        val personalityField = UncivTextField("Optional strategic personality instructions", workingProfile.personality).apply { polishSetupField() }
         formTable.add(personalityField).width(contentWidth).row()
         val bonuses = StartingBonusForm(player, table.previousScreen.ruleset, contentWidth)
         formTable.add(bonuses).width(contentWidth).padTop(6f).row()
@@ -305,9 +305,9 @@ class AgentProfilePopup(
             table.update()
             onSave()
             close()
-        }
+        }.also { GameUiStyle.apply(it.actor, primary = true) }
 
-        addCloseButton("Cancel")
+        addCloseButton("Cancel").also { GameUiStyle.apply(it.actor) }
         equalizeLastTwoButtonWidths()
         open()
     }

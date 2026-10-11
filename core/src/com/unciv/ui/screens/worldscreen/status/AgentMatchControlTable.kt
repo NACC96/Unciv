@@ -16,9 +16,9 @@ class AgentMatchControlTable(
     private val session: AgentMatchSession,
     private val screen: WorldScreen
 ) : Table(BaseScreen.skin) {
-    private val status = "".toLabel(WorldScreenStyle.ink, 13).apply { wrap = true }
-    private val model = "".toLabel(WorldScreenStyle.muted, 11).apply { setEllipsis(true) }
-    private val actionButton = WorldScreenStyle.button("")
+    private val status = "".toLabel(WorldScreenStyle.ink, 14).apply { wrap = true }
+    private val model = "".toLabel(WorldScreenStyle.muted, 12).apply { setEllipsis(true) }
+    private val actionButton = WorldScreenStyle.button("", primary = true)
     private val activityButton = WorldScreenStyle.button("Activity")
     private val activityFeed = AgentActivityFeed(screen, session)
     private val messagesButton = WorldScreenStyle.button("Messages")
@@ -82,8 +82,8 @@ class AgentMatchControlTable(
         val width = minOf(390f, screen.stage.width - 20f)
         clearChildren()
         val text = Table()
-        text.add(status).growX().left().row()
-        text.add(model).growX().left().padTop(3f)
+        text.add(status).minWidth(0f).growX().left().row()
+        text.add(model).minWidth(0f).growX().left().padTop(4f)
         val buttons = Table()
         if (action != null) buttons.add(actionButton).padRight(6f)
         buttons.add(activityButton).padRight(6f)

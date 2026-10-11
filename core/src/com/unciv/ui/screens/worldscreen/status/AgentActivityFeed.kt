@@ -83,12 +83,11 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
     }
 
     init {
-        background = WorldScreenStyle.background("WorldScreen/AgentActivityFeed",
-            Color(WorldScreenStyle.surface).apply { a = 0.82f })
+        background = WorldScreenStyle.panelBackground("WorldScreen/AgentActivityFeed")
         touchable = Touchable.enabled
         pad(12f, 14f, 12f, 14f)
         val header = Table(skin)
-        header.add("Agent activity".toLabel(ink, 16)).left().expandX()
+        header.add("Agent activity".toLabel(ink, 17)).left().expandX()
         val close = Button(BaseScreen.skin).apply {
             WorldScreenStyle.apply(this)
             pad(4f)
@@ -134,7 +133,7 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
         }).size(10f).padLeft(8f)
         add(filterRow).minWidth(0f).growX().padTop(8f).row()
         stateLabel.wrap = true
-        add(stateLabel).growX().left().padTop(4f).padBottom(12f).row()
+        add(stateLabel).growX().left().padTop(5f).padBottom(10f).row()
         entriesTable.top().left()
         scroll.setScrollingDisabled(true, false)
         scroll.setFadeScrollBars(false)
@@ -360,10 +359,10 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
                 val civ = screen.gameInfo.civilizations.firstOrNull { it.civID == entry.civId }
                 if (civ != null) heading.add(ImageGetter.getNationPortrait(civ.nation, 20f)).size(20f).padRight(8f).top()
                 val identity = Table()
-                identity.add(text(names[entry.civId] ?: entry.civId, color, 13)).growX().left().row()
+                identity.add(text(names[entry.civId] ?: entry.civId, color, 14)).growX().left().row()
                 identity.add(text("${entry.civId} · Turn ${entry.turnSerial}", muted, 11)).growX().left().padTop(3f)
                 heading.add(identity).growX()
-                addRow(heading, "turn/$turn", rowWidth, top = 16f, bottom = 10f)
+                addRow(heading, "turn/$turn", rowWidth, top = if (previousTurn.isEmpty()) 4f else 18f, bottom = 10f)
                 previousTurn = turn
             }
             when (row) {
@@ -378,7 +377,7 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
                     }
                     "reasoning" -> {
                         addSpeaker(entry, "Thinking", rowWidth)
-                        addRow(text(body(entry), muted, 13), entry.id, rowWidth, bottom = 12f)
+                        addRow(text(body(entry), muted, 12), entry.id, rowWidth, bottom = 12f)
                     }
                     else -> {
                         addSpeaker(entry, if (entry.kind == "error" || entry.status == "failed") "Error" else "Tools", rowWidth)
@@ -399,7 +398,8 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
 
     private fun addSpeaker(entry: AgentActivityEntry, kind: String?, width: Float) {
         val label = agentName(entry.civId) + if (kind == null) "" else " · $kind"
-        addRow(text(label, AgentActivityAppearance.color(screen.gameInfo, entry.civId), 12), "speaker/${entry.id}", width, bottom = 5f)
+        addRow(text(label, AgentActivityAppearance.color(screen.gameInfo, entry.civId), if (kind == null) 13 else 12),
+            "speaker/${entry.id}", width, bottom = 5f)
     }
 
     private fun toolButton(title: String, entry: AgentActivityEntry, opened: Boolean, action: () -> Unit): Button {
@@ -409,7 +409,10 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
             style = Button.ButtonStyle().apply {
                 over = WorldScreenStyle.background("WorldScreen/AgentActivityFeed/ToolHover", WorldScreenStyle.raised)
                 down = WorldScreenStyle.background("WorldScreen/AgentActivityFeed/ToolDown", WorldScreenStyle.pressed)
+                checked = WorldScreenStyle.background("WorldScreen/AgentActivityFeed/ToolOpen", WorldScreenStyle.raised)
+                focused = over
             }
+            isChecked = opened
             pad(5f, 0f, 5f, 2f)
         }
         val icon = when {

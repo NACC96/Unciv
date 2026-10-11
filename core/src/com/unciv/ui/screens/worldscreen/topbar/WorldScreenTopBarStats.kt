@@ -25,7 +25,7 @@ internal class WorldScreenTopBarStats(private val topbar: WorldScreenTopBar) : S
 
     private val goldLabel = "0".toLabel(WorldScreenStyle.ink, 14)
     private val goldPerTurnLabel = "+0"
-        .toLabel(WorldScreenStyle.ink, 14)
+        .toLabel(WorldScreenStyle.muted, 12)
 
     private val scienceLabel = "0".toLabel(WorldScreenStyle.ink, 14)
     private val happinessLabel = "0".toLabel(WorldScreenStyle.ink, 14)
@@ -33,7 +33,7 @@ internal class WorldScreenTopBarStats(private val topbar: WorldScreenTopBar) : S
 
     private val faithLabel = "0".toLabel(WorldScreenStyle.ink, 14)
     private val faithPerTurnLabel = "+0"
-        .toLabel(WorldScreenStyle.ink, 14)
+        .toLabel(WorldScreenStyle.muted, 12)
 
     private val happinessContainer = Group()
 
@@ -89,7 +89,7 @@ internal class WorldScreenTopBarStats(private val topbar: WorldScreenTopBar) : S
 
         fun addPerTurnLabel(label: Label) {
             add(label).padRight(padRightBetweenStats)
-                .height(14f).top()
+                .padLeft(0f)
         }
 
 

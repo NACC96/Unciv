@@ -8,6 +8,9 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.PixmapIO
+import com.badlogic.gdx.graphics.glutils.FrameBuffer
+import com.badlogic.gdx.graphics.glutils.HdpiMode
+import com.badlogic.gdx.graphics.glutils.HdpiUtils
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.Group
@@ -43,6 +46,7 @@ object AgentMessagesRenderCheck {
     @JvmStatic fun main(args: Array<String>) {
         require(args.isNotEmpty()) { "Provide an output directory for the PNG captures" }
         val sizes = listOf(960 to 720, 420 to 600)
+        val synchronous = java.lang.Boolean.getBoolean("unciv.renderCheck.synchronous")
         val config = Lwjgl3ApplicationConfiguration().apply {
             setTitle("Unciv messages render check")
             setWindowedMode(sizes[0].first, sizes[0].second)
@@ -58,6 +62,8 @@ object AgentMessagesRenderCheck {
             lateinit var recipientPicker: SelectBox<*>
             var sizeIndex = 0
             var frames = 0
+            var completed = false
+            var captureFramebuffer: FrameBuffer? = null
             var captureFilter = false
             var captureRecipient = false
             val nations = listOf("America", "Arabia", "Germany", "China", "Russia", "The Ottomans", "Persia", "England", "France")
@@ -74,6 +80,7 @@ object AgentMessagesRenderCheck {
                     val spectator = fixture.addCiv(fixture.ruleset.nations[Constants.spectator]!!)
                     Fonts.fontImplementation = FontDesktop()
                     ImageGetter.setNewRuleset(fixture.ruleset)
+                    if (synchronous) HdpiUtils.setMode(HdpiMode.Pixels)
                     stage = UncivStage(ScreenViewport())
                     stage.viewport.update(sizes[0].first, sizes[0].second, true)
                     stage.addActor(Table().apply {
@@ -108,7 +115,9 @@ object AgentMessagesRenderCheck {
                     })
                     Mockito.`when`(session.getMessages()).thenReturn(listOf(
                         DiplomaticMessage("nation-delivered", "America", "China",
-                            "We propose peace along the river. Our scouts will stay on the western bank.", 30, 31),
+                            "We propose peace along the river. Our scouts will stay on the western bank.", 30, 31,
+                            acknowledgedTurnSerial = 31,
+                            acknowledgementText = "Received. I will respect the river border and consider peaceful trade."),
                         DiplomaticMessage("reply-delivered", "China", "America",
                             "Agreed. I will keep my Warrior east of the river while we discuss trade.", 31, 32),
                         DiplomaticMessage("spectator-queued", spectator.civID, "China",
@@ -161,81 +170,123 @@ object AgentMessagesRenderCheck {
                     while (setupError != GL20.GL_NO_ERROR) {
                         println("Setup GL error: $setupError"); setupError = Gdx.gl.glGetError()
                     }
-                } catch (ex: Throwable) { failure = ex; Gdx.app.exit() }
+                    if (synchronous) {
+                        // Hidden macOS windows can stall in native event polling. Use the current
+                        // context and logical-size FBOs for every state, including dropdown fades.
+                        while (!completed && failure == null) render()
+                        failure?.let { throw it }
+                        dispose()
+                        kotlin.system.exitProcess(0)
+                    }
+                } catch (ex: Throwable) {
+                    failure = ex
+                    if (synchronous) {
+                        ex.printStackTrace()
+                        dispose()
+                        kotlin.system.exitProcess(1)
+                    }
+                    Gdx.app.exit()
+                }
             }
 
             override fun render() {
-                if (failure != null) return
+                if (failure != null || completed) return
                 try {
-                    Gdx.gl.glClearColor(0.1f, 0.16f, 0.17f, 1f)
-                    Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
-                    stage.act(1 / 60f)
-                    stage.draw()
-                    check(Gdx.gl.glGetError() == GL20.GL_NO_ERROR) { "Messages/feed rendering leaked a GL error" }
-                    // Let SelectBox's show/hide fades settle before evaluating the final UI.
-                    if (++frames < 30) return
                     val (width, height) = sizes[sizeIndex]
-                    check(Gdx.graphics.width == width && Gdx.graphics.height == height) { "Window resize was not applied" }
-                    checkBounds(panel, "Messages panel")
-                    checkBounds(feed, "Activity feed")
-                    feed.validate()
-                    for (control in feed.descendants().filter { it !== feed }) {
-                        val point = control.localToAscendantCoordinates(feed, Vector2())
-                        check(point.x >= -0.5f && point.x + control.width <= feed.width + 0.5f) {
-                            "Activity ${control.javaClass.simpleName} overflows glass at ${width}x$height: x=${point.x} width=${control.width} panel=${feed.width}"
-                        }
-                        if (control.rotation != 0f) for (corner in listOf(Vector2(), Vector2(control.width, 0f),
-                            Vector2(0f, control.height), Vector2(control.width, control.height))) {
-                            val painted = control.localToParentCoordinates(corner)
-                            check(painted.x >= -0.5f && painted.y >= -0.5f &&
-                                painted.x <= control.parent.width + 0.5f && painted.y <= control.parent.height + 0.5f) {
-                                "Rotated activity arrow paints outside its parent at ${width}x$height: $painted in ${control.parent.width}x${control.parent.height}"
-                            }
+                    if (synchronous && (captureFramebuffer?.width != width || captureFramebuffer?.height != height)) {
+                        captureFramebuffer?.dispose()
+                        captureFramebuffer = FrameBuffer(Pixmap.Format.RGBA8888, width, height, false)
+                    }
+                    val target = captureFramebuffer
+                    target?.begin()
+                    try {
+                        if (target == null) stage.viewport.apply()
+                        drawAndCapture(width, height)
+                    } finally { target?.end() }
+                } catch (ex: Throwable) {
+                    failure = ex
+                    if (!synchronous) Gdx.app.exit()
+                }
+            }
+
+            private fun drawAndCapture(width: Int, height: Int) {
+                Gdx.gl.glClearColor(0.1f, 0.16f, 0.17f, 1f)
+                Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+                stage.root.act(1 / 60f)
+                stage.camera.update()
+                stage.batch.projectionMatrix = stage.camera.combined
+                stage.batch.begin()
+                try { stage.root.draw(stage.batch, 1f) } finally { stage.batch.end() }
+                check(Gdx.gl.glGetError() == GL20.GL_NO_ERROR) { "Messages/feed rendering leaked a GL error" }
+                // Let SelectBox's show/hide fades settle before evaluating the final UI.
+                if (++frames < 30) return
+                if (synchronous) check(stage.width == width.toFloat() && stage.height == height.toFloat()) {
+                    "Logical viewport resize was not applied"
+                } else check(Gdx.graphics.width == width && Gdx.graphics.height == height) { "Window resize was not applied" }
+                checkBounds(panel, "Messages panel")
+                checkBounds(feed, "Activity feed")
+                feed.validate()
+                for (control in feed.descendants().filter { it !== feed }) {
+                    val point = control.localToAscendantCoordinates(feed, Vector2())
+                    check(point.x >= -0.5f && point.x + control.width <= feed.width + 0.5f) {
+                        "Activity ${control.javaClass.simpleName} overflows glass at ${width}x$height: x=${point.x} width=${control.width} panel=${feed.width}"
+                    }
+                    if (control.rotation != 0f) for (corner in listOf(Vector2(), Vector2(control.width, 0f),
+                        Vector2(0f, control.height), Vector2(control.width, control.height))) {
+                        val painted = control.localToParentCoordinates(corner)
+                        check(painted.x >= -0.5f && painted.y >= -0.5f &&
+                            painted.x <= control.parent.width + 0.5f && painted.y <= control.parent.height + 0.5f) {
+                            "Rotated activity arrow paints outside its parent at ${width}x$height: $painted in ${control.parent.width}x${control.parent.height}"
                         }
                     }
-                    check(picker.items.size == 11) { "Activity picker must include all nine nations" }
-                    if (captureFilter || captureRecipient) {
-                        val popup = (if (captureFilter) picker else recipientPicker).scrollPane
-                        check(popup.x >= -0.5f && popup.x + popup.width <= stage.width + 0.5f) {
-                            "${if (captureFilter) "Nation" else "Recipient"} dropdown extends past the viewport at ${width}x$height: x=${popup.x} width=${popup.width} stage=${stage.width}"
-                        }
+                }
+                check(picker.items.size == 11) { "Activity picker must include all nine nations" }
+                if (captureFilter || captureRecipient) {
+                    val popup = (if (captureFilter) picker else recipientPicker).scrollPane
+                    check(popup.x >= -0.5f && popup.x + popup.width <= stage.width + 0.5f) {
+                        "${if (captureFilter) "Nation" else "Recipient"} dropdown extends past the viewport at ${width}x$height: x=${popup.x} width=${popup.width} stage=${stage.width}"
                     }
-                    panel.validate()
-                    for (name in listOf("MessageBody", "MessageRecipient", "MessageConversation", "MessageSend")) {
-                        val control = panel.descendants().single { it.name == name }
-                        val point = control.localToStageCoordinates(Vector2())
-                        check(point.x >= panel.x - 0.5f && point.x + control.width <= panel.x + panel.width + 0.5f &&
-                            point.y >= panel.y - 0.5f && point.y + control.height <= panel.y + panel.height + 0.5f) {
-                            "$name falls outside the panel at ${width}x$height"
-                        }
+                }
+                panel.validate()
+                for (name in listOf("MessageBody", "MessageRecipient", "MessageConversation", "MessageSend")) {
+                    val control = panel.descendants().single { it.name == name }
+                    val point = control.localToStageCoordinates(Vector2())
+                    check(point.x >= panel.x - 0.5f && point.x + control.width <= panel.x + panel.width + 0.5f &&
+                        point.y >= panel.y - 0.5f && point.y + control.height <= panel.y + panel.height + 0.5f) {
+                        "$name falls outside the panel at ${width}x$height"
                     }
-                    val pixels = Pixmap.createFromFrameBuffer(0, 0,
-                        Gdx.graphics.backBufferWidth, Gdx.graphics.backBufferHeight)
-                    val kind = when { captureFilter -> "activity-filter"; captureRecipient -> "message-recipient"; else -> "agent-messages" }
+                }
+                val pixels = Pixmap.createFromFrameBuffer(0, 0,
+                    if (synchronous) width else Gdx.graphics.backBufferWidth,
+                    if (synchronous) height else Gdx.graphics.backBufferHeight)
+                val kind = when { captureFilter -> "activity-filter"; captureRecipient -> "message-recipient"; else -> "agent-messages" }
+                try {
+                    check(Gdx.gl.glGetError() == GL20.GL_NO_ERROR) { "Messages capture readback leaked a GL error" }
                     PixmapIO.writePNG(Gdx.files.absolute("${args[0]}/$kind-$width.png"), pixels, -1, true)
-                    pixels.dispose()
-                    frames = 0
-                    if (!captureFilter && !captureRecipient) {
-                        captureRecipient = true
-                        recipientPicker.showList()
-                    } else if (captureRecipient) {
-                        recipientPicker.hideList()
-                        captureRecipient = false
-                        panel.toggle()
-                        captureFilter = true
-                        picker.showList()
+                } finally { pixels.dispose() }
+                frames = 0
+                if (!captureFilter && !captureRecipient) {
+                    captureRecipient = true
+                    recipientPicker.showList()
+                } else if (captureRecipient) {
+                    recipientPicker.hideList()
+                    captureRecipient = false
+                    panel.toggle()
+                    captureFilter = true
+                    picker.showList()
+                } else {
+                    picker.hideList()
+                    captureFilter = false
+                    if (++sizeIndex == sizes.size) {
+                        println("MESSAGES_RENDER_CHECK_PASSED: real GPU, mail provenance, queued/delivered/acknowledged, draft, nine default agent identities and a long selected name, filters, resize, glass content, activity and recipient dropdown bounds")
+                        completed = true
+                        if (!synchronous) Gdx.app.exit()
                     } else {
-                        picker.hideList()
-                        captureFilter = false
-                        if (++sizeIndex == sizes.size) {
-                            println("MESSAGES_RENDER_CHECK_PASSED: real GPU, mail provenance, queued/delivered, draft, nine default agent identities and a long selected name, filters, resize, glass content, activity and recipient dropdown bounds")
-                            Gdx.app.exit()
-                        } else {
-                            panel.toggle()
-                            Gdx.graphics.setWindowedMode(sizes[sizeIndex].first, sizes[sizeIndex].second)
-                        }
+                        panel.toggle()
+                        if (synchronous) resizeLogical(sizes[sizeIndex].first, sizes[sizeIndex].second)
+                        else Gdx.graphics.setWindowedMode(sizes[sizeIndex].first, sizes[sizeIndex].second)
                     }
-                } catch (ex: Throwable) { failure = ex; Gdx.app.exit() }
+                }
             }
 
             private fun checkBounds(actor: Actor, description: String) {
@@ -251,14 +302,20 @@ object AgentMessagesRenderCheck {
                 selection.selected = selection.items.first { it.toString().startsWith("The Ottomans · ") }
             }
 
-            override fun resize(width: Int, height: Int) {
-                if (!::stage.isInitialized || !::panel.isInitialized) return
+            private fun resizeLogical(width: Int, height: Int) {
                 stage.viewport.update(width, height, true)
                 AgentActivityFeed::class.java.getDeclaredMethod("refresh").apply { isAccessible = true }.invoke(feed)
                 panel.refresh()
             }
 
+            override fun resize(width: Int, height: Int) {
+                if (synchronous || !::stage.isInitialized || !::panel.isInitialized) return
+                resizeLogical(width, height)
+            }
+
             override fun dispose() {
+                captureFramebuffer?.dispose()
+                captureFramebuffer = null
                 if (::panel.isInitialized) panel.dispose()
                 if (::feed.isInitialized) feed.dispose()
                 if (::stage.isInitialized) stage.dispose()

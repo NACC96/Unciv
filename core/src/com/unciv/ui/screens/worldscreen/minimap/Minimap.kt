@@ -15,6 +15,7 @@ import com.unciv.ui.components.NonTransformGroup
 import com.unciv.ui.components.input.UncivActorGestureListener
 import com.unciv.ui.images.ClippingImage
 import com.unciv.ui.images.ImageGetter
+import com.unciv.ui.screens.worldscreen.WorldScreenStyle
 import com.unciv.ui.screens.worldscreen.worldmap.WorldMapHolder
 import yairm210.purity.annotations.Pure
 import yairm210.purity.annotations.Readonly
@@ -178,6 +179,7 @@ class Minimap(val mapHolder: WorldMapHolder, minimapSize: Int, private val civIn
         return List(indicatorAmount, init = {
             val indicator = ClippingImage(ImageGetter.getDrawable("OtherIcons/Camera"))
             indicator.touchable = Touchable.disabled
+            indicator.color = WorldScreenStyle.accent
             return@List indicator
         })
     }

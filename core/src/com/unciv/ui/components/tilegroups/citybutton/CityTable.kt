@@ -16,6 +16,7 @@ import com.unciv.ui.components.widgets.BorderedTable
 import com.unciv.ui.images.ImageGetter
 import com.unciv.ui.images.padTopDescent
 import com.unciv.ui.screens.basescreen.BaseScreen
+import com.unciv.ui.screens.worldscreen.WorldScreenStyle
 import com.unciv.utils.DebugUtils
 import com.unciv.view.CityView
 
@@ -51,22 +52,14 @@ internal class CityTable(
 
         val selectedCiv = GUI.getSelectedPlayer()
         val viewingCiv = city.getViewingCiv()
-        when {
-            city.belongsTo(selectedCiv) -> {
-                borderOnTop = true
-                borderSize = 4f
-                bgBorderColor = Color.valueOf("#E9E9AC")
-            }
-            city.isAtWarWith(selectedCiv) -> {
-                borderSize = 4f
-                bgBorderColor = Color.valueOf("#E63200")
-            }
-            else -> {
-                borderSize = 2f
-                bgBorderColor = ImageGetter.CHARCOAL
-            }
+        // Keep ownership/state in a fine rim so names remain legible for every nation palette.
+        borderSize = 1.5f
+        bgBorderColor = when {
+            city.belongsTo(selectedCiv) -> WorldScreenStyle.accent
+            city.isAtWarWith(selectedCiv) -> WorldScreenStyle.error
+            else -> city.getNationOuterColor().cpy().lerp(WorldScreenStyle.muted, 0.35f)
         }
-        bgColor = city.getNationOuterColor().cpy().apply { a = 0.9f }
+        bgColor = WorldScreenStyle.surface.cpy().apply { a = 0.94f }
 
         val isShowDetailedInfo = DebugUtils.VISIBLE_MAP
                 || city.belongsTo(selectedCiv)
@@ -87,7 +80,7 @@ internal class CityTable(
     }
 
     private fun addCityPopNumber(city: CityView) {
-        val textColor = city.getCivInnerColor()
+        val textColor = WorldScreenStyle.ink
         val popLabel = city.getPopulationCount().tr()
             .toLabel(fontColor = textColor, fontSize = 18, alignment = Align.center)
         add(popLabel).minWidth(26f)
@@ -123,7 +116,7 @@ internal class CityTable(
             }
             else -> "-"
         }
-        val textColor = city.getCivInnerColor()
+        val textColor = WorldScreenStyle.muted
         val turnLabel = turnLabelText.toLabel(fontColor = textColor, fontSize = 13)
 
         table.add(growthBar).padRight(2f)
@@ -132,7 +125,7 @@ internal class CityTable(
     }
 
     private fun addCityText(city: CityView, forPopup: Boolean) {
-        val textColor = city.getCivInnerColor()
+        val textColor = WorldScreenStyle.ink
         val table = Table().apply { isTransform = false }
 
         if (city.isCapital()) {
@@ -145,7 +138,9 @@ internal class CityTable(
         }
 
         val cityName = city.name.toLabel(fontColor = textColor, alignment = Align.center, hideIcons = true)
-        table.add(cityName).growY().center().padTopDescent()
+        val nameWidth = cityName.prefWidth.coerceAtMost(220f)
+        cityName.wrap = cityName.prefWidth > nameWidth
+        table.add(cityName).width(nameWidth).growY().center().padTopDescent()
 
         if (!forPopup) {
             val cityReligion = city.getMajorityReligion()
@@ -165,7 +160,7 @@ internal class CityTable(
     }
 
     private fun addCityConstruction(city: CityView) {
-        val textColor = city.getCivInnerColor()
+        val textColor = WorldScreenStyle.muted
 
         val cityConstructions = city.constructions
         val cityCurrentConstruction = cityConstructions.getCurrentConstruction()
@@ -214,7 +209,7 @@ internal class CityTable(
             city.isMajorCiv() -> ImageGetter.getNationIcon(city.getNationName())
             else -> ImageGetter.getImage("CityStateIcons/" + city.getCityStateTypeName())
         }
-        icon.color = city.getCivInnerColor()
+        icon.color = city.getNationOuterColor().cpy().lerp(WorldScreenStyle.ink, 0.35f)
 
         add(icon.toGroup(20f)).minWidth(26f)
     }

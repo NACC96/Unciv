@@ -6,7 +6,7 @@ Implemented October 10, 2026 as a local extension of the [world-screen HUD](worl
 
 Compare civilizations without leaving the live map: filter or sort the roster, select a nation, then inspect its details. The user selected a floating panel and full opponent statistics for spectators. Human games retain the viewer's own details and preserve opponent information limits.
 
-The panel inherits the HUD's charcoal glass, off-white text, restrained teal control states and stable agent accents. `WorldScreenStyle.kt` remains the scoped source of style values; this addition does not establish a new global visual identity or change the global skin.
+The panel inherits the HUD's translucent charcoal surface, off-white text, restrained teal control states and stable agent accents. The October 11 polish pass removes its map blur; existing rounded skin textures draw the fill and rim without framebuffer resources. `WorldScreenStyle.kt` delegates to the scoped `GameUiStyle.kt`; the global skin remains unchanged.
 
 ## Typography
 
@@ -23,7 +23,7 @@ Wide layouts show score, cities, population, gold and science. Narrow layouts re
 - **Open and close:** Overview and the existing Empire Overview shortcut toggle the panel. The close control hides it and releases its keyboard/scroll focus. Reopening refreshes its data.
 - **Find and compare:** Nations is the initial filter; City-states and All are also available. Search matches civilization or configured agent names. Score starts in descending order; clicking a visible column selects its descending sort, then toggles direction. Hidden values display an em dash and sort after visible values. An empty result has explicit helper copy.
 - **Inspect:** Selecting a row starts its detail pane at the top. Available details cover economy, research progress, era, strength, technologies, resources, city population/production, unit counts and wars. Empire details opens the original civilization tabs.
-- **Refresh:** The panel reads the published GL-thread snapshot twice per second while visible and on world updates. Selection, filters, search, sorting and scroll positions survive refreshes within the remaining content bounds. If the selected nation leaves the filtered roster, the first visible nation becomes selected. Its timer and glass resources are disposed with the world screen.
+- **Refresh:** The panel reads the published GL-thread snapshot twice per second while visible and on world updates. Selection, filters, search, sorting and scroll positions survive refreshes within the remaining content bounds. If the selected nation leaves the filtered roster, the first visible nation becomes selected. Its timer is disposed with the world screen.
 
 | Viewer | Roster | Detail visibility |
 | --- | --- | --- |

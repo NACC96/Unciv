@@ -6,17 +6,20 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.TextArea
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton
+import com.badlogic.gdx.math.Vector2
 import com.unciv.Constants
 import com.unciv.dev.FontDesktop
 import com.unciv.logic.agents.AgentMatchSession
 import com.unciv.logic.agents.AgentRunState
 import com.unciv.logic.agents.DiplomaticMessage
 import com.unciv.logic.agents.MessageContact
+import com.unciv.models.translations.tr
 import com.unciv.testing.GdxTestRunner
 import com.unciv.testing.TestGame
 import com.unciv.ui.components.fonts.Fonts
 import com.unciv.ui.components.fonts.FontRulesetIcons
 import com.unciv.ui.components.input.ActivationListener
+import com.unciv.ui.components.widgets.AutoScrollPane
 import com.unciv.ui.images.ImageGetter
 import com.unciv.ui.screens.basescreen.UncivStage
 import com.unciv.ui.screens.worldscreen.TechPolicyDiplomacyButtons
@@ -242,6 +245,39 @@ class AgentMessagesPanelTest {
             for (sender in listOf("Spectator", "Russia")) {
                 val heading = panel.descendants().filterIsInstance<Label>().single { it.text.toString() == "$sender → Rome" }
                 assertTrue("$sender identity must remain legible", heading.style.fontColor.a > 0.5f)
+            }
+        } finally { controls.dispose() }
+    }
+
+    @Test fun `long message identities receipts and acknowledgement wrap inside a narrow history`() {
+        val f = Fixture()
+        val target = "The Ottomans · Keeper of the distant coastlines and trade routes"
+        f.messages = listOf(
+            DiplomaticMessage("acknowledged", "Rome", target, "Please confirm our peaceful borders.", 1234, 1235).apply {
+                acknowledgedTurnSerial = 1235
+                acknowledgementText = "Received. I will keep our borders peaceful while expanding toward the coast."
+            },
+            DiplomaticMessage("queued", Constants.spectator, target, "Consider another Scout.", 1235, null, "SPECTATOR"))
+        val controls = AgentMatchControlTable(f.session, f.screen)
+        try {
+            val panel = controls.openPanel(f)
+            for (width in listOf(960f, 420f, 360f, 960f)) {
+                f.width = width
+                panel.refresh(); panel.validate()
+                val history = panel.descendants().filterIsInstance<AutoScrollPane>().single()
+                assertEquals("Long message identities must wrap rather than create horizontal scrolling", 0f, history.maxX, 0.5f)
+                for (label in history.descendants().filterIsInstance<Label>()) {
+                    val point = label.localToAscendantCoordinates(panel, Vector2())
+                    assertTrue("History label starts outside the panel at $width: ${label.text}", point.x >= -0.5f)
+                    assertTrue("History label extends outside the panel at $width: ${label.text}",
+                        point.x + label.width <= panel.width + 0.5f)
+                }
+                val labels = panel.labels()
+                // Ordinary game labels localize four-digit turn numbers as well as their text.
+                for (receipt in listOf("Sent turn 1234", "Acknowledged · turn 1235", "Queued · next turn"))
+                    assertTrue("Receipt missing at $width: $receipt in $labels", receipt.tr() in labels)
+                assertTrue("$target acknowledged receipt".tr(hideIcons = true) in labels)
+                assertTrue("Received. I will keep our borders peaceful while expanding toward the coast." in labels)
             }
         } finally { controls.dispose() }
     }

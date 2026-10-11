@@ -26,12 +26,11 @@ import com.unciv.ui.screens.overviewscreen.EmpireOverviewScreen
 import com.unciv.ui.screens.worldscreen.WorldScreen
 import com.unciv.ui.screens.worldscreen.WorldScreenStyle
 import com.unciv.ui.screens.worldscreen.status.AgentActivityAppearance
-import com.unciv.ui.screens.worldscreen.status.AgentActivityGlass
 import com.unciv.view.GameView
 
 /**
  * THESIS: Compare civilizations without leaving the live map.
- * OWN-WORLD: Inherit the world HUD's charcoal glass, off-white type and stable agent accents.
+ * OWN-WORLD: Inherit the world HUD's charcoal surface, off-white type and stable agent accents.
  * STORY: Sort nations, select one, inspect accurate stats; preserve human information limits.
  * FIRST VIEWPORT: Movable right-side panel, compact comparison above selected-nation details.
  * FORM: Local HUD extension, specified floating panel; no new visual identity.
@@ -42,8 +41,7 @@ class CivilizationOverviewPanel(private val screen: WorldScreen) : Table(BaseScr
         SCORE("Score", { it.score }), CITIES("Cities", { it.cities }), POPULATION("Pop.", { it.population }),
         GOLD("Gold", { it.gold }), SCIENCE("Science", { it.science })
     }
-    private val glass = AgentActivityGlass(this)
-    private val status = "".toLabel(WorldScreenStyle.muted, 11)
+    private val status = "".toLabel(WorldScreenStyle.muted, 11).apply { wrap = true }
     private val rows = Table(skin)
     private val details = Table(skin)
     private val rowScroll = AutoScrollPane(rows, skin)
@@ -73,11 +71,11 @@ class CivilizationOverviewPanel(private val screen: WorldScreen) : Table(BaseScr
     }
 
     init {
-        background = glass
+        background = WorldScreenStyle.panelBackground("WorldScreen/Overview")
         touchable = Touchable.enabled
         pad(14f)
         val header = Table(skin).apply { touchable = Touchable.enabled }
-        header.add("Civilizations".toLabel(WorldScreenStyle.ink, 19)).left().expandX()
+        header.add("Civilizations".toLabel(WorldScreenStyle.ink, 17)).left().expandX()
         header.add("Drag to move".toLabel(WorldScreenStyle.muted, 10)).padRight(12f)
         val close = Button(skin).apply {
             WorldScreenStyle.apply(this)
@@ -230,7 +228,14 @@ class CivilizationOverviewPanel(private val screen: WorldScreen) : Table(BaseScr
             names.add(label(subtitle, WorldScreenStyle.muted, 10).apply { setEllipsis(true) }).growX().left()
             identity.add(names).growX()
             button.add(identity).width(nameWidth).left()
-            for (column in columns) button.add(label(sortValue(civ, column))).width(metricWidth).center()
+            for (column in columns) {
+                val color = when {
+                    column.value(civ) == null -> WorldScreenStyle.muted
+                    column == Sort.SCIENCE -> WorldScreenStyle.accent
+                    else -> WorldScreenStyle.ink
+                }
+                button.add(label(sortValue(civ, column), color)).width(metricWidth - 8f).right().padRight(8f)
+            }
             rows.add(button).width(tableWidth).padTop(3f).row()
         }
         if (visible.isEmpty()) rows.add(label("No civilizations match this filter.", WorldScreenStyle.muted)).width(tableWidth).padTop(18f)
@@ -249,6 +254,8 @@ class CivilizationOverviewPanel(private val screen: WorldScreen) : Table(BaseScr
         details.clearChildren()
         if (civ == null) return
         val w = width - 40f
+        details.add(ImageGetter.getWhiteDot().apply { color = WorldScreenStyle.hover }).width(w).height(1f)
+            .padBottom(12f).row()
         val accent = AgentActivityAppearance.color(screen.gameInfo, civ.id)
         fun line(text: String, color: Color = WorldScreenStyle.muted, size: Int = 12, top: Float = 4f) {
             details.add(label(text, color, size).apply { wrap = true }).width(w).left().padTop(top).row()
@@ -316,7 +323,6 @@ class CivilizationOverviewPanel(private val screen: WorldScreen) : Table(BaseScr
         if (disposed) return
         disposed = true
         refreshTask.cancel()
-        glass.dispose()
         remove()
     }
 }
