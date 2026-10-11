@@ -1,5 +1,15 @@
 package com.unciv.view
 
+import com.unciv.UncivGame
+import com.unciv.logic.agents.AgentCommand
+import com.unciv.logic.agents.AnnexCityCommand
+import com.unciv.logic.agents.BuyTileCommand
+import com.unciv.logic.agents.CitizenOp
+import com.unciv.logic.agents.CityCitizensCommand
+import com.unciv.logic.agents.CityProductionCommand
+import com.unciv.logic.agents.ProductionOp
+import com.unciv.logic.agents.RenameCityCommand
+import com.unciv.logic.agents.SetRazingCommand
 import com.unciv.logic.automation.Automation
 import com.unciv.logic.city.City
 import com.unciv.logic.city.CityFlags
@@ -149,45 +159,97 @@ class CityView(city: City,
     // ACTIONS
     private fun canChangeState() = city.civ === viewer && viewer.isCurrentPlayer()
 
+    /**
+     * Agent matches route city mutations through the coordinator (§3.2);
+     * returns false with NO side effects when no session is attached, so
+     * ordinary games fall through to the legacy engine calls below.
+     */
+    private fun routeThroughAgentSession(
+        commands: (expectedRevision: Int) -> List<(Int) -> AgentCommand>
+    ): Boolean {
+        val worldScreen = UncivGame.Current.worldScreen ?: return false
+        return worldScreen.routeThroughAgentSession(commands)
+    }
+
+    private fun citizensCommand(op: CitizenOp, tileView: TileView? = null) = { r: Int ->
+        CityCitizensCommand(
+            city.civ.civID, "ui-${System.nanoTime()}", r, city.id, op,
+            tilePos = tileView?.position()
+        )
+    }
+
     fun tryLockTile(tileView: TileView): Boolean {
         if (!canChangeState()) return false
+        if (routeThroughAgentSession { listOf(citizensCommand(CitizenOp.LOCK_TILE, tileView)) }) return true
         if (!isWorked(tileView)) return false
         return city.lockTile(getTile(tileView))
     }
     fun tryUnlockTile(tileView: TileView): Boolean {
         if (!canChangeState()) return false
+        if (routeThroughAgentSession { listOf(citizensCommand(CitizenOp.UNLOCK_TILE, tileView)) }) return true
         return city.unlockTile(getTile(tileView))
     }
     fun tryBuyTile(tileView: TileView): Boolean {
         if (!canChangeState()) return false
+        if (routeThroughAgentSession { rev ->
+                listOf({ r: Int ->
+                    BuyTileCommand(city.civ.civID, "ui-${System.nanoTime()}", r, city.id, tileView.position())
+                })
+            }) return true
         if (!city.expansion.canBuyTile(getTile(tileView))) return false
         city.expansion.buyTile(getTile(tileView))
         return true
     }
     fun tryWorkTile(tileView: TileView): Boolean {
         if (!canChangeState()) return false
+        if (routeThroughAgentSession { listOf(citizensCommand(CitizenOp.WORK_TILE, tileView)) }) return true
         return city.workTile(getTile(tileView))
     }
     fun tryStopWorkingTile(tileView: TileView): Boolean {
         if (!canChangeState()) return false
+        if (routeThroughAgentSession { listOf(citizensCommand(CitizenOp.STOP_TILE, tileView)) }) return true
         return city.stopWorkingTile(getTile(tileView))
     }
     fun tryAddToQueue(name: String): Boolean {
         if (!canChangeState()) return false
+        if (routeThroughAgentSession { rev ->
+                listOf({ r: Int ->
+                    CityProductionCommand(city.civ.civID, "ui-${System.nanoTime()}", r, city.id,
+                        ProductionOp.ADD_BOTTOM, name = name)
+                })
+            }) return true
         city.cityConstructions.addToQueue(name)
         return true
     }
     fun tryRemoveFromQueue(index: Int, automatic: Boolean): Boolean {
         if (!canChangeState()) return false
+        if (routeThroughAgentSession { rev ->
+                listOf({ r: Int ->
+                    CityProductionCommand(city.civ.civID, "ui-${System.nanoTime()}", r, city.id,
+                        ProductionOp.REMOVE, index = index)
+                })
+            }) return true
         city.cityConstructions.removeFromQueue(index, automatic)
         return true
     }
     fun tryRaisePriority(index: Int): Int? {
         if (!canChangeState()) return null
+        if (routeThroughAgentSession { rev ->
+                listOf({ r: Int ->
+                    CityProductionCommand(city.civ.civID, "ui-${System.nanoTime()}", r, city.id,
+                        ProductionOp.RAISE, index = index)
+                })
+            }) return index - 1
         return city.cityConstructions.raisePriority(index)
     }
     fun tryLowerPriority(index: Int): Int? {
         if (!canChangeState()) return null
+        if (routeThroughAgentSession { rev ->
+                listOf({ r: Int ->
+                    CityProductionCommand(city.civ.civID, "ui-${System.nanoTime()}", r, city.id,
+                        ProductionOp.LOWER, index = index)
+                })
+            }) return index + 1
         return city.cityConstructions.lowerPriority(index)
     }
     fun updateTileStats() = city.cityStats.updateTileStats()
@@ -195,16 +257,31 @@ class CityView(city: City,
     fun updateCityStats() = city.cityStats.update()
     fun tryRenameCity(name: String): Boolean {
         if (!canChangeState()) return false
+        if (routeThroughAgentSession { rev ->
+                listOf({ r: Int ->
+                    RenameCityCommand(city.civ.civID, "ui-${System.nanoTime()}", r, city.id, name)
+                })
+            }) return true
         city.name = name
         return true
     }
     fun tryAnnexCity(): Boolean {
         if (!canChangeState()) return false
+        if (routeThroughAgentSession { rev ->
+                listOf({ r: Int ->
+                    AnnexCityCommand(city.civ.civID, "ui-${System.nanoTime()}", r, city.id)
+                })
+            }) return true
         city.annexCity()
         return true
     }
     fun trySetRazing(raze: Boolean): Boolean {
         if (!canChangeState()) return false
+        if (routeThroughAgentSession { rev ->
+                listOf({ r: Int ->
+                    SetRazingCommand(city.civ.civID, "ui-${System.nanoTime()}", r, city.id, raze)
+                })
+            }) return true
         city.isBeingRazed = raze
         return true
     }
@@ -220,11 +297,23 @@ class CityView(city: City,
     }
     fun trySellBuilding(construction: Building): Boolean {
         if (!canChangeState()) return false
+        if (routeThroughAgentSession { rev ->
+                listOf({ r: Int ->
+                    CityProductionCommand(city.civ.civID, "ui-${System.nanoTime()}", r, city.id,
+                        ProductionOp.SELL, name = construction.name)
+                })
+            }) return true
         city.sellBuilding(construction)
         return true
     }
     fun tryMoveEntryToTop(index: Int) {
         if (!canChangeState()) return
+        if (routeThroughAgentSession { rev ->
+                listOf({ r: Int ->
+                    CityProductionCommand(city.civ.civID, "ui-${System.nanoTime()}", r, city.id,
+                        ProductionOp.MOVE_TOP, index = index)
+                })
+            }) return
         city.cityConstructions.moveEntryToTop(index)
     }
     fun tryMoveEntryToEnd(index: Int) {

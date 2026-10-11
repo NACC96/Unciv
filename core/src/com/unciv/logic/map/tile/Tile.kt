@@ -1123,7 +1123,7 @@ class Tile : IsPartOfGameInfoSerialization {
         if (improvementQueue.first().countDown()) return false
         val queueEntry = improvementQueue.removeAt(0)
 
-        if (worker.civ.isCurrentPlayer())
+        if (worker.civ.isCurrentPlayer() && UncivGame.Current.worldScreen != null)
             UncivGame.Current.settings.addCompletedTutorialTask("Construct an improvement")
 
         setImprovement(queueEntry.improvement, worker.civ, worker)

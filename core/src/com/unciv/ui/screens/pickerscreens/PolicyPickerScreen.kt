@@ -1,5 +1,8 @@
 package com.unciv.ui.screens.pickerscreens
 
+import com.unciv.UncivGame
+import com.unciv.logic.agents.AdoptPolicyCommand
+
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.Group
@@ -640,7 +643,16 @@ class PolicyPickerScreen(
         lockIcon.setPosition(table.width, table.height / 2 - lockIcon.height/2)
 
         table.onClick {
-            if (branch.isPickable(viewingCiv, canChangeState))
+            if (branch.isPickable(viewingCiv, canChangeState)) {
+                // Agent matches route policy adoption through the coordinator (§3.2).
+                if (UncivGame.Current.worldScreen?.routeThroughAgentSession { 
+                        listOf({ r: Int ->
+                            AdoptPolicyCommand(viewingCiv.civID, "ui-${System.nanoTime()}", r, branch.name)
+                        })
+                    } == true) {
+                    game.replaceCurrentScreen{ recreate() }
+                    return@onClick
+                }
                 ConfirmPopup(
                     this,
                     "Are you sure you want to adopt [${branch.name}]?",
@@ -649,6 +661,7 @@ class PolicyPickerScreen(
                         game.replaceCurrentScreen{ recreate() }
                     }
                 ).open(force = true)
+            }
         }
 
         return table
@@ -670,6 +683,17 @@ class PolicyPickerScreen(
 
         // Don't accept more clicking anywhere
         Concurrency.run {
+            if (UncivGame.Current.worldScreen?.routeThroughAgentSession {
+                    listOf({ r: Int ->
+                        AdoptPolicyCommand(viewingCiv.civID, "ui-${System.nanoTime()}", r, policy.name)
+                    })
+                } == true) {
+                Concurrency.runOnGLThread {
+                    if (game.screen !is PolicyPickerScreen) game.popScreen()
+                    else game.replaceCurrentScreen{ recreate() }
+                }
+                return@run
+            }
             InputDisabling.withInputDisabled {
                 viewingCiv.policies.adopt(policy)
             }

@@ -2,6 +2,10 @@ package com.unciv.ui.screens.diplomacyscreen
 
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.unciv.Constants
+import com.unciv.UncivGame
+import com.unciv.logic.agents.ProposeTradeCommand
+import com.unciv.logic.agents.RetractTradeCommand
+import com.unciv.logic.agents.TradeOfferDto
 import com.unciv.logic.trade.TradeOfferType
 import com.unciv.models.translations.tr
 import com.unciv.ui.components.extensions.isEnabled
@@ -25,6 +29,16 @@ class TradeTable(
     private val offerButton = offerTradeText.toTextButton()
 
     private fun retractOffer() {
+        // Agent matches retract through the coordinator (§3.2).
+        val worldScreen = UncivGame.Current.worldScreen
+        if (worldScreen != null && worldScreen.routeThroughAgentSession {
+                listOf({ r: Int ->
+                    RetractTradeCommand(civ.civID, "ui-${System.nanoTime()}", r, otherCivilization.civID)
+                })
+            }) {
+            offerButton.setText(offerTradeText.tr())
+            return
+        }
         tradeView.tryRetractOffer()
         offerButton.setText(offerTradeText.tr())
     }
@@ -67,6 +81,19 @@ class TradeTable(
                 }
             }
 
+            // Agent matches propose through the coordinator (§3.2).
+            val worldScreen = UncivGame.Current.worldScreen
+            if (worldScreen != null && worldScreen.routeThroughAgentSession {
+                    listOf({ r: Int ->
+                        ProposeTradeCommand(civ.civID, "ui-${System.nanoTime()}", r, otherCivilization.civID,
+                            ourOffers = tradeView.ourStagedOffers().map {
+                                TradeOfferDto(it.name, it.type, it.amount)
+                            },
+                            theirOffers = tradeView.theirStagedOffers().map {
+                                TradeOfferDto(it.name, it.type, it.amount)
+                            })
+                    })
+                }) return@onClick
             tradeView.tryProposeStagedTrade()
             offerButton.setText("Retract offer".tr())
         }

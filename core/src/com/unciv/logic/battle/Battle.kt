@@ -714,12 +714,15 @@ object Battle {
             city.puppetCity(attackerCiv)
             //Although in Civ5 Venice is unable to re-annex their capital, that seems a bit silly. No check for May not annex cities here.
             city.annexCity()
-        } else if (attackerCiv.isHuman() && UncivGame.Current.worldScreen?.autoPlay?.isAutoPlayingAndFullAutoPlayAI() == false) {
-            // we're not taking our former capital
+        } else if (attackerCiv.isHuman() && UncivGame.Current.worldScreen?.autoPlay?.isAutoPlayingAndFullAutoPlayAI() != true) {
+            // we're not taking our former capital.
+            // Note the `!= true` (not `== false`): headless human-rule conquests
+            // (agent matches, tests) have no world screen and must still raise
+            // the conquest decision instead of silently auto-conquering.
             attackerCiv.popupAlerts.add(PopupAlert(AlertType.CityConquered, city.id))
         } else automateCityConquer(attackerCiv, city)
 
-        if (attackerCiv.isCurrentPlayer())
+        if (attackerCiv.isCurrentPlayer() && UncivGame.Current.worldScreen != null)
             UncivGame.Current.settings.addCompletedTutorialTask("Conquer a city")
 
         for (unique in attackerCiv.getTriggeredUniques(UniqueType.TriggerUponConqueringCity, gameContext)

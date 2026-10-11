@@ -1,0 +1,302 @@
+# Agent Build Checkpoints — Unciv with Agent-Controlled Civilizations
+
+**Purpose:** running context log for AI agents working through `AI_AGENT_PLAN.md`.
+Each entry records a decision, problem, or proof-gate outcome with enough detail
+that a future agent (no prior conversation memory) can pick up the work without
+re-deriving it. Newest entries go at the **bottom**. Keep entries short and factual.
+
+**Conventions:**
+- `CP-NNN` monotonically increasing checkpoint IDs.
+- Status: `decision` | `problem` | `gate-pass` | `gate-fail` | `note`.
+- Always name exact file paths, revisions, and versions.
+- The plan (`AI_AGENT_PLAN.md`) is the contract; this file records what actually happened.
+
+**Starting revision:** `518daddf0a06b273f16b481a0464626889307df7` (matches plan §intro table).
+**Feature branch:** `agent-match-foundation` (branched from `518daddf...`, upstream history untouched).
+**Plan status line at start:** fork/clone/planning doc complete; no gameplay code yet.
+
+---
+
+## W0 — Reproducible baseline and development environment
+
+### CP-001 (note) — Repo state on first agent session, 2026-09-14
+- `origin = https://github.com/NACC96/Unciv.git`, `upstream = https://github.com/yairm210/Unciv.git`. Both remotes verified via `git remote -v`.
+- `HEAD = 518daddf0a06b273f16b481a0464626889307df7`, exactly the plan's inspected revision. `git log` confirms `4.22.0` tag context.
+- `AI_AGENT_PLAN.md` was **untracked** (`??` in `git status`), not committed. Future agents: it must be committed on this branch as part of W0 exit evidence.
+- Working branch for all implementation: `agent-match-foundation`.
+
+### CP-002 (problem) — Lexar volume is ExFAT; AppleDouble `._` files pollute the repo and `.git`
+- `diskutil info /Volumes/Lexar` → File System Personality `exfat`, Partition Type `Windows_NTFS`, 1 TB USB, ~154 GiB free.
+- The checkout is full of macOS AppleDouble files (`._AI_AGENT_PLAN.md`, `docs/._*.md`, `.git/objects/pack/._pack-*.idx`, …). Every git command prints `error: non-monotonic index .git/objects/pack/._pack-…idx` (non-fatal warnings, commands still succeed).
+- Consequences (already anticipated by plan §7.3/§10.1, now confirmed on this machine):
+  1. ExFAT file-permission bits are not an isolation boundary — never rely on them.
+  2. Atomic-move durability for the checkpoint store (§10.1 step 3–4) must be **proven** on this filesystem; assume the immutable-generations fallback until measured.
+  3. Always export `COPYFILE_DISABLE=1` before git/tar operations on this volume to avoid creating new `._` files.
+  4. Do **not** run `dot_clean` on `.git/` or delete `._` files inside `.git/` without a backup — pack `._` shadows could confuse git if removed mid-operation. Cosmetic cleanup only outside `.git/`.
+- Decision: live with the warnings for W0; add `._*` handling to `.gitignore` only if it does not mask real files (git already ignores `._` inside `.git` for content purposes — the errors are just noise).
+
+### CP-003 (decision) — Toolchain versions pinned for W0
+- JDK: **missing** (`java -version` → "Unable to locate a Java Runtime"). Plan §2/§12 require JDK 21 (CI uses Temurin 21). Action: `brew install openjdk@21` (Homebrew formula, not cask; casks present are unrelated). Set `JAVA_HOME=$(brew --prefix openjdk@21)` per-shell; do not change global defaults.
+- Node: default shell node is `v22.22.3`, but Node **v24.13.1 already installed** via nvm (`~/.nvm/versions/node/v24.13.1/`). Plan §7.4 targets Node 24 — use `nvm use 24` / absolute path, no reinstall needed. Record arch: **arm64** (`uname -m`).
+- Provider CLIs match the plan's candidate baselines **exactly**: `codex-cli 0.154.0`, `claude 2.1.270 (Claude Code)`, `opencode 1.18.31`. These are compatibility baselines only (plan §7.1) — W1 must still prove isolation/event parsing per provider.
+- Gradle wrapper present (`gradlew`); baseline build not yet run (blocked on JDK install).
+
+### CP-004 (note) — Where this log lives and how to extend it
+- This file: `docs/agent-build-checkpoints.md`, committed on `agent-match-foundation`.
+- Sibling deliverable required by plan §6: `docs/agent-action-coverage.md` (action coverage table; stub created in W0, filled through W4).
+- Protocol schemas: `agent-protocol/` (W1). Engine code: `core/src/com/unciv/logic/agents/`. Coordinator: `desktop/src/com/unciv/app/desktop/agents/`. Supervisor: `agent-runner/`. None of these exist yet — planned locations, do not assume them.
+- Rule for future agents: append a `CP-NNN` entry for every important decision, failure, or gate result; never rewrite history above — supersede with a new entry.
+
+### CP-005 (note) — Toolchain ready; unchanged-baseline build started, 2026-09-14
+- `JAVA_HOME=/opt/homebrew/opt/openjdk@21` → `openjdk 21.0.11 (2026-04-21)`. Gradle wrapper `gradle-9.4.1-bin.zip`. Node for supervisor work: `/Users/noahkenny/.nvm/versions/node/v24.13.1/bin/node` → `v24.13.1` (plan §7.4 target met, no install needed).
+- Created project-owned data dir `/Volumes/Lexar/Unciv/.agent-data/` (plan §7.4 `--data-dir=` target; gitignored).
+- `.gitignore` += `.agent-data/`, `*.unciv-agent`, `agent-runner/node_modules/`, `agent-runner/dist/`, `agent-protocol/*.local.json`.
+- Created `docs/agent-action-coverage.md` W0 stub: all 13 plan-§6 families listed, every row `not started`, command names marked *(proposed)* until W1 pins schemas in `agent-protocol/`.
+- Baseline command (plan §13.1) launched in background with JDK 21: `./gradlew :tests:test :desktop:dist`, log `/tmp/unciv-baseline.log`. No source changes exist yet on `agent-match-foundation`, so this doubles as the clean-baseline gate. Desktop-open + ordinary-save-load checks still pending after the build.
+- Verified while waiting (no JDK needed, plan §2 constraints confirmed against `518daddf`):
+  - `desktop/.../DesktopLauncher.kt:88` — `--data-dir=` flag exists as planned.
+  - `tests/.../TestGame.kt:67` — helper defaults to **G&K** (`Civ_V_GnK`); all agent fixtures must explicitly construct **Vanilla** (`Civ_V_Vanilla`), per plan §13.1.
+  - `core/.../PlayerType.kt` — enum is only `{AI, Human}`; external agents stay `Human` for rules with a separate controller category (plan §2 row 2, §4.1 `ControllerKind`).
+
+### CP-006 (problem→decision) — Gradle builds fail on ExFAT; fixed with local-only env workaround, 2026-09-14
+- Symptom 1: wrapper JVM crash `UnsatisfiedLinkError: no management in system library path .../Cellar/openjdk@21/21.0.11/...` — transient: Homebrew was still swapping `21.0.11 → 21.0.12.1` while the first build started. Self-resolved once install settled (`openjdk 21.0.12.1`, `libmanagement.dylib` present). Lesson: after `brew install`, confirm `java -version` is stable before building.
+- Symptom 2 (real gate): `Execution failed for InstrumentationAnalysisTransform: .../buildSrc/build/classes/kotlin/main` + bare `IllegalArgumentException`, plus wrapper `Could not set executable permissions` on first download. Root cause: macOS writes AppleDouble `._` sidecars into build outputs on ExFAT (`buildSrc/build/classes/kotlin/main/._META-INF`, `._com`, plus dozens under `buildSrc/build/kotlin/...`), and Gradle 9.4.1's instrumentation transform chokes scanning them. Confirmed by `find buildSrc/build -name '._*'`; also `:jar: No valid plugin descriptors` is benign (buildSrc holds only `AndroidImagePacker.kt`, `BuildConfig.kt` — no plugins).
+- Decision (local-only, NOT committed): `export GRADLE_USER_HOME=/Users/noahkenny/.gradle-unciv` (internal APFS SSD), `./gradlew --stop`, `find buildSrc .gradle -name '._*' -delete`, rebuild with `--no-build-cache` once. Result: `./gradlew help` → **BUILD SUCCESSFUL**. No `._` files reappeared under `buildSrc/build` after the clean build.
+- Standing rule for this project: every Gradle invocation on this machine must set `JAVA_HOME=/opt/homebrew/opt/openjdk@21`, `GRADLE_USER_HOME=/Users/noahkenny/.gradle-unciv`, `COPYFILE_DISABLE=1`. Full baseline (`:tests:test :desktop:dist`) relaunched as `/tmp/unciv-baseline4.log`.
+- Open risk: if `._` sidecars reappear inside `build/` outputs during normal compilation, per-project `buildDir` relocation to APFS (via local `~/.gradle` init script) is the next step. Do not commit any such workaround to the repo — CI builds on ext4 and must stay untouched.
+
+### CP-007 (gate-fail→gate-pass) — Unchanged baseline: 848 tests, 2 environmental failures, both fixed, 2026-09-14
+- First full run (`:tests:test :desktop:dist`, log `/tmp/unciv-baseline4.log`): 77 suites, 848 tests, 15 skipped, **2 failures, 0 errors**. `:desktop:dist` succeeded in the same run (`desktop/build/libs/Unciv.jar`, 57 MB, plus a harmless `._Unciv.jar` sidecar).
+- Failure 1 — `BasicTests.baseRulesetHasNoBugs` (`expected:<0> but was:<2>`): test enumerates `android/assets/jsons/TileSets/` and tried to load `._FantasyHex.json`, `._HexaRealm.json`, `._Minimal.json` AppleDouble sidecars as tileset configs. Environmental, not upstream.
+- Failure 2 — `UniqueErrorTests.testPromotionCircularReferenceWithoutAcyclicAlternativeIsWarned` (`expected:<1> but was:<4>`): same root cause (extra ruleset-load errors from `._` pollution); passed after cleanup with no test/code change, so also environmental.
+- Fix: `find android/assets core/src -name '._*' -delete` removed **953 sidecars**; rerun of exactly those 2 classes → **BUILD SUCCESSFUL** (BasicTests 20/20, UniqueErrorTests 9/9, fresh XMLs in `tests/build/test-results/test/`). Full all-green rerun launched as `/tmp/unciv-baseline5.log`; its report is the W0 exit evidence.
+- Durable consequences:
+  1. `.git/info/exclude` already contains `._*` (line 9, set at clone time) — git stays clean, but the **game and its tests see** these files. Any future unexplained asset/ruleset failure → first suspect `._` sidecars; recount with `find android/assets -name '._*' | wc -l`.
+  2. Do NOT "fix" by changing game asset loading in W0 — upstream behavior on normal filesystems is correct; hardening loaders to skip `._*` is an optional later task (it would also silence the in-game tileset warnings on ExFAT).
+  3. `LoadGameTest` (ordinary-save loading) passed in the full run — covers the W0 "ordinary save loads" gate headlessly. Interactive "desktop window opens" remains a manual check (deferred: popping the game GUI unprompted is intrusive; the dist jar existing + headless engine init passing is the automated proxy).
+
+### CP-008 (decision) — agent-runner skeleton + ExFAT rules for JS tooling, 2026-09-14
+- `agent-runner/` created with Node 24 (`v24.13.1`): `package.json` (`@modelcontextprotocol/sdk 1.18.2`, `typescript 5.9.2`, `vitest 3.2.4`, `@types/node`), `tsconfig.json` + `tsconfig.build.json` (both exclude `**/._*`), `vitest.config.ts` (excludes `**/._*`).
+- Why the vitest config: vitest's glob picked up `test/._fake-game-mcp.test.ts` (AppleDouble sidecar of the real test) and esbuild crashed on its binary header (`Unexpected "\x00"`). Real suite: **8/8 pass**; `tsc --noEmit` and `tsc -p tsconfig.build.json` clean.
+- `src/adapter.ts` = provider-adapter contract (discover/validate/start/resume/liveness/cancel, exact-session-ID identity rule). `src/fake-game-mcp.ts` = deterministic in-memory fake of the 8-tool surface; `test/fake-game-mcp.test.ts` pins §5.1 behaviors (duplicate-ID replay vs conflict wins over STALE_STATE, unknown types rejected without dispatch, end_turn never auto-resolves decisions, MATCH_PAUSED).
+- Gotcha fixed: root `.gitignore` ignored `package.json`/`package-lock.json` **at any depth** (release-build leftovers), which would have silently excluded the supervisor manifests. Added `!agent-runner/package.json` / `!agent-runner/package-lock.json` negations; `node_modules/` stays ignored. Verified via `git check-ignore` (no output = tracked).
+- `agent-protocol/` (v1): README + `protocol-version.json` + 4 draft-2020-12 schemas (envelope, receipt, error codes incl. ACTION_ID_CONFLICT/MUTATION_IN_PROGRESS, supervisor/engine event namespaces). All parse as JSON; semantic test-binding (Kotlin/TS generation) is W1/W2 work.
+
+### CP-009 (gate-pass) — W0 exit: unchanged baseline fully green, 2026-09-14
+- After `rm -rf tests/build` (works around the ExFAT stale-`binary`-dir deletion failure): `./gradlew :tests:test :desktop:dist` → **BUILD SUCCESSFUL**; 77 suites, **848 tests, 15 skipped, 0 failures, 0 errors**; `desktop/build/libs/Unciv.jar` present.
+- Standing ExFAT rules (all local-only, never committed): `JAVA_HOME=/opt/homebrew/opt/openjdk@21`, `GRADLE_USER_HOME=/Users/noahkenny/.gradle-unciv`, `COPYFILE_DISABLE=1`; `rm -rf tests/build` before a from-scratch `:tests:test`; `find <dir> -name '._*' -delete` when asset/ruleset tests fail mysteriously; never `dot_clean .git/`.
+- Pinned versions for the record: engine `518daddf0a06b273f16b481a0464626889307df7`, Gradle 9.4.1, JDK 21.0.12.1 (Homebrew openjdk@21), Node v24.13.1, codex-cli 0.154.0, claude 2.1.270, opencode 1.18.31, @modelcontextprotocol/sdk 1.18.2, typescript 5.9.2, vitest 3.2.4, arm64 macOS.
+- W0 committed on `agent-match-foundation` as \"W0: reproducible baseline…\" including the plan doc itself (was untracked), `.gitignore`, `agent-protocol/`, `agent-runner/`, coverage stub, and this log.
+- Next (W1): MCP transport (Streamable HTTP + per-invocation bearer) in front of the fake, then the three real-CLI capability probes (allowed tools, exact session resume, restricted effective config, auth reuse, stream parsing) with hostile-config fixtures. No paid/model side effects in CI — scripted providers only.
+
+## W1 — Protocol and three-provider capability gate (in progress)
+
+### CP-010 (gate-pass, Codex) — Codex 0.154.0 plays the fake over the real transport, 2026-09-14
+- Transport first: `src/game-mcp-server.ts` (Streamable HTTP, stateless JSON, ephemeral 127.0.0.1, per-invocation bearer on EVERY request, Origin rejection, Host pin, 64 KiB in / 256 KiB out bounds, serial dispatch). vitest: **12/12 pass**, incl. wire-level 401/403/405/413 and exact-8-tool catalog. Two implementation traps recorded for future agents:
+  1. `transport.handleRequest()` resolves after DISPATCH, not after the response is sent — closing the McpServer in `finally` truncates every reply to an empty 200. Must await `res` finish/close first.
+  2. SDK 1.18.2 needs zod **3.25.x** (Standard Schema `~standard`); the caret range also resolves 3.23.8, whose types fail. Pinned `zod@3.25.76` to match the SDK's nested copy.
+- Harness trap (cost 3 failed model calls to find): the probe hosted the server and `spawnSync`ed codex in ONE node process — spawnSync freezes the event loop, codex TCP-connects (kernel backlog) but gets no reply → `route-aware request timed out`, zero requests server-side. RUST_LOG=hyper_util/reqwest/rmcp debug proved the connect succeeded. Rule: **always async spawn** when the server shares the process; `GAME_MCP_DEBUG=1` gates server request logs.
+- Codex PASS (probe `agent-runner/probes/codex-w1.mjs --mode=danger`, fixtures in `.agent-data/w1-probes/`, gitignored): invoke-1 called game.observe + game.act → wire receipt `{"protocolVersion":1,"actionId":"codex-probe-1","status":"applied","revision":43,...}` (plan §5.1 shape byte-for-byte), rev 42→43; invoke-2 resumed the EXACT returned thread ID (no --last) and re-observed. Effective catalog: only `game.observe`/`game.act` invoked, zero shell/web evidence; config = `--ignore-user-config` + `-c` TOML (URL, `bearer_token_env_var` NAME only, `required=true`, 8-tool `enabled_tools`, `default_tools_approval_mode="auto"`); native auth reused, no tokens in match files/prompts/logs (fixtures grepped clean — no bearer, not even the MCP URL).
+- Sandbox verdict (macOS seatbelt, all verified): read-only and workspace-write block loopback (`codex sandbox` curl → 000); `sandbox_workspace_write.network_access=true` re-allows loopback for shell, but exec-MCP **mutations are then denied at the approval layer** (`MCP tool call requires approval, but approval policy is never` — the `auto` default does not take effect there; boxed fixtures preserve this). Only `danger-full-access` runs the contract clean. Product consequence (W5): Codex shell restriction must come from enabled_tools + approval/execpolicy design, not the OS sandbox; none of that is weakened in W1.
+- Supervisor-relevant behaviors observed: codex exec does NOT exit after `turn.completed` (both runs needed SIGKILL at the 5-min timer; fixtures are complete streams ending in turn.completed) → the supervisor must kill the recorded process group after terminal evidence, and liveness must use log/event timestamps, never silence (plan §9 already says this — now empirically grounded). Token note: ~85k input tokens on the tool prompt, mostly pre-existing user skills context ("Skill descriptions were shortened…") — prompt/skill hygiene is a W5 cost item.
+- Not yet done (W1 remainder): Claude + OpenCode probes with the same harness pattern; hostile fixtures (missing-MCP startup, denied shell/file, session-ID mismatch); `W1-COMPATIBILITY.md` report; schema↔code generation tests.
+
+### CP-011 (gate-pass, Claude) — Claude 2.1.270/271 meets the contract, 2026-09-14
+- Probe `agent-runner/probes/claude-w1.mjs`: `-p --output-format stream-json --verbose` + `--restricted` + `--strict-mcp-config` + `--mcp-config <tmp>` + `--tools ""` + `--allowedTools mcp__game__*` + `--permission-mode dontAsk` + `--disable-slash-commands`. Temp MCP config (bearer VALUE inside — no env indirection exists) is 0600 under gitignored `.agent-data/`, deleted in `finally`; fixtures verified leak-free (0 bearer/URL hits).
+- Init event is the whole isolation proof in one line: `tools` = exactly the 8 `mcp__game__game_*` (no Bash/Read/Edit/WebFetch — `--tools ""` kills built-ins without killing MCP), `mcp_servers:[{game, connected}]`, `permissionMode:dontAsk`, `slash_commands:[]`, `apiKeySource:none` (subscription auth, no key material), model `claude-opus-5[1m]`. NOTE: CLI `--version` says 2.1.270 but the stream reports `claude_code_version 2.1.271` — record both; the plan's baseline (2.1.270) has drifted by a patch.
+- Invoke-1: observe + act → rev 42→43, DONE. Invoke-2 `--resume <exact-id>`: same session, observe → replied `43` (live state, not cached). Process exits 0 promptly — no linger (contrast Codex CP-010; supervisor kill policy still required for all).
+- Gotcha (1 failed model call): allowlist must use Claude's NORMALIZED names (`mcp__game__game_observe`, dots→underscores); dotted names silently deny every call under dontAsk. First attempt denied 0-server-contact calls — diagnosed from the init `tools` list, fixed, passed.
+
+### CP-012 (gate-pass, OpenCode) — OpenCode 1.18.31 meets the contract, 2026-09-14
+- Probe `agent-runner/probes/opencode-w1.mjs`: `run --format json --pure --dir <scratch>` with game-owned `opencode.json` (remote MCP, `headers.Authorization: Bearer {env:GAME_MCP_BEARER}`, **`oauth:false`** to disable OAuth auto-discovery on the local bearer endpoint, `tools: {"*":false,"game_*":true}`, `share:"disabled"`, `autoupdate:false`). Bearer via env expansion — value never in prompts/logs (fixtures: 0 hits).
+- Gotcha (0 model calls wasted): `share:"never"` is invalid — enum is `manual|auto|disabled`. Used `disabled`.
+- Invoke-1: `game_game_observe` + `game_game_act` → §5.1 receipt `applied/revision 43`, DONE. Invoke-2 `--session <exact-ses_id>`: same session, observe. Stream has only step_start/tool_use/text/step_finish events; zero non-game tool refs. Tool naming: `<server>_<tool>` with dots→underscores (`game_game_act`).
+- Isolation caveat (unresolved, W5): merge behavior with the user's GLOBAL opencode config was not adversarially tested — the game tools worked and nothing else appeared, but no hostile-global fixture (extra MCP servers, permissive tools, injected instructions) was run. Same gap exists for Codex (`-c` layering) and Claude (managed settings still apply under --restricted). Hostile-config fixtures are the explicit W1 remainder.
+
+## W2 — Core controller state and transaction foundation (in progress)
+
+### CP-013 (note) — W2 bounded increment: §4.1 minimum types + serialization tests, 2026-09-14
+- New package `core/src/com/unciv/logic/agents/` (planned location from §3.1, now real): `ControllerKind` (HUMAN/BUILTIN_AI/EXTERNAL_AGENT), `TurnPhase` (READY_TO_START/AWAITING_DECISIONS/READY_TO_END/COMPLETED), `AgentProfile` (provider as String, not enum, for forward-compat), `CivilizationController` (civ ID + kind + snapshot profile copy), `AgentMatchState` + `PendingDecision`/`GuidanceMessage`/`ActionReceipt`/`DecisionClassification`/`GuidanceState`/`AGENT_MATCH_FORMAT_VERSION=1`.
+- Deliberate omissions (not oversights): `RunBinding` stays supervisor-side (TypeScript) — plan §10.1 puts machine-local session/process bindings in separate optional recovery metadata, never in the checkpoint. Nothing is attached to `GameInfo` yet; coordinator wiring (candidate isolation, checkpoint store, turn stepper) is the next W2 increment.
+- Serialization discipline follows `Player.kt` idiom exactly (explicit no-arg ctors, concrete `ArrayList`/`HashMap`, String keys, `@Transient` for runtime-only — of which there are none yet). `deepCopy()` + `validateFormat()` included; profile snapshot-copy tested so later edits can't leak into running matches.
+- Test `tests/.../logic/agents/AgentMatchStateTest.kt`: 5 tests (roundtrip, deep-copy isolation incl. nested maps/lists, profile-snapshot semantics, explicit version rejection incl. after roundtrip, unknown-field tolerance) — **5/5 pass**. Full `:tests:test` regression after the increment: **78 suites, 853 tests, 0 failures** (848 baseline + 5 new).
+- Env note: `._` sidecars regenerated under `core/src` since the W0 cleanup (something — compiler daemon or Finder — recreates them); harmless to builds so far, still the first suspect for asset/ruleset weirdness.
+
+### CP-014 (note) — W2 coordinator: single-writer MatchCoordinator + first commands, 2026-09-14
+- New `core/.../logic/agents/MatchCoordinator.kt` (plan §3.2 rules 1–6): `@Synchronized execute`, candidate = JSON roundtrip + `setTransients()` (policy object bound before application; enforcement points come with the W4 audit), validate-on-candidate, persist-via-`CheckpointWriter` BEFORE swap, discard+pause+throw on any failure. `UpdateNotesCommand` (metadata-only, bumps notes revision, still rewrites checkpoint so generations never diverge) and `MoveUnitCommand` (ownership/visibility-safe legality, engine `moveToTile` resolves the path, receipt carries `resultJson "x,y"` so replays return the ORIGINAL result).
+- Supporting pieces: `AgentCommandError` (1:1 with protocol error codes), `AgentExecutionPolicy` (+ inert `LEGACY` preset), `AgentCommand` sealed types, `CheckpointWriter` + failing `InMemoryCheckpointWriter`, `AgentBundle` save envelope. `AgentMatchState` gained `matchPaused`/`matchPausedReason` (pause is coordinator-enforced state) and `ActionReceipt.resultJson`.
+- Idempotency scope (`actionId → receipt`) rehydrates from the active turn's receipts on construction/load — recovery keeps the same scope (plan §10.1). Duplicate-check precedes stale-check; stale carries `currentRevision`.
+- Test seam lessons: (1) `TestGame` takes an optional `baseRuleset` (default G&K, source-compatible) — agent fixtures pass Vanilla explicitly. (2) Coordinator candidates restore transients from `RulesetCache`, which knows nothing of synthetic test nations → fixtures MUST use real Vanilla nations (`ruleset.nations["Rome"]`), else `MissingNationException`. Production games always use real nations, so this is test-only.
+- Build-infra escalation (mandatory, local-only): `._` sidecars now appear inside compiled class dirs on EVERY build and Gradle cannot delete them → `GRADLE_USER_HOME/init.d/exfat-build-dir.gradle.kts` relocates all per-project build dirs to `/Users/noahkenny/.unciv-build/` (APFS). Test results now live at `.unciv-build/tests/...`; desktop dist jar will land at `.unciv-build/desktop/...`. CI (ext4) never sees the script. Standing-rule update: no more `rm -rf tests/build` needed; keep the three env vars.
+- Results: `MatchCoordinatorTest` 8/8 (commit+receipt, source-object isolation, replay/conflict, stale, persistence-failure→pause→MATCH_PAUSED, save/load live boundary incl. hot-index rehydration, notes revisions, authority/legality gates); full suite **79 suites / 861 tests / 0 failures**.
+- Explicitly NOT yet: end-turn/nextTurn effects (needs TurnManager surgery — next), pending-decision gating of moves, render-snapshot publication, file checkpoint store (ExFAT atomicity proof gate stands).
+
+### CP-015 (note) — Turn stepper, automation suppression, file store, 2026-09-14
+- `TurnManager.startTurn/endTurn` each take `suppressAutomation: Boolean = false` (default = legacy; all existing call sites untouched). Suppressed start strips inherited delegation (`automated`, Explore/Automate actions) then still runs the settings-gated block so EXPLICIT persistent orders (fortify etc.) execute; suppressed end skips settings-driven city auto-bombardment. Coordinator passes `true` for every coordinator-routed civ (Human and External alike — normal-game humans never route here).
+- `MatchCoordinator`: `beginAwaitingTurn()` (READY_TO_START → first AWAITING, victory short-circuits to COMPLETED) and `EndTurnCommand` (mandatory-decision gate → end effects → inline full turns for BUILTIN_AI/city-states/barbarians → next AWAITING or COMPLETED; defeated/spectators skipped; step cap pauses with reason instead of spinning). Start+end+rotation commit ATOMICALLY in one checkpoint — crash-retry is safe via the revision gate, which is the once-only argument (no partial phases persisted by design; `READY_TO_*` enum values retained for format stability). Round rollover bumps `turns`; ranking-history snapshots deferred to the victory pass (recordRankingStats is private — noted gap).
+- Idempotency: new turns reset the hot scope (old revisions can never match again → replays hit STALE_STATE); end-turn replay returns its receipt + the turn's awaiting civ.
+- `FileCheckpointStore` (core, headless-tested): numbered `.unciv-agent` generations + `.sha256`, temp→fsync→move publish, recovery = newest verified generation, torn/partial/unchecksummed files skipped with fallback report. Measured on the actual target: macOS ExFAT **supports ATOMIC_MOVE** (Java NIO probe, Lexar + control) — primary path holds; plain-move fallback retained. Proof gate §14.4 partially closed (interrupted-write fallback proven by tests; multi-GB scale untested).
+- `TurnLifecycleTest` 6/6, `FileCheckpointStoreTest` 5/5 (incl. live ExFAT roundtrip under `.agent-data/checkpoint-probe/`, cleaned afterwards). Full suite **80 suites / 872 tests / 0 failures**.
+- Still open in W2: pending-decision SOURCES/resolution (gate exists, queue is data-only), render snapshots, desktop-owned store path wiring.
+
+### CP-016 (note) — W4 batch 1: research/production/found/orders/combat/conquest/diplomacy, 2026-09-14
+- 16 new commands in `MatchCoordinator` (all through `runGameplayMutation` except the earlier move/endTurn): research.select (queue/free modes mirroring TechPickerScreen), city.produce (add/remove/raise/lower/gold-purchase with CreatesOneImprovement tile support), unit.found (FoundCity/FoundPuppetCity uniques, consume-unit modifiers allowed, rest rejected), unit.order (UI-gated fortify/sleep/wake/disband), unit.attack (unit + city attackers via TargetHelper/movePreparingAttack/attackOrNuke), conquest.resolve (all 5 dispositions with UI-derived legality), diplomacy.declareWar/makePeace/proposeTrade/respondTrade (recipient-perspective TradeRequest storage, revalidation on accept). 885/885 green (37 agent tests).
+- Engine fixes with desktop-identical behavior: (1) `Battle` conquest popup condition `== false` → `!= true` so headless human-rule captures raise decisions instead of auto-conquering; (2) tutorial-task persistence (`Battle.conquerCity`, `DiplomacyFunctions.meetCiv`, `Tile.doWorkerTurn`) gated on `worldScreen != null` — candidate execution must never persist global settings (this was an order-dependent full-suite-only crash via `files` lateinit).
+- Movement: use `getTileToMoveToThisTurn` (engine's own resolver), not hand-rolled staging — `getShortestPath` returns `[dest]` when in full-movement range even if unenterable, which defeats adjacent-step logic. Single-turn reach enforced; multi-turn treks re-issue per turn.
+- Fixture physics learned the hard way: war declaration teleports units out of foreign borders (place invaders on neutral tiles); garrison counters (~39) + same-turn bombardment + per-turn healing beat piecemeal attacks (focus fire + 8-warrior force); unitless/cityless civs are defeated and cannot declare war; Vanilla nation key is "Aztecs" not "Aztec"; `getShortestPath` ≠ adjacency oracle (use tile.neighbors).
+- Open W4: policies, population/economy, worker orders (improve/road/pillage), gifts, air/nukes, great people, friendship/pacts/demands/counteroffers, city-states, liberate/destroy live paths, ruins, victories, `autoAssignCityProduction` suppression audit (settings default off keeps tests hermetic; production desktops with it on need the W4 automation audit).
+
+### CP-017 (note) — W4 batch 2: civics, citizens, workers, elites, gifts, 2026-09-14
+- 8 more commands: civics.adopt (branch+member+free via isAdoptable/canAdoptPolicy), city.citizens (10 ops: work/stop/lock/unlock/specialist±/focus/manual/avoid/reassign with engine-require→ILLEGAL mapping), city.buyTile (contiguity+gold), unit.build (canBuildImprovement + startWorkingOnImprovement; multi-turn via endTurn), unit.promote (XP gates), unit.upgrade (path+requirements+gold), unit.great (hurry research/policy/wonder/building + trade mission, exact UI formulas, consume), citystate.giftGold (influence formula + receipt). 891/891 green (43 agent tests).
+- Fixture physics: civilian great people don't stack on one tile; merchants can't be placed on foreign city centers (mission from owned lands); founding auto-assigns all citizens (free one first); Vanilla has NO specialist slots (assign fenced, honestly); Farm needs flood plains on desert; CS borders claim neighbors (buy elsewhere); real CS nations required (synthetic → MissingNationException, same as majors).
+- Verification discipline change: several "green" runs were STALE up-to-date skips (including one hiding a real compile error). Rule: filtered runs always follow `:tests:cleanTest`; trust only runs whose XML set matches the current code (count math: 848 + agent tests).
+- Still open W4: friendship/pacts/demands/counteroffers, pillage/repair/roads, air/nukes, golden-age triggers, ruins, liberate/destroy live paths, full upgrade path (needs iron), five victory fixtures, unique-triggered action inventory, autoAssignCityProduction audit.
+
+### CP-020 (note) — W4 batch 3: pillage/repair, friendship, ruins, liberate, victories, 2026-09-14
+- `TilePillage` extracted logic-pure from `UnitActionsPillage` (identical formula/notifications; UI keeps a delegating wrapper): `unit.pillage` (gates + loot + heal + destroy-when-pillaged) and `unit.repair` (full repair-gate matrix incl. enemy-territory and outside-borders fences) with fixtures.
+- `diplomacy.friendship` (once-only flag semantics), open-borders Agreement offers through the trade flow, ruins auto-rewards through movement (seeded-deterministic; no command needed — verified consumption + material change across 3 tiles), live LIBERATE with resurrection, live DOMINATION and TIME stops.
+- Challenger DESTROY removed as dead API: the engine destroys on capture before any popup (Battle.kt:707), so the disposition is unreachable — kept the enum to annex/puppet/raze/liberate.
+- Fixture physics: TestGame leaves `victoryTypes` EMPTY (production fills it) — victory fixtures must set it; `toPercent()` is `1+x/100`, not `x/100` (fixed a latent trade-mission math bug); transcribe UI code mechanically (`val` vs `var` cost a cycle); distrust fast up-to-date builds (ExFAT timestamps) — `:cleanTest` before trusting green.
+- Full suite **907/907** (59 agent tests). Remaining W4: pacts/demands/counteroffers, roads, air/nukes, golden-age triggers, science/culture/diplomatic victory fixtures, unique-triggered inventory, autoAssign audit.
+
+### CP-021 (note) — Supervisor turn loop with scripted end-to-end, 2026-09-14
+- `IGameService` seam extracted (fake implements it; desktop will bridge the real coordinator over stdio later). `provider-events.ts` normalizes all three recorded W1 streams (session/tool/final/usage/cost/advertised-tools; malformed lines dropped, never fatal). `provider-spawn.ts` encodes the W1-proven argv/config for each CLI. `Supervisor.runLeaderTurn` (fresh bearer per invocation, prompt assembly, tool-cap guard with kill, timeout, engine-governed outcome: `turnEnded` decides completed vs incomplete/failed).
+- `probes/scripted-provider.mjs` (real MCP client, deterministic observe→act→end) + `test/supervisor-loop.test.ts`: full loop completes (rev 44), exact-ID resume echoes, runaway looper guard-pauses with nothing committed. 28/28 runner tests.
+- Two traps: (1) the bearer must reach argv builders as a VALUE (signature carries it; env-only passing strands temp-config CLIs); (2) outcome classification must read ENGINE state, not provider prose.
+
+### CP-022 (gate-pass + bugfix) — Match runner loop; round-rollover wrap fix, 2026-09-14
+- `AgentMatchRunner` (core, desktop owns instances later): `runTurn` (one civ through its end checkpoint), `runRounds` (N full rounds by game-turn counter), `AgentPolicy` fun-interface with `PassPolicy` + quiet-policy incomplete-turn semantics. `AgentMatchRunnerTest` drives a REAL GameStarter Tiny Vanilla game (external Rome + human Greece): 2 rounds rotate Rome/Greece/Rome/Greece with receipts, human handoff takes a settler order through the same path, quiet policy leaves AWAITING with moves retained.
+- WRAP BUG (found by the runner's exact accounting, invisible to all earlier tests): rotation counted landing on index 0 from the virtual pre-start position as a round rollover, doubling the turn counter (trace: every endTurn wrapped). Fixed by crossing-detection (`index <= previous && previous >= 0`); single-civ wrap and pre-start placement verified by the trace. Lesson: turn-counter assertions need exact multi-round traces, not single-wrap checks.
+- Full suite **910/910** (62 agent tests).
+
+### CP-024 (problem) — Phantom green: up-to-date skips hide new tests, 2026-09-14
+- `AgentRunControlsTest` shipped with a failing assertion (`"Revoke"` vs `"revoke"`) and NO full-suite run ever executed it: `:tests:test` reported UP-TO-DATE while its XML was absent, and totals math silently agreed. Caught only when a later change forced re-execution.
+- Standing rule, hardened: after adding or touching ANY test, run `:tests:cleanTest :tests:test` (filtered or full) and then VERIFY the new XML exists with the expected test count — never trust totals alone. Count math (`848 + agent tests`) is necessary but not sufficient; per-file presence is required.
+
+### CP-023 (note) — Supervisor daemon over stdio + async engine seam, 2026-09-14
+- `engine-protocol.ts`: versioned JSONL stdio (stdout = engine requests + turn events, stdin = responses + run_turn/shutdown, stderr = logs only; EOF = graceful drain). `StdioEngineBackend` implements `IGameService` with correlation IDs, timeouts, and disconnect rejection.
+- `IGameService` is now fully async (stdio cannot be sync). Fake + MCP transport + supervisor + all tests migrated; `readNotes` added, `turnEnded` rides on observe results, outcomes read post-run engine state. Lesson: mechanical `async` migrations still need a clean `tsc` + full vitest pass — two tests silently compared Promises until fixed.
+- `daemon.ts`: per-match process, per-invocation MCP, all three real providers + scripted wired with correct bearer transports (codex env, claude/opencode temp configs), second-turn concurrency rejected, shutdown/EOF drains. `daemon.test.ts` plays the desktop side (answers RPCs from the fake, sends scripted run_turn): session_bound + completed_turn with rev 44 through the wire. 34/34 runner tests.
+- Remaining integration: desktop Kotlin side (spawn daemon, answer engine RPCs from MatchCoordinator, file checkpoints, run-state UI) and the human-command interception audit.
+
+### CP-027 (note) — Great-person golden age; production automation suppression for agent civs, 2026-09-14
+- GOLDEN_AGE added to `GreatPersonAction` (research/policy/wonder/building/mission/golden_age): coordinator consumes the unit and calls `civ.goldenAges.enterGoldenAge(turns)` resolved from `OneTimeEnterGoldenAgeTurns` (fallback `OneTimeEnterGoldenAge`) uniques. Observation lists it only when a golden-age unique is present (checked both unique types).
+- **Found a real leak while testing**: the human-civ `autoAssignCityProduction` setting auto-filled agent queues. End-turn suppression (CP-024 era) was NOT enough — two hidden unsuppressed paths existed:
+  1. `GameInfo.setTransients()` post-deserialize enrichment auto-chooses when a queue is empty (fires on EVERY coordinator candidate clone — this was the "Monument appears from nowhere" source).
+  2. `constructIfEnough()` re-runs automation for PerpetualConstruction (Idle) every startTurn.
+- Fix pattern: a defaulted `suppressAutomation: Boolean = false` threaded `TurnManager.startTurn/endTurn → CityTurnManager → CityConstructions.endTurn/validateConstructionQueue/chooseNextConstruction/constructIfEnough/purchaseConstruction`; `Civilization.addCity` gained the flag (agent city founding stays empty). For deserialize-time restoration, GameInfo gained a `@Transient suppressAutomationDuringTransients` flag set by `MatchCoordinator.deserializeGame` and reset at setTransients end — candidate restoration can never auto-fill. AI/puppet behavior unchanged (they ignore the flag); global settings remain human-only.
+- Purchase discipline note: agent `city.buy` now passes `automatic = false` so a purchase that empties the queue leaves it idle for an explicit next choice.
+- Tests: DomesticOrdersTest golden-age flow (unit consumed, `isGoldenAge` committed-state read added to coordinator) and auto-production suppression with the setting explicitly ON (fails on legacy behavior). Full suite **923/923** (75 agent tests, 18 agent suites), per-file XMLs presence-verified after `:tests:cleanTest`.
+- Coverage table: great people → done for Vanilla specials; civilian roads proven live (partial narrowed to unit gifts).
+
+### CP-034 (gate-pass) — Orchestration loop suite, popup/trade routing closure, package reconciliation, 2026-09-15
+- **AgentOrchestrationLoopTest green (8/8, stable over 3 runs)**: the file
+  existed but referenced a run-control API that did not (`supervisorFactory`
+  with no args, `coordinator.getMatchState()`). Closed by (a) changing
+  `DesktopAgentMatch.supervisorFactory` to `(() -> SupervisorRunner)?`
+  (production passes none; tests inject the scripted runner — the existing
+  observers `getRunState/getActiveCivId/getFailureReason/canPause/canResume/
+  canRetry/startAutomaticPlay/resume/retry` needed no changes), (b) a narrow
+  documented seam `MatchCoordinator.forcePhaseForTest`, (c)
+  `testImplementation(project(":desktop"))` in tests, (d) an `onTurnCompleted`
+  hook on the fake (two failures were start-vs-completion races in the test,
+  not the loop), (e) gating one pause behind turn-start to remove a
+  startAutomaticPlay/pause race. Suite covers: sequential rotation, the
+  single-invocation invariant, pause-drain, resume without duplicates,
+  failure→retry, human handoff resuming the loop, completion→FINISHED.
+- **Routing closure**: conquest popup options (annex/puppet/raze/liberate via
+  `ResolveConquestCommand` with `conquest:<cityId>`; destroy branch unreachable
+  in agent matches since Battle auto-destroys), friendship offer accept/decline
+  (`RespondFriendshipOfferCommand`), denouncement retaliation
+  (`DeclareWarCommand`), protector-alert answers
+  (`RespondProtectorAlertCommand` with allied/protected war type; break-pledge
+  forces withdrawal with legacy notification), vote picker (`CastVoteCommand`),
+  trade-screen propose/retract (`ProposeTradeCommand` from staged offers +
+  new `RetractTradeCommand`), demands-table buttons (`DemandCommand`),
+  MoveAutomatedUnits banner disabled with a session (automation belongs to
+  turn processing). `executeResolveConquest` now clears the CityConquered
+  alert (AlertPopup.close parity). Marriage auto-puppets — no decision gap.
+- **Lessons**: non-local `return@enclosingFun` is illegal inside button
+  lambdas — route-first must be `val routed` + `if (!routed)`; automation
+  invokes UI lambdas headlessly (null-safe worldScreen lookups only).
+- **Regression tests**: retract / protector-alert (side-with modifier on the
+  attacker's view, break-pledge removal, no-pledge fence) / friendship-offer
+  (sign + decline-flag) — ActionCompletionAndRecoveryTest now 19.
+- **Package reconciliation**: `:desktop:macApp` rebuilt from current sources;
+  `native/Unciv.app` artifact-inspected (com.unciv.app, native launcher,
+  private jlink runtime, 57 MB jar with the new code, daemon.js,
+  node_modules, node v24.13.1; discovery paths align on `Contents/app`).
+  `~/.unciv-build/desktop/Unciv.app` (Resources layout) is a STALE 00:54
+  manual assembly built by no committed task, with an older jar and no
+  bundled Node — superseded; manual phase must use the jpackage bundle.
+- Full suite **975/975** (100 suites; 23 agent suites), agent-runner 34/34,
+  `./gradlew check` green, `agentPackage` + `macApp` green.
+
+### CP-033 (gate-pass) — Complete human mutation routing closure and macOS .app bundle packaging, 2026-09-15
+- **Complete human mutation routing**:
+  - Secondary unit orders routed via `UnitOrderCommand`: `EXPLORE`, `STOP_EXPLORATION`, `AUTOMATE`, `STOP_AUTOMATION`, `GUARD`, `SET_UP`, `AIR_SWEEP`, `ESCORT_FORMATION`, `STOP_ESCORT_FORMATION`.
+  - Movement stop/wake routed: `UnitActionType.StopMovement` mapped to `UnitOrder.WAKE`.
+  - Unit gifts routed via `GiftUnitCommand`: enforces recipient territory, military/unique filter for city-states with influence gain, and friendly territory for major civs.
+  - Map actions routed: `OverlayButtonData.connectRoadToTargetTile` via `ConnectRoadCommand`; `WorldMapHolder.swapMoveUnitToTargetTile` via `SwapUnitsCommand`; `UnitRenamePopup` via `RenameUnitCommand`.
+  - City-state diplomacy routed: `CityStateDiplomacyTable` tribute demands (gold/worker) via `TributeCommand`; protection pledge/revoke via `ProtectionCommand` (enforcing 10-turn pledge and 20-turn revoke cooldowns and influence gates); Austrian diplomatic marriage via `DiplomaticMarriageCommand`.
+  - Non-agent safety preserved: all route calls pass through `WorldScreen.routeThroughAgentSession` which evaluates false in normal matches, keeping ordinary engine callbacks unchanged.
+  - Presentation vs out-of-scope clarified: `MultiplayerStatusButton` is presentation-only preview loading; Spectator Mode disables state mutations (`canChangeState == false`); `UnitActionType.Transform` is a mod-only unique.
+- **macOS application bundle (.app) packaging**:
+  - Gradle task `:desktop:macApp` creates a double-clickable `Unciv.app` bundle in `~/.unciv-build/desktop/Unciv.app`.
+  - Layout: `Contents/MacOS/Unciv` (executable POSIX launcher discovering Java 17+ across `JAVA_HOME`, `/opt/homebrew`, `/Library/Java/JavaVirtualMachines`, `/usr/libexec/java_home`, and PATH, with AppleScript alert fallback), `Contents/Info.plist`, `Contents/Resources/Unciv.icns` (multi-resolution macOS icon), `Contents/Resources/Unciv.jar`, `Contents/Resources/agent-runner/dist/`, and `Contents/Resources/agent-runner/node_modules/`.
+  - Bundled Node support: `-Dunciv.node.home=<dir>` bundles Node into `Contents/Resources/node/`; `DesktopAgentMatch.kt` runtime discovery checks `../Resources/node` and `../Resources/agent-runner/dist` from the binary location.
+- **Automated verification**:
+  - Agent-runner vitest: 7 test files, 34/34 passing. TypeScript build clean.
+  - Core + Tests suite: 97 test XML files, 957 tests, 0 failures, 0 errors, 15 skipped.
+  - Package builds verified: `:desktop:agentPackage` and `:desktop:macApp` assemble valid artifacts.
+
+### CP-032 (note) — Secondary funnel routing, goto persistence, package assembly, 2026-09-14
+- **All five secondary funnels routed** (§3.2): promotions (whole path — one `PromoteUnitCommand` per step), upgrades (button, upgrade menu, and upgrade-all), disband confirm (`UnitOrderCommand` DISBAND), pillage confirm (`PillageCommand`), improvement build/cancel-order/queued-second (`BuildImprovementCommand`/new `StopImprovementCommand`), repair (`RepairCommand`), city sell (`city.produce SELL`), annex (`new AnnexCityCommand`) and raze/stop-raze (`new SetRazingCommand`), queue move-to-top (`new ProductionOp.MOVE_TOP`), and city-state gold gifts (`GiftGoldToCityStateCommand`). Every confirm-popup cancellation routes nothing; guards only activate with a session.
+- **Lesson**: engine WorkerAutomation invokes UI repair lambdas headlessly — the routed lambda must use a null-safe `UncivGame.Current.worldScreen` lookup, not `GUI.getWorldScreen()` (caught by WorkerAutomationTest NPE regression).
+- **Multi-turn goto clarified + implemented**: humans persist destinations via the engine's `unit.action = "moveTo x,y"` (MapUnitView.trySetMoveToAction), resumed by the turn processor every turn. MoveUnitCommand now mirrors this: if the destination is unreached after staging, the command sets the same persistent action (test: warrior staged over a 4-tile goal → isMoving true).
+- **Packaging clarified + implemented**: `:desktop:dist` jar contains NO runner/Node (inspected: zero matches). New `:desktop:agentPackage` task assembles Unciv.jar + agent-runner/dist + agent-runner/node_modules + bundled node (via -Dunciv.node.home). Built package artifact-inspected (all four parts present) and the packaged node+daemon launched from a SPACED path emitting protocol `ready`. A .app bundle is NOT assembled (manual phase).
+- Upgrade fixture lessons: Swordsman needs Iron Working (not Bronze) AND a Mine on the iron tile — strategic resources count only with an extraction improvement (Tile.providesResources); getEquivalentUnit makes Rome upgrade to Legion.
+- Full suite **953/953** (97 suites; ActionCompletionAndRecoveryTest 12, per-file XMLs verified), agent-runner 34/34, agentPackage green.
+
+### CP-031 (note) — Human-through-coordinator routing, snapshot publication, action-coverage completion, 2026-09-14
+- **Human actions now route through the coordinator** (§3.2): `AgentMatchSession.executeHumanAction` + core `HumanCommandExecutor` (revision stamping per command, HUMAN-controller verification, batch all-or-nothing) + `WorldScreen.routeThroughAgentSession` (worker-thread dispatch, GL-thread toasts). Wired funnels: unit orders (fortify/sleep/paradrop via activateAction), movement + multi-unit moves (moveUnitToTargetTile), right-click attacks, city queue/citizens/buy-tile/rename (CityView try-methods — the whole city screen funnels through them), gold purchases (BuyButtonFactory), research (TechPicker tryExit), policies (branch + member), declare war, denounce, friendship, trade-popup accept/decline, demand answers (AlertPopup). Ordinary games: guards return false with zero side effects.
+- **Snapshot publication** (§9): `MatchCoordinator.serializeCommittedGameForPublication` → host serializes/deserializes OFF the GL thread → `WorldScreen.installAgentSnapshot` on the GL thread: swaps gameInfo/viewingCiv/selectedGameView (now vars), rebinds map (WorldMapHolder.tileMap var + tileGroups.clear() fixing stale TileView keys), re-resolves selections by stable unit/city/tile ID — removed entities clear instead of holding orphans (headless tests in HumanRoutingAndPublicationTest).
+- **Coverage completion**: PARADROP order + move-jump (paradrop uniques must be evaluated with the unit's tile bound — cache state lacks tile during restoration; validated in-command), rebase via standard move (proven), `diplomacy.denounce`, `city.produce SELL` (UI-parity gates), `city.rename`, `diplomacy.castVote` + MANDATORY `diplomatic-vote` decision at beginTurn (gated on the TurnsTillNextDiplomaticVote flag EXISTING — an absent flag reads as 0 and must not imply a due vote), war-declaration trades (offerer commits to the war on acceptance — engine semantics). Unit gifts to major civs: genuinely inapplicable (Unciv gifts units only to city-states; no TradeOffer type) — documented.
+- **Recovery**: checkpoint reload replays same-id receipts without re-executing, conflicting payloads rejected, controllers/profiles survive. Engine hardening: proposeTrade NPEs on unmet-civ lookups now surface as clean ILLEGAL_ACTION rejections.
+- **Discovery/packaging**: Node discovery order = explicit property → bundled `node/` beside the app → PATH, with errors naming every searched location; daemon launch from a spaced install path proven by test (dist + node_modules must ship together — plain ESM resolution).
+- **Docs**: acceptance §13.3 corrected (smoke ≠ completed match; three-provider needs ≥3 major civs) + docs/manual-test-checklist.md for the human phase. Full suite **948/948** (97 suites), agent-runner 34/34, `:desktop:dist` green.
+
+### CP-030 (gate-pass) — W4 completion, mutation-audit gating, W7 evidence, 2026-09-14
+- **Demands implemented end to end**: `diplomacy.demand` (mirrors the MajorCivDiplomacyTable button: places the demand alert on the target with full fences — contact, defeated, show(), already-agreed via the DEMANDER's manager — the flag lives on rome's view of greece after `agreeToDemand`, learned the hard way) and `diplomacy.respondDemand` (agree/refuse exactly as AlertPopup does, consumes the alert, clears its decision). Received demands raise MANDATORY `demand-response` decisions at beginTurn for commandable civs — inspector path, never a modal (plan §11.2). Built-in AI answers via its own automation, unchanged.
+- **Pacts proven through the trade path** (no new commands needed): defensive pact via mutual `Treaty` offers (Vanilla gates on Chivalry = Enables Defensive Pacts); counteroffer = decline + richer re-propose (DiplomacyTradeTest). Research agreements are G&K-only — not in Vanilla, documented.
+- **Air/nukes live through the standard attack command**: `getAttackableEnemies` already handles air (strike from base), `attackOrNuke` routes nukes. Fixtures needed city-basing (air units cannot sit on open ground — `NoAirUnitTransport`) and `nuclearWeaponsEnabled = true`. Engine behavior captured honestly: a missile without uranium stockpile HALVES blast damage (ground zero 100→50) — the nuke test asserts the gutted-survivor outcome instead of a kill.
+- **All five victories now have live fixtures** (EndgameDynamicsTest, prepared states + real end-turn evaluation): domination and time (existing) joined by scientific (Apollo + all parts in capital), cultural (5 branches + Utopia Project), diplomatic (UN + won vote). Diplomatic needed Greece kept ALIVE — a cityless Greece is eliminated and domination (earlier in the victory list) fires first.
+- **Mutation audit closed to GATED or better** (docs/agent-mutation-audit.md rewritten): the popup block (AlertPopup/TradePopup/GreatPerson picker) now requires `isPlayersTurn && canChangeState` — closing the human-answers-agent's-decision leak; AutoPlay menu/direct/hotkey gated by `canChangeState`; DevConsole forbidden in agent matches; DebugTab cheat/simulation/god-mode controls hidden with a session. Diplomacy screen inherits the gate via `isNotPlayersTurn() = !GUI.isAllowedChangeState()`.
+- **W7 evidence recorded** (docs/agent-acceptance.md): `:tests:test` **932/932**, `:desktop:dist` jar in `~/.unciv-build/desktop/libs/` (the repo `desktop/build/libs` jar is a stale W0 artifact — relocated builds land in the .unciv-build tree), `./gradlew check` green, agent-runner typecheck/34 tests/build green. §13.2 matrix mapped to test names; §13.3 real-provider matches left as a deliberate human checklist.
+- Full suite **932/932** (+9: 3 diplomacy, 1 lifecycle, 3 victories, 2 combat).
+
+### CP-026 (note) — Desktop host, session seam, mutation audit, 2026-09-14
+- Core `AgentMatchSession` interface + `AgentMatchSessionFactory` (desktop injects the creator; null elsewhere). WorldScreen holds the session: `nextTurn()` routes to it, `canChangeState` gates on it (one line that degrades every compliant UI surface to read-only during agent turns), `NextTurnAction.AgentMatch` carries the status text. NewGameScreen attaches post-validation (validated setups only; failures logged, session stays null).
+- `desktop/.../agents/DesktopAgentMatch` (compile-verified via forced recompile): coordinator + file store under `--data-dir`/.agent-data, run-state machine, guidance queue, session/epoch tracking, node/dist discovery (system props → PATH/sibling/dev fallbacks with actionable errors), supervisor process mgmt with read-only liveness, engine-RPC dispatch under one lock, GL-thread UI refresh. `SupervisorProcess` handles framing (shared AgentJson), inline engine answers, session-bound tracking, graceful shutdown vs kill.
+- `AgentJson` extracted to core (single framing implementation for tests + desktop + bridge; `toJsonMap` delegates). `DaemonLoopTest` now speaks it too.
+- `docs/agent-mutation-audit.md`: every human mutation path enumerated with file refs; only end-turn + canChangeState routed, everything else honestly OPEN with the routing pattern specified. Full interception is the next package, not a hidden gap.
+- Verification honesty: desktop/ has no test sourceSet, so the host is compile-verified + logic-tested via core twins (bridge/daemon tests); interactive paths need manual runs (W7). Full suite **921/921** (73 agent tests, 18 suites presence-verified).
+
+### CP-025 (gate-pass) — Desktop-side loop through the real daemon, 2026-09-14
+- `DaemonLoopTest` (tests/): spawns the built supervisor daemon, answers engine RPCs from a REAL MatchCoordinator via AgentEngineBridge, drives a scripted observe→act→end_turn: completed_turn, rev 0→3, clean exit 0. Engine-call census per turn: 3 observes + 1 notes_get + 1 act + 1 end_turn.
+- Protocol rule established: identity (`actorCivId`) rides at the ENVELOPE level, never in command args (bridge read it from the wrong level; the daemon test caught it because the TS stub bypassed the bridge).
+- Revision accounting: one atomic end-turn commits TWO receipts (end + next begin), so rev advances by 2 per turn (act +1). Replay/duplicate logic keys on receipts, not on +1 steps — verified in the census.
+- `turnEnded` is a sticky latch and LIES after the first turn: completion now keys on a monotonic `endTurnsCommitted` counter (match state + observe DTO + fake + supervisor). Added `endTurnsCommitted` to AgentMatchState/ObservationDto/FakeGameService with the same commit discipline.
+- Full suite **919/919** (71 agent tests across 17 suites, presence-verified).
+
+### CP-018 (note) — Observation/visibility layer (game.observe/legal_actions/rules), 2026-09-14
+- New `AgentObservation.kt`: committed-state-only builders with a documented field policy — full own empire (cities+queues, units+movement, research, policies, gold, notifications as recent events); foreign units via engine `isVisibleTo` with movement/orders zeroed (readiness must not leak); foreign cities on viewable tiles with identity/health/pop only (never queues); explored-unseen/remembered state omitted (TileHistory follow-up); movement targets adjacent-enterable only (no destination oracle); attacks reuse the UI-arrow enumeration; researchable/constructions/promotions/upgrade/found/orders gated per entity.
+- Coordinator `observe/legalActions/rules` are pure reads (no phase requirement, no candidates, no mutation).
+- Fixture lessons: `setTransients` anchors empty currentPlayer to the first human (isMyTurn true — my first assertion was wrong, not the engine); Vanilla scouts are military recon (fortify, not sleep); sight range 2 needs two march rounds to reveal at distance 4.
+- Full suite **894/894** (46 agent tests). Remaining §5: explored-but-unseen remembered state, movement-preview leakage tests, differential visibility tests (two states differing only in hidden info), paged/bounded large-observation tests.
+
+### CP-019 (note) — Setup slice: slot tri-state, profiles, start gate, 2026-09-14
+- `AgentSlotLogic` (pure, headless-tested): AI→Human→Agent cycling, Human rule parity for agent slots, profile lifecycle incl. removal/trim cleanup, duplicate/non-fixed fences, snapshot assembly. `PlayerPickerTable` delegates (button shows "Agent", spectator/random-AI locks preserved, popup opens on becoming Agent); `AgentProfilePopup` edits name/provider/model/reasoning/personality with revision bumps; `NewGameScreen.getErrorMessage` appends setup validation.
+- `AgentMatchSetup.validate` pins Vanilla, espionage/mods/random-count locks, per-slot provider/model/name. `buildMatchState` binds by resolved NATION NAME (immune to spectator-first reordering and random resolution) with snapshot profiles; verified against a real GameStarter Tiny Vanilla game into a running coordinator (begin → Rome awaiting).
+- Key consequence: agent slots stay Human-typed, so the existing "No human players" gate admits all-agent matches unchanged — no gate fork required.
+- Full suite **901/901** (53 agent tests). Open desktop: espionage/mods/random LOCKS in the options UI (validation-only v1), headless widget test (GdxTestRunner) for the table/popup wiring, WorldScreen status + run controls, supervisor daemon + provider loop, save-as-agent-match conversion.

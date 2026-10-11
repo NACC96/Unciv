@@ -1,0 +1,10 @@
+{"type":"thread.started","thread_id":"01a0a236-1cb4-76c1-85dd-83c9aa126c16"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"error","message":"Exceeded skills context budget. All skill descriptions were removed and 27 additional skills were not included in the model-visible skills list."}}
+{"type":"item.completed","item":{"id":"item_1","type":"agent_message","text":"I’ll call the game tools in the order you specified.\n"}}
+{"type":"item.started","item":{"id":"item_2","type":"mcp_tool_call","server":"game","tool":"game.observe","arguments":{},"result":null,"error":null,"status":"in_progress"}}
+{"type":"item.completed","item":{"id":"item_2","type":"mcp_tool_call","server":"game","tool":"game.observe","arguments":{},"result":{"content":[{"type":"text","text":"{\"revision\":42,\"activeTurn\":true,\"requiredDecisions\":[],\"recentEvents\":[\"rev-42-committed\"]}"}],"structured_content":null},"error":null,"status":"completed"}}
+{"type":"item.started","item":{"id":"item_3","type":"mcp_tool_call","server":"game","tool":"game.act","arguments":{"actionId":"codex-probe-1","expectedRevision":42,"type":"unit.move","args":{"unitId":17,"destination":{"x":2,"y":-1}}},"result":null,"error":null,"status":"in_progress"}}
+{"type":"item.completed","item":{"id":"item_3","type":"mcp_tool_call","server":"game","tool":"game.act","arguments":{"actionId":"codex-probe-1","expectedRevision":42,"type":"unit.move","args":{"unitId":17,"destination":{"x":2,"y":-1}}},"result":{"content":[{"type":"text","text":"{\"protocolVersion\":1,\"actionId\":\"codex-probe-1\",\"status\":\"applied\",\"revision\":43,\"result\":{\"unitId\":17,\"position\":{\"x\":2,\"y\":-1}},\"pendingDecisions\":[]}"}],"structured_content":null},"error":null,"status":"completed"}}
+{"type":"item.completed","item":{"id":"item_4","type":"agent_message","text":"DONE"}}
+{"type":"turn.completed","usage":{"input_tokens":91438,"cached_input_tokens":79744,"cache_write_input_tokens":0,"output_tokens":154,"reasoning_output_tokens":0}}

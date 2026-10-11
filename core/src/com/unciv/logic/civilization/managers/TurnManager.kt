@@ -13,6 +13,7 @@ import com.unciv.logic.trade.TradeEvaluation
 import com.unciv.models.ruleset.unique.UniqueTriggerActivation
 import com.unciv.models.ruleset.unique.UniqueType
 import com.unciv.models.ruleset.unique.endTurn
+import com.unciv.models.UnitActionType
 import com.unciv.models.stats.Stats
 import com.unciv.ui.components.MayaCalendar
 import com.unciv.ui.screens.worldscreen.status.NextTurnProgress
@@ -24,7 +25,7 @@ import com.unciv.logic.automation.Timers.Companion.timeThis
 class TurnManager(val civInfo: Civilization) {
 
 
-    fun startTurn(progressBar: NextTurnProgress? = null):Unit = timeThis("TurnManager.startTurn") {
+    fun startTurn(progressBar: NextTurnProgress? = null, suppressAutomation: Boolean = false):Unit = timeThis("TurnManager.startTurn") {
         if (civInfo.isSpectator()) return
 
         for (city in civInfo.cities) city.hasSoldBuildingThisTurn = false
@@ -70,11 +71,23 @@ class TurnManager(val civInfo: Civilization) {
 
         for (city in civInfo.cities) {
             progressBar?.increment()
-            CityTurnManager(city).startTurn()  // Most expensive part of startTurn
+            CityTurnManager(city).startTurn(suppressAutomation)  // Most expensive part of startTurn
         }
 
         for (unit in civInfo.units.getCivUnits()) UnitTurnManager(unit).startTurn()
 
+        if (suppressAutomation) {
+            // Agent-controlled civilizations issue explicit orders through the
+            // match coordinator. Inherited strategic delegation (worker
+            // automation, exploration) must not move their units; explicit
+            // persistent orders (fortify, sleep, chosen builds) are kept and
+            // execute below through the ordinary settings-gated block.
+            for (unit in civInfo.units.getCivUnits())
+                if (unit.isAutomated() || unit.isExploring() || unit.action == UnitActionType.Automate.value) {
+                    unit.automated = false
+                    unit.action = null
+                }
+        }
         if (civInfo.playerType == PlayerType.Human && UncivGame.Current.settings.automatedUnitsMoveOnTurnStart) {
             civInfo.hasMovedAutomatedUnits = true
             for (unit in civInfo.units.getCivUnits())
@@ -251,8 +264,8 @@ class TurnManager(val civInfo: Civilization) {
             * civInfo.gameInfo.speed.modifier.coerceAtLeast(1f)).toInt()
 
 
-    fun endTurn(progressBar: NextTurnProgress? = null):Unit = timeThis("TurnManager.endTurn") {
-        if (UncivGame.Current.settings.citiesAutoBombardAtEndOfTurn)
+    fun endTurn(progressBar: NextTurnProgress? = null, suppressAutomation: Boolean = false):Unit = timeThis("TurnManager.endTurn") {
+        if (!suppressAutomation && UncivGame.Current.settings.citiesAutoBombardAtEndOfTurn)
             NextTurnAutomation.automateCityBombardment(civInfo) // Bombard with all cities that haven't, maybe you missed one
 
         for (unique in civInfo.getTriggeredUniques(UniqueType.TriggerUponTurnEnd, civInfo.state, ignoreCities = true))
@@ -332,7 +345,7 @@ class TurnManager(val civInfo: Civilization) {
         // a city can be removed while iterating (if it's being razed) so we need to iterate over a copy - sorting does one
         for (city in civInfo.cities.sortedByDescending { it.isBeingRazed }) {
             progressBar?.increment()
-            CityTurnManager(city).endTurn()
+            CityTurnManager(city).endTurn(suppressAutomation)
         }
 
         civInfo.temporaryUniques.endTurn()

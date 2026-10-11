@@ -319,15 +319,15 @@ class CityConstructions : IsPartOfGameInfoSerialization {
         inProgressConstructions[constructionName] = inProgressConstructions[constructionName]!! + productionToAdd
     }
 
-    fun constructIfEnough():Unit = timeThis("constructIfEnough") {
-        validateConstructionQueue()
+    fun constructIfEnough(suppressAutomation: Boolean = false):Unit = timeThis("constructIfEnough") {
+        validateConstructionQueue(suppressAutomation)
 
         // Update InProgressConstructions for any available refunds
         validateInProgressConstructions()
 
         val constructionName = currentConstructionName()
         val construction = getConstruction(constructionName)
-        if (construction is PerpetualConstruction) chooseNextConstruction() // check every turn if we could be doing something better, because this doesn't end by itself
+        if (construction is PerpetualConstruction) chooseNextConstruction(suppressAutomation) // check every turn if we could be doing something better, because this doesn't end by itself
         else {
             val productionCost = (construction as INonPerpetualConstruction).getProductionCost(city.civ, city)
             if (inProgressConstructions.containsKey(constructionName)
@@ -348,8 +348,8 @@ class CityConstructions : IsPartOfGameInfoSerialization {
         }
     }
 
-    fun endTurn(cityStats: Stats) {
-        validateConstructionQueue()
+    fun endTurn(cityStats: Stats, suppressAutomation: Boolean = false) {
+        validateConstructionQueue(suppressAutomation)
         validateInProgressConstructions()
 
         if (getConstruction( currentConstructionName()) !is PerpetualConstruction) {
@@ -362,7 +362,7 @@ class CityConstructions : IsPartOfGameInfoSerialization {
     }
 
 
-    private fun validateConstructionQueue() {
+    private fun validateConstructionQueue(suppressAutomation: Boolean = false) {
         val queueSnapshot = constructionQueue.toMutableList()
         constructionQueue.clear()
 
@@ -386,7 +386,7 @@ class CityConstructions : IsPartOfGameInfoSerialization {
             else if (construction is Building)
                 removeImprovementForBuilding(construction)
         }
-        chooseNextConstruction()
+        chooseNextConstruction(suppressAutomation)
         validateCreatesOneImprovementMarkers()
     }
 
@@ -709,10 +709,11 @@ class CityConstructions : IsPartOfGameInfoSerialization {
         queuePosition: Int,
         automatic: Boolean,
         stat: Stat = Stat.Gold,
-        tile: Tile? = null
+        tile: Tile? = null,
+        suppressAutomation: Boolean = false
     ): Boolean {
         val construction = getConstruction(constructionName) as? INonPerpetualConstruction ?: return false
-        return purchaseConstruction(construction, queuePosition, automatic, stat, tile)
+        return purchaseConstruction(construction, queuePosition, automatic, stat, tile, suppressAutomation)
     }
 
     /**
@@ -735,7 +736,8 @@ class CityConstructions : IsPartOfGameInfoSerialization {
         queuePosition: Int,
         automatic: Boolean,
         stat: Stat = Stat.Gold,
-        tile: Tile? = null
+        tile: Tile? = null,
+        suppressAutomation: Boolean = false
     ): Boolean {
         // Support UniqueType.CreatesOneImprovement: it is active when getImprovementToCreate returns an improvement
         val improvementToPlace = (construction as? Building)?.getImprovementToCreate(city.getRuleset(), city.civ)
@@ -787,10 +789,10 @@ class CityConstructions : IsPartOfGameInfoSerialization {
 
         if (queuePosition in 0 until constructionQueue.size)
             removeFromQueue(queuePosition, automatic)
-        validateConstructionQueue()
+        validateConstructionQueue(suppressAutomation)
 
         // A purchase should never leave the city idle if we invalidated or emptied the queue
-        if (isQueueEmptyOrIdle()) chooseNextConstruction()
+        if (isQueueEmptyOrIdle()) chooseNextConstruction(suppressAutomation)
 
         return true
     }
@@ -823,7 +825,7 @@ class CityConstructions : IsPartOfGameInfoSerialization {
 
     private fun removeCurrentConstruction() = removeFromQueue(0, true)
 
-    fun chooseNextConstruction():Unit = timeThis("chooseNextConstruction") {
+    fun chooseNextConstruction(suppressAutomation: Boolean = false):Unit = timeThis("chooseNextConstruction") {
         if (!isQueueEmptyOrIdle()) {
             // If the USER set a perpetual construction, then keep it!
             if (getConstruction( currentConstructionName()) !is PerpetualConstruction || currentConstructionIsUserSet) return
@@ -831,9 +833,13 @@ class CityConstructions : IsPartOfGameInfoSerialization {
 
         val isCurrentPlayersTurn = city.civ.gameInfo.isUsersTurn()
                 || !city.civ.gameInfo.gameParameters.isOnlineMultiplayer
-        if ((isCurrentPlayersTurn && (UncivGame.Current.settings.autoAssignCityProduction
+        // Suppressed for agent-controlled civilizations even when the local
+        // user enabled auto-assignment: unsolicited strategic choices belong
+        // to the acting leader, never to global settings. Puppet cities keep
+        // their rule-mandated management.
+        if (!suppressAutomation && ((isCurrentPlayersTurn && (UncivGame.Current.settings.autoAssignCityProduction
                 || UncivGame.Current.worldScreen?.autoPlay?.isAutoPlayingAndFullAutoPlayAI() == true)) // only automate if the active human player has the setting to automate production
-                || city.civ.isAI() || city.isPuppet) {
+                || city.civ.isAI() || city.isPuppet)) {
             ConstructionAutomation(this).chooseNextConstruction()
         }
 

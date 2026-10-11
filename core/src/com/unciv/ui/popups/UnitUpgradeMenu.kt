@@ -1,5 +1,8 @@
 package com.unciv.ui.popups
 
+import com.unciv.UncivGame
+import com.unciv.logic.agents.UpgradeUnitCommand
+
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.Stage
@@ -105,11 +108,33 @@ class UnitUpgradeMenu(
     }
 
     private fun doUpgrade() {
+        // Agent matches route upgrades through the coordinator (§3.2); the
+        // coordinator revalidates against committed state.
+        val worldScreen = UncivGame.Current.worldScreen
+        if (worldScreen != null && worldScreen.routeThroughAgentSession {
+                listOf({ r: Int ->
+                    UpgradeUnitCommand(unit.civ.civID, "ui-${System.nanoTime()}", r, unit.id)
+                })
+            }) {
+            close()
+            return
+        }
         SoundPlayer.play(unitAction.uncivSound)
         unitAction.action!!()
     }
 
     private fun doAllUpgrade() {
+        val worldScreen = UncivGame.Current.worldScreen
+        if (worldScreen != null && worldScreen.routeThroughAgentSession {
+                allUpgradableUnits.toList().map { upgradable ->
+                    { r: Int ->
+                        UpgradeUnitCommand(upgradable.civ.civID, "ui-${System.nanoTime()}", r, upgradable.id)
+                    }
+                }
+            }) {
+            close()
+            return
+        }
         SoundPlayer.playRepeated(unitAction.uncivSound)
         for (unit in allUpgradableUnits) {
             val otherAction = UnitActionsUpgrade.getUpgradeActions(unit)

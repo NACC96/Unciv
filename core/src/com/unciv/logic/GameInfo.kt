@@ -104,6 +104,9 @@ class GameInfo : IsPartOfGameInfoSerialization, HasGameInfoSerializationVersion 
     /** Version that saved the game, set in [UncivFiles.gameInfoToString][com.unciv.logic.files.UncivFiles.gameInfoToString]. */
     override var version = CompatibilityVersion.FIRST_WITHOUT
 
+    /** Immutable, paired agent metadata for this presentation/save snapshot, never a nested world. */
+    var agentMatchStateJson: String? = null
+
     var civilizations = ArrayList<Civilization>()
     var barbarians = BarbarianManager()
     var religions: HashMap<String, Religion> = hashMapOf()
@@ -176,6 +179,11 @@ class GameInfo : IsPartOfGameInfoSerialization, HasGameInfoSerializationVersion 
     @Transient
     var isUpToDate = false
 
+    /** Set by restoration hosts (agent match coordinator) that must not let
+     *  [setTransients] make unsolicited strategic choices; reset at its end. */
+    @Transient
+    var suppressAutomationDuringTransients = false
+
     @Transient
     lateinit var ruleset: Ruleset
 
@@ -209,6 +217,8 @@ class GameInfo : IsPartOfGameInfoSerialization, HasGameInfoSerializationVersion 
         toReturn.difficulty = difficulty
         toReturn.gameParameters = gameParameters
         toReturn.gameId = gameId
+        toReturn.version = version
+        toReturn.agentMatchStateJson = agentMatchStateJson
         toReturn.diplomaticVictoryVotesCast.putAll(diplomaticVictoryVotesCast)
         toReturn.oneMoreTurnMode = oneMoreTurnMode
         toReturn.customSaveLocation = customSaveLocation
@@ -852,7 +862,7 @@ class GameInfo : IsPartOfGameInfoSerialization, HasGameInfoSerializationVersion 
                  * Also set construction for human players who have automate production turned on
                  */
                 if (city.cityConstructions.constructionQueue.isEmpty())
-                    city.cityConstructions.chooseNextConstruction()
+                    city.cityConstructions.chooseNextConstruction(suppressAutomation = suppressAutomationDuringTransients)
 
                 // We also remove resources that the city may be demanding but are no longer in the ruleset
                 if (!ruleset.tileResources.containsKey(city.demandedResource))
@@ -862,6 +872,7 @@ class GameInfo : IsPartOfGameInfoSerialization, HasGameInfoSerializationVersion 
                 city.cityStats.update()
             }
         }
+        suppressAutomationDuringTransients = false
     }
 
     private fun convertOldSavesToNewSaves() {

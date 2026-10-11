@@ -87,6 +87,13 @@ internal object DesktopLauncher {
 
         val customDataDirPrefix="--data-dir="
         val customDataDir = arg.find { it.startsWith(customDataDirPrefix) }?.removePrefix(customDataDirPrefix)
+            ?: if (System.getProperty("jpackage.app-path") != null) {
+                // Finder/jpackage may start with user.dir=/; never write saves into
+                // the filesystem root or the signed application bundle.
+                File(System.getProperty("user.home"), "Library/Application Support/Unciv").apply {
+                    check(isDirectory || mkdirs()) { "Cannot create Unciv data directory: $absolutePath" }
+                }.absolutePath
+            } else null
 
         // Setup Desktop logging
         Log.backend = DesktopLogBackend()
@@ -106,6 +113,18 @@ internal object DesktopLauncher {
         System.setProperty("org.lwjgl.opengl.Display.allowSoftwareOpenGL", "true")
 
         val dataDirectory = customDataDir ?: "."
+
+        // Agent matches: hosting factory closed over the project-owned data
+        // directory (checkpoints, logs, supervisor runtime live here — never
+        // the ordinary Unciv profile). Null elsewhere (other platforms).
+        com.unciv.logic.agents.AgentMatchSessionFactory.creator = { game, match, setup, screen ->
+            com.unciv.app.desktop.agents.DesktopAgentMatch(
+                game, match, setup, java.io.File(dataDirectory), worldScreen = screen)
+        }
+        com.unciv.logic.agents.AgentMatchSessionFactory.restorer = { game, match, _, screen ->
+            com.unciv.app.desktop.agents.DesktopAgentMatch.restore(
+                game, match, java.io.File(dataDirectory), worldScreen = screen)
+        }
 
         val isRunFromJAR = isRunFromJar(this)
         ImagePacker.packImages(isRunFromJAR, dataDirectory)

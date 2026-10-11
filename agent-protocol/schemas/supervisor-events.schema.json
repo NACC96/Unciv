@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://unciv-agent.local/schemas/supervisor-events.schema.json",
+  "title": "SupervisorEvents",
+  "description": "Two namespaces that must never be mixed (plan §7.1). Provider namespace: normalized adapter stream events. Engine namespace: authoritative coordinator commits. Adapters translate provider protocols only; they never emit engine events.",
+  "type": "object",
+  "required": ["namespace", "name"],
+  "properties": {
+    "namespace": {
+      "type": "string",
+      "enum": ["provider", "engine"]
+    },
+    "name": {
+      "type": "string",
+      "description": "provider: run_started | session_bound | agent_message | tool_activity | usage | provider_retry | run_completed | run_failed. engine: action_committed | decision_created | turn_ended | match_finished."
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Supervisor/engine timestamp. Usage sums must deduplicate by event ID before aggregating (plan §8.3)."
+    },
+    "runId": { "type": "string" },
+    "sessionId": {
+      "type": "string",
+      "description": "Exact provider-returned session/thread ID. Never 'resume last' or directory heuristics (plan §7.1)."
+    },
+    "payload": {
+      "type": "object",
+      "description": "Event-specific body. usage carries nullable token counts/cached tokens/durations/retries/provider-reported cost (never fabricated dollars for subscriptions). Unknown provider fields tolerated; unknown engine fields rejected.",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": { "properties": { "namespace": { "const": "provider" } } },
+      "then": {
+        "properties": {
+          "name": {
+            "enum": [
+              "run_started",
+              "session_bound",
+              "agent_message",
+              "tool_activity",
+              "usage",
+              "provider_retry",
+              "run_completed",
+              "run_failed"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "namespace": { "const": "engine" } } },
+      "then": {
+        "properties": {
+          "name": {
+            "enum": [
+              "action_committed",
+              "decision_created",
+              "turn_ended",
+              "match_finished"
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

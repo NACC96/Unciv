@@ -1,5 +1,8 @@
 package com.unciv.ui.screens.pickerscreens
 
+import com.unciv.UncivGame
+import com.unciv.logic.agents.PromoteUnitCommand
+
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.Actor
@@ -116,6 +119,23 @@ class PromotionPickerScreen private constructor(
         if (button == null || !button.isPickable) return
 
         val path = tree.getPathTo(button.node.promotion)
+        // Agent matches route promotions through the coordinator (§3.2):
+        // one command per step of the promotion path.
+        if (UncivGame.Current.worldScreen?.routeThroughAgentSession {
+                path.map { promotion ->
+                    { r: Int ->
+                        PromoteUnitCommand(unit.civ.civID, "ui-${System.nanoTime()}", r,
+                            unit.id, promotion.name)
+                    }
+                }
+            } == true) {
+            onChange?.invoke()
+            if (!closeOnPick || unit.promotions.canBePromoted())
+                game.replaceCurrentScreen{ recreate(false) }
+            else
+                game.popScreen()
+            return
+        }
         SoundPlayer.playRepeated(UncivSound.Promote, path.size.coerceAtMost(2))
 
         for (promotion in path)

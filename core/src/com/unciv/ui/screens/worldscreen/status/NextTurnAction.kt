@@ -21,6 +21,15 @@ import com.unciv.utils.launchOnGLThread
 import yairm210.purity.annotations.Readonly
 
 enum class NextTurnAction(protected val text: String, val color: Color) {
+    AgentMatch("Agent match", Color.GOLD) {
+        override fun getText(worldScreen: WorldScreen) =
+            worldScreen.agentSession?.statusText() ?: text
+        override fun isChoice(worldScreen: WorldScreen) =
+            worldScreen.agentSession != null
+        override fun action(worldScreen: WorldScreen) {
+            worldScreen.agentSession?.onNextTurnPressed()
+        }
+    },
     Default("", ImageGetter.CHARCOAL) {
         override val icon get() = null
         override fun isChoice(worldScreen: WorldScreen) = false
@@ -134,7 +143,9 @@ enum class NextTurnAction(protected val text: String, val color: Color) {
     },
     MoveAutomatedUnits("Move automated units", Color.LIGHT_GRAY) {
         override fun isChoice(worldScreen: WorldScreen) =
-            worldScreen.canMoveAutomatedUnits()
+            // Agent matches: automated-unit processing runs inside the
+            // coordinator's turn processing, never as a mid-turn bypass.
+            worldScreen.agentSession == null && worldScreen.canMoveAutomatedUnits()
         override fun action(worldScreen: WorldScreen) =
             moveAutomatedUnits(worldScreen)
     },

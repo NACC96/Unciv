@@ -8,6 +8,10 @@ import com.badlogic.gdx.utils.Align
 import com.unciv.Constants
 import com.unciv.UncivGame
 import com.unciv.logic.GameInfo
+import com.unciv.logic.agents.AgentMatchSession
+import com.unciv.logic.agents.AgentCommand
+import com.unciv.logic.agents.AgentSnapshotPublication
+import com.unciv.logic.agents.ResolvedSelection
 import com.unciv.view.GameView
 import com.unciv.logic.UncivShowableException
 import com.unciv.logic.civilization.Civilization
@@ -87,13 +91,25 @@ import kotlin.concurrent.timer
  * @param restoreState
  */
 class WorldScreen(
-    val gameInfo: GameInfo,
+    gameInfo: GameInfo,
     val autoPlay: AutoPlay,
-    private val viewingCiv: Civilization,
+    viewingCiv: Civilization,
     restoreState: RestoreState? = null
 ) : BaseScreen() {
     /** When set, causes the screen to update in the next [render][render] event */
     var shouldUpdate = false
+
+    /**
+     * The game state the screen represents. Agent-match snapshot publication
+     * swaps this to the coordinator's committed snapshot (see
+     * [installAgentSnapshot]); ordinary games never reassign it.
+     */
+    var gameInfo: GameInfo = gameInfo
+        internal set
+
+    /** Active civilization identity — re-pointed into each published snapshot. */
+    var viewingCiv: Civilization = viewingCiv
+        internal set
 
     /** Indicates it's the player's ([viewingCiv]) turn */
     var isPlayersTurn = viewingCiv.isCurrentPlayer()
@@ -126,9 +142,102 @@ class WorldScreen(
      *  (fogged) vision or [spectatorGameView]'s (the spectator's own, unrestricted) vision. */
     var fogOfWar = true
 
-    /** `true` when it's the player's turn unless he is a spectator */
+    /**
+     * Active agent match session, if this screen shows an agent-enabled
+     * match. Routes the end-turn button and gates human input; all other
+     * mutation paths are enumerated in docs/agent-mutation-audit.md (most
+     * still route legacy — full interception is tracked there, not here).
+     */
+    var agentSession: AgentMatchSession? = null
+
+    /** Retire the host before releasing its screen; repeated disposal is harmless. */
+    fun closeAgentSession() {
+        val session = agentSession ?: return
+        agentSession = null
+        session.close()
+    }
+
+    /** `true` when it's the player's turn unless he is a spectator.
+     *  Agent matches route through the session: only its human turns allow input. */
     val canChangeState
-        get() = isPlayersTurn && !viewingCiv.isSpectator()
+        get() = if (agentSession != null) agentSession!!.isHumanInputAllowed()
+            else isPlayersTurn && !viewingCiv.isSpectator()
+
+    /**
+     * Attempts to route one human gameplay mutation through the agent-match
+     * coordinator (AI_AGENT_PLAN.md §3.2). Returns false when no session is
+     * attached — the caller then proceeds with the LEGACY engine path, so
+     * ordinary games are untouched. When a session exists the action is
+     * consumed either way: success publishes a snapshot, failure surfaces
+     * the coordinator's rejection.
+     */
+    fun routeThroughAgentSession(
+        buildCommands: (expectedRevision: Int) -> List<(Int) -> AgentCommand>
+    ): Boolean {
+        val session = agentSession ?: return false
+        // Never run coordinator mutations on the GL thread (serialization +
+        // checkpoint I/O): dispatch to a worker, report back on the GL thread.
+        Concurrency.runOnNonDaemonThreadPool("HumanAction") {
+            val error = session.executeHumanAction(buildCommands)
+            Concurrency.runOnGLThread {
+                if (error != null) ToastPopup(error, this@WorldScreen).open(force = true)
+                shouldUpdate = true
+            }
+        }
+        return true
+    }
+
+    //region Agent snapshot publication (plan §9) — install runs on the GL thread
+
+    /** Selection handles the host captures before serialization. */
+    fun currentViewerCivId(): String = viewingCiv.civID
+    fun currentSelectedUnitId(): Int? = bottomUnitTable.selectedUnit?.id
+    fun currentSelectedCityId(): String? = null // city screens attach below the session
+    fun currentSelectedTilePos(): HexCoord? = mapHolder.selectedTile?.position()
+
+    /**
+     * Installs a committed coordinator snapshot into this screen. The swap
+     * and map rebinding MUST run on the GL thread (the host schedules it);
+     * serialization/deserialization already happened on the host's worker
+     * thread. Selections re-resolve by stable ID — entities that no longer
+     * exist clear their selection instead of holding orphans.
+     */
+    private val agentPublicationFence = com.unciv.logic.agents.AgentPublicationFence()
+
+    fun installAgentSnapshot(snapshot: GameInfo, selection: ResolvedSelection, publicationGeneration: Long = 0) {
+        // A queued frame from an old host must not replace the currently opened game or its autosave.
+        if (game.worldScreen !== this || game.gameInfo !== gameInfo || agentSession == null || gameInfo.gameId != snapshot.gameId) return
+        if (gameInfo === snapshot) return
+        val oldViewerId = viewingCiv.civID
+        val newViewer = snapshot.civilizations.firstOrNull { it.civID == oldViewerId }
+            ?: return // snapshot without the viewer is a host bug; keep current render
+        if (!agentPublicationFence.accept(publicationGeneration)) return
+        gameInfo = snapshot
+        game.gameInfo = snapshot
+        viewingCiv = newViewer
+        selectedCiv = snapshot.civilizations.firstOrNull { it.civID == selectedCiv.civID } ?: newViewer
+        selectedGameView = GameView(snapshot, selectedCiv, spectatorMode = viewingCiv.isSpectator())
+        isPlayersTurn = viewingCiv.isCurrentPlayer()
+
+        // Rebind the map layer to the new object graph.
+        mapHolder.rebindToSnapshot(snapshot.tileMap)
+
+        // Re-resolve selections by stable ID; drop removed entities.
+        val unit = selection.unitId?.let { id ->
+            snapshot.civilizations.asSequence().flatMap { it.units.getCivUnits() }
+                .firstOrNull { it.id == id }
+        }
+        val unitView = unit?.let { selectedGameView.getMapUnitView(it) }
+        bottomUnitTable.reselectAfterSnapshot(unitView)
+        selection.tile?.let { pos ->
+            val tile = snapshot.tileMap.values.firstOrNull { it.position == pos }
+            if (tile != null) mapHolder.selectedTile = selectedGameView.getTile(tile)
+            else mapHolder.selectedTile = null
+        }
+        shouldUpdate = true
+    }
+
+    //endregion
 
     val mapHolder = WorldMapHolder(this, gameInfo.tileMap)
 
@@ -147,7 +256,7 @@ class WorldScreen(
     private val bottomTileInfoTable = TileInfoTable(this)
     internal val notificationsScroll = NotificationsScroll(this)
     internal val nextTurnButton = NextTurnButton(this)
-    private val statusButtons = StatusButtons(nextTurnButton)
+    private val statusButtons = StatusButtons(nextTurnButton, this)
     internal val smallUnitButton = SmallUnitButton(this, statusButtons)
     private val tutorialTaskTable = Table().apply {
         background = skinStrings.getUiBackground("WorldScreen/TutorialTaskTable", tintColor = skinStrings.skinConfig.baseColor.darken(0.5f))
@@ -238,6 +347,7 @@ class WorldScreen(
     }
 
     override fun dispose() {
+        closeAgentSession()
         resizeDeferTimer?.cancel()
         events.stopReceiving()
         statusButtons.dispose()
@@ -320,7 +430,10 @@ class WorldScreen(
 
     @Readonly
     fun openDeveloperConsole() {
-        // No cheating unless you're by yourself, ignoring a possible spectator
+        // No cheating unless you're by yourself, ignoring a possible spectator.
+        // Agent matches forbid the console outright: it mutates through the
+        // engine, bypassing the coordinator.
+        if (agentSession != null) return
         if (gameInfo.civilizations.count { it.isHuman() && !it.isSpectator() } > 1) return
         DevConsolePopup(this)
     }
@@ -443,7 +556,10 @@ class WorldScreen(
             autoPlay.stopAutoPlay()
         }
 
-        if (!hasOpenPopups() && !autoPlay.isAutoPlaying() && isPlayersTurn) {
+        // canChangeState (not just isPlayersTurn) keeps agent-owned popup
+        // decisions (AlertPopup/TradePopup) from being answered by the human
+        // viewer while an external agent holds the turn.
+        if (!hasOpenPopups() && !autoPlay.isAutoPlaying() && isPlayersTurn && canChangeState) {
             when {
                 viewingCiv.shouldShowDiplomaticVotingResults() ->
                     UncivGame.Current.pushScreen{ DiplomaticVoteResultScreen(gameInfo.diplomaticVictoryVotesCast, viewingCiv) }
@@ -603,6 +719,10 @@ class WorldScreen(
     }
 
     fun nextTurn() {
+        // Agent-enabled matches never take the legacy clone/nextTurn path:
+        // the session routes the current civ's end-turn through the match
+        // coordinator (or consumes the press when nothing may act).
+        if (agentSession?.onNextTurnPressed() == true) return
         isPlayersTurn = false
         shouldUpdate = true
         val progressBar = NextTurnProgress(nextTurnButton)

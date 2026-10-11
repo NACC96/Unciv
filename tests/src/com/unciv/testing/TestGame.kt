@@ -27,7 +27,7 @@ import com.unciv.ui.images.ImageGetter
 import kotlin.random.Random
 
 /**
- *  A testing game using a fresh clone of the Civ_V_GnK ruleset so it can be modded in-place.
+ *  A testing game using a fresh clone of a base ruleset so it can be modded in-place.
  *  * By default, it will have a map consisting of a single Tile. Use [makeHexagonalMap] or [makeRectangularMap] for more room.
  *  * Starts with no civilizations, not even barbarians. Use [addCiv], [addBarbarianCiv] as needed. Note addCiv has two overloads, one creating a Nation and one using a G&K Nation.
  *  * Initially, [GameInfo.currentPlayerCiv] is an uninitialized dummy and not suitable for e.g. a nextTurn.
@@ -37,8 +37,14 @@ import kotlin.random.Random
  *
  *  @param addGlobalUniques optional global uniques to add to the ruleset
  *  @param forUITesting default initializes UncivGame.Current and its settings, `true` initializes ImageGetter ruleset instead. Needed for FasterUIDevelopment.
+ *  @param baseRuleset which base ruleset to clone. Defaults to G&K for backwards
+ *    compatibility; agent-match fixtures must pass [BaseRuleset.Civ_V_Vanilla] explicitly.
  */
-class TestGame(vararg addGlobalUniques: String, forUITesting: Boolean = false) {
+class TestGame(
+    vararg addGlobalUniques: String,
+    forUITesting: Boolean = false,
+    baseRuleset: BaseRuleset = BaseRuleset.Civ_V_GnK
+) {
 
     private var objectsCreated = 0
     val ruleset: Ruleset
@@ -64,7 +70,7 @@ class TestGame(vararg addGlobalUniques: String, forUITesting: Boolean = false) {
         // Create a new ruleset we can easily edit, and set the important variables of gameInfo
         if (RulesetCache.isEmpty())
             RulesetCache.loadRulesets(noMods = true)
-        ruleset = RulesetCache[BaseRuleset.Civ_V_GnK.fullName]!!.clone()
+        ruleset = RulesetCache[baseRuleset.fullName]!!.clone()
         ruleset.addGlobalUniques(*addGlobalUniques)
         if (forUITesting)
             ImageGetter.ruleset = ruleset

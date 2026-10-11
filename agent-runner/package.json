@@ -1,0 +1,21 @@
+{
+  "name": "@unciv/agent-runner",
+  "version": "0.1.0",
+  "private": true,
+  "description": "TypeScript supervisor: launches provider CLIs, hosts the civilization-scoped game MCP endpoint, normalizes streamed events. Cannot mutate engine state directly (AI_AGENT_PLAN.md §3.1, §7).",
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "build": "tsc -p tsconfig.build.json"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.18.2",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "^26.5.1",
+    "typescript": "5.9.2",
+    "vitest": "3.2.4"
+  }
+}

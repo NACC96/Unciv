@@ -198,6 +198,7 @@ project(":core") {
 
         dependencies {
             "implementation"(project(":core"))
+            "implementation"(project(":desktop"))
 
             "implementation"(rootProject.libs.coroutines.core)
             "implementation"(rootProject.libs.kotlin.reflect)

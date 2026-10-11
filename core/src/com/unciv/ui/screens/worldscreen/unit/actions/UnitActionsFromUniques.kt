@@ -1,5 +1,7 @@
 package com.unciv.ui.screens.worldscreen.unit.actions
 
+import com.unciv.logic.agents.RepairCommand
+
 import com.unciv.Constants
 import com.unciv.GUI
 import com.unciv.UncivGame
@@ -549,6 +551,14 @@ object UnitActionsFromUniques {
         return UnitAction(UnitActionType.Repair, useFrequency,
             title = "${UnitActionType.Repair} [${unit.currentTile.getImprovementToRepair()!!.name}] - [${turnsToBuild}${Fonts.turn}]",
             action = {
+                // Agent matches route repair through the coordinator (§3.2).
+                // Null-safe lookup: automation also invokes this lambda headlessly.
+                val worldScreen = UncivGame.Current.worldScreen
+                if (worldScreen != null && worldScreen.routeThroughAgentSession {
+                        listOf({ r: Int ->
+                            RepairCommand(unit.civ.civID, "ui-${System.nanoTime()}", r, unit.id)
+                        })
+                    }) return@UnitAction
                 tile.queueImprovement(Constants.repair, turnsToBuild)
                 unit.action = null
             }.takeIf { couldConstruct }

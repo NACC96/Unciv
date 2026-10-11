@@ -1,5 +1,6 @@
 
 import com.google.common.io.Files
+import java.nio.file.Files as NioFiles
 import com.unciv.build.BuildConfig
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
@@ -70,6 +71,71 @@ tasks.register<Jar>("dist") { // Compiles the jar file
 
     manifest {
         attributes(mapOf("Main-Class" to mainClassName, "Specification-Version" to BuildConfig.appVersion))
+    }
+}
+
+// Assembles the complete agent-match package (AI_AGENT_PLAN.md W6):
+// Unciv.jar + the supervisor runner (agent-runner/dist + its node_modules)
+// and, when -Dunciv.node.home points at a Node install, a bundled Node.
+// The resulting layout matches DesktopAgentMatch discovery: <pkg>/agent-runner/dist
+// and <pkg>/node.
+tasks.register<Copy>("agentPackage") {
+    group = "unciv"
+    description = "Assembles Unciv.jar with the agent supervisor runner (and Node when -Dunciv.node.home is given)."
+    dependsOn("dist")
+    into(layout.buildDirectory.dir("agentPackage"))
+    from(layout.buildDirectory.file("libs/Unciv.jar"))
+    from(rootDir.resolve("agent-runner/dist")) { into("agent-runner/dist") }
+    val nodeModules = rootDir.resolve("agent-runner/node_modules")
+    if (nodeModules.isDirectory) from(nodeModules) { into("agent-runner/node_modules") }
+    doLast {
+        val nodeHome = System.getProperty("unciv.node.home")?.let { file(it) }
+        if (nodeHome != null && nodeHome.isDirectory) {
+            copy { from(nodeHome); into(layout.buildDirectory.dir("agentPackage/node")) }
+        } else {
+            println("NOTE: agentPackage has no bundled Node (pass -Dunciv.node.home=<node install dir>); the app will fall back to PATH discovery.")
+        }
+    }
+}
+
+// A native jpackage launcher keeps the running process associated with the
+// app's bundle identity. A shell script exec'ing external java does not.
+tasks.register("macApp") {
+    group = "unciv"
+    description = "Builds a native macOS app with a private Java runtime and agent runner."
+    dependsOn("agentPackage")
+    val destination = layout.buildDirectory.dir("native")
+    // jpackage requires a fresh output directory. Keep previous bundles intact.
+    outputs.upToDateWhen { false }
+    doLast {
+        check(System.getProperty("os.name").contains("Mac")) { "macApp must run on macOS" }
+        val jpackage = File(System.getProperty("java.home"), "bin/jpackage")
+        check(jpackage.canExecute()) { "macApp requires a JDK containing jpackage" }
+        val input = layout.buildDirectory.dir("agentPackage").get().asFile
+        check(input.resolve("Unciv.jar").isFile) { "Missing Unciv.jar" }
+        check(input.resolve("agent-runner/dist/daemon.js").isFile) { "Build agent-runner before macApp" }
+        check(input.resolve("agent-runner/node_modules").isDirectory) { "Install agent-runner dependencies before macApp" }
+        val dest = destination.get().asFile.apply { mkdirs() }
+        val staging = NioFiles.createTempDirectory(dest.toPath(), ".unciv-native-app-").toFile()
+        val result = ProcessBuilder(
+            jpackage.absolutePath, "--type", "app-image", "--name", "Unciv",
+            "--app-version", BuildConfig.appVersion,
+            "--mac-package-identifier", "com.unciv.app",
+            "--input", input.absolutePath, "--main-jar", "Unciv.jar",
+            "--main-class", mainClassName, "--dest", staging.absolutePath,
+            "--java-options", "-Xmx4G",
+            "--icon", rootDir.resolve("extraImages/Icons/Unciv.icns").absolutePath
+        ).inheritIO().start().waitFor()
+        check(result == 0) { "jpackage failed ($result); staging retained at $staging" }
+        val app = dest.resolve("Unciv.app")
+        if (app.exists()) {
+            check(app.renameTo(dest.resolve("Unciv-previous-${System.currentTimeMillis()}.app"))) {
+                "Cannot preserve previous app at $app"
+            }
+        }
+        check(staging.resolve("Unciv.app").renameTo(app)) { "Cannot move staged app from $staging to $app" }
+        staging.delete() // now-empty temporary directory only
+        println("Native macOS app: ${app.absolutePath}")
     }
 }
 

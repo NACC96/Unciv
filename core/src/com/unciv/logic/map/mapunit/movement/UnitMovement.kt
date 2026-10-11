@@ -765,7 +765,7 @@ class UnitMovement(val unit: MapUnit) {
 
     // Can a paratrooper land at this tile?
     @Readonly
-    private fun canParadropOn(destination: Tile, distance: Int): Boolean {
+    internal fun canParadropOn(destination: Tile, distance: Int): Boolean {
         if (unit.cache.cannotMove) return false
 
         // Can only move to tiles within range that are visible and not impassible

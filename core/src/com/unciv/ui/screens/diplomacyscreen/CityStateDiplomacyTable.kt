@@ -1,5 +1,10 @@
 package com.unciv.ui.screens.diplomacyscreen
 
+import com.unciv.logic.agents.DiplomaticMarriageCommand
+import com.unciv.logic.agents.GiftGoldToCityStateCommand
+import com.unciv.logic.agents.ProtectionCommand
+import com.unciv.logic.agents.TributeCommand
+
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane
 import com.badlogic.gdx.scenes.scene2d.ui.Table
@@ -213,7 +218,13 @@ class CityStateDiplomacyTable(private val diplomacyScreen: DiplomacyScreen) {
         val revokeProtectionButton = "Revoke Protection".toTextButton()
         revokeProtectionButton.onClick {
             ConfirmPopup(diplomacyScreen, "Revoke protection for [${otherCiv.civName}]?", "Revoke Protection") {
-                otherCiv.cityStateFunctions.removeProtectorCiv(viewingCiv)
+                // Agent matches route protection through the coordinator (§3.2).
+                if (UncivGame.Current.worldScreen?.routeThroughAgentSession {
+                        listOf({ r: Int ->
+                            ProtectionCommand(viewingCiv.civID, "ui-${System.nanoTime()}", r,
+                                otherCiv.civID, pledge = false)
+                        })
+                    } != true) otherCiv.cityStateFunctions.removeProtectorCiv(viewingCiv)
                 diplomacyScreen.updateLeftSideTable(otherCiv)
                 diplomacyScreen.updateRightSide(otherCiv)
             }.open()
@@ -232,7 +243,12 @@ class CityStateDiplomacyTable(private val diplomacyScreen: DiplomacyScreen) {
                 "Pledge to protect",
                 true
             ) {
-                otherCiv.cityStateFunctions.addProtectorCiv(viewingCiv)
+                if (UncivGame.Current.worldScreen?.routeThroughAgentSession {
+                        listOf({ r: Int ->
+                            ProtectionCommand(viewingCiv.civID, "ui-${System.nanoTime()}", r,
+                                otherCiv.civID, pledge = true)
+                        })
+                    } != true) otherCiv.cityStateFunctions.addProtectorCiv(viewingCiv)
                 diplomacyScreen.updateLeftSideTable(otherCiv)
                 diplomacyScreen.updateRightSide(otherCiv)
             }.open()
@@ -320,7 +336,12 @@ class CityStateDiplomacyTable(private val diplomacyScreen: DiplomacyScreen) {
             "Diplomatic Marriage ([${otherCiv.cityStateFunctions.getDiplomaticMarriageCost()}] Gold)".toTextButton()
         diplomaticMarriageButton.onClick {
             val newCities = otherCiv.cities
-            otherCiv.cityStateFunctions.diplomaticMarriage(viewingCiv)
+            // Agent matches route marriage through the coordinator (§3.2).
+            if (UncivGame.Current.worldScreen?.routeThroughAgentSession {
+                    listOf({ r: Int ->
+                        DiplomaticMarriageCommand(viewingCiv.civID, "ui-${System.nanoTime()}", r, otherCiv.civID)
+                    })
+                } != true) otherCiv.cityStateFunctions.diplomaticMarriage(viewingCiv)
             UncivGame.Current.popScreen() // The other civ will no longer exist
             for (city in newCities)
                 viewingCiv.popupAlerts.add(PopupAlert(AlertType.DiplomaticMarriage, city.id))   // Player gets to choose between annex and puppet
@@ -339,6 +360,17 @@ class CityStateDiplomacyTable(private val diplomacyScreen: DiplomacyScreen) {
             val giftButton =
                 "Gift [$giftAmount] gold (+[$influenceAmount] influence)".toTextButton()
             giftButton.onClick {
+                // Agent matches route gold gifts through the coordinator (§3.2).
+                if (UncivGame.Current.worldScreen?.routeThroughAgentSession {
+                        listOf({ r: Int ->
+                            GiftGoldToCityStateCommand(viewingCiv.civID, "ui-${System.nanoTime()}", r,
+                                otherCiv.civID, giftAmount)
+                        })
+                    } == true) {
+                    diplomacyScreen.updateLeftSideTable(otherCiv)
+                    diplomacyScreen.updateRightSide(otherCiv)
+                    return@onClick
+                }
                 otherCiv.cityStateFunctions.receiveGoldGift(viewingCiv, giftAmount)
                 diplomacyScreen.updateLeftSideTable(otherCiv)
                 diplomacyScreen.updateRightSide(otherCiv)
@@ -422,7 +454,12 @@ class CityStateDiplomacyTable(private val diplomacyScreen: DiplomacyScreen) {
 
         val demandGoldButton = "Take [${otherCiv.cityStateFunctions.goldGainedByTribute()}] gold (-15 Influence)".toTextButton()
         demandGoldButton.onClick {
-            otherCiv.cityStateFunctions.tributeGold(viewingCiv)
+            // Agent matches route tribute through the coordinator (§3.2).
+            if (UncivGame.Current.worldScreen?.routeThroughAgentSession {
+                    listOf({ r: Int ->
+                        TributeCommand(viewingCiv.civID, "ui-${System.nanoTime()}", r, otherCiv.civID, false)
+                    })
+                } != true) otherCiv.cityStateFunctions.tributeGold(viewingCiv)
             diplomacyScreen.rightSideTable.clear()
             diplomacyScreen.rightSideTable.add(ScrollPane(getCityStateDiplomacyTable(otherCiv)))
         }
@@ -431,7 +468,11 @@ class CityStateDiplomacyTable(private val diplomacyScreen: DiplomacyScreen) {
 
         val demandWorkerButton = "Take worker (-50 Influence)".toTextButton()
         demandWorkerButton.onClick {
-            otherCiv.cityStateFunctions.tributeWorker(viewingCiv)
+            if (UncivGame.Current.worldScreen?.routeThroughAgentSession {
+                    listOf({ r: Int ->
+                        TributeCommand(viewingCiv.civID, "ui-${System.nanoTime()}", r, otherCiv.civID, true)
+                    })
+                } != true) otherCiv.cityStateFunctions.tributeWorker(viewingCiv)
             diplomacyScreen.rightSideTable.clear()
             diplomacyScreen.rightSideTable.add(ScrollPane(getCityStateDiplomacyTable(otherCiv)))
         }

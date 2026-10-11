@@ -1,5 +1,9 @@
 package com.unciv.ui.screens.diplomacyscreen
 
+import com.unciv.logic.agents.DenounceCommand
+import com.unciv.logic.agents.DemandCommand
+import com.unciv.logic.agents.FriendshipCommand
+
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton
@@ -129,6 +133,12 @@ class MajorCivDiplomacyTable(private val diplomacyScreen: DiplomacyScreen) {
     ): TextButton {
         val denounceButton = "Denounce ([30] turns)".toTextButton()
         denounceButton.onClick {
+            // Agent matches route denouncement through the coordinator (§3.2).
+            if (UncivGame.Current.worldScreen?.routeThroughAgentSession {
+                    listOf({ r: Int ->
+                        DenounceCommand(viewingCiv.civID, "ui-${System.nanoTime()}", r, otherCiv.civID)
+                    })
+                } == true) return@onClick
             ConfirmPopup(diplomacyScreen, "Denounce [${otherCiv.civName}]?", "Denounce ([30] turns)") {
                 diplomacyManager.denounce()
                 diplomacyScreen.updateLeftSideTable(otherCiv)
@@ -150,6 +160,15 @@ class MajorCivDiplomacyTable(private val diplomacyScreen: DiplomacyScreen) {
         val declareFriendshipButton =
             "Offer Declaration of Friendship ([30] turns)".toTextButton()
         declareFriendshipButton.onClick {
+            // Agent matches route friendship through the coordinator (§3.2).
+            if (UncivGame.Current.worldScreen?.routeThroughAgentSession {
+                    listOf({ r: Int ->
+                        FriendshipCommand(viewingCiv.civID, "ui-${System.nanoTime()}", r, otherCiv.civID)
+                    })
+                } == true) {
+                declareFriendshipButton.disable()
+                return@onClick
+            }
             otherCiv.popupAlerts.add(
                 PopupAlert(
                     AlertType.DeclarationOfFriendship,
@@ -234,6 +253,16 @@ class MajorCivDiplomacyTable(private val diplomacyScreen: DiplomacyScreen) {
                 button.disable()
             } else {
                 button.onClick {
+                    // Agent matches issue demands through the coordinator (§3.2).
+                    if (UncivGame.Current.worldScreen?.routeThroughAgentSession {
+                            listOf({ r: Int ->
+                                DemandCommand(viewingCiv.civID, "ui-${System.nanoTime()}", r,
+                                    otherCiv.civID, demand.name)
+                            })
+                        } == true) {
+                        button.disable()
+                        return@onClick
+                    }
                     otherCiv.popupAlerts.add(PopupAlert(demand.demandAlert, viewingCiv.civID))
                     button.disable()
                 }

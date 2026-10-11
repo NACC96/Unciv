@@ -25,11 +25,14 @@ class AutoPlayStatusButton(
         onActivation(binding = KeyboardBinding.AutoPlayMenu) {
             if (worldScreen.autoPlay.isAutoPlaying())
                 worldScreen.autoPlay.stopAutoPlay()
-            else if (worldScreen.isPlayersTurn)
+            else if (worldScreen.canChangeState)
                 AutoPlayMenu(stage,this, nextTurnButton, worldScreen)
         }
         val directAutoPlay = {
+            // canChangeState: autoplay must never drive an external agent's
+            // civilization — that turn belongs to the coordinator.
             if (!worldScreen.gameInfo.gameParameters.isOnlineMultiplayer
+                && worldScreen.canChangeState
                 && worldScreen.selectedGameView.civView.getCiv() == worldScreen.gameInfo.currentPlayerCiv) {
                 worldScreen.autoPlay.startMultiturnAutoPlay()
                 nextTurnButton.update()

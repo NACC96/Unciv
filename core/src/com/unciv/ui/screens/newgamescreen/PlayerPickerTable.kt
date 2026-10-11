@@ -8,6 +8,9 @@ import com.badlogic.gdx.utils.Align
 import com.unciv.Constants
 import com.unciv.UncivGame
 import com.unciv.logic.IdChecker
+import com.unciv.logic.agents.AgentProfile
+import com.unciv.logic.agents.AgentSlotLogic
+import com.unciv.logic.agents.SlotControl
 import com.unciv.logic.civilization.PlayerType
 import com.unciv.logic.civilization.PlayerType.AI
 import com.unciv.logic.civilization.PlayerType.Human
@@ -63,6 +66,15 @@ class PlayerPickerTable(
     /** Locks player table for editing, currently unused, was previously used for scenarios and could be useful in the future. */
     var locked = false
 
+    /**
+     * External-agent assignments by slot. Presence in this map is the agent
+     * distinction: agent slots stay [Human]-typed for rule parity, and
+     * [AgentSlotLogic] keeps the two in sync. Profiles are edited through
+     * [AgentProfilePopup] and snapshot-copied at match creation.
+     */
+    val agentProfiles = HashMap<Player, AgentProfile>()
+    val profileCache = HashMap<Player, AgentProfile>()
+
     /** No random civilization is available, potentially used in the future during map editing. */
     var noRandom = false
 
@@ -73,8 +85,12 @@ class PlayerPickerTable(
             player.playerId = "" // This is to stop people from getting other users' IDs and cheating with them in multiplayer games
 
         top()
+        val watchAgentsBtn = "Watch agents play (Spectator)".toTextButton().apply { color = Color.SKY }
+        watchAgentsBtn.onClick { setupSpectatorAgentMatch() }
+        add(watchAgentsBtn).padTop(5f).padBottom(5f).row()
+
         gameParameters.shufflePlayerOrder = false
-        add("Shuffle Civ Order at Start".toCheckBox(false) { gameParameters.shufflePlayerOrder = it }).padTop(5f).padBottom(5f).row()
+        add("Shuffle Civ Order at Start".toCheckBox(false) { gameParameters.shufflePlayerOrder = it }).padTop(2f).padBottom(5f).row()
         add(ScrollPane(playerListTable).apply { setOverscroll(false, false) }).width(civBlocksWidth)
         update()
         background = BaseScreen.skinStrings.getUiBackground("NewGameScreen/PlayerPickerTable", tintColor = BaseScreen.skinStrings.skinConfig.clearColor)
@@ -96,6 +112,8 @@ class PlayerPickerTable(
 
         if (gameParameters.players.size > newRulesetPlayableCivs)
             gameParameters.players.removeRange(newRulesetPlayableCivs, gameParameters.players.size)
+        // Drop agent profiles of trimmed slots.
+        agentProfiles.keys.retainAll(gameParameters.players.toSet())
 
         if (desiredCiv.isNotEmpty()) assignDesiredCiv(desiredCiv)
 
@@ -134,8 +152,61 @@ class PlayerPickerTable(
         (previousScreen as? PickerScreen)?.setRightSideButtonEnabled(isValid)
     }
 
-    fun updateRandomNumberLabel() {
-        randomNumberLabel?.run {
+    /**
+     * Agent-match readiness errors for [NewGameScreen.getErrorMessage]: slot
+     * structure plus profile/ruleset validation. Empty when no agent slots
+     * exist (ordinary games are unaffected).
+     */
+    fun collectAgentErrors(): List<String> {
+        if (agentProfiles.isEmpty()) return emptyList()
+        val errors = ArrayList(AgentSlotLogic.collectSlotErrors(gameParameters.players, agentProfiles))
+        try {
+            val setup = AgentSlotLogic.buildSetup(gameParameters.players, agentProfiles)
+            errors.addAll(setup.validate(gameParameters))
+        } catch (ex: IllegalArgumentException) {
+            errors.add(ex.message ?: "Invalid agent configuration")
+        }
+        return errors
+    }
+
+    fun setupSpectatorAgentMatch() {
+        gameParameters.players.clear()
+        agentProfiles.clear()
+        profileCache.clear()
+
+        val spectator = Player(Constants.spectator, PlayerType.Human).apply {
+            setNationTransient(previousScreen.ruleset)
+        }
+        gameParameters.players.add(spectator)
+
+        val nations = previousScreen.ruleset.nations.values
+            .filter { !it.isCityState && !it.isSpectator && it.name != Constants.random }
+            .shuffled()
+            .take(2)
+
+        for (nation in nations) {
+            val agentPlayer = Player(nation.name, PlayerType.Human).apply {
+                setNationTransient(previousScreen.ruleset)
+            }
+            gameParameters.players.add(agentPlayer)
+            val profile = AgentProfile.defaultFor(nation.name, "codex")
+            agentProfiles[agentPlayer] = profile
+            profileCache[agentPlayer] = profile
+        }
+        update()
+    }
+
+    fun onCivChanged(player: Player, oldCiv: String, newCiv: String) {
+        val existing = agentProfiles[player] ?: profileCache[player]
+        if (existing != null) {
+            AgentSlotLogic.onCivChanged(player, oldCiv, newCiv, agentProfiles, profileCache)
+        }
+    }
+
+    /** Snapshot of the current slot assignment for match creation. */
+    fun buildAgentMatchSetup() = AgentSlotLogic.buildSetup(gameParameters.players, agentProfiles)
+
+    fun updateRandomNumberLabel() {        randomNumberLabel?.run {
             val playerRange = if (gameParameters.minNumberOfPlayers == gameParameters.maxNumberOfPlayers) {
                 gameParameters.minNumberOfPlayers.tr()
             } else {
@@ -197,8 +268,23 @@ class PlayerPickerTable(
         val nationTable = getNationTable(player)
         playerTable.add(nationTable).left()
 
+        val control = AgentSlotLogic.controlOf(player, agentProfiles)
         val playerTypeTextButton = player.playerType.name.toTextButton()
-        playerTable.add(playerTypeTextButton).width(100f).pad(5f).right()
+        // Agent slots stay Human-typed (rule parity); the label carries the distinction.
+        if (control == SlotControl.AGENT)
+            playerTypeTextButton.setText("Agent")
+        playerTable.add(playerTypeTextButton).width(80f).pad(5f).right()
+
+        if (control == SlotControl.AGENT) {
+            val editAgentButton = "Edit".toTextButton()
+            editAgentButton.onClick {
+                val profile = agentProfiles[player]
+                if (profile != null) {
+                    AgentProfilePopup(this@PlayerPickerTable, player, profile, onSave = { update() })
+                }
+            }
+            playerTable.add(editAgentButton).width(60f).pad(5f).right()
+        }
         fun updatePlayerTypeButtonEnabled() {
             // This could be written much shorter with logical operators - I think this is readable
             playerTypeTextButton.isEnabled = when {
@@ -209,7 +295,7 @@ class PlayerPickerTable(
                 // In randomNumberOfPlayers mode, don't let the user choose random AI's
                 gameParameters.randomNumberOfPlayers && player.chosenCiv == Constants.random -> false
                 else -> true
-            }
+            } && AgentSlotLogic.isSlotEditable(player, gameParameters.randomNumberOfPlayers)
         }
         updatePlayerTypeButtonEnabled()
 
@@ -221,7 +307,12 @@ class PlayerPickerTable(
             updatePlayerTypeButtonEnabled()
         }
         playerTypeTextButton.onClick {
-            player.playerType = if (player.playerType == AI) Human else AI
+            val next = AgentSlotLogic.nextControl(AgentSlotLogic.controlOf(player, agentProfiles))
+            AgentSlotLogic.applyControl(player, next, agentProfiles, profileCache)
+            if (next == SlotControl.AGENT)
+                AgentProfilePopup(this@PlayerPickerTable, player,
+                    agentProfiles[player]!!,
+                    onSave = { update() })
             update()
         }
 
@@ -230,9 +321,24 @@ class PlayerPickerTable(
                 .surroundWithCircle(40f)
                 .onClick {
                     gameParameters.players.remove(player)
+                    AgentSlotLogic.forgetPlayer(player, agentProfiles)
+                    profileCache.remove(player)
                     update()
                 }
             ).pad(5f).right()
+        }
+
+        if (control == SlotControl.AGENT) {
+            val profile = agentProfiles[player]
+            if (profile != null) {
+                playerTable.row()
+                val thinking = profile.reasoning?.let { "Reasoning: $it" } ?: "Reasoning: default"
+                val summaryText = "${profile.displayName} · ${profile.modelId} · $thinking"
+                val summaryLabel = summaryText.toLabel(Color.LIGHT_GRAY, 12).apply {
+                    wrap = true
+                }
+                playerTable.add(summaryLabel).colspan(4).padLeft(10f).padBottom(4f).fillX()
+            }
         }
 
         if (gameParameters.isOnlineMultiplayer && player.playerType == PlayerType.Human)

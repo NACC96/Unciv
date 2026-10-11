@@ -113,7 +113,7 @@ class GameSerializationTests {
             Assert.assertTrue(saveFile.readText().startsWith('{'))
             Assert.assertEquals(game.gameId, loadedGame.gameId)
             Assert.assertEquals(game.turns, loadedGame.turns)
-            Assert.assertEquals(CompatibilityVersion.CURRENT_COMPATIBILITY_VERSION, loadedGame.version)
+            Assert.assertEquals(CompatibilityVersion.forGame(game), loadedGame.version)
             Assert.assertEquals(
                 game.getCivilization("Rome").cities.size,
                 loadedGame.getCivilization("Rome").cities.size

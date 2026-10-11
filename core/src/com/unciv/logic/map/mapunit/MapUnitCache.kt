@@ -125,6 +125,18 @@ class MapUnitCache(private val mapUnit: MapUnit) {
         hasCitadelPlacementUnique = mapUnit.getMatchingUniques(UniqueType.ConstructImprovementInstantly)
             .mapNotNull { mapUnit.civ.gameInfo.ruleset.tileImprovements[it.params[0]] }
             .any { it.hasUnique(UniqueType.OneTimeTakeOverTilesInRadius) }
+
+        // Populate paradrop destination filters from the unit's state so
+        // movement.canParadropOn works without a UI pass having run first
+        // (mirrors UnitActionsFromUniques.getParadropActions).
+        paradropDestinationTileFilters.clear()
+        for (unique in mapUnit.getMatchingUniques(UniqueType.MayParadrop, state)) {
+            val tileFilter = unique.params[0]
+            val distanceAllowed = unique.params[1].toInt()
+            val existingDistance = paradropDestinationTileFilters[tileFilter]
+            if (existingDistance == null || distanceAllowed > existingDistance)
+                paradropDestinationTileFilters[tileFilter] = distanceAllowed
+        }
     }
 
     companion object {

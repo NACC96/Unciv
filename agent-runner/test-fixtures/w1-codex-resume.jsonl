@@ -1,0 +1,8 @@
+{"type":"thread.started","thread_id":"01a0a236-1cb4-76c1-85dd-83c9aa126c16"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"error","message":"Skill descriptions were shortened to fit the skills context budget. Codex can still see every skill, but some descriptions are shorter. Disable unused skills or plugins to leave more room for the rest."}}
+{"type":"item.completed","item":{"id":"item_1","type":"agent_message","text":"I’ll check the game revision.\n"}}
+{"type":"item.started","item":{"id":"item_2","type":"mcp_tool_call","server":"game","tool":"game.observe","arguments":{},"result":null,"error":null,"status":"in_progress"}}
+{"type":"item.completed","item":{"id":"item_2","type":"mcp_tool_call","server":"game","tool":"game.observe","arguments":{},"result":{"content":[{"type":"text","text":"{\"revision\":43,\"activeTurn\":true,\"requiredDecisions\":[],\"recentEvents\":[\"rev-43-committed\"]}"}],"structured_content":null},"error":null,"status":"completed"}}
+{"type":"item.completed","item":{"id":"item_3","type":"agent_message","text":"43"}}
+{"type":"turn.completed","usage":{"input_tokens":149477,"cached_input_tokens":131456,"cache_write_input_tokens":0,"output_tokens":196,"reasoning_output_tokens":0}}

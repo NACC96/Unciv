@@ -1,5 +1,11 @@
 package com.unciv.ui.screens.worldscreen.unit.actions
 
+import com.unciv.logic.agents.UnitOrder
+import com.unciv.logic.agents.UnitOrderCommand
+import com.unciv.logic.agents.UpgradeUnitCommand
+import com.unciv.logic.agents.GiftUnitCommand
+import java.util.UUID
+
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.scenes.scene2d.Touchable
@@ -194,6 +200,56 @@ class UnitActionsTable(val worldScreen: WorldScreen) : Table() {
     }
 
     private fun activateAction(unitAction: UnitAction, unit: MapUnit) {
+        // Agent matches route simple orders through the coordinator (§3.2);
+        // the coordinator validates and republishes state. Other games run
+        // the legacy lambda unchanged.
+        val routedOrder = when (unitAction.type) {
+            UnitActionType.Fortify -> UnitOrder.FORTIFY
+            UnitActionType.FortifyUntilHealed -> UnitOrder.FORTIFY_UNTIL_HEALED
+            UnitActionType.Sleep -> UnitOrder.SLEEP
+            UnitActionType.SleepUntilHealed -> UnitOrder.SLEEP_UNTIL_HEALED
+            UnitActionType.Paradrop -> UnitOrder.PARADROP
+            UnitActionType.Explore -> UnitOrder.EXPLORE
+            UnitActionType.StopExploration -> UnitOrder.STOP_EXPLORATION
+            UnitActionType.Automate -> UnitOrder.AUTOMATE
+            UnitActionType.StopAutomation -> UnitOrder.STOP_AUTOMATION
+            UnitActionType.Guard -> UnitOrder.GUARD
+            UnitActionType.SetUp -> UnitOrder.SET_UP
+            UnitActionType.AirSweep -> UnitOrder.AIR_SWEEP
+            UnitActionType.EscortFormation -> UnitOrder.ESCORT_FORMATION
+            UnitActionType.StopEscortFormation -> UnitOrder.STOP_ESCORT_FORMATION
+            UnitActionType.StopMovement -> UnitOrder.WAKE
+            else -> null
+        }
+        if (routedOrder != null && worldScreen.routeThroughAgentSession { 
+                listOf({ r: Int ->
+                    UnitOrderCommand(unit.civ.civID, "ui-${UUID.randomUUID()}", r, unit.id, routedOrder)
+                })
+            }) {
+            worldScreen.mapHolder.removeUnitActionOverlay()
+            worldScreen.shouldUpdate = true
+            return
+        }
+        // Upgrade actions route through the coordinator; the coordinator
+        // revalidates gold, movement, and requirements on committed state.
+        if (unitAction is UpgradeUnitAction && worldScreen.routeThroughAgentSession {
+                listOf({ r: Int ->
+                    UpgradeUnitCommand(unit.civ.civID, "ui-${UUID.randomUUID()}", r, unit.id)
+                })
+            }) {
+            worldScreen.mapHolder.removeUnitActionOverlay()
+            worldScreen.shouldUpdate = true
+            return
+        }
+        if (unitAction.type == UnitActionType.GiftUnit && worldScreen.routeThroughAgentSession {
+                listOf({ r: Int ->
+                    GiftUnitCommand(unit.civ.civID, "ui-${UUID.randomUUID()}", r, unit.id)
+                })
+            }) {
+            worldScreen.mapHolder.removeUnitActionOverlay()
+            worldScreen.shouldUpdate = true
+            return
+        }
         unitAction.action!!.invoke()
         worldScreen.shouldUpdate = true
         // We keep the unit action/selection overlay from the previous unit open even when already selecting another unit

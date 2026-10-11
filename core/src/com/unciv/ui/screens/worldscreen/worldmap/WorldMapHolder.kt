@@ -1,5 +1,10 @@
 package com.unciv.ui.screens.worldscreen.worldmap
 
+import com.unciv.logic.agents.AttackCommand
+import com.unciv.logic.agents.MoveUnitCommand
+import com.unciv.logic.agents.SwapUnitsCommand
+import java.util.UUID
+
 import com.badlogic.gdx.Application
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
@@ -46,7 +51,7 @@ import java.lang.Float.max
 
 class WorldMapHolder(
     internal val worldScreen: WorldScreen,
-    internal val tileMap: TileMap
+    internal var tileMap: TileMap
 ) : ZoomableScrollPane(20f, 20f) {
     internal var selectedTile: TileView? = null
     val tileGroups = HashMap<TileView, WorldTileGroup>()
@@ -97,6 +102,10 @@ class WorldMapHolder(
         val tileSetStrings = TileSetStrings(worldScreen.gameInfo.ruleset, worldScreen.game.settings)
         currentTileSetStrings = tileSetStrings
         val tileMapView = worldScreen.selectedGameView.tileMapView
+        // Clear before rebinding: after an agent-match snapshot publication
+        // the map holds a NEW object graph, and stale TileView keys would
+        // keep orphaned groups alive here.
+        tileGroups.clear()
         val tileGroupsNew = tileMap.values.map { WorldTileGroup(tileMapView.getTile(it), tileSetStrings) }
         tileGroupMap = TileGroupMap(this, tileGroupsNew, continuousScrollingX)
 
@@ -107,6 +116,18 @@ class WorldMapHolder(
         actor = tileGroupMap
         setSize(worldScreen.stage.width, worldScreen.stage.height)
         layout() // Fit the scroll pane to the contents - otherwise, setScroll won't work!
+    }
+
+    /**
+     * Rebinds the map layer after an agent-match snapshot publication
+     * (AI_AGENT_PLAN.md §9). The whole object graph (tiles, units, cities)
+     * was replaced by the published snapshot, so tile groups are rebuilt
+     * against the new [GameView]; pan/zoom state lives in this scroll pane
+     * and is preserved.
+     */
+    internal fun rebindToSnapshot(newTileMap: TileMap) {
+        tileMap = newTileMap
+        addTiles()
     }
 
     private fun addClickListener() {
@@ -252,6 +273,18 @@ class WorldMapHolder(
                     .firstOrNull { it.getTileToAttack() == tileView }
             if (unitView.canAttack() && attackableTile != null) {
                 /** ****** Right-click Attack ****** */
+                if (worldScreen.routeThroughAgentSession { rev ->
+                        listOf({ r: Int ->
+                            AttackCommand(
+                                worldScreen.viewingCiv.civID, "ui-${UUID.randomUUID()}", r,
+                                attackerUnitId = unitView.id, target = tileView.position()
+                            )
+                        })
+                    }) {
+                    localShouldUpdate = true
+                    worldScreen.shouldUpdate = localShouldUpdate
+                    return
+                }
                 val attackerCombatant = unitView.asCombatant()
                 if (!unitView.tryMovePreparingAttack(attackableTile)) return
                 if (!SoundPlayer.play(UncivSound(attackerCombatant.getCombatantName())))
@@ -277,6 +310,22 @@ class WorldMapHolder(
 
     internal fun moveUnitToTargetTile(selectedUnits: List<MapUnitView>, targetTileView: TileView) {
         val targetTile = targetTileView.getTile()
+        // Agent matches: route each unit's move through the coordinator
+        // (§3.2) instead of the legacy direct engine path.
+        if (worldScreen.routeThroughAgentSession {
+                selectedUnits.map { unitView ->
+                    { r: Int ->
+                        MoveUnitCommand(
+                            worldScreen.viewingCiv.civID, "ui-${UUID.randomUUID()}", r,
+                            unitView.id, targetTile.position
+                        )
+                    }
+                }
+            }) {
+            markUnitMoveTutorialComplete(selectedUnits.first())
+            worldScreen.shouldUpdate = true
+            return
+        }
         // this can take a long time, because of the unit-to-tile calculation needed, so we put it in a different thread
         // THIS PART IS REALLY ANNOYING
         // So lets say you have 2 units you want to move in the same direction, right
@@ -409,6 +458,19 @@ class WorldMapHolder(
 
     internal fun swapMoveUnitToTargetTile(selectedUnitView: MapUnitView, targetTileView: TileView) {
         markUnitMoveTutorialComplete(selectedUnitView)
+        // Agent matches route swaps through the coordinator (§3.2).
+        if (worldScreen.routeThroughAgentSession {
+                listOf({ r: Int ->
+                    SwapUnitsCommand(
+                        worldScreen.viewingCiv.civID, "ui-${UUID.randomUUID()}", r,
+                        selectedUnitView.id, targetTileView.position()
+                    )
+                })
+            }) {
+            worldScreen.shouldUpdate = true
+            removeUnitActionOverlay()
+            return
+        }
         selectedUnitView.trySwapMoveToTile(targetTileView, keepEscorting = true)
 
         if (selectedUnitView.isExploring() || selectedUnitView.isMoving())
@@ -463,8 +525,19 @@ class WorldMapHolder(
                 if (UncivGame.Current.settings.singleTapMove && turnsToGetThere == 1) {
                     // single turn instant move
                     val selectedUnitView = unitsWhoCanMoveThere.keys.first()
-                    for (unitView in unitsWhoCanMoveThere.keys) {
-                        unitView.tryHeadTowards(tileView)
+                    if (!worldScreen.routeThroughAgentSession {
+                            unitsWhoCanMoveThere.keys.map { unitView ->
+                                { r: Int ->
+                                    MoveUnitCommand(
+                                        worldScreen.viewingCiv.civID, "ui-${UUID.randomUUID()}", r,
+                                        unitView.id, tileView.position()
+                                    )
+                                }
+                            }
+                        }) {
+                        for (unitView in unitsWhoCanMoveThere.keys) {
+                            unitView.tryHeadTowards(tileView)
+                        }
                     }
                     worldScreen.bottomUnitTable.selectUnit(selectedUnitView) // keep moved unit selected
                 } else {

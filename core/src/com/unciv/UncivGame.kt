@@ -4,6 +4,11 @@ import com.badlogic.gdx.*
 import com.unciv.logic.GameInfo
 import com.unciv.logic.UncivShowableException
 import com.unciv.logic.Version
+import com.unciv.logic.agents.AgentMatchSessionFactory
+import com.unciv.logic.agents.AgentMatchSetup
+import com.unciv.logic.agents.AgentMatchState
+import com.unciv.logic.agents.AgentOrdinarySave
+import com.unciv.logic.agents.ControllerKind
 import com.unciv.logic.automation.Timers
 import com.unciv.logic.civilization.PlayerType
 import com.unciv.logic.files.UncivFiles
@@ -196,7 +201,12 @@ open class UncivGame(val isConsoleMode: Boolean = false) : Game(), PlatformSpeci
      * Sets the returned `WorldScreen` as the only active screen.
      * @param autoPlay pass in the old WorldScreen AutoPlay to retain the state throughout turns. Otherwise leave it is the default.
      */
-    suspend fun loadGame(newGameInfo: GameInfo, autoPlay: AutoPlay = AutoPlay(settings.autoPlay), callFromLoadScreen: Boolean = false): WorldScreen = withThreadPoolContext toplevel@{
+    suspend fun loadGame(newGameInfo: GameInfo, autoPlay: AutoPlay = AutoPlay(settings.autoPlay), callFromLoadScreen: Boolean = false, agentSetup: AgentMatchSetup? = null): WorldScreen = withThreadPoolContext toplevel@{
+        val savedAgentMatch = if (agentSetup == null) AgentOrdinarySave.read(newGameInfo) else null
+        if (savedAgentMatch != null) {
+            AgentMatchSessionFactory.requireRestoreSupport()
+            autoPlay.stopAutoPlay()
+        }
         val prevGameInfo = gameInfo
         gameInfo = newGameInfo
 
@@ -228,9 +238,42 @@ open class UncivGame(val isConsoleMode: Boolean = false) : Game(), PlatformSpeci
 
             worldScreen = null // This allows the GC to collect our old WorldScreen, otherwise we keep two WorldScreens in memory.
             val newWorldScreen = WorldScreen(newGameInfo, autoPlay, newGameInfo.getPlayerToViewAs(), worldScreenRestoreState)
-            worldScreen = newWorldScreen
+            if (savedAgentMatch != null) {
+                // No new-game setup/automatic play: exact saved controllers, work and receipts, PAUSED.
+                try {
+                    attachRestoredAgentWorld(newWorldScreen, savedAgentMatch)
+                } catch (ex: Exception) {
+                    gameInfo = prevGameInfo
+                    setAsRootScreen(MainMenuScreen())
+                    loadingScreen.dispose()
+                    throw ex
+                }
+            } else if (agentSetup != null) {
+                try {
+                    newWorldScreen.agentSession = AgentMatchSessionFactory.create(
+                        newGameInfo, agentSetup, newWorldScreen
+                    )
+                } catch (ex: Exception) {
+                    Log.error("Could not start agent match session", ex)
+                    newWorldScreen.agentSession = null
+                }
+                worldScreen = newWorldScreen
+            } else {
+                worldScreen = newWorldScreen
+            }
 
-            val moreThanOnePlayer = newGameInfo.civilizations.count { it.playerType == PlayerType.Human } > 1
+            val humanCount = if (savedAgentMatch != null) {
+                newGameInfo.civilizations.count {
+                    !it.isSpectator() && savedAgentMatch.controllers[it.civID]?.kind == ControllerKind.HUMAN
+                }
+            } else if (agentSetup != null) {
+                newGameInfo.civilizations.count {
+                    !it.isSpectator() && it.playerType == PlayerType.Human && !agentSetup.slots.containsKey(it.civName)
+                }
+            } else {
+                newGameInfo.civilizations.count { it.playerType == PlayerType.Human }
+            }
+            val moreThanOnePlayer = humanCount > 1
             val isSingleplayer = !newGameInfo.gameParameters.isOnlineMultiplayer
             val screenToShow = if (moreThanOnePlayer && isSingleplayer) {
                 PlayerReadyScreen(newWorldScreen)
@@ -243,6 +286,19 @@ open class UncivGame(val isConsoleMode: Boolean = false) : Game(), PlatformSpeci
             loadingScreen.dispose()
 
             return@withGLContext newWorldScreen
+        }
+    }
+
+    /** Publish a restored world only after its controlling host exists; failures remain unreachable. */
+    private fun attachRestoredAgentWorld(newWorldScreen: WorldScreen, match: AgentMatchState) {
+        try {
+            newWorldScreen.agentSession = AgentMatchSessionFactory.restore(
+                newWorldScreen.gameInfo, match, newWorldScreen)
+            worldScreen = newWorldScreen
+        } catch (ex: Exception) {
+            worldScreen = null
+            newWorldScreen.dispose()
+            throw ex
         }
     }
 

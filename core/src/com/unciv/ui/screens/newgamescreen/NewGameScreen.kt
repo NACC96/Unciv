@@ -2,6 +2,7 @@ package com.unciv.ui.screens.newgamescreen
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup
 import com.unciv.Constants
 import com.unciv.UncivGame
@@ -120,6 +121,13 @@ class NewGameScreen(
             horizontalGroup.addActor(resetToDefaultsButton)
         }
 
+        val agentNoticeLabel = "Starting an agent game begins automated play immediately using the selected provider account.".toLabel(Color.SKY, 12).apply {
+            wrap = true
+            setAlignment(Align.right)
+            width = 260f
+        }
+        horizontalGroup.addActor(agentNoticeLabel)
+
         val startGameButton = "Start game!".toTextButton().apply { color = Color.GREEN }        
         startGameButton.onClick(this::startGameAvoidANRs)
         horizontalGroup.addActor(startGameButton)
@@ -189,6 +197,13 @@ class NewGameScreen(
             }) return "No human players selected!"
 
         if (gameSetupInfo.gameParameters.victoryTypes.isEmpty()) return "No victory conditions were selected!"
+
+        // Agent slots stay Human-typed (rule parity), so the human-count gate
+        // above already admits all-agent matches. Their own contract —
+        // Vanilla, no espionage/mods/random counts, configured providers —
+        // is enforced here before creation.
+        val agentErrors = playerPickerTable.collectAgentErrors()
+        if (agentErrors.isNotEmpty()) return agentErrors.joinToString("\n")
         
         if (mapOptionsTable.mapTypeSelectBox.selected.value == MapGeneratedMainType.custom) {
             val map = try {
@@ -391,8 +406,16 @@ class NewGameScreen(
             }
         }
 
-        val worldScreen = game.loadGame(newGame)
-        
+        val agentSetup = if (playerPickerTable.collectAgentErrors().isEmpty() && playerPickerTable.agentProfiles.isNotEmpty()) {
+            playerPickerTable.buildAgentMatchSetup()
+        } else null
+
+        val worldScreen = game.loadGame(newGame, agentSetup = agentSetup)
+
+        if (agentSetup != null) {
+            worldScreen.agentSession?.startAutomaticPlay()
+        }
+
         worldScreen.autoSave()
 
         if (newGame.gameParameters.isOnlineMultiplayer) {
