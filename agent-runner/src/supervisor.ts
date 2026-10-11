@@ -11,6 +11,7 @@
  * Provider output and JSONL logs are evidence; engine receipts govern.
  */
 import { spawn, type ChildProcess } from "node:child_process";
+import { delimiter, dirname } from "node:path";
 import type { IGameService } from "./fake-game-mcp.js";
 import { startGameMcpServer, type RunBinding } from "./game-mcp-server.js";
 import { buildTurnPrompt } from "./turn-prompt.js";
@@ -62,7 +63,9 @@ export class NodeRunner implements ProviderRunner {
   spawn(spec: SpawnSpec, env: NodeJS.ProcessEnv): RunningChild {
     const child: ChildProcess = spawn(spec.executable, spec.argv, {
       cwd: spec.cwd,
-      env,
+      // GUI environments may discover a Node-script CLI without having node
+      // on PATH. Reuse the already-running supervisor's verified runtime.
+      env: { ...env, PATH: [dirname(process.execPath), env["PATH"] ?? ""].filter(Boolean).join(delimiter) },
       stdio: ["ignore", "pipe", "pipe"],
     });
     let stderr = "";

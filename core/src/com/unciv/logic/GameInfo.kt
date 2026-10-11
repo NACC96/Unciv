@@ -104,6 +104,9 @@ class GameInfo : IsPartOfGameInfoSerialization, HasGameInfoSerializationVersion 
     /** Version that saved the game, set in [UncivFiles.gameInfoToString][com.unciv.logic.files.UncivFiles.gameInfoToString]. */
     override var version = CompatibilityVersion.FIRST_WITHOUT
 
+    /** Immutable, paired agent metadata for this presentation/save snapshot, never a nested world. */
+    var agentMatchStateJson: String? = null
+
     var civilizations = ArrayList<Civilization>()
     var barbarians = BarbarianManager()
     var religions: HashMap<String, Religion> = hashMapOf()
@@ -214,6 +217,8 @@ class GameInfo : IsPartOfGameInfoSerialization, HasGameInfoSerializationVersion 
         toReturn.difficulty = difficulty
         toReturn.gameParameters = gameParameters
         toReturn.gameId = gameId
+        toReturn.version = version
+        toReturn.agentMatchStateJson = agentMatchStateJson
         toReturn.diplomaticVictoryVotesCast.putAll(diplomaticVictoryVotesCast)
         toReturn.oneMoreTurnMode = oneMoreTurnMode
         toReturn.customSaveLocation = customSaveLocation

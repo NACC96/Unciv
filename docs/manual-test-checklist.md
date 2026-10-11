@@ -36,8 +36,9 @@ verified. Execute top to bottom; stop at the first failure and record it.
    (Starting provider → Agent deciding → Applying), map updates WITHOUT
    reopening the screen after each action, checkpoint dir grows under
    `--data-dir/.agent-data`.
-9. Pause mid-turn: status flips to Paused; provider activity drains; Run
-   resumes; no duplicated actions after resume (revision continuity).
+9. Pause mid-turn: status shows Pausing while the admitted provider turn
+   finishes normally, then Paused before the next provider starts. Run resumes
+   without duplicated actions (revision continuity).
 10. Take over human → the civ's turn answers to the UI; return-to-agent with
     a different model → fresh provider session, no stale resume.
 

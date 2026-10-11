@@ -4,11 +4,11 @@ import com.unciv.logic.GameInfo
 import com.unciv.logic.agents.AgentCommand
 import com.unciv.logic.agents.AgentControl
 import com.unciv.logic.agents.AgentEngineBridge
-import com.unciv.logic.agents.AgentGuidanceQueue
 import com.unciv.logic.agents.AgentJson
 import com.unciv.logic.agents.AgentMatchSession
 import com.unciv.logic.agents.AgentMatchState
 import com.unciv.logic.agents.AgentMatchSetup
+import com.unciv.logic.agents.AgentOrdinarySave
 import com.unciv.logic.agents.AgentProfile
 import com.unciv.logic.agents.AgentRunControls
 import com.unciv.logic.agents.AgentRunState
@@ -62,29 +62,40 @@ class DesktopAgentMatch(
     private val nodeExecutable: File? = null,
     private val supervisorDist: File? = null,
     /** Injected runner (tests, scripted providers); production spawns `node dist/daemon.js`. */
-    private val supervisorFactory: (() -> SupervisorRunner)? = null
+    private val supervisorFactory: (() -> SupervisorRunner)? = null,
+    /** Fresh checkpoint namespace when an ordinary save reopens an older branch. */
+    private val recoveryLineage: String? = null
 ) : AgentMatchSession {
 
     override val matchId: String = match.matchId
 
     private val lock = Any()
-    val coordinator = MatchCoordinator(game, match, fileStore(dataDir, match.matchId))
+    val recoveryDirectory: File = recoveryLineage?.let { File(checkpointDir(dataDir, match.matchId), "restores/$it") }
+        ?: checkpointDir(dataDir, match.matchId)
+    val coordinator = MatchCoordinator(game, match, FileCheckpointStore(recoveryDirectory, match.matchId))
     private val bridge = AgentEngineBridge(coordinator)
     private val humanExecutor = HumanCommandExecutor(coordinator)
-    private val guidance = AgentGuidanceQueue()
-    private var runState: AgentRunState = AgentRunState.PAUSED
+    private var runState: AgentRunState = when {
+        match.turnPhase == TurnPhase.COMPLETED -> AgentRunState.FINISHED
+        match.matchPaused -> AgentRunState.NEEDS_ATTENTION
+        else -> AgentRunState.PAUSED
+    }
     private var authorityEpoch = 1
     private val sessions = HashMap<String, String>() // civId -> provider session ID
     private var supervisor: SupervisorRunner? = null
-    private var failureReason: String? = null
+    private var failureReason: String? = match.matchPausedReason
     private val isLoopRunning = AtomicBoolean(false)
 
     companion object {
         fun checkpointDir(dataDir: File, matchId: String): File =
             File(dataDir, ".agent-data/checkpoints/$matchId")
 
-        private fun fileStore(dataDir: File, matchId: String) =
-            FileCheckpointStore(checkpointDir(dataDir, matchId), matchId)
+        fun restore(game: GameInfo, match: AgentMatchState, dataDir: File,
+                    worldScreen: WorldScreen? = null,
+                    supervisorFactory: (() -> SupervisorRunner)? = null): DesktopAgentMatch =
+            DesktopAgentMatch(game, match, AgentOrdinarySave.setupFor(game, match), dataDir,
+                worldScreen = worldScreen, supervisorFactory = supervisorFactory,
+                recoveryLineage = UUID.randomUUID().toString())
 
         /**
          * Node discovery (AI_AGENT_PLAN.md §10): explicit path (system
@@ -236,10 +247,10 @@ class DesktopAgentMatch(
             selectedCityId = screen.currentSelectedCityId(),
             selectedTile = screen.currentSelectedTilePos()
         )
-        val snapshot = coordinator.deserializeForPublication(payload.serializedGame)
+        val snapshot = AgentSnapshotPublication.deserializeGame(payload)
         val selection = AgentSnapshotPublication.resolveSelection(snapshot, payload)
         Concurrency.runOnGLThread {
-            screen.installAgentSnapshot(snapshot, selection)
+            screen.installAgentSnapshot(snapshot, selection, payload.generation)
         }
     }
 
@@ -259,7 +270,7 @@ class DesktopAgentMatch(
     }
 
     override fun canResume(): Boolean = synchronized(lock) {
-        runState == AgentRunState.PAUSED && coordinator.getTurnPhase() != TurnPhase.COMPLETED
+        runState == AgentRunState.PAUSED && !coordinator.isPaused() && coordinator.getTurnPhase() != TurnPhase.COMPLETED
     }
 
     override fun canRetry(): Boolean = synchronized(lock) {
@@ -288,6 +299,14 @@ class DesktopAgentMatch(
     override fun retry() {
         synchronized(lock) {
             if (runState != AgentRunState.NEEDS_ATTENTION) return
+            try {
+                coordinator.retryPausedMatch()
+                publishSnapshotLocked()
+            } catch (ex: Exception) {
+                failureReason = coordinator.getPausedReason() ?: ex.message
+                refreshUi()
+                return
+            }
             failureReason = null
             runState = AgentRunState.STARTING
         }
@@ -334,6 +353,7 @@ class DesktopAgentMatch(
     /** Continuous agent play, advancing across civs and pausing at human turns or failures. */
     fun run() {
         synchronized(lock) {
+            if (coordinator.isPaused()) return
             if (runState == AgentRunState.FINISHED) return
             if (coordinator.getTurnPhase() == TurnPhase.COMPLETED) {
                 runState = AgentRunState.FINISHED
@@ -404,7 +424,10 @@ class DesktopAgentMatch(
     }
 
     fun queueGuidance(civId: String, text: String) {
-        synchronized(lock) { guidance.queue(civId, text) }
+        synchronized(lock) {
+            coordinator.queueGuidance(civId, text)
+            publishSnapshotLocked()
+        }
     }
 
     private fun transition(control: AgentControl): Boolean {
@@ -521,9 +544,11 @@ class DesktopAgentMatch(
             return
         }
         val runId = "run-${UUID.randomUUID()}"
-        val control: Map<String, Any?>
-        synchronized(lock) {
-            control = mapOf(
+        val control: Map<String, Any?> = try { synchronized(lock) {
+            val beforeGeneration = coordinator.getPublicationGeneration()
+            val turnGuidance = coordinator.takeGuidanceForDelivery(civId)
+            if (coordinator.getPublicationGeneration() != beforeGeneration) publishSnapshotLocked()
+            mapOf(
                 "protocol" to 1,
                 "kind" to "control",
                 "op" to "run_turn",
@@ -543,7 +568,11 @@ class DesktopAgentMatch(
                 "context" to mapOf("rulesetName" to coordinator.getRulesetName(),
                     "protocolVersion" to 1, "civId" to civId,
                     "turnSerial" to coordinator.getTurnSerial()),
-                "guidance" to guidance.takeForDelivery(civId))
+                "guidance" to turnGuidance)
+        } } catch (ex: Exception) {
+            synchronized(lock) { publishSnapshotLocked() }
+            fail(coordinator.getPausedReason() ?: "Cannot prepare agent turn: ${ex.message}")
+            return
         }
         val outcome = proc.runTurn(control)
         synchronized(lock) {
@@ -572,6 +601,7 @@ class DesktopAgentMatch(
                 civId, "reassign-${UUID.randomUUID()}",
                 coordinator.getStateRevision(), civId, kind, profile))
             runState = AgentRunState.PAUSED
+            publishSnapshotLocked()
         }
         refreshUi()
     }
@@ -613,26 +643,31 @@ class DesktopAgentMatch(
     /** Engine-RPC dispatch for supervisor frames (called on the RPC thread). */
     fun answerEngineRequest(method: String, params: Map<String, Any?>): Any? {
         synchronized(lock) {
-            return when (method) {
-                "observe" -> bridge.observe(params["civId"] as String)
-                "inspect" -> bridge.inspect(params["civId"] as String,
-                    (params["unitId"] as Number).toInt())
-                "rules" -> bridge.rules()
-                "legal_actions" -> bridge.legalActions(
-                    params["civId"] as String,
-                    (params["unitId"] as? Number)?.toInt(),
-                    params["cityId"] as? String)
-                "act" -> bridge.act(params)
-                "action_result" -> bridge.actionResult(params["actionId"] as String)
-                "notes_get" -> bridge.readNotes(params["civId"] as String)
-                "notes_put" -> bridge.updateNotes(
-                    params["civId"] as String, params["notes"] as String,
-                    (params["expectedNotesRevision"] as Number).toInt())
-                "end_turn" -> bridge.endTurn(
-                    params["civId"] as String,
-                    params["actionId"] as String,
-                    coordinator.getStateRevision())
-                else -> throw EngineCallException("INVALID_ARGUMENT", "Unknown method $method")
+            val before = coordinator.getPublicationGeneration()
+            try {
+                return when (method) {
+                    "observe" -> bridge.observe(params["civId"] as String)
+                    "inspect" -> bridge.inspect(params["civId"] as String,
+                        (params["unitId"] as Number).toInt())
+                    "rules" -> bridge.rules()
+                    "legal_actions" -> bridge.legalActions(
+                        params["civId"] as String,
+                        (params["unitId"] as? Number)?.toInt(),
+                        params["cityId"] as? String)
+                    "act" -> bridge.act(params)
+                    "action_result" -> bridge.actionResult(params["actionId"] as String)
+                    "notes_get" -> bridge.readNotes(params["civId"] as String)
+                    "notes_put" -> bridge.updateNotes(
+                        params["civId"] as String, params["notes"] as String,
+                        (params["expectedNotesRevision"] as Number).toInt())
+                    "end_turn" -> bridge.endTurn(
+                        params["civId"] as String,
+                        params["actionId"] as String,
+                        coordinator.getStateRevision())
+                    else -> throw EngineCallException("INVALID_ARGUMENT", "Unknown method $method")
+                }
+            } finally {
+                if (coordinator.getPublicationGeneration() != before) publishSnapshotLocked()
             }
         }
     }

@@ -14,6 +14,7 @@ import com.unciv.logic.BackwardCompatibility.migrateCivID
 import com.unciv.logic.GameInfo
 import com.unciv.logic.GameInfoPreview
 import com.unciv.logic.UncivShowableException
+import com.unciv.logic.agents.AgentOrdinarySave
 import com.unciv.models.metadata.GameSettings
 import com.unciv.models.metadata.doMigrations
 import com.unciv.models.metadata.isMigrationNecessary
@@ -176,7 +177,8 @@ class UncivFiles(
     fun saveGame(game: GameInfo, file: FileHandle, saveCompletionCallback: (Exception?) -> Unit = ::rethrowIfNotNull) {
         try {
             debug("Saving GameInfo %s to %s", game.gameId, file.path())
-            game.version = CompatibilityVersion.CURRENT_COMPATIBILITY_VERSION
+            AgentOrdinarySave.prepareForSave(game)
+            game.version = CompatibilityVersion.forGame(game)
             FileConversions.writeJson(file, game, saveZipped)
             saveCompletionCallback(null)
         } catch (ex: Exception) {
@@ -260,6 +262,7 @@ class UncivFiles(
             // this means there wasn't an immediate error while serializing, but this version will cause other errors later down the line
             throw IncompatibleGameInfoVersionException(gameInfo.version)
         }
+        AgentOrdinarySave.prepareForLoad(gameInfo)
         gameInfo.setTransients()
         return gameInfo
     }
@@ -445,6 +448,7 @@ class UncivFiles(
                 // this means there wasn't an immediate error while serializing, but this version will cause other errors later down the line
                 throw IncompatibleGameInfoVersionException(gameInfo.version)
             }
+            AgentOrdinarySave.prepareForLoad(gameInfo)
             gameInfo.setTransients()
             return gameInfo
         }
@@ -461,7 +465,8 @@ class UncivFiles(
 
         /** Returns gzipped serialization of [game], optionally gzipped ([forceZip] overrides [saveZipped]) */
         fun gameInfoToString(game: GameInfo, forceZip: Boolean? = null, updateChecksum: Boolean = false): String {
-            game.version = CompatibilityVersion.CURRENT_COMPATIBILITY_VERSION
+            AgentOrdinarySave.prepareForSave(game)
+            game.version = CompatibilityVersion.forGame(game)
 
             if (updateChecksum) game.checksum = game.calculateChecksum()
             val plainJson = json().toJson(game)

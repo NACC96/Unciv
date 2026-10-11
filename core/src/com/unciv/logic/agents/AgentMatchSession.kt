@@ -65,9 +65,25 @@ object AgentMatchSessionFactory {
     /** Set once by the desktop launcher; null on platforms without hosting. */
     var creator: ((game: GameInfo, match: AgentMatchState, setup: AgentMatchSetup, screen: WorldScreen) -> AgentMatchSession)? = null
 
+    /** Restores an exact ordinary save; this callback must construct an idle, paused host. */
+    var restorer: ((game: GameInfo, match: AgentMatchState, setup: AgentMatchSetup, screen: WorldScreen) -> AgentMatchSession)? = null
+
+    fun requireRestoreSupport() {
+        if (restorer == null)
+            throw com.unciv.logic.UncivShowableException("This platform cannot host saved agent matches.")
+    }
+
     fun create(game: GameInfo, setup: AgentMatchSetup, screen: WorldScreen): AgentMatchSession? {
         if (setup.slots.isEmpty()) return null
         val creator = creator ?: return null
-        return creator(game, setup.buildMatchState(game), setup, screen)
+        val match = setup.buildMatchState(game)
+        return creator(game, match, setup, screen).also {
+            game.agentMatchStateJson = AgentOrdinarySave.encode(match)
+        }
+    }
+
+    fun restore(game: GameInfo, match: AgentMatchState, screen: WorldScreen): AgentMatchSession {
+        requireRestoreSupport()
+        return restorer!!(game, match.deepCopy(), AgentOrdinarySave.setupFor(game, match), screen)
     }
 }

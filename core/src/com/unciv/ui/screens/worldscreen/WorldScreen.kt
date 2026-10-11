@@ -202,12 +202,18 @@ class WorldScreen(
      * thread. Selections re-resolve by stable ID — entities that no longer
      * exist clear their selection instead of holding orphans.
      */
-    fun installAgentSnapshot(snapshot: GameInfo, selection: ResolvedSelection) {
+    private val agentPublicationFence = com.unciv.logic.agents.AgentPublicationFence()
+
+    fun installAgentSnapshot(snapshot: GameInfo, selection: ResolvedSelection, publicationGeneration: Long = 0) {
+        // A queued frame from an old host must not replace the currently opened game or its autosave.
+        if (game.worldScreen !== this || game.gameInfo !== gameInfo || agentSession == null || gameInfo.gameId != snapshot.gameId) return
         if (gameInfo === snapshot) return
         val oldViewerId = viewingCiv.civID
         val newViewer = snapshot.civilizations.firstOrNull { it.civID == oldViewerId }
             ?: return // snapshot without the viewer is a host bug; keep current render
+        if (!agentPublicationFence.accept(publicationGeneration)) return
         gameInfo = snapshot
+        game.gameInfo = snapshot
         viewingCiv = newViewer
         selectedCiv = snapshot.civilizations.firstOrNull { it.civID == selectedCiv.civID } ?: newViewer
         selectedGameView = GameView(snapshot, selectedCiv, spectatorMode = viewingCiv.isSpectator())

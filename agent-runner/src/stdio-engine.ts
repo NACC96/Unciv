@@ -131,8 +131,9 @@ export class StdioEngineBackend implements IGameService {
     return this.call("rules", {});
   }
 
-  async legalActions(unitId: number): Promise<{ unitId: number; actions: unknown[] } | EngineLegalActions | FakeError> {
-    return this.call("legal_actions", { civId: this.actorCivId(), unitId });
+  async legalActions(unitId?: number, cityId?: string): Promise<{ unitId: number; actions: unknown[] } | EngineLegalActions | FakeError> {
+    return this.call("legal_actions", { civId: this.actorCivId(),
+      ...(unitId !== undefined ? { unitId } : {}), ...(cityId !== undefined ? { cityId } : {}) });
   }
 
   async act(envelope: {

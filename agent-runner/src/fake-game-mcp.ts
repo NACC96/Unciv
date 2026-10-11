@@ -21,7 +21,7 @@ export interface IGameService {
   observe(): Promise<GameObserveResult>;
   inspect(unitId: number): Promise<FakeUnit | ObservedUnit | FakeError | null>;
   rules(): Promise<{ ruleset: string; note: string }>;
-  legalActions(unitId: number): Promise<{ unitId: number; actions: unknown[] } | EngineLegalActions | FakeError>;
+  legalActions(unitId?: number, cityId?: string): Promise<{ unitId: number; actions: unknown[] } | EngineLegalActions | FakeError>;
   act(envelope: {
     protocolVersion: number;
     actionId: string;
@@ -105,6 +105,7 @@ export class FakeGameService implements IGameService {
   /** When true, game.end_turn reports a mandatory decision instead of succeeding. */
   decisionsPending: string[] = [];
   units: FakeUnit[] = [{ id: 17, position: { x: 0, y: 0 }, movementLeft: 2 }];
+  cities = [{ id: "city-1", constructions: ["Monument", "Warrior"] }];
   notes = "";
   notesRevision = 0;
   turnEnded = false;
@@ -130,12 +131,21 @@ export class FakeGameService implements IGameService {
     return { ruleset: "Civ V - Vanilla (fake stub)", note: "static rules may be cached" };
   }
 
-  async legalActions(unitId: number): Promise<{ unitId: number; actions: unknown[] } | FakeError> {
+  async legalActions(unitId?: number, cityId?: string): Promise<{ unitId: number; actions: unknown[] } | EngineLegalActions | FakeError> {
+    if ((unitId === undefined) === (cityId === undefined))
+      return { protocolVersion: 1, status: "rejected", code: "INVALID_ARGUMENT", message: "supply exactly one unitId or cityId" };
+    if (cityId !== undefined) {
+      const city = this.cities.find(candidate => candidate.id === cityId);
+      if (!city) return { protocolVersion: 1, status: "rejected", code: "ILLEGAL_ACTION", message: "no such visible entity" };
+      return { moveTargets: [], attackTargets: [], orders: [], canFound: false,
+        constructions: [...city.constructions], researchable: ["Pottery"], freeTechs: 0, freePolicies: 0,
+        promotions: [], canUpgrade: false, upgradeTo: null, greatActions: [] };
+    }
     const seen = this.units.find((u) => u.id === unitId);
     if (!seen) {
       return { protocolVersion: 1, status: "rejected", code: "ILLEGAL_ACTION", message: "no such visible entity" };
     }
-    return { unitId, actions: [{ type: "unit.move", costs: { movement: 1 }, targets: "adjacent-explored-tiles" }] };
+    return { unitId: seen.id, actions: [{ type: "unit.move", costs: { movement: 1 }, targets: "adjacent-explored-tiles" }] };
   }
 
   async inspect(unitId: number): Promise<FakeUnit | FakeError> {

@@ -14,6 +14,10 @@ import com.unciv.logic.map.HexCoord
  */
 class PublicationPayload(
     var serializedGame: String = "",
+    /** Captured under the same host lock as serializedGame; no live-session lookup during save. */
+    var serializedMatchState: String = "",
+    /** Monotonic committed generation, including changes to notes/guidance at the same revision. */
+    var generation: Long = 0,
     var revision: Int = 0,
     var turnSerial: Int = 0,
     var phase: TurnPhase = TurnPhase.READY_TO_START,
@@ -32,6 +36,17 @@ class ResolvedSelection(
     val tile: HexCoord?
 )
 
+/** GL-owned fence: an older queued frame can never roll back a newer metadata-only frame. */
+class AgentPublicationFence {
+    private var installedGeneration = -1L
+
+    fun accept(generation: Long): Boolean {
+        if (generation <= installedGeneration) return false
+        installedGeneration = generation
+        return true
+    }
+}
+
 object AgentSnapshotPublication {
 
     /** Serializes the committed game plus publication metadata, coordinator-side. */
@@ -45,6 +60,8 @@ object AgentSnapshotPublication {
         val serialized = coordinator.serializeCommittedGameForPublication()
         return PublicationPayload(
             serializedGame = serialized,
+            serializedMatchState = coordinator.serializeCommittedMatchForPublication(),
+            generation = coordinator.getPublicationGeneration(),
             revision = coordinator.getStateRevision(),
             turnSerial = coordinator.getTurnSerial(),
             phase = coordinator.getTurnPhase(),
@@ -59,7 +76,9 @@ object AgentSnapshotPublication {
 
     /** Restores a payload into a fresh [GameInfo] with transients bound. */
     fun deserializeGame(payload: PublicationPayload): GameInfo =
-        MatchCoordinator.deserializeForPublication(payload.serializedGame)
+        MatchCoordinator.deserializeForPublication(payload.serializedGame).also {
+            it.agentMatchStateJson = payload.serializedMatchState
+        }
 
     /**
      * Re-resolves UI selection handles against the NEW object graph by

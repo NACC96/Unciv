@@ -3,9 +3,13 @@
  *
  * Absolute executable paths, explicit environments, argument arrays — no
  * shell, no interpolation of names/models/personalities into commands, no
- * interactive profile sourcing. Values here are the W1-proven configurations
+ * interactive profile sourcing. Arguments here are the W1-proven configurations
  * from agent-runner/probes/* (see W1-COMPATIBILITY.md + CP-010–CP-012).
  */
+import { accessSync, constants, readdirSync, statSync } from "node:fs";
+import { homedir } from "node:os";
+import { delimiter, isAbsolute, join, resolve } from "node:path";
+
 export const GAME_TOOL_ALLOWLIST = [
   "game.observe",
   "game.inspect",
@@ -23,9 +27,53 @@ export interface SpawnSpec {
   cwd: string;
 }
 
-export const CODEX_EXECUTABLE = "/Users/noahkenny/.nvm/versions/node/v24.13.1/bin/codex";
-export const CLAUDE_EXECUTABLE = "/Users/noahkenny/.local/bin/claude";
-export const OPENCODE_EXECUTABLE = "/Users/noahkenny/.opencode/bin/opencode";
+type Provider = "codex" | "claude" | "opencode";
+
+/** Only reads executable metadata: no CLI invocations, shells, or profile sourcing. */
+export function resolveProviderExecutable(
+  provider: Provider,
+  options: { env?: NodeJS.ProcessEnv; homeDir?: string } = {},
+): string {
+  const env = options.env ?? process.env;
+  const home = options.homeDir ?? homedir();
+  const variable = `UNCIV_${provider.toUpperCase()}_EXECUTABLE`;
+  const isExecutable = (candidate: string) => {
+    try {
+      if (!statSync(candidate).isFile()) return false;
+      accessSync(candidate, constants.X_OK);
+      return true;
+    } catch { return false; }
+  };
+  const configured = env[variable];
+  if (configured !== undefined) {
+    if (!isAbsolute(configured) || !isExecutable(configured))
+      throw new Error(`${variable} must be an absolute path to an executable ${provider} CLI; fix or unset the override to use discovery.`);
+    return resolve(configured);
+  }
+  const names = process.platform === "win32" ? [`${provider}.exe`, provider] : [provider];
+  // Empty PATH entries mean cwd in shells; deliberately exclude them here.
+  const directories = (env["PATH"] ?? "").split(delimiter).filter(dir => dir.length > 0);
+  if (provider === "opencode") directories.push(join(home, ".opencode", "bin"));
+  directories.push(join(home, ".local", "bin"), join(home, ".volta", "bin"), join(home, ".npm-global", "bin"));
+  const nvmRoot = join(home, ".nvm", "versions", "node");
+  try {
+    // GUI launches may lack the PATH supplied by an interactive NVM profile.
+    const versions = readdirSync(nvmRoot).filter(name => /^v\d+\.\d+\.\d+$/.test(name));
+    versions.sort((a, b) => {
+      const av = a.slice(1).split(".").map(Number), bv = b.slice(1).split(".").map(Number);
+      for (let index = 0; index < 3; index++) if (av[index] !== bv[index]) return bv[index] - av[index];
+      return 0;
+    });
+    directories.push(...versions.map(version => join(nvmRoot, version, "bin")));
+  } catch { /* NVM is optional. */ }
+  for (const directory of directories) {
+    for (const name of names) {
+      const candidate = resolve(directory, name);
+      if (isExecutable(candidate)) return candidate;
+    }
+  }
+  throw new Error(`Install the ${provider} CLI and add it to PATH, or set ${variable} to its absolute executable path. No executable was found in PATH or standard per-user installs.`);
+}
 
 export function codexSpawn(args: {
   prompt: string;
@@ -59,7 +107,7 @@ export function codexSpawn(args: {
   );
   if (args.resumeId) argv.push("resume", args.resumeId);
   argv.push(args.prompt);
-  return { executable: CODEX_EXECUTABLE, argv, cwd: args.cwd };
+  return { executable: resolveProviderExecutable("codex"), argv, cwd: args.cwd };
 }
 
 export function claudeSpawn(args: {
@@ -89,7 +137,7 @@ export function claudeSpawn(args: {
   }
   if (args.resumeId) argv.push("--resume", args.resumeId);
   argv.push(args.prompt);
-  return { executable: CLAUDE_EXECUTABLE, argv, cwd: args.cwd };
+  return { executable: resolveProviderExecutable("claude"), argv, cwd: args.cwd };
 }
 
 export function opencodeSpawn(args: {
@@ -109,5 +157,5 @@ export function opencodeSpawn(args: {
   }
   if (args.resumeId) argv.push("--session", args.resumeId);
   argv.push(args.prompt);
-  return { executable: OPENCODE_EXECUTABLE, argv, cwd: args.dir };
+  return { executable: resolveProviderExecutable("opencode"), argv, cwd: args.dir };
 }
