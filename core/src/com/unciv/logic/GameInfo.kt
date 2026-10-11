@@ -181,6 +181,14 @@ class GameInfo : IsPartOfGameInfoSerialization, HasGameInfoSerializationVersion 
     @Transient
     var suppressAutomationDuringTransients = false
 
+    /** Agent controllers always use normal civilization sight, including restoration. */
+    @Transient
+    var agentNormalVisibility = false
+
+    /** Unpublished action collector only; never copied or serialized. */
+    @Transient
+    var agentMapSightings: com.unciv.logic.agents.AgentMapSightings? = null
+
     @Transient
     lateinit var ruleset: Ruleset
 

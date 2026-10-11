@@ -85,15 +85,8 @@ internal object DesktopLauncher {
             GraphicsEnvironment.getLocalGraphicsEnvironment()
         }
 
-        val customDataDirPrefix="--data-dir="
-        val customDataDir = arg.find { it.startsWith(customDataDirPrefix) }?.removePrefix(customDataDirPrefix)
-            ?: if (System.getProperty("jpackage.app-path") != null) {
-                // Finder/jpackage may start with user.dir=/; never write saves into
-                // the filesystem root or the signed application bundle.
-                File(System.getProperty("user.home"), "Library/Application Support/Unciv").apply {
-                    check(isDirectory || mkdirs()) { "Cannot create Unciv data directory: $absolutePath" }
-                }.absolutePath
-            } else null
+        val customDataDir = DesktopDataDirectory.resolve(arg,
+            nativeLaunch = System.getProperty("jpackage.app-path") != null)
 
         // Setup Desktop logging
         Log.backend = DesktopLogBackend()
@@ -117,9 +110,9 @@ internal object DesktopLauncher {
         // Agent matches: hosting factory closed over the project-owned data
         // directory (checkpoints, logs, supervisor runtime live here — never
         // the ordinary Unciv profile). Null elsewhere (other platforms).
-        com.unciv.logic.agents.AgentMatchSessionFactory.creator = { game, match, setup ->
+        com.unciv.logic.agents.AgentMatchSessionFactory.creator = { game, match, setup, screen ->
             com.unciv.app.desktop.agents.DesktopAgentMatch(
-                game, match, setup, java.io.File(dataDirectory))
+                game, match, setup, java.io.File(dataDirectory), worldScreen = screen)
         }
 
         val isRunFromJAR = isRunFromJar(this)
@@ -130,6 +123,7 @@ internal object DesktopLauncher {
         if (SharedLibraryLoader.os == Os.MacOsX) updateDockIconForMacOs("ExtraImages/Icons/Unciv128.png")
         config.setTitle("Unciv")
         config.setHdpiMode(HdpiMode.Logical)
+        config.setResizable(true)
         config.setWindowSizeLimits(WindowState.minimumWidth, WindowState.minimumHeight, -1, -1)
 
 
@@ -140,7 +134,7 @@ internal object DesktopLauncher {
         val settings = UncivFiles.getSettingsForPlatformLaunchers(dataDirectory)
         if (settings.isFreshlyCreated) {
             settings.screenSize = ScreenSize.Large // By default we guess that Desktops have larger screens
-            settings.windowState = WindowState(maximumWindowBounds)
+            settings.windowState = WindowState(1280, 800).coerceIn(maximumWindowBounds)
 
             FileHandle(dataDirectory + File.separator + SETTINGS_FILE_NAME).writeString(json().toJson(settings), false, Charsets.UTF_8.name()) // so when we later open the game we get fullscreen
         }

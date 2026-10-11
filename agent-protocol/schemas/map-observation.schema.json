@@ -1,0 +1,456 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "map-observation.schema.json",
+  "title": "Agent permitted map observation v2",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "protocolVersion": {
+      "const": 1
+    },
+    "observationVersion": {
+      "const": 2
+    },
+    "matchId": {
+      "type": "string"
+    },
+    "timelineId": {
+      "type": "string"
+    },
+    "revision": {
+      "type": "integer"
+    },
+    "tiles": {
+      "type": "array",
+      "maxItems": 128,
+      "items": {
+        "$ref": "#/$defs/ObservedTile"
+      }
+    },
+    "nextCursor": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  },
+  "required": [
+    "protocolVersion",
+    "observationVersion",
+    "matchId",
+    "timelineId",
+    "revision",
+    "tiles",
+    "nextCursor"
+  ],
+  "$defs": {
+    "ObservedTile": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "x": {
+          "type": "integer"
+        },
+        "y": {
+          "type": "integer"
+        },
+        "visibility": {
+          "enum": [
+            "VISIBLE",
+            "REMEMBERED"
+          ]
+        },
+        "detailsKnown": {
+          "type": "boolean"
+        },
+        "lastSeenTurn": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "lastSeenRevision": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "terrain": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "features": {
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "naturalWonder": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "river": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "resource": {
+          "anyOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "amount": {
+                  "type": "integer"
+                },
+                "updatedTurn": {
+                  "type": "integer"
+                },
+                "updatedRevision": {
+                  "type": "integer"
+                },
+                "source": {
+                  "enum": [
+                    "SIGHTING",
+                    "TECHNOLOGY"
+                  ]
+                }
+              },
+              "required": [
+                "name",
+                "amount",
+                "updatedTurn",
+                "updatedRevision",
+                "source"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "ownerCivId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "city": {
+          "anyOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "cityId": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "ownerCivId": {
+                  "type": "string"
+                },
+                "health": {
+                  "type": "integer"
+                },
+                "population": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "cityId",
+                "name",
+                "ownerCivId",
+                "health",
+                "population"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "improvement": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "improvementPillaged": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "road": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "roadPillaged": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "yields": {
+          "anyOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "context": {
+                  "enum": [
+                    "ACTOR_CITY",
+                    "ACTOR_GENERAL"
+                  ]
+                },
+                "cityId": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "values": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "number"
+                  }
+                }
+              },
+              "required": [
+                "context",
+                "cityId",
+                "values"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "ownWork": {
+          "anyOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "improvement": {
+                  "type": "string"
+                },
+                "turnsRemaining": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "improvement",
+                "turnsRemaining"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "land": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "water": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "hill": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "coast": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "freshwater": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "riverEdges": {
+          "anyOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "bottomRight": {
+                  "type": "boolean"
+                },
+                "bottom": {
+                  "type": "boolean"
+                },
+                "bottomLeft": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "bottomRight",
+                "bottom",
+                "bottomLeft"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "x",
+        "y",
+        "visibility",
+        "detailsKnown",
+        "lastSeenTurn",
+        "lastSeenRevision",
+        "terrain",
+        "features",
+        "naturalWonder",
+        "river",
+        "resource",
+        "ownerCivId",
+        "city",
+        "improvement",
+        "improvementPillaged",
+        "road",
+        "roadPillaged",
+        "yields",
+        "ownWork",
+        "land",
+        "water",
+        "hill",
+        "coast",
+        "freshwater",
+        "riverEdges"
+      ]
+    },
+    "MapSummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "observationVersion": {
+          "const": 2
+        },
+        "coordinateSystem": {
+          "const": "UNCIV_HEX"
+        },
+        "knownTileCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "visibleTileCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "worldWrap": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "observationVersion",
+        "coordinateSystem",
+        "knownTileCount",
+        "visibleTileCount",
+        "worldWrap"
+      ]
+    }
+  }
+}

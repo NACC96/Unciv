@@ -43,7 +43,9 @@ class MoveUnitCommand(
 
 /**
  * End the acting civ's turn (game.end_turn). Never auto-resolves missing
- * mandatory decisions — those reject with DECISIONS_PENDING. On success the
+ * mandatory decisions — those reject with DECISIONS_PENDING. External agents
+ * must explicitly acknowledge delivered incoming mail (MESSAGES_UNACKNOWLEDGED).
+ * On success the
  * command atomically applies end-turn effects, rotates through built-in
  * automation inline, applies the next commandable civ's start-turn effects,
  * and lands in AWAITING_DECISIONS (or COMPLETED). Crash-safe by construction:
@@ -64,6 +66,36 @@ sealed interface CommandResult {
 class NotesUpdatedResult(
     override val actorCivId: String,
     val notesRevision: Int
+) : CommandResult
+
+/** One-way diplomatic mail; the recipient sees it when its next turn begins. */
+class SendDiplomaticMessageCommand(
+    override val actorCivId: String,
+    val actionId: String,
+    val expectedRevision: Int,
+    val targetCivId: String,
+    val text: String
+) : AgentCommand
+
+class DiplomaticMessageSentResult(
+    override val actorCivId: String,
+    val receipt: ActionReceipt,
+    val message: DiplomaticMessage
+) : CommandResult
+
+/** Explicit acknowledgement of delivered incoming mail (game.act diplomacy.acknowledgeMessage). */
+class AcknowledgeDiplomaticMessageCommand(
+    override val actorCivId: String,
+    val actionId: String,
+    val expectedRevision: Int,
+    val messageId: String,
+    val text: String
+) : AgentCommand
+
+class DiplomaticMessageAcknowledgedResult(
+    override val actorCivId: String,
+    val receipt: ActionReceipt,
+    val message: DiplomaticMessage
 ) : CommandResult
 
 class UnitMovedResult(
@@ -341,6 +373,21 @@ class BuildImprovementCommand(
     val unitId: Int,
     val improvementName: String
 ) : AgentCommand
+
+/** Internal human-routed intent: validate all entries before starting any work. */
+class QueueWorkerImprovementsCommand(
+    override val actorCivId: String,
+    val actionId: String,
+    val expectedRevision: Int,
+    val unitId: Int,
+    val improvementNames: List<String>
+) : AgentCommand
+
+class WorkerImprovementsQueuedResult(
+    override val actorCivId: String,
+    val receipt: ActionReceipt,
+    val turnsToBuild: Int
+) : CommandResult
 
 class ImprovementStartedResult(
     override val actorCivId: String,

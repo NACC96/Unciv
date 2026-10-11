@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { FakeGameService } from "../src/fake-game-mcp.js";
 import { startGameMcpServer, type StartedGameMcpServer } from "../src/game-mcp-server.js";
+import { StdioEngineBackend } from "../src/stdio-engine.js";
 
 let server: StartedGameMcpServer | undefined;
 afterEach(async () => {
@@ -40,6 +41,34 @@ async function handshake(url: string, bearer: string) {
 }
 
 describe("game MCP transport guards (plan §7.3)", () => {
+  it("passes real desktop unit and legal-action DTOs through and routes city queries", async () => {
+    const unit = { unitId: 17, name: "Settler", ownerCivId: "Rome", x: 2, y: 1, health: 100, movementLeft: 2, action: null };
+    const legal = { moveTargets: [{ x: 3, y: 1 }], attackTargets: [], orders: ["SLEEP"], canFound: true,
+      constructions: [], researchable: ["Pottery"], freeTechs: 0, freePolicies: 0, promotions: [], canUpgrade: false, upgradeTo: null, greatActions: [] };
+    const requests: { method: string; params: Record<string, unknown> }[] = [];
+    const engine = new StdioEngineBackend((line) => {
+      const frame = JSON.parse(line);
+      requests.push(frame);
+      const result = frame.method === "inspect" ? (frame.params.unitId === 17 ? unit : null) : legal;
+      queueMicrotask(() => engine.feedLine(JSON.stringify({ protocol: 1, kind: "engine_response", id: frame.id, ok: true, result })));
+    }, 30000, () => "Rome");
+    server = await startGameMcpServer(engine, { matchId: "m", timelineId: "t", civId: "Rome", runId: "r", authorityEpoch: 1 });
+    const tool = async (name: string, args: unknown) => {
+      const response = await rpc(server!.url, server!.bearer, call("tools/call", { name, arguments: args }));
+      const body = response.json?.["result"] as { isError?: boolean; content: { text: string }[] };
+      return { isError: body.isError ?? false, value: JSON.parse(body.content[0].text) };
+    };
+    expect(await tool("game.inspect", { unitId: 17 })).toEqual({ isError: false, value: unit });
+    expect(await tool("game.legal_actions", { unitId: 17 })).toEqual({ isError: false, value: legal });
+    expect(await tool("game.legal_actions", { cityId: "city-1" })).toEqual({ isError: false, value: legal });
+    expect(requests.at(-1)).toMatchObject({ method: "legal_actions", params: { civId: "Rome", cityId: "city-1" } });
+    expect(await tool("game.inspect", { unitId: 999 })).toMatchObject({ isError: true, value: { code: "ILLEGAL_ACTION" } });
+    const count = requests.length;
+    expect(await tool("game.legal_actions", {})).toMatchObject({ isError: true, value: { code: "INVALID_ARGUMENT" } });
+    expect(await tool("game.legal_actions", { unitId: 17, cityId: "city-1" })).toMatchObject({ isError: true, value: { code: "INVALID_ARGUMENT" } });
+    expect(requests.length).toBe(count);
+    engine.disconnect();
+  });
   it("requires the per-invocation bearer on every request", async () => {
     server = await startGameMcpServer(new FakeGameService(), {
       matchId: "m", timelineId: "t", civId: "civ", runId: "r", authorityEpoch: 1,
@@ -71,7 +100,7 @@ describe("game MCP transport guards (plan §7.3)", () => {
     expect([413, 400]).toContain(big.status);
   });
 
-  it("exposes exactly the 8 game tools and round-trips observe/act", async () => {
+  it("exposes exactly the 10 game tools and round-trips observe/act", async () => {
     server = await startGameMcpServer(new FakeGameService(), {
       matchId: "m", timelineId: "t", civId: "civ", runId: "r", authorityEpoch: 1,
     });
@@ -80,7 +109,7 @@ describe("game MCP transport guards (plan §7.3)", () => {
     const names = ((list.json?.["result"] as { tools: { name: string }[] }).tools).map((t) => t.name).sort();
     expect(names).toEqual([
       "game.act", "game.action_result", "game.end_turn", "game.inspect",
-      "game.legal_actions", "game.notes", "game.observe", "game.rules",
+      "game.legal_actions", "game.map", "game.notes", "game.observe", "game.rules", "game.tile",
     ]);
     const obs = await rpc(server.url, server.bearer, call("tools/call", { name: "game.observe", arguments: {} }));
     const obsText = (obs.json?.["result"] as { content: { text: string }[] }).content[0].text;
@@ -92,4 +121,110 @@ describe("game MCP transport guards (plan §7.3)", () => {
     const actText = (act.json?.["result"] as { content: { text: string }[] }).content[0].text;
     expect(JSON.parse(actText)).toMatchObject({ status: "applied", revision: 43 });
   });
+});
+
+it("round-trips complete map and rules DTOs, validates radius pairs and does not accept actor override", async () => {
+  const fake = new FakeGameService();
+  const tile = fake.tiles[0]!;
+  const page = await fake.map({ mode: "KNOWN" });
+  const catalog = { rulesetName: "Civ V", baseRuleset: "Civ V", rulesetIdentity: "pinned", section: "improvements", entries: [{ name: "Farm", techRequired: null, terrainsCanBeBuiltOn: ["Grassland"], yields: { Food: 1 }, effects: [], section: "improvements" }], nextCursor: "opaque" };
+  const requests: any[] = [];
+  const engine = new StdioEngineBackend(line => {
+    const frame = JSON.parse(line);
+    requests.push(frame);
+    const result = frame.method === "inspect_tile" ? (frame.params.x === 0 ? tile : null) : frame.method === "map" ? page : catalog;
+    queueMicrotask(() => engine.feedLine(JSON.stringify({ protocol: 1, kind: "engine_response", id: frame.id, ok: true, result })));
+  }, 5000, () => "Rome");
+  server = await startGameMcpServer(engine, { matchId: "m", timelineId: "t", civId: "Rome", runId: "r", authorityEpoch: 1 });
+  const tool = async (name: string, args: unknown) => {
+    const response = await rpc(server!.url, server!.bearer, call("tools/call", { name, arguments: args }));
+    const result = response.json?.["result"] as { isError?: boolean; content: { text: string }[] };
+    return { isError: result.isError ?? false, value: JSON.parse(result.content[0].text) };
+  };
+  expect(await tool("game.tile", { x: 0, y: 0, civId: "Greece" })).toEqual({ isError: false, value: tile });
+  expect(requests.at(-1)).toMatchObject({ method: "inspect_tile", params: { x: 0, y: 0, civId: "Rome" } });
+  expect(await tool("game.map", { mode: "VISIBLE", center: { x: 48, y: -33 }, radius: 0, limit: 128, civId: "Greece" })).toEqual({ isError: false, value: page });
+  expect(requests.at(-1)).toMatchObject({ method: "map", params: { mode: "VISIBLE", center: { x: 48, y: -33 }, radius: 0, limit: 128, civId: "Rome" } });
+  expect(await tool("game.rules", { section: "improvements", name: "Farm", limit: 1, cursor: "opaque" })).toEqual({ isError: false, value: catalog });
+  expect(requests.at(-1)).toMatchObject({ method: "rules", params: { section: "improvements", name: "Farm", limit: 1, cursor: "opaque" } });
+  const count = requests.length;
+  expect(await tool("game.map", { radius: 2 })).toMatchObject({ isError: true, value: { code: "INVALID_ARGUMENT" } });
+  expect(await tool("game.map", { center: { x: 1, y: 1 } })).toMatchObject({ isError: true, value: { code: "INVALID_ARGUMENT" } });
+  expect(requests).toHaveLength(count);
+  expect(await tool("game.tile", { x: 999, y: 0 })).toMatchObject({ isError: true, value: { code: "ILLEGAL_ACTION" } });
+  engine.disconnect();
+});
+
+it("enforces read budgets by UTF-8 bytes for both map and rules even below transport limit", async () => {
+  const fake = new FakeGameService();
+  fake.map = async () => ({ protocolVersion: 1, observationVersion: 2, matchId: "fake", timelineId: "fake", revision: 42, tiles: [{ ...fake.tiles[0]!, terrain: "雪".repeat(33 * 1024) }], nextCursor: null });
+  fake.rules = async () => ({ rulesetName: "fake", baseRuleset: "fake", rulesetIdentity: "fake", section: "improvements", entries: [{ name: "雪".repeat(33 * 1024), section: "improvements", yields: {}, effects: [] }], nextCursor: null });
+  server = await startGameMcpServer(fake, { matchId: "m", timelineId: "t", civId: "Rome", runId: "r", authorityEpoch: 1 });
+  for (const name of ["game.map", "game.rules"]) {
+    const response = await rpc(server.url, server.bearer, call("tools/call", { name, arguments: {} }));
+    const result = response.json?.["result"] as { isError: boolean; content: { text: string }[] };
+    expect(result.isError).toBe(true);
+    expect(JSON.parse(result.content[0].text)).toMatchObject({ code: "INVALID_ARGUMENT" });
+  }
+});
+
+it("preserves production stdio rejection codes and receipt metadata through all new reads", async () => {
+  const error = { code: "STALE_STATE", message: "cursor is stale", currentRevision: 45, actionId: "original" };
+  const engine = new StdioEngineBackend(line => {
+    const frame = JSON.parse(line);
+    queueMicrotask(() => engine.feedLine(JSON.stringify({ protocol: 1, kind: "engine_response", id: frame.id, ok: false,
+      error: frame.method === "rules" ? { ...error, code: "INVALID_ARGUMENT", message: "invalid section" } : error })));
+  }, 5000, () => "Rome");
+  server = await startGameMcpServer(engine, { matchId: "m", timelineId: "t", civId: "Rome", runId: "r", authorityEpoch: 1 });
+  for (const [name, args] of [["game.map", { cursor: "stale" }], ["game.tile", { x: 0, y: 0 }], ["game.rules", { section: "invalid" }]] as const) {
+    const response = await rpc(server.url, server.bearer, call("tools/call", { name, arguments: args }));
+    const result = response.json?.["result"] as { isError: boolean; content: { text: string }[] };
+    expect(result.isError).toBe(true);
+    expect(JSON.parse(result.content[0].text)).toEqual({ status: "rejected", ...(name === "game.rules" ? { ...error, code: "INVALID_ARGUMENT", message: "invalid section" } : error) });
+  }
+  engine.disconnect();
+});
+
+it("budgets final escaped JSON-RPC read responses with actual bounded request IDs", async () => {
+  const fake = new FakeGameService();
+  const text = '"\\雪'.repeat(13 * 1024);
+  fake.rules = async () => ({ rulesetName: "fake", baseRuleset: "fake", rulesetIdentity: "fake", section: "improvements", entries: [{ name: text, section: "improvements", yields: {}, effects: [] }], nextCursor: null });
+  let mapCalls = 0;
+  fake.map = async () => {
+    mapCalls++;
+    return { protocolVersion: 1, observationVersion: 2, matchId: "m", timelineId: "t", revision: 42, tiles: [{ ...fake.tiles[0]!, terrain: text }], nextCursor: null };
+  };
+  server = await startGameMcpServer(fake, { matchId: "m", timelineId: "t", civId: "Rome", runId: "r", authorityEpoch: 1 });
+  const id = "x".repeat(126); // JSON quotes make this exactly 128 serialized bytes.
+  for (const name of ["game.map", "game.rules", "game.tile"]) {
+    const response = await rpc(server.url, server.bearer, { jsonrpc: "2.0", id, method: "tools/call", params: { name, arguments: name === "game.tile" ? { x: 0, y: 0 } : {} } });
+    expect(response.status).toBe(200);
+    expect(Buffer.byteLength(JSON.stringify(response.json), "utf8")).toBeLessThanOrEqual(96 * 1024);
+    const result = response.json?.["result"] as { isError?: boolean; content: { text: string }[] };
+    if (name !== "game.tile") expect(JSON.parse(result.content[0].text)).toMatchObject({ status: "rejected", code: "INVALID_ARGUMENT" });
+  }
+  const callsBeforeOverlong = mapCalls;
+  const overlong = await rpc(server.url, server.bearer, { jsonrpc: "2.0", id: "雪".repeat(43), method: "tools/call", params: { name: "game.map", arguments: {} } });
+  expect(overlong.status).toBe(400);
+  expect(mapCalls).toBe(callsBeforeOverlong);
+});
+
+it("returns escape-aware paginated map pages inside the real wire envelope", async () => {
+  const fake = new FakeGameService();
+  const terrain = '"\\雪'.repeat(5 * 1024);
+  fake.tiles = [{ ...fake.tiles[0]!, terrain }, { ...fake.tiles[0]!, x: 1, terrain }];
+  server = await startGameMcpServer(fake, { matchId: "m", timelineId: "t", civId: "Rome", runId: "r", authorityEpoch: 1 });
+  const tiles: number[] = [];
+  let cursor: string | undefined;
+  do {
+    const response = await rpc(server.url, server.bearer, { jsonrpc: "2.0", id: "x".repeat(126), method: "tools/call", params: { name: "game.map", arguments: { limit: 128, ...(cursor ? { cursor } : {}) } } });
+    expect(Buffer.byteLength(JSON.stringify(response.json), "utf8")).toBeLessThanOrEqual(96 * 1024);
+    const result = response.json?.["result"] as { isError?: boolean; content: { text: string }[] };
+    expect(result.isError).not.toBe(true);
+    const page = JSON.parse(result.content[0].text);
+    expect(page.tiles).toHaveLength(1);
+    tiles.push(page.tiles[0].x);
+    cursor = page.nextCursor ?? undefined;
+  } while (cursor);
+  expect(tiles).toEqual([0, 1]);
 });

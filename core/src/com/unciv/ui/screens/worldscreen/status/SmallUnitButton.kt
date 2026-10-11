@@ -2,7 +2,6 @@ package com.unciv.ui.screens.worldscreen.status
 
 import com.unciv.models.translations.tr
 import com.unciv.ui.components.UncivTooltip.Companion.addTooltip
-import com.unciv.ui.components.extensions.isEnabled
 import com.unciv.ui.components.extensions.setSize
 import com.unciv.ui.components.input.KeyboardBinding
 import com.unciv.ui.components.input.keyShortcuts
@@ -10,6 +9,7 @@ import com.unciv.ui.components.input.onActivation
 import com.unciv.ui.images.IconTextButton
 import com.unciv.ui.images.ImageGetter
 import com.unciv.ui.screens.worldscreen.WorldScreen
+import com.unciv.ui.screens.worldscreen.WorldScreenStyle
 
 const val nextLabel = "Cycle"
 const val skipLabel = "Skip"
@@ -17,11 +17,12 @@ const val skipLabel = "Skip"
 class SmallUnitButton(
     private val worldScreen: WorldScreen,
     private val statusButtons: StatusButtons
-) : IconTextButton("", null, fontColor = NextTurnAction.NextUnit.color) {
+) : IconTextButton("", null, fontSize = 14, fontColor = NextTurnAction.NextUnit.color) {
 
     private var isSkip = worldScreen.game.settings.checkForDueUnitsCycles
     
     init {
+        WorldScreenStyle.apply(this)
         onActivation { 
             worldScreen.switchToNextUnit(resetDue = isSkip)
         }
@@ -47,8 +48,8 @@ class SmallUnitButton(
             && nextTurnButton.isNextUnitAction()
             && worldScreen.bottomUnitTable.selectedUnit != null
         statusButtons.smallUnitButton = if (visible) this else null
-        isEnabled = visible && nextTurnButton.isEnabled
-            && worldScreen.bottomUnitTable.selectedUnit?.run { due && isIdle() } == true
+        WorldScreenStyle.setEnabled(this, visible && !nextTurnButton.isDisabled
+            && worldScreen.bottomUnitTable.selectedUnit?.run { due && isIdle() } == true)
         pack()
     }
 

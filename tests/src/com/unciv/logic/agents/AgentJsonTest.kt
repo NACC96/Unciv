@@ -30,6 +30,20 @@ class AgentJsonTest {
     }
 
     @Test
+    fun `control characters round trip without invalid json`() {
+        val text = (0 until 32).map { it.toChar() }.joinToString("") + "地形\\\""
+        Assert.assertEquals(text, AgentJson.parse(AgentJson.stringify(text)))
+        Assert.assertFalse(AgentJson.stringify(text).any { it.code < 32 })
+    }
+
+    @Test
+    fun `read budget counts escaped mcp text rather than only the dto`() {
+        val value = mapOf("name" to "\"".repeat(30000))
+        Assert.assertTrue(AgentJson.stringify(value).toByteArray(Charsets.UTF_8).size < AGENT_READ_BYTE_BUDGET)
+        Assert.assertFalse(AgentReadBudget.fits(value))
+    }
+
+    @Test
     fun `garbage never parses`() {
         Assert.assertNull(try {
             AgentJson.parse("{oops")

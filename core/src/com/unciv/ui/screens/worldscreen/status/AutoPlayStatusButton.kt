@@ -12,6 +12,7 @@ import com.unciv.ui.components.input.onRightClick
 import com.unciv.ui.images.ImageGetter
 import com.unciv.ui.screens.basescreen.BaseScreen
 import com.unciv.ui.screens.worldscreen.WorldScreen
+import com.unciv.ui.screens.worldscreen.WorldScreenStyle
 
 class AutoPlayStatusButton(
     val worldScreen: WorldScreen,
@@ -21,7 +22,8 @@ class AutoPlayStatusButton(
 
 
     init {
-        add(Stack(autoPlayImage)).pad(5f)
+        WorldScreenStyle.apply(this)
+        add(Stack(autoPlayImage)).size(20f)
         onActivation(binding = KeyboardBinding.AutoPlayMenu) {
             if (worldScreen.autoPlay.isAutoPlaying())
                 worldScreen.autoPlay.stopAutoPlay()
@@ -44,7 +46,7 @@ class AutoPlayStatusButton(
 
     private fun createAutoplayImage(): Image {
         val img = ImageGetter.getImage("OtherIcons/NationSwap")
-        img.setSize(40f)
+        img.setSize(20f)
         return img
     }
 

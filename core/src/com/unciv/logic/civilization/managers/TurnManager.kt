@@ -1,6 +1,7 @@
 package com.unciv.logic.civilization.managers
 
 import com.unciv.UncivGame
+import com.unciv.logic.StartingBonusApplicator
 import com.unciv.logic.VictoryData
 import com.unciv.logic.automation.civilization.NextTurnAutomation
 import com.unciv.logic.city.managers.CityTurnManager
@@ -27,6 +28,8 @@ class TurnManager(val civInfo: Civilization) {
 
     fun startTurn(progressBar: NextTurnProgress? = null, suppressAutomation: Boolean = false):Unit = timeThis("TurnManager.startTurn") {
         if (civInfo.isSpectator()) return
+
+        StartingBonusApplicator.deliverPendingUnits(civInfo)
 
         for (city in civInfo.cities) city.hasSoldBuildingThisTurn = false
 

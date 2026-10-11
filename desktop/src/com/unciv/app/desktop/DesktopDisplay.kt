@@ -5,6 +5,8 @@ import com.badlogic.gdx.Graphics.Monitor
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics
+import com.badlogic.gdx.utils.Os
+import com.badlogic.gdx.utils.SharedLibraryLoader
 import com.unciv.models.metadata.GameSettings
 import com.unciv.models.translations.tr
 import com.unciv.utils.PlatformDisplay
@@ -101,11 +103,22 @@ enum class DesktopScreenMode : ScreenMode {
             return java.awt.Rectangle(monitor.virtualX, monitor.virtualY, mode.width, mode.height)
         }
 
+        fun logicalWorkArea(bounds: java.awt.Rectangle, insets: java.awt.Insets) = java.awt.Rectangle(
+            bounds.x + insets.left, bounds.y + insets.top,
+            (bounds.width - insets.left - insets.right).coerceAtLeast(1),
+            (bounds.height - insets.top - insets.bottom).coerceAtLeast(1)
+        )
+
         private fun getMaximumWindowBounds(
             device: GraphicsDevice,
             config: GraphicsConfiguration,
             bounds: java.awt.Rectangle
         ): java.awt.Rectangle {
+            // GLFW uses logical points on macOS with HdpiMode.Logical. Converting
+            // AWT's point bounds to Retina pixels creates an oversized window.
+            if (SharedLibraryLoader.os == Os.MacOsX) {
+                return logicalWorkArea(bounds, Toolkit.getDefaultToolkit().getScreenInsets(config))
+            }
             val displayWidth = device.displayMode.width
             val displayHeight = device.displayMode.height
             val scalePercent = (displayWidth.toDouble() / bounds.width * 100).roundToInt() * 0.01

@@ -66,6 +66,8 @@ class MatchCoordinator(
     val policy: AgentExecutionPolicy = AgentExecutionPolicy()
 ) {
     private val json = json()
+    /** Explicit versions survive Gdx's otherwise compact/default-skipping saves. */
+    private val metadataJson = json().apply { setUsePrototypes(false) }
     private var committedGame: GameInfo
     private var committedMatch: AgentMatchState
     private val actionReceipts = HashMap<String, ActionReceipt>()
@@ -76,6 +78,11 @@ class MatchCoordinator(
         // Deep-copy inputs so the caller retains no alias into committed state.
         committedGame = deserializeGame(json.toJson(game))
         committedMatch = match.deepCopy()
+        // Initial/load knowledge is populated once, never by a read tool.
+        AgentMapSightings().apply {
+            captureAll(committedGame, committedMatch)
+            flushInto(committedMatch, committedMatch.stateRevision)
+        }
         rebuildHotIndex()
     }
 
@@ -130,6 +137,60 @@ class MatchCoordinator(
     fun getControllers(): Map<String, CivilizationController> =
         committedMatch.controllers.mapValues { it.value.copy() }
 
+    /** Host visibility depends on the real viewing civilization, never a caller-supplied mode flag. */
+    @Synchronized
+    fun isSpectatorViewer(viewerCivId: String): Boolean =
+        committedGame.getCivilizationOrNull(viewerCivId)?.isSpectator() == true
+
+    /** The host binds the viewing identity; this list never enumerates unmet opponents. */
+    @Synchronized
+    fun getMessageContacts(viewerCivId: String): List<MessageContact> {
+        requireMessageViewer(viewerCivId)
+        return buildMessageContacts(committedGame, committedMatch, viewerCivId)
+    }
+
+    /** Senders see queued mail; recipients see it after delivery; spectators can inspect all mail. */
+    @Synchronized
+    fun getMessageHistory(viewerCivId: String): List<DiplomaticMessage> {
+        val viewer = requireMessageViewer(viewerCivId)
+        return committedMatch.diplomaticMessages.filter { message ->
+            viewer.isSpectator() || message.senderCivId == viewerCivId ||
+                (message.targetCivId == viewerCivId && message.deliveredTurnSerial != null)
+        }.map { it.copy() }
+    }
+
+    /**
+     * Host-only player/spectator mail may queue between turns, including while play is paused.
+     * This metadata commit preserves an active provider's gameplay revision and never invokes it.
+     */
+    @Synchronized
+    fun queuePlayerMessage(
+        senderCivId: String,
+        messageId: String,
+        targetCivId: String,
+        text: String
+    ): DiplomaticMessage {
+        val sender = requireMessageViewer(senderCivId)
+        if (!sender.isSpectator() && committedMatch.controllers[senderCivId]?.kind != ControllerKind.HUMAN)
+            throw AgentCommandException(AgentCommandError.AUTHORITY_REVOKED,
+                "Only the human player or spectator may use the player message composer")
+        if (committedMatch.matchPaused)
+            throw AgentCommandException(AgentCommandError.MATCH_PAUSED, "Match requires recovery before sending mail")
+        if (committedMatch.turnPhase == TurnPhase.COMPLETED || sender.isDefeated())
+            throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Cannot send mail after play has ended")
+        val origin = if (sender.isSpectator()) "SPECTATOR" else "NATION"
+        val body = validateMessageBody(messageId, text)
+        findDuplicateMessage(messageId, senderCivId, targetCivId, body, origin)?.let { return it.copy() }
+        requireMessageTarget(senderCivId, targetCivId)
+        requireMessageLimit(senderCivId)
+        val candidate = committedMatch.deepCopy()
+        val message = DiplomaticMessage(messageId, senderCivId, targetCivId, body,
+            candidate.turnSerial, null, origin)
+        candidate.diplomaticMessages.add(message)
+        commit(candidateGame = null, candidateMatch = candidate)
+        return message.copy()
+    }
+
     fun getTimelineId(): String = committedMatch.timelineId
     fun getMatchId(): String = committedMatch.matchId
 
@@ -138,13 +199,26 @@ class MatchCoordinator(
 
     /** Committed receipt by action ID (active-turn scope), for result lookup. */
     fun getReceipt(actionId: String): ActionReceipt? {
-        return actionReceipts[actionId]?.copy()
+        return (actionReceipts[actionId] ?: committedMatch.diplomaticMessageReceipts[actionId])?.copy()
     }
 
     /** Single-unit inspection with visibility policy (null = hidden/nonexistent). */
     fun inspectUnit(actorCivId: String, unitId: Int): ObservedUnit? {
         requireController(actorCivId)
-        return buildUnitInspection(committedGame, actorCivId, unitId)
+        return buildUnitInspection(committedGame, actorCivId, unitId)?.also { unit ->
+            if (unit.ownerCivId == actorCivId)
+                unit.tile = buildPermittedTile(committedGame, committedMatch, actorCivId, HexCoord(unit.x, unit.y))
+        }
+    }
+
+    fun inspectTile(actorCivId: String, position: HexCoord): ObservedTile? {
+        requireController(actorCivId)
+        return buildPermittedTile(committedGame, committedMatch, actorCivId, position)
+    }
+
+    fun map(actorCivId: String, query: MapQuery): MapPage {
+        requireController(actorCivId)
+        return buildMapPage(committedGame, committedMatch, actorCivId, query)
     }
 
     /** Owner civ ID of a city in COMMITTED state, null when the city is gone. */
@@ -194,11 +268,23 @@ class MatchCoordinator(
     /** Gated per-entity actions (game.legal_actions). Pure read, same guarantees. */
     fun legalActions(actorCivId: String, unitId: Int? = null, cityId: String? = null): LegalActionsDto {
         requireController(actorCivId)
-        return buildLegalActions(committedGame, actorCivId, unitId, cityId)
+        return buildLegalActions(committedGame, actorCivId, unitId, cityId).also {
+            it.revision = committedMatch.stateRevision
+        }
     }
 
     /** Static rules summary (game.rules). Safe to cache by ruleset identity. */
     fun rules(): RulesSummaryDto = buildRulesSummary(committedGame)
+
+    fun rules(query: RulesQuery): Any {
+        if (query.limit !in 1..128)
+            throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Rules limit must be 1 through 128")
+        return if (query.section == null) {
+            if (query.name != null || query.cursor != null)
+                throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Rules name/cursor requires a section")
+            rules()
+        } else buildRulesCatalog(committedGame, getRulesetName(), query).toJson()
+    }
 
     /** Adopted policy names in COMMITTED state. */
     fun getAdoptedPolicies(civId: String): List<String> {
@@ -312,6 +398,8 @@ class MatchCoordinator(
 
         return when (command) {
             is UpdateNotesCommand -> executeNotes(command)
+            is SendDiplomaticMessageCommand -> executeDiplomaticMessage(command)
+            is AcknowledgeDiplomaticMessageCommand -> executeAcknowledgeMessage(command)
             is MoveUnitCommand -> executeMove(command)
             is EndTurnCommand -> executeEndTurn(command)
             is SelectResearchCommand -> executeResearch(command)
@@ -328,6 +416,7 @@ class MatchCoordinator(
             is CityCitizensCommand -> executeCitizens(command)
             is BuyTileCommand -> executeBuyTile(command)
             is BuildImprovementCommand -> executeBuildImprovement(command)
+            is QueueWorkerImprovementsCommand -> executeQueueWorkerImprovements(command)
             is PromoteUnitCommand -> executePromote(command)
             is UpgradeUnitCommand -> executeUpgrade(command)
             is GreatPersonCommand -> executeGreatPerson(command)
@@ -380,6 +469,133 @@ class MatchCoordinator(
         return NotesUpdatedResult(command.actorCivId, current + 1)
     }
 
+    private fun executeDiplomaticMessage(command: SendDiplomaticMessageCommand): DiplomaticMessageSentResult {
+        if (command.actorCivId != committedGame.currentPlayer)
+            throw AgentCommandException(AgentCommandError.NOT_YOUR_TURN,
+                "Diplomatic messages may only be sent by the active civilization")
+        val body = validateMessageBody(command.actionId, command.text)
+        val duplicate = findDuplicateMessage(command.actionId, command.actorCivId,
+            command.targetCivId, body, "NATION")
+        val fingerprint = "diplomacy.message|" + json.toJson(arrayListOf(
+            command.actorCivId, command.targetCivId, body, "NATION"))
+        committedMatch.diplomaticMessageReceipts[command.actionId]?.let { prior ->
+            if (prior.requestFingerprint != fingerprint)
+                throw AgentCommandException(AgentCommandError.ACTION_ID_CONFLICT,
+                    "Action ID was already used for a different command")
+        }
+        if (duplicate != null) {
+            val activeReceipt = actionReceipts[command.actionId]
+            if (activeReceipt != null && activeReceipt.requestFingerprint != fingerprint)
+                throw AgentCommandException(AgentCommandError.ACTION_ID_CONFLICT,
+                    "Action ID was already used for a different command")
+            // Older mail may have no retained receipt. Its saved record still proves delivery was
+            // queued successfully; acknowledge it at the current revision without another commit.
+            val prior = committedMatch.diplomaticMessageReceipts[command.actionId] ?: activeReceipt ?: ActionReceipt(
+                actionId = command.actionId, actorCivId = command.actorCivId,
+                timelineId = committedMatch.timelineId, requestFingerprint = fingerprint,
+                beforeRevision = committedMatch.stateRevision, afterRevision = committedMatch.stateRevision,
+                outcome = "applied", resultJson = command.actionId
+            )
+            return DiplomaticMessageSentResult(command.actorCivId, prior.copy(), duplicate.copy())
+        }
+        val receipt = runGameplayMutation(command.actorCivId, command.actionId,
+            command.expectedRevision, fingerprint,
+            collectSightings = false,
+            rememberReceipt = { candidateMatch, retained ->
+                candidateMatch.diplomaticMessageReceipts[command.actionId] = retained.copy()
+            }) { _, candidateMatch ->
+            requireMessageTarget(command.actorCivId, command.targetCivId)
+            requireMessageLimit(command.actorCivId)
+            candidateMatch.diplomaticMessages.add(DiplomaticMessage(command.actionId,
+                command.actorCivId, command.targetCivId, body, candidateMatch.turnSerial))
+            command.actionId
+        }
+        val message = committedMatch.diplomaticMessages.first { it.messageId == receipt.resultJson }
+        return DiplomaticMessageSentResult(command.actorCivId, receipt, message.copy())
+    }
+
+    private fun executeAcknowledgeMessage(command: AcknowledgeDiplomaticMessageCommand): DiplomaticMessageAcknowledgedResult {
+        if (command.actorCivId != committedGame.currentPlayer)
+            throw AgentCommandException(AgentCommandError.NOT_YOUR_TURN,
+                "Messages may only be acknowledged by the active civilization")
+        // Resolve access before replay: a receipt must never expose somebody else's private mail.
+        val message = committedMatch.diplomaticMessages.firstOrNull {
+            it.messageId == command.messageId && it.isDeliveredTo(command.actorCivId, committedMatch.turnSerial)
+        } ?: throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "No such delivered incoming message")
+        val body = validateMessageBody(command.actionId, command.text)
+        val fingerprint = "diplomacy.acknowledgeMessage|" + json.toJson(arrayListOf(
+            command.actorCivId, command.messageId, body))
+        val prior = actionReceipts[command.actionId] ?: committedMatch.diplomaticMessageReceipts[command.actionId]
+        if (prior != null) {
+            if (prior.requestFingerprint != fingerprint)
+                throw AgentCommandException(AgentCommandError.ACTION_ID_CONFLICT,
+                    "Action ID was already used for a different command")
+            return DiplomaticMessageAcknowledgedResult(command.actorCivId, prior.copy(), message.copy())
+        }
+        val receipt = runGameplayMutation(command.actorCivId, command.actionId,
+            command.expectedRevision, fingerprint, collectSightings = false,
+            rememberReceipt = { candidate, retained ->
+                candidate.diplomaticMessageReceipts[command.actionId] = retained.copy()
+            }) { _, candidate ->
+            val incoming = candidate.diplomaticMessages.first { it.messageId == command.messageId }
+            if (incoming.acknowledgedTurnSerial != null)
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Message is already acknowledged")
+            incoming.acknowledgedTurnSerial = candidate.turnSerial
+            incoming.acknowledgementText = body
+            incoming.messageId
+        }
+        val acknowledged = committedMatch.diplomaticMessages.first { it.messageId == receipt.resultJson }
+        return DiplomaticMessageAcknowledgedResult(command.actorCivId, receipt, acknowledged.copy())
+    }
+
+    private fun requireMessageViewer(viewerCivId: String): Civilization {
+        val viewer = committedGame.getCivilizationOrNull(viewerCivId)
+            ?: throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Unknown viewing civilization")
+        val kind = committedMatch.controllers[viewerCivId]?.kind
+        if (!viewer.isSpectator() && kind != ControllerKind.HUMAN && kind != ControllerKind.EXTERNAL_AGENT)
+            throw AgentCommandException(AgentCommandError.AUTHORITY_REVOKED, "This civilization has no message access")
+        return viewer
+    }
+
+    private fun requireMessageTarget(senderCivId: String, targetCivId: String) {
+        if (buildMessageContacts(committedGame, committedMatch, senderCivId).none { it.civId == targetCivId })
+            throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "No eligible diplomatic contact")
+    }
+
+    private fun validateMessageBody(messageId: String, text: String): String {
+        val body = text.trim()
+        if (messageId.isBlank() || messageId.length > 128)
+            throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Message ID must contain 1–128 characters")
+        if (body.isEmpty() || body.length > DiplomaticMessageLimits.MAX_BODY_CHARS ||
+            body.toByteArray(Charsets.UTF_8).size > DiplomaticMessageLimits.MAX_BODY_BYTES)
+            throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT,
+                "Message must contain 1–2000 characters and fit within 8 KiB UTF-8")
+        return body
+    }
+
+    private fun findDuplicateMessage(
+        messageId: String,
+        senderCivId: String,
+        targetCivId: String,
+        body: String,
+        origin: String
+    ): DiplomaticMessage? {
+        val prior = committedMatch.diplomaticMessages.firstOrNull { it.messageId == messageId } ?: return null
+        if (prior.senderCivId != senderCivId || prior.targetCivId != targetCivId ||
+            prior.text != body || prior.origin != origin)
+            throw AgentCommandException(AgentCommandError.ACTION_ID_CONFLICT,
+                "Message ID was already used for different mail")
+        return prior
+    }
+
+    private fun requireMessageLimit(senderCivId: String) {
+        if (committedMatch.diplomaticMessages.count {
+                it.senderCivId == senderCivId && it.sentTurnSerial == committedMatch.turnSerial
+            } >= DiplomaticMessageLimits.MAX_MESSAGES_PER_TURN)
+            throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION,
+                "A civilization may send at most 10 messages per turn")
+    }
+
     /**
      * Shared gameplay-mutation path: duplicate/revision gates, unpublished
      * candidate, [apply] on the candidate returning the sanitized result
@@ -391,9 +607,11 @@ class MatchCoordinator(
         actionId: String,
         expectedRevision: Int,
         fingerprint: String,
+        rememberReceipt: ((AgentMatchState, ActionReceipt) -> Unit)? = null,
+        collectSightings: Boolean = true,
         apply: (candidateGame: GameInfo, candidateMatch: AgentMatchState) -> String
     ): ActionReceipt {
-        actionReceipts[actionId]?.let { prior ->
+        (actionReceipts[actionId] ?: committedMatch.diplomaticMessageReceipts[actionId])?.let { prior ->
             if (prior.requestFingerprint == fingerprint) return prior
             throw AgentCommandException(
                 AgentCommandError.ACTION_ID_CONFLICT,
@@ -408,7 +626,7 @@ class MatchCoordinator(
             )
         mutationInFlight = actionId
         try {
-            val candidateGame = deserializeGame(json.toJson(committedGame))
+            val candidateGame = deserializeGame(json.toJson(committedGame), collectSightings = collectSightings)
             val candidateMatch = committedMatch.deepCopy()
             val resultJson = apply(candidateGame, candidateMatch)
             val before = committedMatch.stateRevision
@@ -425,6 +643,7 @@ class MatchCoordinator(
                 resultJson = resultJson
             )
             candidateMatch.currentTurnReceipts.add(receipt)
+            rememberReceipt?.invoke(candidateMatch, receipt)
             commit(candidateGame = candidateGame, candidateMatch = candidateMatch)
             actionReceipts[actionId] = receipt
             return receipt
@@ -1235,15 +1454,24 @@ class MatchCoordinator(
                 ?: throw AgentCommandException(
                     AgentCommandError.INVALID_ARGUMENT, "Unknown improvement ${command.improvementName}"
                 )
-            if (!unit.canBuildImprovement(improvement))
-                throw AgentCommandException(
-                    AgentCommandError.ILLEGAL_ACTION, "${command.improvementName} cannot be built here now"
-                )
+            requireWorkerBuildAllowed(WorkerBuildContext(candidateGame, command.actorCivId, unit), improvement)
             val tile = unit.getTile()
             tile.startWorkingOnImprovement(improvement, unit.civ, unit)
-            improvement.getTurnsToBuild(unit.civ, unit).toString()
+            unit.action = null
+            tile.turnsToImprovement.toString()
         }
         return ImprovementStartedResult(command.actorCivId, receipt, receipt.resultJson.toInt())
+    }
+
+    /** Internal human clear-then-build intent: one candidate and one receipt. */
+    private fun executeQueueWorkerImprovements(command: QueueWorkerImprovementsCommand): WorkerImprovementsQueuedResult {
+        val receipt = runGameplayMutation(command.actorCivId, command.actionId, command.expectedRevision,
+            "unit.queueImprovements|${command.unitId}|${json.toJson(command.improvementNames)}") { candidateGame, _ ->
+            val unit = requireOwnUnit(candidateGame, command.actorCivId, command.unitId)
+            startValidatedWorkerQueue(WorkerBuildContext(candidateGame, command.actorCivId, unit),
+                command.improvementNames).toString()
+        }
+        return WorkerImprovementsQueuedResult(command.actorCivId, receipt, receipt.resultJson.toInt())
     }
 
     private fun executePromote(command: PromoteUnitCommand): UnitPromotedResult {
@@ -1474,21 +1702,7 @@ class MatchCoordinator(
         ) { candidateGame, _ ->
             val unit = requireOwnUnit(candidateGame, command.actorCivId, command.unitId)
             val tile = unit.getTile()
-            // Gates mirror UnitActionsFromUniques.getRepairAction.
-            if (!tile.ruleset.tileImprovements.containsKey(com.unciv.Constants.repair))
-                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Repair unavailable in this ruleset")
-            if (!unit.cache.hasUniqueToBuildImprovements)
-                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Unit cannot repair")
-            if (unit.isEmbarked() || tile.isCityCenter() || !tile.isPillaged())
-                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Nothing to repair here")
-            if (!unit.hasMovement() || tile.improvementInProgress == com.unciv.Constants.repair)
-                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Repair cannot start now")
-            if (tile.isEnemyTerritory(unit.civ))
-                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Cannot repair in enemy territory")
-            val repairTurns = minOf(
-                tile.ruleset.tileImprovements[com.unciv.Constants.repair]!!.getTurnsToBuild(unit.civ, unit),
-                tile.getImprovementToRepair()!!.getTurnsToBuild(unit.civ, unit)
-            )
+            val repairTurns = requireWorkerRepairAllowed(WorkerBuildContext(candidateGame, command.actorCivId, unit))
             tile.queueImprovement(com.unciv.Constants.repair, repairTurns)
             unit.action = null
             repairTurns.toString()
@@ -1677,8 +1891,7 @@ class MatchCoordinator(
         ) { candidateGame, _ ->
             val unit = requireOwnUnit(candidateGame, command.actorCivId, command.unitId)
             val tile = unit.getTile()
-            if (!tile.hasImprovementInProgress())
-                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "No improvement in progress here")
+            requireWorkerCancelAllowed(WorkerBuildContext(candidateGame, command.actorCivId, unit))
             tile.stopWorkingOnImprovement()
             "stopped"
         }
@@ -1981,7 +2194,8 @@ class MatchCoordinator(
             throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Only external controllers take profiles")
         val receipt = runGameplayMutation(
             command.actorCivId, command.actionId, command.expectedRevision,
-            "controller.set|${command.targetCivId}|${command.kind}|${command.profile?.profileRevision ?: "-"}"
+            "controller.set|${command.targetCivId}|${command.kind}|${command.profile?.profileRevision ?: "-"}",
+            collectSightings = false
         ) { candidateGame, candidateMatch ->
             candidateGame.getCivilizationOrNull(command.targetCivId)
                 ?: throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Unknown civilization")
@@ -2011,7 +2225,7 @@ class MatchCoordinator(
                 "beginAwaitingTurn requires phase READY_TO_START, current is ${committedMatch.turnPhase}"
             )
 
-        val candidateGame = deserializeGame(json.toJson(committedGame))
+        val candidateGame = deserializeGame(json.toJson(committedGame), collectSightings = true)
         val candidateMatch = committedMatch.deepCopy()
         if (candidateGame.victoryData != null) {
             candidateMatch.turnPhase = TurnPhase.COMPLETED
@@ -2060,7 +2274,7 @@ class MatchCoordinator(
 
     private fun executeEndTurn(command: EndTurnCommand): TurnEndedResult {
         val fingerprint = "end-turn"
-        actionReceipts[command.actionId]?.let { prior ->
+        (actionReceipts[command.actionId] ?: committedMatch.diplomaticMessageReceipts[command.actionId])?.let { prior ->
             if (prior.requestFingerprint == fingerprint) {
                 val next = if (committedMatch.turnPhase == TurnPhase.AWAITING_DECISIONS)
                     committedMatch.currentTurnReceipts.firstOrNull()?.actorCivId else null
@@ -2078,6 +2292,20 @@ class MatchCoordinator(
                 currentRevision = committedMatch.stateRevision
             )
 
+        if (command.actorCivId != committedGame.currentPlayer)
+            throw AgentCommandException(AgentCommandError.NOT_YOUR_TURN,
+                "Only the active civilization may end its turn")
+
+        if (committedMatch.controllers[command.actorCivId]?.kind == ControllerKind.EXTERNAL_AGENT) {
+            val unread = committedMatch.diplomaticMessages.filter {
+                it.isDeliveredTo(command.actorCivId, committedMatch.turnSerial) && it.acknowledgedTurnSerial == null
+            }.map { it.messageId }
+            if (unread.isNotEmpty())
+                throw AgentCommandException(AgentCommandError.MESSAGES_UNACKNOWLEDGED,
+                    "Acknowledge delivered incoming messages first: ${unread.joinToString(",")}",
+                    messageIds = unread)
+        }
+
         val blocking = committedMatch.pendingDecisions
             .filter { it.owningCivId == command.actorCivId && it.classification == DecisionClassification.MANDATORY }
         if (blocking.isNotEmpty())
@@ -2089,7 +2317,7 @@ class MatchCoordinator(
 
         mutationInFlight = command.actionId
         try {
-            val candidateGame = deserializeGame(json.toJson(committedGame))
+            val candidateGame = deserializeGame(json.toJson(committedGame), collectSightings = true)
             val candidateMatch = committedMatch.deepCopy()
             val civ = candidateGame.getCivilizationOrNull(command.actorCivId)
                 ?: throw AgentCommandException(
@@ -2215,6 +2443,11 @@ class MatchCoordinator(
         candidateGame.currentTurnStartTime = System.currentTimeMillis()
         candidateMatch.turnPhase = TurnPhase.AWAITING_DECISIONS
         candidateMatch.turnSerial++
+        // Delivery is persisted with the turn transition. Reads and provider retries never drain it.
+        candidateMatch.diplomaticMessages.filter {
+            it.targetCivId == civId && it.deliveredTurnSerial == null &&
+                it.sentTurnSerial < candidateMatch.turnSerial
+        }.forEach { it.deliveredTurnSerial = candidateMatch.turnSerial }
         // Received demands surface as MANDATORY decisions for commandable
         // civs — the agent inspector path, never a modal popup (plan §11.2).
         // Built-in AI answers them through its own automation.
@@ -2305,8 +2538,13 @@ class MatchCoordinator(
      * so game and metadata generations never diverge.
      */
     private fun commit(candidateGame: GameInfo?, candidateMatch: AgentMatchState) {
+        candidateGame?.agentMapSightings?.let { sightings ->
+            sightings.captureAll(candidateGame, candidateMatch)
+            sightings.flushInto(candidateMatch, candidateMatch.stateRevision)
+            candidateGame.agentMapSightings = null
+        }
         val gameJson = if (candidateGame != null) json.toJson(candidateGame) else json.toJson(committedGame)
-        val matchJson = json.toJson(candidateMatch)
+        val matchJson = metadataJson.toJson(candidateMatch)
         try {
             writer.write(gameJson, matchJson)
         } catch (ex: Exception) {
@@ -2323,10 +2561,10 @@ class MatchCoordinator(
     /** Versioned bundle for save/reopen and recovery scans. */
     fun saveToJson(): String {
         val persistedGame = committedGame
-        return json.toJson(
+        return metadataJson.toJson(
             AgentBundle(
                 json.toJson(persistedGame),
-                json.toJson(committedMatch)
+                metadataJson.toJson(committedMatch)
             )
         )
     }
@@ -2338,14 +2576,16 @@ class MatchCoordinator(
         committedMatch.controllers[civId]
             ?: throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Unknown civilization $civId")
 
-    private fun deserializeGame(gameJson: String): GameInfo {
+    private fun deserializeGame(gameJson: String, collectSightings: Boolean = false): GameInfo {
         val game = json.fromJson(GameInfo::class.java, gameJson)
         // Controlled transient restoration on the unpublished candidate.
         // Agent policy is installed before restoration (executeMove binds it
         // above); restoration itself must not make unsolicited choices -
         // including the settings-driven queue auto-fill.
         game.suppressAutomationDuringTransients = true
+        game.agentNormalVisibility = true
         game.setTransients()
+        if (collectSightings) game.agentMapSightings = AgentMapSightings()
         return game
     }
 
@@ -2372,6 +2612,7 @@ class MatchCoordinator(
         fun deserializeForPublication(gameJson: String): GameInfo {
             val game = publicationJson.fromJson(GameInfo::class.java, gameJson)
             game.suppressAutomationDuringTransients = true
+            game.agentNormalVisibility = true
             game.setTransients()
             return game
         }
@@ -2383,7 +2624,7 @@ class MatchCoordinator(
             policy: AgentExecutionPolicy = AgentExecutionPolicy()
         ): MatchCoordinator {
             val json = json()
-            val bundle = json.fromJson(AgentBundle::class.java, bundleJson)
+            val bundle = migrateAgentBundleJson(bundleJson)
             bundle.validateFormat()
             val game = json.fromJson(GameInfo::class.java, bundle.gameJson)
             val match = json.fromJson(AgentMatchState::class.java, bundle.matchJson)

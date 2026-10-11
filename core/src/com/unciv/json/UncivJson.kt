@@ -22,6 +22,8 @@ fun json() = Json(JsonWriter.OutputType.json).apply {
     setIgnoreDeprecated(true)
     ignoreUnknownFields = true
 
+    setSerializer(com.unciv.logic.agents.AgentMapKnowledge::class.java,
+        com.unciv.logic.agents.AgentMapKnowledgeSerializer())
     setSerializer(Duration::class.java, DurationSerializer())
     setSerializer(KeyCharAndCode::class.java, KeyCharAndCode.Serializer())
     setSerializer(HexCoord::class.java, HexCoord.Serializer())

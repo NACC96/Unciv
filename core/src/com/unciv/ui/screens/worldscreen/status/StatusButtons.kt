@@ -27,11 +27,12 @@ class StatusButtons(
 
         if (agentSession != null) {
             if (agentMatchControlTable == null) {
-                agentMatchControlTable = AgentMatchControlTable(agentSession)
+                agentMatchControlTable = AgentMatchControlTable(agentSession, worldScreen)
             } else {
                 agentMatchControlTable?.update()
             }
         } else {
+            agentMatchControlTable?.dispose()
             agentMatchControlTable = null
         }
 
@@ -67,6 +68,7 @@ class StatusButtons(
     }
 
     override fun dispose() {
+        agentMatchControlTable?.dispose()
         autoPlayStatusButton?.dispose()
         multiplayerStatusButton?.dispose()
     }

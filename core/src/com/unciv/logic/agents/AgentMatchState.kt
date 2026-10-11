@@ -3,7 +3,7 @@ package com.unciv.logic.agents
 import com.unciv.logic.IsPartOfGameInfoSerialization
 
 /** Fork save-format version for agent-match metadata. Reject others explicitly. */
-const val AGENT_MATCH_FORMAT_VERSION = 1
+const val AGENT_MATCH_FORMAT_VERSION = 2
 
 /** Mandatory choices block end-turn; optional ones are deferrable reminders; informational ones log only. */
 enum class DecisionClassification : IsPartOfGameInfoSerialization {
@@ -128,13 +128,19 @@ class AgentMatchState(
      * turn completed iff this counter advanced during the invocation
      * (a sticky boolean would stay true forever after the first turn).
      */
-    var endTurnsCommitted: Int = 0
+    var endTurnsCommitted: Int = 0,
+    /** Saved sent/received mail; queued mail becomes visible only at the recipient's next turn. */
+    var diplomaticMessages: ArrayList<DiplomaticMessage> = ArrayList(),
+    /** Mail-send and acknowledgement receipts outlive turn-scoped gameplay receipts; private to the host. */
+    var diplomaticMessageReceipts: HashMap<String, ActionReceipt> = HashMap(),
+    /** Sanitized last sightings and geometry-only discovery, isolated per controller. */
+    var mapKnowledge: AgentMapKnowledge = AgentMapKnowledge()
 ) : IsPartOfGameInfoSerialization {
     @Suppress("unused") // used by json serialization
     constructor() : this(
         AGENT_MATCH_FORMAT_VERSION, "", "", 0, 0, TurnPhase.READY_TO_START,
         HashMap(), false, HashMap(), HashMap(), ArrayList(), ArrayList(), ArrayList(),
-        false, null, 0
+        false, null, 0, ArrayList(), HashMap(), AgentMapKnowledge()
     )
 
     /** Rejects incompatible format versions explicitly; never silently converts. */
@@ -155,6 +161,9 @@ class AgentMatchState(
         ArrayList(currentTurnReceipts.map { it.copy() }),
         matchPaused,
         matchPausedReason,
-        endTurnsCommitted
+        endTurnsCommitted,
+        ArrayList(diplomaticMessages.map { it.copy() }),
+        HashMap(diplomaticMessageReceipts.mapValues { it.value.copy() }),
+        mapKnowledge.deepCopy()
     )
 }

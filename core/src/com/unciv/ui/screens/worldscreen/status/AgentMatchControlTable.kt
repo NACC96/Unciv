@@ -1,40 +1,36 @@
 package com.unciv.ui.screens.worldscreen.status
 
-import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.ui.Table
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton
-import com.badlogic.gdx.utils.Align
 import com.unciv.logic.agents.AgentMatchSession
+import com.unciv.logic.agents.AgentModelCatalog
 import com.unciv.logic.agents.AgentRunState
-import com.unciv.ui.components.extensions.darken
-import com.unciv.ui.components.extensions.isEnabled
+import com.unciv.logic.agents.ThinkingLevel
 import com.unciv.ui.components.extensions.toLabel
-import com.unciv.ui.components.extensions.toTextButton
 import com.unciv.ui.components.input.onClick
 import com.unciv.ui.screens.basescreen.BaseScreen
+import com.unciv.ui.screens.worldscreen.WorldScreen
+import com.unciv.ui.screens.worldscreen.WorldScreenStyle
 
-/**
- * UI controls for agent matches (AI_AGENT_PLAN.md §9, §11.1).
- * Displays active civilization, agent display name, provider/model, and current activity.
- * Exposes Pause, Resume, and Retry controls decoupled from human turn authority.
- */
+/** Compact match controls, independent of human turn authority. */
 class AgentMatchControlTable(
-    private val session: AgentMatchSession
+    private val session: AgentMatchSession,
+    private val screen: WorldScreen
 ) : Table(BaseScreen.skin) {
+    private val status = "".toLabel(WorldScreenStyle.ink, 13).apply { wrap = true }
+    private val model = "".toLabel(WorldScreenStyle.muted, 11).apply { setEllipsis(true) }
+    private val actionButton = WorldScreenStyle.button("")
+    private val activityButton = WorldScreenStyle.button("Activity")
+    private val activityFeed = AgentActivityFeed(screen, session)
+    private val messagesButton = WorldScreenStyle.button("Messages")
+    private val messagesPanel = AgentMessagesPanel(screen, session)
 
-    private val statusTable = Table(skin)
-    private val actionButton: TextButton = "".toTextButton()
+    fun dispose() { activityFeed.dispose(); messagesPanel.dispose() }
 
     init {
-        pad(6f)
-        background = BaseScreen.skinStrings.getUiBackground(
-            "NewGameScreen/PlayerPickerTable/PlayerTable",
-            tintColor = BaseScreen.skinStrings.skinConfig.baseColor.darken(0.85f)
-        )
-
-        add(statusTable).left().padRight(8f)
-        add(actionButton).right().row()
-
+        pad(8f)
+        background = WorldScreenStyle.background("WorldScreen/AgentControls")
+        activityButton.onClick { activityFeed.toggle(); update() }
+        messagesButton.onClick { messagesPanel.toggle(); update() }
         actionButton.onClick {
             when {
                 session.canPause() -> session.pause()
@@ -43,83 +39,63 @@ class AgentMatchControlTable(
             }
             update()
         }
-
         update()
     }
 
     fun update() {
-        statusTable.clear()
-
         val state = session.getRunState()
-        val civId = session.getActiveCivId() ?: "—"
-        val profile = session.getActiveAgentProfile()
-
         val stateText = when (state) {
-            AgentRunState.PAUSED -> "PAUSED"
-            AgentRunState.STARTING -> "STARTING"
-            AgentRunState.AGENT_DECIDING -> "DECIDING"
-            AgentRunState.APPLYING -> "APPLYING"
-            AgentRunState.WAITING_HUMAN -> "PLAYER TURN"
-            AgentRunState.PAUSING -> "PAUSING…"
-            AgentRunState.NEEDS_ATTENTION -> "NEEDS ATTENTION"
-            AgentRunState.FINISHED -> "FINISHED"
+            AgentRunState.PAUSED -> "Paused"
+            AgentRunState.STARTING -> "Starting"
+            AgentRunState.AGENT_DECIDING -> "Thinking"
+            AgentRunState.APPLYING -> "Playing"
+            AgentRunState.WAITING_HUMAN -> "Your turn"
+            AgentRunState.PAUSING -> "Finishing turn…"
+            AgentRunState.NEEDS_ATTENTION -> "Needs attention"
+            AgentRunState.FINISHED -> "Finished"
         }
-
-        val stateColor = when (state) {
-            AgentRunState.AGENT_DECIDING, AgentRunState.APPLYING, AgentRunState.STARTING -> Color.GREEN
-            AgentRunState.PAUSED -> Color.YELLOW
-            AgentRunState.PAUSING -> Color.ORANGE
-            AgentRunState.NEEDS_ATTENTION -> Color.RED
-            AgentRunState.WAITING_HUMAN -> Color.CYAN
-            AgentRunState.FINISHED -> Color.LIGHT_GRAY
+        status.setText("$stateText · ${session.getActiveCivId() ?: "Agents"}")
+        status.color = when (state) {
+            AgentRunState.NEEDS_ATTENTION -> WorldScreenStyle.error
+            AgentRunState.PAUSING, AgentRunState.PAUSED -> WorldScreenStyle.warning
+            else -> WorldScreenStyle.ink
         }
-
-        val headerText = "● $stateText · $civId"
-        val headerLabel = headerText.toLabel(stateColor, 14)
-        statusTable.add(headerLabel).left().row()
-
-        val detailText = if (profile != null) {
-            val thinking = profile.reasoning?.let { " [$it]" } ?: ""
-            "${profile.displayName} (${profile.provider}/${profile.modelId}$thinking)"
-        } else if (state == AgentRunState.NEEDS_ATTENTION) {
+        val profile = session.getActiveAgentProfile()
+        model.setText(if (state == AgentRunState.NEEDS_ATTENTION)
             session.getFailureReason() ?: "Provider failure"
+        else if (profile != null) {
+            val effort = ThinkingLevel.fromWireValue(profile.reasoning).label
+            "${AgentModelCatalog.findModel(profile.provider, profile.modelId).label} · $effort"
+        } else session.statusText())
+
+        val action = when {
+            session.canPause() -> "Pause"
+            session.canResume() -> "Resume"
+            session.canRetry() -> "Retry"
+            state == AgentRunState.PAUSING -> "Pausing…"
+            else -> null
+        }
+        actionButton.setText(action ?: "")
+        WorldScreenStyle.setEnabled(actionButton, action != null && state != AgentRunState.PAUSING)
+        activityButton.isChecked = activityFeed.isVisible
+        messagesButton.isChecked = messagesPanel.isVisible
+        val width = minOf(390f, screen.stage.width - 20f)
+        clearChildren()
+        val text = Table()
+        text.add(status).growX().left().row()
+        text.add(model).growX().left().padTop(3f)
+        val buttons = Table()
+        if (action != null) buttons.add(actionButton).padRight(6f)
+        buttons.add(activityButton).padRight(6f)
+        buttons.add(messagesButton)
+        val narrow = width - buttons.prefWidth - 26f < 120f
+        if (narrow) {
+            add(text).width(width - 16f).row()
+            add(buttons).right().padTop(8f)
         } else {
-            session.statusText()
+            add(text).width((width - buttons.prefWidth - 26f).coerceAtLeast(80f)).left().padRight(10f)
+            add(buttons).right()
         }
-        val detailLabel = detailText.toLabel(Color.LIGHT_GRAY, 12)
-        detailLabel.wrap = true
-        statusTable.add(detailLabel).width(240f).left().row()
-
-        when {
-            session.canPause() -> {
-                actionButton.setText("Pause")
-                actionButton.color = Color.YELLOW
-                actionButton.isEnabled = true
-                actionButton.isVisible = true
-            }
-            session.canResume() -> {
-                actionButton.setText("Resume")
-                actionButton.color = Color.GREEN
-                actionButton.isEnabled = true
-                actionButton.isVisible = true
-            }
-            session.canRetry() -> {
-                actionButton.setText("Retry")
-                actionButton.color = Color.ORANGE
-                actionButton.isEnabled = true
-                actionButton.isVisible = true
-            }
-            state == AgentRunState.PAUSING -> {
-                actionButton.setText("Pausing…")
-                actionButton.color = Color.GRAY
-                actionButton.isEnabled = false
-                actionButton.isVisible = true
-            }
-            else -> {
-                actionButton.isVisible = false
-            }
-        }
-
         pack()
     }
 }

@@ -6,7 +6,6 @@ import com.unciv.logic.civilization.managers.TurnManager
 import com.unciv.models.translations.tr
 import com.unciv.ui.components.UncivTooltip.Companion.addTooltip
 import com.unciv.ui.components.UncivTooltip.Companion.removeTooltips
-import com.unciv.ui.components.extensions.isEnabled
 import com.unciv.ui.components.extensions.setSize
 import com.unciv.ui.components.input.KeyboardBinding
 import com.unciv.ui.components.input.keyShortcuts
@@ -16,19 +15,20 @@ import com.unciv.ui.images.ImageGetter
 import com.unciv.ui.popups.AnimatedMenuPopup.Companion.addContextMenu
 import com.unciv.ui.screens.basescreen.BaseScreen
 import com.unciv.ui.screens.worldscreen.WorldScreen
+import com.unciv.ui.screens.worldscreen.WorldScreenStyle
 import com.unciv.ui.screens.worldscreen.status.NextTurnAction.Default
 import com.unciv.utils.Concurrency
 import yairm210.purity.annotations.Readonly
 
 class NextTurnButton(
     private val worldScreen: WorldScreen
-) : IconTextButton("", null, 30) {
+) : IconTextButton("", null, 16) {
     private var nextTurnAction = Default
     private val unitsDueLabel = Label("", BaseScreen.skin)
     private val unitsDueCell: Cell<Label>
 
     init {
-        pad(15f)
+        WorldScreenStyle.apply(this)
         onActivation { nextTurnAction.action(worldScreen) }
         addContextMenu { NextTurnMenu(stage, this, worldScreen) }
         keyShortcuts.add(KeyboardBinding.NextTurn)
@@ -44,7 +44,7 @@ class NextTurnButton(
         if (agentSession != null) {
             // Agent matches own the button: status text comes from the match,
             // and it is enabled only while a human may act.
-            isEnabled = agentSession.isHumanInputAllowed()
+            WorldScreenStyle.setEnabled(this, agentSession.isHumanInputAllowed())
             removeTooltips()
             worldScreen.smallUnitButton.update()
             return
@@ -59,9 +59,9 @@ class NextTurnButton(
             }
         }
 
-        isEnabled = nextTurnAction.getText(worldScreen) == "AutoPlay"
-            || ((worldScreen.isPlayersTurn || worldScreen.failedUpload) && !worldScreen.waitingForAutosave && !worldScreen.isNextTurnUpdateRunning())
-        if (isEnabled) {
+        WorldScreenStyle.setEnabled(this, nextTurnAction.getText(worldScreen) == "AutoPlay"
+            || ((worldScreen.isPlayersTurn || worldScreen.failedUpload) && !worldScreen.waitingForAutosave && !worldScreen.isNextTurnUpdateRunning()))
+        if (!isDisabled) {
             addTooltip(KeyboardBinding.NextTurn)
         } else {
             removeTooltips()
@@ -75,7 +75,7 @@ class NextTurnButton(
         label.color = nextTurnAction.color
         if (nextTurnAction.icon != null && ImageGetter.imageExists(nextTurnAction.icon!!))
             iconCell.setActor(ImageGetter.getImage(nextTurnAction.icon).apply {
-                setSize(30f)
+                setSize(20f)
                 color = nextTurnAction.color
             })
         else

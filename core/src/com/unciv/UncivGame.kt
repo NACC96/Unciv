@@ -29,6 +29,8 @@ import com.unciv.ui.screens.LanguagePickerScreen
 import com.unciv.ui.screens.LoadingScreen
 import com.unciv.ui.screens.basescreen.BaseScreen
 import com.unciv.ui.screens.mainmenuscreen.MainMenuScreen
+import com.unciv.ui.screens.mapeditorscreen.MapEditorScreen
+import com.unciv.ui.screens.newgamescreen.NewGameScreen
 import com.unciv.ui.screens.savescreens.LoadGameScreen
 import com.unciv.ui.screens.worldscreen.PlayerReadyScreen
 import com.unciv.ui.screens.worldscreen.WorldScreen
@@ -198,7 +200,8 @@ open class UncivGame(val isConsoleMode: Boolean = false) : Game(), PlatformSpeci
      */
     suspend fun loadGame(newGameInfo: GameInfo, autoPlay: AutoPlay = AutoPlay(settings.autoPlay), callFromLoadScreen: Boolean = false, agentSetup: com.unciv.logic.agents.AgentMatchSetup? = null): WorldScreen = withThreadPoolContext toplevel@{
         val prevGameInfo = gameInfo
-        gameInfo = newGameInfo
+        // Retire publication authority before exposing a replacement; admitted providers may drain.
+        withGLContext { installLoadedGameInfo(newGameInfo) }
 
 
         if (gameInfo?.gameParameters?.isOnlineMultiplayer == true
@@ -223,17 +226,14 @@ open class UncivGame(val isConsoleMode: Boolean = false) : Game(), PlatformSpeci
         }
 
         return@toplevel withGLContext {
-            for (screen in screenStack) screen.dispose()
-            screenStack.clear()
-
-            worldScreen = null // This allows the GC to collect our old WorldScreen, otherwise we keep two WorldScreens in memory.
+            disposeScreens()
             val newWorldScreen = WorldScreen(newGameInfo, autoPlay, newGameInfo.getPlayerToViewAs(), worldScreenRestoreState)
             worldScreen = newWorldScreen
 
             if (agentSetup != null) {
                 try {
                     newWorldScreen.agentSession = com.unciv.logic.agents.AgentMatchSessionFactory.create(
-                        newGameInfo, agentSetup
+                        newGameInfo, agentSetup, newWorldScreen
                     )
                 } catch (ex: Exception) {
                     Log.error("Could not start agent match session", ex)
@@ -262,6 +262,12 @@ open class UncivGame(val isConsoleMode: Boolean = false) : Game(), PlatformSpeci
 
             return@withGLContext newWorldScreen
         }
+    }
+
+    /** Runs on GL so a queued old snapshot cannot publish between retirement and replacement. */
+    private fun installLoadedGameInfo(newGameInfo: GameInfo) {
+        worldScreen?.closeAgentSession()
+        gameInfo = newGameInfo
     }
 
     /** The new game info may have different mods or rulesets, which may use different resources that need to be loaded. */
@@ -294,6 +300,7 @@ open class UncivGame(val isConsoleMode: Boolean = false) : Game(), PlatformSpeci
 
     private fun setScreen(newScreen: BaseScreen) {
         debug("Setting new screen: %s, screenStack: %s", newScreen, screenStack)
+        updateAgentMatchContext(newScreen)
         Gdx.input.inputProcessor = newScreen.stage
         super.setScreen(newScreen) // This can set the screen to the policy picker or tech picker screen, so the input processor must be set before
         if (newScreen is WorldScreen) {
@@ -302,10 +309,32 @@ open class UncivGame(val isConsoleMode: Boolean = false) : Game(), PlatformSpeci
         Gdx.graphics.requestRendering()
     }
 
+    /** Related match screens retain the world in the stack; menu/setup/loading are boundaries. */
+    private fun updateAgentMatchContext(newScreen: BaseScreen) {
+        val ownedWorld = worldScreen ?: return
+        val session = ownedWorld.agentSession ?: return
+        val ownsMatch = screenStack.any { it === ownedWorld || it is PlayerReadyScreen }
+        val isOpen = ownsMatch && !isOutsideMatch(newScreen) && screenStack.none(::isOutsideMatch)
+        if (isOpen) session.onMatchEntered() else session.onMatchLeft()
+    }
+
+    private fun isOutsideMatch(screen: BaseScreen): Boolean =
+        screen is MainMenuScreen || screen is NewGameScreen || screen is LoadGameScreen ||
+            screen is LoadingScreen || screen is MapEditorScreen || screen is GameStartScreen ||
+            screen is CrashScreen
+
+    /** PlayerReadyScreen can own a retained world that is not itself in the stack. */
+    private fun disposeScreens() {
+        val retainedWorld = worldScreen
+        worldScreen = null
+        for (screen in screenStack) screen.dispose()
+        if (retainedWorld != null && screenStack.none { it === retainedWorld }) retainedWorld.dispose()
+        screenStack.clear()
+    }
+
     /** Removes & [disposes][BaseScreen.dispose] all currently active screens in the [screenStack] and sets the given screen as the only screen. */
     private fun setAsRootScreen(root: BaseScreen) {
-        for (screen in screenStack) screen.dispose()
-        screenStack.clear()
+        disposeScreens()
         screenStack.addLast(root)
         setScreen(root)
     }
@@ -456,6 +485,8 @@ open class UncivGame(val isConsoleMode: Boolean = false) : Game(), PlatformSpeci
     override fun render() = wrappedCrashHandlingRender()
 
     override fun dispose() {
+        // Detach before shutting down pools needed to drain an admitted provider and its supervisor.
+        worldScreen?.closeAgentSession()
         Gdx.input.inputProcessor = null // don't allow ANRs when shutting down, that's silly
         SoundPlayer.clearCache()
         if (::musicController.isInitialized) musicController.gracefulShutdown()  // Do allow fade-out
@@ -499,6 +530,7 @@ private fun logRunningThreads() {
     }
 
     fun goToMainMenu(): MainMenuScreen {
+        worldScreen?.agentSession?.onMatchLeft()
         val curGameInfo = gameInfo
         if (curGameInfo != null) {
             files.autosaves.requestAutoSaveUnCloned(curGameInfo) // Can save gameInfo directly because the user can't modify it on the MainMenuScreen

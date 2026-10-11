@@ -77,12 +77,12 @@ class AgentMatchControlTest {
 
         AgentSlotLogic.applyControl(slot, SlotControl.AGENT, profiles, profileCache)
         val profile = profiles[slot]!!
-        Assert.assertEquals("GPT-5.6 Luna Rome", profile.displayName)
+        Assert.assertEquals("GPT-6 Luna Rome", profile.displayName)
 
-        // Change civ from Rome to Greece with default name -> should update to GPT-5.6 Luna Greece
+        // Change civ from Rome to Greece with default name -> should update to GPT-6 Luna Greece
         slot.chosenCiv = "Greece"
         AgentSlotLogic.onCivChanged(slot, "Rome", "Greece", profiles, profileCache)
-        Assert.assertEquals("GPT-5.6 Luna Greece", profile.displayName)
+        Assert.assertEquals("GPT-6 Luna Greece", profile.displayName)
 
         // Custom name
         profile.displayName = "My Custom Agent"

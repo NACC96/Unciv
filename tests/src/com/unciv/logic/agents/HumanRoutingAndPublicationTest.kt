@@ -1,6 +1,7 @@
 package com.unciv.logic.agents
 
 import com.unciv.logic.trade.TradeOfferType
+import com.unciv.logic.map.HexCoord
 import com.unciv.models.UnitActionType
 import com.unciv.models.metadata.BaseRuleset
 import com.unciv.testing.BaseTestRunner
@@ -105,6 +106,66 @@ class HumanRoutingAndPublicationTest {
     }
 
     @Test
+    fun `human clear then build intent publishes both queue entries in one commit without completion effects`() {
+        val f = Fixture()
+        val workerId = f.prepareForestWorker()
+        val position = HexCoord(2, 0)
+        val before = AgentSnapshotPublication.deserializeGame(
+            AgentSnapshotPublication.buildPayload(f.coordinator, f.romeId))
+        val beforeCiv = before.getCivilization(f.romeId)
+        val revision = f.coordinator.getStateRevision()
+        val writes = f.writer.writeCount
+
+        val error = f.executor.executeAll(f.romeId) { listOf({ r: Int ->
+            QueueWorkerImprovementsCommand(f.romeId, "human-forest-farm", r, workerId,
+                listOf("Remove Forest", "Farm"))
+        }) }
+        Assert.assertNull(error)
+        Assert.assertEquals(revision + 1, f.coordinator.getStateRevision())
+        Assert.assertEquals(writes + 1, f.writer.writeCount)
+        val payload = AgentSnapshotPublication.buildPayload(f.coordinator, f.romeId,
+            selectedUnitId = workerId, selectedTile = position)
+        val published = AgentSnapshotPublication.deserializeGame(payload)
+        val tile = published.tileMap[position]
+        val serializedTile = AgentJson.parse(com.unciv.json.json().toJson(tile)) as Map<*, *>
+        val queue = serializedTile["improvementQueue"] as List<*>
+        Assert.assertEquals(listOf("Remove Forest", "Farm"), queue.map { (it as Map<*, *>)["improvement"] })
+        Assert.assertTrue("Forest" in tile.terrainFeatures)
+        Assert.assertNull(tile.improvement)
+        val civ = published.getCivilization(f.romeId)
+        Assert.assertNull(civ.units.getCivUnits().first { it.id == workerId }.action)
+        Assert.assertEquals(beforeCiv.cities.first().cityConstructions.inProgressConstructions,
+            civ.cities.first().cityConstructions.inProgressConstructions)
+        Assert.assertEquals(beforeCiv.resourceStockpiles, civ.resourceStockpiles)
+        Assert.assertEquals(beforeCiv.notifications.map { it.text }, civ.notifications.map { it.text })
+        Assert.assertEquals(workerId, AgentSnapshotPublication.resolveSelection(published, payload).unitId)
+        Assert.assertFalse(f.testGame.getTile(position).hasImprovementInProgress())
+    }
+
+    @Test
+    fun `invalid second human queue entry preserves publication checkpoint and memory atomically`() {
+        val f = Fixture()
+        val workerId = f.prepareForestWorker()
+        val before = f.coordinator.saveToJson()
+        val payloadBefore = AgentSnapshotPublication.buildPayload(f.coordinator, f.romeId)
+        val writes = f.writer.writeCount
+        val revision = f.coordinator.getStateRevision()
+
+        val error = f.executor.executeAll(f.romeId) { listOf({ r: Int ->
+            QueueWorkerImprovementsCommand(f.romeId, "human-invalid-second", r, workerId,
+                listOf("Remove Forest", "Lumber mill"))
+        }) }
+        Assert.assertNotNull(error)
+        Assert.assertTrue(error!!.contains("cannot be built"))
+        Assert.assertEquals(revision, f.coordinator.getStateRevision())
+        Assert.assertEquals(writes, f.writer.writeCount)
+        Assert.assertEquals(before, f.coordinator.saveToJson())
+        Assert.assertEquals(payloadBefore.serializedGame,
+            AgentSnapshotPublication.buildPayload(f.coordinator, f.romeId).serializedGame)
+        Assert.assertNull(f.coordinator.legalActions(f.romeId, unitId = workerId).workInProgress)
+    }
+
+    @Test
     fun `publication payload round-trips and re-resolves selections by id`() {
         val f = Fixture()
         // Select the warrior, then publish.
@@ -205,5 +266,21 @@ class HumanRoutingAndPublicationTest {
             AgentProfile("p1", "Ada", "codex", "m", null, "", 1))
         coordinator = MatchCoordinator(testGame.gameInfo, match, writer)
         executor = HumanCommandExecutor(coordinator)
+    }
+
+    private fun Fixture.prepareForestWorker(): Int {
+        val civ = testGame.gameInfo.getCivilization(romeId)
+        for (tech in listOf("Agriculture", "Mining", "Bronze Working", "Construction"))
+            if (!civ.tech.isResearched(tech)) civ.tech.addTechnology(tech)
+        val tile = testGame.setTileTerrainAndFeatures(HexCoord(2, 0), "Grassland", "Forest")
+        testGame.addTileToCity(civ.cities.first(), tile)
+        tile.setOwningCity(civ.cities.first())
+        Assert.assertEquals(civ, tile.getOwner())
+        val worker = testGame.addUnit("Worker", civ, tile)
+        worker.action = UnitActionType.Sleep.value
+        testGame.gameInfo.currentPlayer = romeId
+        rebuildFixture()
+        Assert.assertTrue(executor.isHumanTurn())
+        return worker.id
     }
 }

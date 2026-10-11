@@ -33,6 +33,7 @@ import com.unciv.ui.components.widgets.LoadingImage
 import com.unciv.ui.screens.basescreen.BaseScreen
 import com.unciv.ui.screens.victoryscreen.LoadMapPreview
 import com.unciv.utils.Concurrency
+import com.unciv.utils.Log
 import com.unciv.utils.toGdxArray
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.asFlow
@@ -41,6 +42,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.isActive
+import kotlinx.coroutines.ensureActive
 
 private inline fun <T> SelectBox<T>.withoutChangeEvents(block: SelectBox<T>.() -> Unit) {
     selection.setProgrammaticChangeEvents(false)
@@ -62,6 +64,7 @@ class MapFileSelectTable(
     private val miniMapWrapper = Container<Group?>()
     private var mapPreviewJob: Job? = null
     private var preselectedName = mapParameters.name
+    private val preselectedFile = newGameScreen.gameSetupInfo.mapFile
     private val descriptionLabel = "".toLabel()
     private val descriptionLabelCell: Cell<Label>
 
@@ -113,21 +116,20 @@ class MapFileSelectTable(
     }
 
     private fun getMapFilesSequence() = sequence<FileHandle> {
+        preselectedFile?.takeIf { it.exists() }?.let { yield(it) }
         yieldAll(MapSaver.getMaps().asSequence())
         for (modFolder in RulesetCache.values.mapNotNull { it.folderLocation }) {
             val mapsFolder = modFolder.child(MapSaver.mapsFolder)
             if (mapsFolder.exists())
                 yieldAll(mapsFolder.list().asSequence())
         }
-    }.sortedByDescending { it.lastModified() }
+    }.distinctBy { it.file().absolutePath }.sortedByDescending { it.lastModified() }
 
     private fun addMapWrappersAsync() {
-        val mapFilesFlow = getMapFilesSequence().asFlow().map {
-            MapWrapper(it, MapSaver.loadMapPreview(it))
-        }
-
         loadingIcon.show()
         Concurrency.run {
+            val mapFilesFlow = MapSaver.getMapPreviews(getMapFilesSequence().onEach { ensureActive() })
+                .asFlow().map { (file, preview) -> MapWrapper(file, preview) }
             mapFilesFlow
                 .onEach {
                     mapWrappers.add(it)
@@ -135,12 +137,14 @@ class MapFileSelectTable(
                         addAsyncEntryToSelectBoxes(it)
                     }
                 }
-                .catch {}
+                .catch { Log.error("Error while discovering custom maps", it) }
                 .collect()
             Concurrency.runOnGLThread {
                 loadingIcon.hide {
                     loadingIcon.remove()
                 }
+                val preselected = mapWrappers.firstOrNull { it.fileHandle.file().absolutePath == preselectedFile?.file()?.absolutePath }
+                if (preselected != null) mapCategorySelectBox.withoutChangeEvents { selected = preselected.getCategoryName() }
                 onCategorySelectBoxChange() // re-sort lower SelectBox, and trigger map selection (mod select, description and preview)
             }
         }
@@ -176,14 +180,7 @@ class MapFileSelectTable(
     }
 
     private val firstMap: FileHandle? by lazy {
-        getMapFilesSequence().firstOrNull {
-            try {
-                MapSaver.loadMapParameters(it)
-                true
-            } catch (_: Exception) {
-                false
-            }
-        }
+        MapSaver.getMapPreviews(getMapFilesSequence()).firstOrNull()?.first
     }
 
     private fun FileHandle.isRecentlyModified() = lastModified() > System.currentTimeMillis() - 900000 // 900s = quarter hour
@@ -211,6 +208,10 @@ class MapFileSelectTable(
             .toGdxArray()
         fun getPreselect(): MapWrapper? {
             if (mapFiles.isEmpty) return null
+            val exact = mapFiles.firstOrNull { it.fileHandle.file().absolutePath == preselectedFile?.file()?.absolutePath }
+            if (exact != null) return exact
+            val named = mapFiles.firstOrNull { it.fileHandle.name() == preselectedName }
+            if (named != null) return named
             val modOptionPreselect = RulesetCache[selectedRuleset]
                 ?.modOptions?.getMatchingUniques(UniqueType.ModMapPreselection)
                 ?.firstOrNull()?.params?.get(0)
@@ -227,9 +228,6 @@ class MapFileSelectTable(
                 if (recent != null && (recent.fileHandle.lastModified() - oldestTimestamp) > 100 || mapFiles.size == 1)
                     return recent
             }
-            val named = mapFiles.firstOrNull { it.fileHandle.name() == preselectedName }
-            if (named != null)
-                return named
             return mapFiles.first()
         }
         val selectedItem = getPreselect()

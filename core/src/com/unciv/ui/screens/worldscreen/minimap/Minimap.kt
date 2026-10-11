@@ -76,6 +76,9 @@ class Minimap(val mapHolder: WorldMapHolder, minimapSize: Int, private val civIn
         addActor(scrollIndicatorLayer)
 
         mapHolder.onViewportChangedListener = ::updateScrollPosition
+        // A published snapshot replaces the minimap without moving the map.
+        // Place its new camera outline now instead of waiting for a pan/zoom.
+        mapHolder.onViewportChanged()
         addClickListener()
     }
 

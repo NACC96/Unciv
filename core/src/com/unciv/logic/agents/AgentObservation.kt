@@ -35,7 +35,9 @@ class ObservedUnit(
     var y: Int = 0,
     var health: Int = 0,
     var movementLeft: Float = 0f,
-    var action: String? = null
+    var action: String? = null,
+    /** Own-unit inspection only; foreign units never include tile detail. */
+    var tile: ObservedTile? = null
 ) {
     @Suppress("unused")
     constructor() : this(0, "", "", 0, 0, 0, 0f, null)
@@ -68,10 +70,12 @@ class EmpireOverview(
     var freePolicies: Int = 0,
     var adoptedPolicies: ArrayList<String> = ArrayList(),
     var cityCount: Int = 0,
-    var unitCount: Int = 0
+    var unitCount: Int = 0,
+    /** One-time aircraft/missile grants waiting for a city with air capacity; not deployed units. */
+    var pendingStartingUnits: LinkedHashMap<String, Int> = LinkedHashMap()
 ) {
     @Suppress("unused")
-    constructor() : this(0, null, ArrayList(), 0, 0, 0, 0, ArrayList(), 0, 0)
+    constructor() : this(0, null, ArrayList(), 0, 0, 0, 0, ArrayList(), 0, 0, LinkedHashMap())
 }
 
 class ObservationDto(
@@ -91,11 +95,17 @@ class ObservationDto(
     var ownUnits: ArrayList<ObservedUnit> = ArrayList(),
     var visibleForeignUnits: ArrayList<ObservedUnit> = ArrayList(),
     var ownCities: ArrayList<ObservedCity> = ArrayList(),
-    var visibleForeignCities: ArrayList<ObservedCity> = ArrayList()
+    var visibleForeignCities: ArrayList<ObservedCity> = ArrayList(),
+    /** Current-turn delivered mail and older unread mail; repeated reads/retries do not drain it. */
+    var inbox: ArrayList<DiplomaticMessage> = ArrayList(),
+    var messageContacts: ArrayList<MessageContact> = ArrayList(),
+    var observationVersion: Int = 2,
+    var mapSummary: MapSummary = MapSummary()
 ) {
     @Suppress("unused")
     constructor() : this(1, 0, "", "", 0, TurnPhase.READY_TO_START, "", false, 0,
-        ArrayList(), ArrayList(), EmpireOverview(), ArrayList(), ArrayList(), ArrayList(), ArrayList())
+        ArrayList(), ArrayList(), EmpireOverview(), ArrayList(), ArrayList(), ArrayList(), ArrayList(),
+        ArrayList(), ArrayList())
 }
 
 class AttackOption(
@@ -120,7 +130,12 @@ class LegalActionsDto(
     var promotions: ArrayList<String> = ArrayList(),
     var canUpgrade: Boolean = false,
     var upgradeTo: String? = null,
-    var greatActions: ArrayList<GreatPersonAction> = ArrayList()
+    var greatActions: ArrayList<GreatPersonAction> = ArrayList(),
+    var revision: Int = 0,
+    var improvements: ArrayList<WorkerImprovementOption> = ArrayList(),
+    var workInProgress: WorkInProgress? = null,
+    var repair: RepairOption? = null,
+    var canCancelWork: Boolean = false
 ) {
     @Suppress("unused")
     constructor() : this(ArrayList(), ArrayList(), ArrayList(), false, ArrayList(),
@@ -198,6 +213,7 @@ fun buildObservation(
         ?: throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Unknown civilization $actorCivId")
     val dto = ObservationDto()
     dto.revision = match.stateRevision
+    dto.mapSummary = buildMapSummary(game, match, actorCivId)
     dto.matchId = match.matchId
     dto.timelineId = match.timelineId
     dto.turnSerial = match.turnSerial
@@ -205,6 +221,11 @@ fun buildObservation(
     dto.activeCivId = game.currentPlayer
     dto.isMyTurn = match.turnPhase == TurnPhase.AWAITING_DECISIONS && game.currentPlayer == actorCivId
     dto.endTurnsCommitted = match.endTurnsCommitted
+    if (dto.isMyTurn) dto.inbox = ArrayList(match.diplomaticMessages.filter {
+        it.isDeliveredTo(actorCivId, match.turnSerial) &&
+            (it.deliveredTurnSerial == match.turnSerial || it.acknowledgedTurnSerial == null)
+    }.map { it.copy() })
+    dto.messageContacts = buildMessageContacts(game, match, actorCivId)
     dto.requiredDecisions = ArrayList(match.pendingDecisions
         .filter { it.owningCivId == actorCivId }.map { it.copy() })
     dto.recentEvents = ArrayList(civ.notifications.takeLast(20).map { it.text })
@@ -219,7 +240,8 @@ fun buildObservation(
         civ.policies.freePolicies,
         ArrayList(civ.policies.getAdoptedPolicies().toList()),
         civ.cities.size,
-        civ.units.getCivUnitsSize()
+        civ.units.getCivUnitsSize(),
+        LinkedHashMap(civ.pendingStartingUnits)
     )
 
     for (unit in civ.units.getCivUnits()) {
@@ -269,6 +291,11 @@ fun buildLegalActions(
     if (unitId != null) {
         val unit = civ.units.getCivUnits().firstOrNull { it.id == unitId }
             ?: throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "No such visible unit")
+        val workerOptions = buildWorkerOptions(game, actorCivId, unit)
+        dto.improvements = workerOptions.improvements
+        dto.workInProgress = workerOptions.workInProgress
+        dto.repair = workerOptions.repair
+        dto.canCancelWork = workerOptions.canCancelWork
         if (unit.owner != actorCivId || unit.isDestroyed)
             throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "No such visible unit")
         if (unit.hasMovement()) {

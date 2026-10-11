@@ -1,3 +1,5 @@
+import { GAME_INSTRUCTIONS } from "./game-instructions.js";
+
 /**
  * Provider invocation builders (AI_AGENT_PLAN.md §7.2).
  *
@@ -9,6 +11,8 @@
 export const GAME_TOOL_ALLOWLIST = [
   "game.observe",
   "game.inspect",
+  "game.tile",
+  "game.map",
   "game.rules",
   "game.legal_actions",
   "game.act",
@@ -21,6 +25,7 @@ export interface SpawnSpec {
   executable: string;
   argv: string[];
   cwd: string;
+  context?: { matchId: string; civId: string; turnSerial: number; runId: string; provider?: string; model?: string; reasoning?: string };
 }
 
 export const CODEX_EXECUTABLE = "/Users/noahkenny/.nvm/versions/node/v24.13.1/bin/codex";
@@ -45,7 +50,15 @@ export function codexSpawn(args: {
     "exec", "--json",
     "--ignore-user-config",
     "--skip-git-repo-check",
+    // Game runs do not need the desktop's installed plugins, skills or coding tools.
+    "--disable", "plugins", "--disable", "apps",
+    "--enable", "skip_host_skill_discovery", "--disable", "skill_search",
+    "--disable", "shell_tool", "--disable", "in_app_browser", "--disable", "multi_agent",
+    "-c", 'web_search="disabled"',
     "-s", "danger-full-access",
+    "-c", `developer_instructions=${JSON.stringify(GAME_INSTRUCTIONS)}`,
+    "-c", 'model_reasoning_summary="detailed"',
+
   ];
   if (args.model) {
     argv.push("-m", args.model);
@@ -74,6 +87,8 @@ export function claudeSpawn(args: {
   const allowedTools = GAME_TOOL_ALLOWLIST.map((t) => `mcp__game__${t.replaceAll(".", "_")}`).join(" ");
   const argv = [
     "-p", "--output-format", "stream-json", "--verbose",
+    "--include-partial-messages", "--include-hook-events",
+    "--append-system-prompt", GAME_INSTRUCTIONS,
     "--restricted", "--strict-mcp-config",
     "--mcp-config", args.mcpConfigPath,
     "--tools", "",

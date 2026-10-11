@@ -2,11 +2,9 @@ package com.unciv.ui.screens.worldscreen.topbar
 
 import com.badlogic.gdx.scenes.scene2d.Group
 import com.badlogic.gdx.scenes.scene2d.ui.Label
-import com.unciv.Constants
 import com.unciv.logic.civilization.Civilization
 import com.unciv.models.stats.Stats
 import com.unciv.models.translations.tr
-import com.unciv.ui.components.extensions.colorFromRGB
 import com.unciv.ui.components.extensions.setFontColor
 import com.unciv.ui.components.extensions.toLabel
 import com.unciv.ui.components.extensions.toStringSigned
@@ -14,6 +12,7 @@ import com.unciv.ui.components.fonts.Fonts
 import com.unciv.ui.components.input.onClick
 import com.unciv.ui.components.widgets.ScalingTableWrapper
 import com.unciv.ui.images.ImageGetter
+import com.unciv.ui.screens.worldscreen.WorldScreenStyle
 import com.unciv.ui.screens.basescreen.BaseScreen
 import com.unciv.ui.screens.overviewscreen.EmpireOverviewCategories
 import com.unciv.ui.screens.overviewscreen.EmpireOverviewScreen
@@ -22,25 +21,25 @@ import com.unciv.ui.screens.pickerscreens.TechPickerScreen
 import kotlin.math.ceil
 import kotlin.math.roundToInt
 
-internal class WorldScreenTopBarStats(topbar: WorldScreenTopBar) : ScalingTableWrapper() {
+internal class WorldScreenTopBarStats(private val topbar: WorldScreenTopBar) : ScalingTableWrapper() {
 
-    private val goldLabel = "0".toLabel(colorFromRGB(225, 217, 71)) // #ed1947
+    private val goldLabel = "0".toLabel(WorldScreenStyle.ink, 14)
     private val goldPerTurnLabel = "+0"
-        .toLabel(colorFromRGB(225, 217, 71), 14)
+        .toLabel(WorldScreenStyle.ink, 14)
 
-    private val scienceLabel = "0".toLabel(colorFromRGB(78, 140, 151)) // #4e8c97
-    private val happinessLabel = "0".toLabel()
-    private val cultureLabel = "0".toLabel(colorFromRGB(210, 94, 210)) // #d25ed2
+    private val scienceLabel = "0".toLabel(WorldScreenStyle.ink, 14)
+    private val happinessLabel = "0".toLabel(WorldScreenStyle.ink, 14)
+    private val cultureLabel = "0".toLabel(WorldScreenStyle.ink, 14)
 
-    private val faithLabel = "0".toLabel(colorFromRGB(168, 196, 241)) // #a8c4f1
+    private val faithLabel = "0".toLabel(WorldScreenStyle.ink, 14)
     private val faithPerTurnLabel = "+0"
-        .toLabel(colorFromRGB(168, 196, 241), 14)
+        .toLabel(WorldScreenStyle.ink, 14)
 
     private val happinessContainer = Group()
 
     // These are all to improve performance IE reduce update time (was 150 ms on my phone, which is a lot!)
-    private val malcontentColor = colorFromRGB(239,83,80) // Color.valueOf("ef5350")
-    private val happinessColor = colorFromRGB(92, 194, 77) // Color.valueOf("8cc24d")
+    private val malcontentColor = WorldScreenStyle.error
+    private val happinessColor = WorldScreenStyle.ink
     private val malcontentImage = ImageGetter.getStatIcon("Malcontent")
     private val happinessImage = ImageGetter.getStatIcon("Happiness")
 
@@ -48,12 +47,12 @@ internal class WorldScreenTopBarStats(topbar: WorldScreenTopBar) : ScalingTableW
 
 
     companion object {
-        const val defaultImageSize = 20f
-        const val defaultHorizontalPad = 3f
-        const val defaultTopPad = 8f
-        const val defaultBottomPad = 3f
-        const val defaultImageBottomPad = 6f
-        const val padRightBetweenStats = 20f
+        const val defaultImageSize = 16f
+        const val defaultHorizontalPad = 2f
+        const val defaultTopPad = 3f
+        const val defaultBottomPad = 2f
+        const val defaultImageBottomPad = 2f
+        const val padRightBetweenStats = 12f
     }
 
     init {
@@ -85,22 +84,22 @@ internal class WorldScreenTopBarStats(topbar: WorldScreenTopBar) : ScalingTableW
             overviewPage: EmpireOverviewCategories,
             noPad: Boolean = false
         ) = addStat(icon, label, noPad) {
-            EmpireOverviewScreen(worldScreen.selectedGameView.civView, overviewPage)
+            EmpireOverviewScreen(topbar.displayedGameView.civView, overviewPage)
         }
 
         fun addPerTurnLabel(label: Label) {
             add(label).padRight(padRightBetweenStats)
-                .height(Constants.defaultFontSize.toFloat()).top()
+                .height(14f).top()
         }
 
 
         addStat("Gold", goldLabel, EmpireOverviewCategories.Stats, true)
         addPerTurnLabel(goldPerTurnLabel)
 
-        addStat("Science", scienceLabel) { TechPickerScreen(worldScreen.selectedCiv) }
+        addStat("Science", scienceLabel) { TechPickerScreen(topbar.displayedCiv) }
 
         val invokeResourcesPage = {
-            worldScreen.openEmpireOverview(EmpireOverviewCategories.Resources)
+            topbar.openOverview(EmpireOverviewCategories.Resources)
         }
         happinessContainer.onClick(invokeResourcesPage)
         happinessLabel.onClick(invokeResourcesPage)
@@ -109,13 +108,13 @@ internal class WorldScreenTopBarStats(topbar: WorldScreenTopBar) : ScalingTableW
 
         addStat("Culture", cultureLabel) {
             if (worldScreen.gameInfo.ruleset.policyBranches.isEmpty()) null
-            else PolicyPickerScreen(worldScreen.selectedCiv, worldScreen.canChangeState)
+            else PolicyPickerScreen(topbar.displayedCiv, worldScreen.canChangeState)
         }
 
         if (worldScreen.gameInfo.isReligionEnabled()) {
             addStat("Faith", faithLabel, EmpireOverviewCategories.Religion, true)
             addPerTurnLabel(faithPerTurnLabel)
-        } else add("Religion: Off".toLabel())
+        }
 
 
     }

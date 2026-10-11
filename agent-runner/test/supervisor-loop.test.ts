@@ -56,6 +56,41 @@ const profile = { displayName: "Ada", personality: "Bold.", modelLabel: "scripte
 const context = { rulesetName: "Civ V - Vanilla", protocolVersion: 1, civId: "civ", turnSerial: 1 };
 
 describe("supervisor turn loop with a scripted provider", () => {
+  it("preserves fresh provider credentials over extra environment values", async () => {
+    const engine = new FakeGameService();
+    const build = (_prompt: string, _resume: string | undefined, url: string, bearer: string) => ({
+      spec: {
+        executable: process.execPath,
+        argv: ["--input-type=module", "-e",
+          'process.argv = ["node", "script", ...process.argv.slice(1), "--bearer", process.env.GAME_MCP_BEARER]; await import("./probes/scripted-provider.mjs");',
+          "--", "--mcp-url", url],
+        cwd: repoRoot,
+      },
+      env: { GAME_MCP_BEARER: bearer },
+    });
+    const supervisor = new Supervisor(build, parseScripted);
+    const outcome = await supervisor.runLeaderTurn({
+      engine, binding: binding("credential-run"), profile, context,
+      guidance: [], cwd: repoRoot,
+      extraEnv: { GAME_MCP_BEARER: "unused-by-scripted" },
+    });
+    expect(outcome.status).toBe("completed_turn");
+    expect(outcome.turnEnded).toBe(true);
+    expect(engine.revision).toBe(44);
+  }, 60000);
+
+  it("lets an active provider finish after the elapsed-time warning", async () => {
+    const engine = new FakeGameService();
+    const supervisor = new Supervisor(scriptedBuild, parseScripted, undefined, 500, 1);
+    const outcome = await supervisor.runLeaderTurn({
+      engine, binding: binding("slow-run"), profile, context,
+      guidance: [], cwd: repoRoot,
+    });
+    expect(outcome.status).toBe("completed_turn");
+    expect(outcome.turnEnded).toBe(true);
+    expect(outcome.run.sessionId).toMatch(/^scripted-/);
+  }, 60000);
+
   it("observe-act-end completes a turn and binds the session", async () => {
     const engine = new FakeGameService();
     const supervisor = new Supervisor(scriptedBuild, parseScripted);

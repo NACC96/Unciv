@@ -1,6 +1,7 @@
 package com.unciv.logic.city.managers
 
 import com.unciv.Constants
+import com.unciv.logic.StartingBonusApplicator
 import com.unciv.logic.city.City
 import com.unciv.logic.civilization.Civilization
 import com.unciv.logic.civilization.Proximity
@@ -99,6 +100,7 @@ class CityFounder {
                 GameContext(civInfo, city, unit)))
                 UniqueTriggerActivation.triggerUnique(unique, civInfo, city, unit, triggerNotificationText = "due to founding a city")
 
+        StartingBonusApplicator.deliverPendingUnits(civInfo)
         return city
     }
 

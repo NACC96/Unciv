@@ -17,6 +17,8 @@ export const ENGINE_PROTOCOL_VERSION = 1;
 export type EngineMethod =
   | "observe"
   | "inspect"
+  | "inspect_tile"
+  | "map"
   | "rules"
   | "legal_actions"
   | "act"
@@ -39,7 +41,7 @@ export interface EngineResponseFrame {
   id: string;
   ok: boolean;
   result?: unknown;
-  error?: { code: string; message: string };
+  error?: { code: string; message: string; currentRevision?: number; actionId?: string; messageIds?: string[] };
 }
 
 export interface TurnEventFrame {

@@ -196,6 +196,9 @@ class Civilization : IsPartOfGameInfoSerialization {
 
     var resourceStockpiles = Counter<String>()
 
+    /** Saved one-time setup grants waiting for an owned city with air-unit capacity. */
+    var pendingStartingUnits = LinkedHashMap<String, Int>()
+
     /** Arraylist instead of HashMap as the same unique might appear multiple times
      * We don't use pairs, as these cannot be serialized due to having no no-arg constructor
      * We ALSO can't use a class inheriting from ArrayList<TemporaryUnique>() because ANNOYINGLY that doesn't pass deserialization
@@ -355,6 +358,7 @@ class Civilization : IsPartOfGameInfoSerialization {
         toReturn.hasMovedAutomatedUnits = hasMovedAutomatedUnits
         toReturn.statsHistory = statsHistory.clone()
         toReturn.resourceStockpiles = resourceStockpiles.clone()
+        toReturn.pendingStartingUnits = LinkedHashMap(pendingStartingUnits)
         return toReturn
     }
 

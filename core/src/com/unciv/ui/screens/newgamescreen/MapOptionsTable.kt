@@ -29,7 +29,7 @@ class MapOptionsTable(private val newGameScreen: NewGameScreen) : Table() {
         val initialMapType = mapParameters.type.takeIf { it in mapTypes } ?: MapGeneratedMainType.generated
         mapTypeSelectBox = TranslatedSelectBox(mapTypes, initialMapType)
 
-        fun updateOnMapTypeChange() {
+        fun updateOnMapTypeChange(resetGodMode: Boolean = true) {
             mapTypeSpecificTable.clear()
             when (mapTypeSelectBox.selected.value) {
                 MapGeneratedMainType.custom -> {
@@ -56,12 +56,12 @@ class MapOptionsTable(private val newGameScreen: NewGameScreen) : Table() {
                     newGameScreen.lockTables()
                 }
             }
-            newGameScreen.gameSetupInfo.gameParameters.godMode = false
+            if (resetGodMode) newGameScreen.gameSetupInfo.gameParameters.godMode = false
             newGameScreen.updateTables()
         }
 
         // activate once, so the MapGeneratedMainType.generated controls show
-        updateOnMapTypeChange()
+        updateOnMapTypeChange(resetGodMode = false)
 
         mapTypeSelectBox.onChange { updateOnMapTypeChange() }
 

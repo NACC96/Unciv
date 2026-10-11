@@ -1,6 +1,7 @@
 package com.unciv.logic.agents
 
 import com.unciv.logic.GameInfo
+import com.unciv.ui.screens.worldscreen.WorldScreen
 
 /**
  * Desktop-owned agent match session (AI_AGENT_PLAN.md §3.1, §11).
@@ -39,7 +40,13 @@ interface AgentMatchSession {
         buildCommands: (expectedRevision: Int) -> List<(Int) -> AgentCommand>
     ): String?
 
-    /** Detach from the screen; shuts the supervisor down. */
+    /** Stop scheduling when navigation leaves this match; an active provider may finish normally. */
+    fun onMatchLeft() = pause()
+
+    /** Reopen the match's controls without automatically resuming its agents. */
+    fun onMatchEntered() {}
+
+    /** Detach from the screen; an active provider may finish before its supervisor shuts down. */
     fun close()
 
     // Platform-independent match controls (AI_AGENT_PLAN.md §9, §11)
@@ -55,18 +62,32 @@ interface AgentMatchSession {
     fun getRunState(): AgentRunState
     fun getActiveCivId(): String?
     fun getActiveAgentProfile(): AgentProfile?
+    /** Identity for activity from an earlier civilization, independent of the active turn. */
+    fun getAgentProfile(civId: String): AgentProfile? =
+        if (civId == getActiveCivId()) getActiveAgentProfile() else null
     fun getFailureReason(): String?
     fun isSpectatorMode(): Boolean
+    /** Live provider activity, available while a turn is still running. */
+    fun getActivity(): List<AgentActivityEntry> = emptyList()
+    fun getActivityDetails(id: String): String = ""
+    fun getActivityDirectory(): String? = null
+    /** Private mail for the attached viewer; spectators may inspect all conversations. */
+    fun getMessageContacts(): List<MessageContact> = emptyList()
+    fun getMessages(): List<DiplomaticMessage> = emptyList()
+    /** Saves off the rendering thread. Callback runs on GL; null means durably queued. */
+    fun sendMessage(targetCivId: String, text: String, onComplete: (String?) -> Unit) {
+        onComplete("Messaging is unavailable for this match")
+    }
     fun startAutomaticPlay()
 }
 
 object AgentMatchSessionFactory {
     /** Set once by the desktop launcher; null on platforms without hosting. */
-    var creator: ((game: GameInfo, match: AgentMatchState, setup: AgentMatchSetup) -> AgentMatchSession)? = null
+    var creator: ((game: GameInfo, match: AgentMatchState, setup: AgentMatchSetup, screen: WorldScreen) -> AgentMatchSession)? = null
 
-    fun create(game: GameInfo, setup: AgentMatchSetup): AgentMatchSession? {
+    fun create(game: GameInfo, setup: AgentMatchSetup, screen: WorldScreen): AgentMatchSession? {
         if (setup.slots.isEmpty()) return null
         val creator = creator ?: return null
-        return creator(game, setup.buildMatchState(game), setup)
+        return creator(game, setup.buildMatchState(game), setup, screen)
     }
 }

@@ -9,6 +9,7 @@ import com.unciv.models.ruleset.tile.ResourceType
 import com.unciv.models.ruleset.tile.TileResource
 import com.unciv.models.ruleset.unique.UniqueType
 import com.unciv.models.translations.tr
+import com.unciv.ui.screens.worldscreen.WorldScreenStyle
 import com.unciv.ui.components.MayaCalendar
 import com.unciv.ui.components.YearTextUtil
 import com.unciv.ui.components.extensions.toLabel
@@ -20,8 +21,8 @@ import com.unciv.ui.images.ImageGetter
 import com.unciv.ui.screens.overviewscreen.EmpireOverviewCategories
 import com.unciv.ui.screens.victoryscreen.VictoryScreen
 
-internal class WorldScreenTopBarResources(topbar: WorldScreenTopBar) : ScalingTableWrapper() {
-    private val turnsLabel = "Turns: 0/400".toLabel()
+internal class WorldScreenTopBarResources(private val topbar: WorldScreenTopBar) : ScalingTableWrapper() {
+    private val turnsLabel = "Turns: 0/400".toLabel(WorldScreenStyle.muted, 12)
     private data class ResourceActors(val resource: TileResource, val label: Label, val icon: Group)
     private val resourceActors = ArrayList<ResourceActors>(12)
     private val resourcesWrapper = Table()
@@ -33,13 +34,13 @@ internal class WorldScreenTopBarResources(topbar: WorldScreenTopBar) : ScalingTa
     // now being on the outside - the buttons moved out of the way despite there being visually ample space.
 
     private companion object {
-        const val defaultPad = 5f
-        const val extraPadBetweenLabelAndResources = 20f
-        const val bottomPad = 10f
+        const val defaultPad = 3f
+        const val extraPadBetweenLabelAndResources = 14f
+        const val bottomPad = 2f
         const val extraPadBetweenResources = 5f
         const val outerHorizontalPad = 2f
-        const val iconSize = 20f
-        const val resourceAmountDescentTweak = 3f
+        const val iconSize = 14f
+        const val resourceAmountDescentTweak = 1f
     }
 
     init {
@@ -50,22 +51,22 @@ internal class WorldScreenTopBarResources(topbar: WorldScreenTopBar) : ScalingTa
         resourcesWrapper.touchable = Touchable.enabled
 
         turnsLabel.onClick {
-            if (worldScreen.selectedCiv.isLongCountDisplay()) {
-                val gameInfo = worldScreen.selectedCiv.gameInfo
-                MayaCalendar.openPopup(worldScreen, worldScreen.selectedCiv, gameInfo.getYear())
+            if (topbar.displayedCiv.isLongCountDisplay()) {
+                val gameInfo = topbar.displayedCiv.gameInfo
+                MayaCalendar.openPopup(worldScreen, topbar.displayedCiv, gameInfo.getYear())
             } else {
                 worldScreen.game.pushScreen{ VictoryScreen(worldScreen) }
             }
         }
         resourcesWrapper.onClick {
-            worldScreen.openEmpireOverview(EmpireOverviewCategories.Resources)
+            topbar.openOverview(EmpireOverviewCategories.Resources)
         }
 
         val strategicResources = worldScreen.gameInfo.ruleset.tileResources.values
             .filter { it.resourceType == ResourceType.Strategic && !it.isCityWide }
         for (resource in strategicResources) {
             val resourceImage = ImageGetter.getResourcePortrait(resource.name, iconSize)
-            val resourceLabel = "0".toLabel()
+            val resourceLabel = "0".toLabel(WorldScreenStyle.muted, 12)
             resourceActors += ResourceActors(resource, resourceLabel, resourceImage)
         }
 

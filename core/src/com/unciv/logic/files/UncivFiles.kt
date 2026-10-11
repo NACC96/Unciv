@@ -77,16 +77,17 @@ class UncivFiles(
             gameName, saveFolder, preferExternalStorage, files.externalStoragePath)
         val location = "${saveFolder}/$gameName"
         val localFile = getLocalFile(location)
-        val externalFile = files.external(location)
-
-        val toReturn = if (files.isExternalStorageAvailable && (
-                externalFile.exists() && !localFile.exists() || // external file is only valid choice
-                preferExternalStorage && (externalFile.exists() || !localFile.exists()) // unless local file is only valid choice, choose external
-                ) ) {
-            if (externalFile.isDirectory) externalFile.deleteDirectory() // fix for #13113
-            externalFile
-        } else {
-            localFile
+        // A configured profile is authoritative: never read, overwrite or delete a legacy
+        // external save just because its configured-local counterpart does not exist yet.
+        val toReturn = if (customDataDirectory != null) localFile else {
+            val externalFile = files.external(location)
+            if (files.isExternalStorageAvailable && (
+                    externalFile.exists() && !localFile.exists() || // external file is only valid choice
+                    preferExternalStorage && (externalFile.exists() || !localFile.exists()) // unless local file is only valid choice, choose external
+                    ) ) {
+                if (externalFile.isDirectory) externalFile.deleteDirectory() // fix for #13113
+                externalFile
+            } else localFile
         }
 
         toReturn.parent().mkdirs()
@@ -103,7 +104,7 @@ class UncivFiles(
     }
 
     fun pathToFileHandle(path: String): FileHandle {
-        return if (preferExternalStorage && files.isExternalStorageAvailable) files.external(path)
+        return if (customDataDirectory == null && preferExternalStorage && files.isExternalStorageAvailable) files.external(path)
         else getLocalFile(path)
     }
 
@@ -126,6 +127,7 @@ class UncivFiles(
         val localFiles = Sequence { getLocalFile(saveFolder).list().iterator() }
 
         val externalFiles = when {
+            customDataDirectory != null -> emptySequence()
             !files.isExternalStorageAvailable -> emptySequence()
             getDataFolder().file().absolutePath == files.external("").file().absolutePath -> emptySequence()
             else -> Sequence { files.external(saveFolder).list().iterator() }

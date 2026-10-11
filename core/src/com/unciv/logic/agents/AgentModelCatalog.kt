@@ -13,7 +13,9 @@ enum class ThinkingLevel(
     LOW("Low", "low"),
     MEDIUM("Medium", "medium"),
     HIGH("High", "high"),
-    MAX("Max", "max");
+    XHIGH("XHigh", "xhigh"),
+    MAX("Max", "max"),
+    ULTRA("Ultra", "ultra");
 
     companion object {
         fun fromWireValue(value: String?): ThinkingLevel {
@@ -54,6 +56,22 @@ object AgentModelCatalog {
 
     // Codex models: Luna is the immediate target and default for new profiles.
     val CODEX_MODELS = listOf(
+        ModelSpec(
+            id = "gpt-6-luna",
+            label = "GPT-6 Luna",
+            provider = PROVIDER_CODEX,
+            supportedThinkingLevels = listOf(ThinkingLevel.PROVIDER_DEFAULT, ThinkingLevel.LOW,
+                ThinkingLevel.MEDIUM, ThinkingLevel.HIGH, ThinkingLevel.XHIGH, ThinkingLevel.MAX),
+            defaultThinkingLevel = ThinkingLevel.XHIGH
+        ),
+        ModelSpec(
+            id = "gpt-6.1-sol",
+            label = "GPT-6.1 Sol",
+            provider = PROVIDER_CODEX,
+            supportedThinkingLevels = listOf(ThinkingLevel.PROVIDER_DEFAULT, ThinkingLevel.LOW,
+                ThinkingLevel.MEDIUM, ThinkingLevel.HIGH, ThinkingLevel.XHIGH, ThinkingLevel.MAX, ThinkingLevel.ULTRA),
+            defaultThinkingLevel = ThinkingLevel.LOW
+        ),
         ModelSpec(
             id = "gpt-5.6-luna",
             label = "GPT-5.6 Luna",
@@ -129,6 +147,16 @@ object AgentModelCatalog {
         )
     )
 
+    /** OpenCode Go id/efforts verified against its model metadata (2026-10-11). */
+    val OPENCODE_GO_DEEPSEEK = ModelSpec(
+        id = "opencode-go/deepseek-v4.1-flash",
+        label = "OpenCode Go: DeepSeek V4.1 Flash",
+        provider = PROVIDER_OPENCODE,
+        supportedThinkingLevels = listOf(ThinkingLevel.PROVIDER_DEFAULT, ThinkingLevel.LOW,
+            ThinkingLevel.HIGH, ThinkingLevel.MAX),
+        defaultThinkingLevel = ThinkingLevel.PROVIDER_DEFAULT
+    )
+
     val OPENCODE_MODELS = listOf(
         ModelSpec(
             id = "openai/gpt-5.6-luna",
@@ -173,7 +201,7 @@ object AgentModelCatalog {
             supportedThinkingLevels = emptyList(),
             defaultThinkingLevel = ThinkingLevel.PROVIDER_DEFAULT
         )
-    )
+    ) + OPENCODE_GO_DEEPSEEK
 
     /** Optional host-provided discovery function. Called off the UI thread. */
     var modelDiscoverer: ((provider: String) -> List<ModelSpec>?)? = null
@@ -195,7 +223,17 @@ object AgentModelCatalog {
     fun getModelsForProvider(provider: String): List<ModelSpec> {
         synchronized(discoveredModels) {
             val discovered = discoveredModels[provider]
-            if (!discovered.isNullOrEmpty()) return discovered
+            if (!discovered.isNullOrEmpty()) {
+                return if (provider == PROVIDER_OPENCODE) {
+                    val verified = discovered.map { model ->
+                        if (model.id == OPENCODE_GO_DEEPSEEK.id) model.copy(
+                            supportedThinkingLevels = OPENCODE_GO_DEEPSEEK.supportedThinkingLevels,
+                            defaultThinkingLevel = OPENCODE_GO_DEEPSEEK.defaultThinkingLevel
+                        ) else model
+                    }
+                    verified + listOf(OPENCODE_GO_DEEPSEEK).filter { fallback -> discovered.none { it.id == fallback.id } }
+                } else discovered
+            }
         }
         return when (provider) {
             PROVIDER_CODEX -> CODEX_MODELS
@@ -209,7 +247,8 @@ object AgentModelCatalog {
     fun getDefaultModel(provider: String): ModelSpec {
         val models = getModelsForProvider(provider)
         return if (provider == PROVIDER_CODEX) {
-            models.firstOrNull { it.id == "gpt-5.6-luna" } ?: models.firstOrNull() ?: customModel("gpt-5.6-luna", provider)
+            (models.firstOrNull { it.id == "gpt-6-luna" }
+                ?: CODEX_MODELS.first { it.id == "gpt-6-luna" }).copy(defaultThinkingLevel = ThinkingLevel.XHIGH)
         } else {
             models.firstOrNull() ?: customModel("default", provider)
         }

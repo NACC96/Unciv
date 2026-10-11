@@ -149,6 +149,8 @@ class CivInfoTransientCache(val civInfo: Civilization) {
 
             discoverNaturalWonders()
         }
+
+        civInfo.gameInfo.agentMapSightings?.recordVisible(civInfo)
     }
 
     private fun updateViewableInvisibleTiles() {
@@ -185,31 +187,28 @@ class CivInfoTransientCache(val civInfo: Civilization) {
 
     private fun setNewViewableTiles() {
         // while spectating (or defeated in singleplayer, which grants the same rights) all map is visible
-        if (civInfo.hasSpectatorVision() || DebugUtils.VISIBLE_MAP) {
+        if ((!civInfo.gameInfo.agentNormalVisibility || civInfo.isSpectator())
+            && (civInfo.hasSpectatorVision() || DebugUtils.VISIBLE_MAP)) {
             civInfo.viewableTiles = civInfo.gameInfo.tileMap.values.toSet()
             return
         }
 
-        if (civInfo.isDefeated()) {
-            // Avoid meeting dead city states when entering a tile owned by their former ally (#9245)
-            // In that case ourTilesAndNeighboringTiles and getCivUnits will be empty, but the for
-            // loop getKnownCivs/getAllyCiv would add tiles.
-            civInfo.viewableTiles = emptySet()
-            return
-        }
+        civInfo.viewableTiles = normalViewableTiles()
+    }
 
+    /** Pure actor sight calculation: no debug/spectator override or explored writes. */
+    fun normalViewableTiles(): Set<Tile> {
+        if (civInfo.isDefeated() || civInfo.isSpectator()) return emptySet()
         val newViewableTiles = HashSet<Tile>(ourTilesAndNeighboringTiles)
-        newViewableTiles.addAll(civInfo.units.getCivUnits().flatMap { unit -> unit.viewableTiles.asSequence().filter { it.getOwner() != civInfo } })
-
+        newViewableTiles.addAll(civInfo.units.getCivUnits().flatMap { unit ->
+            unit.viewableTiles.asSequence().filter { it.getOwner() != civInfo }
+        })
         for (otherCiv in civInfo.getKnownCivs()) {
-            if (otherCiv.allyCiv == civInfo || otherCiv == civInfo.allyCiv) {
+            if (otherCiv.allyCiv == civInfo || otherCiv == civInfo.allyCiv)
                 newViewableTiles.addAll(otherCiv.cities.asSequence().flatMap { it.getTiles() })
-            }
         }
-
         newViewableTiles.addAll(civInfo.espionageManager.getTilesVisibleViaSpies())
-
-        civInfo.viewableTiles = newViewableTiles // to avoid concurrent modification problems
+        return newViewableTiles
     }
 
     private fun updateLastSeenImprovements() {

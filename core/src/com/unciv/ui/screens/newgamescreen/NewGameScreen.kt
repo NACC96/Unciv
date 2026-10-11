@@ -2,7 +2,6 @@ package com.unciv.ui.screens.newgamescreen
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup
 import com.unciv.Constants
 import com.unciv.UncivGame
@@ -52,7 +51,8 @@ import kotlin.math.floor
 import com.unciv.ui.components.widgets.AutoScrollPane as ScrollPane
 
 class NewGameScreen(
-    defaultGameSetupInfo: GameSetupInfo? = null
+    defaultGameSetupInfo: GameSetupInfo? = null,
+    private val savedAgentSlots: List<com.unciv.logic.files.PresetAgentSlot> = emptyList()
 ): IPreviousScreen, PickerScreen(), RecreateOnResize {
 
     override val gameSetupInfo = defaultGameSetupInfo ?: GameSetupInfo.fromSettings()
@@ -83,6 +83,7 @@ class NewGameScreen(
             this, gameSetupInfo.gameParameters,
             if (isPortrait) stage.width - 20f else 0f
         )
+        playerPickerTable.restoreAgentSlots(savedAgentSlots)
         newGameOptionsTable = GameOptionsTable(
             this, isPortrait,
             updatePlayerPickerTable = { desiredCiv -> playerPickerTable.update(desiredCiv) },
@@ -103,6 +104,7 @@ class NewGameScreen(
 
         val horizontalGroup = HorizontalGroup().padBottom(5f).space(10f)
         rightSideGroup.addActorAt(0, horizontalGroup)
+        horizontalGroup.addActor("Presets".toTextButton().onClick { SetupPresetsPopup(this) })
 
         if (UncivGame.Current.settings.lastGameSetup != null) {
             val resetToDefaultsButton = "Reset to defaults".toTextButton()
@@ -121,12 +123,8 @@ class NewGameScreen(
             horizontalGroup.addActor(resetToDefaultsButton)
         }
 
-        val agentNoticeLabel = "Starting an agent game begins automated play immediately using the selected provider account.".toLabel(Color.SKY, 12).apply {
-            wrap = true
-            setAlignment(Align.right)
-            width = 260f
-        }
-        horizontalGroup.addActor(agentNoticeLabel)
+        descriptionLabel.color = Color.SKY
+        descriptionLabel.setText("Starting an agent game begins automated play immediately using the selected provider account.")
 
         val startGameButton = "Start game!".toTextButton().apply { color = Color.GREEN }        
         startGameButton.onClick(this::startGameAvoidANRs)
@@ -204,6 +202,10 @@ class NewGameScreen(
         // is enforced here before creation.
         val agentErrors = playerPickerTable.collectAgentErrors()
         if (agentErrors.isNotEmpty()) return agentErrors.joinToString("\n")
+        val bonusErrors = gameSetupInfo.gameParameters.players.flatMap { player ->
+            player.startingBonuses.validate(ruleset, player.chosenCiv).map { "${player.chosenCiv}: $it" }
+        }
+        if (bonusErrors.isNotEmpty()) return bonusErrors.joinToString("\n")
         
         if (mapOptionsTable.mapTypeSelectBox.selected.value == MapGeneratedMainType.custom) {
             val map = try {
@@ -368,7 +370,8 @@ class NewGameScreen(
                 popup.apply {
                     reuseWith("It looks like we can't make a map with the parameters you requested!")
                     row()
-                    addGoodSizedLabel("Maybe you put too many players into too small a map?").row()
+                    addGoodSizedLabel(if (exception is UncivShowableException) exception.localizedMessage
+                        else "Maybe you put too many players into too small a map?").row()
                     addButton("Copy to clipboard"){
                         Gdx.app.clipboard.contents = exception.stackTraceToString()
                     }
@@ -495,5 +498,13 @@ class NewGameScreen(
         newGameOptionsTable.update()
     }
 
-    override fun recreate(): BaseScreen = NewGameScreen(gameSetupInfo)
+    internal fun loadPreset(preset: com.unciv.logic.files.SetupPreset) {
+        require(RulesetCache.containsKey(preset.setup.gameParameters.baseRuleset)) { "The preset's base ruleset is not installed." }
+        require(preset.setup.gameParameters.mods.all { RulesetCache.containsKey(it) }) { "One or more of the preset's mods are not installed." }
+        RulesetCache.getComplexRuleset(preset.setup.gameParameters)
+        mapOptionsTable.cancelBackgroundJobs()
+        game.replaceCurrentScreen { NewGameScreen(preset.setup, preset.agents) }
+    }
+
+    override fun recreate(): BaseScreen = NewGameScreen(gameSetupInfo, playerPickerTable.snapshotAgentSlots())
 }

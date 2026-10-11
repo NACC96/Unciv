@@ -10,7 +10,7 @@
  * use the W1-proven spawn builders (their config file/dir setup is owned by
  * the desktop, which passes absolute paths through providerConfig).
  */
-import { codexSpawn, claudeSpawn, opencodeSpawn, type SpawnSpec } from "./provider-spawn.js";
+import { GAME_TOOL_ALLOWLIST, codexSpawn, claudeSpawn, opencodeSpawn, type SpawnSpec } from "./provider-spawn.js";
 import { parseClaudeStream, parseCodexStream, parseOpencodeStream, type NormalizedRun } from "./provider-events.js";
 import { Supervisor } from "./supervisor.js";
 import { StdioEngineBackend } from "./stdio-engine.js";
@@ -78,7 +78,7 @@ export function buildSpawnForProvider(
               headers: { Authorization: "Bearer {env:OPENCODE_GAME_MCP_BEARER}" }, timeout: 30000,
             },
           },
-          tools: { "*": false, "game_*": true },
+          tools: { "*": false, ...Object.fromEntries(GAME_TOOL_ALLOWLIST.map(name => [`game_${name.replaceAll(".", "_")}`, true])) },
           share: "disabled",
           autoupdate: false,
         }),
@@ -171,10 +171,18 @@ export async function main(): Promise<void> {
 
   const finish = () => {
     backend.disconnect();
+    process.exit(0);
   };
-  process.on("SIGTERM", () => {
-    finish();
-  });
+  const requestShutdown = (transportDisconnected = false) => {
+    // EOF cannot carry further engine responses. A shutdown control can, so
+    // keep that channel alive until the current provider finishes normally.
+    if (transportDisconnected) backend.disconnect();
+    if (shuttingDown) return;
+    shuttingDown = true;
+    if (activeTurn) void activeTurn.then(finish, finish);
+    else finish();
+  };
+  process.on("SIGTERM", () => { requestShutdown(); });
 
   process.stdout.write(JSON.stringify({ protocol: 1, kind: "ready" }) + "\n");
 
@@ -187,18 +195,7 @@ export async function main(): Promise<void> {
     for (const line of lines) handleLine(line);
   });
   process.stdin.on("end", () => {
-    // Graceful shutdown on EOF: drain, reject disconnected calls, exit
-    // naturally after the active turn settles (plan §9).
-    shuttingDown = true;
-    void (activeTurn ?? Promise.resolve()).finally(() => {
-      finish();
-      process.exit(0);
-    });
-    // If no turn is active, exit promptly.
-    if (!activeTurn) {
-      finish();
-      process.exit(0);
-    }
+    requestShutdown(true);
   });
 
   function handleLine(line: string): void {
@@ -209,10 +206,7 @@ export async function main(): Promise<void> {
       return;
     }
     if (frame.kind === "control" && frame.op === "shutdown") {
-      shuttingDown = true;
-      finish();
-      void (activeTurn ?? Promise.resolve()).finally(() => process.exit(0));
-      if (!activeTurn) process.exit(0);
+      requestShutdown();
       return;
     }
     if (frame.kind === "control" && frame.op === "run_turn") {
@@ -241,8 +235,11 @@ export async function main(): Promise<void> {
     };
     emit("run_started", { provider: control.provider, civ: control.binding.civId });
     const supervisor = new Supervisor(
-      (prompt, resumeId, serverUrl, bearer) =>
-        buildSpawnForProvider(control.provider, prompt, resumeId, serverUrl, bearer, control.providerConfig, scratch),
+      (prompt, resumeId, serverUrl, bearer) => {
+        const built = buildSpawnForProvider(control.provider, prompt, resumeId, serverUrl, bearer, control.providerConfig, scratch);
+        return { ...built, spec: { ...built.spec, context: { ...control.binding, turnSerial: control.context.turnSerial,
+          provider: control.provider, model: control.providerConfig.model, reasoning: control.providerConfig.reasoning } } };
+      },
       parseForProvider(control.provider),
     );
     try {
@@ -258,7 +255,6 @@ export async function main(): Promise<void> {
         guidance: control.guidance,
         resumeId: control.providerConfig.resumeId,
         cwd: scratch,
-        extraEnv: { GAME_MCP_BEARER: "unused-by-scripted" },
       });
       if (outcome.run.sessionId) {
         emit("session_bound", { sessionId: outcome.run.sessionId });
