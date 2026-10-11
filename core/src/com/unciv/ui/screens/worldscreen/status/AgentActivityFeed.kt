@@ -31,7 +31,7 @@ import com.unciv.ui.screens.worldscreen.WorldScreen
 import com.unciv.ui.screens.worldscreen.WorldScreenStyle
 import java.io.File
 
-/** Floating transcript: compact tools, readable agent identity, and paced following. */
+/** Floating transcript: compact tools, readable agent identity, and live following. */
 class AgentActivityFeed(private val screen: WorldScreen, private val session: AgentMatchSession) : Table(BaseScreen.skin), Disposable {
     private val muted = WorldScreenStyle.muted
     private val ink = WorldScreenStyle.ink
@@ -79,13 +79,6 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
         override fun run() {
             if (disposed) { cancel(); return }
             if (isVisible) { refresh(); Gdx.graphics.requestRendering() }
-        }
-    }
-    private val paceTask = object : Timer.Task() {
-        override fun run() {
-            if (disposed) { cancel(); return }
-            // Unciv renders on demand. Only request animation frames while catching up.
-            if (isVisible && followLive && scroll.maxY - scroll.scrollY > 0.5f) Gdx.graphics.requestRendering()
         }
     }
 
@@ -170,14 +163,15 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
         screen.stage.addActor(this)
         refresh()
         Timer.schedule(refreshTask, 0.35f, 0.35f)
-        Timer.schedule(paceTask, 0.05f, 0.05f)
     }
 
     override fun act(delta: Float) {
         super.act(delta)
-        if (isVisible && followLive && scroll.scrollY < scroll.maxY) {
-            // A little under two lines per second; stalled frames never cause a large jump.
-            scroll.scrollY = minOf(scroll.maxY, scroll.scrollY + 40f * delta.coerceIn(0f, 0.1f))
+        if (isVisible && followLive) {
+            // Layout/streaming growth must never leave Live accumulating a scroll backlog.
+            validate()
+            scroll.validate()
+            scroll.scrollY = scroll.maxY
             scroll.updateVisualScroll()
         }
     }
@@ -258,7 +252,6 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
             else -> emptyList()
         }
         val changed = latest != shownEntries
-        val firstContent = shownEntries.isEmpty() && latest.isNotEmpty()
         if (changed) {
             if (!followLive) {
                 val oldIds = shownEntries.map { it.id }.toSet()
@@ -269,7 +262,7 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
             shownEntries = latest
         }
         if (changed || resized || switched) rebuild()
-        if ((firstContent || switched) && followLive) jumpToLive()
+        if (followLive && (changed || resized || switched)) jumpToLive()
         updateFooter()
     }
 
@@ -477,6 +470,7 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
 
     private fun jumpToLive() {
         scroll.layout()
+        scroll.velocityY = 0f
         scroll.scrollY = scroll.maxY
         scroll.updateVisualScroll()
         Gdx.graphics.requestRendering()
@@ -485,7 +479,6 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
     override fun dispose() {
         disposed = true
         refreshTask.cancel()
-        paceTask.cancel()
         setShown(false)
         remove()
     }

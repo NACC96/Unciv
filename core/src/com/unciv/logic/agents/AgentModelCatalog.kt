@@ -247,8 +247,12 @@ object AgentModelCatalog {
     fun getDefaultModel(provider: String): ModelSpec {
         val models = getModelsForProvider(provider)
         return if (provider == PROVIDER_CODEX) {
-            (models.firstOrNull { it.id == "gpt-6-luna" }
-                ?: CODEX_MODELS.first { it.id == "gpt-6-luna" }).copy(defaultThinkingLevel = ThinkingLevel.XHIGH)
+            val model = models.firstOrNull { it.id == "gpt-6-luna" }
+                ?: models.firstOrNull()
+                ?: CODEX_MODELS.first { it.id == "gpt-6-luna" }
+            if (model.id == "gpt-6-luna") {
+                model.copy(defaultThinkingLevel = revalidateThinkingLevel(model, ThinkingLevel.XHIGH))
+            } else model
         } else {
             models.firstOrNull() ?: customModel("default", provider)
         }

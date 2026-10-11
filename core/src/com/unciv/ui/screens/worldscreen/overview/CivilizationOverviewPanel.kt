@@ -129,6 +129,7 @@ class CivilizationOverviewPanel(private val screen: WorldScreen) : Table(BaseScr
     }
 
     fun toggle() = setShown(!isVisible)
+    fun hide() = setShown(false)
 
     private fun setShown(shown: Boolean) {
         isVisible = shown

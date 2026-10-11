@@ -9,6 +9,40 @@ import org.junit.runner.RunWith
 class AgentModelCatalogTest {
 
     @Test
+    fun `codex default respects a discovered catalog without luna`() {
+        val discovered = AgentModelCatalog.CODEX_MODELS.first { it.id == "gpt-6.1-sol" }
+            .copy(defaultThinkingLevel = ThinkingLevel.MEDIUM, isDiscovered = true)
+        try {
+            AgentModelCatalog.setDiscoveredModels("codex", listOf(discovered))
+            val model = AgentModelCatalog.getDefaultModel("codex")
+            Assert.assertEquals(discovered.id, model.id)
+            Assert.assertEquals(ThinkingLevel.MEDIUM, model.defaultThinkingLevel)
+            val profile = AgentProfile.defaultFor("America", "codex")
+            Assert.assertEquals(discovered.id, profile.modelId)
+            Assert.assertEquals("medium", profile.reasoning)
+            Assert.assertTrue(AgentModelCatalog.validateProfile(profile).isEmpty())
+        } finally {
+            AgentModelCatalog.setDiscoveredModels("codex", emptyList())
+        }
+    }
+
+    @Test
+    fun `discovered luna default uses only supported reasoning levels`() {
+        val discovered = AgentModelCatalog.CODEX_MODELS.first { it.id == "gpt-6-luna" }
+            .copy(supportedThinkingLevels = listOf(ThinkingLevel.PROVIDER_DEFAULT, ThinkingLevel.LOW),
+                defaultThinkingLevel = ThinkingLevel.LOW, isDiscovered = true)
+        try {
+            AgentModelCatalog.setDiscoveredModels("codex", listOf(discovered))
+            val profile = AgentProfile.defaultFor("America", "codex")
+            Assert.assertEquals("gpt-6-luna", profile.modelId)
+            Assert.assertEquals("low", profile.reasoning)
+            Assert.assertTrue(AgentModelCatalog.validateProfile(profile).isEmpty())
+        } finally {
+            AgentModelCatalog.setDiscoveredModels("codex", emptyList())
+        }
+    }
+
+    @Test
     fun `codex defaults to gpt-6-luna with xhigh thinking`() {
         val defaultModel = AgentModelCatalog.getDefaultModel("codex")
         Assert.assertEquals("gpt-6-luna", defaultModel.id)

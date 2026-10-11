@@ -59,6 +59,7 @@ import com.unciv.ui.screens.worldscreen.chat.ChatButton
 import com.unciv.ui.screens.worldscreen.mainmenu.WorldScreenMusicPopup
 import com.unciv.ui.screens.worldscreen.minimap.MinimapHolder
 import com.unciv.ui.screens.worldscreen.status.AutoPlayStatusButton
+import com.unciv.ui.screens.worldscreen.status.AgentMessagesPanel
 import com.unciv.ui.screens.worldscreen.status.MultiplayerStatusButton
 import com.unciv.ui.screens.worldscreen.status.NextTurnButton
 import com.unciv.ui.screens.worldscreen.status.NextTurnProgress
@@ -163,8 +164,17 @@ class WorldScreen(
 
     fun toggleCivilizationOverview() {
         val panel = civilizationOverview
+        if (panel == null || !panel.isVisible) {
+            // These floating detail panels share the right side of the map; Activity remains independent.
+            stage.root.children.filterIsInstance<AgentMessagesPanel>().forEach { it.hide() }
+        }
         if (panel == null) civilizationOverview = com.unciv.ui.screens.worldscreen.overview.CivilizationOverviewPanel(this)
         else panel.toggle()
+        shouldUpdate = true
+    }
+
+    fun hideCivilizationOverview() {
+        civilizationOverview?.hide()
     }
 
     /** `true` when it's the player's turn unless he is a spectator.

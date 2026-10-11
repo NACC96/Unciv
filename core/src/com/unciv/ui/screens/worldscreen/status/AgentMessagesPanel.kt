@@ -147,9 +147,10 @@ class AgentMessagesPanel(private val screen: WorldScreen, private val session: A
     }
 
     fun toggle() = setShown(!isVisible)
+    fun hide() = setShown(false)
     private fun setShown(shown: Boolean) {
         isVisible = shown
-        if (shown) { toFront(); refresh() }
+        if (shown) { screen.hideCivilizationOverview(); toFront(); refresh() }
         else {
             recipient.hideList(); conversation.hideList()
             if (screen.stage.scrollFocus?.isDescendantOf(this) == true) screen.stage.scrollFocus = null

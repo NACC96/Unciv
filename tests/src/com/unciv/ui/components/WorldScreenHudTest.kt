@@ -263,10 +263,12 @@ class WorldScreenHudTest {
         assertEquals(scroll.maxY, scroll.scrollY, 0.1f)
         scroll.captureListeners.filterIsInstance<InputListener>().forEach { it.scrolled(InputEvent(), 0f, 0f, 0f, -1f) }
         scroll.scrollY = 20f
-        f.activity = f.activity + entry("new")
+        f.activity = f.activity + (1..25).map { entry("new-$it") }
         feed.refreshNow()
         assertEquals(20f, scroll.scrollY, 0.1f)
-        val live = feed.descendants().filterIsInstance<TextButton>().single { it.text.toString() == "1 new" }
+        feed.act(5f)
+        assertEquals("Even a burst and delayed frame must leave manual reading in place", 20f, scroll.scrollY, 0.1f)
+        val live = feed.descendants().filterIsInstance<TextButton>().single { it.text.toString() == "25 new" }
         live.press()
         assertEquals(scroll.maxY, scroll.scrollY, 0.1f)
         assertEquals("Live", live.text.toString())
@@ -301,22 +303,30 @@ class WorldScreenHudTest {
         for (title in listOf("Before message", "Before agent change", "Korean tool", "New turn", "Action rejected", "Recovery")) assertTrue(title, title in labels)
     }
 
-    @Test fun `live feed advances at reading pace instead of jumping past new paragraphs`() {
+    @Test fun `live feed immediately follows bursts and growing streamed messages`() {
         val f = Fixture()
         f.activity = (1..40).map { entry("$it") }
         val feed = f.feed()
         val scroll = feed.descendants().filterIsInstance<AutoScrollPane>().single()
-        val before = scroll.scrollY
-        f.activity = f.activity + entry("new")
+        for (burst in 1..3) {
+            f.activity = f.activity + (1..25).map { entry("burst-$burst-$it") }
+            feed.refreshNow()
+            assertEquals("Live must catch the newest entry in the same refresh", scroll.maxY, scroll.scrollY, 0.1f)
+            assertEquals("Painted text must catch up with the logical scroll position", scroll.maxY, scroll.visualScrollY, 0.1f)
+        }
+        val latest = f.activity.last()
+        Mockito.`when`(f.session.getActivityDetails(latest.id)).thenReturn("A long streamed paragraph. ".repeat(250))
+        f.activity = f.activity.dropLast(1) + latest.copy(timestamp = "stream-grown")
         feed.refreshNow()
-        assertEquals("A refresh must not teleport to the bottom", before, scroll.scrollY, 0.1f)
-        feed.act(0.05f)
-        assertTrue("Live should gently advance", scroll.scrollY > before)
-        assertEquals("The requested faster pace is 40 logical pixels per second", 2f, scroll.scrollY - before, 0.05f)
-        val paced = scroll.scrollY
-        feed.act(5f)
-        assertEquals("A stalled frame still has a bounded catch-up step", 4f, scroll.scrollY - paced, 0.05f)
-        assertTrue(scroll.scrollY < scroll.maxY)
+        assertEquals("Streaming growth must remain caught up", scroll.maxY, scroll.scrollY, 0.1f)
+        assertEquals(scroll.maxY, scroll.visualScrollY, 0.1f)
+        val beforeResize = scroll.maxY
+        f.width = 420f
+        feed.refreshNow()
+        feed.act(0.001f)
+        assertTrue("Narrower wrapping should grow this long transcript", scroll.maxY > beforeResize)
+        assertEquals("Live also follows layout growth", scroll.maxY, scroll.scrollY, 0.1f)
+        assertEquals(scroll.maxY, scroll.visualScrollY, 0.1f)
     }
 
     @Test fun `each agent keeps its name and distinct readable identity color across turns`() {

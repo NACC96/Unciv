@@ -23,6 +23,10 @@ import com.unciv.ui.screens.worldscreen.TechPolicyDiplomacyButtons
 import com.unciv.ui.screens.worldscreen.WorldScreen
 import com.unciv.ui.screens.worldscreen.status.AgentMatchControlTable
 import com.unciv.ui.screens.worldscreen.status.AgentMessagesPanel
+import com.unciv.ui.screens.worldscreen.status.AgentActivityFeed
+import com.unciv.ui.screens.worldscreen.overview.CivilizationOverviewPanel
+import com.unciv.ui.screens.worldscreen.topbar.WorldScreenTopBar
+import com.unciv.view.GameView
 import org.junit.After
 import org.junit.Before
 import org.junit.Assert.*
@@ -104,6 +108,46 @@ class AgentMessagesPanelTest {
             assertTrue("Messages should be accessible without leaving the live map", "Messages" in buttons)
             assertTrue("Activity" in buttons)
         } finally { controls.dispose() }
+    }
+
+    @Test fun `Messages and Overview controls show only their chosen detail panel`() {
+        val f = Fixture()
+        Mockito.`when`(f.screen.selectedCiv).thenReturn(f.viewer)
+        Mockito.`when`(f.screen.selectedGameView).thenReturn(GameView(f.game.gameInfo, f.viewer, true))
+        Mockito.`when`(f.session.getActiveCivId()).thenReturn(f.rome.civID)
+        Mockito.`when`(f.session.getMessages()).thenReturn(emptyList())
+        Mockito.doCallRealMethod().`when`(f.screen).toggleCivilizationOverview()
+        Mockito.doCallRealMethod().`when`(f.screen).hideCivilizationOverview()
+        val controls = AgentMatchControlTable(f.session, f.screen)
+        val bar = WorldScreenTopBar(f.screen)
+        f.root.addActor(controls)
+        f.root.addActor(bar)
+        bar.javaClass.methods.single { it.name.substringBefore('$') == "update" }.invoke(bar, f.viewer)
+        val overviewButton = bar.descendants().filterIsInstance<TextButton>().single { it.text.toString() == "Overview" }
+        var overview: CivilizationOverviewPanel? = null
+        try {
+            overviewButton.press()
+            overview = f.root.children.filterIsInstance<CivilizationOverviewPanel>().single()
+            assertTrue(overview.isVisible)
+            val messages = controls.openPanel(f)
+            assertTrue(messages.isVisible)
+            assertFalse("Opening Messages must close the existing civilization overview", overview.isVisible)
+            assertTrue("Activity can remain alongside the chosen detail panel",
+                f.root.children.filterIsInstance<AgentActivityFeed>().single().isVisible)
+            overview.refresh(); controls.update()
+            assertFalse("An ordinary refresh must not reopen Overview", overview.isVisible)
+            overviewButton.press()
+            assertTrue(overview.isVisible)
+            assertFalse("Opening Overview must close Messages", messages.isVisible)
+            messages.refresh(); controls.update()
+            assertFalse("An ordinary refresh must not reopen Messages", messages.isVisible)
+            controls.openPanel(f)
+            assertTrue(messages.isVisible)
+            assertFalse(overview.isVisible)
+            controls.openPanel(f)
+            assertFalse(messages.isVisible)
+            assertFalse("Closing Messages must not resurrect Overview", overview.isVisible)
+        } finally { overview?.dispose(); controls.dispose() }
     }
 
     @Test fun `viewer switch removes previous private messages even when the new inbox is empty`() {
