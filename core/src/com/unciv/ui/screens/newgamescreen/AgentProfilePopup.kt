@@ -81,45 +81,50 @@ class AgentProfilePopup(
         errorLabel.wrap = true
         formTable.add(errorLabel).width(contentWidth).padBottom(6f).row()
 
+        // Each label sits close to its own field, with a larger gap between groups.
+        fun fieldLabel(text: String, groupStart: Boolean = true) =
+            formTable.add(text.toLabel(GameUiStyle.muted, GameUiStyle.Type.label).apply { wrap = true })
+                .width(contentWidth).padTop(if (groupStart) GameUiStyle.Space.l else GameUiStyle.Space.s)
+                .padBottom(GameUiStyle.Space.xs)
+
         // Display Name
-        formTable.add("Display Name:".toLabel(GameUiStyle.ink, 16)).row()
+        fieldLabel("Display name", groupStart = false).row()
         val nameField = UncivTextField("Display name", workingProfile.displayName).apply { polishSetupField() }
-        formTable.add(nameField).width(contentWidth).row()
+        formTable.add(nameField).width(contentWidth).padTop(0f).row()
 
         // Provider Selector
-        formTable.add("Provider:".toLabel(GameUiStyle.ink, 16)).padTop(6f).row()
+        fieldLabel("Provider").row()
         val providerBox = SetupSelectBox<String>().apply { polishSetupSelect() }
         providerBox.setItems(com.badlogic.gdx.utils.Array(AgentModelCatalog.SUPPORTED_PROVIDERS.toTypedArray()))
         providerBox.selected = workingProfile.provider
-        formTable.add(providerBox).width(contentWidth).row()
+        formTable.add(providerBox).width(contentWidth).padTop(0f).row()
 
         // Model Selector
-        formTable.add("Model:".toLabel(GameUiStyle.ink, 16)).padTop(6f).row()
+        fieldLabel("Model").row()
         val modelBox = SetupSelectBox<ModelChoice>().apply { polishSetupSelect() }
-        formTable.add(modelBox).width(contentWidth).row()
+        formTable.add(modelBox).width(contentWidth).padTop(0f).row()
 
         // Custom Model Field (hidden unless custom selected)
-        val customModelLabel = "Custom Model ID:".toLabel(GameUiStyle.muted, 14)
-        val customModelField = UncivTextField("e.g. gpt-6-luna", workingProfile.modelId).apply { polishSetupField() }
-        val customModelRowLabel = formTable.add(customModelLabel).padTop(2f)
+        val customModelRowLabel = fieldLabel("Custom model ID", groupStart = false)
         customModelRowLabel.row()
-        val customModelRowField = formTable.add(customModelField).width(contentWidth)
+        val customModelLabel = customModelRowLabel.actor
+        val customModelField = UncivTextField("e.g. gpt-6-luna", workingProfile.modelId).apply { polishSetupField() }
+        val customModelRowField = formTable.add(customModelField).width(contentWidth).padTop(0f)
         customModelRowField.row()
 
         // Thinking Level Selector
-        val thinkingHeaderLabel = "Thinking Level / Reasoning Effort:".toLabel(GameUiStyle.ink, 16).apply { wrap = true }
-        formTable.add(thinkingHeaderLabel).width(contentWidth).padTop(6f).row()
+        fieldLabel("Thinking level / reasoning effort").row()
         val thinkingBox = SetupSelectBox<ThinkingChoice>().apply { polishSetupSelect() }
-        val thinkingRow = formTable.add(thinkingBox).width(contentWidth)
+        val thinkingRow = formTable.add(thinkingBox).width(contentWidth).padTop(0f)
         thinkingRow.row()
         val thinkingUnsupportedLabel = "Thinking setting is not supported for this model.".toLabel(GameUiStyle.muted, 14).apply { wrap = true }
         val unsupportedRow = formTable.add(thinkingUnsupportedLabel).width(contentWidth)
         unsupportedRow.row()
 
         // Personality Instructions
-        formTable.add("Personality Instructions:".toLabel(GameUiStyle.ink, 16)).padTop(6f).row()
+        fieldLabel("Personality instructions").row()
         val personalityField = UncivTextField("Optional strategic personality instructions", workingProfile.personality).apply { polishSetupField() }
-        formTable.add(personalityField).width(contentWidth).row()
+        formTable.add(personalityField).width(contentWidth).padTop(0f).row()
         val bonuses = StartingBonusForm(player, table.previousScreen.ruleset, contentWidth)
         formTable.add(bonuses).width(contentWidth).padTop(6f).row()
 
@@ -128,8 +133,10 @@ class AgentProfilePopup(
         fun showCustomModelFields(show: Boolean) {
             customModelLabel.isVisible = show
             customModelField.isVisible = show
-            customModelRowLabel.height(if (show) customModelLabel.prefHeight else 0f).pad(if (show) 4f else 0f)
-            customModelRowField.height(if (show) customModelField.prefHeight else 0f).pad(if (show) 4f else 0f)
+            customModelRowLabel.height(if (show) customModelLabel.prefHeight else 0f)
+                .padTop(if (show) GameUiStyle.Space.s else 0f).padBottom(if (show) GameUiStyle.Space.xs else 0f)
+            customModelRowField.height(if (show) customModelField.prefHeight else 0f)
+                .pad(if (show) 4f else 0f).padTop(0f)
             formTable.invalidateHierarchy()
         }
 
@@ -142,7 +149,7 @@ class AgentProfilePopup(
                 thinkingBox.isVisible = currentModelSpec.supportsThinking
                 thinkingUnsupportedLabel.isVisible = !currentModelSpec.supportsThinking
                 thinkingRow.height(if (currentModelSpec.supportsThinking) thinkingBox.prefHeight else 0f)
-                    .pad(if (currentModelSpec.supportsThinking) 4f else 0f)
+                    .pad(if (currentModelSpec.supportsThinking) 4f else 0f).padTop(0f)
                 unsupportedRow.height(if (currentModelSpec.supportsThinking) 0f else thinkingUnsupportedLabel.prefHeight)
                     .pad(if (currentModelSpec.supportsThinking) 0f else 4f)
                 if (!currentModelSpec.supportsThinking) {

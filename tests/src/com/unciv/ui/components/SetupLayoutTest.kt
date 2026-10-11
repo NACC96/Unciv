@@ -61,6 +61,7 @@ internal class SetupLayoutFixture(val width: Float, val height: Float, realStage
             invocation.method.name.startsWith("getColumnWidth") -> width
             invocation.method.name.startsWith("getPlayerPickerTable") -> if (::picker.isInitialized) picker else null
             invocation.method.name.startsWith("setStartEnabled") -> invocation.callRealMethod()
+            invocation.method.name.startsWith("showStartReadiness") -> invocation.callRealMethod()
             else -> org.mockito.Answers.RETURNS_DEFAULTS.answer(invocation)
         }
     }
@@ -320,6 +321,48 @@ class SetupLayoutTest {
             start.listeners.filterIsInstance<ActivationListener>().single().tap(InputEvent().apply { listenerActor = start }, 1f, 1f, 1, 0)
             assertEquals(1, starts)
         }
+    }
+
+    @Test fun `stacked setup caps its measure on wide windows`() {
+        val width = setupMember(NewGameScreen.Companion, NewGameScreen.Companion::class.java, "stackedContentWidth", 1000f) as Float
+        assertEquals(720f, width, 0.01f)
+        val narrow = setupMember(NewGameScreen.Companion, NewGameScreen.Companion::class.java, "stackedContentWidth", 520f) as Float
+        assertEquals(500f, narrow, 0.01f)
+    }
+
+    @Test fun `footer separates Back and keeps Reset away from the primary Start`() {
+        for ((width, height) in listOf(800f to 500f, 520f to 360f)) {
+            val fixture = SetupLayoutFixture(width, height)
+            val actions = fixture.pane.bottomTable.setupDescendants().filterIsInstance<Table>().single { it.name == "SetupFooterActions" }
+            val order = actions.children.filterIsInstance<TextButton>().map { it.text.toString() }
+            assertEquals(listOf(Constants.close, "Reset to defaults", "Presets", "Start game!"), order)
+            val start = fixture.pane.rightSideButton
+            val widest = actions.children.filterIsInstance<TextButton>().maxOf { it.width }
+            assertEquals("Start is the widest action", widest, start.width, 0.5f)
+        }
+    }
+
+    @Test fun `a disabled Start explains what is missing`() {
+        val fixture = SetupLayoutFixture(800f, 500f)
+        fixture.setup.gameParameters.players.removeAt(1)
+        fixture.picker.update()
+        assertTrue(fixture.pane.rightSideButton.isDisabled)
+        assertEquals("Add at least one more player to start.", fixture.pane.descriptionLabel.text.toString())
+        fixture.setup.gameParameters.players.add(Player("Korea", PlayerType.AI))
+        fixture.picker.update()
+        assertFalse(fixture.pane.rightSideButton.isDisabled)
+        assertTrue(fixture.pane.descriptionLabel.text.toString().startsWith("Starting an agent game"))
+    }
+
+    @Test fun `removing an agent slot asks before discarding its profile`() {
+        val fixture = SetupLayoutFixture(800f, 500f)
+        val card = fixture.picker.setupDescendants().filterIsInstance<Table>().single { it.name == "SetupNation-Rome" }
+        val remove = card.setupDescendants().filterIsInstance<com.badlogic.gdx.scenes.scene2d.ui.Button>()
+            .single { it.name == "SetupRemovePlayer" }
+        remove.silenceSetupActivationSounds()
+        remove.listeners.filterIsInstance<ActivationListener>().single().tap(InputEvent().apply { listenerActor = remove }, 1f, 1f, 1, 0)
+        assertTrue("The agent slot stays until the removal is confirmed", fixture.player in fixture.setup.gameParameters.players)
+        assertNotNull(fixture.picker.agentProfiles[fixture.player])
     }
 
     @Test fun `narrow bonus pickers stack Add actions inside the form width`() {

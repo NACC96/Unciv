@@ -96,23 +96,47 @@ class MapAnnotationPolishTest {
         assertEquals(Touchable.enabled, foreign.touchable)
     }
 
-    @Test fun `a long city name stays complete and wraps inside the plaque`() {
+    @Test fun `a long city name is clamped to two lines inside the plaque`() {
         val f = Fixture()
-        f.romanCity.name = "A very long capital name beside the northern mountains and coastal trade routes"
+        f.romanCity.name = "A very long capital name beside the northern mountains and coastal trade routes " +
+            "that an agent chose while renaming every city after a complete regional history"
         val plaque = f.plaque(f.romanCity, f.rome)
         plaque.pack()
         plaque.validate()
         val label = plaque.descendants().filterIsInstance<Label>()
-            .single { it.text.toString() == f.romanCity.name }
-        assertTrue("Full labels must wrap rather than overrun the map annotation", label.wrap)
+            .single { it.text.toString().startsWith("A very long capital") }
+        assertTrue("Long names wrap rather than overrun the map annotation", label.wrap)
+        assertTrue("A clamped name shows that it was shortened", label.text.toString().endsWith("..."))
+        assertTrue(f.romanCity.name.startsWith(label.text.toString().removeSuffix("...").trimEnd()))
         assertTrue(label.width <= 220.5f)
-        assertTrue(label.height > label.style.font.lineHeight)
+        val lines = label.glyphLayout.runs.map { it.y }.distinct().size
+        assertEquals("Map labels stay at most two lines tall", 2, lines)
         for (corner in listOf(com.badlogic.gdx.math.Vector2(), com.badlogic.gdx.math.Vector2(label.width, label.height))) {
             val point = label.localToAscendantCoordinates(plaque, corner)
             assertTrue(point.x >= 0f && point.x <= plaque.width + 0.5f)
             assertTrue(point.y >= -0.5f && point.y <= plaque.height + 0.5f)
         }
         assertSame(f.rome, f.screen.selectedCiv)
+    }
+
+    @Test fun `a moderately long city name wraps without truncation`() {
+        val f = Fixture()
+        f.romanCity.name = "The Eternal City upon the Seven Hills"
+        val plaque = f.plaque(f.romanCity, f.rome)
+        plaque.pack()
+        assertTrue(plaque.descendants().filterIsInstance<Label>().any { it.text.toString() == f.romanCity.name })
+    }
+
+    @Test fun `own cities keep a heavy rim and foreign identity uses the nation's own colour pair`() {
+        val f = Fixture()
+        val own = f.plaque(f.romanCity, f.rome)
+        assertTrue("Own cities need a rim that survives zooming out", own.borderSize >= 3f)
+        assertTrue(own.borderOnTop)
+        val foreign = f.plaque(f.foreignCity, f.rome)
+        assertTrue("Neutral rims stay quiet", foreign.borderSize < 3f)
+        val disc = foreign.descendants().filterIsInstance<com.unciv.ui.images.IconCircleGroup>().first()
+        val glyph = disc.descendants().filterIsInstance<com.badlogic.gdx.scenes.scene2d.ui.Image>().last()
+        assertEquals(f.arabia.nation.getInnerColor().toString(), glyph.color.toString())
     }
 
     @Test fun `layer controls initialize from flags and keep their original toggle callback`() {

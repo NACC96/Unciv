@@ -2,13 +2,17 @@ package com.unciv.ui.components.tilegroups.citybutton
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.Touchable
+import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.utils.Align
 import com.unciv.GUI
+import com.unciv.logic.civilization.NotificationIcon
 import com.unciv.models.ruleset.INonPerpetualConstruction
 import com.unciv.models.ruleset.PerpetualConstruction
 import com.unciv.models.translations.tr
 import com.unciv.ui.components.extensions.darken
+import com.unciv.ui.components.extensions.surroundWithCircle
+import com.unciv.ui.components.extensions.surroundWithThinCircle
 import com.unciv.ui.components.extensions.toGroup
 import com.unciv.ui.components.extensions.toLabel
 import com.unciv.ui.components.fonts.Fonts
@@ -52,14 +56,30 @@ internal class CityTable(
 
         val selectedCiv = GUI.getSelectedPlayer()
         val viewingCiv = city.getViewingCiv()
-        // Keep ownership/state in a fine rim so names remain legible for every nation palette.
-        borderSize = 1.5f
-        bgBorderColor = when {
-            city.belongsTo(selectedCiv) -> WorldScreenStyle.accent
-            city.isAtWarWith(selectedCiv) -> WorldScreenStyle.error
-            else -> city.getNationOuterColor().cpy().lerp(WorldScreenStyle.muted, 0.35f)
+        // Own and hostile cities keep a heavy rim that survives zooming out; nation identity
+        // lives in the icon disc, so neutral rims stay quiet for every nation palette.
+        val isAtWar = !city.belongsTo(selectedCiv) && city.isAtWarWith(selectedCiv)
+        when {
+            city.belongsTo(selectedCiv) -> {
+                borderOnTop = true
+                borderSize = 3f
+                bgBorderColor = WorldScreenStyle.ownership
+            }
+            isAtWar -> {
+                borderSize = 3f
+                bgBorderColor = WorldScreenStyle.error
+            }
+            else -> {
+                borderSize = 1.5f
+                bgBorderColor = WorldScreenStyle.muted.cpy().apply { a = 0.55f }
+            }
         }
         bgColor = WorldScreenStyle.surface.cpy().apply { a = 0.94f }
+
+        // War is also marked by shape, so the state does not depend on hue alone.
+        if (isAtWar)
+            add(ImageGetter.getImage(NotificationIcon.War).apply { color = WorldScreenStyle.error })
+                .size(16f).padLeft(4f)
 
         val isShowDetailedInfo = DebugUtils.VISIBLE_MAP
                 || city.belongsTo(selectedCiv)
@@ -138,8 +158,8 @@ internal class CityTable(
         }
 
         val cityName = city.name.toLabel(fontColor = textColor, alignment = Align.center, hideIcons = true)
-        val nameWidth = cityName.prefWidth.coerceAtMost(220f)
-        cityName.wrap = cityName.prefWidth > nameWidth
+        val nameWidth = cityName.prefWidth.coerceAtMost(MAX_NAME_WIDTH)
+        if (cityName.prefWidth > nameWidth) cityName.clampToLines(nameWidth, MAX_NAME_LINES)
         table.add(cityName).width(nameWidth).growY().center().padTopDescent()
 
         if (!forPopup) {
@@ -209,8 +229,41 @@ internal class CityTable(
             city.isMajorCiv() -> ImageGetter.getNationIcon(city.getNationName())
             else -> ImageGetter.getImage("CityStateIcons/" + city.getCityStateTypeName())
         }
-        icon.color = city.getNationOuterColor().cpy().lerp(WorldScreenStyle.ink, 0.35f)
+        // The nation's own inner/outer pair is designed for contrast; a thin ring
+        // separates dark outer colours (all city-states) from the charcoal plaque.
+        icon.color = city.getCivInnerColor().cpy()
+        val disc = icon.surroundWithCircle(20f, color = city.getNationOuterColor().cpy())
+            .surroundWithThinCircle(WorldScreenStyle.muted)
 
-        add(icon.toGroup(20f)).minWidth(26f)
+        add(disc).minWidth(26f)
     }
+
+    companion object {
+        private const val MAX_NAME_WIDTH = 220f
+        private const val MAX_NAME_LINES = 2
+    }
+}
+
+/** Map labels stay at most [maxLines] tall over the terrain; the city screen keeps the full name. */
+internal fun Label.clampToLines(maxWidth: Float, maxLines: Int) {
+    val full = text.toString()
+    wrap = true
+    width = maxWidth
+    fun lineCount(): Int {
+        layout()
+        return glyphLayout.runs.map { it.y }.distinct().size
+    }
+    if (lineCount() <= maxLines) return
+    // Fonts maps U+2026 to the range symbol, so the ellipsis is spelled out.
+    fun truncated(length: Int) = full.take(length).trimEnd() + "..."
+    var low = 0
+    var high = full.length
+    while (low < high) {
+        val mid = (low + high + 1) / 2
+        setText(truncated(mid))
+        if (lineCount() <= maxLines) low = mid else high = mid - 1
+    }
+    // Prefer ending on a whole word when that keeps most of the second line.
+    val wordEnd = full.take(low).lastIndexOf(' ')
+    setText(truncated(if (wordEnd > low * 0.8f) wordEnd else low))
 }

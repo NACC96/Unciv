@@ -6,6 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Cell
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.unciv.logic.civilization.Civilization
 import com.unciv.models.translations.tr
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.extensions.toLabel
 import com.unciv.ui.components.input.KeyboardBinding
 import com.unciv.ui.components.input.onActivation
@@ -32,7 +33,7 @@ class WorldScreenTopBar(internal val worldScreen: WorldScreen) : Table() {
     private val resourceTable = WorldScreenTopBarResources(this)
     private val identity = Table()
     private val civLabel = "".toLabel(WorldScreenStyle.ink, 17, hideIcons = true).apply { setEllipsis(true) }
-    private val viewingLabel = "".toLabel(WorldScreenStyle.muted, 10)
+    private val viewingLabel = "".toLabel(WorldScreenStyle.muted, GameUiStyle.Type.caption)
     private val portraitCell: Cell<Group>
     private var portraitCiv = ""
     private val overview = Table()

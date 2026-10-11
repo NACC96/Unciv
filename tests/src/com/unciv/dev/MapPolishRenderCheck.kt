@@ -247,7 +247,11 @@ object MapPolishRenderCheck {
         val other = cities.single { it.foreignCityView.getCity() === foreign }
         check(own.descendants().filterIsInstance<ImageGetter.ProgressBar>().count() == 2)
         check(other.descendants().filterIsInstance<ImageGetter.ProgressBar>().count() == if (spectator) 2 else 0)
-        check(own.descendants().filterIsInstance<Label>().any { it.text.toString() == capital.name && it.wrap })
+        // Long names wrap to at most two lines; a clamped name keeps its prefix and ends with "...".
+        check(own.descendants().filterIsInstance<Label>().any {
+            val text = it.text.toString()
+            it.wrap && (text == capital.name || text.endsWith("...") && capital.name.startsWith(text.removeSuffix("...").trimEnd()))
+        })
         check(own.descendants().any { it.javaClass.simpleName == "AirUnitTable" }) { "Visible capital aircraft badge is absent" }
         check(other.descendants().any { it.javaClass.simpleName == "StatusTable" && (it as Table).cells.size > 0 })
     }

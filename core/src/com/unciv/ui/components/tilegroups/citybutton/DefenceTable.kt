@@ -21,12 +21,15 @@ internal class DefenceTable(city: City, selectedCiv: Civilization) : BorderedTab
     init {
         pad(2f, 3f, 0f, 3f)
 
-        borderSize = 1f
         bgColor = WorldScreenStyle.raised.cpy().apply { a = 0.96f }
 
+        // Match the main plaque: own and hostile states keep a rim that survives zooming out.
+        val isOwn = city.civ == selectedCiv
+        val isAtWar = !isOwn && city.civ.isAtWarWith(selectedCiv)
+        borderSize = if (isOwn || isAtWar) 2f else 1f
         bgBorderColor = when {
-            city.civ == selectedCiv -> WorldScreenStyle.accent
-            city.civ.isAtWarWith(selectedCiv) -> WorldScreenStyle.error
+            isOwn -> WorldScreenStyle.ownership
+            isAtWar -> WorldScreenStyle.error
             else -> WorldScreenStyle.hover
         }
 

@@ -21,6 +21,7 @@ import com.badlogic.gdx.utils.Timer
 import com.unciv.logic.agents.AgentMatchSession
 import com.unciv.logic.agents.DiplomaticMessageLimits
 import com.unciv.ui.components.extensions.setFontSize
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.extensions.toLabel
 import com.unciv.ui.components.input.onClick
 import com.unciv.ui.components.widgets.AutoScrollPane
@@ -55,7 +56,7 @@ class AgentMessagesPanel(private val screen: WorldScreen, private val session: A
     private val send = WorldScreenStyle.button("Send", primary = true).apply { name = "MessageSend" }
     private val status = "".toLabel(WorldScreenStyle.muted, 11).apply { wrap = true }
     private val identity = "".toLabel(WorldScreenStyle.muted, 11).apply { wrap = true }
-    private val count = "".toLabel(WorldScreenStyle.muted, 10)
+    private val count = "".toLabel(WorldScreenStyle.muted, GameUiStyle.Type.caption)
     private val allConversations = NationOption(null, "All conversations")
     private var mail = emptyList<Mail>()
     private var options = emptyList<NationOption>()
@@ -82,7 +83,7 @@ class AgentMessagesPanel(private val screen: WorldScreen, private val session: A
         }
         val header = Table(skin).apply { touchable = Touchable.enabled }
         header.add("Messages".toLabel(WorldScreenStyle.ink, 17)).expandX().left()
-        header.add("Drag to move".toLabel(WorldScreenStyle.muted, 10)).padRight(8f)
+        header.add(WorldScreenStyle.dragGrip()).padRight(8f)
         header.add(close).size(26f)
         header.addListener(object : InputListener() {
             private val origin = Vector2()
@@ -265,13 +266,14 @@ class AgentMessagesPanel(private val screen: WorldScreen, private val session: A
                 .width(contentWidth).left().row()
             val state = message.acknowledged?.let { "Acknowledged · turn $it" }
                 ?: message.delivered?.let { "Delivered · turn $it" } ?: "Queued · next turn"
+            // Receipt colours read as progress; amber stays reserved for real problems.
             val stateColor = when {
-                message.acknowledged != null -> WorldScreenStyle.accent
-                message.delivered != null -> WorldScreenStyle.muted
-                else -> WorldScreenStyle.warning
+                message.acknowledged != null -> WorldScreenStyle.positive
+                message.delivered != null -> WorldScreenStyle.ink
+                else -> WorldScreenStyle.muted
             }
             val receipt = Table(skin)
-            receipt.add("Sent turn ${message.sent}".toLabel(WorldScreenStyle.muted, 10)).left().expandX()
+            receipt.add("Sent turn ${message.sent}".toLabel(WorldScreenStyle.muted, GameUiStyle.Type.caption)).left().expandX()
             receipt.add(state.toLabel(stateColor, 11)).right().padLeft(8f)
             history.add(receipt).width(contentWidth).left().padTop(3f).row()
             val text = Label(message.text, Label.LabelStyle(BaseScreen.skin.get(Label.LabelStyle::class.java))).apply {

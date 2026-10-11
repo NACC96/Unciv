@@ -3,6 +3,7 @@ package com.unciv.ui.screens.newgamescreen
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.Touchable
+import com.badlogic.gdx.scenes.scene2d.ui.Button
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.utils.Align
 import com.unciv.Constants
@@ -23,6 +24,7 @@ import com.unciv.models.ruleset.nation.Nation
 import com.unciv.models.ruleset.unique.UniqueType
 import com.unciv.models.translations.tr
 import com.unciv.ui.components.GameUiStyle
+import com.unciv.ui.components.UncivTooltip.Companion.addTooltip
 import com.unciv.ui.components.extensions.setFontColor
 import com.unciv.ui.components.extensions.surroundWithCircle
 import com.unciv.ui.components.extensions.toCheckBox
@@ -35,6 +37,7 @@ import com.unciv.ui.components.input.onClick
 import com.unciv.ui.components.widgets.UncivTextField
 import com.unciv.ui.components.widgets.WrappableLabel
 import com.unciv.ui.images.ImageGetter
+import com.unciv.ui.popups.ConfirmPopup
 import com.unciv.ui.popups.Popup
 import com.unciv.ui.screens.basescreen.BaseScreen
 import com.unciv.ui.screens.multiplayerscreens.FriendPickerList
@@ -61,7 +64,7 @@ class PlayerPickerTable(
     val playerListTable = Table()
     val civBlocksWidth = if (blockWidth > 10f) blockWidth else
         if (NewGameScreen.usesStackedLayout(previousScreen.stage.width, previousScreen.stage.height))
-            previousScreen.stage.width - 20f else previousScreen.stage.width / 3 - 12f
+            NewGameScreen.stackedContentWidth(previousScreen.stage.width) else previousScreen.stage.width / 3 - 12f
     private var randomNumberLabel: WrappableLabel? = null
 
     /** Locks player table for editing, currently unused, was previously used for scenarios and could be useful in the future. */
@@ -155,7 +158,14 @@ class PlayerPickerTable(
         // enable start game when at least one human player and they're not alone
         val humanPlayerCount = gameParameters.players.count { it.playerType == PlayerType.Human }
         val isValid = humanPlayerCount >= 1 && (isRandomNumberOfPlayers || gameParameters.players.size >= 2)
-        if (previousScreen is NewGameScreen) previousScreen.setStartEnabled(isValid)
+        if (previousScreen is NewGameScreen) {
+            previousScreen.setStartEnabled(isValid)
+            previousScreen.showStartReadiness(when {
+                isValid -> null
+                humanPlayerCount < 1 -> "Add a human, agent or spectator player to start."
+                else -> "Add at least one more player to start."
+            })
+        }
         else (previousScreen as? PickerScreen)?.setRightSideButtonEnabled(isValid)
     }
 
@@ -288,7 +298,9 @@ class PlayerPickerTable(
         val playerTable = Table()
         playerTable.name = "SetupNation-${player.chosenCiv}"
         playerTable.pad(12f)
-        playerTable.background = GameUiStyle.background("NewGameScreen/PlayerPickerTable/PlayerTable", GameUiStyle.raised)
+        // Sits between the picker surface and the raised buttons, so card actions keep visible edges.
+        playerTable.background = GameUiStyle.background("NewGameScreen/PlayerPickerTable/PlayerTable",
+            GameUiStyle.surface.cpy().lerp(GameUiStyle.raised, 0.5f))
         val contentWidth = (civBlocksWidth - 24f).coerceAtLeast(100f)
 
         val nationTable = getNationTable(player)
@@ -298,13 +310,13 @@ class PlayerPickerTable(
         val actionWidth = (contentWidth - actionCount * 6f - if (locked) 0f else 36f) / actionCount
 
         val control = AgentSlotLogic.controlOf(player, agentProfiles)
-        val playerTypeTextButton = GameUiStyle.button(player.playerType.name).apply {
+        // Agent slots stay Human-typed (rule parity); the label carries the distinction.
+        // Naming the setting makes clear that the button cycles a choice rather than showing a status.
+        val controlName = if (control == SlotControl.AGENT) "Agent" else player.playerType.name
+        val playerTypeTextButton = GameUiStyle.button("${"Control".tr()}: ${controlName.tr()}").apply {
             name = "SetupPlayerControl"
             label.wrap = true
         }
-        // Agent slots stay Human-typed (rule parity); the label carries the distinction.
-        if (control == SlotControl.AGENT)
-            playerTypeTextButton.setText("Agent")
         actions.add(playerTypeTextButton).width(actionWidth).padRight(6f)
 
         if (player.chosenCiv != Constants.spectator) {
@@ -350,14 +362,25 @@ class PlayerPickerTable(
         }
 
         if (!locked) {
-            actions.add(GameUiStyle.button("-")
-                .onClick {
-                    gameParameters.players.remove(player)
-                    AgentSlotLogic.forgetPlayer(player, agentProfiles)
-                    profileCache.remove(player)
-                    update()
+            fun removePlayer() {
+                gameParameters.players.remove(player)
+                AgentSlotLogic.forgetPlayer(player, agentProfiles)
+                profileCache.remove(player)
+                update()
+            }
+            val remove = Button(BaseScreen.skin).apply {
+                name = "SetupRemovePlayer"
+                GameUiStyle.apply(this, size = GameUiStyle.ButtonSize.Icon)
+                add(ImageGetter.getImage("OtherIcons/Close").apply { color = GameUiStyle.muted }).size(14f)
+                addTooltip("Remove", 22f)
+                onClick {
+                    // Removing an agent slot also forgets its configured profile, so confirm first.
+                    if (agentProfiles[player] == null) removePlayer()
+                    else ConfirmPopup(previousScreen.stage,
+                        "Remove [${player.chosenCiv}] and its agent profile?", "Remove") { removePlayer() }.open()
                 }
-            ).width(36f)
+            }
+            actions.add(remove).size(36f)
         }
         playerTable.add(actions).width(contentWidth).left().padTop(8f).padBottom(6f).row()
 
@@ -376,7 +399,7 @@ class PlayerPickerTable(
 
         val bonuses = player.startingBonuses.summary()
         if (bonuses.isNotEmpty()) {
-            playerTable.add(bonuses.toLabel(GameUiStyle.warning, 12).apply {
+            playerTable.add(bonuses.toLabel(GameUiStyle.info, GameUiStyle.Type.small).apply {
                 wrap = true
                 name = "SetupBonusSummary"
             }).width(contentWidth).left().padBottom(4f).row()

@@ -17,14 +17,22 @@ object WorldScreenStyle {
     val accent get() = GameUiStyle.accent
     val warning get() = GameUiStyle.warning
     val error get() = GameUiStyle.error
+    val ownership get() = GameUiStyle.ownership
+    val selection get() = GameUiStyle.selection
+    val positive get() = GameUiStyle.positive
+    val info get() = GameUiStyle.info
 
     fun background(path: String, color: Color = surface): Drawable = GameUiStyle.background(path, color)
 
     fun panelBackground(path: String, opacity: Float = 0.94f): Drawable = GameUiStyle.panelBackground(path, opacity)
 
-    fun button(text: String, primary: Boolean = false): TextButton = GameUiStyle.button(text, primary)
+    fun button(text: String, primary: Boolean = false, size: GameUiStyle.ButtonSize = GameUiStyle.ButtonSize.Regular): TextButton =
+        GameUiStyle.button(text, primary, size)
 
-    fun apply(button: Button, primary: Boolean = false) = GameUiStyle.apply(button, primary)
+    fun apply(button: Button, primary: Boolean = false, size: GameUiStyle.ButtonSize = GameUiStyle.ButtonSize.Regular) =
+        GameUiStyle.apply(button, primary, size)
 
     fun setEnabled(button: Button, enabled: Boolean) = GameUiStyle.setEnabled(button, enabled)
+
+    fun dragGrip() = GameUiStyle.dragGrip()
 }

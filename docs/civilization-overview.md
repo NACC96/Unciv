@@ -16,7 +16,7 @@ The panel title leads, followed by colored civilization names and a larger selec
 
 The first viewport places a movable panel on the right, with comparison rows above a separate scrolling detail pane. Drag the header to move it; its geometry stays within the stage after dragging or resizing the window. Only the panel's rectangle captures input, leaving the map and match controls usable outside it.
 
-Wide layouts show score, cities, population, gold and science. Narrow layouts retain score and science, with the remaining available statistics in selected-nation details. The detail metrics change from three columns to two. Individual panel resizing is deferred.
+The active sort column is highlighted in its heading and values, with the sort arrow in a fixed slot; headings share the values' right edge. Wide layouts show score, cities, population, gold and science. Narrow layouts retain score and science, with the remaining available statistics in selected-nation details. The detail metrics change from three columns to two. Individual panel resizing is deferred.
 
 ## Components
 

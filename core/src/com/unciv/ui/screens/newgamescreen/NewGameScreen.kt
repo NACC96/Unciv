@@ -70,6 +70,7 @@ class NewGameScreen(
     internal val playerPickerTable: PlayerPickerTable
     private val mapOptionsTable: MapOptionsTable
     private var mapOptionsTableInitialized = false
+    private var startBlockedReason: String? = null
 
     init {
         val isPortrait = usesStackedLayout(stage.width, stage.height)
@@ -90,7 +91,7 @@ class NewGameScreen(
         setStartEnabled(true)  // PlayerPickerTable init may disable this same visible action
         playerPickerTable = PlayerPickerTable(
             this, gameSetupInfo.gameParameters,
-            if (isPortrait) stage.width - 20f else 0f
+            if (isPortrait) stackedContentWidth(stage.width) else 0f
         )
         playerPickerTable.restoreAgentSlots(savedAgentSlots)
         newGameOptionsTable = GameOptionsTable(
@@ -126,12 +127,11 @@ class NewGameScreen(
             }
         } else null
 
-        descriptionLabel.setFontColor(GameUiStyle.muted)
-        descriptionLabel.setText("Starting an agent game begins automated play immediately using the selected provider account.")
-
+        showStartReadiness(startBlockedReason)
         pickerPane.configureSetupFooter(stage.width, stage.height, { SetupPresetsPopup(this) }, resetAction)
+        showStartReadiness(startBlockedReason)
+        // No Enter shortcut: a key pressed in a seed or size field must never start a paid agent match.
         rightSideButton.onActivation(this::startGameAvoidANRs)
-        rightSideButton.keyShortcuts.add(KeyCharAndCode.RETURN)
     }
 
     private fun startGameAvoidANRs(){
@@ -250,16 +250,33 @@ class NewGameScreen(
     }
 
     /** Subtables may need an upper limit to their width - they can ask this function. */
-    internal fun getColumnWidth() = floor(stage.width / (if (usesStackedLayout(stage.width, stage.height)) 1 else 3))
+    internal fun getColumnWidth() = floor(
+        if (usesStackedLayout(stage.width, stage.height)) minOf(stage.width, stackedContentWidth(stage.width) + 20f)
+        else stage.width / 3)
 
     internal fun setStartEnabled(enabled: Boolean) {
         GameUiStyle.apply(rightSideButton, primary = true)
         GameUiStyle.setEnabled(rightSideButton, enabled)
     }
 
+    /** Explains a disabled Start in the footer; `null` restores the agent-start notice. */
+    internal fun showStartReadiness(blockedReason: String?) {
+        startBlockedReason = blockedReason
+        val description = pickerPane.descriptionLabel
+        description.setFontColor(if (blockedReason == null) GameUiStyle.muted else GameUiStyle.warning)
+        description.setText((blockedReason ?: AGENT_START_NOTICE).tr())
+    }
+
     companion object {
+        private const val AGENT_START_NOTICE =
+            "Starting an agent game begins automated play immediately using the selected provider account."
+        /** Stacked setup keeps a readable measure instead of stretching cards across wide windows. */
+        private const val MAX_STACKED_WIDTH = 720f
+
         /** Three option columns need readable controls even in a short landscape window. */
         internal fun usesStackedLayout(width: Float, height: Float) = width < 1080f || width < height * 4f / 3f
+
+        internal fun stackedContentWidth(stageWidth: Float) = minOf(stageWidth - 20f, MAX_STACKED_WIDTH)
     }
 
     internal fun refreshExampleMap() {
@@ -508,14 +525,16 @@ class NewGameScreen(
 }
 
 internal fun Table.configureStackedSetup(options: GameOptionsTable, map: MapOptionsTable, players: PlayerPickerTable) {
-    add(ExpanderTab("Game Options") { it.add(options).row() }).expandX().fillX().row()
-    addSeparator(GameUiStyle.hover, height = 1f)
-    add(options.modCheckboxes).expandX().fillX().row()
-    addSeparator(GameUiStyle.hover, height = 1f)
-    add(ExpanderTab("Map Options") { it.add(map).row() }).expandX().fillX().row()
-    addSeparator(GameUiStyle.hover, height = 1f)
+    // The nation cards already carry the capped stacked measure; every section shares it, centred.
+    val contentWidth = players.civBlocksWidth + 20f
+    add(ExpanderTab("Game Options") { it.add(options).row() }).width(contentWidth).row()
+    addSeparator(GameUiStyle.hover, height = 1f).width(contentWidth)
+    add(options.modCheckboxes).width(contentWidth).row()
+    addSeparator(GameUiStyle.hover, height = 1f).width(contentWidth)
+    add(ExpanderTab("Map Options") { it.add(map).row() }).width(contentWidth).row()
+    addSeparator(GameUiStyle.hover, height = 1f).width(contentWidth)
     (players.playerListTable.parent as ScrollPane).setScrollingDisabled(true, true)
-    add(ExpanderTab("Civilizations") { it.add(players).row() }).expandX().fillX().row()
+    add(ExpanderTab("Civilizations") { it.add(players).row() }).width(contentWidth).row()
 }
 
 /** Presentation-only traversal keeps option-table listeners and mod-specific contents intact. */
@@ -554,18 +573,27 @@ internal fun PickerPane.configureSetupFooter(
     GameUiStyle.setEnabled(rightSideButton, !rightSideButton.isDisabled)
     rightSideButton.setText("Start game!".tr())
     rightSideButton.name = "SetupStart"
-    val buttons = ArrayList<com.badlogic.gdx.scenes.scene2d.ui.TextButton>()
-    buttons.add(closeButton)
-    buttons.add(GameUiStyle.button("Presets").apply { onClick(onPresets) })
-    if (onReset != null) buttons.add(GameUiStyle.button("Reset to defaults").apply { onClick(onReset) })
-    buttons.add(rightSideButton)
+    // Back stands apart on the left; Presets separates the destructive Reset from the primary Start.
+    val secondary = ArrayList<TextButton>()
+    if (onReset != null) secondary.add(GameUiStyle.button("Reset to defaults").apply { onClick(onReset) })
+    secondary.add(GameUiStyle.button("Presets").apply { onClick(onPresets) })
+    val buttons = listOf(closeButton) + secondary + rightSideButton
+
+    val gap = 8f
+    val spacer = 16f
+    val available = width - 16f - gap * buttons.size - spacer
+    fun preferred(button: TextButton) =
+        if (button === rightSideButton) maxOf(button.prefWidth, 150f) else button.prefWidth
+    val preferredTotal = buttons.sumOf { preferred(it).toDouble() }.toFloat()
+    // Natural widths when they fit; otherwise shrink proportionally so Start stays the widest.
+    val scale = (available / preferredTotal).coerceAtMost(1f)
 
     val actions = Table().apply { name = "SetupFooterActions" }
-    val buttonWidth = ((width - 48f) / buttons.size).coerceAtMost(140f)
     for (button in buttons) {
-        button.label.wrap = true
+        button.label.wrap = scale < 1f
         button.label.setAlignment(Align.center)
-        actions.add(button).width(buttonWidth).fillY().pad(4f)
+        val cell = actions.add(button).width(preferred(button) * scale).fillY().pad(gap / 2)
+        if (button === closeButton) cell.padRight(gap / 2 + spacer).expandX().left()
     }
     bottomTable.clear()
     bottomTable.background = GameUiStyle.background("NewGameScreen/BottomTable")
@@ -577,7 +605,7 @@ internal fun PickerPane.configureSetupFooter(
     descriptionLabel.setAlignment(Align.left)
     descriptionLabel.width = width - 16f
     bottomTable.add(descriptionLabel).width(width - 16f).growX().padBottom(6f).row()
-    bottomTable.add(actions).right().row()
+    bottomTable.add(actions).growX().row()
     // PickerPane normally reserves only 15% for the footer. A short desktop window
     // needs the actual fixed action height, with the option area taking the remainder.
     splitPane.maxSplitAmount = (1f - bottomTable.prefHeight / height).coerceIn(0.4f, 0.85f)

@@ -127,6 +127,7 @@ internal class WorldScreenTopBarStats(private val topbar: WorldScreenTopBar) : S
 
         goldLabel.setText(civInfo.gold.tr())
         goldPerTurnLabel.setText(rateLabel(nextTurnStats.gold))
+        goldPerTurnLabel.setFontColor(rateColor(nextTurnStats.gold))
 
         scienceLabel.setText(rateLabel(nextTurnStats.science))
 
@@ -146,9 +147,13 @@ internal class WorldScreenTopBarStats(private val topbar: WorldScreenTopBar) : S
 
         faithLabel.setText(civInfo.religionManager.storedFaith.tr())
         faithPerTurnLabel.setText(rateLabel(nextTurnStats.faith))
+        faithPerTurnLabel.setFontColor(rateColor(nextTurnStats.faith))
 
         scaleTo(worldScreen.stage.width)
     }
+
+    /** Positive rates stay quiet; a deficit is the value the player must notice. */
+    private fun rateColor(rate: Float) = if (rate.roundToInt() < 0) WorldScreenStyle.error else WorldScreenStyle.muted
 
     private fun getCultureText(civInfo: Civilization, nextTurnStats: Stats): String {
         var cultureString = rateLabel(nextTurnStats.culture)

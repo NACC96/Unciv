@@ -6,7 +6,6 @@ import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.ui.Image
-import com.badlogic.gdx.scenes.scene2d.ui.Button
 import com.badlogic.gdx.scenes.scene2d.ui.Stack
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.utils.DragListener
@@ -20,7 +19,6 @@ import com.unciv.ui.components.extensions.addInTable
 import com.unciv.ui.components.input.onActivation
 import com.unciv.ui.components.input.onClick
 import com.unciv.ui.images.ImageGetter
-import com.unciv.ui.screens.basescreen.BaseScreen
 import com.unciv.ui.screens.worldscreen.WorldScreenStyle
 import com.unciv.ui.screens.worldscreen.worldmap.WorldMapHolder
 
@@ -141,16 +139,20 @@ class MinimapHolder(val mapHolder: WorldMapHolder) : Table() {
             rebuildAndUpdateMap(civInfo)
         }
 
-        val table = Button(BaseScreen.skin).apply {
-            WorldScreenStyle.apply(this)
-            pad(4f)
-        }
+        val table = Table()
         if (shouldShowMapButtons()) {
-            // table provides larger click area. we want the resize icon to be small to not cover the map
+            // table provides larger click area. we want the resize icon to be small to not cover the map,
+            // so only a compact plate behind the icon is drawn.
             val name = if (maximized) "Reduce" else "Increase"
             val image = ImageGetter.getImage("OtherIcons/$name")
             image.color = WorldScreenStyle.ink
-            table.add(image).expand().size(20f).align(alignment)
+            val plate = Table().apply {
+                background = WorldScreenStyle.background("WorldScreen/Minimap/ResizePlate",
+                    WorldScreenStyle.raised.cpy().apply { a = 0.9f })
+                touchable = Touchable.disabled
+                add(image).size(16f).pad(5f)
+            }
+            table.add(plate).expand().size(26f).align(alignment).pad(2f)
             table.touchable = Touchable.enabled
             table.onActivation(toggle)
         } else {

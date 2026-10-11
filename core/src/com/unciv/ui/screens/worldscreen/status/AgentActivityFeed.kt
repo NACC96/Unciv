@@ -22,6 +22,7 @@ import com.unciv.logic.agents.AgentMatchSession
 import com.unciv.logic.agents.AgentRunState
 import com.unciv.ui.components.extensions.setFontColor
 import com.unciv.ui.components.extensions.setFontSize
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.extensions.toLabel
 import com.unciv.ui.components.input.onClick
 import com.unciv.ui.components.widgets.AutoScrollPane
@@ -377,7 +378,7 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
                     }
                     "reasoning" -> {
                         addSpeaker(entry, "Thinking", rowWidth)
-                        addRow(text(body(entry), muted, 12), entry.id, rowWidth, bottom = 12f)
+                        addRow(text(body(entry), muted, GameUiStyle.Type.body), entry.id, rowWidth, bottom = 12f)
                     }
                     else -> {
                         addSpeaker(entry, if (entry.kind == "error" || entry.status == "failed") "Error" else "Tools", rowWidth)
@@ -410,7 +411,8 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
                 over = WorldScreenStyle.background("WorldScreen/AgentActivityFeed/ToolHover", WorldScreenStyle.raised)
                 down = WorldScreenStyle.background("WorldScreen/AgentActivityFeed/ToolDown", WorldScreenStyle.pressed)
                 checked = WorldScreenStyle.background("WorldScreen/AgentActivityFeed/ToolOpen", WorldScreenStyle.raised)
-                focused = over
+                focused = GameUiStyle.outlinedBackground("WorldScreen/AgentActivityFeed/ToolFocused",
+                    WorldScreenStyle.raised, WorldScreenStyle.accent)
             }
             isChecked = opened
             pad(5f, 0f, 5f, 2f)
