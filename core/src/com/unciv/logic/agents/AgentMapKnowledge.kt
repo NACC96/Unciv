@@ -99,37 +99,48 @@ class AgentMapSightings {
     }
 }
 
+/** Historical serializers omitted default version 1; never interpret omission as the v2 prototype default. */
+fun migrateAgentMatchStateJson(matchJson: String, expectedVersion: Int? = null): AgentMatchState {
+    val raw = com.badlogic.gdx.utils.JsonReader().parse(matchJson)
+    require(raw.isObject) { "Agent match metadata must be an object" }
+    val version = rawAgentVersion(raw, "formatVersion")
+    require(expectedVersion == null || expectedVersion == version) { "Agent bundle/state versions do not match" }
+    require(version in 1..AGENT_MATCH_FORMAT_VERSION) { "Unsupported agent match format version $version" }
+    val state = json().fromJson(AgentMatchState::class.java, matchJson)
+    state.formatVersion = version
+    if (version == 1) {
+        // v1 exploration survives in the world; complete historical sightings cannot be invented.
+        state.formatVersion = AGENT_MATCH_FORMAT_VERSION
+        state.mapKnowledge = AgentMapKnowledge()
+    }
+    state.validateFormat()
+    return state
+}
+
 /** Explicit matching v1->v2 migration, before strict current-version validation. */
 fun migrateAgentBundle(bundle: AgentBundle): AgentBundle {
-    val serializer = json()
-    val state = serializer.fromJson(AgentMatchState::class.java, bundle.matchJson)
-    require(bundle.bundleVersion == state.formatVersion) { "Agent bundle/state versions do not match" }
     require(bundle.bundleVersion in 1..AGENT_MATCH_FORMAT_VERSION) {
         "Unsupported agent bundle version ${bundle.bundleVersion}"
     }
-    if (bundle.bundleVersion == AGENT_MATCH_FORMAT_VERSION) {
-        bundle.validateFormat()
-        state.validateFormat()
-        return bundle
-    }
-    serializer.setUsePrototypes(false)
-    val upgraded = state.deepCopy()
-    upgraded.formatVersion = AGENT_MATCH_FORMAT_VERSION
-    // v1 exploration is retained in the game; complete historical sightings cannot be invented.
-    upgraded.mapKnowledge = AgentMapKnowledge()
-    return AgentBundle(bundle.gameJson, serializer.toJson(upgraded), AGENT_MATCH_FORMAT_VERSION)
+    val state = migrateAgentMatchStateJson(bundle.matchJson, bundle.bundleVersion)
+    val serializer = json().apply { setUsePrototypes(false) }
+    return AgentBundle(bundle.gameJson, serializer.toJson(state), AGENT_MATCH_FORMAT_VERSION)
 }
 
-/** Historical serializers omitted default version 1; inspect raw presence before parsing. */
+/** Raw bundle and state defaults are resolved before parsing under today's prototypes. */
 fun migrateAgentBundleJson(bundleJson: String): AgentBundle {
-    val serializer = json()
     val raw = com.badlogic.gdx.utils.JsonReader().parse(bundleJson)
-    val bundle = serializer.fromJson(AgentBundle::class.java, bundleJson)
-    bundle.bundleVersion = raw.getInt("bundleVersion", 1)
-    val rawState = com.badlogic.gdx.utils.JsonReader().parse(bundle.matchJson)
-    val state = serializer.fromJson(AgentMatchState::class.java, bundle.matchJson)
-    state.formatVersion = rawState.getInt("formatVersion", 1)
-    serializer.setUsePrototypes(false)
-    bundle.matchJson = serializer.toJson(state)
+    require(raw.isObject) { "Agent bundle must be an object" }
+    val bundle = json().fromJson(AgentBundle::class.java, bundleJson)
+    bundle.bundleVersion = rawAgentVersion(raw, "bundleVersion")
     return migrateAgentBundle(bundle)
+}
+
+private fun rawAgentVersion(raw: com.badlogic.gdx.utils.JsonValue, field: String): Int {
+    val value = raw.get(field) ?: return 1
+    require(value.isNumber) { "Invalid agent $field" }
+    val number = value.asDouble()
+    require(number.isFinite() && number in 1.0..AGENT_MATCH_FORMAT_VERSION.toDouble()
+        && number == value.asInt().toDouble()) { "Unsupported agent $field $number" }
+    return value.asInt()
 }

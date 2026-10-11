@@ -216,3 +216,20 @@ Opening Messages hides the civilization overview, and opening Overview hides Mes
 Fresh gameplay mutations require the active civilization after saved receipt replay. Private notes and host controller metadata keep their existing independent semantics. Authority regressions cover inactive movement, research, unit rename, diplomacy responses and end-turn, zero checkpoint writes on rejection, and an end-turn retry after the actor rotates. Diplomacy command fixtures select the actor explicitly while lifecycle tests exercise real turn transitions.
 
 The complete combined `./gradlew check --offline` succeeded: **1,202 Kotlin tests, 1,187 passed, 15 skipped, zero failures/errors**. The authority and diplomacy command suites passed 32 tests. No provider or running match was interrupted by validation or packaging.
+
+## 2026-10-11 foundation review fixes
+
+The standalone foundation now preserves the minted provider bearer, accepts production unit/legal-action DTOs through MCP and stdio, attaches the owning world screen to its session, and closes the session when the screen is disposed. Fresh gameplay commands require the active civilization; idempotent receipt replay remains before that check, and private notes/host controller metadata retain their independent semantics. Diplomacy command fixtures select the acting civilization explicitly; the authority regressions also reject inactive diplomacy responses.
+
+Full isolated `./gradlew check --offline` succeeded: **984 Kotlin tests, 967 passed, 17 skipped, zero failures/errors**. The focused authority/lifecycle/command suites passed 61 tests. Runner build and typecheck passed, followed by **37 tests across eight files**. Tests use engine-shaped transport fixtures and mocked or scripted providers; no paid provider was started by these checks.
+
+
+## 2026-10-11 combined foundation and experience integration
+
+The reviewed foundation changes are integrated with the experience branch's format-2 compact map memory, private mail acknowledgements, filters, floating panels, Live follow behavior and Lexar storage policy. The bridge and model-visible catalog expose 42 command types. Provider executable discovery supports explicit overrides, PATH, per-user locations and NVM; the existing authentication, bounded map/rules tools and isolated runner behavior are retained.
+
+The final isolated `./gradlew check` succeeded: **1,241 Kotlin tests, 1,226 passed, 15 skipped, zero failures/errors**. Runner typecheck/build and **85 tests across 17 files** passed. Recovery regressions demonstrate failed human mutations, end-turn and guidance publishing their pause metadata, keeping Retry available only after an admitted worker drains, preserving failure across a completed outcome, and requiring explicit recovery after hidden-match re-entry. No provider was launched or interrupted by these tests.
+
+Ordinary saves now carry the paired compact metadata, restore with normal visibility before transients, and reopen idle in a fresh recovery lineage. Repeated 164×80/15-civilization profiling retained all 196,800 diverse historical tile records and acknowledged mail without recursive growth: **4.397 MB raw / 1.773 MB gzip/base64 ordinary save**. The Lexar checkpoint benchmark retained exactly three verified generations; its full-diverse window was **3.653 MB**, and median fsynced mutation latency was **591.9 ms**. See [ordinary-save profiling limits](agent-ordinary-saves.md#combined-format-2-profiling) and the existing [checkpoint harness](../tests/src/com/unciv/dev/AgentMapPerformanceCheck.kt).
+
+The installed native app remains on the previously packaged experience build. Its JAR hash is unchanged, and live game data, local Earth maps, saved presets and old archives are untouched. Combined native GUI save/reopen acceptance is pending. The earlier visible check for reciprocal Messages/Overview behavior and instant Live follow also remains pending. GitHub CI is not configured for this fork; local checks do not establish CI or merge readiness.

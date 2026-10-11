@@ -127,6 +127,7 @@ class AgentCommandsTest {
         } catch (ex: AgentCommandException) {
             Assert.assertEquals(AgentCommandError.INVALID_ARGUMENT, ex.code)
         }
+        // Off-turn authority is checked before foreign-city legality.
         try {
             f.coordinator.execute(
                 CityProductionCommand(f.greeceId, "p6", f.rev(), f.cityId, ProductionOp.ADD_BOTTOM, name = "Monument"))

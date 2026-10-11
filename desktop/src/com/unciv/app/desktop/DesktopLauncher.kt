@@ -114,6 +114,10 @@ internal object DesktopLauncher {
             com.unciv.app.desktop.agents.DesktopAgentMatch(
                 game, match, setup, java.io.File(dataDirectory), worldScreen = screen)
         }
+        com.unciv.logic.agents.AgentMatchSessionFactory.restorer = { game, match, _, screen ->
+            com.unciv.app.desktop.agents.DesktopAgentMatch.restore(
+                game, match, java.io.File(dataDirectory), worldScreen = screen)
+        }
 
         val isRunFromJAR = isRunFromJar(this)
         ImagePacker.packImages(isRunFromJAR, dataDirectory)

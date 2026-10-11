@@ -1,4 +1,5 @@
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { readFileSync } from "node:fs";
 import { FakeGameService } from "../src/fake-game-mcp.js";
 import { startGameMcpServer, type StartedGameMcpServer } from "../src/game-mcp-server.js";
 import { StdioEngineBackend } from "../src/stdio-engine.js";
@@ -227,4 +228,83 @@ it("returns escape-aware paginated map pages inside the real wire envelope", asy
     cursor = page.nextCursor ?? undefined;
   } while (cursor);
   expect(tiles).toEqual([0, 1]);
+});
+
+it("requires exactly one entity selector before dispatching legal_actions", async () => {
+  const fake = new FakeGameService(); const legal = vi.spyOn(fake, "legalActions");
+  server = await startGameMcpServer(fake, { matchId: "m", timelineId: "t", civId: "Rome", runId: "r", authorityEpoch: 1 });
+  for (const args of [{}, { unitId: 17, cityId: "city-1" }]) {
+    const response = await rpc(server.url, server.bearer, call("tools/call", { name: "game.legal_actions", arguments: args }));
+    const result = response.json?.["result"] as { isError: boolean; content: { text: string }[] };
+    expect(result.isError).toBe(true);
+    expect(JSON.parse(result.content[0].text)).toMatchObject({ code: "INVALID_ARGUMENT" });
+  }
+  expect(legal).not.toHaveBeenCalled();
+});
+
+it("supports concrete fake city options without exposing unit choices", async () => {
+  const fake = new FakeGameService();
+  expect(await fake.legalActions(undefined, "city-1")).toMatchObject({ constructions: ["Monument", "Warrior"], moveTargets: [], orders: [] });
+  expect(await fake.legalActions(undefined, "hidden-city")).toEqual(await fake.legalActions(undefined, "missing-city"));
+  expect(await fake.legalActions()).toMatchObject({ code: "INVALID_ARGUMENT" });
+  expect(await fake.legalActions(17, "city-1")).toMatchObject({ code: "INVALID_ARGUMENT" });
+});
+
+it("retains every typed legal_actions rejection field from real stdio", async () => {
+  const error = { code: "STALE_STATE", message: "re-observe", currentRevision: 47, actionId: "recovered-query", messageIds: ["message-1"] };
+  const engine = new StdioEngineBackend(line => {
+    const frame = JSON.parse(line);
+    queueMicrotask(() => engine.feedLine(JSON.stringify({ protocol: 1, kind: "engine_response", id: frame.id, ok: false, error })));
+  }, 5000, () => "Rome");
+  server = await startGameMcpServer(engine, { matchId: "m", timelineId: "t", civId: "Rome", runId: "r", authorityEpoch: 1 });
+  try {
+    const response = await rpc(server.url, server.bearer, call("tools/call", { name: "game.legal_actions", arguments: { cityId: "city-1" } }));
+    const result = response.json?.["result"] as { isError: boolean; content: { text: string }[] };
+    expect(result.isError).toBe(true);
+    expect(JSON.parse(result.content[0].text)).toEqual({ status: "rejected", ...error });
+  } finally { engine.disconnect(); }
+});
+
+it("passes actor-bound city legal choices through real stdio and treats hidden/missing cities equally", async () => {
+  const requests: { method: string; params: Record<string, unknown> }[] = [];
+  const choices = { moveTargets: [], attackTargets: [], orders: [], canFound: false, constructions: ["Monument", "Warrior"], researchable: ["Pottery"], freeTechs: 0, freePolicies: 0, promotions: [], canUpgrade: false, upgradeTo: null, greatActions: [] };
+  const engine = new StdioEngineBackend(line => {
+    const frame = JSON.parse(line); requests.push(frame);
+    const reply = frame.params.cityId === "owned-city" ? { ok: true, result: choices }
+      : { ok: false, error: { code: "ILLEGAL_ACTION", message: "no such visible entity" } };
+    queueMicrotask(() => engine.feedLine(JSON.stringify({ protocol: 1, kind: "engine_response", id: frame.id, ...reply })));
+  }, 5000, () => "Rome");
+  server = await startGameMcpServer(engine, { matchId: "m", timelineId: "t", civId: "Rome", runId: "r", authorityEpoch: 1 });
+  const query = async (cityId: string) => {
+    const response = await rpc(server!.url, server!.bearer, call("tools/call", { name: "game.legal_actions", arguments: { cityId } }));
+    const result = response.json?.["result"] as { isError?: boolean; content: { text: string }[] };
+    return { isError: result.isError ?? false, value: JSON.parse(result.content[0].text) };
+  };
+  try {
+    expect(await query("owned-city")).toEqual({ isError: false, value: choices });
+    expect(requests[0]).toMatchObject({ method: "legal_actions", params: { civId: "Rome", cityId: "owned-city" } });
+    expect(requests[0].params).not.toHaveProperty("unitId");
+    const hidden = await query("hidden-city"); const missing = await query("missing-city");
+    expect(hidden).toEqual(missing);
+    expect(hidden).toMatchObject({ isError: true, value: { status: "rejected", code: "ILLEGAL_ACTION" } });
+  } finally { engine.disconnect(); }
+});
+
+it("publishes actionable names, arguments and enum choices in model-visible game.act metadata", async () => {
+  server = await startGameMcpServer(new FakeGameService(), { matchId: "m", timelineId: "t", civId: "Rome", runId: "r", authorityEpoch: 1 });
+  const response = await rpc(server.url, server.bearer, call("tools/list"));
+  const tools = (response.json?.["result"] as { tools: { name: string; description: string; inputSchema: unknown }[] }).tools;
+  const act = tools.find(tool => tool.name === "game.act")!;
+  // Cross-language contract: newly bridged commands must remain discoverable to models.
+  const bridge = readFileSync(new URL("../../core/src/com/unciv/logic/agents/AgentEngineBridge.kt", import.meta.url), "utf8");
+  const dispatch = bridge.split("return when (type)")[1].split("else ->")[0];
+  const bridgeNames = [...dispatch.matchAll(/"([a-z][A-Za-z.]+)"\s*->/g)].map(match => match[1]).sort();
+  const documentedNames = [...act.description.matchAll(/^([a-z][A-Za-z.]+) -> \{/gm)].map(match => match[1]).sort();
+  expect(documentedNames).toEqual(bridgeNames);
+  for (const action of ["unit.move", "research.select", "city.produce", "unit.found", "unit.order", "unit.attack", "conquest.resolve", "diplomacy.declareWar", "diplomacy.makePeace", "diplomacy.friendship", "diplomacy.proposeTrade", "diplomacy.respondTrade", "civics.adopt", "city.citizens", "city.buyTile", "unit.build", "unit.promote", "unit.upgrade", "unit.great", "citystate.giftGold", "unit.pillage", "unit.repair", "diplomacy.denounce", "diplomacy.demand", "diplomacy.respondDemand", "diplomacy.castVote", "city.rename", "city.annex", "city.raze", "unit.stopImprovement", "unit.swap", "unit.rename", "unit.connectRoad", "citystate.tribute", "citystate.protection", "citystate.marry", "diplomacy.retractTrade", "diplomacy.respondProtectorAlert", "diplomacy.respondFriendshipOffer", "unit.gift", "diplomacy.message", "diplomacy.acknowledgeMessage"])
+    expect(act.description).toContain(action);
+  for (const shape of ["destination:{x:integer,y:integer}", "techName:string", "improvementName:string", "ourOffers:TradeOffer[]", "ADD_TOP", "SLEEP", "ANNEX", "DECLARE_WAR", "demandWorker:boolean", "accept:boolean", "attackerUnitId", "attackerCityId"])
+    expect(act.description).toContain(shape);
+  expect(act.description).toContain("actor identity");
+  expect(act.description).not.toContain("controller.set");
 });

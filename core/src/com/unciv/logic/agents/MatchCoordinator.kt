@@ -70,6 +70,8 @@ class MatchCoordinator(
     private val metadataJson = json().apply { setUsePrototypes(false) }
     private var committedGame: GameInfo
     private var committedMatch: AgentMatchState
+    private var committedMatchJson: String
+    private var publicationGeneration = 0L
     private val actionReceipts = HashMap<String, ActionReceipt>()
     private var mutationInFlight: String? = null
 
@@ -83,6 +85,7 @@ class MatchCoordinator(
             captureAll(committedGame, committedMatch)
             flushInto(committedMatch, committedMatch.stateRevision)
         }
+        committedMatchJson = AgentOrdinarySave.encode(committedMatch)
         rebuildHotIndex()
     }
 
@@ -98,6 +101,7 @@ class MatchCoordinator(
      */
     fun forcePhaseForTest(phase: TurnPhase) {
         committedMatch.turnPhase = phase
+        refreshMatchPublication()
     }
     fun isPaused(): Boolean = committedMatch.matchPaused
     fun getPausedReason(): String? = committedMatch.matchPausedReason
@@ -122,6 +126,37 @@ class MatchCoordinator(
         requireController(civId)
         return (committedMatch.privateNotes[civId] ?: "") to
             (committedMatch.notesRevisions[civId] ?: 0)
+    }
+
+    /** Guidance travels with the same durable game/metadata pair, never a provider session. */
+    @Synchronized
+    fun queueGuidance(civId: String, text: String) {
+        requireController(civId)
+        val candidate = committedMatch.deepCopy()
+        candidate.guidanceQueue.add(GuidanceMessage(
+            "guidance-${java.util.UUID.randomUUID()}", civId, System.currentTimeMillis(), GuidanceState.QUEUED, text))
+        commit(null, candidate)
+    }
+
+    @Synchronized
+    fun takeGuidanceForDelivery(civId: String): List<String> {
+        requireController(civId)
+        val candidate = committedMatch.deepCopy()
+        val pending = candidate.guidanceQueue.filter { it.targetCivId == civId && it.state == GuidanceState.QUEUED }
+        if (pending.isEmpty()) return emptyList()
+        pending.forEach { it.state = GuidanceState.DELIVERED }
+        commit(null, candidate)
+        return pending.map { it.text }
+    }
+
+    /** Explicit retry may clear a persisted failure only after the replacement checkpoint succeeds. */
+    @Synchronized
+    fun retryPausedMatch() {
+        if (!committedMatch.matchPaused) return
+        val candidate = committedMatch.deepCopy()
+        candidate.matchPaused = false
+        candidate.matchPausedReason = null
+        commit(null, candidate)
     }
 
     /** Committed pending decisions for one civ (copies; mutating them affects nothing). */
@@ -2273,6 +2308,7 @@ class MatchCoordinator(
     private fun pauseCommitted(reason: String) {
         committedMatch.matchPaused = true
         committedMatch.matchPausedReason = reason
+        refreshMatchPublication()
     }
 
     private fun requireActiveActor(actorCivId: String) {
@@ -2293,6 +2329,7 @@ class MatchCoordinator(
                 "actionId ${command.actionId} reused with a different request"
             )
         }
+        requireActiveActor(command.actorCivId)
         if (command.expectedRevision != committedMatch.stateRevision)
             throw AgentCommandException(
                 AgentCommandError.STALE_STATE,
@@ -2552,7 +2589,7 @@ class MatchCoordinator(
             candidateGame.agentMapSightings = null
         }
         val gameJson = if (candidateGame != null) json.toJson(candidateGame) else json.toJson(committedGame)
-        val matchJson = metadataJson.toJson(candidateMatch)
+        val matchJson = AgentOrdinarySave.encode(candidateMatch)
         try {
             writer.write(gameJson, matchJson)
         } catch (ex: Exception) {
@@ -2560,10 +2597,13 @@ class MatchCoordinator(
             // with the reason. No success receipt escapes.
             committedMatch.matchPaused = true
             committedMatch.matchPausedReason = "Checkpoint persistence failed: ${ex.message}"
+            refreshMatchPublication()
             throw AgentCommandException(AgentCommandError.INTERNAL_ERROR, "Checkpoint persistence failed", null)
         }
         if (candidateGame != null) committedGame = candidateGame
         committedMatch = candidateMatch
+        committedMatchJson = matchJson
+        publicationGeneration++
     }
 
     /** Versioned bundle for save/reopen and recovery scans. */
@@ -2572,7 +2612,7 @@ class MatchCoordinator(
         return metadataJson.toJson(
             AgentBundle(
                 json.toJson(persistedGame),
-                metadataJson.toJson(committedMatch)
+                committedMatchJson
             )
         )
     }
@@ -2586,6 +2626,9 @@ class MatchCoordinator(
 
     private fun deserializeGame(gameJson: String, collectSightings: Boolean = false): GameInfo {
         val game = json.fromJson(GameInfo::class.java, gameJson)
+        // Canonical/candidate worlds never contain the presentation envelope.
+        game.agentMatchStateJson = null
+        game.version = com.unciv.logic.CompatibilityVersion.forGame(game)
         // Controlled transient restoration on the unpublished candidate.
         // Agent policy is installed before restoration (executeMove binds it
         // above); restoration itself must not make unsolicited choices -
@@ -2604,6 +2647,16 @@ class MatchCoordinator(
      */
     fun serializeCommittedGameForPublication(): String = json.toJson(committedGame)
 
+    fun serializeCommittedMatchForPublication(): String = committedMatchJson
+
+    /** Includes metadata-only commits, whose gameplay revision intentionally does not advance. */
+    fun getPublicationGeneration(): Long = publicationGeneration
+
+    private fun refreshMatchPublication() {
+        committedMatchJson = AgentOrdinarySave.encode(committedMatch)
+        publicationGeneration++
+    }
+
     /** Restores a publication snapshot; mirrors deserializeGame's no-surprises policy. */
     fun deserializeForPublication(gameJson: String): GameInfo = deserializeGame(gameJson)
 
@@ -2614,11 +2667,10 @@ class MatchCoordinator(
     }
 
     companion object {
-        private val publicationJson = json()
-
         /** Restores a publication snapshot; no-surprises restoration policy. */
         fun deserializeForPublication(gameJson: String): GameInfo {
-            val game = publicationJson.fromJson(GameInfo::class.java, gameJson)
+            // Different hosts may deserialize concurrently; Gdx Json has mutable parser state.
+            val game = json().fromJson(GameInfo::class.java, gameJson)
             game.suppressAutomationDuringTransients = true
             game.agentNormalVisibility = true
             game.setTransients()

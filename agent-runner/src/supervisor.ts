@@ -15,7 +15,7 @@ import { StringDecoder } from "node:string_decoder";
 import { spawn, type ChildProcess } from "node:child_process";
 import { appendFileSync, mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { delimiter, dirname, join } from "node:path";
 import type { IGameService } from "./fake-game-mcp.js";
 import { startGameMcpServer, type RunBinding } from "./game-mcp-server.js";
 import { buildTurnPrompt } from "./turn-prompt.js";
@@ -73,7 +73,8 @@ export class NodeRunner implements ProviderRunner {
     const runDir = mkdtempSync(join(this.logRoot, "run-"));
     const child: ChildProcess = spawn(spec.executable, spec.argv, {
       cwd: spec.cwd,
-      env,
+      // GUI CLI discovery may find a Node script without node on PATH.
+      env: { ...env, PATH: [dirname(process.execPath), env["PATH"] ?? ""].filter(Boolean).join(delimiter) },
       stdio: ["ignore", "pipe", "pipe"],
     });
     const metadata: Record<string, unknown> = {

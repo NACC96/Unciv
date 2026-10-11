@@ -237,6 +237,9 @@ class AgentScreenLifecycleTest {
             field(WorldScreen::class.java, "selectedCiv").set(world, rome)
             field(WorldScreen::class.java, "mapHolder").set(world, Mockito.mock(WorldMapHolder::class.java))
             field(WorldScreen::class.java, "bottomUnitTable").set(world, Mockito.mock(UnitTable::class.java))
+            field(WorldScreen::class.java, "agentPublicationFence").set(world, AgentPublicationFence())
+            world.agentSession = Mockito.mock(AgentMatchSession::class.java)
+            game.gameInfo = prior
             field(UncivGame::class.java, "worldScreen").set(game, world)
             // This test isolates publication ownership; immutable fixture entities can be shared.
             snapshot = GameInfo().apply {
@@ -253,7 +256,7 @@ class AgentScreenLifecycleTest {
         f.game.gameInfo = rewind
         f.publish()
         assertSame("Same game ID does not grant authority over a save reload", rewind, f.game.gameInfo)
-        assertSame("The retained screen may finish its own render snapshot", f.snapshot, f.world.gameInfo)
+        assertSame("The obsolete screen must reject a snapshot after save replacement", f.prior, f.world.gameInfo)
     }
 
     @Test fun `a detached world cannot publish over the current loaded game`() {
@@ -261,7 +264,7 @@ class AgentScreenLifecycleTest {
         field(UncivGame::class.java, "worldScreen").set(f.game, Mockito.mock(WorldScreen::class.java))
         f.publish()
         assertSame(f.prior, f.game.gameInfo)
-        assertSame(f.snapshot, f.world.gameInfo)
+        assertSame(f.prior, f.world.gameInfo)
     }
 
     @Test fun `an owned retained world still publishes its final committed snapshot`() {

@@ -12,6 +12,9 @@ import com.unciv.ui.screens.worldscreen.WorldScreen
 interface AgentMatchSession {
     val matchId: String
 
+    /** Immutable metadata from the host's committed post-construction state, captured under its lock. */
+    fun getCommittedMatchStateJson(): String? = null
+
     /** One-line status for the turn button: phase, active civ/provider, revision. */
     fun statusText(): String
 
@@ -85,9 +88,37 @@ object AgentMatchSessionFactory {
     /** Set once by the desktop launcher; null on platforms without hosting. */
     var creator: ((game: GameInfo, match: AgentMatchState, setup: AgentMatchSetup, screen: WorldScreen) -> AgentMatchSession)? = null
 
+    /** Restores an exact ordinary save; this callback must construct an idle, paused host. */
+    var restorer: ((game: GameInfo, match: AgentMatchState, setup: AgentMatchSetup, screen: WorldScreen) -> AgentMatchSession)? = null
+
+    fun requireRestoreSupport() {
+        if (restorer == null)
+            throw com.unciv.logic.UncivShowableException("This platform cannot host saved agent matches.")
+    }
+
     fun create(game: GameInfo, setup: AgentMatchSetup, screen: WorldScreen): AgentMatchSession? {
         if (setup.slots.isEmpty()) return null
         val creator = creator ?: return null
-        return creator(game, setup.buildMatchState(game), setup, screen)
+        val session = creator(game, setup.buildMatchState(game), setup, screen)
+        return attachCapturedState(game, session)
+    }
+
+    private fun attachCapturedState(game: GameInfo, session: AgentMatchSession): AgentMatchSession {
+        try {
+            val captured = session.getCommittedMatchStateJson()
+            if (captured.isNullOrBlank())
+                throw com.unciv.logic.UncivShowableException("Agent host did not capture its committed match metadata.")
+            game.agentMatchStateJson = captured
+            return session
+        } catch (ex: Exception) {
+            session.close()
+            throw ex
+        }
+    }
+
+    fun restore(game: GameInfo, match: AgentMatchState, screen: WorldScreen): AgentMatchSession {
+        requireRestoreSupport()
+        val session = restorer!!(game, match.deepCopy(), AgentOrdinarySave.setupFor(game, match), screen)
+        return attachCapturedState(game, session)
     }
 }

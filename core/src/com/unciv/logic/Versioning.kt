@@ -29,8 +29,7 @@ interface HasGameInfoSerializationVersion {
 }
 
 data class CompatibilityVersion(
-    /** Contains the current serialization version of [GameInfo], i.e. when this number is not equal to [CURRENT_COMPATIBILITY_NUMBER], it means
-     * this instance has been loaded from a save file json that was made with another version of the game. */
+    /** Minimum compatible reader for this save; plain and agent-bearing games have distinct floors. */
     val number: Int,
     /** This is the version that saved the game, not the one that did the "new game". */
     val createdWith: Version
@@ -44,9 +43,18 @@ data class CompatibilityVersion(
     companion object {
         /** The current compatibility version of [GameInfo]. This number is incremented whenever changes are made to the save file structure that guarantee that
          * previous versions of the game will not be able to load or play a game normally. */
-        const val CURRENT_COMPATIBILITY_NUMBER = 4
+        const val AGENT_GAME_COMPATIBILITY_NUMBER = 5
+        const val CURRENT_COMPATIBILITY_NUMBER = AGENT_GAME_COMPATIBILITY_NUMBER
+
+        /** Plain games retain their existing portable format; agent saves require protected readers. */
+        const val PLAIN_GAME_COMPATIBILITY_NUMBER = 4
 
         val CURRENT_COMPATIBILITY_VERSION = CompatibilityVersion(CURRENT_COMPATIBILITY_NUMBER, UncivGame.Companion.VERSION)
+
+        fun forGame(game: GameInfo) = CompatibilityVersion(
+            if (game.agentMatchStateJson == null) PLAIN_GAME_COMPATIBILITY_NUMBER else AGENT_GAME_COMPATIBILITY_NUMBER,
+            UncivGame.VERSION
+        )
 
         /** This is the version just before this field was introduced, i.e. all saves without any version will be from this version */
         val FIRST_WITHOUT = CompatibilityVersion(1, Version("4.1.14", 731))

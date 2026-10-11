@@ -51,6 +51,16 @@ class AgentEngineBridge(val coordinator: MatchCoordinator) {
         args[name] as? String
             ?: throw EngineCallException("INVALID_ARGUMENT", "Missing string argument $name")
 
+    private fun requireBoolean(args: Map<String, Any?>, name: String): Boolean =
+        args[name] as? Boolean
+            ?: throw EngineCallException("INVALID_ARGUMENT", "Missing boolean argument $name")
+
+    private fun optionalBoolean(args: Map<String, Any?>, name: String): Boolean =
+        if (!args.containsKey(name)) false else requireBoolean(args, name)
+
+    private fun optionalString(args: Map<String, Any?>, name: String): String? =
+        if (args[name] == null) null else requireString(args, name)
+
     private fun requireInt(args: Map<String, Any?>, name: String): Int =
         (args[name] as? Number)?.toInt()
             ?: throw EngineCallException("INVALID_ARGUMENT", "Missing integer argument $name")
@@ -319,11 +329,115 @@ class AgentEngineBridge(val coordinator: MatchCoordinator) {
                     receiptMap(result.receipt, mapOf("turnsToRepair" to result.turnsToRepair),
                         decisionsFor(actorCivId))
                 }
+                "diplomacy.denounce" -> {
+                    val result = coordinator.execute(DenounceCommand(
+                        actorCivId, actionId, expectedRevision,
+                        requireString(args, "targetCivId"))) as DenouncedResult
+                    receiptMap(result.receipt, mapOf("denounced" to true), decisionsFor(actorCivId))
+                }
+                "diplomacy.demand" -> {
+                    val result = coordinator.execute(DemandCommand(
+                        actorCivId, actionId, expectedRevision,
+                        requireString(args, "targetCivId"), requireString(args, "demandName"))) as DemandIssuedResult
+                    receiptMap(result.receipt, mapOf("issued" to result.issued), decisionsFor(actorCivId))
+                }
+                "diplomacy.respondDemand" -> {
+                    val result = coordinator.execute(RespondDemandCommand(
+                        actorCivId, actionId, expectedRevision,
+                        requireString(args, "requesterCivId"), requireString(args, "demandName"),
+                        requireBoolean(args, "accept"))) as DemandRespondedResult
+                    receiptMap(result.receipt, mapOf("accepted" to result.accepted), decisionsFor(actorCivId))
+                }
+                "diplomacy.castVote" -> {
+                    val result = coordinator.execute(CastVoteCommand(
+                        actorCivId, actionId, expectedRevision,
+                        optionalString(args, "targetCivId"))) as VoteCastResult
+                    receiptMap(result.receipt, mapOf("targetCivId" to result.targetCivId), decisionsFor(actorCivId))
+                }
+                "city.rename" -> {
+                    val result = coordinator.execute(RenameCityCommand(
+                        actorCivId, actionId, expectedRevision,
+                        requireString(args, "cityId"), requireString(args, "newName"))) as CityRenamedResult
+                    receiptMap(result.receipt, mapOf("name" to result.name), decisionsFor(actorCivId))
+                }
+                "city.annex" -> {
+                    val result = coordinator.execute(AnnexCityCommand(
+                        actorCivId, actionId, expectedRevision,
+                        requireString(args, "cityId"))) as CityAnnexedResult
+                    receiptMap(result.receipt, mapOf("annexed" to true), decisionsFor(actorCivId))
+                }
+                "city.raze" -> {
+                    val result = coordinator.execute(SetRazingCommand(
+                        actorCivId, actionId, expectedRevision,
+                        requireString(args, "cityId"), requireBoolean(args, "raze"))) as RazingSetResult
+                    receiptMap(result.receipt, mapOf("razing" to result.razing), decisionsFor(actorCivId))
+                }
                 "unit.stopImprovement" -> {
                     val result = coordinator.execute(StopImprovementCommand(
                         actorCivId, actionId, expectedRevision,
                         requireInt(args, "unitId"))) as ImprovementStoppedResult
                     receiptMap(result.receipt, mapOf("stopped" to true), decisionsFor(actorCivId))
+                }
+                "unit.swap" -> {
+                    val result = coordinator.execute(SwapUnitsCommand(
+                        actorCivId, actionId, expectedRevision,
+                        requireInt(args, "unitId"), requireHex(args, "destination"))) as UnitsSwappedResult
+                    receiptMap(result.receipt, mapOf("position" to mapOf("x" to result.finalPosition.x, "y" to result.finalPosition.y)), decisionsFor(actorCivId))
+                }
+                "unit.rename" -> {
+                    val result = coordinator.execute(RenameUnitCommand(
+                        actorCivId, actionId, expectedRevision,
+                        requireInt(args, "unitId"), requireString(args, "newName"))) as UnitRenamedResult
+                    receiptMap(result.receipt, mapOf("name" to result.name), decisionsFor(actorCivId))
+                }
+                "unit.connectRoad" -> {
+                    val result = coordinator.execute(ConnectRoadCommand(
+                        actorCivId, actionId, expectedRevision,
+                        requireInt(args, "unitId"), requireHex(args, "destination"))) as RoadConnectionStartedResult
+                    receiptMap(result.receipt, mapOf("connecting" to true), decisionsFor(actorCivId))
+                }
+                "citystate.tribute" -> {
+                    val result = coordinator.execute(TributeCommand(
+                        actorCivId, actionId, expectedRevision,
+                        requireString(args, "cityStateId"), requireBoolean(args, "demandWorker"))) as TributeTakenResult
+                    receiptMap(result.receipt, mapOf("worker" to result.worker), decisionsFor(actorCivId))
+                }
+                "citystate.protection" -> {
+                    val result = coordinator.execute(ProtectionCommand(
+                        actorCivId, actionId, expectedRevision,
+                        requireString(args, "cityStateId"), requireBoolean(args, "pledge"))) as ProtectionSetResult
+                    receiptMap(result.receipt, mapOf("pledged" to result.pledged), decisionsFor(actorCivId))
+                }
+                "citystate.marry" -> {
+                    val result = coordinator.execute(DiplomaticMarriageCommand(
+                        actorCivId, actionId, expectedRevision,
+                        requireString(args, "cityStateId"))) as CityStateMarriedResult
+                    receiptMap(result.receipt, mapOf("married" to true), decisionsFor(actorCivId))
+                }
+                "diplomacy.retractTrade" -> {
+                    val result = coordinator.execute(RetractTradeCommand(
+                        actorCivId, actionId, expectedRevision,
+                        requireString(args, "targetCivId"))) as TradeRetractedResult
+                    receiptMap(result.receipt, mapOf("retracted" to true), decisionsFor(actorCivId))
+                }
+                "diplomacy.respondProtectorAlert" -> {
+                    val result = coordinator.execute(RespondProtectorAlertCommand(
+                        actorCivId, actionId, expectedRevision,
+                        requireString(args, "cityStateId"), requireString(args, "attackerCivId"),
+                        requireEnum<ProtectorAlertChoice>(args, "choice"), optionalBoolean(args, "alliedCityState"))) as ProtectorAlertAnsweredResult
+                    receiptMap(result.receipt, mapOf("choice" to result.choice.name), decisionsFor(actorCivId))
+                }
+                "diplomacy.respondFriendshipOffer" -> {
+                    val result = coordinator.execute(RespondFriendshipOfferCommand(
+                        actorCivId, actionId, expectedRevision,
+                        requireString(args, "requesterCivId"), requireBoolean(args, "accept"))) as FriendshipOfferAnsweredResult
+                    receiptMap(result.receipt, mapOf("accepted" to result.accepted), decisionsFor(actorCivId))
+                }
+                "unit.gift" -> {
+                    val result = coordinator.execute(GiftUnitCommand(
+                        actorCivId, actionId, expectedRevision,
+                        requireInt(args, "unitId"))) as UnitGiftedResult
+                    receiptMap(result.receipt, mapOf("recipientCivId" to result.recipientCivId), decisionsFor(actorCivId))
                 }
                 else -> throw EngineCallException("INVALID_ARGUMENT", "Unknown command type $type")
             }

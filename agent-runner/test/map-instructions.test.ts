@@ -1,4 +1,4 @@
-import { expect, it } from "vitest";
+import { afterEach, expect, it, vi } from "vitest";
 import { GAME_INSTRUCTIONS } from "../src/game-instructions.js";
 import { buildTurnPrompt } from "../src/turn-prompt.js";
 import { GAME_TOOL_ALLOWLIST, claudeSpawn, codexSpawn, opencodeSpawn } from "../src/provider-spawn.js";
@@ -6,6 +6,8 @@ import { buildSpawnForProvider } from "../src/daemon.js";
 import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+
+afterEach(() => vi.unstubAllEnvs());
 
 it("teaches geography, memory limits and exact worker choices while preserving personality", () => {
   const prompt = buildTurnPrompt({ displayName: "Ada", personality: "Peaceful. Never launch nuclear weapons.", rulesetName: "Civ V", protocolVersion: 1, civId: "Rome", turnSerial: 1, stateRevision: 42, notes: "", recentEvents: [], pendingDecisions: [], guidance: [] });
@@ -15,6 +17,7 @@ it("teaches geography, memory limits and exact worker choices while preserving p
 });
 
 it("allows exactly all ten game tools through each provider configuration", () => {
+  for (const name of ["CODEX", "CLAUDE", "OPENCODE"]) vi.stubEnv(`UNCIV_${name}_EXECUTABLE`, process.execPath);
   expect(GAME_TOOL_ALLOWLIST).toHaveLength(10);
   const codex = codexSpawn({ prompt: "play", mcpUrl: "http://127.0.0.1/mcp", bearerEnvVar: "TEST_GAME_BEARER", cwd: "/tmp", sandboxDangerous: true });
   expect(codex.argv.find(a => a.includes("enabled_tools="))).toContain(`enabled_tools=${JSON.stringify(GAME_TOOL_ALLOWLIST)}`);

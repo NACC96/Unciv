@@ -352,7 +352,7 @@ Match run state and provider process state are separate. UI states include Pause
 | Event/control | Required behavior |
 | --- | --- |
 | Run | Start/resume at the committed boundary. If an invocation is still active, wait for/reuse it; never launch an overlapping replacement |
-| Pause | Stop granting mutations after the currently executing atomic operation. Show Pausing until that operation commits/discards, then Paused. Do not kill the provider |
+| Pause | Stop scheduling new provider turns. Let the admitted invocation finish normally, including legal mutations and end-turn; show Pausing until it exits, then Paused before the next invocation. Do not kill the provider |
 | Step action | Grant one successful gameplay mutation, including explicit end-turn; reads, note updates, internal preparation, and rejected proposals do not consume it; return to Paused |
 | Step civilization turn | Run the current eligible civilization through its end-turn checkpoint, then pause before the next begins; do not run an entire round |
 | Built-in AI step | Its ordinary automation is one indivisible turn initially; label this clearly rather than pretending to expose individual decisions |
@@ -368,7 +368,7 @@ Match run state and provider process state are separate. UI states include Pause
 | Desktop/supervisor connection lost | Reject further game calls and new launches. Supervisor drains existing children/logs until they exit; reopening never restores old authority automatically |
 | Storage unavailable/full | Do not acknowledge an uncommitted action; retain published state and pause with the storage error |
 
-The current atomic operation may finish after Pause was clicked; after Paused is acknowledged no new operation may commit until permitted. State this in the UI. Controller changes and note bookkeeping do not count as gameplay steps.
+The admitted provider invocation may finish its turn after Pause was clicked. After Paused is acknowledged, no new provider invocation starts until Resume. Each gameplay operation remains atomic and validated, and a former actor cannot submit fresh gameplay mutations after turn rotation. State the turn-drain behavior in the UI. Controller changes and note bookkeeping do not count as gameplay steps.
 
 Use read-only liveness checks: process identity/status, log growth, event timestamps, child process tree, and provider retry/tool events. Silence or elapsed time alone is never failure or cancellation authority. Do not send terminal control input as a liveness probe. Cancellation requires explicit user intent or separately captured evidence of a true stale failure.
 

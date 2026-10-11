@@ -20,6 +20,21 @@ describe("engine protocol framing", () => {
 });
 
 describe("StdioEngineBackend", () => {
+  it("forwards unit or city legal selectors with the authenticated actor, never a default unit", async () => {
+    const sent: { id: string; method: string; params: Record<string, unknown> }[] = [];
+    const backend = new StdioEngineBackend(line => {
+      const frame = JSON.parse(line); sent.push(frame);
+      queueMicrotask(() => backend.feedLine(JSON.stringify({ protocol: 1, kind: "engine_response", id: frame.id, ok: true, result: { constructions: [] } })));
+    }, 5000, () => "Rome");
+    try {
+      await backend.legalActions(17);
+      await backend.legalActions(undefined, "rome-capital");
+      expect(sent.map(({ method, params }) => ({ method, params }))).toEqual([
+        { method: "legal_actions", params: { civId: "Rome", unitId: 17 } },
+        { method: "legal_actions", params: { civId: "Rome", cityId: "rome-capital" } },
+      ]);
+    } finally { backend.disconnect(); }
+  });
   it("correlates responses and surfaces engine errors", async () => {
     const sent: string[] = [];
     const backend = new StdioEngineBackend((line) => sent.push(line), 5000);

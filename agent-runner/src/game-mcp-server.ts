@@ -62,6 +62,60 @@ const err = (code: string, message: string, extra: Record<string, unknown> = {})
   isError: true,
 });
 
+/** Model-visible command contract, matching AgentEngineBridge's v1 gameplay dispatch. */
+const ACTION_DESCRIPTION = `One typed state-changing command with actionId (idempotency key) and expectedRevision from observe. No batching. The authenticated connection supplies actor identity; never put actorCivId in args. Read legal_actions and observe before choosing eligible actions. Reuse an actionId only for the identical command; use action_result for uncertain mutations. Names and enum values are exact and case-sensitive. Fields marked ? are optional; all other fields are required. Coordinates use Unciv hex integers, not pixels.
+Receipt acknowledgement confirms reading and does not imply agreement; use concise visible acknowledgement text. Message text is limited to 2000 characters and 8192 UTF-8 bytes.
+type -> args:
+unit.move -> {unitId:integer,destination:{x:integer,y:integer}}
+research.select -> {techName:string,queue?:boolean=false,useFreeTech?:boolean=false}
+city.produce -> {cityId:string,op:ProductionOp,name?:string,index?:integer,tilePos?:Hex}; name is required for ADD_TOP/ADD_BOTTOM/PURCHASE/SELL, zero-based index for REMOVE/RAISE/LOWER/MOVE_TOP; tilePos for constructions creating a tile improvement. PURCHASE index defaults -1.
+unit.found -> {unitId:integer}
+unit.order -> {unitId:integer,order:UnitOrder}
+unit.attack -> {attackerUnitId?:integer,attackerCityId?:string,target:Hex}; supply exactly one attacker.
+conquest.resolve -> {decisionId:string,disposition:ANNEX|PUPPET|RAZE|LIBERATE}
+diplomacy.declareWar -> {targetCivId:string}
+diplomacy.makePeace -> {targetCivId:string}
+diplomacy.friendship -> {targetCivId:string}
+diplomacy.proposeTrade -> {targetCivId:string,ourOffers:TradeOffer[],theirOffers:TradeOffer[]}
+diplomacy.respondTrade -> {requestingCivId:string,accept:boolean}
+civics.adopt -> {policyName:string}
+city.citizens -> {cityId:string,op:CitizenOp,tilePos?:Hex,specialist?:string,focus?:string,flag?:boolean=false}; tilePos for tile ops, specialist for specialist ops, focus for SET_FOCUS, flag for SET_MANUAL_SPECIALISTS/SET_AVOID_GROWTH.
+city.buyTile -> {cityId:string,tilePos:Hex}
+unit.build -> {unitId:integer,improvementName:string}
+unit.promote -> {unitId:integer,promotionName:string}
+unit.upgrade -> {unitId:integer}
+unit.great -> {unitId:integer,action:HURRY_RESEARCH|HURRY_POLICY|HURRY_WONDER|HURRY_BUILDING|TRADE_MISSION|GOLDEN_AGE}
+citystate.giftGold -> {cityStateId:string,amount:integer}
+unit.pillage -> {unitId:integer}
+unit.repair -> {unitId:integer}
+diplomacy.denounce -> {targetCivId:string}
+diplomacy.demand -> {targetCivId:string,demandName:string}
+diplomacy.respondDemand -> {requesterCivId:string,demandName:string,accept:boolean}
+diplomacy.castVote -> {targetCivId?:string|null}; omitted/null/blank abstains.
+city.rename -> {cityId:string,newName:string}; newName must be nonblank.
+city.annex -> {cityId:string}
+city.raze -> {cityId:string,raze:boolean}
+unit.stopImprovement -> {unitId:integer}
+unit.swap -> {unitId:integer,destination:{x:integer,y:integer}}
+unit.rename -> {unitId:integer,newName:string}; blank clears the custom name.
+unit.connectRoad -> {unitId:integer,destination:{x:integer,y:integer}}
+citystate.tribute -> {cityStateId:string,demandWorker:boolean}
+citystate.protection -> {cityStateId:string,pledge:boolean}
+citystate.marry -> {cityStateId:string}
+diplomacy.retractTrade -> {targetCivId:string}
+diplomacy.respondProtectorAlert -> {cityStateId:string,attackerCivId:string,choice:DECLARE_WAR|SIDE_WITH|BREAK_PLEDGE,alliedCityState?:boolean=false}
+diplomacy.respondFriendshipOffer -> {requesterCivId:string,accept:boolean}
+unit.gift -> {unitId:integer}; recipient is derived from the tile owner.
+diplomacy.message -> {targetCivId:string,text:string}
+diplomacy.acknowledgeMessage -> {messageId:string,text:string}; acknowledge delivered incoming mail explicitly, never automatically.
+Hex={x:integer,y:integer}. TradeOffer={name:string,type:Embassy|Gold|Gold_Per_Turn|Treaty|Agreement|Luxury_Resource|Strategic_Resource|Stockpiled_Resource|Technology|Introduction|WarDeclaration|PeaceProposal|City,amount:integer}.
+ProductionOp=ADD_TOP|ADD_BOTTOM|REMOVE|RAISE|LOWER|MOVE_TOP|PURCHASE|SELL.
+UnitOrder=FORTIFY|FORTIFY_UNTIL_HEALED|SLEEP|SLEEP_UNTIL_HEALED|WAKE|DISBAND|PARADROP|EXPLORE|STOP_EXPLORATION|AUTOMATE|STOP_AUTOMATION|GUARD|SET_UP|AIR_SWEEP|ESCORT_FORMATION|STOP_ESCORT_FORMATION.
+CitizenOp=WORK_TILE|STOP_TILE|LOCK_TILE|UNLOCK_TILE|ASSIGN_SPECIALIST|UNASSIGN_SPECIALIST|SET_FOCUS|SET_MANUAL_SPECIALISTS|SET_AVOID_GROWTH|REASSIGN.
+focus=NoFocus|Manual|FoodFocus|ProductionFocus|GoldFocus|ScienceFocus|CultureFocus|HappinessFocus|FaithFocus|GoldGrowthFocus|ProductionGrowthFocus.
+demandName=DontSpyOnUs|DoNotSpreadReligion|DoNotSettleNearUs|DoNotAttackUs; eligibility depends on the pinned ruleset and current diplomacy.
+End-turn and private notes use game.end_turn and game.notes, not game.act.`;
+
 type ReadRejection = { code: string; message: string; currentRevision?: number; actionId?: string; messageIds?: string[] };
 const readError = (rejected: ReadRejection) => err(rejected.code, rejected.message, {
   ...(rejected.currentRevision !== undefined ? { currentRevision: rejected.currentRevision } : {}),
@@ -149,12 +203,14 @@ function registerGameTools(mcp: McpServer, game: IGameService, actorCivId: strin
     inputSchema: { unitId: z.number().int().optional(), cityId: z.string().min(1).max(128).optional() },
   }, async ({ unitId, cityId }) => {
     if ((unitId === undefined) === (cityId === undefined)) return err("INVALID_ARGUMENT", "supply exactly one unitId or cityId");
-    const res = await game.legalActions(unitId, cityId);
-    return "status" in res ? err(res.code, res.message) : ok(res);
+    return serviceResult(async () => {
+      const res = await game.legalActions(unitId, cityId);
+      return "status" in res ? readError(res) : ok(res);
+    });
   });
 
   mcp.registerTool("game.act", {
-    description: "One typed state-changing command with idempotency key and expected revision. Includes diplomacy.acknowledgeMessage args {messageId,text} for delivered incoming mail; receipt acknowledgement does not imply agreement. No batching.",
+    description: ACTION_DESCRIPTION,
     inputSchema: {
       actionId: z.string().min(1).max(128),
       expectedRevision: z.number().int().min(0),
