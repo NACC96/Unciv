@@ -258,7 +258,6 @@ export async function main(): Promise<void> {
         guidance: control.guidance,
         resumeId: control.providerConfig.resumeId,
         cwd: scratch,
-        extraEnv: { GAME_MCP_BEARER: "unused-by-scripted" },
       });
       if (outcome.run.sessionId) {
         emit("session_bound", { sessionId: outcome.run.sessionId });

@@ -70,7 +70,8 @@ function registerGameTools(mcp: McpServer, game: IGameService): void {
     inputSchema: { unitId: z.number().int() },
   }, async ({ unitId }) => {
     const res = await game.inspect(unitId);
-    return "position" in res ? ok(res) : err(res.code, res.message);
+    if (res === null) return err("ILLEGAL_ACTION", "no such visible entity");
+    return "status" in res ? err(res.code, res.message) : ok(res);
   });
 
   mcp.registerTool("game.rules", {
@@ -83,7 +84,7 @@ function registerGameTools(mcp: McpServer, game: IGameService): void {
     inputSchema: { unitId: z.number().int() },
   }, async ({ unitId }) => {
     const res = await game.legalActions(unitId);
-    return "actions" in res ? ok(res) : err(res.code, res.message);
+    return "status" in res ? err(res.code, res.message) : ok(res);
   });
 
   mcp.registerTool("game.act", {

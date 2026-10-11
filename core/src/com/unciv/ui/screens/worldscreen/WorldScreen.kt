@@ -150,6 +150,13 @@ class WorldScreen(
      */
     var agentSession: AgentMatchSession? = null
 
+    /** Retire the host before releasing its screen; repeated disposal is harmless. */
+    fun closeAgentSession() {
+        val session = agentSession ?: return
+        agentSession = null
+        session.close()
+    }
+
     /** `true` when it's the player's turn unless he is a spectator.
      *  Agent matches route through the session: only its human turns allow input. */
     val canChangeState
@@ -334,6 +341,7 @@ class WorldScreen(
     }
 
     override fun dispose() {
+        closeAgentSession()
         resizeDeferTimer?.cancel()
         events.stopReceiving()
         statusButtons.dispose()

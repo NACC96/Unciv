@@ -233,7 +233,7 @@ open class UncivGame(val isConsoleMode: Boolean = false) : Game(), PlatformSpeci
             if (agentSetup != null) {
                 try {
                     newWorldScreen.agentSession = com.unciv.logic.agents.AgentMatchSessionFactory.create(
-                        newGameInfo, agentSetup
+                        newGameInfo, agentSetup, newWorldScreen
                     )
                 } catch (ex: Exception) {
                     Log.error("Could not start agent match session", ex)

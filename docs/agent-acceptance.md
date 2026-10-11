@@ -151,3 +151,9 @@ and the GL thread never waiting on provider/network/disk work.
 - Research agreements and G&K-specific air sweep mechanics are out of Vanilla scope.
 - Real-provider matches (plan §13.3) are intentionally deferred to the manual phase
   using user auth plans.
+
+## 2026-10-11 foundation review fixes
+
+The standalone foundation now preserves the minted provider bearer, accepts production unit/legal-action DTOs through MCP and stdio, attaches the owning world screen to its session, and closes the session when the screen is disposed. Fresh gameplay commands require the active civilization; idempotent receipt replay remains before that check, and private notes/host controller metadata retain their independent semantics. Diplomacy command fixtures select the acting civilization explicitly; the authority regressions also reject inactive diplomacy responses.
+
+Full isolated `./gradlew check --offline` succeeded: **984 Kotlin tests, 967 passed, 17 skipped, zero failures/errors**. The focused authority/lifecycle/command suites passed 61 tests. Runner build and typecheck passed, followed by **37 tests across eight files**. Tests use engine-shaped transport fixtures and mocked or scripted providers; no paid provider was started by these checks.

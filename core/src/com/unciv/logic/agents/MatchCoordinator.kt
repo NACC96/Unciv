@@ -391,6 +391,7 @@ class MatchCoordinator(
         actionId: String,
         expectedRevision: Int,
         fingerprint: String,
+        requiresActiveActor: Boolean = true,
         apply: (candidateGame: GameInfo, candidateMatch: AgentMatchState) -> String
     ): ActionReceipt {
         actionReceipts[actionId]?.let { prior ->
@@ -400,6 +401,7 @@ class MatchCoordinator(
                 "actionId $actionId reused with a different request"
             )
         }
+        if (requiresActiveActor) requireActiveActor(actorCivId)
         if (expectedRevision != committedMatch.stateRevision)
             throw AgentCommandException(
                 AgentCommandError.STALE_STATE,
@@ -1981,7 +1983,8 @@ class MatchCoordinator(
             throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Only external controllers take profiles")
         val receipt = runGameplayMutation(
             command.actorCivId, command.actionId, command.expectedRevision,
-            "controller.set|${command.targetCivId}|${command.kind}|${command.profile?.profileRevision ?: "-"}"
+            "controller.set|${command.targetCivId}|${command.kind}|${command.profile?.profileRevision ?: "-"}",
+            requiresActiveActor = false
         ) { candidateGame, candidateMatch ->
             candidateGame.getCivilizationOrNull(command.targetCivId)
                 ?: throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Unknown civilization")
@@ -2058,6 +2061,11 @@ class MatchCoordinator(
         committedMatch.matchPausedReason = reason
     }
 
+    private fun requireActiveActor(actorCivId: String) {
+        if (actorCivId != committedGame.currentPlayer)
+            throw AgentCommandException(AgentCommandError.NOT_YOUR_TURN, "Only the active civilization may change gameplay")
+    }
+
     private fun executeEndTurn(command: EndTurnCommand): TurnEndedResult {
         val fingerprint = "end-turn"
         actionReceipts[command.actionId]?.let { prior ->
@@ -2071,6 +2079,7 @@ class MatchCoordinator(
                 "actionId ${command.actionId} reused with a different request"
             )
         }
+        requireActiveActor(command.actorCivId)
         if (command.expectedRevision != committedMatch.stateRevision)
             throw AgentCommandException(
                 AgentCommandError.STALE_STATE,

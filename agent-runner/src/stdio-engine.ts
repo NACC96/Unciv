@@ -12,6 +12,8 @@ import type {
   FakeError,
   FakeReceipt,
   FakeUnit,
+  ObservedUnit,
+  EngineLegalActions,
   GameObserveResult,
   IGameService,
 } from "./fake-game-mcp.js";
@@ -121,7 +123,7 @@ export class StdioEngineBackend implements IGameService {
     return this.call("observe", { civId: this.actorCivId() });
   }
 
-  async inspect(unitId: number): Promise<FakeUnit | FakeError> {
+  async inspect(unitId: number): Promise<FakeUnit | ObservedUnit | FakeError | null> {
     return this.call("inspect", { civId: this.actorCivId(), unitId });
   }
 
@@ -129,7 +131,7 @@ export class StdioEngineBackend implements IGameService {
     return this.call("rules", {});
   }
 
-  async legalActions(unitId: number): Promise<{ unitId: number; actions: unknown[] } | FakeError> {
+  async legalActions(unitId: number): Promise<{ unitId: number; actions: unknown[] } | EngineLegalActions | FakeError> {
     return this.call("legal_actions", { civId: this.actorCivId(), unitId });
   }
 

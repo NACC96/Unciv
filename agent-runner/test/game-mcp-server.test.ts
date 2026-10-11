@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it } from "vitest";
+import { StdioEngineBackend } from "../src/stdio-engine.js";
 import { FakeGameService } from "../src/fake-game-mcp.js";
 import { startGameMcpServer, type StartedGameMcpServer } from "../src/game-mcp-server.js";
 
@@ -92,4 +93,44 @@ describe("game MCP transport guards (plan §7.3)", () => {
     const actText = (act.json?.["result"] as { content: { text: string }[] }).content[0].text;
     expect(JSON.parse(actText)).toMatchObject({ status: "applied", revision: 43 });
   });
+});
+
+
+it("accepts desktop DTOs and safely rejects hidden or nonexistent units", async () => {
+  const unit = { unitId: 17, name: "Warrior", ownerCivId: "Rome", x: 2, y: 1, health: 100, movementLeft: 2, action: null };
+  const legal = { moveTargets: [{ x: 3, y: 1 }], attackTargets: [], orders: ["SLEEP"], canFound: false,
+    constructions: [], researchable: ["Pottery"], promotions: [], canUpgrade: false };
+  const engine = new StdioEngineBackend(line => {
+    const frame = JSON.parse(line);
+    const result = frame.method === "inspect" ? (frame.params.unitId === 17 ? unit : null) : legal;
+    queueMicrotask(() => engine.feedLine(JSON.stringify({ protocol: 1, kind: "engine_response", id: frame.id, ok: true, result })));
+  }, 5000, () => "Rome");
+  server = await startGameMcpServer(engine, { matchId: "m", timelineId: "t", civId: "Rome", runId: "r", authorityEpoch: 1 });
+  const tool = async (name: string, unitId: number) => {
+    const response = await rpc(server!.url, server!.bearer, call("tools/call", { name, arguments: { unitId } }));
+    const body = response.json?.["result"] as { isError?: boolean; content: { text: string }[] };
+    return { isError: body.isError ?? false, value: JSON.parse(body.content[0].text) };
+  };
+  try {
+    expect(await tool("game.inspect", 17)).toEqual({ isError: false, value: unit });
+    expect(await tool("game.legal_actions", 17)).toEqual({ isError: false, value: legal });
+    const hidden = await tool("game.inspect", 18);
+    const missing = await tool("game.inspect", 999);
+    expect(hidden).toEqual(missing);
+    expect(hidden).toMatchObject({ isError: true, value: { code: "ILLEGAL_ACTION" } });
+  } finally { engine.disconnect(); }
+});
+
+it("retains structured read rejection codes", async () => {
+  const fake = new FakeGameService();
+  const rejection = { protocolVersion: 1 as const, status: "rejected" as const, code: "NOT_YOUR_TURN" as const, message: "not active" };
+  fake.inspect = async () => rejection;
+  fake.legalActions = async () => rejection;
+  server = await startGameMcpServer(fake, { matchId: "m", timelineId: "t", civId: "Rome", runId: "r", authorityEpoch: 1 });
+  for (const name of ["game.inspect", "game.legal_actions"]) {
+    const response = await rpc(server.url, server.bearer, call("tools/call", { name, arguments: { unitId: 17 } }));
+    const body = response.json?.["result"] as { isError: boolean; content: { text: string }[] };
+    expect(body.isError).toBe(true);
+    expect(JSON.parse(body.content[0].text)).toMatchObject({ status: "rejected", code: "NOT_YOUR_TURN", message: "not active" });
+  }
 });

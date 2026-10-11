@@ -19,9 +19,9 @@ export interface GameObserveResult {
 
 export interface IGameService {
   observe(): Promise<GameObserveResult>;
-  inspect(unitId: number): Promise<FakeUnit | FakeError>;
+  inspect(unitId: number): Promise<FakeUnit | ObservedUnit | FakeError | null>;
   rules(): Promise<{ ruleset: string; note: string }>;
-  legalActions(unitId: number): Promise<{ unitId: number; actions: unknown[] } | FakeError>;
+  legalActions(unitId: number): Promise<{ unitId: number; actions: unknown[] } | EngineLegalActions | FakeError>;
   act(envelope: {
     protocolVersion: number;
     actionId: string;
@@ -33,6 +33,33 @@ export interface IGameService {
   readNotes(): Promise<{ notes: string; notesRevision: number }>;
   updateNotes(notes: string, expectedNotesRevision: number): Promise<{ notesRevision: number } | FakeError>;
   endTurn(): Promise<{ turnEnded: boolean } | FakeError>;
+}
+
+/** Production engine DTOs: the fake's convenience fields are not transport discriminators. */
+export interface ObservedUnit {
+  unitId: number;
+  name: string;
+  ownerCivId: string;
+  x: number;
+  y: number;
+  health: number;
+  movementLeft: number;
+  action: string | null;
+}
+
+export interface EngineLegalActions {
+  moveTargets: { x: number; y: number }[];
+  attackTargets: unknown[];
+  orders: string[];
+  canFound: boolean;
+  constructions: string[];
+  researchable: string[];
+  freeTechs: number;
+  freePolicies: number;
+  promotions: string[];
+  canUpgrade: boolean;
+  upgradeTo: string | null;
+  greatActions: string[];
 }
 
 export interface FakeUnit {

@@ -117,9 +117,9 @@ internal object DesktopLauncher {
         // Agent matches: hosting factory closed over the project-owned data
         // directory (checkpoints, logs, supervisor runtime live here — never
         // the ordinary Unciv profile). Null elsewhere (other platforms).
-        com.unciv.logic.agents.AgentMatchSessionFactory.creator = { game, match, setup ->
+        com.unciv.logic.agents.AgentMatchSessionFactory.creator = { game, match, setup, screen ->
             com.unciv.app.desktop.agents.DesktopAgentMatch(
-                game, match, setup, java.io.File(dataDirectory))
+                game, match, setup, java.io.File(dataDirectory), worldScreen = screen)
         }
 
         val isRunFromJAR = isRunFromJar(this)

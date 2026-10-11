@@ -1,6 +1,7 @@
 package com.unciv.logic.agents
 
 import com.unciv.logic.GameInfo
+import com.unciv.ui.screens.worldscreen.WorldScreen
 
 /**
  * Desktop-owned agent match session (AI_AGENT_PLAN.md §3.1, §11).
@@ -62,11 +63,11 @@ interface AgentMatchSession {
 
 object AgentMatchSessionFactory {
     /** Set once by the desktop launcher; null on platforms without hosting. */
-    var creator: ((game: GameInfo, match: AgentMatchState, setup: AgentMatchSetup) -> AgentMatchSession)? = null
+    var creator: ((game: GameInfo, match: AgentMatchState, setup: AgentMatchSetup, screen: WorldScreen) -> AgentMatchSession)? = null
 
-    fun create(game: GameInfo, setup: AgentMatchSetup): AgentMatchSession? {
+    fun create(game: GameInfo, setup: AgentMatchSetup, screen: WorldScreen): AgentMatchSession? {
         if (setup.slots.isEmpty()) return null
         val creator = creator ?: return null
-        return creator(game, setup.buildMatchState(game), setup)
+        return creator(game, setup.buildMatchState(game), setup, screen)
     }
 }
