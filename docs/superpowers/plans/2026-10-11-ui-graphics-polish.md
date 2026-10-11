@@ -77,8 +77,8 @@
 - [x] After all workers freeze, run isolated `./gradlew check` and write the test runtime classpath. Build logs must identify the source commit/tree.
 - [x] Run real GPU panel/map/setup captures at representative wide/narrow sizes; inspect one batched round and fix observed defects together, with one confirming round.
 - [x] Verify long names/bonuses, actual Start/Save controls, receipt/privacy states, latest Live following, manual hold, city visibility, map input and stable zoom/wrap layout.
-- [ ] Independently review each worker's changed files and then the complete branch; route material fixes to implementers and record verdicts.
-- [ ] Commit only owned source/tests/docs. Package a separate native build without replacing the running app. Report local artifact, verified checks and pending human/native acceptance; do not merge a new PR without authorization.
+- [x] Independently review each worker's changed files and then the complete branch; route material fixes to implementers and record verdicts.
+- [x] Commit only owned source/tests/docs. Package a separate native build without replacing the running app. Report local artifact, verified checks and pending human/native acceptance; do not merge a new PR without authorization.
 
 ## Execution ledger
 
@@ -88,5 +88,7 @@ Use the plan-specific ignored SDD workspace for worker reports, ownership, revie
 
 - Full isolated Gradle `check`: 1,254 tests, zero failures/errors, 15 skipped.
 - Real GPU: Messages/Activity and Overview at 960×720 and 420×600; city/minimap human/spectator at both sizes, wrap at 960×720, bounded tooltip at 420×600; setup and editor/menu/footer states at 800×500 and 520×360. All capture processes exit 0.
-- Independent task reviews are clean after dropdown/tooltip bounds and synthetic harness corrections. Whole-branch review and separate package pending.
+- Independent task reviews are clean after dropdown/tooltip bounds and synthetic harness corrections. Whole-branch review is clean; the separate native package built successfully and its ZIP CRC/JAR hash were verified.
 - Installed app JAR hash and primary checkout verified unchanged. Native interaction acceptance of this polish remains pending; no real game/provider was launched for these tests.
+
+**Delivery:** Implementation commit `3e6e43f81f28f03584dbcb3ea6e63c184e144350` on `codex/ui-graphics-polish`. Screenshots, build provenance and the review ZIP are saved in `/Volumes/Lexar/Unciv/.superpowers/ui-graphics-polish/`. Native installation/interaction is pending; the live app and primary checkout remain unchanged.
