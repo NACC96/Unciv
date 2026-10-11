@@ -210,3 +210,9 @@ The user confirmed the live acceptance check after installation: a message sent 
 Opening Messages hides the civilization overview, and opening Overview hides Messages. Activity remains independent. Live now stays at the newest entry after transcript growth, bursts of calls and resizing; manual scrolling still holds the reader's position until Live is selected again. Tests exercise the actual Scene2D controls and world-screen panel transitions. Discovered Codex models and their supported reasoning levels also take precedence when choosing a new profile's default.
 
 `./gradlew check --offline` succeeded with **1,198 Kotlin tests: 1,183 passed, 15 skipped, zero failures/errors**. The targeted panel/Live suite passed 36 tests, and the model catalog passed 10 tests after both new regressions were demonstrated failing against the prior implementation. The new panel and Live behavior still requires a visible check in the packaged app.
+
+## 2026-10-11 shared gameplay authority
+
+Fresh gameplay mutations require the active civilization after saved receipt replay. Private notes and host controller metadata keep their existing independent semantics. Authority regressions cover inactive movement, research, unit rename, diplomacy responses and end-turn, zero checkpoint writes on rejection, and an end-turn retry after the actor rotates. Diplomacy command fixtures select the actor explicitly while lifecycle tests exercise real turn transitions.
+
+The complete combined `./gradlew check --offline` succeeded: **1,202 Kotlin tests, 1,187 passed, 15 skipped, zero failures/errors**. The authority and diplomacy command suites passed 32 tests. No provider or running match was interrupted by validation or packaging.

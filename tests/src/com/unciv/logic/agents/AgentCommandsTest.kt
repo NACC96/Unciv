@@ -130,9 +130,9 @@ class AgentCommandsTest {
         try {
             f.coordinator.execute(
                 CityProductionCommand(f.greeceId, "p6", f.rev(), f.cityId, ProductionOp.ADD_BOTTOM, name = "Monument"))
-            Assert.fail("expected ILLEGAL_ACTION")
+            Assert.fail("expected NOT_YOUR_TURN")
         } catch (ex: AgentCommandException) {
-            Assert.assertEquals(AgentCommandError.ILLEGAL_ACTION, ex.code)
+            Assert.assertEquals(AgentCommandError.NOT_YOUR_TURN, ex.code)
         }
 
         // Purchase with ample gold succeeds and keeps a legal queue.
@@ -193,13 +193,13 @@ class AgentCommandsTest {
         Assert.assertTrue(disbanded.disbanded)
         Assert.assertNull(f.coordinator.getUnitPosition(f.romeId, f.scoutId))
 
-        // Opponent units are not orderable (same safe response as missing).
+        // Inactive actors are rejected before examining unit ownership.
         try {
             f.coordinator.execute(
                 UnitOrderCommand(f.greeceId, "o6", f.rev(), f.warriorId, UnitOrder.WAKE))
-            Assert.fail("expected ILLEGAL_ACTION")
+            Assert.fail("expected NOT_YOUR_TURN")
         } catch (ex: AgentCommandException) {
-            Assert.assertEquals(AgentCommandError.ILLEGAL_ACTION, ex.code)
+            Assert.assertEquals(AgentCommandError.NOT_YOUR_TURN, ex.code)
         }
     }
 }

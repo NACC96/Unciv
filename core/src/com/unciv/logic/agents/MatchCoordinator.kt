@@ -609,6 +609,7 @@ class MatchCoordinator(
         fingerprint: String,
         rememberReceipt: ((AgentMatchState, ActionReceipt) -> Unit)? = null,
         collectSightings: Boolean = true,
+        requiresActiveActor: Boolean = true,
         apply: (candidateGame: GameInfo, candidateMatch: AgentMatchState) -> String
     ): ActionReceipt {
         (actionReceipts[actionId] ?: committedMatch.diplomaticMessageReceipts[actionId])?.let { prior ->
@@ -618,6 +619,7 @@ class MatchCoordinator(
                 "actionId $actionId reused with a different request"
             )
         }
+        if (requiresActiveActor) requireActiveActor(actorCivId)
         if (expectedRevision != committedMatch.stateRevision)
             throw AgentCommandException(
                 AgentCommandError.STALE_STATE,
@@ -2195,7 +2197,8 @@ class MatchCoordinator(
         val receipt = runGameplayMutation(
             command.actorCivId, command.actionId, command.expectedRevision,
             "controller.set|${command.targetCivId}|${command.kind}|${command.profile?.profileRevision ?: "-"}",
-            collectSightings = false
+            collectSightings = false,
+            requiresActiveActor = false
         ) { candidateGame, candidateMatch ->
             candidateGame.getCivilizationOrNull(command.targetCivId)
                 ?: throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Unknown civilization")
@@ -2270,6 +2273,11 @@ class MatchCoordinator(
     private fun pauseCommitted(reason: String) {
         committedMatch.matchPaused = true
         committedMatch.matchPausedReason = reason
+    }
+
+    private fun requireActiveActor(actorCivId: String) {
+        if (actorCivId != committedGame.currentPlayer)
+            throw AgentCommandException(AgentCommandError.NOT_YOUR_TURN, "Only the active civilization may change gameplay")
     }
 
     private fun executeEndTurn(command: EndTurnCommand): TurnEndedResult {

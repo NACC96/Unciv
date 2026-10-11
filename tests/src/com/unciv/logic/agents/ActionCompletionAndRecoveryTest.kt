@@ -58,6 +58,18 @@ class ActionCompletionAndRecoveryTest {
             coordinator = MatchCoordinator(testGame.gameInfo, match, writer)
         }
 
+        /** Selects the actor in this command-level fixture, preserving offers and receipts.
+         * Turn rotation and start/end effects are covered by the lifecycle suites. */
+        fun selectActor(civId: String) {
+            if (coordinator.getCurrentCivId() == civId) return
+            val serializer = com.unciv.json.json().apply { setUsePrototypes(false) }
+            val bundle = serializer.fromJson(AgentBundle::class.java, coordinator.saveToJson())
+            val snapshot = serializer.fromJson(com.unciv.logic.GameInfo::class.java, bundle.gameJson)
+            snapshot.currentPlayer = civId
+            bundle.gameJson = serializer.toJson(snapshot)
+            coordinator = MatchCoordinator.loadFromJson(serializer.toJson(bundle), writer)
+        }
+
         fun rev() = coordinator.getStateRevision()
     }
 
@@ -113,9 +125,11 @@ class ActionCompletionAndRecoveryTest {
 
         // Greece stages a declaration against the Aztecs; Rome accepts. The
         // engine's TradeLogic charges the declaration to the OFFERER.
+        f.selectActor(f.greeceId)
         f.coordinator.execute(ProposeTradeCommand(f.greeceId, "jw1", f.rev(), f.romeId,
             ourOffers = listOf(TradeOfferDto(f.aztecId, TradeOfferType.WarDeclaration, 1)),
             theirOffers = emptyList()))
+        f.selectActor(f.romeId)
         val accepted = f.coordinator.execute(
             RespondTradeCommand(f.romeId, "jw2", f.rev(), f.greeceId, accept = true)) as TradeRespondedResult
         Assert.assertTrue(accepted.accepted)
@@ -577,6 +591,7 @@ class ActionCompletionAndRecoveryTest {
             .hasFlag(com.unciv.logic.civilization.diplomacy.DiplomacyFlags.DeclarationOfFriendship))
 
         // A fresh offer declined records the refusal on the other side.
+        f.selectActor(f.greeceId)
         f.coordinator.execute(RespondFriendshipOfferCommand(f.greeceId, "fo2", f.rev(),
             f.romeId, accept = false))
         payload = AgentSnapshotPublication.buildPayload(f.coordinator, f.romeId)
