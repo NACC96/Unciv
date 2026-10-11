@@ -152,8 +152,84 @@ and the GL thread never waiting on provider/network/disk work.
 - Real-provider matches (plan §13.3) are intentionally deferred to the manual phase
   using user auth plans.
 
+## 2026-10-11 structured map implementation — current acceptance scope
+
+The CP-034 counts above are historical evidence. They do not certify the new observation-v2 map memory, bounded catalogs or worker controls.
+
+Current runner validation covers typecheck/build, ten-tool discovery and provider configuration, actor binding, typed production stdio errors, full escaped UTF-8 response bounds, bounded IDs, fake map pagination, prompt guidance and activity summaries. The runner suite passed 64 tests across 14 files after adding the China/scout workflow fixture; the commands and scope are recorded in the implementation report. Root records the final Kotlin and combined automated checks separately; no full-release-pass claim is made here.
+
+The automated China/scout workflow uses deterministic service fixtures through stdio and authenticated MCP. It exercises the information available to a leader and revision-bound re-querying; it does not demonstrate a real model's strategic choices. Kotlin visibility/memory, checkpoint rollback, Earth wrapping, worker parity and migration tests supply production-engine evidence, subject to root's final results.
+
+Still pending for this change: packaging/install into the running app, real-provider access (including OpenCode Go), a naturally safe live match boundary, and interactive China/worker/scout geography checks. No provider invocation, app restart or current-game control was performed as part of these automated checks. Existing full-match and human/UI acceptance gates remain applicable. See [Structured map and worker tools](agent-map-tools.md) for incomplete legacy history, historical enemy intelligence and null worker yield-delta limitations.
+
+## Approved storage policy
+
+The Earth checkpoint measurement (roughly 147 MB and 1.65 s; about 1.47 TB for 10,000 retained generations) triggered the storage-design gate. The user explicitly approved compact map memory plus compressed managed recovery retaining only the latest three verified checkpoints. Old archive files remain untouched, and manual saves are not part of that managed recovery window.
+
+Approved game-data location: `/Volumes/Lexar/Unciv/userdata` for manual saves, settings, presets/maps, game logs and recovery. Profile migration copies data and preserves the original. The app must fail closed if Lexar is unavailable, including before every checkpoint, with no internal game-data fallback. Existing supported legacy representations remain readable; missing historical terrain and debug-contaminated exploration still cannot be reconstructed. Developer build-cache paths in historical commands are separate from game-data storage.
+
+Automated checks verified compact serialization, compressed writes, the three-checkpoint window, interrupted/corrupt-write recovery, old-archive preservation and unavailable-volume handling. Native installation/startup passed; live-provider acceptance remains pending. Runner evidence remains 64 passing tests across 14 files; no new runner test/build was performed for this documentation-only storage update.
+
+The feed-blur benchmark on local M4 Pro/2x Retina measured median refresh costs near 4.97 ms with blur and 0.46 ms plain; feed blur was removed. The numbers describe that UI refresh benchmark, not whole-game FPS. Root records final performance and release acceptance separately.
+
+## 2026-10-11 final automated and measured record
+
+This record supersedes the pending automated-storage status above. The final relevant Kotlin agent/map/worker/turn/HUD/storage suite passed **323 checks with zero failures**. Runner validation remains **64 tests across 14 files**, with typecheck and build passing and runner sources unchanged. Eight emitted map/tile output fixtures passed the Draft 2020-12 JSON Schema. These automated results do not certify a completed live-provider match or the installed native app.
+
+Read-only headless compatibility checks restored the latest checksum-verified copied version-1 checkpoint, generation **252**, state revision 251. Migration and explicit version-2 roundtrip preserved all 15 external agent profiles, diplomatic mail and receipts, current-turn receipts, game identity/turn, units/actions/charges, cities, economy/resources and difficulty/bonus configuration. The normal `Autosave` passed its normal loader and serialization roundtrip; it has no paired agent metadata to check. There were **zero source-data or checkpoint writes**, with source bytes and modification times unchanged. Across controlled civilizations, **97 hidden explored legacy tiles remained incomplete**, with no invented historical details. This establishes read/roundtrip compatibility, not a simulated turn, UI restoration or every archived generation. See the [compatibility harness](../tests/src/com/unciv/dev/AgentMapSaveCompatibilityCheck.kt).
+
+The compact/GZIP benchmark ran on **Lexar ExFAT**, using a synthetic 164×80 rectangle (13,120 tiles), 15 civilizations, no live cities and one unit per civilization. Each case used two warmups and five measured samples and retained exactly three managed generations.
+
+| Initial map memory | Median mutation including fsynced checkpoint |
+| --- | ---: |
+| Empty | 98.6 ms |
+| Partial (25%) | 153.9 ms |
+| Full, uniform | 414.8 ms |
+| Full, diverse historical facts | 613.8 ms |
+
+The full uniform case used **0.549 MB per checkpoint / 1.647 MB for the three-checkpoint window**; the synthetic diverse case used **1.218 MB / 3.653 MB**. MB here is decimal logical file size; window totals include checksum sidecars, exclude AppleDouble companions and omit allocation rounding/filesystem overhead. The diverse-case isolated metadata-copy and serialization medians were about **53 ms** and **181 ms**. See [compact benchmark harness](../tests/src/com/unciv/dev/AgentMapPerformanceCheck.kt). Existing old archive files remain untouched and outside the managed window.
+
+These samples measure the current pipeline, including candidate copy, sight capture, metadata serialization and checkpoint writing. The empty-memory baseline also includes the new visibility pipeline; it is not a pre-feature build. Synthetic historical variation, sequential case order, JVM/GC and filesystem cache effects limit generalization to a played Earth match. They do not measure whole-game FPS. A separate JFR run completed with 592 execution samples. Copy and palette serialization dominate the sampled map-memory work; sighting collection is retained on gameplay changes for conservative visibility/resource capture. Notes, mail and controller metadata commits already skip terrain rescans. Overlapping sample stacks are not wall-time percentages. No provider or game UI was exercised by these headless gates. Live-provider acceptance, including OpenCode Go authentication and interactive geography/worker checks, remains pending.
+
+
+## Installed artifact and startup
+
+Native packaging succeeded with `-Dunciv.data.dir=/Volumes/Lexar/Unciv/userdata`. The installed JAR SHA256 matches the build; all 226 packaged agent class files and seven read-tool/instruction/runner modules match their tested outputs. The runtime data-directory property confirms Lexar. Unciv opens its main menu using the copied profile without starting a provider. The previous app bundle and original internal profile are preserved. Native UI clicks return `noWindowsAvailable`. The user confirmed that the DeepSeek V4.1 Flash choice is available and survives Save/reopen; actual provider gameplay remains unverified.
+
+
+## 2026-10-11 message acknowledgement and publication checks
+
+Delivered mail now requires an explicit, recipient-bound `diplomacy.acknowledgeMessage` action before an external agent can end its turn. The saved receipt text appears as a standalone Activity entry and as a separate **Acknowledged** status in Messages. Receipt confirms that the message was received, not agreement with its contents. Older delivered-but-unacknowledged messages remain in the inbox. Durable mail action IDs remain reserved across receipt rotation and reload; recovered receipts are bound to the authenticated recipient before activity is emitted. Provider stream text cannot forge the saved acknowledgement entry.
+
+The complete Kotlin suite completed **1,195 tests: 1,180 passed, 15 skipped, zero failures/errors**. Final `./gradlew check` succeeded across the configured modules. The runner passed **72 tests across 15 files**, plus typecheck and build. Targeted tests cover acknowledgement validation, end-turn gating, save/reload, duplicate/reused IDs, lost-response recovery, sender/recipient attribution, forged provider stream rejection, and Messages refresh from Queued to Delivered to Acknowledged. Protocol schemas parse and `git diff --check` is clean.
+
+The user confirmed the live acceptance check after installation: a message sent to an agent was acknowledged in Activity, and Messages showed Acknowledged with the reply. This verifies the visible receipt path in the installed app; automated engine/MCP/UI tests cover the separate retry and persistence cases. Native packaging succeeded with the Lexar data-directory property. The installed JAR SHA256 matches the build and contains the acknowledgement command/result and Messages panel; seven acknowledgement/runner modules match the tested build. The previous app bundle is preserved. No provider was started by packaging.
+
+## 2026-10-11 floating-panel and Live follow regressions
+
+Opening Messages hides the civilization overview, and opening Overview hides Messages. Activity remains independent. Live now stays at the newest entry after transcript growth, bursts of calls and resizing; manual scrolling still holds the reader's position until Live is selected again. Tests exercise the actual Scene2D controls and world-screen panel transitions. Discovered Codex models and their supported reasoning levels also take precedence when choosing a new profile's default.
+
+`./gradlew check --offline` succeeded with **1,198 Kotlin tests: 1,183 passed, 15 skipped, zero failures/errors**. The targeted panel/Live suite passed 36 tests, and the model catalog passed 10 tests after both new regressions were demonstrated failing against the prior implementation. The new panel and Live behavior still requires a visible check in the packaged app.
+
+## 2026-10-11 shared gameplay authority
+
+Fresh gameplay mutations require the active civilization after saved receipt replay. Private notes and host controller metadata keep their existing independent semantics. Authority regressions cover inactive movement, research, unit rename, diplomacy responses and end-turn, zero checkpoint writes on rejection, and an end-turn retry after the actor rotates. Diplomacy command fixtures select the actor explicitly while lifecycle tests exercise real turn transitions.
+
+The complete combined `./gradlew check --offline` succeeded: **1,202 Kotlin tests, 1,187 passed, 15 skipped, zero failures/errors**. The authority and diplomacy command suites passed 32 tests. No provider or running match was interrupted by validation or packaging.
+
 ## 2026-10-11 foundation review fixes
 
 The standalone foundation now preserves the minted provider bearer, accepts production unit/legal-action DTOs through MCP and stdio, attaches the owning world screen to its session, and closes the session when the screen is disposed. Fresh gameplay commands require the active civilization; idempotent receipt replay remains before that check, and private notes/host controller metadata retain their independent semantics. Diplomacy command fixtures select the acting civilization explicitly; the authority regressions also reject inactive diplomacy responses.
 
 Full isolated `./gradlew check --offline` succeeded: **984 Kotlin tests, 967 passed, 17 skipped, zero failures/errors**. The focused authority/lifecycle/command suites passed 61 tests. Runner build and typecheck passed, followed by **37 tests across eight files**. Tests use engine-shaped transport fixtures and mocked or scripted providers; no paid provider was started by these checks.
+
+
+## 2026-10-11 combined foundation and experience integration
+
+The reviewed foundation changes are integrated with the experience branch's format-2 compact map memory, private mail acknowledgements, filters, floating panels, Live follow behavior and Lexar storage policy. The bridge and model-visible catalog expose 42 command types. Provider executable discovery supports explicit overrides, PATH, per-user locations and NVM; the existing authentication, bounded map/rules tools and isolated runner behavior are retained.
+
+The final isolated `./gradlew check` succeeded: **1,241 Kotlin tests, 1,226 passed, 15 skipped, zero failures/errors**. Runner typecheck/build and **85 tests across 17 files** passed. Recovery regressions demonstrate failed human mutations, end-turn and guidance publishing their pause metadata, keeping Retry available only after an admitted worker drains, preserving failure across a completed outcome, and requiring explicit recovery after hidden-match re-entry. No provider was launched or interrupted by these tests.
+
+Ordinary saves now carry the paired compact metadata, restore with normal visibility before transients, and reopen idle in a fresh recovery lineage. Repeated 164×80/15-civilization profiling retained all 196,800 diverse historical tile records and acknowledged mail without recursive growth: **4.397 MB raw / 1.773 MB gzip/base64 ordinary save**. The Lexar checkpoint benchmark retained exactly three verified generations; its full-diverse window was **3.653 MB**, and median fsynced mutation latency was **591.9 ms**. See [ordinary-save profiling limits](agent-ordinary-saves.md#combined-format-2-profiling) and the existing [checkpoint harness](../tests/src/com/unciv/dev/AgentMapPerformanceCheck.kt).
+
+The installed native app remains on the previously packaged experience build. Its JAR hash is unchanged, and live game data, local Earth maps, saved presets and old archives are untouched. Combined native GUI save/reopen acceptance is pending. The earlier visible check for reciprocal Messages/Overview behavior and instant Live follow also remains pending. GitHub CI is not configured for this fork; local checks do not establish CI or merge readiness.

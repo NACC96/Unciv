@@ -1,7 +1,6 @@
 package com.unciv.ui.screens.newgamescreen
 
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.SelectBox
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.utils.Align
@@ -12,6 +11,8 @@ import com.unciv.logic.agents.ThinkingLevel
 import com.unciv.models.metadata.Player
 import com.unciv.ui.components.extensions.addSeparator
 import com.unciv.ui.components.extensions.toLabel
+import com.unciv.ui.components.input.KeyCharAndCode
+import com.unciv.ui.components.input.onChange
 import com.unciv.ui.components.widgets.UncivTextField
 import com.unciv.ui.popups.Popup
 import kotlin.math.min
@@ -29,7 +30,7 @@ class AgentProfilePopup(
 ) : Popup(table.previousScreen.stage, Scrollability.WithoutButtons, 0.85f) {
 
     private val workingProfile: AgentProfile = profile.copy()
-    private val contentWidth: Float = min(stageToShowOn.width * 0.8f, 500f)
+    private val contentWidth: Float = min(stageToShowOn.width * 0.85f - 56f, 500f).coerceAtLeast(120f)
 
     private class ModelChoice(
         val spec: ModelSpec,
@@ -70,6 +71,7 @@ class AgentProfilePopup(
         val title = if (profile.displayName.isBlank()) "Configure Agent for ${player.chosenCiv}"
         else "Edit Agent: ${profile.displayName} (${player.chosenCiv})"
         val titleLabel = title.toLabel(fontSize = 22)
+        titleLabel.wrap = true
         titleLabel.setAlignment(Align.center)
         formTable.add(titleLabel).width(contentWidth).center().padBottom(10f).row()
         formTable.addSeparator(Color.DARK_GRAY)
@@ -98,7 +100,7 @@ class AgentProfilePopup(
 
         // Custom Model Field (hidden unless custom selected)
         val customModelLabel = "Custom Model ID:".toLabel(Color.LIGHT_GRAY, 14)
-        val customModelField = UncivTextField("e.g. gpt-5.6-luna", workingProfile.modelId)
+        val customModelField = UncivTextField("e.g. gpt-6-luna", workingProfile.modelId)
         val customModelRowLabel = formTable.add(customModelLabel).padTop(2f)
         customModelRowLabel.row()
         val customModelRowField = formTable.add(customModelField).width(contentWidth)
@@ -118,24 +120,46 @@ class AgentProfilePopup(
         formTable.add("Personality Instructions:".toLabel(Color.WHITE, 16)).padTop(6f).row()
         val personalityField = UncivTextField("Optional strategic personality instructions", workingProfile.personality)
         formTable.add(personalityField).width(contentWidth).row()
+        val bonuses = StartingBonusForm(player, table.previousScreen.ruleset, contentWidth)
+        formTable.add(bonuses).width(contentWidth).padTop(6f).row()
 
-        // Function to populate and sync thinking levels
+        var updatingChoices = false
+
+        fun showCustomModelFields(show: Boolean) {
+            customModelLabel.isVisible = show
+            customModelField.isVisible = show
+            customModelRowLabel.height(if (show) customModelLabel.prefHeight else 0f).pad(if (show) 4f else 0f)
+            customModelRowField.height(if (show) customModelField.prefHeight else 0f).pad(if (show) 4f else 0f)
+            formTable.invalidateHierarchy()
+        }
+
+        // Replacing SelectBox items emits ChangeEvents. Ignore those while
+        // rebuilding choices so the first item cannot overwrite saved reasoning.
         fun updateThinkingLevels(currentModelSpec: ModelSpec) {
-            if (!currentModelSpec.supportsThinking) {
-                thinkingBox.isVisible = false
-                thinkingUnsupportedLabel.isVisible = true
-                workingProfile.reasoning = null
-            } else {
-                thinkingBox.isVisible = true
-                thinkingUnsupportedLabel.isVisible = false
-                val choices = currentModelSpec.supportedThinkingLevels.map { ThinkingChoice(it) }
-                thinkingBox.setItems(com.badlogic.gdx.utils.Array(choices.toTypedArray()))
-                val currentLevel = ThinkingLevel.fromWireValue(workingProfile.reasoning)
-                val matching = choices.firstOrNull { it.level == currentLevel }
-                    ?: choices.firstOrNull { it.level == currentModelSpec.defaultThinkingLevel }
-                    ?: choices.first()
-                thinkingBox.selected = matching
-                workingProfile.reasoning = matching.level.wireValue
+            val wasUpdating = updatingChoices
+            updatingChoices = true
+            try {
+                thinkingBox.isVisible = currentModelSpec.supportsThinking
+                thinkingUnsupportedLabel.isVisible = !currentModelSpec.supportsThinking
+                thinkingRow.height(if (currentModelSpec.supportsThinking) thinkingBox.prefHeight else 0f)
+                    .pad(if (currentModelSpec.supportsThinking) 4f else 0f)
+                unsupportedRow.height(if (currentModelSpec.supportsThinking) 0f else thinkingUnsupportedLabel.prefHeight)
+                    .pad(if (currentModelSpec.supportsThinking) 0f else 4f)
+                if (!currentModelSpec.supportsThinking) {
+                    workingProfile.reasoning = null
+                } else {
+                    val currentLevel = ThinkingLevel.fromWireValue(workingProfile.reasoning)
+                    val choices = currentModelSpec.supportedThinkingLevels.map { ThinkingChoice(it) }
+                    val matching = choices.firstOrNull { it.level == currentLevel }
+                        ?: choices.firstOrNull { it.level == currentModelSpec.defaultThinkingLevel }
+                        ?: choices.first()
+                    thinkingBox.setItems(com.badlogic.gdx.utils.Array(choices.toTypedArray()))
+                    thinkingBox.selected = matching
+                    workingProfile.reasoning = matching.level.wireValue
+                }
+                formTable.invalidateHierarchy()
+            } finally {
+                updatingChoices = wasUpdating
             }
         }
 
@@ -155,17 +179,21 @@ class AgentProfilePopup(
             // Add custom choice escape hatch
             choices.add(ModelChoice(AgentModelCatalog.customModel("", provider), isCustomChoice = true))
 
-            modelBox.setItems(com.badlogic.gdx.utils.Array(choices.toTypedArray()))
-
             // Select active model
             val selectedChoice = choices.firstOrNull { !it.isCustomChoice && it.spec.id == workingProfile.modelId }
                 ?: choices.firstOrNull { !it.isCustomChoice }
                 ?: choices.last()
 
-            modelBox.selected = selectedChoice
+            val wasUpdating = updatingChoices
+            updatingChoices = true
+            try {
+                modelBox.setItems(com.badlogic.gdx.utils.Array(choices.toTypedArray()))
+                modelBox.selected = selectedChoice
+            } finally {
+                updatingChoices = wasUpdating
+            }
             val isCustom = selectedChoice.isCustomChoice
-            customModelLabel.isVisible = isCustom
-            customModelField.isVisible = isCustom
+            showCustomModelFields(isCustom)
             if (isCustom) {
                 customModelField.text = workingProfile.modelId
             }
@@ -179,7 +207,8 @@ class AgentProfilePopup(
         }
 
         // Listeners
-        providerBox.addListener {
+        providerBox.onChange {
+            if (updatingChoices) return@onChange
             val newProvider = providerBox.selected
             if (newProvider != workingProfile.provider) {
                 workingProfile.provider = newProvider
@@ -188,14 +217,13 @@ class AgentProfilePopup(
                 workingProfile.reasoning = defaultSpec.defaultThinkingLevel.wireValue
                 updateModelChoices(newProvider)
             }
-            false
         }
 
-        modelBox.addListener {
-            val selected = modelBox.selected ?: return@addListener false
+        modelBox.onChange {
+            if (updatingChoices) return@onChange
+            val selected = modelBox.selected ?: return@onChange
             val isCustom = selected.isCustomChoice
-            customModelLabel.isVisible = isCustom
-            customModelField.isVisible = isCustom
+            showCustomModelFields(isCustom)
             if (isCustom) {
                 workingProfile.modelId = customModelField.text.trim()
                 val spec = AgentModelCatalog.customModel(workingProfile.modelId, workingProfile.provider)
@@ -204,32 +232,30 @@ class AgentProfilePopup(
                 workingProfile.modelId = selected.spec.id
                 updateThinkingLevels(selected.spec)
             }
-            false
         }
 
-        customModelField.addListener {
+        customModelField.onChange {
             if (modelBox.selected?.isCustomChoice == true) {
                 workingProfile.modelId = customModelField.text.trim()
             }
-            false
         }
 
-        thinkingBox.addListener {
+        thinkingBox.onChange {
+            if (updatingChoices) return@onChange
             val selected = thinkingBox.selected
             if (selected != null) {
                 workingProfile.reasoning = selected.level.wireValue
             }
-            false
         }
 
         // Initial setup
         updateModelChoices(workingProfile.provider)
 
-        // Add formTable to innerTable of popup
-        innerTable.add(formTable).width(contentWidth).row()
+        // Popup.add routes content into the scroll area, above the fixed buttons.
+        add(formTable).width(contentWidth).row()
 
         // Buttons
-        addButton("Save") {
+        addButton("Save", KeyCharAndCode.RETURN) {
             val name = nameField.text.trim()
             val provider = providerBox.selected
             val model = if (modelBox.selected?.isCustomChoice == true) {
@@ -262,6 +288,11 @@ class AgentProfilePopup(
                 return@addButton
             }
 
+            val startingBonuses = try { bonuses.read() } catch (ex: IllegalArgumentException) {
+                errorLabel.setText(ex.message)
+                return@addButton
+            }
+
             // Commit to authoritative profile
             profile.displayName = name
             profile.provider = provider
@@ -269,6 +300,7 @@ class AgentProfilePopup(
             profile.reasoning = thinkingLevel.wireValue
             profile.personality = personality
             profile.profileRevision++
+            player.startingBonuses = startingBonuses
 
             table.update()
             onSave()
@@ -276,6 +308,7 @@ class AgentProfilePopup(
         }
 
         addCloseButton("Cancel")
+        equalizeLastTwoButtonWidths()
         open()
     }
 }

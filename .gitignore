@@ -189,6 +189,7 @@ detekt/reports.html
 
 # Agent-match runtime and build artifacts (AI_AGENT_PLAN.md §7.4)
 .agent-data/
+/userdata/
 *.unciv-agent
 agent-runner/node_modules/
 agent-runner/dist/
@@ -204,3 +205,6 @@ agent-protocol/*.local.json
 /buildSrc/.kotlin/errors/*
 /buildSrc/.kotlin/sessions/*
 /.claude/
+
+# Local agent implementation and publication ledgers
+/.superpowers/

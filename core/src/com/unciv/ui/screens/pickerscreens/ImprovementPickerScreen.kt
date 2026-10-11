@@ -2,6 +2,7 @@ package com.unciv.ui.screens.pickerscreens
 
 import com.unciv.UncivGame
 import com.unciv.logic.agents.BuildImprovementCommand
+import com.unciv.logic.agents.QueueWorkerImprovementsCommand
 import com.unciv.logic.agents.StopImprovementCommand
 
 import com.badlogic.gdx.graphics.Color
@@ -75,18 +76,13 @@ class ImprovementPickerScreen(
                         })
                     }) { game.popScreen(); return }
             } else if (worldScreen.routeThroughAgentSession {
-                    buildList {
-                        if (improvement.name != tile.improvementInProgress)
-                            add({ r: Int ->
-                                BuildImprovementCommand(unit.civ.civID, "ui-${System.nanoTime()}", r,
-                                    unit.id, improvement.name)
-                            })
-                        if (secondImprovement != null)
-                            add({ r: Int ->
-                                BuildImprovementCommand(unit.civ.civID, "ui-${System.nanoTime()}", r,
-                                    unit.id, secondImprovement.name)
-                            })
-                    }
+                    if (secondImprovement != null) listOf({ r: Int ->
+                        QueueWorkerImprovementsCommand(unit.civ.civID, "ui-${System.nanoTime()}", r,
+                            unit.id, listOf(improvement.name, secondImprovement.name))
+                    }) else if (improvement.name != tile.improvementInProgress) listOf({ r: Int ->
+                        BuildImprovementCommand(unit.civ.civID, "ui-${System.nanoTime()}", r,
+                            unit.id, improvement.name)
+                    }) else emptyList()
                 }) { game.popScreen(); return }
         }
         if (improvement.name == Constants.cancelImprovementOrder) {

@@ -30,9 +30,7 @@ object AgentOrdinarySave {
         }
         return try {
             require(encoded.isNotBlank()) { "Empty agent metadata" }
-            val match = json().fromJson(AgentMatchState::class.java, encoded)
-                ?: throw IllegalArgumentException("Empty agent metadata")
-            match.validateFormat()
+            val match = migrateAgentMatchStateJson(encoded)
             require(match.matchId.isNotBlank() && match.timelineId.isNotBlank()) { "Missing match identity" }
             require(match.matchId.matches(Regex("[A-Za-z0-9_-]{1,128}"))) { "Invalid match identity" }
             require(match.stateRevision >= 0 && match.turnSerial >= 0 && match.endTurnsCommitted >= 0) {
@@ -69,6 +67,7 @@ object AgentOrdinarySave {
 
     fun prepareForLoad(game: GameInfo): AgentMatchState? = read(game)?.also {
         game.suppressAutomationDuringTransients = true
+        game.agentNormalVisibility = true
     }
 
     /** Rebuild operational setup only; the saved controller state stays authoritative. */

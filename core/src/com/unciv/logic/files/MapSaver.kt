@@ -5,6 +5,8 @@ import com.unciv.UncivGame
 import com.unciv.json.json
 import com.unciv.logic.map.MapParameters
 import com.unciv.logic.map.TileMap
+import com.unciv.utils.Log
+import kotlinx.coroutines.CancellationException
 
 object MapSaver {
 
@@ -37,6 +39,18 @@ object MapSaver {
     }
 
     fun getMaps(): Array<FileHandle> = UncivGame.Current.files.getLocalFile(mapsFolder).list()
+
+    fun getMapPreviews(mapFiles: Sequence<FileHandle>): Sequence<Pair<FileHandle, TileMap.Preview>> =
+        mapFiles.filter { !it.isDirectory && !it.name().startsWith('.') }.mapNotNull { file ->
+            try {
+                file to loadMapPreview(file)
+            } catch (ex: CancellationException) {
+                throw ex
+            } catch (ex: Exception) {
+                Log.error("Could not read map preview from %s: %s", file.path(), ex)
+                null
+            }
+        }
 
     private fun mapFromJson(json: String): TileMap = json().fromJson(TileMap::class.java, json)
 

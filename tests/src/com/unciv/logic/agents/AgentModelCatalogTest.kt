@@ -9,12 +9,46 @@ import org.junit.runner.RunWith
 class AgentModelCatalogTest {
 
     @Test
-    fun `codex defaults to gpt-5-6-luna with low thinking`() {
+    fun `codex default respects a discovered catalog without luna`() {
+        val discovered = AgentModelCatalog.CODEX_MODELS.first { it.id == "gpt-6.1-sol" }
+            .copy(defaultThinkingLevel = ThinkingLevel.MEDIUM, isDiscovered = true)
+        try {
+            AgentModelCatalog.setDiscoveredModels("codex", listOf(discovered))
+            val model = AgentModelCatalog.getDefaultModel("codex")
+            Assert.assertEquals(discovered.id, model.id)
+            Assert.assertEquals(ThinkingLevel.MEDIUM, model.defaultThinkingLevel)
+            val profile = AgentProfile.defaultFor("America", "codex")
+            Assert.assertEquals(discovered.id, profile.modelId)
+            Assert.assertEquals("medium", profile.reasoning)
+            Assert.assertTrue(AgentModelCatalog.validateProfile(profile).isEmpty())
+        } finally {
+            AgentModelCatalog.setDiscoveredModels("codex", emptyList())
+        }
+    }
+
+    @Test
+    fun `discovered luna default uses only supported reasoning levels`() {
+        val discovered = AgentModelCatalog.CODEX_MODELS.first { it.id == "gpt-6-luna" }
+            .copy(supportedThinkingLevels = listOf(ThinkingLevel.PROVIDER_DEFAULT, ThinkingLevel.LOW),
+                defaultThinkingLevel = ThinkingLevel.LOW, isDiscovered = true)
+        try {
+            AgentModelCatalog.setDiscoveredModels("codex", listOf(discovered))
+            val profile = AgentProfile.defaultFor("America", "codex")
+            Assert.assertEquals("gpt-6-luna", profile.modelId)
+            Assert.assertEquals("low", profile.reasoning)
+            Assert.assertTrue(AgentModelCatalog.validateProfile(profile).isEmpty())
+        } finally {
+            AgentModelCatalog.setDiscoveredModels("codex", emptyList())
+        }
+    }
+
+    @Test
+    fun `codex defaults to gpt-6-luna with xhigh thinking`() {
         val defaultModel = AgentModelCatalog.getDefaultModel("codex")
-        Assert.assertEquals("gpt-5.6-luna", defaultModel.id)
-        Assert.assertEquals("GPT-5.6 Luna", defaultModel.label)
-        Assert.assertEquals(ThinkingLevel.LOW, defaultModel.defaultThinkingLevel)
-        Assert.assertEquals("low", defaultModel.defaultThinkingLevel.wireValue)
+        Assert.assertEquals("gpt-6-luna", defaultModel.id)
+        Assert.assertEquals("GPT-6 Luna", defaultModel.label)
+        Assert.assertEquals(ThinkingLevel.XHIGH, defaultModel.defaultThinkingLevel)
+        Assert.assertEquals("xhigh", defaultModel.defaultThinkingLevel.wireValue)
         Assert.assertTrue(defaultModel.supportsThinking)
     }
 
@@ -22,12 +56,30 @@ class AgentModelCatalogTest {
     fun `profile factory produces valid luna profile`() {
         val profile = AgentProfile.defaultFor("America", "codex")
         Assert.assertEquals("codex", profile.provider)
-        Assert.assertEquals("gpt-5.6-luna", profile.modelId)
-        Assert.assertEquals("low", profile.reasoning)
-        Assert.assertEquals("GPT-5.6 Luna America", profile.displayName)
+        Assert.assertEquals("gpt-6-luna", profile.modelId)
+        Assert.assertEquals("xhigh", profile.reasoning)
+        Assert.assertEquals("GPT-6 Luna America", profile.displayName)
 
         val errors = AgentModelCatalog.validateProfile(profile)
         Assert.assertTrue("Expected no errors but got: $errors", errors.isEmpty())
+    }
+
+    @Test
+    fun `luna max and sol reasoning levels round trip without substitution`() {
+        for (id in listOf("gpt-6-luna", "gpt-6.1-sol")) {
+            val spec = AgentModelCatalog.findModel("codex", id)
+            for (wire in listOf("low", "medium", "high", "xhigh", "max")) {
+                val level = ThinkingLevel.fromWireValue(wire)
+                Assert.assertEquals(wire, level.wireValue)
+                Assert.assertEquals(level, AgentModelCatalog.revalidateThinkingLevel(spec, level))
+                Assert.assertNull(AgentModelCatalog.validateThinkingLevel("codex", id, level))
+            }
+        }
+        Assert.assertNull(AgentModelCatalog.validateThinkingLevel("codex", "gpt-6.1-sol", ThinkingLevel.ULTRA))
+        Assert.assertNotNull(AgentModelCatalog.validateThinkingLevel("codex", "gpt-6-luna", ThinkingLevel.ULTRA))
+        val saved = AgentProfile.defaultFor("Rome").apply { modelId = "gpt-5.6-luna"; reasoning = "low" }
+        Assert.assertTrue(AgentModelCatalog.validateProfile(saved).isEmpty())
+        Assert.assertEquals("gpt-5.6-luna", saved.modelId)
     }
 
     @Test
@@ -91,4 +143,29 @@ class AgentModelCatalogTest {
         val errs2 = AgentModelCatalog.validateProfile(gpt4oWithThinking)
         Assert.assertTrue(errs2.any { it.contains("does not support thinking levels") })
     }
+    @Test
+    fun `deepseek flash via opencode go has verified efforts and stays selectable without discovery`() {
+        AgentModelCatalog.setDiscoveredModels("opencode", emptyList())
+        val model = AgentModelCatalog.getModelsForProvider("opencode")
+            .first { it.id == "opencode-go/deepseek-v4.1-flash" }
+        Assert.assertEquals("OpenCode Go: DeepSeek V4.1 Flash", model.label)
+        Assert.assertFalse(model.isCustom)
+        Assert.assertEquals(listOf(ThinkingLevel.PROVIDER_DEFAULT, ThinkingLevel.LOW, ThinkingLevel.HIGH, ThinkingLevel.MAX), model.supportedThinkingLevels)
+        for (level in model.supportedThinkingLevels)
+            Assert.assertNull(AgentModelCatalog.validateThinkingLevel("opencode", model.id, level))
+        Assert.assertNotNull(AgentModelCatalog.validateThinkingLevel("opencode", model.id, ThinkingLevel.MEDIUM))
+        Assert.assertNotNull(AgentModelCatalog.validateThinkingLevel("opencode", model.id, ThinkingLevel.OFF))
+        Assert.assertEquals("openai/gpt-5.6-luna", AgentModelCatalog.getDefaultModel("opencode").id)
+        try {
+            AgentModelCatalog.setDiscoveredModels("opencode", listOf(AgentModelCatalog.OPENCODE_MODELS.first()))
+            Assert.assertTrue(AgentModelCatalog.getModelsForProvider("opencode").any { it.id == model.id })
+            AgentModelCatalog.setDiscoveredModels("opencode", listOf(model.copy(supportedThinkingLevels = listOf(ThinkingLevel.MEDIUM), isDiscovered = true)))
+            val discovered = AgentModelCatalog.getModelsForProvider("opencode").first { it.id == model.id }
+            Assert.assertEquals(model.supportedThinkingLevels, discovered.supportedThinkingLevels)
+            Assert.assertTrue(discovered.isDiscovered)
+        } finally {
+            AgentModelCatalog.setDiscoveredModels("opencode", emptyList())
+        }
+    }
+
 }

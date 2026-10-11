@@ -73,7 +73,12 @@ open class ZoomableScrollPane(
         val group: Group? = super.getActor() as Group?
         if (group != null) {
             group.clearChildren()
-            group.addActor(content)
+            if (content != null) group.addActor(content)
+            // The wrapper stays in the ScrollPane when map snapshots replace
+            // its child. Refresh its padding and scroll range even if the pane
+            // itself has not changed size.
+            updatePadding()
+            invalidateHierarchy()
         } else {
             super.setActor(content)
         }

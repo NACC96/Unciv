@@ -59,6 +59,7 @@ import com.unciv.ui.screens.worldscreen.chat.ChatButton
 import com.unciv.ui.screens.worldscreen.mainmenu.WorldScreenMusicPopup
 import com.unciv.ui.screens.worldscreen.minimap.MinimapHolder
 import com.unciv.ui.screens.worldscreen.status.AutoPlayStatusButton
+import com.unciv.ui.screens.worldscreen.status.AgentMessagesPanel
 import com.unciv.ui.screens.worldscreen.status.MultiplayerStatusButton
 import com.unciv.ui.screens.worldscreen.status.NextTurnButton
 import com.unciv.ui.screens.worldscreen.status.NextTurnProgress
@@ -132,9 +133,11 @@ class WorldScreen(
 
     /** The [viewingCiv]'s own perspective.
      * This should only ever be used A. for spectators B. when forOfWar is false, for specific UI elements */
-    private val spectatorGameView by lazy {
+    private var cachedSpectatorGameView: GameView? = null
+    private val spectatorGameView get(): GameView {
         if (!viewingCiv.isSpectator()) throw Exception("Managed to disable fog of war without being spectator?!")
-        GameView(gameInfo, viewingCiv, spectatorMode = true)
+        return cachedSpectatorGameView ?: GameView(gameInfo, viewingCiv, spectatorMode = true)
+            .also { cachedSpectatorGameView = it }
     }  
     fun getGameViewConsideringForOfWar() = if (fogOfWar) selectedGameView else spectatorGameView    
 
@@ -150,11 +153,28 @@ class WorldScreen(
      */
     var agentSession: AgentMatchSession? = null
 
-    /** Retire the host before releasing its screen; repeated disposal is harmless. */
+    /** The session owns asynchronous work, so detach it before releasing this screen's resources. */
     fun closeAgentSession() {
         val session = agentSession ?: return
         agentSession = null
         session.close()
+    }
+
+    private var civilizationOverview: com.unciv.ui.screens.worldscreen.overview.CivilizationOverviewPanel? = null
+
+    fun toggleCivilizationOverview() {
+        val panel = civilizationOverview
+        if (panel == null || !panel.isVisible) {
+            // These floating detail panels share the right side of the map; Activity remains independent.
+            stage.root.children.filterIsInstance<AgentMessagesPanel>().forEach { it.hide() }
+        }
+        if (panel == null) civilizationOverview = com.unciv.ui.screens.worldscreen.overview.CivilizationOverviewPanel(this)
+        else panel.toggle()
+        shouldUpdate = true
+    }
+
+    fun hideCivilizationOverview() {
+        civilizationOverview?.hide()
     }
 
     /** `true` when it's the player's turn unless he is a spectator.
@@ -192,7 +212,7 @@ class WorldScreen(
     /** Selection handles the host captures before serialization. */
     fun currentViewerCivId(): String = viewingCiv.civID
     fun currentSelectedUnitId(): Int? = bottomUnitTable.selectedUnit?.id
-    fun currentSelectedCityId(): String? = null // city screens attach below the session
+    fun currentSelectedCityId(): String? = bottomUnitTable.selectedCity?.getCity()?.id
     fun currentSelectedTilePos(): HexCoord? = mapHolder.selectedTile?.position()
 
     /**
@@ -217,6 +237,7 @@ class WorldScreen(
         viewingCiv = newViewer
         selectedCiv = snapshot.civilizations.firstOrNull { it.civID == selectedCiv.civID } ?: newViewer
         selectedGameView = GameView(snapshot, selectedCiv, spectatorMode = viewingCiv.isSpectator())
+        cachedSpectatorGameView = null
         isPlayersTurn = viewingCiv.isCurrentPlayer()
 
         // Rebind the map layer to the new object graph.
@@ -228,13 +249,16 @@ class WorldScreen(
                 .firstOrNull { it.id == id }
         }
         val unitView = unit?.let { selectedGameView.getMapUnitView(it) }
-        bottomUnitTable.reselectAfterSnapshot(unitView)
-        selection.tile?.let { pos ->
+        val cityView = selection.cityId?.let { id ->
+            snapshot.getCities().firstOrNull { it.id == id }?.let { selectedGameView.getForeignCityView(it) }
+        }
+        bottomUnitTable.reselectAfterSnapshot(unitView, cityView)
+        mapHolder.selectedTile = selection.tile?.let { pos ->
             val tile = snapshot.tileMap.values.firstOrNull { it.position == pos }
-            if (tile != null) mapHolder.selectedTile = selectedGameView.getTile(tile)
-            else mapHolder.selectedTile = null
+            tile?.let { selectedGameView.getTile(it) }
         }
         shouldUpdate = true
+        Gdx.graphics.requestRendering()
     }
 
     //endregion
@@ -351,6 +375,7 @@ class WorldScreen(
         resizeDeferTimer?.cancel()
         events.stopReceiving()
         statusButtons.dispose()
+        civilizationOverview?.dispose()
         super.dispose()
     }
 
@@ -539,6 +564,7 @@ class WorldScreen(
         mapHolder.updateTiles(getGameViewConsideringForOfWar().civView)
 
         topBar.update(selectedCiv)
+        civilizationOverview?.takeIf { it.isVisible }?.refresh()
         if (tutorialTaskTable.isVisible)
             tutorialTaskTable.y = topBar.getYForTutorialTask() - tutorialTaskTable.height
 
@@ -885,6 +911,18 @@ class WorldScreen(
     private var resizeDeferTimer: Timer? = null
 
     override fun resize(width: Int, height: Int) {
+        if (agentSession != null) {
+            // Keep the live host and feed attached; reconstructing this screen
+            // discards the agent session. ExtendViewport scales down with the window.
+            stage.viewport.update(width, height, true)
+            notificationsScroll.width = stage.width / 2
+            minimapWrapper.x = stage.width - minimapWrapper.width
+            battleTable.width = stage.width / 3
+            battleTable.x = stage.width / 3
+            mapHolder.setSize(stage.width / mapHolder.scaleX, stage.height / mapHolder.scaleY)
+            shouldUpdate = true
+            return
+        }
         resizeDeferTimer?.cancel()
         if (resizeDeferTimer == null && stage.viewport.screenWidth == width && stage.viewport.screenHeight == height) return
         resizeDeferTimer = timer("Resize", daemon = true, 500L, Long.MAX_VALUE) {

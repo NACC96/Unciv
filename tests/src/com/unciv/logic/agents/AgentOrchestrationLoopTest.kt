@@ -18,21 +18,42 @@ import com.unciv.models.metadata.GameSetupInfo
 import com.unciv.models.metadata.Player
 import com.unciv.models.ruleset.RulesetCache
 import com.unciv.testing.BaseTestRunner
+import org.junit.After
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.File
 import java.nio.file.Files
 import java.util.UUID
-import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
+import java.util.concurrent.ExecutorService
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 
 @RunWith(BaseTestRunner::class)
 class AgentOrchestrationLoopTest {
+    private val matches = ArrayList<Pair<DesktopAgentMatch, TestSupervisor>>()
+    private val testExecutors = ArrayList<ExecutorService>()
+
+    @After fun drainScriptedMatchesBeforeTheNextFixture() {
+        for (executor in testExecutors) {
+            executor.shutdown()
+            Assert.assertTrue("All test resume requests must finish before draining the match",
+                executor.awaitTermination(5, TimeUnit.SECONDS))
+        }
+        for ((host, supervisor) in matches) {
+            host.pause()
+            Assert.assertTrue("Every scripted invocation must finish before the next test replaces global game state",
+                awaitCondition(10000) {
+                    supervisor.activeInvocations.get() == 0 && host.getRunState() in setOf(
+                        AgentRunState.PAUSED, AgentRunState.WAITING_HUMAN,
+                        AgentRunState.NEEDS_ATTENTION, AgentRunState.FINISHED)
+                })
+            host.close()
+        }
+    }
 
     private class TestSupervisor(
         private val answerEngineRequest: (String, Map<String, Any?>) -> Any?
@@ -90,7 +111,7 @@ class AgentOrchestrationLoopTest {
         override fun kill() {}
     }
 
-    private class MatchFixture(
+    private inner class MatchFixture(
         val playerConfigs: List<Pair<String, ControllerKind>>
     ) {
         val game: GameInfo
@@ -152,7 +173,7 @@ class AgentOrchestrationLoopTest {
                 setup = setup,
                 dataDir = tempDir,
                 supervisorFactory = { supervisor }
-            )
+            ).also { matches.add(it to supervisor) }
         }
     }
 
@@ -162,11 +183,9 @@ class AgentOrchestrationLoopTest {
             "Rome" to ControllerKind.EXTERNAL_AGENT,
             "Greece" to ControllerKind.EXTERNAL_AGENT
         ))
-        lateinit var supervisor: TestSupervisor
-        val desktopMatch = fixture.createMatch(TestSupervisor { m, p ->
-            desktopMatchRef?.answerEngineRequest(m, p)
-        }.also { supervisor = it })
-        desktopMatchRef = desktopMatch
+        lateinit var desktopMatch: DesktopAgentMatch
+        val supervisor = TestSupervisor { method, params -> desktopMatch.answerEngineRequest(method, params) }
+        desktopMatch = fixture.createMatch(supervisor)
 
         // We want to observe 4 completed turns (2 rounds: Rome, Greece, Rome, Greece).
         // The latch counts COMPLETIONS, not invocations: asserting order on a
@@ -203,11 +222,9 @@ class AgentOrchestrationLoopTest {
             "Rome" to ControllerKind.EXTERNAL_AGENT,
             "Greece" to ControllerKind.EXTERNAL_AGENT
         ))
-        lateinit var supervisor: TestSupervisor
-        val desktopMatch = fixture.createMatch(TestSupervisor { m, p ->
-            desktopMatchRef?.answerEngineRequest(m, p)
-        }.also { supervisor = it })
-        desktopMatchRef = desktopMatch
+        lateinit var desktopMatch: DesktopAgentMatch
+        val supervisor = TestSupervisor { method, params -> desktopMatch.answerEngineRequest(method, params) }
+        desktopMatch = fixture.createMatch(supervisor)
 
         val inFlightActiveCount = AtomicInteger(0)
         val maxSimultaneous = AtomicInteger(0)
@@ -237,11 +254,9 @@ class AgentOrchestrationLoopTest {
             "Rome" to ControllerKind.EXTERNAL_AGENT,
             "Greece" to ControllerKind.EXTERNAL_AGENT
         ))
-        lateinit var supervisor: TestSupervisor
-        val desktopMatch = fixture.createMatch(TestSupervisor { m, p ->
-            desktopMatchRef?.answerEngineRequest(m, p)
-        }.also { supervisor = it })
-        desktopMatchRef = desktopMatch
+        lateinit var desktopMatch: DesktopAgentMatch
+        val supervisor = TestSupervisor { method, params -> desktopMatch.answerEngineRequest(method, params) }
+        desktopMatch = fixture.createMatch(supervisor)
 
         val turnStarted = CountDownLatch(1)
         val allowTurnFinish = CountDownLatch(1)
@@ -292,11 +307,9 @@ class AgentOrchestrationLoopTest {
             "Rome" to ControllerKind.EXTERNAL_AGENT,
             "Greece" to ControllerKind.EXTERNAL_AGENT
         ))
-        lateinit var supervisor: TestSupervisor
-        val desktopMatch = fixture.createMatch(TestSupervisor { m, p ->
-            desktopMatchRef?.answerEngineRequest(m, p)
-        }.also { supervisor = it })
-        desktopMatchRef = desktopMatch
+        lateinit var desktopMatch: DesktopAgentMatch
+        val supervisor = TestSupervisor { method, params -> desktopMatch.answerEngineRequest(method, params) }
+        desktopMatch = fixture.createMatch(supervisor)
 
         val romeFinished = CountDownLatch(1)
         val allowRomeToFinish = CountDownLatch(1)
@@ -357,13 +370,11 @@ class AgentOrchestrationLoopTest {
             "Rome" to ControllerKind.EXTERNAL_AGENT,
             "Greece" to ControllerKind.EXTERNAL_AGENT
         ))
-        lateinit var supervisor: TestSupervisor
-        val desktopMatch = fixture.createMatch(TestSupervisor { m, p ->
-            desktopMatchRef?.answerEngineRequest(m, p)
-        }.also { supervisor = it })
-        desktopMatchRef = desktopMatch
+        lateinit var desktopMatch: DesktopAgentMatch
+        val supervisor = TestSupervisor { method, params -> desktopMatch.answerEngineRequest(method, params) }
+        desktopMatch = fixture.createMatch(supervisor)
 
-        val threadPool = Executors.newFixedThreadPool(8)
+        val threadPool = Executors.newFixedThreadPool(8).also { testExecutors.add(it) }
         val turnsToObserve = CountDownLatch(4)
         supervisor.onTurnInvoked = { _, _ ->
             turnsToObserve.countDown()
@@ -394,11 +405,9 @@ class AgentOrchestrationLoopTest {
             "Rome" to ControllerKind.EXTERNAL_AGENT,
             "Greece" to ControllerKind.EXTERNAL_AGENT
         ))
-        lateinit var supervisor: TestSupervisor
-        val desktopMatch = fixture.createMatch(TestSupervisor { m, p ->
-            desktopMatchRef?.answerEngineRequest(m, p)
-        }.also { supervisor = it })
-        desktopMatchRef = desktopMatch
+        lateinit var desktopMatch: DesktopAgentMatch
+        val supervisor = TestSupervisor { method, params -> desktopMatch.answerEngineRequest(method, params) }
+        desktopMatch = fixture.createMatch(supervisor)
 
         val failOnce = AtomicInteger(1)
         val failureObserved = CountDownLatch(1)
@@ -465,11 +474,9 @@ class AgentOrchestrationLoopTest {
             "Rome" to ControllerKind.EXTERNAL_AGENT,
             "Greece" to ControllerKind.HUMAN
         ))
-        lateinit var supervisor: TestSupervisor
-        val desktopMatch = fixture.createMatch(TestSupervisor { m, p ->
-            desktopMatchRef?.answerEngineRequest(m, p)
-        }.also { supervisor = it })
-        desktopMatchRef = desktopMatch
+        lateinit var desktopMatch: DesktopAgentMatch
+        val supervisor = TestSupervisor { method, params -> desktopMatch.answerEngineRequest(method, params) }
+        desktopMatch = fixture.createMatch(supervisor)
 
         desktopMatch.startAutomaticPlay()
 
@@ -506,11 +513,9 @@ class AgentOrchestrationLoopTest {
             "Rome" to ControllerKind.EXTERNAL_AGENT,
             "Greece" to ControllerKind.EXTERNAL_AGENT
         ))
-        lateinit var supervisor: TestSupervisor
-        val desktopMatch = fixture.createMatch(TestSupervisor { m, p ->
-            desktopMatchRef?.answerEngineRequest(m, p)
-        }.also { supervisor = it })
-        desktopMatchRef = desktopMatch
+        lateinit var desktopMatch: DesktopAgentMatch
+        val supervisor = TestSupervisor { method, params -> desktopMatch.answerEngineRequest(method, params) }
+        desktopMatch = fixture.createMatch(supervisor)
 
         // Let one turn complete
         val firstTurnLatch = CountDownLatch(1)
@@ -520,7 +525,8 @@ class AgentOrchestrationLoopTest {
         Assert.assertTrue(firstTurnLatch.await(5, TimeUnit.SECONDS))
         desktopMatch.pause()
 
-        awaitCondition(5000) { desktopMatch.getRunState() == AgentRunState.PAUSED }
+        Assert.assertTrue("The invocation must drain before forcing match completion",
+            awaitCondition(5000) { desktopMatch.getRunState() == AgentRunState.PAUSED })
 
         // Artificially complete the match on the coordinator
         desktopMatch.coordinator.forcePhaseForTest(TurnPhase.COMPLETED)
@@ -533,9 +539,6 @@ class AgentOrchestrationLoopTest {
     }
 
     companion object {
-        @Volatile
-        private var desktopMatchRef: DesktopAgentMatch? = null
-
         private fun awaitCondition(timeoutMs: Long, condition: () -> Boolean): Boolean {
             val deadline = System.currentTimeMillis() + timeoutMs
             while (System.currentTimeMillis() < deadline) {

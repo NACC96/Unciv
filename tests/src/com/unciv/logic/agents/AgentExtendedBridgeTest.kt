@@ -118,7 +118,7 @@ class AgentExtendedBridgeTest {
             Case("city.rename", { mapOf("cityId" to "missing", "newName" to "New City") }, "INVALID_ARGUMENT", "Unknown or foreign city"),
             Case("city.annex", { mapOf("cityId" to it.cityId) }, "ILLEGAL_ACTION", "City is not a puppet"),
             Case("city.raze", { mapOf("cityId" to "missing", "raze" to false) }, "ILLEGAL_ACTION", "No such city under your control"),
-            Case("unit.stopImprovement", { mapOf("unitId" to it.unitId) }, "ILLEGAL_ACTION", "No improvement in progress"),
+            Case("unit.stopImprovement", { mapOf("unitId" to it.unitId) }, "ILLEGAL_ACTION", "Unit cannot work on improvements now"),
             Case("unit.swap", { mapOf("unitId" to it.unitId, "destination" to mapOf("x" to 100, "y" to 100)) }, "ILLEGAL_ACTION", "Destination is not a tile"),
             Case("unit.rename", { mapOf("unitId" to -1, "newName" to "Named Unit") }, "ILLEGAL_ACTION", "No such visible unit"),
             Case("unit.connectRoad", { mapOf("unitId" to it.unitId, "destination" to mapOf("x" to 100, "y" to 100)) }, "ILLEGAL_ACTION", "Destination is not a tile"),
@@ -160,6 +160,29 @@ class AgentExtendedBridgeTest {
             }
         }
         assertEquals(0, f.writer.writeCount)
+    }
+
+    @Test fun `extended receipt and known tile survive format two save reload and replay`() {
+        val f = Fixture()
+        val revision = f.coordinator.getStateRevision()
+        val args = mapOf("unitId" to f.unitId, "newName" to "Legion")
+        val receipt = f.act("unit.rename", args)
+        val knownTile = f.bridge.inspectTile(f.romeId, mapOf("x" to 0, "y" to 0))
+        assertNotNull(knownTile)
+        val saved = f.coordinator.saveToJson()
+        val rawBundle = com.badlogic.gdx.utils.JsonReader().parse(saved)
+        assertEquals(AGENT_MATCH_FORMAT_VERSION, rawBundle.getInt("bundleVersion"))
+        assertEquals(AGENT_MATCH_FORMAT_VERSION,
+            com.badlogic.gdx.utils.JsonReader().parse(rawBundle.getString("matchJson")).getInt("formatVersion"))
+        val writer = InMemoryCheckpointWriter()
+        val restored = MatchCoordinator.loadFromJson(saved, writer)
+        val bridge = AgentEngineBridge(restored)
+        assertEquals(knownTile, bridge.inspectTile(f.romeId, mapOf("x" to 0, "y" to 0)))
+        assertEquals(receipt, bridge.act(mapOf(
+            "protocolVersion" to 1, "actionId" to "unit.rename", "expectedRevision" to revision,
+            "actorCivId" to f.romeId, "type" to "unit.rename", "args" to args)))
+        assertEquals(f.coordinator.getStateRevision(), restored.getStateRevision())
+        assertEquals(0, writer.writeCount)
     }
 
     @Test fun `rename arguments reach persisted entities and return sanitized results`() {

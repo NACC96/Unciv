@@ -117,7 +117,10 @@ tasks.register("macApp") {
         check(input.resolve("agent-runner/node_modules").isDirectory) { "Install agent-runner dependencies before macApp" }
         val dest = destination.get().asFile.apply { mkdirs() }
         val staging = NioFiles.createTempDirectory(dest.toPath(), ".unciv-native-app-").toFile()
-        val result = ProcessBuilder(
+        val dataOptions = System.getProperty("unciv.data.dir")?.let {
+            listOf("--java-options", "-Dunciv.data.dir=$it")
+        } ?: emptyList()
+        val result = ProcessBuilder(listOf(
             jpackage.absolutePath, "--type", "app-image", "--name", "Unciv",
             "--app-version", BuildConfig.appVersion,
             "--mac-package-identifier", "com.unciv.app",
@@ -125,7 +128,7 @@ tasks.register("macApp") {
             "--main-class", mainClassName, "--dest", staging.absolutePath,
             "--java-options", "-Xmx4G",
             "--icon", rootDir.resolve("extraImages/Icons/Unciv.icns").absolutePath
-        ).inheritIO().start().waitFor()
+        ) + dataOptions).inheritIO().start().waitFor()
         check(result == 0) { "jpackage failed ($result); staging retained at $staging" }
         val app = dest.resolve("Unciv.app")
         if (app.exists()) {

@@ -1,6 +1,7 @@
 package com.unciv.logic.agents
 
 import com.unciv.logic.map.HexCoord
+import com.unciv.json.json
 import com.unciv.models.metadata.BaseRuleset
 import com.unciv.testing.BaseTestRunner
 import com.unciv.testing.TestGame
@@ -16,7 +17,7 @@ import org.junit.runner.RunWith
 @RunWith(BaseTestRunner::class)
 class ObservationVisibilityTest {
 
-    private class Fixture {
+    private class Fixture(pendingBonuses: Boolean = false) {
         val testGame = TestGame(baseRuleset = BaseRuleset.Civ_V_Vanilla)
         val writer = InMemoryCheckpointWriter()
         lateinit var coordinator: MatchCoordinator
@@ -43,6 +44,10 @@ class ObservationVisibilityTest {
             farGreekId = testGame.addUnit("Warrior", greece, testGame.getTile(4, 0)).id
             nearGreekId = testGame.addUnit("Warrior", greece, testGame.getTile(2, 0)).id
             testGame.addCity(greece, testGame.getTile(4, 1))
+            if (pendingBonuses) {
+                rome.pendingStartingUnits["Nuclear Missile"] = 2
+                greece.pendingStartingUnits["Bomber"] = 4
+            }
 
             val match = AgentMatchState(
                 matchId = "m1", timelineId = "t1", turnPhase = TurnPhase.AWAITING_DECISIONS
@@ -139,5 +144,16 @@ class ObservationVisibilityTest {
         val rules = f.coordinator.rules()
         Assert.assertEquals(BaseRuleset.Civ_V_Vanilla.fullName, rules.baseRuleset)
         Assert.assertTrue(rules.note.isNotEmpty())
+    }
+
+    @Test
+    fun `agent observation shows copied pending bonuses for its own civilization only`() {
+        val f = Fixture(pendingBonuses = true)
+        val obs = f.coordinator.observe(f.romeId)
+        val encoded = json().toJson(obs.empire)
+        Assert.assertTrue("Waiting units must be visible to the agent", encoded.contains("Nuclear Missile"))
+        Assert.assertFalse("Another nation's waiting bonuses are private", encoded.contains("Bomber"))
+        obs.empire.pendingStartingUnits.clear()
+        Assert.assertEquals(2, f.coordinator.observe(f.romeId).empire.pendingStartingUnits["Nuclear Missile"])
     }
 }

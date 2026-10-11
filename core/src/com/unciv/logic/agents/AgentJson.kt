@@ -13,9 +13,20 @@ import com.badlogic.gdx.utils.JsonValue
 object AgentJson {
     fun stringify(value: Any?): String = when (value) {
         null -> "null"
-        is String -> "\"" + value
-            .replace("\\", "\\\\").replace("\"", "\\\"")
-            .replace("\n", "\\n").replace("\r", "\\r").replace("\t", "\\t") + "\""
+        is String -> buildString {
+            append('"')
+            for (character in value) when (character) {
+                '\\' -> append("\\\\")
+                '"' -> append("\\\"")
+                '\n' -> append("\\n")
+                '\r' -> append("\\r")
+                '\t' -> append("\\t")
+                else -> if (character.code < 0x20)
+                    append("\\u").append(character.code.toString(16).padStart(4, '0'))
+                else append(character)
+            }
+            append('"')
+        }
         is Boolean -> value.toString()
         is Number -> {
             val long = value.toLong()

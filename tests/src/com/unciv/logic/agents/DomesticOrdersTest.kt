@@ -51,6 +51,7 @@ class DomesticOrdersTest {
             testGame.gameInfo.getCivilization(romeId).units.getCivUnits()
                 .first { it.id == warriorId }.promotions.XP = 20
             workerId = testGame.addUnit("Worker", rome, testGame.getTile(-2, 0)).id
+            testGame.addTileToCity(city, testGame.getTile(-2, 0))
             testGame.setTileTerrainAndFeatures(HexCoord(-2, 0), "Desert", "Flood plains")
             settlerId = testGame.addUnit("Settler", rome, testGame.getTile(0, -1)).id
             // Engineer must stand on the city center to hurry; scientist works anywhere.
@@ -153,9 +154,9 @@ class DomesticOrdersTest {
         // Tile purchase transfers ownership with gold (tile near the city,
         // outside any other borders — (2,0) belongs to Cape Town's ring).
         val bought = f.coordinator.execute(BuyTileCommand(f.romeId, "z9", f.rev(), f.cityId,
-            HexCoord(-2, 0))) as TileBoughtResult
-        Assert.assertEquals(HexCoord(-2, 0), bought.tilePos)
-        Assert.assertEquals(f.romeId, f.coordinator.getTileOwnerCiv(-2, 0))
+            HexCoord(0, -2))) as TileBoughtResult
+        Assert.assertEquals(HexCoord(0, -2), bought.tilePos)
+        Assert.assertEquals(f.romeId, f.coordinator.getTileOwnerCiv(0, -2))
     }
 
     @Test

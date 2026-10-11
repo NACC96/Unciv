@@ -46,6 +46,7 @@ class GameStarter private constructor(
 
     private val gameInfo = GameInfo()
     private val rng = GameContext(gameInfo = gameInfo).stateBasedRandom("GameStarter")
+    private var startingBonuses = emptyMap<String, com.unciv.models.metadata.StartingBonuses>()
     private val ruleset: Ruleset
     private lateinit var tileMap: TileMap
 
@@ -94,6 +95,7 @@ class GameStarter private constructor(
             tileMap.gameInfo = gameInfo // need to set this transient before placing units in the map
             addCivilizations(phaseOneChosenCivs) // this is before gameInfo.setTransients, so gameInfo doesn't yet have the gameBasics
         }
+        startingBonuses = phaseOneChosenCivs.associate { it.chosenCiv to it.startingBonuses.copy() }
 
         runAndMeasure("Remove units") {
             // Remove units for civs that aren't in this game
@@ -305,14 +307,16 @@ class GameStarter private constructor(
                     .thenBy { it.playerType == PlayerType.AI }) // Human before AI
                 // ...another for the extra random ones
                 + (0 until extraRandomAIPlayers).asSequence().map { Player() }
-            ).mapNotNull {
+            ).mapNotNull { slot ->
                 // Resolve random players
-                when {
-                    it.chosenCiv != Constants.random -> Player(ruleset.nations[it.chosenCiv]!!, it.playerType, it.playerId)
-                    presetRandomNationsPool.isNotEmpty() -> Player(presetRandomNationsPool.removeLast(), it.playerType, it.playerId)
-                    randomNationsPool.isNotEmpty() -> Player(randomNationsPool.removeLast(), it.playerType, it.playerId)
+                @LocalState val resolved = when {
+                    slot.chosenCiv != Constants.random -> Player(ruleset.nations[slot.chosenCiv]!!, slot.playerType, slot.playerId)
+                    presetRandomNationsPool.isNotEmpty() -> Player(presetRandomNationsPool.removeLast(), slot.playerType, slot.playerId)
+                    randomNationsPool.isNotEmpty() -> Player(randomNationsPool.removeLast(), slot.playerType, slot.playerId)
                     else -> null
                 }
+                if (resolved != null) resolved.startingBonuses = slot.startingBonuses.copy()
+                resolved
             }.toMutableList()
 
         // ensure Spectators always first players
@@ -436,6 +440,9 @@ class GameStarter private constructor(
             val startingUnits = getStartingUnitsForEraAndDifficulty(civ, startingEra)
             adjustStartingUnitsForCityStatesAndOneCityChallenge(civ, startingUnits, settlerLikeUnits)
             placeStartingUnits(civ, startingLocation, startingUnits, ruleset.eras[startingEra]!!.startingMilitaryUnit, settlerLikeUnits)
+            startingBonuses[civ.civID]?.let { bonuses ->
+                StartingBonusApplicator.apply(civ, startingLocation, bonuses, startingLocations.values)
+            }
 
             // Trigger any global or nation uniques that should be triggered.
             // We may need the starting location for some uniques, which is why we're doing it now

@@ -13,10 +13,12 @@ import type {
   FakeReceipt,
   FakeUnit,
   ObservedUnit,
-  EngineLegalActions,
+  LegalActionsResult,
   GameObserveResult,
   IGameService,
 } from "./fake-game-mcp.js";
+
+import type { HexPosition, MapQuery, MapPage, ObservedTile, RulesQuery, RulesResult } from "./map-types.js";
 
 export class EngineDisconnected extends Error {
   constructor(message = "engine disconnected") {
@@ -101,12 +103,13 @@ export class StdioEngineBackend implements IGameService {
       this.pending.set(id, {
         resolve: (frame) => {
           if (!frame.ok) {
-            const err = (frame.error ?? { code: "INTERNAL_ERROR", message: "engine error" }) as {
-              code: string;
-              message: string;
-            };
-            const typed = new Error(err.message) as Error & { code?: string };
-            typed.code = err.code;
+            const err = frame.error ?? { code: "INTERNAL_ERROR", message: "engine error" };
+            const typed = Object.assign(new Error(err.message), {
+              code: err.code,
+              ...(err.currentRevision !== undefined ? { currentRevision: err.currentRevision } : {}),
+              ...(err.actionId !== undefined ? { actionId: err.actionId } : {}),
+              ...(err.messageIds !== undefined ? { messageIds: err.messageIds } : {}),
+            });
             reject(typed);
             return;
           }
@@ -127,13 +130,20 @@ export class StdioEngineBackend implements IGameService {
     return this.call("inspect", { civId: this.actorCivId(), unitId });
   }
 
-  async rules(): Promise<{ ruleset: string; note: string }> {
-    return this.call("rules", {});
+  async inspectTile(position: HexPosition): Promise<ObservedTile | FakeError | null> {
+    return this.call("inspect_tile", { ...position, civId: this.actorCivId() });
   }
 
-  async legalActions(unitId?: number, cityId?: string): Promise<{ unitId: number; actions: unknown[] } | EngineLegalActions | FakeError> {
-    return this.call("legal_actions", { civId: this.actorCivId(),
-      ...(unitId !== undefined ? { unitId } : {}), ...(cityId !== undefined ? { cityId } : {}) });
+  async map(query: MapQuery = {}): Promise<MapPage | FakeError> {
+    return this.call("map", { ...query, civId: this.actorCivId() });
+  }
+
+  async rules(query: RulesQuery = {}): Promise<RulesResult | FakeError> {
+    return this.call("rules", { ...query });
+  }
+
+  async legalActions(unitId?: number, cityId?: string): Promise<LegalActionsResult | FakeError> {
+    return this.call("legal_actions", { civId: this.actorCivId(), ...(unitId !== undefined ? { unitId } : {}), ...(cityId !== undefined ? { cityId } : {}) });
   }
 
   async act(envelope: {

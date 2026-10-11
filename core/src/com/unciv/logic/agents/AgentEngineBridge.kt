@@ -19,7 +19,8 @@ import com.unciv.logic.trade.TradeOfferType
 class EngineCallException(
     val code: String,
     message: String,
-    val currentRevision: Int? = null
+    val currentRevision: Int? = null,
+    val messageIds: List<String>? = null
 ) : Exception(message)
 
 class AgentEngineBridge(val coordinator: MatchCoordinator) {
@@ -34,6 +35,7 @@ class AgentEngineBridge(val coordinator: MatchCoordinator) {
     ).apply {
         ignoreUnknownFields = true
         setUsePrototypes(false)
+        setTypeName(null)
     }
 
     /**
@@ -137,6 +139,18 @@ class AgentEngineBridge(val coordinator: MatchCoordinator) {
 
         try {
             return when (type) {
+                "diplomacy.message" -> {
+                    val result = coordinator.execute(SendDiplomaticMessageCommand(
+                        actorCivId, actionId, expectedRevision,
+                        requireString(args, "targetCivId"), requireString(args, "text"))) as DiplomaticMessageSentResult
+                    receiptMap(result.receipt, toJsonMap(result.message), decisionsFor(actorCivId))
+                }
+                "diplomacy.acknowledgeMessage" -> {
+                    val result = coordinator.execute(AcknowledgeDiplomaticMessageCommand(
+                        actorCivId, actionId, expectedRevision,
+                        requireString(args, "messageId"), requireString(args, "text"))) as DiplomaticMessageAcknowledgedResult
+                    receiptMap(result.receipt, toJsonMap(result.message), decisionsFor(actorCivId))
+                }
                 "unit.move" -> {
                     val result = coordinator.execute(MoveUnitCommand(
                         actorCivId, actionId, expectedRevision,
@@ -428,7 +442,7 @@ class AgentEngineBridge(val coordinator: MatchCoordinator) {
                 else -> throw EngineCallException("INVALID_ARGUMENT", "Unknown command type $type")
             }
         } catch (ex: AgentCommandException) {
-            throw EngineCallException(ex.code.name, ex.message ?: ex.code.name, ex.currentRevision)
+            throw EngineCallException(ex.code.name, ex.message ?: ex.code.name, ex.currentRevision, ex.messageIds)
         }
     }
 
@@ -451,8 +465,51 @@ class AgentEngineBridge(val coordinator: MatchCoordinator) {
         }
     }
 
-    /** game.rules — static summary. */
-    fun rules(): Any = toJsonMap(coordinator.rules())
+    private fun readInteger(args: Map<String, Any?>, name: String, default: Int? = null): Int {
+        if (!args.containsKey(name)) return default
+            ?: throw EngineCallException("INVALID_ARGUMENT", "Missing integer argument $name")
+        val number = args[name] as? Number
+            ?: throw EngineCallException("INVALID_ARGUMENT", "Invalid integer argument $name")
+        val value = number.toDouble()
+        if (!value.isFinite() || value < Int.MIN_VALUE || value > Int.MAX_VALUE || value != number.toInt().toDouble())
+            throw EngineCallException("INVALID_ARGUMENT", "Invalid integer argument $name")
+        return number.toInt()
+    }
+
+    /** game.tile — unknown and nonexistent tiles share null. */
+    fun inspectTile(actorCivId: String, args: Map<String, Any?>): Any? = readResult {
+        coordinator.inspectTile(actorCivId, HexCoord(readInteger(args, "x"), readInteger(args, "y")))
+            ?.toWire()
+    }
+
+    /** game.map — bounded actor-scoped reads of committed knowledge. */
+    fun map(actorCivId: String, args: Map<String, Any?>): Any? = readResult {
+        val mode = if (args.containsKey("mode")) requireEnum<MapQueryMode>(args, "mode") else MapQueryMode.KNOWN
+        val center = if (args.containsKey("center")) {
+            @Suppress("UNCHECKED_CAST")
+            val position = args["center"] as? Map<String, Any?>
+                ?: throw EngineCallException("INVALID_ARGUMENT", "Invalid center")
+            HexCoord(readInteger(position, "x"), readInteger(position, "y"))
+        } else null
+        coordinator.map(actorCivId, MapQuery(mode, center,
+            if (args.containsKey("radius")) readInteger(args, "radius") else null,
+            readInteger(args, "limit", 64), optionalReadString(args, "cursor"))).toWire()
+    }
+
+    private fun optionalReadString(args: Map<String, Any?>, name: String): String? =
+        if (!args.containsKey(name)) null else args[name] as? String
+            ?: throw EngineCallException("INVALID_ARGUMENT", "Invalid string argument $name")
+
+    private inline fun readResult(block: () -> Any?): Any? = try { block() }
+    catch (ex: AgentCommandException) {
+        throw EngineCallException(ex.code.name, ex.message ?: ex.code.name, ex.currentRevision)
+    }
+
+    /** game.rules — identity by default; bounded section catalogs otherwise. */
+    fun rules(args: Map<String, Any?> = emptyMap()): Any = readResult {
+        toJsonMap(coordinator.rules(RulesQuery(optionalReadString(args, "section"),
+            optionalReadString(args, "name"), readInteger(args, "limit", 64), optionalReadString(args, "cursor"))))
+    }!!
 
     /** game.legal_actions — gated per-entity options. */
     fun legalActions(actorCivId: String, unitId: Int?, cityId: String?): Any {
@@ -464,15 +521,28 @@ class AgentEngineBridge(val coordinator: MatchCoordinator) {
     }
 
     /** game.action_result — prior receipt lookup without resubmission. */
-    fun actionResult(actionId: String): Any {
+    fun actionResult(actionId: String, actorCivId: String = coordinator.getCurrentCivId()): Any {
+        val unavailable = mapOf("status" to "rejected", "actionId" to actionId)
         val receipt = coordinator.getReceipt(actionId)
-            ?: return mapOf("status" to "rejected", "actionId" to actionId)
+            ?: return unavailable
+        val acknowledgement = receipt.requestFingerprint.startsWith("diplomacy.acknowledgeMessage|")
+        val diplomatic = acknowledgement || receipt.requestFingerprint.startsWith("diplomacy.message|")
+        val result = if (diplomatic) {
+            // IDs alone grant no access, including to a receipt's actor/revision metadata.
+            if (receipt.actorCivId != actorCivId || receipt.status() != "applied") return unavailable
+            val message = coordinator.getMessageHistory(actorCivId).firstOrNull {
+                it.messageId == receipt.resultJson &&
+                    (!acknowledgement || (it.targetCivId == actorCivId &&
+                        it.acknowledgedTurnSerial != null && it.acknowledgementText != null))
+            } ?: return unavailable
+            toJsonMap(message)
+        } else receipt.resultJson
         return mapOf(
             "protocolVersion" to 1,
             "actionId" to receipt.actionId,
             "status" to receipt.status(),
             "revision" to receipt.afterRevision,
-            "result" to receipt.resultJson,
+            "result" to result,
             "pendingDecisions" to emptyList<Any>()
         )
     }
@@ -514,7 +584,7 @@ class AgentEngineBridge(val coordinator: MatchCoordinator) {
                 "revision" to result.receipt.afterRevision
             )
         } catch (ex: AgentCommandException) {
-            throw EngineCallException(ex.code.name, ex.message ?: ex.code.name, ex.currentRevision)
+            throw EngineCallException(ex.code.name, ex.message ?: ex.code.name, ex.currentRevision, ex.messageIds)
         }
     }
 

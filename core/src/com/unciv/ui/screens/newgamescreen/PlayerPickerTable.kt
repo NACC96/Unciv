@@ -89,8 +89,7 @@ class PlayerPickerTable(
         watchAgentsBtn.onClick { setupSpectatorAgentMatch() }
         add(watchAgentsBtn).padTop(5f).padBottom(5f).row()
 
-        gameParameters.shufflePlayerOrder = false
-        add("Shuffle Civ Order at Start".toCheckBox(false) { gameParameters.shufflePlayerOrder = it }).padTop(2f).padBottom(5f).row()
+        add("Shuffle Civ Order at Start".toCheckBox(gameParameters.shufflePlayerOrder) { gameParameters.shufflePlayerOrder = it }).padTop(2f).padBottom(5f).row()
         add(ScrollPane(playerListTable).apply { setOverscroll(false, false) }).width(civBlocksWidth)
         update()
         background = BaseScreen.skinStrings.getUiBackground("NewGameScreen/PlayerPickerTable", tintColor = BaseScreen.skinStrings.skinConfig.clearColor)
@@ -206,6 +205,26 @@ class PlayerPickerTable(
     /** Snapshot of the current slot assignment for match creation. */
     fun buildAgentMatchSetup() = AgentSlotLogic.buildSetup(gameParameters.players, agentProfiles)
 
+    fun snapshotAgentSlots(): List<com.unciv.logic.files.PresetAgentSlot> = gameParameters.players.mapIndexedNotNull { index, player ->
+        val profile = agentProfiles[player] ?: profileCache[player] ?: return@mapIndexedNotNull null
+        com.unciv.logic.files.PresetAgentSlot().also {
+            it.index = index; it.active = player in agentProfiles; it.profile = profile.copy()
+        }
+    }
+
+    fun restoreAgentSlots(slots: List<com.unciv.logic.files.PresetAgentSlot>) {
+        for (slot in slots) {
+            val player = gameParameters.players.getOrNull(slot.index) ?: continue
+            val profile = slot.profile.copy()
+            profileCache[player] = profile
+            if (slot.active && player.chosenCiv != Constants.spectator) {
+                player.playerType = PlayerType.Human
+                agentProfiles[player] = profile
+            }
+        }
+        if (slots.isNotEmpty()) update()
+    }
+
     fun updateRandomNumberLabel() {        randomNumberLabel?.run {
             val playerRange = if (gameParameters.minNumberOfPlayers == gameParameters.maxNumberOfPlayers) {
                 gameParameters.minNumberOfPlayers.tr()
@@ -275,13 +294,13 @@ class PlayerPickerTable(
             playerTypeTextButton.setText("Agent")
         playerTable.add(playerTypeTextButton).width(80f).pad(5f).right()
 
-        if (control == SlotControl.AGENT) {
+        if (player.chosenCiv != Constants.spectator) {
             val editAgentButton = "Edit".toTextButton()
             editAgentButton.onClick {
                 val profile = agentProfiles[player]
                 if (profile != null) {
                     AgentProfilePopup(this@PlayerPickerTable, player, profile, onSave = { update() })
-                }
+                } else NationSettingsPopup(this@PlayerPickerTable, player)
             }
             playerTable.add(editAgentButton).width(60f).pad(5f).right()
         }
@@ -339,6 +358,13 @@ class PlayerPickerTable(
                 }
                 playerTable.add(summaryLabel).colspan(4).padLeft(10f).padBottom(4f).fillX()
             }
+        }
+
+        val bonuses = player.startingBonuses.summary()
+        if (bonuses.isNotEmpty()) {
+            playerTable.row()
+            playerTable.add(bonuses.toLabel(Color.GOLD, 12).apply { wrap = true })
+                .colspan(4).padLeft(10f).padBottom(4f).fillX()
         }
 
         if (gameParameters.isOnlineMultiplayer && player.playerType == PlayerType.Human)

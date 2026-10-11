@@ -1,5 +1,7 @@
 package com.unciv.app.desktop.agents
 
+import com.badlogic.gdx.Gdx
+
 import com.unciv.logic.GameInfo
 import com.unciv.logic.agents.AgentCommand
 import com.unciv.logic.agents.AgentControl
@@ -15,6 +17,8 @@ import com.unciv.logic.agents.AgentRunState
 import com.unciv.logic.agents.AgentSnapshotPublication
 import com.unciv.logic.agents.CivilizationController
 import com.unciv.logic.agents.ControllerKind
+import com.unciv.logic.agents.DiplomaticMessage
+import com.unciv.logic.agents.MessageContact
 import com.unciv.logic.agents.EndTurnCommand
 import com.unciv.logic.agents.EngineCallException
 import com.unciv.logic.agents.FileCheckpointStore
@@ -46,9 +50,8 @@ import java.util.concurrent.atomic.AtomicBoolean
  *   stdio protocol; engine RPCs answered from the coordinator under a
  *   single host lock; provider streams never touch protocol stdout.
  *
- * Snapshot publication to the live map (rebinding cities/units/selections
- * by stable IDs without rebuilding the UI) is the documented next step;
- * until then the map refreshes on explicit reopen (see the status text).
+ * Committed actions publish isolated render snapshots to the attached
+ * world screen, rebinding cities/units/selections by stable IDs.
  * Human secondary controls (city screens, diplomacy popups, shortcuts)
  * are enumerated in docs/agent-mutation-audit.md — most still route
  * legacy; the end-turn button and [canChangeState] gate route here.
@@ -69,10 +72,72 @@ class DesktopAgentMatch(
 
     override val matchId: String = match.matchId
 
+    override fun getCommittedMatchStateJson(): String = synchronized(lock) {
+        coordinator.serializeCommittedMatchForPublication()
+    }
+
+    private val activity = AgentActivityJournal(File(dataDir, ".agent-data/logs/$matchId"))
+    private val readingActivity = AtomicBoolean(false)
+    override fun getActivity(): List<com.unciv.logic.agents.AgentActivityEntry> {
+        if (readingActivity.compareAndSet(false, true)) Concurrency.run("Read agent activity") {
+            try { activity.refresh() } finally { readingActivity.set(false) }
+        }
+        val viewer = worldScreen?.currentViewerCivId() ?: return emptyList()
+        return synchronized(lock) {
+            if (coordinator.isSpectatorViewer(viewer)) activity.entries()
+            else activity.entries().filter { it.civId == viewer }
+        }
+    }
+    override fun getActivityDetails(id: String): String {
+        val viewer = worldScreen?.currentViewerCivId() ?: return ""
+        val permitted = synchronized(lock) {
+            coordinator.isSpectatorViewer(viewer) || activity.entries().any { it.id == id && it.civId == viewer }
+        }
+        return if (permitted) activity.details(id) else ""
+    }
+    override fun getActivityDirectory(): String? {
+        val viewer = worldScreen?.currentViewerCivId() ?: return null
+        return synchronized(lock) {
+            if (coordinator.isSpectatorViewer(viewer)) activity.directory.absolutePath else null
+        }
+    }
+
+    override fun getMessageContacts(): List<MessageContact> {
+        val viewer = worldScreen?.currentViewerCivId() ?: return emptyList()
+        return synchronized(lock) { coordinator.getMessageContacts(viewer).filter { it.isAgent } }
+    }
+
+    override fun getMessages(): List<DiplomaticMessage> {
+        val viewer = worldScreen?.currentViewerCivId() ?: return emptyList()
+        return synchronized(lock) { coordinator.getMessageHistory(viewer) }
+    }
+
+    override fun sendMessage(targetCivId: String, text: String, onComplete: (String?) -> Unit) {
+        // Capture the actual viewing identity before dispatch; the composer cannot supply a sender.
+        val viewer = worldScreen?.currentViewerCivId()
+        val messageId = UUID.randomUUID().toString()
+        Concurrency.runOnNonDaemonThreadPool("Save diplomatic message") {
+            val error = try {
+                synchronized(lock) {
+                    check(!closed.get()) { "This match has closed" }
+                    require(viewer != null) { "Messaging requires an attached player or spectator" }
+                    publishCommittedChangesLocked {
+                        coordinator.queuePlayerMessage(viewer, messageId, targetCivId, text)
+                    }
+                }
+                null
+            } catch (ex: Exception) { ex.message ?: "Could not save the message" }
+            Concurrency.runOnGLThread {
+                onComplete(error)
+                Gdx.graphics.requestRendering()
+            }
+        }
+    }
+
     private val lock = Any()
     val recoveryDirectory: File = recoveryLineage?.let { File(checkpointDir(dataDir, match.matchId), "restores/$it") }
         ?: checkpointDir(dataDir, match.matchId)
-    val coordinator = MatchCoordinator(game, match, FileCheckpointStore(recoveryDirectory, match.matchId))
+    val coordinator = MatchCoordinator(game, match, fileStore(dataDir, recoveryDirectory, match.matchId))
     private val bridge = AgentEngineBridge(coordinator)
     private val humanExecutor = HumanCommandExecutor(coordinator)
     private var runState: AgentRunState = when {
@@ -81,14 +146,27 @@ class DesktopAgentMatch(
         else -> AgentRunState.PAUSED
     }
     private var authorityEpoch = 1
+    /** Host-side identity remains bound to the admitted run, including its final reads. */
+    private var providerRunCivId: String? = null
     private val sessions = HashMap<String, String>() // civId -> provider session ID
     private var supervisor: SupervisorRunner? = null
     private var failureReason: String? = match.matchPausedReason
     private val isLoopRunning = AtomicBoolean(false)
+    private val closed = AtomicBoolean(false)
+    /** Navigation may hide a retained match; reopening grants access, never automatic play. */
+    private var matchOpen = true // protected by lock
 
     companion object {
         fun checkpointDir(dataDir: File, matchId: String): File =
             File(dataDir, ".agent-data/checkpoints/$matchId")
+
+        private fun fileStore(dataDir: File, directory: File, matchId: String) = object : com.unciv.logic.agents.CheckpointWriter {
+            private val store = FileCheckpointStore(directory, matchId, maxRetainedGenerations = 3)
+            override fun write(gameJson: String, matchJson: String) {
+                com.unciv.app.desktop.DesktopDataDirectory.requireAvailableVolume(dataDir.absoluteFile)
+                store.write(gameJson, matchJson)
+            }
+        }
 
         fun restore(game: GameInfo, match: AgentMatchState, dataDir: File,
                     worldScreen: WorldScreen? = null,
@@ -190,6 +268,7 @@ class DesktopAgentMatch(
 
     override fun isHumanInputAllowed(): Boolean {
         synchronized(lock) {
+            if (closed.get() || !matchOpen) return false
             if (runState != AgentRunState.PAUSED && runState != AgentRunState.WAITING_HUMAN) return false
             if (coordinator.getTurnPhase() != TurnPhase.AWAITING_DECISIONS) return false
             return coordinator.getController(coordinator.getCurrentCivId())?.kind == ControllerKind.HUMAN
@@ -198,6 +277,7 @@ class DesktopAgentMatch(
 
     override fun onNextTurnPressed(): Boolean {
         val civId = synchronized(lock) {
+            if (closed.get() || !matchOpen) return false
             if (coordinator.getTurnPhase() != TurnPhase.AWAITING_DECISIONS) return false
             val current = coordinator.getCurrentCivId()
             if (coordinator.getController(current)?.kind != ControllerKind.HUMAN) return false
@@ -206,9 +286,11 @@ class DesktopAgentMatch(
         Concurrency.runOnNonDaemonThreadPool("AgentMatch") {
             try {
                 synchronized(lock) {
-                    coordinator.execute(EndTurnCommand(civId, "ui-end-${UUID.randomUUID()}",
-                        coordinator.getStateRevision()))
-                    publishSnapshotLocked()
+                    if (closed.get() || !matchOpen) return@runOnNonDaemonThreadPool
+                    publishCommittedChangesLocked {
+                        coordinator.execute(EndTurnCommand(civId, "ui-end-${UUID.randomUUID()}",
+                            coordinator.getStateRevision()))
+                    }
                     val nextCiv = if (coordinator.getTurnPhase() == TurnPhase.AWAITING_DECISIONS) coordinator.getCurrentCivId() else null
                     if (nextCiv != null && coordinator.getController(nextCiv)?.kind == ControllerKind.HUMAN) {
                         runState = AgentRunState.WAITING_HUMAN
@@ -231,14 +313,32 @@ class DesktopAgentMatch(
     override fun executeHumanAction(
         buildCommands: (expectedRevision: Int) -> List<(Int) -> AgentCommand>
     ): String? = synchronized(lock) {
-        val error = humanExecutor.executeAll(null, buildCommands)
-        if (error == null) publishSnapshotLocked()
-        error
+        if (closed.get() || !matchOpen) return@synchronized "This match is not open"
+        publishCommittedChangesLocked {
+            humanExecutor.executeAll(null, buildCommands)
+        }
     }.also {
         if (it == null) refreshUi()
     }
 
+    /** All coordinator mutations publish their committed pair, including failure-only metadata. */
+    private inline fun <T> publishCommittedChangesLocked(action: () -> T): T {
+        val beforeGeneration = coordinator.getPublicationGeneration()
+        try {
+            return action()
+        } finally {
+            if (coordinator.getPublicationGeneration() != beforeGeneration) {
+                if (coordinator.isPaused() && !closed.get()) {
+                    failureReason = coordinator.getPausedReason()
+                    runState = AgentRunState.NEEDS_ATTENTION
+                }
+                publishSnapshotLocked()
+            }
+        }
+    }
+
     private fun publishSnapshotLocked() {
+        if (closed.get()) return
         val screen = worldScreen ?: return
         val payload = AgentSnapshotPublication.buildPayload(
             coordinator,
@@ -250,31 +350,60 @@ class DesktopAgentMatch(
         val snapshot = AgentSnapshotPublication.deserializeGame(payload)
         val selection = AgentSnapshotPublication.resolveSelection(snapshot, payload)
         Concurrency.runOnGLThread {
+            if (closed.get()) return@runOnGLThread
             screen.installAgentSnapshot(snapshot, selection, payload.generation)
+            Gdx.graphics.requestRendering()
         }
     }
 
     override fun close() {
-        synchronized(lock) { runState = AgentRunState.PAUSED }
-        try {
-            supervisor?.shutdown()
-        } catch (ex: Exception) {
+        val idleSupervisor = synchronized(lock) {
+            if (!closed.compareAndSet(false, true)) return
+            matchOpen = false
+            // Keep engine RPCs alive for an admitted turn. Its existing worker owns shutdown.
+            runState = if (isLoopRunning.get()) AgentRunState.PAUSING else AgentRunState.PAUSED
+            if (isLoopRunning.get()) null else detachSupervisorLocked()
+        }
+        if (worldScreen?.agentSession === this) worldScreen.agentSession = null
+        if (idleSupervisor != null) Concurrency.runOnNonDaemonThreadPool("Close agent supervisor") {
+            shutdownSupervisor(idleSupervisor)
+        }
+    }
+
+    override fun onMatchLeft() {
+        synchronized(lock) { matchOpen = false }
+        pause()
+    }
+
+    override fun onMatchEntered() {
+        synchronized(lock) {
+            if (closed.get()) return
+            matchOpen = true
+            if (coordinator.isPaused()) {
+                failureReason = coordinator.getPausedReason()
+                runState = AgentRunState.NEEDS_ATTENTION
+            }
+        }
+    }
+
+    private fun detachSupervisorLocked(): SupervisorRunner? = supervisor.also { supervisor = null }
+
+    private fun shutdownSupervisor(runner: SupervisorRunner) {
+        try { runner.shutdown() } catch (ex: Exception) {
             Log.error("Agent supervisor shutdown failed", ex)
         }
-        supervisor = null
-        worldScreen?.agentSession = null
     }
 
     override fun canPause(): Boolean = synchronized(lock) {
-        runState == AgentRunState.STARTING || runState == AgentRunState.AGENT_DECIDING || runState == AgentRunState.APPLYING
+        !closed.get() && matchOpen && (runState == AgentRunState.STARTING || runState == AgentRunState.AGENT_DECIDING || runState == AgentRunState.APPLYING)
     }
 
     override fun canResume(): Boolean = synchronized(lock) {
-        runState == AgentRunState.PAUSED && !coordinator.isPaused() && coordinator.getTurnPhase() != TurnPhase.COMPLETED
+        !closed.get() && matchOpen && runState == AgentRunState.PAUSED && !coordinator.isPaused() && coordinator.getTurnPhase() != TurnPhase.COMPLETED
     }
 
     override fun canRetry(): Boolean = synchronized(lock) {
-        runState == AgentRunState.NEEDS_ATTENTION
+        !closed.get() && matchOpen && !isLoopRunning.get() && runState == AgentRunState.NEEDS_ATTENTION
     }
 
     override fun pause() {
@@ -298,10 +427,10 @@ class DesktopAgentMatch(
 
     override fun retry() {
         synchronized(lock) {
+            if (closed.get() || !matchOpen || isLoopRunning.get()) return
             if (runState != AgentRunState.NEEDS_ATTENTION) return
             try {
-                coordinator.retryPausedMatch()
-                publishSnapshotLocked()
+                publishCommittedChangesLocked { coordinator.retryPausedMatch() }
             } catch (ex: Exception) {
                 failureReason = coordinator.getPausedReason() ?: ex.message
                 refreshUi()
@@ -325,6 +454,10 @@ class DesktopAgentMatch(
         civId?.let { coordinator.getController(it)?.agentProfile }
     }
 
+    override fun getAgentProfile(civId: String): AgentProfile? = synchronized(lock) {
+        coordinator.getController(civId)?.agentProfile?.copy()
+    }
+
     override fun getFailureReason(): String? = synchronized(lock) { failureReason }
 
     override fun isSpectatorMode(): Boolean = synchronized(lock) {
@@ -333,9 +466,9 @@ class DesktopAgentMatch(
 
     override fun startAutomaticPlay() {
         synchronized(lock) {
+            if (closed.get() || !matchOpen) return
             if (coordinator.getTurnPhase() == TurnPhase.READY_TO_START) {
-                coordinator.beginAwaitingTurn()
-                publishSnapshotLocked()
+                publishCommittedChangesLocked { coordinator.beginAwaitingTurn() }
             }
             val current = coordinator.getCurrentCivId()
             if (coordinator.getController(current)?.kind == ControllerKind.HUMAN) {
@@ -353,6 +486,7 @@ class DesktopAgentMatch(
     /** Continuous agent play, advancing across civs and pausing at human turns or failures. */
     fun run() {
         synchronized(lock) {
+            if (closed.get() || !matchOpen || runState == AgentRunState.PAUSING) return
             if (coordinator.isPaused()) return
             if (runState == AgentRunState.FINISHED) return
             if (coordinator.getTurnPhase() == TurnPhase.COMPLETED) {
@@ -361,8 +495,7 @@ class DesktopAgentMatch(
                 return
             }
             if (coordinator.getTurnPhase() == TurnPhase.READY_TO_START) {
-                coordinator.beginAwaitingTurn()
-                publishSnapshotLocked()
+                publishCommittedChangesLocked { coordinator.beginAwaitingTurn() }
             }
             val current = coordinator.getCurrentCivId()
             if (coordinator.getController(current)?.kind == ControllerKind.HUMAN) {
@@ -379,19 +512,40 @@ class DesktopAgentMatch(
     }
 
     private fun triggerRunLoop() {
-        if (isLoopRunning.compareAndSet(false, true)) {
+        synchronized(lock) {
+            if (closed.get() || !matchOpen || runState != AgentRunState.STARTING) return
+            if (!isLoopRunning.compareAndSet(false, true)) return
             Concurrency.runOnNonDaemonThreadPool("AgentMatch") {
                 try {
                     runLoop()
+                } catch (ex: Exception) {
+                    fail(ex.message ?: "Agent match loop failed")
                 } finally {
-                    isLoopRunning.set(false)
+                    val closingSupervisor = synchronized(lock) {
+                        isLoopRunning.set(false)
+                        if (closed.get()) {
+                            runState = AgentRunState.PAUSED
+                            detachSupervisorLocked()
+                        } else {
+                            if (coordinator.isPaused()) {
+                                failureReason = coordinator.getPausedReason()
+                                runState = AgentRunState.NEEDS_ATTENTION
+                            }
+                            // Resume/retry may arrive after the loop publishes its boundary,
+                            // but before this worker releases ownership. Hand off that request.
+                            if (matchOpen && runState == AgentRunState.STARTING) triggerRunLoop()
+                            null
+                        }
+                    }
+                    if (closingSupervisor != null) shutdownSupervisor(closingSupervisor)
+                    refreshUi()
                 }
             }
         }
     }
 
     fun stop() {
-        transition(AgentControl.STOP)
+        if (!transition(AgentControl.STOP)) return
         try {
             supervisor?.kill()
         } catch (ex: Exception) {
@@ -414,24 +568,27 @@ class DesktopAgentMatch(
 
     fun takeOverHuman() {
         val civId = synchronized(lock) { currentCommandable() } ?: return
-        transition(AgentControl.TAKEOVER)
+        if (!transition(AgentControl.TAKEOVER)) return
         reassign(civId, ControllerKind.HUMAN, null)
     }
 
     fun returnToAgent(civId: String, profile: AgentProfile) {
-        transition(AgentControl.RETURN_TO_AGENT)
+        if (!transition(AgentControl.RETURN_TO_AGENT)) return
         reassign(civId, ControllerKind.EXTERNAL_AGENT, profile)
     }
 
     fun queueGuidance(civId: String, text: String) {
         synchronized(lock) {
-            coordinator.queueGuidance(civId, text)
-            publishSnapshotLocked()
+            publishCommittedChangesLocked { coordinator.queueGuidance(civId, text) }
         }
     }
 
     private fun transition(control: AgentControl): Boolean {
         synchronized(lock) {
+            if (closed.get() || !matchOpen) return false
+            if (isLoopRunning.get() && control in listOf(AgentControl.RETRY, AgentControl.SWITCH_PROVIDER,
+                    AgentControl.TAKEOVER, AgentControl.RETURN_TO_AGENT, AgentControl.STEP_ACTION, AgentControl.STEP_TURN))
+                return false
             val next = AgentRunControls.transition(runState, control) ?: return false
             runState = next.to
             return true
@@ -441,7 +598,7 @@ class DesktopAgentMatch(
     private fun fail(reason: String) {
         synchronized(lock) {
             failureReason = reason
-            runState = AgentRunState.NEEDS_ATTENTION
+            runState = if (closed.get()) AgentRunState.PAUSED else AgentRunState.NEEDS_ATTENTION
         }
         refreshUi()
     }
@@ -452,6 +609,17 @@ class DesktopAgentMatch(
     private fun runLoop() {
         while (true) {
             val (state, civId) = synchronized(lock) {
+                if (closed.get() || !matchOpen) {
+                    runState = if (!closed.get() && coordinator.isPaused()) AgentRunState.NEEDS_ATTENTION
+                        else AgentRunState.PAUSED
+                    return
+                }
+                if (coordinator.isPaused()) {
+                    failureReason = coordinator.getPausedReason()
+                    runState = AgentRunState.NEEDS_ATTENTION
+                    refreshUi()
+                    return
+                }
                 if (runState == AgentRunState.PAUSING) {
                     runState = AgentRunState.PAUSED
                     refreshUi()
@@ -463,8 +631,7 @@ class DesktopAgentMatch(
                     return
                 }
                 if (coordinator.getTurnPhase() == TurnPhase.READY_TO_START) {
-                    coordinator.beginAwaitingTurn()
-                    publishSnapshotLocked()
+                    publishCommittedChangesLocked { coordinator.beginAwaitingTurn() }
                 }
                 if (coordinator.getTurnPhase() == TurnPhase.COMPLETED) {
                     runState = AgentRunState.FINISHED
@@ -483,7 +650,8 @@ class DesktopAgentMatch(
             val controllerKind = synchronized(lock) { coordinator.getController(civId)?.kind }
             if (controllerKind == ControllerKind.HUMAN) {
                 synchronized(lock) {
-                    runState = AgentRunState.WAITING_HUMAN
+                    runState = if (closed.get() || !matchOpen || runState == AgentRunState.PAUSING)
+                        AgentRunState.PAUSED else AgentRunState.WAITING_HUMAN
                     publishSnapshotLocked()
                 }
                 refreshUi()
@@ -515,12 +683,15 @@ class DesktopAgentMatch(
 
     private fun stepSingleTurn() {
         synchronized(lock) {
+            if (closed.get() || !matchOpen) return
             if (coordinator.getTurnPhase() == TurnPhase.READY_TO_START)
-                coordinator.beginAwaitingTurn()
+                publishCommittedChangesLocked { coordinator.beginAwaitingTurn() }
             if (coordinator.getTurnPhase() != TurnPhase.AWAITING_DECISIONS) return
             val civId = coordinator.getCurrentCivId()
-            coordinator.execute(EndTurnCommand(civId, "step-${UUID.randomUUID()}",
-                coordinator.getStateRevision()))
+            publishCommittedChangesLocked {
+                coordinator.execute(EndTurnCommand(civId, "step-${UUID.randomUUID()}",
+                    coordinator.getStateRevision()))
+            }
         }
         refreshUi()
     }
@@ -529,7 +700,14 @@ class DesktopAgentMatch(
     //region Supervisor process
 
     private fun runAgentTurn(civId: String) {
-        synchronized(lock) { runState = AgentRunState.AGENT_DECIDING }
+        synchronized(lock) {
+            // Pause can arrive after runLoop selects the next civ but before dispatch claims it.
+            if (closed.get() || !matchOpen) return
+            if (runState == AgentRunState.PAUSING || runState == AgentRunState.PAUSED) return
+            if (runState != AgentRunState.STARTING && runState != AgentRunState.AGENT_DECIDING
+                && runState != AgentRunState.APPLYING) return
+            runState = AgentRunState.AGENT_DECIDING
+        }
         refreshUi()
         val proc = try {
             ensureSupervisor()
@@ -545,9 +723,7 @@ class DesktopAgentMatch(
         }
         val runId = "run-${UUID.randomUUID()}"
         val control: Map<String, Any?> = try { synchronized(lock) {
-            val beforeGeneration = coordinator.getPublicationGeneration()
-            val turnGuidance = coordinator.takeGuidanceForDelivery(civId)
-            if (coordinator.getPublicationGeneration() != beforeGeneration) publishSnapshotLocked()
+            val turnGuidance = publishCommittedChangesLocked { coordinator.takeGuidanceForDelivery(civId) }
             mapOf(
                 "protocol" to 1,
                 "kind" to "control",
@@ -570,17 +746,24 @@ class DesktopAgentMatch(
                     "turnSerial" to coordinator.getTurnSerial()),
                 "guidance" to turnGuidance)
         } } catch (ex: Exception) {
-            synchronized(lock) { publishSnapshotLocked() }
             fail(coordinator.getPausedReason() ?: "Cannot prepare agent turn: ${ex.message}")
             return
         }
-        val outcome = proc.runTurn(control)
+        val outcome = try {
+            synchronized(lock) { providerRunCivId = civId }
+            proc.runTurn(control)
+        } finally {
+            synchronized(lock) { providerRunCivId = null }
+        }
         synchronized(lock) {
             val session = outcome.sessionId
             if (session != null) sessions[civId] = session
             if (outcome.status == "completed_turn") {
                 publishSnapshotLocked()
-                if (runState == AgentRunState.PAUSING) {
+                if (!closed.get() && coordinator.isPaused()) {
+                    failureReason = coordinator.getPausedReason()
+                    runState = AgentRunState.NEEDS_ATTENTION
+                } else if (closed.get() || !matchOpen || runState == AgentRunState.PAUSING || runState == AgentRunState.PAUSED) {
                     runState = AgentRunState.PAUSED
                 } else {
                     runState = AgentRunState.STARTING
@@ -595,13 +778,15 @@ class DesktopAgentMatch(
 
     private fun reassign(civId: String, kind: ControllerKind, profile: AgentProfile?) {
         synchronized(lock) {
+            if (closed.get() || !matchOpen || isLoopRunning.get()) return
             authorityEpoch = AgentRunControls.nextEpoch(authorityEpoch)
             sessions.remove(civId)
-            coordinator.execute(SetControllerCommand(
-                civId, "reassign-${UUID.randomUUID()}",
-                coordinator.getStateRevision(), civId, kind, profile))
+            publishCommittedChangesLocked {
+                coordinator.execute(SetControllerCommand(
+                    civId, "reassign-${UUID.randomUUID()}",
+                    coordinator.getStateRevision(), civId, kind, profile))
+            }
             runState = AgentRunState.PAUSED
-            publishSnapshotLocked()
         }
         refreshUi()
     }
@@ -626,15 +811,19 @@ class DesktopAgentMatch(
                     "or set -Dunciv.supervisor.dist=/path/to/dist"
             )
         val proc = SupervisorProcess(node, File(dist, "daemon.js"),
+            activityLogsDir = activity.directory,
             answerEngineRequest = this::answerEngineRequest)
         supervisor = proc
         return proc
     }
 
     private fun refreshUi() {
+        if (closed.get()) return
         val screen = worldScreen ?: return
         Concurrency.runOnGLThread {
+            if (closed.get()) return@runOnGLThread
             screen.shouldUpdate = true
+            Gdx.graphics.requestRendering()
         }
     }
 
@@ -643,19 +832,27 @@ class DesktopAgentMatch(
     /** Engine-RPC dispatch for supervisor frames (called on the RPC thread). */
     fun answerEngineRequest(method: String, params: Map<String, Any?>): Any? {
         synchronized(lock) {
-            val before = coordinator.getPublicationGeneration()
-            try {
-                return when (method) {
+            return publishCommittedChangesLocked {
+                val mapActor = if (method == "map" || method == "inspect_tile") {
+                    val admitted = providerRunCivId ?: coordinator.getCurrentCivId()
+                    if (params["civId"] != admitted)
+                        throw EngineCallException("AUTHORITY_REVOKED", "Map read actor does not match the admitted civilization")
+                    admitted
+                } else null
+                when (method) {
                     "observe" -> bridge.observe(params["civId"] as String)
                     "inspect" -> bridge.inspect(params["civId"] as String,
                         (params["unitId"] as Number).toInt())
-                    "rules" -> bridge.rules()
+                    "inspect_tile" -> bridge.inspectTile(mapActor!!, params)
+                    "map" -> bridge.map(mapActor!!, params)
+                    "rules" -> bridge.rules(params)
                     "legal_actions" -> bridge.legalActions(
                         params["civId"] as String,
                         (params["unitId"] as? Number)?.toInt(),
                         params["cityId"] as? String)
                     "act" -> bridge.act(params)
-                    "action_result" -> bridge.actionResult(params["actionId"] as String)
+                    "action_result" -> bridge.actionResult(params["actionId"] as String,
+                        providerRunCivId ?: coordinator.getCurrentCivId())
                     "notes_get" -> bridge.readNotes(params["civId"] as String)
                     "notes_put" -> bridge.updateNotes(
                         params["civId"] as String, params["notes"] as String,
@@ -666,8 +863,6 @@ class DesktopAgentMatch(
                         coordinator.getStateRevision())
                     else -> throw EngineCallException("INVALID_ARGUMENT", "Unknown method $method")
                 }
-            } finally {
-                if (coordinator.getPublicationGeneration() != before) publishSnapshotLocked()
             }
         }
     }

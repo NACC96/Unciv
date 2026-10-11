@@ -82,3 +82,21 @@ describe("StdioEngineBackend", () => {
     expect(vi.fn()).toBeTruthy();
   });
 });
+
+it("forwards additive map/tile/rules reads with immutable authenticated actor and mutation protocol 1", async () => {
+  const sent: any[] = [];
+  const backend = new StdioEngineBackend(line => sent.push(JSON.parse(line)), 5000, () => "Rome");
+  const checks: [() => Promise<unknown>, string, object, unknown][] = [
+    [() => backend.inspectTile({ x: 48, y: -33 }), "inspect_tile", { x: 48, y: -33, civId: "Rome" }, { terrain: "Grassland", visibility: "REMEMBERED" }],
+    [() => backend.map({ mode: "KNOWN", center: { x: 48, y: -33 }, radius: 2, limit: 1, cursor: "cursor", civId: "Greece" } as any), "map", { mode: "KNOWN", center: { x: 48, y: -33 }, radius: 2, limit: 1, cursor: "cursor", civId: "Rome" }, { observationVersion: 2, tiles: [], nextCursor: "next" }],
+    [() => backend.rules({ section: "improvements", name: "Farm", limit: 1, cursor: "rules-next" }), "rules", { section: "improvements", name: "Farm", limit: 1, cursor: "rules-next" }, { rulesetName: "Civ V", baseRuleset: "Civ V", rulesetIdentity: "pinned", section: "improvements", entries: [{ name: "Farm", techRequired: null }], nextCursor: null }],
+  ];
+  for (const [invoke, method, params, result] of checks) {
+    const pending = invoke();
+    const frame = sent.at(-1);
+    expect(frame).toMatchObject({ protocol: 1, method, params });
+    backend.feedLine(JSON.stringify({ protocol: 1, kind: "engine_response", id: frame.id, ok: true, result }));
+    await expect(pending).resolves.toEqual(result);
+  }
+  backend.disconnect();
+});

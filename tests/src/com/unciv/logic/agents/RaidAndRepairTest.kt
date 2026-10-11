@@ -35,10 +35,10 @@ class RaidAndRepairTest {
             val greece = testGame.addCiv(testGame.ruleset.nations["Greece"]!!)
             greeceId = greece.civID
             testGame.addCity(greece, testGame.getTile(3, 0))
-            // War prize in Greek lands, plus a neutral farm for the repair half
-            // (repairs are barred in enemy territory; civilians can't pillage).
+            // War prize in Greek lands, plus a neutral road for the repair half.
+            // Roads allow neutral-territory repair; Farms require owned territory.
             testGame.getTile(farmPos).setImprovement("Farm", greece)
-            testGame.getTile(neutralFarmPos).setImprovement("Farm")
+            testGame.getTile(neutralFarmPos).setRoadStatus(com.unciv.logic.map.tile.RoadStatus.Road, null)
             warriorId = testGame.addUnit("Warrior", rome, testGame.getTile(1, 0)).id
             raiderId = testGame.addUnit("Warrior", rome, testGame.getTile(-1, 0)).id
             workerId = testGame.addUnit("Worker", rome, testGame.getTile(-1, -1)).id

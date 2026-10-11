@@ -15,6 +15,7 @@ import com.badlogic.gdx.utils.Align
 import com.unciv.GUI
 import com.unciv.UncivGame
 import com.unciv.logic.civilization.Civilization
+import com.unciv.logic.map.TileMap
 import com.unciv.ui.components.InputDisabling
 import com.unciv.ui.components.extensions.addInTable
 import com.unciv.ui.components.input.onActivation
@@ -28,6 +29,8 @@ class MinimapHolder(val mapHolder: WorldMapHolder) : Table() {
     private var minimapSize = Int.MIN_VALUE
     private var maximized = false
     private var lastCutoutSetting = false
+    private var lastTileMap: TileMap? = null
+    private var resizeDragListener: ResizeDragListener? = null
     lateinit var minimap: Minimap
 
     /** Button, next to the minimap, to toggle the unit movement map overlay. */
@@ -74,9 +77,11 @@ class MinimapHolder(val mapHolder: WorldMapHolder) : Table() {
         val civ: Civilization? = civInfo.takeUnless { GUI.getWorldScreen().selectedGameView.spectatorMode }
         val newMinimapSize = worldScreen.game.settings.minimapSize
         val cutoutSetting = worldScreen.game.settings.androidCutout
-        if (newMinimapSize == minimapSize && civ?.exploredRegion?.shouldUpdateMinimap() != true && cutoutSetting == lastCutoutSetting) return
+        if (newMinimapSize == minimapSize && civ?.exploredRegion?.shouldUpdateMinimap() != true
+            && cutoutSetting == lastCutoutSetting && lastTileMap === mapHolder.tileMap) return
         lastCutoutSetting = cutoutSetting
         minimapSize = newMinimapSize
+        lastTileMap = mapHolder.tileMap
         maximized = false
         rebuild(civ)
     }
@@ -97,7 +102,8 @@ class MinimapHolder(val mapHolder: WorldMapHolder) : Table() {
         pack()
         if (stage != null) x = stage.width - width
 
-        addListener(ResizeDragListener(civInfo))
+        resizeDragListener?.let { removeListener(it) }
+        resizeDragListener = ResizeDragListener(civInfo).also { addListener(it) }
     }
 
     private fun rebuildAndUpdateMap(civInfo: Civilization?) {

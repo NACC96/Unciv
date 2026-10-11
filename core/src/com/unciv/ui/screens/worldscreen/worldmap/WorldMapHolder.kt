@@ -114,7 +114,9 @@ class WorldMapHolder(
         addClickListener()
 
         actor = tileGroupMap
-        setSize(worldScreen.stage.width, worldScreen.stage.height)
+        // The pane itself is scaled for map zoom. Its local dimensions must
+        // still render to the stage dimensions when contents are replaced.
+        setSize(worldScreen.stage.width / scaleX, worldScreen.stage.height / scaleY)
         layout() // Fit the scroll pane to the contents - otherwise, setScroll won't work!
     }
 
@@ -126,8 +128,20 @@ class WorldMapHolder(
      * and is preserved.
      */
     internal fun rebindToSnapshot(newTileMap: TileMap) {
+        val oldScrollX = scrollX
+        val oldScrollY = scrollY
+        val oldZoom = scaleX
+        removeUnitActionOverlay()
+        unitMovementPaths.clear()
+        unitConnectRoadPaths.clear()
         tileMap = newTileMap
         addTiles()
+        zoom(oldZoom)
+        scrollX = oldScrollX
+        scrollY = oldScrollY
+        updateVisualScroll()
+        updateCulling()
+        onViewportChanged()
     }
 
     private fun addClickListener() {

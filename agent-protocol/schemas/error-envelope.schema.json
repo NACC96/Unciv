@@ -22,6 +22,7 @@
         "INVALID_ARGUMENT",
         "ILLEGAL_ACTION",
         "DECISIONS_PENDING",
+        "MESSAGES_UNACKNOWLEDGED",
         "UNSUPPORTED_RULESET",
         "ACTION_ID_CONFLICT",
         "MUTATION_IN_PROGRESS",
@@ -39,6 +40,11 @@
     "currentRevision": {
       "type": "integer",
       "description": "Committed revision the client should re-observe from (present for STALE_STATE)."
+    },
+    "messageIds": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Delivered incoming message IDs the acting agent must acknowledge before ending its turn. Never includes another nation's private inbox."
     },
     "diagnosticId": {
       "type": "string",

@@ -59,7 +59,7 @@ class DiplomacyTradeTest {
          * Turn rotation and start/end effects are covered by the lifecycle suites. */
         fun selectActor(civId: String) {
             if (coordinator.getCurrentCivId() == civId) return
-            val serializer = com.unciv.json.json()
+            val serializer = com.unciv.json.json().apply { setUsePrototypes(false) }
             val bundle = serializer.fromJson(AgentBundle::class.java, coordinator.saveToJson())
             val snapshot = serializer.fromJson(com.unciv.logic.GameInfo::class.java, bundle.gameJson)
             snapshot.currentPlayer = civId

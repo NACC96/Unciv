@@ -18,6 +18,12 @@ class Player(
         }
     @Transient
     lateinit var chosenNation: Nation
+    var startingBonuses = StartingBonuses()
+
+    fun copy() = Player(chosenCiv, playerType, playerId).also {
+        it.startingBonuses = startingBonuses.copy()
+        if (::chosenNation.isInitialized) it.chosenNation = chosenNation
+    }
     fun setNationTransient(ruleset: Ruleset) {
         chosenNation = ruleset.nations[chosenCiv]!!
     }

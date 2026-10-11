@@ -1,0 +1,27 @@
+package com.unciv.ui.screens.newgamescreen
+
+import com.badlogic.gdx.graphics.Color
+import com.unciv.models.metadata.Player
+import com.unciv.ui.components.extensions.toLabel
+import com.unciv.ui.components.input.KeyCharAndCode
+import com.unciv.ui.popups.Popup
+
+class NationSettingsPopup(private val table: PlayerPickerTable, private val player: Player) : Popup(table.previousScreen.stage, Scrollability.WithoutButtons, 0.85f) {
+    init {
+        val width = minOf(500f, stageToShowOn.width * 0.85f - 56f).coerceAtLeast(120f)
+        addGoodSizedLabel("Edit nation: ${player.chosenCiv}", 22).row()
+        val error = "".toLabel(Color.RED, 14).apply { wrap = true }
+        add(error).width(width).row()
+        val bonuses = StartingBonusForm(player, table.previousScreen.ruleset, width)
+        add(bonuses).width(width).row()
+        addButton("Save", KeyCharAndCode.RETURN) {
+            try {
+                player.startingBonuses = bonuses.read()
+                table.update()
+                close()
+            } catch (ex: IllegalArgumentException) { error.setText(ex.message) }
+        }
+        addButton("Cancel", KeyCharAndCode.ESC) { close() }
+        open()
+    }
+}

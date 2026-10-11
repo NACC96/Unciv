@@ -49,6 +49,7 @@ class AgentSessionOwnershipTest {
                 assertSame(setup, config)
                 assertSame(world, owner)
                 assertEquals(ControllerKind.EXTERNAL_AGENT, match.controllers[rome.civID]!!.kind)
+                Mockito.`when`(session.getCommittedMatchStateJson()).thenReturn(AgentOrdinarySave.encode(match))
                 session
             }
             assertSame(session, AgentMatchSessionFactory.create(game.gameInfo, setup, world))

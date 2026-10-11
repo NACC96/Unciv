@@ -11,9 +11,10 @@ vi.mock("../src/supervisor.js", () => ({ Supervisor: class {
   }
 } }));
 vi.mock("../src/stdio-engine.js", () => ({ StdioEngineBackend: class { disconnect() {} } }));
-afterEach(() => vi.restoreAllMocks());
+afterEach(() => { vi.restoreAllMocks(); vi.unstubAllEnvs(); });
 
 it("does not replace the minted Codex bearer with a daemon placeholder", async () => {
+  vi.stubEnv("UNCIV_CODEX_EXECUTABLE", process.execPath);
   const stdin = process.stdin;
   const oldData = stdin.listeners("data");
   const oldEnd = stdin.listeners("end");

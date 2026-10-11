@@ -10,8 +10,12 @@
  *
  * Provider output and JSONL logs are evidence; engine receipts govern.
  */
+import { ActivityNormalizer, type ActivityEntry } from "./activity.js";
+import { StringDecoder } from "node:string_decoder";
 import { spawn, type ChildProcess } from "node:child_process";
-import { delimiter, dirname } from "node:path";
+import { appendFileSync, mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { delimiter, dirname, join } from "node:path";
 import type { IGameService } from "./fake-game-mcp.js";
 import { startGameMcpServer, type RunBinding } from "./game-mcp-server.js";
 import { buildTurnPrompt } from "./turn-prompt.js";
@@ -57,27 +61,81 @@ export interface RunningChild {
   stderrText(): string;
   wait(): Promise<{ code: number | null; signal: string | null }>;
   kill(): void;
+  /** Committed engine receipts remain visible even if the provider omits its tool-result stream. */
+  recordActivity?(entry: ActivityEntry): void;
 }
 
 export class NodeRunner implements ProviderRunner {
+  constructor(private readonly logRoot = process.env["UNCIV_AGENT_LOG_DIR"] ?? join(tmpdir(), "unciv-agent-runs")) {}
+
   spawn(spec: SpawnSpec, env: NodeJS.ProcessEnv): RunningChild {
+    mkdirSync(this.logRoot, { recursive: true, mode: 0o700 });
+    const runDir = mkdtempSync(join(this.logRoot, "run-"));
     const child: ChildProcess = spawn(spec.executable, spec.argv, {
       cwd: spec.cwd,
-      // GUI environments may discover a Node-script CLI without having node
-      // on PATH. Reuse the already-running supervisor's verified runtime.
+      // GUI CLI discovery may find a Node script without node on PATH.
       env: { ...env, PATH: [dirname(process.execPath), env["PATH"] ?? ""].filter(Boolean).join(delimiter) },
       stdio: ["ignore", "pipe", "pipe"],
     });
+    const metadata: Record<string, unknown> = {
+      pid: child.pid,
+      ...spec.context,
+      command: [spec.executable, ...spec.argv.map((arg, i) => spec.argv[i - 1] === "--bearer" ? "[redacted]" : arg)],
+      cwd: spec.cwd,
+      startedAt: new Date().toISOString(),
+      sessionId: null,
+    };
+    const saveMetadata = () => writeFileSync(join(runDir, "meta.json"), JSON.stringify(metadata, null, 2), { mode: 0o600 });
+    saveMetadata();
+    writeFileSync(join(runDir, "pid"), `${child.pid}\n`, { mode: 0o600 });
+    writeFileSync(join(runDir, "events.jsonl"), "", { mode: 0o600 });
+    writeFileSync(join(runDir, "stderr.log"), "", { mode: 0o600 });
+    const activityPath = join(runDir, "activity.jsonl");
+    const normalizer = new ActivityNormalizer();
+    const appendActivity = (entry: unknown) => appendFileSync(activityPath, JSON.stringify(entry) + "\n", { mode: 0o600 });
+    appendActivity({ id: "run-start", kind: "system", title: "Provider started", text: JSON.stringify(metadata, null, 2), timestamp: metadata["startedAt"] });
+    const eventDecoder = new StringDecoder("utf8");
+    let eventBuffer = "";
+    child.stdout?.on("data", (c: Buffer) => {
+      appendFileSync(join(runDir, "events.jsonl"), c);
+      eventBuffer += eventDecoder.write(c);
+      const events = eventBuffer.split("\n");
+      eventBuffer = events.pop() ?? "";
+      for (const line of events) {
+        if (line.trim()) for (const entry of normalizer.fromLine(line)) appendActivity(entry);
+        try {
+          const event = JSON.parse(line) as Record<string, unknown>;
+          const sessionId = event["thread_id"] ?? event["session_id"] ?? event["sessionID"] ?? event["sessionId"];
+          if (!metadata["sessionId"] && typeof sessionId === "string") {
+            metadata["sessionId"] = sessionId;
+            saveMetadata();
+          }
+        } catch { /* Partial/non-JSON output remains in the raw stream log. */ }
+      }
+    });
+    child.on("close", (code, signal) => {
+      Object.assign(metadata, { endedAt: new Date().toISOString(), exitCode: code, signal });
+      saveMetadata();
+      if (eventBuffer.trim()) for (const entry of normalizer.fromLine(eventBuffer)) appendActivity(entry);
+      appendActivity({ id: "run-end", kind: code === 0 ? "system" : "error", title: `Provider exited (${code ?? signal})`, text: JSON.stringify(metadata, null, 2), timestamp: metadata["endedAt"] });
+    });
+    process.stderr.write(`Provider pid=${child.pid} cwd=${spec.cwd} logs=${runDir}\n`);
+    const stderrDecoder = new StringDecoder("utf8");
     let stderr = "";
     child.stderr?.on("data", (c: Buffer) => {
-      stderr += c.toString("utf-8");
+      const decoded = stderrDecoder.write(c);
+      stderr += decoded;
+      appendFileSync(join(runDir, "stderr.log"), c);
+      appendActivity({ id: `stderr-${Date.now()}-${Math.random()}`, kind: "diagnostic", title: "Provider diagnostic", text: decoded, timestamp: new Date().toISOString() });
     });
     return {
       pid: child.pid,
+      recordActivity: appendActivity,
       stdoutLines(onLine) {
+        const decoder = new StringDecoder("utf8");
         let pending = "";
         child.stdout?.on("data", (c: Buffer) => {
-          pending += c.toString("utf-8");
+          pending += decoder.write(c);
           const parts = pending.split("\n");
           pending = parts.pop() ?? "";
           for (const line of parts) onLine(line);
@@ -132,15 +190,22 @@ export class Supervisor {
       stateRevision: revisionBefore,
       notes: storedNotes.notes,
       recentEvents: preFlight.recentEvents,
-      pendingDecisions: preFlight.requiredDecisions.map((d) => ({ id: d, type: "decision", summary: d })),
+      pendingDecisions: preFlight.requiredDecisions.map((d) => typeof d === "string"
+        ? { id: d, type: "decision", summary: d }
+        : { id: d.decisionId, type: d.decisionType, summary: JSON.stringify({ sourceRef: d.sourceRef, classification: d.classification, options: d.options }) }),
       guidance: args.guidance,
+      inbox: preFlight.inbox,
       continuityNote: args.resumeId ? `Resumed provider session ${args.resumeId}.` : args.context.continuityNote,
     });
 
-    const server = await startGameMcpServer(args.engine, args.binding);
+    let currentChild: RunningChild | undefined;
+    const server = await startGameMcpServer(args.engine, args.binding, entry => currentChild?.recordActivity?.(entry));
     try {
       const built = this.buildSpawn(prompt, args.resumeId, server.url, server.bearer);
-      const child = this.runner.spawn(built.spec, { ...process.env, ...built.env, ...args.extraEnv });
+      // Invocation credentials must win over inherited or supplemental env.
+      const child = this.runner.spawn({ ...built.spec, context: { ...built.spec.context,
+        matchId: args.binding.matchId, civId: args.binding.civId, turnSerial: args.context.turnSerial, runId: args.binding.runId } }, { ...process.env, ...args.extraEnv, ...built.env });
+      currentChild = child;
       const lines: string[] = [];
       let toolCallCount = 0;
       let guardHit: string | null = null;
@@ -158,8 +223,7 @@ export class Supervisor {
       });
       const timeout = setTimeout(() => {
         if (!guardHit) {
-          guardHit = "turn timeout; collecting evidence and pausing";
-          child.kill();
+          process.stderr.write(`Provider pid=${child.pid} is still active after ${this.turnTimeoutMs}ms; inspect its logs and process before taking action.\n`);
         }
       }, this.turnTimeoutMs);
       const exit = await done;

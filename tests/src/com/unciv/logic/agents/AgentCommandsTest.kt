@@ -194,7 +194,7 @@ class AgentCommandsTest {
         Assert.assertTrue(disbanded.disbanded)
         Assert.assertNull(f.coordinator.getUnitPosition(f.romeId, f.scoutId))
 
-        // Inactive actors are rejected before entity-specific legality checks.
+        // Inactive actors are rejected before examining unit ownership.
         try {
             f.coordinator.execute(
                 UnitOrderCommand(f.greeceId, "o6", f.rev(), f.warriorId, UnitOrder.WAKE))

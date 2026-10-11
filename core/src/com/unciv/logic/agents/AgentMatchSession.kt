@@ -12,6 +12,9 @@ import com.unciv.ui.screens.worldscreen.WorldScreen
 interface AgentMatchSession {
     val matchId: String
 
+    /** Immutable metadata from the host's committed post-construction state, captured under its lock. */
+    fun getCommittedMatchStateJson(): String? = null
+
     /** One-line status for the turn button: phase, active civ/provider, revision. */
     fun statusText(): String
 
@@ -40,7 +43,13 @@ interface AgentMatchSession {
         buildCommands: (expectedRevision: Int) -> List<(Int) -> AgentCommand>
     ): String?
 
-    /** Detach from the screen; shuts the supervisor down. */
+    /** Stop scheduling when navigation leaves this match; an active provider may finish normally. */
+    fun onMatchLeft() = pause()
+
+    /** Reopen the match's controls without automatically resuming its agents. */
+    fun onMatchEntered() {}
+
+    /** Detach from the screen; an active provider may finish before its supervisor shuts down. */
     fun close()
 
     // Platform-independent match controls (AI_AGENT_PLAN.md §9, §11)
@@ -56,8 +65,22 @@ interface AgentMatchSession {
     fun getRunState(): AgentRunState
     fun getActiveCivId(): String?
     fun getActiveAgentProfile(): AgentProfile?
+    /** Identity for activity from an earlier civilization, independent of the active turn. */
+    fun getAgentProfile(civId: String): AgentProfile? =
+        if (civId == getActiveCivId()) getActiveAgentProfile() else null
     fun getFailureReason(): String?
     fun isSpectatorMode(): Boolean
+    /** Live provider activity, available while a turn is still running. */
+    fun getActivity(): List<AgentActivityEntry> = emptyList()
+    fun getActivityDetails(id: String): String = ""
+    fun getActivityDirectory(): String? = null
+    /** Private mail for the attached viewer; spectators may inspect all conversations. */
+    fun getMessageContacts(): List<MessageContact> = emptyList()
+    fun getMessages(): List<DiplomaticMessage> = emptyList()
+    /** Saves off the rendering thread. Callback runs on GL; null means durably queued. */
+    fun sendMessage(targetCivId: String, text: String, onComplete: (String?) -> Unit) {
+        onComplete("Messaging is unavailable for this match")
+    }
     fun startAutomaticPlay()
 }
 
@@ -76,14 +99,26 @@ object AgentMatchSessionFactory {
     fun create(game: GameInfo, setup: AgentMatchSetup, screen: WorldScreen): AgentMatchSession? {
         if (setup.slots.isEmpty()) return null
         val creator = creator ?: return null
-        val match = setup.buildMatchState(game)
-        return creator(game, match, setup, screen).also {
-            game.agentMatchStateJson = AgentOrdinarySave.encode(match)
+        val session = creator(game, setup.buildMatchState(game), setup, screen)
+        return attachCapturedState(game, session)
+    }
+
+    private fun attachCapturedState(game: GameInfo, session: AgentMatchSession): AgentMatchSession {
+        try {
+            val captured = session.getCommittedMatchStateJson()
+            if (captured.isNullOrBlank())
+                throw com.unciv.logic.UncivShowableException("Agent host did not capture its committed match metadata.")
+            game.agentMatchStateJson = captured
+            return session
+        } catch (ex: Exception) {
+            session.close()
+            throw ex
         }
     }
 
     fun restore(game: GameInfo, match: AgentMatchState, screen: WorldScreen): AgentMatchSession {
         requireRestoreSupport()
-        return restorer!!(game, match.deepCopy(), AgentOrdinarySave.setupFor(game, match), screen)
+        val session = restorer!!(game, match.deepCopy(), AgentOrdinarySave.setupFor(game, match), screen)
+        return attachCapturedState(game, session)
     }
 }

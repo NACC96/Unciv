@@ -14,6 +14,7 @@ enum class AgentCommandError {
     INVALID_ARGUMENT,
     ILLEGAL_ACTION,
     DECISIONS_PENDING,
+    MESSAGES_UNACKNOWLEDGED,
     UNSUPPORTED_RULESET,
     ACTION_ID_CONFLICT,
     MUTATION_IN_PROGRESS,
@@ -25,5 +26,7 @@ class AgentCommandException(
     val code: AgentCommandError,
     message: String,
     /** Committed revision the client should re-observe from (STALE_STATE). */
-    val currentRevision: Int? = null
+    val currentRevision: Int? = null,
+    /** Only delivered incoming mail belonging to the acting civilization. */
+    val messageIds: List<String>? = null
 ) : Exception(message)

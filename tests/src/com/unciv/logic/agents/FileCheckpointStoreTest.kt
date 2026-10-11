@@ -119,4 +119,139 @@ class FileCheckpointStoreTest {
 
         dir.listFiles()?.forEach { it.delete() }
     }
+    private fun currentBundle(label: String): String {
+        val serializer = com.unciv.json.json().apply { setUsePrototypes(false) }
+        return serializer.toJson(AgentBundle(label, serializer.toJson(AgentMatchState(matchId = "m1", timelineId = "t1"))))
+    }
+    private fun generationFiles(dir: File) = dir.listFiles()!!.filter { it.name.endsWith(".unciv-agent") }.sortedBy { it.name }
+
+    @Test fun `bounded compressed store retains three verified generations after twenty writes and reopen`() {
+        val dir = freshDir("ckpt-bounded-")
+        try {
+            var store = FileCheckpointStore(dir, "m1", maxRetainedGenerations = 3)
+            for (revision in 1..20) {
+                if (revision == 11) store = FileCheckpointStore(dir, "m1", maxRetainedGenerations = 3)
+                store.writeBundle(currentBundle("revision-$revision " + "repeated geography ".repeat(10000)))
+            }
+            Assert.assertEquals(listOf("m1-gen-000018.unciv-agent", "m1-gen-000019.unciv-agent", "m1-gen-000020.unciv-agent"),
+                generationFiles(dir).map { it.name })
+            Assert.assertEquals(3, dir.listFiles()!!.count { it.name.endsWith(".sha256") })
+            val files = generationFiles(dir)
+            Assert.assertTrue(files.all { it.readBytes().take(2).map { byte -> byte.toInt() and 255 } == listOf(0x1f, 0x8b) })
+            Assert.assertTrue("Compressed retained disk must remain bounded", files.sumOf { it.length() } < 10000)
+            Assert.assertEquals(20, store.recover()!!.generation)
+            files.last().writeText("corrupt newest")
+            Assert.assertEquals(19, store.recover()!!.generation)
+            files[1].writeText("corrupt second newest")
+            Assert.assertEquals(18, store.recover()!!.generation)
+        } finally { dir.deleteRecursively() }
+    }
+
+    @Test fun `retention activation never deletes or rewrites preexisting archived generations`() {
+        val dir = freshDir("ckpt-archives-")
+        try {
+            val legacy = FileCheckpointStore(dir, "m1")
+            repeat(4) { legacy.writeBundle(currentBundle("archived-$it")) }
+            val archived = dir.listFiles()!!.associate { it.name to it.readBytes().toList() }
+            var store = FileCheckpointStore(dir, "m1", maxRetainedGenerations = 3)
+            repeat(10) {
+                if (it == 5) store = FileCheckpointStore(dir, "m1", maxRetainedGenerations = 3)
+                store.writeBundle(currentBundle("bounded-$it"))
+            }
+            Assert.assertEquals(7, generationFiles(dir).size)
+            for ((name, bytes) in archived) Assert.assertEquals(bytes, File(dir, name).readBytes().toList())
+            Assert.assertEquals(14, store.recover()!!.generation)
+        } finally { dir.deleteRecursively() }
+    }
+
+    @Test fun `compression recovery detects legacy plain and gzip bytes without filename changes`() {
+        val dir = freshDir("ckpt-mixed-")
+        try {
+            FileCheckpointStore(dir, "m1").writeBundle(currentBundle("plain legacy"))
+            val bounded = FileCheckpointStore(dir, "m1", maxRetainedGenerations = 3)
+            bounded.writeBundle(currentBundle("compressed current"))
+            Assert.assertEquals(2, FileCheckpointStore(dir, "m1").recover()!!.generation)
+            File(dir, "m1-gen-000002.unciv-agent").writeText("corrupt gzip")
+            val recovery = bounded.recover()!!
+            Assert.assertEquals(1, recovery.generation)
+            Assert.assertTrue(recovery.fellBack)
+            val bundle = com.unciv.json.json().fromJson(AgentBundle::class.java, recovery.bundleJson)
+            Assert.assertEquals("plain legacy", bundle.gameJson)
+        } finally { dir.deleteRecursively() }
+    }
+
+    @Test fun `failed new checksum publication keeps every old recoverable generation`() {
+        val dir = freshDir("ckpt-write-fail-")
+        try {
+            val store = FileCheckpointStore(dir, "m1", maxRetainedGenerations = 3)
+            repeat(3) { store.writeBundle(currentBundle("good-$it")) }
+            val blockedSidecar = File(dir, "m1-gen-000004.unciv-agent.sha256")
+            blockedSidecar.mkdirs()
+            File(blockedSidecar, "blocker").writeText("occupied")
+            try { store.writeBundle(currentBundle("cannot publish checksum")); Assert.fail("Expected checksum publication failure") }
+            catch (_: java.io.IOException) { }
+            Assert.assertTrue((1..3).all { File(dir, "m1-gen-${it.toString().padStart(6, '0')}.unciv-agent").exists() })
+            Assert.assertEquals(3, store.recover()!!.generation)
+        } finally { dir.deleteRecursively() }
+    }
+
+    @Test fun `pruning failure does not roll back a durable verified publication`() {
+        val dir = freshDir("ckpt-prune-fail-")
+        try {
+            val store = FileCheckpointStore(dir, "m1", maxRetainedGenerations = 3)
+            repeat(3) { store.writeBundle(currentBundle("good-$it")) }
+            val undeletable = File(dir, "m1-gen-000001.unciv-agent")
+            undeletable.delete()
+            undeletable.mkdirs()
+            File(undeletable, "blocker").writeText("occupied")
+            store.writeBundle(currentBundle("published despite cleanup failure"))
+            Assert.assertNotNull(store.lastRetentionFailure)
+            Assert.assertEquals(4, store.recover()!!.generation)
+            Assert.assertEquals(listOf(4, 3, 2), store.lastRetainedGenerations)
+        } finally { dir.deleteRecursively() }
+    }
+
+    @Test fun `future and mismatched new bundles cannot prune existing recovery fallback`() {
+        val dir = freshDir("ckpt-version-fail-")
+        try {
+            val store = FileCheckpointStore(dir, "m1", maxRetainedGenerations = 3)
+            repeat(3) { store.writeBundle(currentBundle("good-$it")) }
+            val serializer = com.unciv.json.json().apply { setUsePrototypes(false) }
+            store.writeBundle(serializer.toJson(AgentBundle("future", "{\"formatVersion\":3}", 3)))
+            store.writeBundle(serializer.toJson(AgentBundle("mismatched", "{\"formatVersion\":2}", 1)))
+            Assert.assertEquals(5, generationFiles(dir).size)
+            val recovery = FileCheckpointStore(dir, "m1", maxRetainedGenerations = 3).recover()!!
+            Assert.assertEquals(3, recovery.generation)
+            Assert.assertEquals(listOf(5, 4), recovery.discardedGenerations)
+            Assert.assertTrue((1..3).all { File(dir, "m1-gen-${it.toString().padStart(6, '0')}.unciv-agent").exists() })
+        } finally { dir.deleteRecursively() }
+    }
+
+    @Test fun `directory sync failure retains old fallbacks after published checkpoint`() {
+        val dir = freshDir("ckpt-sync-fail-")
+        var failSync = false
+        try {
+            val store = FileCheckpointStore(dir, "m1", maxRetainedGenerations = 3,
+                directorySync = { if (failSync) throw java.io.IOException("Injected directory sync failure") })
+            repeat(3) { store.writeBundle(currentBundle("good-$it")) }
+            failSync = true
+            store.writeBundle(currentBundle("published with uncertain directory sync"))
+            Assert.assertEquals(4, generationFiles(dir).size)
+            Assert.assertTrue(store.lastRetentionFailure!!.contains("directory sync failed"))
+            Assert.assertEquals(4, store.recover()!!.generation)
+        } finally { dir.deleteRecursively() }
+    }
+
+    @Test fun `activation policy sync failure publishes no checkpoint`() {
+        val dir = freshDir("ckpt-policy-sync-fail-")
+        try {
+            val store = FileCheckpointStore(dir, "m1", maxRetainedGenerations = 3,
+                directorySync = { throw java.io.IOException("Injected policy sync failure") })
+            try { store.writeBundle(currentBundle("must not publish")); Assert.fail("Expected activation failure") }
+            catch (_: java.io.IOException) { }
+            Assert.assertTrue(generationFiles(dir).isEmpty())
+            Assert.assertNull(store.recover())
+        } finally { dir.deleteRecursively() }
+    }
+
 }

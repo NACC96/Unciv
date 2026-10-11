@@ -66,3 +66,43 @@ describe("FakeGameService game.act contract (plan §5.1)", () => {
     expect(game.revision).toBe(43);
   });
 });
+
+it("fake read contract preserves memory and traverses bounded pages without omissions", async () => {
+  const game = new FakeGameService();
+  const tile = game.tiles[0]!;
+  game.tiles = [2, -1, 0, 1].map(x => ({ ...tile, x, visibility: x === 2 ? "REMEMBERED" : "VISIBLE" }));
+  const seen: number[] = [];
+  let cursor: string | undefined;
+  do {
+    const page = await game.map({ limit: 1, ...(cursor ? { cursor } : {}) });
+    if ("status" in page) throw Error(page.message);
+    expect(page.tiles).toHaveLength(1);
+    seen.push(page.tiles[0]!.x);
+    cursor = page.nextCursor ?? undefined;
+  } while (cursor);
+  expect(seen).toEqual([-1, 0, 1, 2]);
+  expect(await game.map({ mode: "VISIBLE" })).toMatchObject({ tiles: [{ x: -1 }, { x: 0 }, { x: 1 }] });
+  expect(await game.map({ center: { x: 0, y: 0 }, radius: 0 })).toMatchObject({ tiles: [{ x: 0 }] });
+  expect(await game.map({ center: { x: 0, y: 0 }, radius: 8, limit: 128 })).toMatchObject({ tiles: [{ x: -1 }, { x: 0 }, { x: 1 }, { x: 2 }] });
+  expect(await game.map({ center: { x: 0, y: 0 } })).toMatchObject({ code: "INVALID_ARGUMENT" });
+  const first = await game.map({ limit: 1 });
+  if ("status" in first || !first.nextCursor) throw Error("missing cursor");
+  expect(await game.map({ limit: 2, cursor: first.nextCursor })).toMatchObject({ code: "INVALID_ARGUMENT" });
+  game.revision++;
+  expect(await game.map({ limit: 1, cursor: first.nextCursor })).toMatchObject({ code: "STALE_STATE" });
+  expect(await game.inspectTile({ x: 999, y: 999 })).toBeNull();
+  expect(game.tiles[0]).toMatchObject({ lastSeenRevision: 42 });
+});
+
+it("fake pagination accounts for Unicode page/cursor overhead and rejects a single oversized tile", async () => {
+  const game = new FakeGameService();
+  const tile = { ...game.tiles[0]!, terrain: "雪".repeat(18 * 1024) };
+  game.tiles = [tile, { ...tile, x: 1 }];
+  const first = await game.map({ limit: 128 });
+  if ("status" in first || !first.nextCursor) throw Error("expected early bounded page");
+  expect(first.tiles).toHaveLength(1);
+  expect(Buffer.byteLength(JSON.stringify(first), "utf8")).toBeLessThanOrEqual(96 * 1024);
+  expect(await game.map({ limit: 128, cursor: first.nextCursor })).toMatchObject({ tiles: [{ x: 1 }], nextCursor: null });
+  game.tiles[0]!.terrain = "雪".repeat(33 * 1024);
+  expect(await game.map()).toMatchObject({ status: "rejected", code: "INVALID_ARGUMENT" });
+});

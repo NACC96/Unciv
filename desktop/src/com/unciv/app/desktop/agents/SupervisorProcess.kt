@@ -26,6 +26,7 @@ class SupervisorProcess(
     nodeExecutable: File,
     daemonJs: File,
     private val turnTimeoutMinutes: Long = 10,
+    activityLogsDir: File? = null,
     private val answerEngineRequest: (method: String, params: Map<String, Any?>) -> Any? = { _, _ -> null }
 ) : SupervisorRunner {
     data class TurnOutcome(
@@ -40,6 +41,12 @@ class SupervisorProcess(
     private val process: Process = ProcessBuilder(
         nodeExecutable.absolutePath, daemonJs.absolutePath)
         .redirectErrorStream(false)
+        .apply {
+            if (activityLogsDir != null) {
+                activityLogsDir.mkdirs()
+                environment()["UNCIV_AGENT_LOG_DIR"] = activityLogsDir.absolutePath
+            }
+        }
         .start()
     private val writer = PrintWriter(process.outputStream, true)
     private val events = LinkedBlockingQueue<Map<String, Any?>>()
@@ -101,9 +108,15 @@ class SupervisorProcess(
             sendFrame(mapOf("protocol" to 1, "kind" to "engine_response",
                 "id" to id, "ok" to true, "result" to result))
         } catch (ex: EngineCallException) {
+            val error = buildMap<String, Any> {
+                put("code", ex.code)
+                put("message", ex.message ?: ex.code)
+                ex.currentRevision?.let { put("currentRevision", it) }
+                ex.messageIds?.let { put("messageIds", it) }
+            }
             sendFrame(mapOf("protocol" to 1, "kind" to "engine_response",
                 "id" to id, "ok" to false,
-                "error" to mapOf("code" to ex.code, "message" to (ex.message ?: ex.code))))
+                "error" to error))
         } catch (ex: Exception) {
             sendFrame(mapOf("protocol" to 1, "kind" to "engine_response",
                 "id" to id, "ok" to false,
@@ -127,8 +140,18 @@ class SupervisorProcess(
         sendFrame(control)
         var sessionId: String? = null
         val deadline = System.currentTimeMillis() + turnTimeoutMinutes * 60 * 1000
-        while (System.currentTimeMillis() < deadline) {
-            val frame = events.poll(200, TimeUnit.MILLISECONDS) ?: continue
+        var warned = false
+        while (true) {
+            if (!warned && System.currentTimeMillis() >= deadline) {
+                warned = true
+                logLines.add("Provider turn is still active after $turnTimeoutMinutes minutes; waiting for its outcome. Inspect activity and process liveness before taking action.")
+            }
+            val frame = events.poll(200, TimeUnit.MILLISECONDS)
+            if (frame == null) {
+                if (!process.isAlive) return TurnOutcome("failed", sessionId, null, false, emptyList(),
+                    "supervisor exited before a turn outcome (see supervisor logs)")
+                continue
+            }
             if (frame["kind"] != "turn_event") continue
             @Suppress("UNCHECKED_CAST")
             val payload = (frame["payload"] as? Map<String, Any?>) ?: emptyMap()
@@ -146,18 +169,16 @@ class SupervisorProcess(
                 )
             }
         }
-        return TurnOutcome("failed", sessionId, null, false, emptyList(),
-            "no turn outcome within $turnTimeoutMinutes minutes (see supervisor logs)")
     }
 
-    /** Graceful shutdown: EOF semantics via control, then bounded wait. */
+    /** Drain the active turn with engine responses still connected, then wait for natural exit. */
     override fun shutdown() {
         try {
             sendFrame(mapOf("protocol" to 1, "kind" to "control", "op" to "shutdown"))
         } catch (ex: Exception) {
             Log.error("Supervisor shutdown write failed", ex)
         }
-        if (!process.waitFor(15, TimeUnit.SECONDS)) process.destroyForcibly()
+        process.waitFor()
     }
 
     override fun kill() {

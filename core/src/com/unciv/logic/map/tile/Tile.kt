@@ -266,6 +266,19 @@ class Tile : IsPartOfGameInfoSerialization {
         return toReturn
     }
 
+    /** Detached yield context: excludes a foreign city's private modifiers, without owner registry writes. */
+    internal fun cloneForObservation(ownCity: City?): Tile = clone(addUnits = false).also { snapshot ->
+        snapshot.tileMap = tileMap
+        snapshot.ruleset = ruleset
+        snapshot.baseTerrainObject = baseTerrainObject
+        snapshot.allTerrains = allTerrains
+        snapshot.lastTerrain = lastTerrain
+        snapshot.cachedTerrainData = cachedTerrainData
+        snapshot.owningCity = ownCity
+        snapshot.isCityCenterInternal = isCityCenterInternal
+        snapshot.stateThisTile = GameContext(tile = snapshot, city = ownCity, gameInfo = tileMap.gameInfo)
+    }
+
     @Readonly fun getHillTerrain(): Terrain? {
         val base = getBaseTerrain()
         if (base.isHill)
@@ -306,7 +319,7 @@ class Tile : IsPartOfGameInfoSerialization {
     /** Actively observed tiles (no fog of war) */
     @Readonly
     fun isVisible(player: Civilization): Boolean {
-        if (DebugUtils.VISIBLE_MAP)
+        if (DebugUtils.VISIBLE_MAP && !usesNormalAgentVision(player))
             return true
         return player.viewableTiles.contains(this)
     }
@@ -314,10 +327,16 @@ class Tile : IsPartOfGameInfoSerialization {
     /** Tiles that at some point have been explored (may have fog of war) */
     @Readonly
     fun isExplored(player: Civilization): Boolean {
-        if (DebugUtils.VISIBLE_MAP || player.isSpectator())
+        if (!usesNormalAgentVision(player) && (DebugUtils.VISIBLE_MAP || player.isSpectator()))
             return true
         return exploredBy.contains(player.civID)
     }
+
+    @Readonly private fun usesNormalAgentVision(player: Civilization): Boolean =
+        isTilemapInitialized() && tileMap.hasGameInfo() && tileMap.gameInfo.agentNormalVisibility && !player.isSpectator()
+
+    /** Actual saved exploration, independent of spectator and debug presentation. */
+    @Readonly fun isExploredNormally(player: Civilization): Boolean = exploredBy.contains(player.civID)
 
     @Readonly fun isCityCenter(): Boolean = isCityCenterInternal
     @Readonly fun isNaturalWonder(): Boolean = naturalWonder != null

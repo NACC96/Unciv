@@ -2,11 +2,15 @@ package com.unciv.logic.agents
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.files.FileHandle
+import com.badlogic.gdx.utils.Json
 import com.badlogic.gdx.utils.JsonReader
+import com.badlogic.gdx.utils.JsonWriter
 import com.unciv.UncivGame
 import com.unciv.app.desktop.agents.DesktopAgentMatch
 import com.unciv.json.json
 import com.unciv.logic.GameInfo
+import com.unciv.logic.map.HexCoord
+import com.unciv.utils.DebugUtils
 import com.unciv.logic.files.UncivFiles
 import com.unciv.models.metadata.BaseRuleset
 import com.unciv.testing.BaseTestRunner
@@ -155,7 +159,7 @@ class AgentOrdinarySaveTest {
             val bundle = json().fromJson(AgentBundle::class.java, coordinator.saveToJson())
             assertNull(JsonReader().parse(bundle.gameJson).get("agentMatchStateJson"))
             assertNull(JsonReader().parse(bundle.matchJson).get("gameJson"))
-            assertEquals(1, JsonReader().parse(bundle.matchJson).getInt("formatVersion"))
+            assertEquals(AGENT_MATCH_FORMAT_VERSION, JsonReader().parse(bundle.matchJson).getInt("formatVersion"))
             snapshot = AgentSnapshotPublication.deserializeGame(AgentSnapshotPublication.buildPayload(coordinator, f.civId))
         }
         assertEquals(UncivFiles.gameInfoToString(f.snapshot(), false), UncivFiles.gameInfoToString(snapshot, false))
@@ -202,6 +206,7 @@ class AgentOrdinarySaveTest {
         val match = savedMatch(snapshot)
         val world = Mockito.mock(WorldScreen::class.java)
         val session = Mockito.mock(AgentMatchSession::class.java)
+        Mockito.`when`(session.getCommittedMatchStateJson()).thenReturn(AgentOrdinarySave.encode(match))
         val oldCreator = AgentMatchSessionFactory.creator
         val oldRestorer = AgentMatchSessionFactory.restorer
         try {
@@ -220,7 +225,8 @@ class AgentOrdinarySaveTest {
                 session
             }
             assertSame(session, AgentMatchSessionFactory.restore(snapshot, match, world))
-            Mockito.verifyNoInteractions(session)
+            Mockito.verify(session).getCommittedMatchStateJson()
+            Mockito.verifyNoMoreInteractions(session)
             AgentMatchSessionFactory.restorer = { _, _, _, _ -> error("Restore failure") }
             assertThrows(IllegalStateException::class.java) { AgentMatchSessionFactory.restore(snapshot, match, world) }
         } finally {
@@ -234,6 +240,9 @@ class AgentOrdinarySaveTest {
         val base = f.snapshot()
         val variants = listOf("", " ", "null", "[]", "{}", "{broken",
             AgentOrdinarySave.encode(savedMatch(base).apply { formatVersion = 999 }),
+            base.agentMatchStateJson!!.replace("\"formatVersion\":2", "\"formatVersion\":1.5"),
+            base.agentMatchStateJson!!.replace("\"formatVersion\":2", "\"formatVersion\":\"2\""),
+            base.agentMatchStateJson!!.replace("\"encodingVersion\":1", "\"encodingVersion\":999"),
             AgentOrdinarySave.encode(savedMatch(base).apply { controllers.clear() }),
             AgentOrdinarySave.encode(savedMatch(base).apply { matchId = "../escaped" }),
             AgentOrdinarySave.encode(savedMatch(base).apply { currentTurnReceipts.add(ActionReceipt(actorCivId = f.civId, timelineId = "other")) }))
@@ -245,11 +254,153 @@ class AgentOrdinarySaveTest {
         val missing = base.clone().apply { agentMatchStateJson = null; version = com.unciv.logic.CompatibilityVersion.CURRENT_COMPATIBILITY_VERSION }
         assertThrows(Exception::class.java) { UncivFiles.gameInfoFromString(json().toJson(missing)) }
         val historical = base.clone().apply {
+            // Genuine v1 had neither a format field nor map knowledge. Keep its saved identities/controllers.
             val root = JsonReader().parse(agentMatchStateJson)
             root.remove("formatVersion")
-            agentMatchStateJson = root.toJson(com.badlogic.gdx.utils.JsonWriter.OutputType.json)
+            root.remove("mapKnowledge")
+            agentMatchStateJson = root.toJson(JsonWriter.OutputType.json)
         }
-        assertEquals(1, AgentOrdinarySave.read(UncivFiles.gameInfoFromString(json().toJson(historical)))!!.formatVersion)
+        val migrated = AgentOrdinarySave.read(UncivFiles.gameInfoFromString(json().toJson(historical)))!!
+        assertEquals(AGENT_MATCH_FORMAT_VERSION, migrated.formatVersion)
+        assertTrue(migrated.mapKnowledge.tilesByCiv.isEmpty())
+        assertEquals("saved-match", migrated.matchId)
+        assertEquals("snapshot A", migrated.privateNotes[f.civId])
+    }
+
+    @Test fun `ordinary compact and legacy-v2 memories preserve hidden facts and resource provenance`() {
+        val f = Fixture()
+        val base = f.snapshot()
+        val memory = ObservedTile(4, 0, detailsKnown = true, lastSeenTurn = 1,
+            lastSeenRevision = 2, terrain = "Grassland", features = arrayListOf("Forest"),
+            resource = ObservedResource("Iron", 6, 2, 4, ResourceKnowledgeSource.TECHNOLOGY),
+            ownerCivId = f.civId, improvement = "Mine", land = true, water = false)
+        val state = savedMatch(base).apply { mapKnowledge.put(f.civId, memory) }
+        val compact = AgentOrdinarySave.encode(state)
+        val legacy = Json(JsonWriter.OutputType.json).apply { setUsePrototypes(false) }.toJson(state)
+        assertTrue(compact.contains("\"encodingVersion\":1"))
+        assertTrue(legacy.contains("tilesByCiv"))
+        for (encoded in listOf(compact, legacy)) {
+            val selected = base.clone().apply { agentMatchStateJson = encoded }
+            val loaded = UncivFiles.gameInfoFromString(UncivFiles.gameInfoToString(selected, false))
+            val restored = AgentOrdinarySave.read(loaded)!!
+            assertEquals(AGENT_MATCH_FORMAT_VERSION, restored.formatVersion)
+            assertEquals(memory.toWire(), restored.mapKnowledge.get(f.civId, HexCoord(4, 0))!!.toWire())
+            val host = MatchCoordinator(loaded, restored)
+            val remembered = host.inspectTile(f.civId, HexCoord(4, 0))!!
+            assertEquals(TileKnowledgeVisibility.REMEMBERED, remembered.visibility)
+            assertEquals(2, remembered.lastSeenRevision)
+            assertEquals(ResourceKnowledgeSource.TECHNOLOGY, remembered.resource!!.source)
+            assertEquals(4, remembered.resource!!.updatedRevision)
+            val rewritten = AgentSnapshotPublication.buildPayload(host, f.civId).serializedMatchState
+            assertTrue(rewritten.contains("\"encodingVersion\":1"))
+        }
+    }
+
+    @Test fun `ordinary loading uses normal visibility before the first transients even with debug reveal`() {
+        val f = Fixture()
+        val saved = UncivFiles.gameInfoToString(f.snapshot(), false)
+        val previous = DebugUtils.VISIBLE_MAP
+        try {
+            DebugUtils.VISIBLE_MAP = true
+            val restored = UncivFiles.gameInfoFromString(saved)
+            assertTrue(restored.agentNormalVisibility)
+            assertFalse(restored.tileMap[HexCoord(4, 0)].isExploredNormally(restored.getCivilization(f.civId)))
+            assertNull(MatchCoordinator(restored, AgentOrdinarySave.read(restored)!!).inspectTile(f.civId, HexCoord(4, 0)))
+        } finally { DebugUtils.VISIBLE_MAP = previous }
+    }
+
+    @Test fun `initial factory metadata comes from constructed canonical knowledge`() {
+        val f = Fixture()
+        val setup = AgentOrdinarySave.setupFor(f.game.gameInfo, savedMatch(f.snapshot()))
+        val original = AgentMatchSessionFactory.creator
+        val session = Mockito.mock(AgentMatchSession::class.java)
+        try {
+            AgentMatchSessionFactory.creator = { game, match, _, _ ->
+                assertTrue(match.mapKnowledge.tilesByCiv.isEmpty())
+                val canonical = MatchCoordinator(game, match)
+                val captured = canonical.serializeCommittedMatchForPublication()
+                val initial = json().fromJson(AgentMatchState::class.java, captured)
+                assertFalse(initial.mapKnowledge.tilesByCiv[f.civId]!!.isEmpty())
+                Mockito.`when`(session.getCommittedMatchStateJson()).thenReturn(captured)
+                session
+            }
+            assertSame(session, AgentMatchSessionFactory.create(f.game.gameInfo, setup, Mockito.mock(WorldScreen::class.java)))
+            val saved = AgentOrdinarySave.read(f.game.gameInfo)!!
+            assertFalse(saved.mapKnowledge.tilesByCiv[f.civId]!!.isEmpty())
+            assertEquals("Grassland", saved.mapKnowledge.get(f.civId, HexCoord())!!.terrain)
+        } finally { AgentMatchSessionFactory.creator = original }
+    }
+
+    @Test fun `initial factory refuses uncaptured metadata instead of saving raw setup state`() {
+        val f = Fixture()
+        val setup = AgentOrdinarySave.setupFor(f.game.gameInfo, savedMatch(f.snapshot()))
+        val original = AgentMatchSessionFactory.creator
+        try {
+            AgentMatchSessionFactory.creator = { _, _, _, _ -> Mockito.mock(AgentMatchSession::class.java) }
+            assertThrows(Exception::class.java) {
+                AgentMatchSessionFactory.create(f.game.gameInfo, setup, Mockito.mock(WorldScreen::class.java))
+            }
+            assertNull(f.game.gameInfo.agentMatchStateJson)
+        } finally { AgentMatchSessionFactory.creator = original }
+    }
+
+    @Test fun `frozen ordinary save retains map mail acknowledgement and private receipts before later changes`() {
+        val game = TestGame(baseRuleset = BaseRuleset.Civ_V_Vanilla).apply {
+            makeHexagonalMap(7)
+            gameInfo.gameParameters.baseRuleset = BaseRuleset.Civ_V_Vanilla.fullName
+        }
+        val rome = game.addCiv(game.ruleset.nations["Rome"]!!, isPlayer = true)
+        val greece = game.addCiv(game.ruleset.nations["Greece"]!!, isPlayer = true)
+        val china = game.addCiv(game.ruleset.nations["China"]!!, isPlayer = true)
+        for ((civ, x) in listOf(rome to 0, greece to 3, china to -5)) {
+            game.addCity(civ, game.getTile(x, 0))
+            game.addUnit("Warrior", civ, game.getTile(x, -1))
+        }
+        rome.diplomacyFunctions.makeCivilizationsMeet(greece)
+        game.gameInfo.currentPlayer = rome.civID
+        val state = AgentMatchState(matchId = "mail-save", timelineId = "mail-timeline",
+            turnSerial = 5, turnPhase = TurnPhase.AWAITING_DECISIONS)
+        for (civ in listOf(rome, greece, china)) state.controllers[civ.civID] = CivilizationController(
+            civ.civID, ControllerKind.EXTERNAL_AGENT, AgentProfile("p-${civ.civID}", civ.civName, "codex", "gpt-6-luna", "xhigh", "", 1))
+        state.diplomaticMessages.add(DiplomaticMessage("incoming", greece.civID, rome.civID,
+            "Please protect the border.", 2, 5))
+        state.mapKnowledge.put(rome.civID, ObservedTile(7, 0, detailsKnown = true,
+            lastSeenTurn = 1, lastSeenRevision = 0, terrain = "Desert"))
+        val coordinator = MatchCoordinator(game.gameInfo, state)
+        val bridge = AgentEngineBridge(coordinator)
+        val newlyVisible = HexCoord(-3, -1)
+        assertNull(coordinator.inspectTile(rome.civID, newlyVisible))
+        bridge.act(mapOf("protocolVersion" to 1, "actorCivId" to rome.civID, "actionId" to "ack-a",
+            "expectedRevision" to 0, "type" to "diplomacy.acknowledgeMessage",
+            "args" to mapOf("messageId" to "incoming", "text" to "I read your request.")))
+        val a = AgentSnapshotPublication.deserializeGame(AgentSnapshotPublication.buildPayload(coordinator, rome.civID))
+        val frozenA = UncivFiles.gameInfoToString(a.clone(), false)
+        coordinator.queueGuidance(rome.civID, "Newer guidance")
+        coordinator.execute(UpdateNotesCommand(rome.civID, "Newer notes", 0))
+        bridge.act(mapOf("protocolVersion" to 1, "actorCivId" to rome.civID, "actionId" to "send-b",
+            "expectedRevision" to 1, "type" to "diplomacy.message",
+            "args" to mapOf("targetCivId" to greece.civID, "text" to "Newer message B")))
+        coordinator.execute(MoveUnitCommand(rome.civID, "move-b", 2,
+            rome.units.getCivUnits().single().id, HexCoord(-2, -1)))
+        assertNotNull(coordinator.inspectTile(rome.civID, newlyVisible))
+        val loadedA = UncivFiles.gameInfoFromString(frozenA)
+        val savedA = AgentOrdinarySave.read(loadedA)!!
+        val restored = MatchCoordinator(loadedA, savedA)
+        assertEquals(1, restored.getStateRevision())
+        assertEquals("I read your request.", restored.getMessageHistory(rome.civID).single().acknowledgementText)
+        assertTrue(restored.getMessageHistory(china.civID).isEmpty())
+        assertNotNull(restored.getReceipt("ack-a"))
+        assertNull(restored.getReceipt("send-b"))
+        assertTrue(savedA.guidanceQueue.isEmpty())
+        assertTrue(savedA.privateNotes.isEmpty())
+        assertEquals("Desert", restored.inspectTile(rome.civID, HexCoord(7, 0))!!.terrain)
+        assertNull(restored.inspectTile(rome.civID, newlyVisible))
+        assertNull(restored.getReceipt("move-b"))
+        assertEquals(mapOf("status" to "rejected", "actionId" to "ack-a"),
+            AgentEngineBridge(restored).actionResult("ack-a", china.civID))
+        // HashMap key order is not part of save semantics; every nested world field must still match.
+        assertEquals(AgentJson.parse(frozenA), AgentJson.parse(UncivFiles.gameInfoToString(a, false)))
+        assertEquals(JsonReader().parse(frozenA).getString("agentMatchStateJson"), a.agentMatchStateJson)
     }
 
     @Test fun `default and numbered autosaves preserve frozen agent metadata in isolated storage`() {
@@ -457,15 +608,19 @@ class AgentOrdinarySaveTest {
         UncivGame::class.java.getDeclaredField("worldScreen").apply { isAccessible = true }.set(UncivGame.Current, screen)
         UncivGame.Current.gameInfo = initial
         val newer = AgentSnapshotPublication.deserializeGame(newerPayload)
-        screen.installAgentSnapshot(newer, ResolvedSelection(null, null, null), newerPayload.generation)
-        screen.installAgentSnapshot(AgentSnapshotPublication.deserializeGame(olderPayload),
-            ResolvedSelection(null, null, null), olderPayload.generation)
-        assertSame(newer, screen.gameInfo)
-        assertSame(newer, UncivGame.Current.gameInfo)
-        assertEquals("newer frame B", savedMatch(UncivGame.Current.gameInfo!!).privateNotes[f.civId])
-        val rebinds = Mockito.mockingDetails(map).invocations.filter { it.method.name.startsWith("rebindToSnapshot") }
-        assertEquals(1, rebinds.size)
-        assertSame(newer.tileMap, rebinds.single().arguments.single())
+        val previousGraphics = Gdx.graphics
+        Gdx.graphics = Mockito.mock(com.badlogic.gdx.Graphics::class.java)
+        try {
+            screen.installAgentSnapshot(newer, ResolvedSelection(null, null, null), newerPayload.generation)
+            screen.installAgentSnapshot(AgentSnapshotPublication.deserializeGame(olderPayload),
+                ResolvedSelection(null, null, null), olderPayload.generation)
+            assertSame(newer, screen.gameInfo)
+            assertSame(newer, UncivGame.Current.gameInfo)
+            assertEquals("newer frame B", savedMatch(UncivGame.Current.gameInfo!!).privateNotes[f.civId])
+            val rebinds = Mockito.mockingDetails(map).invocations.filter { it.method.name.startsWith("rebindToSnapshot") }
+            assertEquals(1, rebinds.size)
+            assertSame(newer.tileMap, rebinds.single().arguments.single())
+        } finally { Gdx.graphics = previousGraphics }
     }
 
     @Test fun `GUI restored-world attachment leaves no resumable uncontrolled world on failure`() {
@@ -486,11 +641,13 @@ class AgentOrdinarySaveTest {
             assertFalse(com.unciv.GUI.isWorldLoaded())
             Mockito.verify(world).dispose()
             val session = Mockito.mock(AgentMatchSession::class.java)
+            Mockito.`when`(session.getCommittedMatchStateJson()).thenReturn(snapshot.agentMatchStateJson)
             AgentMatchSessionFactory.restorer = { _, _, _, _ -> session }
             method.invoke(UncivGame.Current, world, savedMatch(snapshot))
             assertSame(world, UncivGame.Current.worldScreen)
             Mockito.verify(world).agentSession = session
-            Mockito.verifyNoInteractions(session)
+            Mockito.verify(session).getCommittedMatchStateJson()
+            Mockito.verifyNoMoreInteractions(session)
         } finally { AgentMatchSessionFactory.restorer = oldRestorer }
     }
 }
