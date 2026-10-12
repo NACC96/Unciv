@@ -135,7 +135,7 @@ class WorldScreenHudTest {
     private fun AgentActivityFeed.selectNation(label: String) {
         @Suppress("UNCHECKED_CAST")
         val picker = descendants().filterIsInstance<SelectBox<*>>().single() as SelectBox<Any>
-        picker.selected = picker.items.first { it.toString() == label }
+        picker.selected = picker.items.first { it.toString() == label || it.toString().endsWith(" · $label") }
     }
     private fun AgentActivityFeed.messageIds() = descendants().filterIsInstance<Label>()
         .map { it.text.toString() }.filter { it.startsWith("Message ") }.toList()
@@ -388,7 +388,9 @@ class WorldScreenHudTest {
                     val picker = feed.descendants().filterIsInstance<SelectBox<*>>().single()
                     assertEquals(11, picker.items.size)
                     assertEquals("Every real nation should retain its full identity in the choices", nations.toSet(),
-                        picker.items.toList().drop(2).map { it.toString().substringBefore(" · ") }.toSet())
+                        picker.items.toList().drop(2).map { it.toString().substringAfter(". ")
+                            .removePrefix("Current · ").removePrefix("Eliminated · ")
+                            .removePrefix("Previous in order · ").substringBefore(" · ") }.toSet())
                     for (actor in feed.descendants().filter { it !== feed }) {
                         val point = actor.localToAscendantCoordinates(feed, Vector2())
                         val label = when (actor) {
@@ -585,12 +587,63 @@ class WorldScreenHudTest {
         assertTrue(feed.messageIds().all { it.startsWith("Message rome") })
         val picker = feed.descendants().filterIsInstance<SelectBox<*>>().single()
         assertEquals("Follow active nation", picker.selected.toString())
-        assertEquals(setOf("Follow active nation", "All nations", "Korea · Nova", "Rome · Atlas"), picker.items.map { it.toString() }.toSet())
+        assertEquals(listOf("Follow active nation", "All nations", "1. Current · Rome · Atlas", "2. Eliminated · Korea · Nova"),
+            picker.items.map { it.toString() })
         f.active = "Korea"
         feed.refreshNow()
         assertTrue(feed.messageIds().all { it.startsWith("Message korea") })
         val scroll = feed.descendants().filterIsInstance<AutoScrollPane>().single()
         assertEquals(scroll.maxY, scroll.scrollY, 0.1f)
+    }
+
+    @Test fun `nation picker uses numbered engine order rather than alphabetical agent names`() {
+        val f = Fixture()
+        val china = f.game.addCiv(f.game.ruleset.nations["China"]!!)
+        for (civ in listOf(f.rome, f.korea, china)) f.game.addUnit("Settler", civ, null)
+        f.active = "Korea"
+        val feed = f.feed()
+        val picker = feed.descendants().filterIsInstance<SelectBox<*>>().single()
+        assertEquals(listOf("Follow active nation", "All nations",
+            "1. Previous in order · Rome · Atlas", "2. Current · Korea · Nova", "3. China · Nova"),
+            picker.items.map { it.toString() })
+    }
+
+    @Test fun `previous nation wraps and skips eliminated nations without losing historical filters`() {
+        val f = Fixture()
+        val china = f.game.addCiv(f.game.ruleset.nations["China"]!!)
+        for (civ in listOf(f.rome, f.korea, china)) f.game.addUnit("Settler", civ, null)
+        f.korea.hasEverOwnedOriginalCapital = true // No remaining cities: excluded from rotation.
+        Mockito.`when`(f.session.getAgentProfile("China")).thenReturn(null)
+        f.activity = listOf(entry("old-china").copy(civId = "China"), entry("unknown").copy(civId = "Unknown"))
+        val feed = f.feed()
+        val picker = feed.descendants().filterIsInstance<SelectBox<*>>().single()
+        assertEquals(listOf("Follow active nation", "All nations",
+            "1. Current · Rome · Atlas", "2. Eliminated · Korea · Nova", "3. Previous in order · China"),
+            picker.items.map { it.toString() })
+        f.active = "China"
+        feed.refreshNow()
+        assertEquals(listOf("Follow active nation", "All nations",
+            "1. Previous in order · Rome · Atlas", "2. Eliminated · Korea · Nova", "3. Current · China"),
+            picker.items.map { it.toString() })
+    }
+
+    @Test fun `turn order label changes preserve fixed nation selection and reading position`() {
+        val f = Fixture()
+        for (civ in listOf(f.rome, f.korea)) f.game.addUnit("Settler", civ, null)
+        f.activity = (1..40).map { entry("rome$it") }
+        val feed = f.feed()
+        @Suppress("UNCHECKED_CAST")
+        val picker = feed.descendants().filterIsInstance<SelectBox<*>>().single() as SelectBox<Any>
+        picker.selected = picker.items.first { it.toString() == "1. Current · Rome · Atlas" }
+        val scroll = feed.descendants().filterIsInstance<AutoScrollPane>().single()
+        scroll.captureListeners.filterIsInstance<InputListener>().forEach { it.scrolled(InputEvent(), 0f, 0f, 0f, -1f) }
+        scroll.scrollY = 20f
+        f.active = "Korea"
+        feed.refreshNow()
+        assertEquals("1. Previous in order · Rome · Atlas", picker.selected.toString())
+        assertEquals(20f, scroll.scrollY, 0.1f)
+        assertTrue(feed.messageIds().all { it.startsWith("Message rome") })
+        assertFalse(feed.descendants().filterIsInstance<TextButton>().single { it.text.toString() == "Live" }.isChecked)
     }
 
     @Test fun `reading holds the auto nation across turns and hidden activity leaves scroll and unread alone`() {
@@ -645,7 +698,7 @@ class WorldScreenHudTest {
         feed.toggle()
         feed.toggle()
         feed.refreshNow()
-        assertEquals("Rome · Atlas", feed.descendants().filterIsInstance<SelectBox<*>>().single().selected.toString())
+        assertTrue(feed.descendants().filterIsInstance<SelectBox<*>>().single().selected.toString().endsWith(" · Rome · Atlas"))
         assertTrue(feed.messageIds().single().startsWith("Message rome."))
         assertTrue("A fixed feed must identify its selected nation while a different agent thinks", feed.descendants().filterIsInstance<Label>().any { it.text.toString().contains("Rome") && it.text.toString().contains("activity", ignoreCase = true) })
     }
@@ -687,7 +740,7 @@ class WorldScreenHudTest {
         f.activity = listOf(entry("own")) // Host supplies only the viewer's private activity.
         val feed = f.feed()
         val picker = feed.descendants().filterIsInstance<SelectBox<*>>().single()
-        assertEquals(setOf("Follow active nation", "All nations", "Rome · Atlas"), picker.items.map { it.toString() }.toSet())
+        assertEquals(listOf("Follow active nation", "All nations", "1. Eliminated · Rome · Atlas"), picker.items.map { it.toString() })
         assertTrue(feed.messageIds().single().startsWith("Message own."))
         feed.selectNation("All nations")
         assertTrue(feed.messageIds().single().startsWith("Message own."))

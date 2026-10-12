@@ -225,7 +225,7 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
             deliberateFilterSwitch = true
             followLive = true
         }
-        updateNationPicker(activity)
+        updateNationPicker(activity, active)
         val viewedCiv = when (selectedFilter.mode) {
             FilterMode.ALL -> null
             FilterMode.NATION -> selectedFilter.civId
@@ -272,17 +272,34 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
         updateFooter()
     }
 
-    private fun updateNationPicker(activity: List<AgentActivityEntry>) {
+    private fun updateNationPicker(activity: List<AgentActivityEntry>, activeCivId: String?) {
         val viewer = screen.viewingCiv
+        // Both native and agent turn rotation traverse this saved list, not alphabetical names.
         val majorNations = screen.gameInfo.civilizations.filter {
             it.isMajorCiv() && (viewer.isSpectator() || it.civID == viewer.civID)
-        }.map { it.civID }.toSet()
-        val agentNations = majorNations.filter { session.getAgentProfile(it) != null }
-        val historicalNations = activity.map { it.civId }.toSet().filter { it in majorNations }
-        val selectedNation = selectedFilter.civId?.takeIf { it in majorNations }?.let { setOf(it) }.orEmpty()
-        val nations = (agentNations + historicalNations + selectedNation).distinct().sorted().map { id ->
+        }
+        val majorIds = majorNations.map { it.civID }.toSet()
+        val agentNations = majorIds.filter { session.getAgentProfile(it) != null }
+        val historicalNations = activity.map { it.civId }.toSet().filter { it in majorIds }
+        val selectedNation = selectedFilter.civId?.takeIf { it in majorIds }?.let { setOf(it) }.orEmpty()
+        val included = (agentNations + historicalNations + selectedNation).toSet()
+        val livingNations = majorNations.filterNot { it.isDefeated() }
+        val activeIndex = livingNations.indexOfFirst { it.civID == activeCivId }
+        // This marks the cyclic roster predecessor, not a claim that a provider ended its turn.
+        val previousCivId = if (activeIndex >= 0 && livingNations.size > 1)
+            livingNations[(activeIndex + livingNations.size - 1) % livingNations.size].civID else null
+        val nations = majorNations.mapIndexedNotNull { index, civ ->
+            val id = civ.civID
+            if (id !in included) return@mapIndexedNotNull null
             val name = agentName(id)
-            NationFilter(FilterMode.NATION, if (name == id) id else "$id · $name", id)
+            val identity = if (name == id) id else "$id · $name"
+            val marker = when {
+                id == activeCivId -> "Current · "
+                civ.isDefeated() -> "Eliminated · "
+                id == previousCivId -> "Previous in order · "
+                else -> ""
+            }
+            NationFilter(FilterMode.NATION, "${index + 1}. $marker$identity", id)
         }
         val choices = listOf(activeFilter, allFilter) + nations
         if (nationPicker.items.toList() == choices) return
