@@ -230,7 +230,7 @@ object AtlasFixtureCatalog {
         stats.add(AtlasWidgets.stat("Wheat", "12")).minWidth(0f).uniformX().growX()
         stats.add(AtlasWidgets.stat("Rome", "● Nation", Color.valueOf("A993ED"))).minWidth(0f).uniformX().growX()
         content.add(stats).row()
-        content.add(AtlasWidgets.tabs(listOf("Economy", "Research", "Long translated tab"), 0) {}).row()
+        content.add(AtlasWidgets.tabs(listOf("Economy", "Research", "Details"), 0) {}).row()
         val field = UncivTextField("Draft", "draft • Zürich • 東京")
         content.add(AtlasWidgets.field("Message draft — keyboard focus", field)).row()
         val select = SelectBox<String>(BaseScreen.skin).apply { setItems("Peaceful trade", "Long option name with diacritics — São Paulo") }
@@ -249,9 +249,10 @@ object AtlasFixtureCatalog {
         val hover = GameUiStyle.button("Hover").apply { style = TextButton.TextButtonStyle(style).apply { up = over; fontColor = overFontColor } }
         val pressed = GameUiStyle.button("Pressed").apply { style = TextButton.TextButtonStyle(style).apply { up = down; fontColor = downFontColor } }
         val disabled = GameUiStyle.button("Disabled").apply { isDisabled = true }
-        for (button in listOf(normal, hover, pressed, disabled)) {
+        for ((index, button) in listOf(normal, hover, pressed, disabled).withIndex()) {
             button.label.wrap = true
             states.add(button).minWidth(0f).uniformX().growX().minHeight(40f).pad(2f)
+            if (width < 500 && index == 1) states.row()
         }
         content.add(states).row()
         content.add(AtlasWidgets.footer(GameUiStyle.button("Confirm ✓"), listOf(GameUiStyle.button("Cancel")))).row()

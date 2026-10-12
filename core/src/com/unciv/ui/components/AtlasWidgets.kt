@@ -3,6 +3,7 @@ package com.unciv.ui.components
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.ui.Button
+import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.utils.Align
 import com.unciv.ui.components.extensions.toLabel
@@ -54,9 +55,17 @@ object AtlasWidgets {
 
     fun disclosure(title: String, body: Actor, expanded: Boolean): Table {
         return ExpanderTab(title, fontSize = GameUiStyle.Type.label, startsOutOpened = expanded,
-            headerPad = GameUiStyle.Space.m, expanderHeight = GameUiStyle.standardControlHeight) {
+            headerPad = GameUiStyle.Space.m) {
             it.add(body).growX()
-        }.apply { name = "AtlasDisclosure"; GameUiStyle.applyWidget(this) }
+        }.apply {
+            name = "AtlasDisclosure"
+            val heading = header.children.filterIsInstance<Label>().single()
+            val naturalWidth = heading.prefWidth
+            heading.wrap = true
+            header.getCell(heading).minWidth(0f).prefWidth(naturalWidth).growX()
+                .minHeight(GameUiStyle.standardControlHeight)
+            GameUiStyle.applyWidget(this)
+        }
     }
 
     fun footer(primary: Actor, secondary: List<Actor>): Table = Table().apply {

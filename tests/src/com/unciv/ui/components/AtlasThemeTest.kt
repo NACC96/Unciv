@@ -206,6 +206,19 @@ class AtlasThemeTest {
         checkbox.validate()
         assertTrue(checkbox.label.x >= 0f)
         assertTrue(checkbox.label.x + checkbox.label.width <= width + 0.1f)
+        val disclosure = AtlasWidgets.disclosure("Long detail — expand for secondary context", "Body".toLabel(), true) as ExpanderTab
+        val heading = disclosure.header.children.filterIsInstance<Label>().single()
+        assertTrue("Disclosure heading must wrap at narrow widths", heading.wrap)
+        disclosure.setSize(width, disclosure.prefHeight)
+        // Scene2D invalidates ancestor preferred heights when a wrapping label receives its width.
+        repeat(3) {
+            disclosure.setHeight(disclosure.prefHeight)
+            disclosure.validate()
+            disclosure.header.validate()
+        }
+        assertTrue(heading.x >= 0f)
+        assertTrue(heading.x + heading.width <= disclosure.header.width + 0.1f)
+        assertTrue("Wrapped heading height ${heading.height} is below ${heading.prefHeight}", heading.height >= heading.prefHeight - 0.1f)
         val tabs = AtlasWidgets.tabs(listOf("Civilization details", "Research prerequisites", "International diplomacy"), 0) {}
         for (row in listOf(stats, tabs)) {
             row.setSize(width, row.prefHeight)
