@@ -57,6 +57,10 @@ class AtlasThemeTest {
         assertTrue(minControlContrast >= 3.0)
         val button = GameUiStyle.button("Confirm", primary = true)
         assertTrue(contrast(button.style.fontColor, GameUiStyle.accent) >= 4.5)
+        assertTrue(contrast(button.style.downFontColor, GameUiStyle.accent.cpy().lerp(GameUiStyle.surface, 0.3f)) >= 4.5)
+        assertTrue(contrast(GameUiStyle.muted, GameUiStyle.raised) >= 4.5)
+        assertTrue(contrast(GameUiStyle.accent, GameUiStyle.raised) >= 3.0)
+        assertTrue(contrast(Color.RED, GameUiStyle.surface) >= 3.0) // status symbol, paired with ivory text.
     }
 
     @Test fun legacySkinSurvivesAtlasSelectionCycle() {
@@ -183,6 +187,27 @@ class AtlasThemeTest {
             assertEquals("draft", field.text)
             assertEquals(listeners, field.listeners.toList())
         } finally { stage.dispose() }
+    }
+
+    @Test fun reusableRowsFitNarrowViewportAtLargeTextScale() {
+        UncivGame.Current.settings.fontSizeMultiplier = 1.5f
+        com.unciv.ui.components.fonts.Fonts.fontImplementation = com.unciv.app.desktop.DesktopFont()
+        selectSkin("Atlas")
+        val width = 372f // 420px viewport minus outer/panel padding.
+        val stats = Table().apply {
+            add(AtlasWidgets.stat("Gold", "1,204")).uniformX().growX()
+            add(AtlasWidgets.stat("Wheat", "Wheat 12")).uniformX().growX()
+            add(AtlasWidgets.stat("Rome", "● Nation")).uniformX().growX()
+        }
+        val tabs = AtlasWidgets.tabs(listOf("Civilization details", "Research prerequisites", "International diplomacy"), 0) {}
+        for (row in listOf(stats, tabs)) {
+            row.setSize(width, row.prefHeight)
+            row.validate()
+            for (child in row.children) {
+                assertTrue("${child.javaClass.simpleName} starts outside narrow row: ${child.x}", child.x >= -0.1f)
+                assertTrue("${child.javaClass.simpleName} exceeds narrow row: ${child.x + child.width}", child.x + child.width <= width + 0.1f)
+            }
+        }
     }
 
     companion object {

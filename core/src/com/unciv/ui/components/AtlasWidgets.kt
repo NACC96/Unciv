@@ -23,8 +23,8 @@ object AtlasWidgets {
     fun stat(label: String, value: String, tint: Color? = null): Table = Table().apply {
         name = "AtlasStat"
         pad(GameUiStyle.Space.m)
-        add(label.toLabel(GameUiStyle.muted, GameUiStyle.Type.small)).left().row()
-        add(value.toLabel(tint?.cpy() ?: GameUiStyle.ink, GameUiStyle.Type.title)).left().row()
+        add(label.toLabel(GameUiStyle.muted, GameUiStyle.Type.small).apply { wrap = true }).growX().minWidth(0f).left().row()
+        add(value.toLabel(tint?.cpy() ?: GameUiStyle.ink, GameUiStyle.Type.title).apply { wrap = true }).growX().minWidth(0f).left().row()
     }
 
     fun tabs(labels: List<String>, selected: Int, onSelect: (Int) -> Unit): Table = Table().apply {
@@ -40,7 +40,7 @@ object AtlasWidgets {
         }
         buttons.forEachIndexed { index, button ->
             button.onActivation { showSelection(index); onSelect(index) }
-            add(button).minHeight(GameUiStyle.standardControlHeight).growX().padRight(GameUiStyle.Space.s)
+            add(button).minWidth(0f).minHeight(GameUiStyle.standardControlHeight).uniformX().growX().padRight(GameUiStyle.Space.s)
         }
         showSelection(selected)
     }
@@ -49,7 +49,7 @@ object AtlasWidgets {
         name = "AtlasField"
         GameUiStyle.applyWidget(input)
         add(label.toLabel(GameUiStyle.muted, GameUiStyle.Type.body).apply { wrap = true }).growX().left().row()
-        add(input).growX().minHeight(GameUiStyle.standardControlHeight).padTop(GameUiStyle.Space.s).row()
+        add(input).growX().minWidth(0f).minHeight(GameUiStyle.standardControlHeight).padTop(GameUiStyle.Space.s).row()
     }
 
     fun disclosure(title: String, body: Actor, expanded: Boolean): Table {
