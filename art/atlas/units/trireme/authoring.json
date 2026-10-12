@@ -1,19 +1,95 @@
 {
-"schemaVersion": 1,
-"unitName": "Trireme",
-"assetId": "trireme",
-"reviewState": "missing",
-"canvasWidth": 128,
-"canvasHeight": 128,
-"anchorX": 64,
-"anchorY": 96,
-"clippingMargin": 2,
-"uniqueUnitIdentity": null,
-"uniqueTo": null,
-"replaces": null,
-"staticFallbackKey": "TileSets/AtlasUnits/Units/Trireme",
-"framesDirectory": "frames/",
-"applicableStates": [ "IDLE", "MOVE", "ATTACK", "HIT", "DEFEAT" ],
-"facings": [ "E", "NE", "NW", "W", "SW", "SE" ],
-"minimumFrames": { "IDLE": 4, "MOVE": 8, "ATTACK": 8, "HIT": 4, "DEFEAT": 8 }
+  "schemaVersion": 1,
+  "unitName": "Trireme",
+  "assetId": "trireme",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": null,
+  "uniqueTo": null,
+  "replaces": null,
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Trireme",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/trireme/e-motion-v1.png",
+      "rawHash": "7742cacf9fe16c22154f667595f8e7fb9bf85684c0915a7402cd35f3e25bf6a7",
+      "promptPath": "art/atlas/units/trireme/prompts/e-v1.txt",
+      "promptHash": "f655ff87b61b885e246757719336a613e8ad8dc835dfbbd3e96c83f28ae28df6",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/trireme/ne-motion-v1.png",
+      "rawHash": "8f6f4e170a3b46a82d24b9e83eaeee192b890bdae8bbff73c13caed3ad9b9ecf",
+      "promptPath": "art/atlas/units/trireme/prompts/ne-v1.txt",
+      "promptHash": "6a4c03c6ebe6097c95074ab2aa549702c03b785e712f5b6ec49ad430b345f443",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/trireme/se-motion-v1.png",
+      "rawHash": "35e438d018bd1e233c2736413661e9d42d6dd4147d0c5c2b018e43617c06f656",
+      "promptPath": "art/atlas/units/trireme/prompts/se-v1.txt",
+      "promptHash": "cf37b01be8922ed2a424a614116948e3e29fce120cf890ac301c86b8b9fe541d",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
 }

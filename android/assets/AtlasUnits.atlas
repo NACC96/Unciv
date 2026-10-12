@@ -1,19 +1,89 @@
 
 AtlasUnits.png
-size: 512, 256
+size: 2048, 256
 format: RGBA8888
 filter: MipMapLinearLinear, Linear
 repeat: none
-TileSets/AtlasUnits/Units/Warrior
+TileSets/AtlasUnits/Units/Horseman
   rotate: false
   xy: 4, 4
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
   index: -1
-TileSets/AtlasUnits/Units/Warrior-1
+TileSets/AtlasUnits/Units/Horseman-1
   rotate: false
   xy: 140, 4
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: -1
+TileSets/AtlasUnits/Units/Rifleman
+  rotate: false
+  xy: 276, 4
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: -1
+TileSets/AtlasUnits/Units/Rifleman-1
+  rotate: false
+  xy: 412, 4
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: -1
+TileSets/AtlasUnits/Units/Tank
+  rotate: false
+  xy: 548, 4
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: -1
+TileSets/AtlasUnits/Units/Tank-1
+  rotate: false
+  xy: 684, 4
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: -1
+TileSets/AtlasUnits/Units/Trireme
+  rotate: false
+  xy: 820, 4
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: -1
+TileSets/AtlasUnits/Units/Trireme-1
+  rotate: false
+  xy: 956, 4
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: -1
+TileSets/AtlasUnits/Units/Warrior
+  rotate: false
+  xy: 1092, 4
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: -1
+TileSets/AtlasUnits/Units/Warrior-1
+  rotate: false
+  xy: 1228, 4
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: -1
+TileSets/AtlasUnits/Units/Worker
+  rotate: false
+  xy: 1364, 4
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: -1
+TileSets/AtlasUnits/Units/Worker-1
+  rotate: false
+  xy: 1500, 4
   size: 128, 128
   orig: 128, 128
   offset: 0, 0

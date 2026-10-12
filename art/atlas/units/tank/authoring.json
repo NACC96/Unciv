@@ -1,19 +1,95 @@
 {
-"schemaVersion": 1,
-"unitName": "Tank",
-"assetId": "tank",
-"reviewState": "missing",
-"canvasWidth": 128,
-"canvasHeight": 128,
-"anchorX": 64,
-"anchorY": 96,
-"clippingMargin": 2,
-"uniqueUnitIdentity": null,
-"uniqueTo": null,
-"replaces": null,
-"staticFallbackKey": "TileSets/AtlasUnits/Units/Tank",
-"framesDirectory": "frames/",
-"applicableStates": [ "IDLE", "MOVE", "ATTACK", "HIT", "DEFEAT" ],
-"facings": [ "E", "NE", "NW", "W", "SW", "SE" ],
-"minimumFrames": { "IDLE": 4, "MOVE": 8, "ATTACK": 8, "HIT": 4, "DEFEAT": 8 }
+  "schemaVersion": 1,
+  "unitName": "Tank",
+  "assetId": "tank",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": null,
+  "uniqueTo": null,
+  "replaces": null,
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Tank",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/tank/e-motion-v1.png",
+      "rawHash": "b6639f7c8ccc40272482eccc0e8ea427bd7524db471752a9c4faa99df7e3fdd0",
+      "promptPath": "art/atlas/units/tank/prompts/e-v1.txt",
+      "promptHash": "a0f78b04c37c25b9b63f666efad8520dc8c7f6a02a4cc01fbb55042119366520",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/tank/ne-motion-v1.png",
+      "rawHash": "ab0d10be536e8ac738c76d7fd12478c066a0a84a34a75fbd72b9c912ffd5b2ff",
+      "promptPath": "art/atlas/units/tank/prompts/ne-v1.txt",
+      "promptHash": "8fa9e18ab036f1cacbade7855355b08a483c465c17b1234b8b1fb69abefa9128",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/tank/se-motion-v1.png",
+      "rawHash": "0bb5ab4f03919e181625c5ab83287ffe1eada57f9684655f5149d599a36f8dc3",
+      "promptPath": "art/atlas/units/tank/prompts/se-v1.txt",
+      "promptHash": "f27c256746eba029295638b9e977699d962f086dae772103a11c23240a12f95d",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
 }
