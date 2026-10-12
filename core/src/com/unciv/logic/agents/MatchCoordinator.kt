@@ -2,7 +2,6 @@ package com.unciv.logic.agents
 
 import com.unciv.Constants
 import com.unciv.json.json
-import com.unciv.Constants
 import com.unciv.logic.GameInfo
 import com.unciv.logic.battle.AttackableTile
 import com.unciv.logic.battle.Battle
@@ -31,7 +30,6 @@ import com.unciv.logic.trade.TradeLogic
 import com.unciv.logic.trade.TradeOffer
 import com.unciv.logic.trade.TradeOfferType
 import com.unciv.logic.trade.TradeRequest
-import com.unciv.logic.trade.TradeOfferType
 import com.unciv.models.UnitActionType
 import com.unciv.models.ruleset.Building
 import com.unciv.models.ruleset.INonPerpetualConstruction

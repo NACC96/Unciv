@@ -101,7 +101,7 @@ diplomacy.declareWar -> {targetCivId:string}
 diplomacy.makePeace -> {targetCivId:string}; city-state-only. Major-nation peace requires a reciprocal Peace Treaty proposal and recipient acceptance.
 diplomacy.friendship -> {targetCivId:string}
 diplomacy.proposeTrade -> {targetCivId:string,ourOffers:TradeOffer[],theirOffers:TradeOffer[]}; queues a pending offer and does not end war. Major-nation peace requires {name:"Peace Treaty",type:"Treaty",amount:1} in BOTH arrays.
-diplomacy.respondTrade -> {requestingCivId:string,accept:boolean}; only the recipient on its own turn may accept or decline a pending offer. Only an applied acceptance ends war under the reciprocal peace treaty; declining keeps war.
+diplomacy.respondTrade -> {requestingCivId:string,accept:boolean}; read observe.pendingTradeRequests for the first actionable request per sender and its complete recipient-perspective terms (ourOffers are what you give; theirOffers are what you receive). Only the recipient on its own turn may accept or decline it. Re-observe after responding to see the next request from that sender. Only an applied acceptance ends war under the reciprocal peace treaty; declining keeps war.
 civics.adopt -> {policyName:string}
 city.citizens -> {cityId:string,op:CitizenOp,tilePos?:Hex,specialist?:string,focus?:string,flag?:boolean=false}; tilePos for tile ops, specialist for specialist ops, focus for SET_FOCUS, flag for SET_MANUAL_SPECIALISTS/SET_AVOID_GROWTH.
 city.buyTile -> {cityId:string,tilePos:Hex}
@@ -179,7 +179,7 @@ function registerGameTools(mcp: McpServer, game: IGameService, actorCivId: strin
     if (entry) onAcknowledgement?.(entry);
   };
   mcp.registerTool("game.observe", {
-    description: "Permitted overview: revision, active-turn status, required decisions, recent visible events.",
+    description: "Permitted overview: revision, active-turn status, required decisions, recent visible events, and private pendingTradeRequests with full recipient-perspective terms. Answer the first request per sender with diplomacy.respondTrade on your turn; re-observe for the next.",
     inputSchema: {},
   }, async () => ok(await game.observe()));
 

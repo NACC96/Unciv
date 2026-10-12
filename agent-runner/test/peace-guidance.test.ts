@@ -17,4 +17,10 @@ it("gives each leader a usable reciprocal peace proposal and recipient consent p
   expect(prompt).toMatch(/diplomacy\.respondTrade[^\n]*requestingCivId[^\n]*accept/);
   expect(prompt).toMatch(/PeaceProposal[^\n]*third-party[^\n]*civilization ID/);
   expect(prompt).toMatch(/PeaceProposal[^\n]*cannot[^\n]*major/);
+  expect(prompt).toContain("Review pendingTradeRequests each turn");
+  expect(prompt).toContain("ourOffers are what you give or commit to");
+  expect(prompt).toContain("theirOffers are what the sender gives or commits to");
+  expect(prompt).toContain("name, type, amount and duration");
+  expect(prompt).toContain("first pending request per sender");
+  expect(prompt).toContain("re-observe after each response");
 });

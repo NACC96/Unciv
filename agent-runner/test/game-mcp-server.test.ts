@@ -42,6 +42,30 @@ async function handshake(url: string, bearer: string) {
 }
 
 describe("game MCP transport guards (plan §7.3)", () => {
+  it("passes private trade terms from the bound engine observation through to the recipient", async () => {
+    const treaty = { name: "Peace Treaty", type: "Treaty", amount: 1, duration: 10 };
+    const observation = { revision: 7, isMyTurn: true, pendingTradeRequests: [{
+      requestingCivId: "Rome", pendingRequestsFromCiv: 2, ourOffers: [treaty],
+      theirOffers: [treaty, { name: "Gold", type: "Gold", amount: 25, duration: -1 }],
+    }] };
+    const requests: { method: string; params: Record<string, unknown> }[] = [];
+    const engine = new StdioEngineBackend((line) => {
+      const frame = JSON.parse(line);
+      requests.push(frame);
+      queueMicrotask(() => engine.feedLine(JSON.stringify({ protocol: 1, kind: "engine_response", id: frame.id,
+        ok: true, result: observation })));
+    }, 30000, () => "Greece");
+    server = await startGameMcpServer(engine, { matchId: "m", timelineId: "t", civId: "Greece", runId: "r", authorityEpoch: 1 });
+    const response = await rpc(server.url, server.bearer, call("tools/call", { name: "game.observe", arguments: {} }));
+    const body = response.json?.["result"] as { content: { text: string }[] };
+    expect(JSON.parse(body.content[0].text)).toEqual(observation);
+    expect(requests).toMatchObject([{ method: "observe", params: { civId: "Greece" } }]);
+    const tools = await rpc(server.url, server.bearer, call("tools/list"));
+    const list = (tools.json?.["result"] as { tools: { name: string; description: string }[] }).tools;
+    expect(list.find(tool => tool.name === "game.observe")?.description).toContain("pendingTradeRequests");
+    expect(list.find(tool => tool.name === "game.act")?.description).toContain("first actionable request per sender");
+    engine.disconnect();
+  });
   it("passes real desktop unit and legal-action DTOs through and routes city queries", async () => {
     const unit = { unitId: 17, name: "Settler", ownerCivId: "Rome", x: 2, y: 1, health: 100, movementLeft: 2, action: null };
     const legal = { moveTargets: [{ x: 3, y: 1 }], attackTargets: [], orders: ["SLEEP"], canFound: true,
