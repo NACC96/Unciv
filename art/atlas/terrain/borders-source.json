@@ -1,0 +1,161 @@
+{
+  "schemaVersion": 1,
+  "batchId": "borders",
+  "tool": "built-in image_gen",
+  "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/terrain-authoring/raw/borders.png",
+  "rawSha256": "1267ca2f52439d9bca51d24233588321b09a13198b787c5e42dd45015ae9c138",
+  "rawDimensions": [
+    1774,
+    887
+  ],
+  "promptPath": "art/atlas/terrain/borders-prompt.txt",
+  "promptSha256": "b77b639432b893b6160ba023e0bb767b0de408bc07197c30fc5797917812da0d",
+  "reviewState": "candidate",
+  "formalAcceptance": "deferred by user",
+  "cells": [
+    {
+      "item": "@Borders/ConcaveInner",
+      "cell": 0,
+      "cropBox": [
+        0,
+        0,
+        444,
+        444
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Borders/ConcaveInner.png",
+      "canvas": [
+        128,
+        24
+      ],
+      "normalization": "border",
+      "sha256": "9e2f6b4f77bad6d0ab012ed0a7037ca0808f498aaad8ee44e273189efc1157d9",
+      "clippingMargin": 0
+    },
+    {
+      "item": "@Borders/ConcaveOuter",
+      "cell": 1,
+      "cropBox": [
+        444,
+        0,
+        887,
+        444
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Borders/ConcaveOuter.png",
+      "canvas": [
+        128,
+        24
+      ],
+      "normalization": "border",
+      "sha256": "b7f33e76978a59da4137ce14f9afc6444af130f42494b3523971a53f58e104d0",
+      "clippingMargin": 0
+    },
+    {
+      "item": "@Borders/ConvexInner",
+      "cell": 2,
+      "cropBox": [
+        887,
+        0,
+        1330,
+        444
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Borders/ConvexInner.png",
+      "canvas": [
+        128,
+        24
+      ],
+      "normalization": "border",
+      "sha256": "62f1678b7bc595a22b1c58e4e0dfd5f310d1989337eff907a5a581f6c479761f",
+      "clippingMargin": 0
+    },
+    {
+      "item": "@Borders/ConvexOuter",
+      "cell": 3,
+      "cropBox": [
+        1330,
+        0,
+        1774,
+        444
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Borders/ConvexOuter.png",
+      "canvas": [
+        128,
+        24
+      ],
+      "normalization": "border",
+      "sha256": "241ad2dd58326a4871113a810f7220ddaa564ab9893a417c0b79993dd1c566d2",
+      "clippingMargin": 0
+    },
+    {
+      "item": "@Borders/ConcaveConvexInner",
+      "cell": 4,
+      "cropBox": [
+        0,
+        444,
+        444,
+        887
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Borders/ConcaveConvexInner.png",
+      "canvas": [
+        128,
+        24
+      ],
+      "normalization": "border",
+      "sha256": "1a4a52cfd448e5e7b6a648f293e8ee27063255d056f1a5277d6b40be2d94bf6f",
+      "clippingMargin": 0
+    },
+    {
+      "item": "@Borders/ConcaveConvexOuter",
+      "cell": 5,
+      "cropBox": [
+        444,
+        444,
+        887,
+        887
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Borders/ConcaveConvexOuter.png",
+      "canvas": [
+        128,
+        24
+      ],
+      "normalization": "border",
+      "sha256": "ce7caf76bcf0de2310e9c4cf0a9a44dfc6a7dd5cbe0419e70bc3fb8225b40c46",
+      "clippingMargin": 0
+    },
+    {
+      "item": "@Borders/ConvexConcaveInner",
+      "cell": 6,
+      "cropBox": [
+        887,
+        444,
+        1330,
+        887
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Borders/ConvexConcaveInner.png",
+      "canvas": [
+        128,
+        24
+      ],
+      "normalization": "border",
+      "sha256": "5bdb977abcf8394824013fb143437f1f81f3a8e56c2053b472149055648a151a",
+      "clippingMargin": 0
+    },
+    {
+      "item": "@Borders/ConvexConcaveOuter",
+      "cell": 7,
+      "cropBox": [
+        1330,
+        444,
+        1774,
+        887
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Borders/ConvexConcaveOuter.png",
+      "canvas": [
+        128,
+        24
+      ],
+      "normalization": "border",
+      "sha256": "8f4b672f9c7bdd0f53d701790b5bf6d400786327b82e3eb1ecc76a261e8ed955",
+      "clippingMargin": 0
+    }
+  ]
+}

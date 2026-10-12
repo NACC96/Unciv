@@ -1,0 +1,233 @@
+{
+  "schemaVersion": 1,
+  "batchId": "damaged-cities",
+  "tool": "built-in image_gen",
+  "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/terrain-authoring/raw/damaged-cities.png",
+  "rawSha256": "451943322588ebc02682e31302af588762daafecb397b99ef858d6cddc564406",
+  "rawDimensions": [
+    1536,
+    1024
+  ],
+  "promptPath": "art/atlas/terrain/damaged-cities-prompt.txt",
+  "promptSha256": "59dd6cd4decc38eb3fade2fd0fc6706b9d1d7c2443b1a329f706e0c9fe6a87c8",
+  "reviewState": "candidate",
+  "formalAcceptance": "deferred by user",
+  "cells": [
+    {
+      "item": "City center-Damaged-Ancient era",
+      "cell": 0,
+      "cropBox": [
+        0,
+        0,
+        384,
+        341
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/City center-Damaged-Ancient era.png",
+      "canvas": [
+        128,
+        144
+      ],
+      "normalization": "era-city",
+      "sha256": "a3d8788dfc6bba781895f126a1184b7a163e18479084931c089834bcd6976495",
+      "clippingMargin": 16
+    },
+    {
+      "item": "City center-Damaged-Classical era",
+      "cell": 1,
+      "cropBox": [
+        384,
+        0,
+        768,
+        341
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/City center-Damaged-Classical era.png",
+      "canvas": [
+        128,
+        144
+      ],
+      "normalization": "era-city",
+      "sha256": "314b1cec845d9fd1fef81a5c69b965694c6dab159053fe7896b3fa73deaa36a3",
+      "clippingMargin": 16
+    },
+    {
+      "item": "City center-Damaged-Medieval era",
+      "cell": 2,
+      "cropBox": [
+        768,
+        0,
+        1152,
+        341
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/City center-Damaged-Medieval era.png",
+      "canvas": [
+        128,
+        144
+      ],
+      "normalization": "era-city",
+      "sha256": "cea097e270915b4f471fe145c8f2e66cddc48af6a355b21e988582ef53c97095",
+      "clippingMargin": 16
+    },
+    {
+      "item": "City center-Damaged-Renaissance era",
+      "cell": 3,
+      "cropBox": [
+        1152,
+        0,
+        1536,
+        341
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/City center-Damaged-Renaissance era.png",
+      "canvas": [
+        128,
+        144
+      ],
+      "normalization": "era-city",
+      "sha256": "66bd91a766cc23195d897dcee81cf4adb27e288b393d315033482fceeaeaa342",
+      "clippingMargin": 16
+    },
+    {
+      "item": "City center-Damaged-Industrial era",
+      "cell": 4,
+      "cropBox": [
+        0,
+        341,
+        384,
+        683
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/City center-Damaged-Industrial era.png",
+      "canvas": [
+        128,
+        144
+      ],
+      "normalization": "era-city",
+      "sha256": "f7cab24a566074292075c03c79a22c02cb0c8089102ea6b357fcd12402e78efa",
+      "clippingMargin": 16
+    },
+    {
+      "item": "City center-Damaged-Modern era",
+      "cell": 5,
+      "cropBox": [
+        384,
+        341,
+        768,
+        683
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/City center-Damaged-Modern era.png",
+      "canvas": [
+        128,
+        144
+      ],
+      "normalization": "era-city",
+      "sha256": "ae9aba0b6634dea036f3f9da85dd4214d5c133eb3a88642d1affbd50a692ed5b",
+      "clippingMargin": 16
+    },
+    {
+      "item": "City center-Damaged-Atomic era",
+      "cell": 6,
+      "cropBox": [
+        768,
+        341,
+        1152,
+        683
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/City center-Damaged-Atomic era.png",
+      "canvas": [
+        128,
+        144
+      ],
+      "normalization": "era-city",
+      "sha256": "0c16a3464a4ff663de93c658809808f74d442610db34a681f4ab3096845f6ccf",
+      "clippingMargin": 16
+    },
+    {
+      "item": "City center-Damaged-Information era",
+      "cell": 7,
+      "cropBox": [
+        1152,
+        341,
+        1536,
+        683
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/City center-Damaged-Information era.png",
+      "canvas": [
+        128,
+        144
+      ],
+      "normalization": "era-city",
+      "sha256": "fe8c58ea50b7356198262ce859434c0b58fba652c9f9675bbad5fef483341769",
+      "clippingMargin": 16
+    },
+    {
+      "item": "City center-Damaged-Future era",
+      "cell": 8,
+      "cropBox": [
+        0,
+        683,
+        384,
+        1024
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/City center-Damaged-Future era.png",
+      "canvas": [
+        128,
+        144
+      ],
+      "normalization": "era-city",
+      "sha256": "df70e8996c785d7fbf238521900b245f372b5a4e95c5aee6c232bb895dc8b76a",
+      "clippingMargin": 16
+    },
+    {
+      "item": "Terrace farm-Pillaged",
+      "cell": 9,
+      "cropBox": [
+        384,
+        683,
+        768,
+        1024
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Terrace farm-Pillaged.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "improvement",
+      "sha256": "fd163be995c9660fdd2055b80291a9daf0e09fd790ff7384be4466bb687572a2",
+      "clippingMargin": 0
+    },
+    {
+      "item": "Trading post-Pillaged",
+      "cell": 10,
+      "cropBox": [
+        768,
+        683,
+        1152,
+        1024
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Trading post-Pillaged.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "improvement",
+      "sha256": "20982a2175b9f64244d6bd2ad80ebab78fb0ead7088d6a8e681e4b8b8a60073e",
+      "clippingMargin": 0
+    },
+    {
+      "item": "City center-Damaged",
+      "cell": 11,
+      "cropBox": [
+        1152,
+        683,
+        1536,
+        1024
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/City center-Damaged.png",
+      "canvas": [
+        128,
+        144
+      ],
+      "normalization": "era-city",
+      "sha256": "8c97f5e8c5d5d744fb3f1022eb64d5ea209b4e57903bc57e31d764eeaf9bf403",
+      "clippingMargin": 16
+    }
+  ]
+}
