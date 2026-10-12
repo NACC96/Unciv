@@ -1,0 +1,305 @@
+{
+  "schemaVersion": 1,
+  "batchId": "resources-1",
+  "tool": "built-in image_gen",
+  "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/terrain-authoring/raw/resources-1.png",
+  "rawSha256": "f6cb1c992ab9940f24092638d20dd8011fe3f48e16bba2e6027357d04a052330",
+  "rawDimensions": [
+    1275,
+    1234
+  ],
+  "promptPath": "art/atlas/terrain/resources-1-prompt.txt",
+  "promptSha256": "fc86eede0c2b5379906cb34d349b9a04ae67ae4dabfecf6f570f6c075b0ecee5",
+  "reviewState": "candidate",
+  "formalAcceptance": "deferred by user",
+  "cells": [
+    {
+      "item": "Aluminum",
+      "cell": 0,
+      "cropBox": [
+        0,
+        0,
+        319,
+        308
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Aluminum.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "resource",
+      "sha256": "a38b10c9e0aee9f7cb0e417c779ef6d022b3913bf1e65c80a1f9ae4439d52b95",
+      "clippingMargin": 0
+    },
+    {
+      "item": "Bananas",
+      "cell": 1,
+      "cropBox": [
+        319,
+        0,
+        638,
+        308
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Bananas.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "resource",
+      "sha256": "9f6ffaee53d4c294bc643122cd9921ae3811dfdbe1e5cd933301aec153ffe106",
+      "clippingMargin": 0
+    },
+    {
+      "item": "Cattle",
+      "cell": 2,
+      "cropBox": [
+        638,
+        0,
+        956,
+        308
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Cattle.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "resource",
+      "sha256": "b2e20f9721ffb544d98d460267d100de889f48e905ba4390fe1a09b8ba9c38ee",
+      "clippingMargin": 0
+    },
+    {
+      "item": "Citrus",
+      "cell": 3,
+      "cropBox": [
+        956,
+        0,
+        1275,
+        308
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Citrus.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "resource",
+      "sha256": "38820c0d724a62c603b931a31dc92c651e7fa3000884fac5a1ed31a9d5a8c0a0",
+      "clippingMargin": 0
+    },
+    {
+      "item": "Coal",
+      "cell": 4,
+      "cropBox": [
+        0,
+        308,
+        319,
+        617
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Coal.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "resource",
+      "sha256": "ed185f5401d3a2326805eace63a1d79ad49823863461bc5b3eaf4389b81c28a8",
+      "clippingMargin": 0
+    },
+    {
+      "item": "Copper",
+      "cell": 5,
+      "cropBox": [
+        319,
+        308,
+        638,
+        617
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Copper.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "resource",
+      "sha256": "9554c2db065370eb91c0c1ce86cadb3cb7e57744e489cb51cb7d793239024a2c",
+      "clippingMargin": 0
+    },
+    {
+      "item": "Cotton",
+      "cell": 6,
+      "cropBox": [
+        638,
+        308,
+        956,
+        617
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Cotton.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "resource",
+      "sha256": "295292f934d84790ddcc040ddd2c9a6a421e0a67d43284d66e95ba3b26b068f7",
+      "clippingMargin": 0
+    },
+    {
+      "item": "Crab",
+      "cell": 7,
+      "cropBox": [
+        956,
+        308,
+        1275,
+        617
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Crab.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "resource",
+      "sha256": "79b46b03fcfe698e2a2ee2e0cb465d39d0347169036117f25c239f267c2aaf92",
+      "clippingMargin": 0
+    },
+    {
+      "item": "Deer",
+      "cell": 8,
+      "cropBox": [
+        0,
+        617,
+        319,
+        926
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Deer.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "resource",
+      "sha256": "f184448f045d1ec4133cb05172cf602223a8c10e5b31417fe9ae766609f41178",
+      "clippingMargin": 0
+    },
+    {
+      "item": "Dyes",
+      "cell": 9,
+      "cropBox": [
+        319,
+        617,
+        638,
+        926
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Dyes.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "resource",
+      "sha256": "d740ec6746e6d8960c60f850dc7db0d961776f210a004c828982a2bee3c85570",
+      "clippingMargin": 0
+    },
+    {
+      "item": "Fish",
+      "cell": 10,
+      "cropBox": [
+        638,
+        617,
+        956,
+        926
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Fish.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "resource",
+      "sha256": "b9fd1d1f05201297bfc2fba35c18255ee99544117b64c2a7baca5962e71f2d3d",
+      "clippingMargin": 0
+    },
+    {
+      "item": "Furs",
+      "cell": 11,
+      "cropBox": [
+        956,
+        617,
+        1275,
+        926
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Furs.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "resource",
+      "sha256": "070694f84a0d49970132695146ca659add596a808705dce9700b62c04e41a039",
+      "clippingMargin": 0
+    },
+    {
+      "item": "Gems",
+      "cell": 12,
+      "cropBox": [
+        0,
+        926,
+        319,
+        1234
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Gems.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "resource",
+      "sha256": "7621669cc4d21fd1e81a129e1bb28ef1f2ab8c02dd9b185ffdf4e9117d015340",
+      "clippingMargin": 0
+    },
+    {
+      "item": "Gold Ore",
+      "cell": 13,
+      "cropBox": [
+        319,
+        926,
+        638,
+        1234
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Gold Ore.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "resource",
+      "sha256": "53787f92592713fee26c4f3bd3c75535cdad2648e37c65084fb409fc8586d354",
+      "clippingMargin": 0
+    },
+    {
+      "item": "Horses",
+      "cell": 14,
+      "cropBox": [
+        638,
+        926,
+        956,
+        1234
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Horses.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "resource",
+      "sha256": "e91d77e09244f409b4b693af0fcb85e896c399f87c06f9db495e982a2d3c2e56",
+      "clippingMargin": 0
+    },
+    {
+      "item": "Incense",
+      "cell": 15,
+      "cropBox": [
+        956,
+        926,
+        1275,
+        1234
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Incense.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "resource",
+      "sha256": "8fec74b43e7603527d1d79aa03bd790dfb28fc7f0d05b9e74ee131f6dfb8f5d3",
+      "clippingMargin": 0
+    }
+  ]
+}
