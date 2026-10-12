@@ -35,7 +35,9 @@ class SupervisorProcess(
         val revision: Int?,
         val turnEnded: Boolean,
         val toolCalls: List<String>,
-        val detail: String
+        val detail: String,
+        /** The leader's bounded closing summary; carried into its next fresh session. */
+        val summary: String? = null
     )
 
     private val process: Process = ProcessBuilder(
@@ -165,7 +167,8 @@ class SupervisorProcess(
                     revision = (payload["revision"] as? Number)?.toInt(),
                     turnEnded = payload["turnEnded"] as? Boolean ?: false,
                     toolCalls = (payload["toolCalls"] as? List<*>)?.map { it.toString() } ?: emptyList(),
-                    detail = (payload["detail"] as? String) ?: (payload["reason"] as? String ?: "")
+                    detail = (payload["detail"] as? String) ?: (payload["reason"] as? String ?: ""),
+                    summary = payload["summary"] as? String
                 )
             }
         }

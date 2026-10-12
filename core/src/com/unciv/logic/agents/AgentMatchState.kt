@@ -60,6 +60,22 @@ class GuidanceMessage(
         GuidanceMessage(guidanceId, targetCivId, sentAtMillis, state, text)
 }
 
+/** Receipt-time own-unit state. An absent unit was consumed or destroyed by the command. */
+class ActionUnitSnapshot(
+    var unitId: Int = 0,
+    var present: Boolean = false,
+    var x: Int = 0,
+    var y: Int = 0,
+    var movementLeft: Float = 0f,
+    var health: Int = 0,
+    var action: String? = null
+) : IsPartOfGameInfoSerialization {
+    @Suppress("unused") // used by json serialization
+    constructor() : this(0, false, 0, 0, 0f, 0, null)
+
+    fun copy(): ActionUnitSnapshot = ActionUnitSnapshot(unitId, present, x, y, movementLeft, health, action)
+}
+
 /**
  * Durable outcome of one applied mutation or internal turn boundary
  * (AI_AGENT_PLAN.md §4.1). The committed receipt governs over any lost
@@ -78,14 +94,16 @@ class ActionReceipt(
     /** Committed engine event IDs for correlation with observations. */
     var committedEventIds: ArrayList<String> = ArrayList(),
     /** Sanitized command-specific result (e.g. "x,y" final position); only permitted post-action knowledge. */
-    var resultJson: String = ""
+    var resultJson: String = "",
+    /** Null for old receipts or commands without a unit snapshot; never reconstructed from live state. */
+    var unitSnapshot: ActionUnitSnapshot? = null
 ) : IsPartOfGameInfoSerialization {
     @Suppress("unused") // used by json serialization
     constructor() : this("", "", "", "", 0, 0, "", ArrayList(), "")
 
     fun copy(): ActionReceipt = ActionReceipt(
         actionId, actorCivId, timelineId, requestFingerprint,
-        beforeRevision, afterRevision, outcome, ArrayList(committedEventIds), resultJson
+        beforeRevision, afterRevision, outcome, ArrayList(committedEventIds), resultJson, unitSnapshot?.copy()
     )
 }
 

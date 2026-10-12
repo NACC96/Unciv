@@ -216,6 +216,8 @@ export class Supervisor {
     resumeId?: string;
     cwd: string;
     extraEnv?: NodeJS.ProcessEnv;
+    /** False when the provider already receives GAME_INSTRUCTIONS as system/developer instructions. */
+    includeStaticInstructions?: boolean;
   }): Promise<TurnOutcome> {
     const preFlight = await args.engine.observe();
     const revisionBefore = preFlight.revision;
@@ -229,6 +231,7 @@ export class Supervisor {
       turnSerial: args.context.turnSerial,
       stateRevision: revisionBefore,
       notes: storedNotes.notes,
+      notesRevision: storedNotes.notesRevision,
       recentEvents: preFlight.recentEvents,
       pendingDecisions: preFlight.requiredDecisions.map((d) => typeof d === "string"
         ? { id: d, type: "decision", summary: d }
@@ -237,6 +240,7 @@ export class Supervisor {
       inbox: preFlight.inbox,
       diplomaticHistory: preFlight.diplomaticHistory,
       continuityNote: args.resumeId ? `Resumed provider session ${args.resumeId}.` : args.context.continuityNote,
+      includeStaticInstructions: args.includeStaticInstructions,
     });
 
     let currentChild: RunningChild | undefined;

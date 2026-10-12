@@ -38,6 +38,16 @@ export function summarizeTool(rawName: string, input: any = {}, result?: any, st
     case "game.notes": title = input.notes != null ? (active ? "Saving strategy notes" : "Saved strategy notes") : (active ? "Reading strategy notes" : "Read strategy notes"); break;
     case "game.end_turn": title = active ? "Ending turn" : "Ended turn"; break;
     case "game.action_result": title = active ? "Checking action result" : "Checked action result"; break;
+    case "game.act_batch": {
+      const requested = Array.isArray(input.actions) ? input.actions.length : 0;
+      const applied = typeof result?.applied === "number" ? result.applied : 0;
+      if (active) title = `Applying ${requested} ${requested === 1 ? "action" : "actions"}`;
+      else if (result?.status === "partial") {
+        title = `Applied ${applied} of ${requested} actions`;
+        summary = `Stopped: ${result?.rejected?.message ?? "action rejected"}`;
+      } else title = `Applied ${applied} ${applied === 1 ? "action" : "actions"}`;
+      break;
+    }
     case "game.act": {
       switch (input.type) {
         case "unit.found": title = active ? "Founding a city" : "Founded a city"; break;

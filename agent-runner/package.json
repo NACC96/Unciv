@@ -7,7 +7,8 @@
   "scripts": {
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "build": "tsc -p tsconfig.build.json"
+    "build": "tsc -p tsconfig.build.json",
+    "ab-report": "node scripts/session-ab-report.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.18.2",

@@ -6,6 +6,7 @@ import com.unciv.logic.civilization.Civilization
 import com.unciv.logic.map.HexCoord
 import com.unciv.logic.map.mapunit.MapUnit
 import com.unciv.logic.city.City
+import com.unciv.models.ruleset.unique.UniqueTarget
 import com.unciv.logic.trade.TradeOffer
 import com.unciv.logic.trade.TradeOfferType
 import com.unciv.models.ruleset.unique.UniqueType
@@ -74,10 +75,14 @@ class EmpireOverview(
     var cityCount: Int = 0,
     var unitCount: Int = 0,
     /** One-time aircraft/missile grants waiting for a city with air capacity; not deployed units. */
-    var pendingStartingUnits: LinkedHashMap<String, Int> = LinkedHashMap()
+    var pendingStartingUnits: LinkedHashMap<String, Int> = LinkedHashMap(),
+    /** Enough culture or a free policy to adopt one now. */
+    var canAdoptPolicy: Boolean = false,
+    /** Policies and branches civics.adopt accepts now; empty unless [canAdoptPolicy]. */
+    var adoptablePolicies: ArrayList<String> = ArrayList()
 ) {
     @Suppress("unused")
-    constructor() : this(0, null, ArrayList(), 0, 0, 0, 0, ArrayList(), 0, 0, LinkedHashMap())
+    constructor() : this(0, null, ArrayList(), 0, 0, 0, 0, ArrayList(), 0, 0, LinkedHashMap(), false, ArrayList())
 }
 
 /** Detached terms, including the actual duration of this pending offer. */
@@ -150,7 +155,12 @@ class LegalActionsDto(
     var moveTargets: ArrayList<HexCoord> = ArrayList(),
     var attackTargets: ArrayList<AttackOption> = ArrayList(),
     var orders: ArrayList<UnitOrder> = ArrayList(),
+    /** unit.found would be accepted on the unit's current tile right now. */
     var canFound: Boolean = false,
+    /** Why a founding unit cannot found here now, e.g. "Too close to another city"; null otherwise. */
+    var foundBlockedReason: String? = null,
+    /** Unit responses only: movement points left this turn. */
+    var movementLeft: Float = 0f,
     var constructions: ArrayList<String> = ArrayList(),
     var researchable: ArrayList<String> = ArrayList(),
     var freeTechs: Int = 0,
@@ -166,7 +176,7 @@ class LegalActionsDto(
     var canCancelWork: Boolean = false
 ) {
     @Suppress("unused")
-    constructor() : this(ArrayList(), ArrayList(), ArrayList(), false, ArrayList(),
+    constructor() : this(ArrayList(), ArrayList(), ArrayList(), false, null, 0f, ArrayList(),
         ArrayList(), 0, 0, ArrayList(), false, null, ArrayList())
 }
 
@@ -175,10 +185,12 @@ class RulesSummaryDto(
     var rulesetName: String = "",
     var baseRuleset: String = "",
     var gameVersion: String = "",
-    var note: String = "Static rules may be cached; actions validated live against this ruleset."
+    var note: String = "Static rules may be cached; actions validated live against this ruleset.",
+    /** Catalog sections game.rules accepts. */
+    var sections: ArrayList<String> = ArrayList(RULES_SECTIONS)
 ) {
     @Suppress("unused")
-    constructor() : this("", "", "", "")
+    constructor() : this("", "", "", "", ArrayList(RULES_SECTIONS))
 }
 
 private fun MapUnit.toObserved() = ObservedUnit(
@@ -284,6 +296,9 @@ fun buildObservation(
         civ.units.getCivUnitsSize(),
         LinkedHashMap(civ.pendingStartingUnits)
     )
+    dto.empire.canAdoptPolicy = civ.policies.canAdoptPolicy()
+    if (dto.empire.canAdoptPolicy) dto.empire.adoptablePolicies = ArrayList(
+        game.ruleset.policies.values.filter { civ.policies.isAdoptable(it) }.map { it.name })
 
     for (unit in civ.units.getCivUnits()) {
         if (!unit.isDestroyed) dto.ownUnits.add(unit.toObserved())
@@ -357,8 +372,11 @@ fun buildLegalActions(
         if (!unit.isSleepingUntilHealed() && unit.canHealInCurrentTile()) dto.orders.add(UnitOrder.SLEEP_UNTIL_HEALED)
         if (unit.action != null) dto.orders.add(UnitOrder.WAKE)
         dto.orders.add(UnitOrder.DISBAND)
-        dto.canFound = unit.getMatchingUniques(UniqueType.FoundCity).any()
-            || unit.getMatchingUniques(UniqueType.FoundPuppetCity).any()
+        dto.movementLeft = unit.currentMovement
+        if (unit.getMatchingUniques(UniqueType.FoundCity).any() || unit.getMatchingUniques(UniqueType.FoundPuppetCity).any()) {
+            dto.foundBlockedReason = foundCityBlocker(unit)
+            dto.canFound = dto.foundBlockedReason == null
+        }
         if (unit.promotions.canBePromoted())
             dto.promotions = ArrayList(unit.promotions.getAvailablePromotions().map { it.name }.toList())
         val upgradesTo = unit.baseUnit.upgradesTo
@@ -402,6 +420,31 @@ fun buildLegalActions(
         }
     }
     return dto
+}
+
+/**
+ * Engine founding checks shared by legal_actions and unit.found, so canFound
+ * never promises a city the command then rejects. Null means the unit can
+ * found on its current tile now. Spacing ignores visibility, matching the
+ * human UI's disabled found-city button.
+ */
+fun foundCityBlocker(unit: MapUnit): String? {
+    val unique = unit.getMatchingUniques(UniqueType.FoundCity).firstOrNull()
+        ?: unit.getMatchingUniques(UniqueType.FoundPuppetCity).firstOrNull()
+        ?: return "Unit cannot found cities"
+    if (unique.modifiers.any {
+            it.type?.targetTypes?.contains(UniqueTarget.UnitActionModifier) == true
+                && it.type != UniqueType.UnitActionConsumeUnit
+        }) return "Complex founding rites are unsupported in v1"
+    val tile = unit.getTile()
+    val civ = unit.civ
+    return when {
+        tile.isWater || tile.isImpassible() -> "Cannot found a city here"
+        civ.isOneCityChallenger() && civ.hasEverOwnedOriginalCapital -> "Cannot found another city"
+        !unit.hasMovement() -> "Unit has no movement left"
+        !tile.canBeSettled(civ) -> "Too close to another city"
+        else -> null
+    }
 }
 
 fun buildRulesSummary(game: GameInfo): RulesSummaryDto {

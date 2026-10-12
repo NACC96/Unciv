@@ -4,6 +4,9 @@ import com.unciv.logic.GameInfo
 import com.unciv.models.stats.Stats
 import java.security.MessageDigest
 
+/** Static catalog sections served by game.rules. */
+val RULES_SECTIONS = listOf("improvements", "terrains", "resources")
+
 /** Optional section preserves the existing summary response when absent. */
 data class RulesQuery(
     val section: String? = null,
@@ -39,7 +42,8 @@ fun buildRulesCatalog(game: GameInfo, rulesetIdentity: String, query: RulesQuery
     if (section.length > 128) rulesInvalid("Rules section is too long")
     if (query.name != null && query.name.length > 128) rulesInvalid("Rules name is too long")
     if (query.cursor != null && query.cursor.length > 512) rulesInvalid("Rules cursor is too long")
-    if (section !in setOf("improvements", "terrains", "resources")) rulesInvalid("Unknown rules section: $section")
+    if (section !in RULES_SECTIONS)
+        rulesInvalid("Unknown rules section: $section. Valid sections: ${RULES_SECTIONS.joinToString()}")
     if (query.limit !in 1..128) rulesInvalid("Rules limit must be 1 through 128")
     if (query.name != null && query.name.isBlank()) rulesInvalid("Rules name cannot be blank")
     val ruleset = game.ruleset

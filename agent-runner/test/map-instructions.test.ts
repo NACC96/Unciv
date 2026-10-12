@@ -16,9 +16,9 @@ it("teaches geography, memory limits and exact worker choices while preserving p
   expect(GAME_INSTRUCTIONS).toContain('name:"Farm"');
 });
 
-it("allows exactly all eleven game tools through each provider configuration", () => {
+it("allows exactly all twelve game tools through each provider configuration", () => {
   for (const name of ["CODEX", "CLAUDE", "OPENCODE"]) vi.stubEnv(`UNCIV_${name}_EXECUTABLE`, process.execPath);
-  expect(GAME_TOOL_ALLOWLIST).toHaveLength(11);
+  expect(GAME_TOOL_ALLOWLIST).toHaveLength(12);
   const codex = codexSpawn({ prompt: "play", mcpUrl: "http://127.0.0.1/mcp", bearerEnvVar: "TEST_GAME_BEARER", cwd: "/tmp", sandboxDangerous: true });
   expect(codex.argv.find(a => a.includes("enabled_tools="))).toContain(`enabled_tools=${JSON.stringify(GAME_TOOL_ALLOWLIST)}`);
   const claude = claudeSpawn({ prompt: "play", mcpConfigPath: "/tmp/game.json", cwd: "/tmp" });
