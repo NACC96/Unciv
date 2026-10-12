@@ -1,6 +1,6 @@
 # Atlas design readiness audit
 
-Source: `7fced2becf07f6fa211a98e49c89659a3c23523a`. Audit is read-only with respect to product code, live app and game data. Findings refine the proposed [design](2026-10-12-civ6-atlas-ui-design.md); they do not demonstrate implementation or completion.
+Source: `7fced2becf07f6fa211a98e49c89659a3c23523a`. Audit is read-only with respect to product code, live app and game data. Findings refine the approved [design](2026-10-12-civ6-atlas-ui-design.md); they do not demonstrate implementation or completion.
 
 ## Load-bearing findings
 
@@ -41,4 +41,4 @@ The acceptance inventory must cover these user-facing families:
 
 ## Verification still required
 
-No new theme components, production art, animation cache or event playback has been implemented. No new performance or native interaction result is claimed. The design approval is pending; after approval, the implementation plan must preserve all of the coverage above, and actual rendered/runtime evidence must replace these source-only observations.
+No new theme components, production art, animation cache or event playback has been implemented. No new performance or native interaction result is claimed. The user approved the design on 2026-10-12. The implementation plan preserves all of the coverage above; actual rendered/runtime evidence must replace these source-only observations before completion.

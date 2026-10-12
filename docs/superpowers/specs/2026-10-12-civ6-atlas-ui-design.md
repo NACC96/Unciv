@@ -1,6 +1,6 @@
 # Atlas: full interface, map art and animated units
 
-Status: proposed design for user review. Product implementation has not started.
+Status: approved by the user on 2026-10-12 ("Approve this design"). Product implementation has not started; the implementation plan is the next review artifact.
 
 ## Objective and agreed scope
 
