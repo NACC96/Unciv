@@ -255,7 +255,7 @@ class AgentNationSettingsPanelTest {
             panel.toggle(); panel.validate(); controls.validate()
             assertTrue(panel.x >= 0 && panel.y >= 0 && panel.x + panel.width <= f.width && panel.y + panel.height <= f.height)
             assertTrue(controls.width <= f.width - 16f)
-            for (name in listOf("NationPicker", "NationProvider", "NationModel", "NationDisplayName", "NationPersonality")) {
+            for (name in listOf("MatchVision", "NationPicker", "NationProvider", "NationModel", "NationDisplayName", "NationPersonality")) {
                 val actor = panel.named(name); val pos = actor.localToAscendantCoordinates(panel, Vector2())
                 assertTrue("$name horizontal bounds", pos.x >= 0 && pos.x + actor.width <= panel.width)
             }
@@ -279,5 +279,33 @@ class AgentNationSettingsPanelTest {
                 panel.hide(); assertNull(stage.keyboardFocus)
             } finally { panel.dispose(); stage.dispose(); stage.batch.dispose() }
         }
+    }
+
+    @Test fun `map vision picker shows the match setting and commits only the user's pick`() {
+        val f = Fixture()
+        var vision = MatchVision.FULL
+        val changes = ArrayList<MatchVision>()
+        var done: ((String?) -> Unit)? = null
+        Mockito.`when`(f.session.getVision()).thenAnswer { vision }
+        Mockito.doAnswer { changes.add(it.getArgument(0)); done = it.getArgument(1); null }
+            .`when`(f.session).setVision(Mockito.any(MatchVision::class.java) ?: MatchVision.FOG, Mockito.any<(String?) -> Unit>() ?: {})
+        val panel = AgentNationSettingsPanel(f.screen, f.session)
+        try {
+            panel.toggle()
+            val picker = panel.named("MatchVision") as SelectBox<*>
+            assertEquals("Everything", picker.selected.toString())
+            assertTrue("Opening and refreshing never commits", changes.isEmpty())
+            panel.select("MatchVision", "Map revealed")
+            assertEquals(listOf(MatchVision.MAP), changes)
+            assertTrue("One change at a time", picker.isDisabled)
+            vision = MatchVision.MAP
+            done!!(null)
+            assertFalse(picker.isDisabled)
+            assertTrue((panel.named("NationStatus") as Label).text.toString().startsWith("Map vision: Map revealed"))
+            vision = MatchVision.FOG
+            panel.refresh()
+            assertEquals("Another change to the match is followed", "Fog of war", picker.selected.toString())
+            assertEquals(1, changes.size)
+        } finally { panel.dispose() }
     }
 }

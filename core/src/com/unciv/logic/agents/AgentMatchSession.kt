@@ -87,6 +87,12 @@ interface AgentMatchSession {
         if (image == null) sendMessage(targetCivId, text, onComplete)
         else onComplete("Image messaging is unavailable for this match")
     }
+    /** Match-wide map vision for agents and the local player; ordinary games keep fog of war. */
+    fun getVision(): MatchVision = MatchVision.FOG
+    /** Commits a new [MatchVision] off the rendering thread; completion runs on GL. */
+    fun setVision(vision: MatchVision, onComplete: (String?) -> Unit) {
+        onComplete("Map vision is unavailable for this match")
+    }
     /** Deletes the viewer's own still-queued message off the rendering thread; completion runs on GL. */
     fun deleteMessage(messageId: String, onComplete: (String?) -> Unit) {
         onComplete("Deleting messages is unavailable for this match")

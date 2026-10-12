@@ -44,7 +44,7 @@ class TileView internal constructor(private val tile: Tile, val tileMapView: Til
     }
     @Readonly private fun isVisible(unit: MapUnit): Boolean {
         if (viewer == null) return false
-        return DebugUtils.VISIBLE_MAP || tileMapView.gameView?.revealMap == true || unit.isVisibleTo(viewer)
+        return DebugUtils.VISIBLE_MAP || tileMapView.gameView?.revealUnits == true || unit.isVisibleTo(viewer)
     }
     @Readonly private fun toForeignMapUnitView(unit: MapUnit): ForeignMapUnitView =
         tileMapView.gameView!!.getForeignMapUnitView(unit)
@@ -94,9 +94,9 @@ class TileView internal constructor(private val tile: Tile, val tileMapView: Til
     @Readonly private fun isExploredInView(other: Tile): Boolean =
         viewer == null || tileMapView.gameView?.revealMap == true || other.isExplored(viewer)
     /** `true` when this tile should be shown regardless of exploration/tech: there's no real [viewer] (e.g. civilopedia/map editor previews),
-     * debug mode has the whole map revealed, the view reveals the map ([GameView.revealMap]), or [getCivView] is watching a defeated game play out.
+     * debug mode has the whole map revealed, the view reveals everything ([GameView.revealUnits]), or [getCivView] is watching a defeated game play out.
      * TODO: Replace all usages with altering the view function called, to reveal data where relevant */
-    @Readonly fun isForceVisible(): Boolean = viewer == null || DebugUtils.VISIBLE_MAP || tileMapView.gameView?.revealMap == true
+    @Readonly fun isForceVisible(): Boolean = viewer == null || DebugUtils.VISIBLE_MAP || tileMapView.gameView?.revealUnits == true
         || getCivView()?.isMapRevealed() == true
     @Readonly fun getVisibleNeighbors(): Sequence<TileView> =
         tile.neighbors

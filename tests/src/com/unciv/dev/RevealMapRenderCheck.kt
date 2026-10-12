@@ -31,10 +31,19 @@ import com.unciv.view.GameView
 import org.mockito.Mockito
 
 /**
- * A spectator playing a nation with fog lifted: the whole map shows, while the played nation's own
- * city keeps its private details. Real GPU, synthetic game only; no provider, save or session I/O.
+ * A nation's view under fog, map-only vision (every tile, units still fogged) and full vision (a spectator
+ * lifting fog, or the agent match's Everything setting): the played nation's own city keeps its private
+ * details throughout. Real GPU, synthetic game only; no provider, save or session I/O.
  */
 object RevealMapRenderCheck {
+    private enum class Mode(val file: String, val caption: String) {
+        FOGGED("fogged", "Playing Rome · fog of war"),
+        MAP("map-only", "Playing Rome · map revealed, units fogged"),
+        LIFTED("lifted", "Playing Rome · everything visible");
+        val revealsTiles get() = this != FOGGED
+        val revealsUnits get() = this == LIFTED
+    }
+
     @JvmStatic fun main(args: Array<String>) {
         require(args.isNotEmpty()) { "Provide an output directory for the PNG captures" }
         var failure: Throwable? = null
@@ -49,7 +58,7 @@ object RevealMapRenderCheck {
             override fun create() {
                 try {
                     Gdx.files.absolute(args[0]).mkdirs()
-                    for (reveal in listOf(false, true)) capture(960, 720, reveal, args[0])
+                    for (mode in Mode.entries) capture(960, 720, mode, args[0])
                     println("REVEAL_MAP_RENDER_CHECK_PASSED")
                     if (System.getProperty("unciv.renderCheck.synchronous") == "true") System.exit(0)
                     Gdx.app.exit()
@@ -64,7 +73,8 @@ object RevealMapRenderCheck {
         failure?.let { kotlin.system.exitProcess(1) }
     }
 
-    private fun capture(width: Int, height: Int, reveal: Boolean, output: String) {
+    private fun capture(width: Int, height: Int, mode: Mode, output: String) {
+        val reveal = mode.revealsTiles
         val game = TestGame()
         game.makeHexagonalMap(7, Constants.grassland)
         val rome = game.addCiv(game.ruleset.nations["Rome"]!!, isPlayer = true)
@@ -98,7 +108,7 @@ object RevealMapRenderCheck {
             stage.viewport.update(width, height, true)
             val screen = Mockito.mock(WorldScreen::class.java)
             val played = GameView(game.gameInfo, rome)
-            val rendered = if (reveal) GameView(game.gameInfo, rome, revealMap = true) else played
+            val rendered = if (reveal) GameView(game.gameInfo, rome, revealMap = true, revealUnits = mode.revealsUnits) else played
             Mockito.`when`(screen.stage).thenReturn(stage)
             Mockito.`when`(screen.game).thenReturn(UncivGame.Current)
             Mockito.`when`(screen.gameInfo).thenReturn(game.gameInfo)
@@ -124,8 +134,7 @@ object RevealMapRenderCheck {
             minimap.setPosition(stage.width - minimap.width - 12f, 12f)
             stage.addActor(Table().apply {
                 background = WorldScreenStyle.background("", WorldScreenStyle.surface)
-                add((if (reveal) "Playing Rome · fog lifted (spectator vision)" else "Playing Rome · fog of war")
-                    .toLabel(WorldScreenStyle.ink, 14)).pad(8f)
+                add(mode.caption.toLabel(WorldScreenStyle.ink, 14)).pad(8f)
                 pack()
                 setPosition(12f, stage.height - this.height - 12f)
             })
@@ -143,7 +152,8 @@ object RevealMapRenderCheck {
                 "Lifting fog must not expose a foreign city's private production"
             }
             val hiddenTile = holder.tileGroups.values.single { it.tileView.position() == hiddenWarrior.getTile().position }
-            check((hiddenTile.tileView.militaryUnit != null) == reveal) { "Arabia's warrior must show only with fog lifted" }
+            check((hiddenTile.tileView.militaryUnit != null) == mode.revealsUnits) { "Arabia's warrior must show only with everything visible ($mode)" }
+            check(hiddenTile.isViewable(rendered.civView) == mode.revealsUnits) { "Out-of-sight tiles keep fog shading unless everything is visible ($mode)" }
             val minimapTiles = (minimap.minimap.children.first() as Group).children
             val shown = minimapTiles.count { it.isVisible }
             check(if (reveal) shown == game.tileMap.values.count() else shown < game.tileMap.values.count()) {
@@ -151,7 +161,7 @@ object RevealMapRenderCheck {
             }
 
             while (Gdx.gl.glGetError() != GL20.GL_NO_ERROR) { }
-            drawCapture(stage, frame, width, height, "$output/reveal-map-${if (reveal) "lifted" else "fogged"}.png")
+            drawCapture(stage, frame, width, height, "$output/reveal-map-${mode.file}.png")
         } finally {
             UncivGame::class.java.getDeclaredField("worldScreen").apply { isAccessible = true }.set(UncivGame.Current, null)
             frame.dispose()

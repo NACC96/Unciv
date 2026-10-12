@@ -102,8 +102,9 @@ it("summarizes a queued message without exposing its body or calling an unconfir
 });
 
 const assertPurposefulOutreach = (prompt: string) => {
-  for (const instruction of ["Review game.observe.messageContacts each turn", "concrete mutual opportunities", "cooperation, trade, alliances, borders and geopolitical bargains",
-    "shared objective", "specific asks", "each recipient's role", "credible warnings", "ten messages per turn", "no quota", "nuclear weapons a last resort",
+  for (const instruction of ["Review game.observe.messageContacts each turn", "use it every turn to improve your position", "alliances of convenience against stronger rivals",
+    "isolate your next target", "shared objective", "specific asks", "each recipient's role", "threats work best when your observed strength can back them",
+    "ten messages per turn", "Every message should serve your position", "Nuclear weapons invite retaliation", "keep them a last resort",
     "inbox and private correspondence", "separate tailored", "one recipient per call", "fresh actionId", "current expectedRevision"])
     expect(prompt).toContain(instruction);
   expect(prompt).toContain("no automatic reply");
