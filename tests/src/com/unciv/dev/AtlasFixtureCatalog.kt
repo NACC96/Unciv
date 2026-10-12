@@ -1,11 +1,16 @@
 package com.unciv.dev
 
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Files as GdxFiles
 import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.Group
 import com.badlogic.gdx.scenes.scene2d.ui.Table
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton
+import com.badlogic.gdx.scenes.scene2d.ui.SelectBox
+import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane
+import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.viewport.ScreenViewport
 import com.unciv.Constants
@@ -20,9 +25,16 @@ import com.unciv.logic.files.SETTINGS_FILE_NAME
 import com.unciv.logic.map.MapShape
 import com.unciv.logic.map.HexCoord
 import com.unciv.models.tilesets.TileSetCache
+import com.unciv.models.skins.SkinCache
 import com.unciv.testing.TestGame
 import com.unciv.ui.audio.MusicController
 import com.unciv.ui.components.SetupLayoutFixture
+import com.unciv.ui.components.AtlasWidgets
+import com.unciv.ui.components.GameUiStyle
+import com.unciv.ui.components.extensions.toLabel
+import com.unciv.ui.components.extensions.toCheckBox
+import com.unciv.ui.components.widgets.UncivTextField
+import com.unciv.ui.components.fonts.FontRulesetIcons
 import com.unciv.ui.components.fonts.Fonts
 import com.unciv.ui.images.ImageGetter
 import com.unciv.ui.screens.basescreen.BaseScreen
@@ -57,7 +69,7 @@ object AtlasFixtureCatalog {
         "Persia", "England", "France", "Rome", "Korea", "Babylon", "Polynesia", "Mongolia", "Egypt")
     private val registered = linkedSetOf("world", "activity", "messages", "overview", "nation-control",
         "terrain", "units", "city", "research", "policies", "religion", "promotions", "diplomacy",
-        "setup", "menu", "supporting")
+        "setup", "menu", "supporting", "supporting-atlas")
     private val scopes = IdentityHashMap<BaseScreen, AtlasDataScope>()
 
     fun ids(): Set<String> = registered.toSet()
@@ -77,6 +89,7 @@ object AtlasFixtureCatalog {
             val fixture = scope.seedGame(large)
             val game = UncivGame.Current
             game.settings.apply {
+                skin = if (id == "supporting-atlas") "Atlas" else "Minimal"
                 fontSizeMultiplier = fontScale
                 showTutorials = false
                 enableEasterEggs = false
@@ -92,6 +105,11 @@ object AtlasFixtureCatalog {
             // A new JVM per matrix cell owns Fonts, atlases and this sole GL context.
             Fonts.fontImplementation = DesktopFont()
             ImageGetter.setNewRuleset(fixture.ruleset)
+            if (id == "supporting-atlas") {
+                SkinCache.loadSkinConfigs()
+                BaseScreen.setSkin()
+                FontRulesetIcons.addRulesetImages(fixture.ruleset)
+            }
             TileSetCache.loadTileSetConfigs()
             val civ = fixture.gameInfo.civilizations.first()
             val observer = fixture.gameInfo.civilizations.last()
@@ -152,6 +170,11 @@ object AtlasFixtureCatalog {
                     holder.layout()
                     holder.setCenterPosition(civ.cities.first().location, immediately = true, selectUnit = false)
                     holder.clearActions()
+                    if (id == "supporting-atlas") {
+                        addControlGallery(screen, width, height)
+                        scopes[screen] = scope
+                        return screen
+                    }
                     val bar = WorldScreenTopBar(facade)
                     getter(facade, "getTopBar", bar)
                     screen.stage.addActor(bar)
@@ -187,6 +210,62 @@ object AtlasFixtureCatalog {
         } catch (failure: Throwable) {
             scope.close()
             throw failure
+        }
+    }
+
+    /** Explicit Atlas variant over the same real mixed-biome map; supporting retains MapEditorScreen. */
+    private fun addControlGallery(screen: BaseScreen, width: Int, height: Int) {
+        val content = Table().apply {
+            name = "AtlasControlGallery"
+            background = GameUiStyle.panelBackground("Atlas/Gallery", 0.94f)
+            pad(12f)
+            defaults().growX().padBottom(8f)
+        }
+        val columnWidth = minOf(540f, width - 48f)
+        content.add(AtlasWidgets.header("Atlas controls — aperçu", "Synthetic widget gallery • 日本語 / 中文 / Crème brûlée"))
+            .width(columnWidth).row()
+        val stats = Table()
+        stats.add(AtlasWidgets.stat("Gold", "¤ 1,204")).growX()
+        stats.add(AtlasWidgets.stat("Wheat", "[Wheat] 12")).growX()
+        stats.add(AtlasWidgets.stat("Rome", "● Nation", Color.valueOf("A993ED"))).growX()
+        content.add(stats).row()
+        content.add(AtlasWidgets.tabs(listOf("Economy", "Research", "Long translated tab"), 0) {}).row()
+        val field = UncivTextField("Draft", "draft • Zürich • 東京")
+        content.add(AtlasWidgets.field("Message draft — keyboard focus", field)).row()
+        val select = SelectBox<String>(BaseScreen.skin).apply { setItems("Peaceful trade", "Long option name with diacritics — São Paulo") }
+        content.add(AtlasWidgets.field("Choice", select)).row()
+        content.add("✓ Enabled • status includes text".toCheckBox(true).apply { GameUiStyle.applyWidget(this) }).row()
+        content.add("✘ Disabled • unavailable".toCheckBox(false).apply { isDisabled = true; GameUiStyle.applyWidget(this) }).row()
+        content.add("✘ Validation / semantic red".toLabel(Color.RED, 14).apply { wrap = true }).row()
+        content.add(AtlasWidgets.disclosure("Long detail — expand for secondary context",
+            "Readable long text wraps without replacing the selected platform font or ruleset symbols: [Wheat] [Iron] ¤.".toLabel(GameUiStyle.muted, 13).apply { wrap = true }, true)).row()
+        val states = Table()
+        val normal = GameUiStyle.button("Normal")
+        val hover = GameUiStyle.button("Hover").apply { style = TextButton.TextButtonStyle(style).apply { up = over; fontColor = overFontColor } }
+        val pressed = GameUiStyle.button("Pressed").apply { style = TextButton.TextButtonStyle(style).apply { up = down; fontColor = downFontColor } }
+        val disabled = GameUiStyle.button("Disabled").apply { isDisabled = true }
+        for (button in listOf(normal, hover, pressed, disabled)) {
+            button.label.wrap = true
+            states.add(button).growX().minHeight(40f).pad(2f)
+        }
+        content.add(states).row()
+        content.add(AtlasWidgets.footer(GameUiStyle.button("Confirm ✓"), listOf(GameUiStyle.button("Cancel")))).row()
+        val scroll = ScrollPane(content).apply { setScrollingDisabled(true, false); setFadeScrollBars(false) }
+        scroll.setSize(columnWidth + 24f, height - 24f)
+        scroll.setPosition(12f, 12f)
+        screen.stage.addActor(scroll)
+        scroll.validate()
+        screen.stage.keyboardFocus = field
+        // This complementary panel is over the map too, exposing the same opacity on a second biome.
+        if (width >= 960) {
+            val notes = Table().apply {
+                background = GameUiStyle.panelBackground("Atlas/Gallery/SecondBiome", 0.94f)
+                pad(16f)
+                add(AtlasWidgets.header("Bright / dark terrain", "Ivory body • muted details • brass action\nNo blur; existing 2D map remains authoritative")).width(300f).row()
+                add("日本語 中文 — Łódź — Ångström\n[Wheat] [Iron] ¤ ⚔".toLabel(GameUiStyle.ink, 14).apply { wrap = true }).width(300f).row()
+            }
+            notes.pack(); notes.setPosition(width - notes.width - 12f, height - notes.height - 12f)
+            screen.stage.addActor(notes)
         }
     }
 

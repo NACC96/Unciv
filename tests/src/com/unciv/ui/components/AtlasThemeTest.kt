@@ -1,0 +1,202 @@
+package com.unciv.ui.components
+
+import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.scenes.scene2d.Actor
+import com.badlogic.gdx.scenes.scene2d.ui.Label
+import com.badlogic.gdx.scenes.scene2d.ui.CheckBox
+import com.badlogic.gdx.scenes.scene2d.ui.SelectBox
+import com.badlogic.gdx.scenes.scene2d.ui.Table
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton
+import com.badlogic.gdx.scenes.scene2d.ui.TextField
+import com.unciv.UncivGame
+import com.unciv.ui.components.extensions.toLabel
+import com.unciv.ui.components.extensions.toCheckBox
+import com.unciv.models.skins.SkinCache
+import com.unciv.models.skins.SkinConfig
+import com.unciv.json.json
+import com.unciv.ui.images.ImageGetter
+import com.unciv.ui.components.input.keyShortcuts
+import com.unciv.ui.components.input.onActivation
+import com.unciv.ui.components.input.ActivationListener
+import com.badlogic.gdx.scenes.scene2d.InputEvent
+import com.unciv.ui.components.input.KeyCharAndCode
+import com.unciv.ui.components.widgets.ExpanderTab
+import org.mockito.Mockito
+import com.unciv.ui.screens.basescreen.BaseScreen
+import com.badlogic.gdx.scenes.scene2d.Stage
+import com.badlogic.gdx.graphics.g2d.Batch
+import com.badlogic.gdx.utils.viewport.ScreenViewport
+import com.unciv.testing.GdxTestRunner
+import org.junit.After
+import org.junit.Assert.*
+import org.junit.Before
+import org.junit.Test
+import org.junit.runner.RunWith
+import kotlin.math.pow
+
+@RunWith(GdxTestRunner::class)
+class AtlasThemeTest {
+    private lateinit var snapshot: SetupUiStateSnapshot
+    @Before fun rememberState() { snapshot = SetupUiStateSnapshot(); SetupLayoutFixture(800f, 500f) }
+    @After fun restoreState() { snapshot.restore() }
+
+    private fun selectSkin(name: String) {
+        UncivGame.Current.settings.skin = name
+        BaseScreen.setSkin()
+    }
+
+    @Test fun atlasContrastOnBrightAndDarkMaps() {
+        selectSkin("Atlas")
+        assertEquals(Color.valueOf("10232F"), GameUiStyle.surface)
+        assertEquals(Color.valueOf("F2EBDD"), BaseScreen.skin.get(Label.LabelStyle::class.java).fontColor)
+        val terrain = listOf(Color.valueOf("F1E7C7"), Color.valueOf("092B45"))
+        val composited = terrain.map { composite(GameUiStyle.surface.cpy().apply { a = 0.94f }, it) }
+        val minBodyContrast = composited.flatMap { listOf(contrast(GameUiStyle.ink, it), contrast(GameUiStyle.muted, it)) }.min()
+        val minControlContrast = composited.map { contrast(GameUiStyle.accent, it) }.min()
+        assertTrue(minBodyContrast >= 4.5)
+        assertTrue(minControlContrast >= 3.0)
+        val button = GameUiStyle.button("Confirm", primary = true)
+        assertTrue(contrast(button.style.fontColor, GameUiStyle.accent) >= 4.5)
+    }
+
+    @Test fun legacySkinSurvivesAtlasSelectionCycle() {
+        SkinCache["SyntheticModSkin"] = json().fromJson(SkinConfig::class.java,
+            """{"clearColor":{"r":0.4,"g":0.1,"b":0.2,"a":1},"skinVariants":{"Probe":{"tint":{"r":0.2,"g":0.6,"b":0.3,"a":1}}}}""")
+        for (name in listOf("Minimal", "SyntheticModSkin")) {
+            selectSkin(name)
+            val before = BaseScreen.skin.get(TextButton.TextButtonStyle::class.java)
+            val beforeField = BaseScreen.skin.get(TextField.TextFieldStyle::class.java)
+            val beforeColor = GameUiStyle.surface.cpy()
+            val beforeProbe = BaseScreen.skinStrings.getUIColor("Probe")
+            selectSkin("Atlas")
+            selectSkin(name)
+            val after = BaseScreen.skin.get(TextButton.TextButtonStyle::class.java)
+            assertEquals(before.fontColor, after.fontColor)
+            assertEquals(before.overFontColor, after.overFontColor)
+            assertEquals(before.up.minHeight, after.up.minHeight, 0f)
+            assertEquals(beforeField.fontColor, BaseScreen.skin.get(TextField.TextFieldStyle::class.java).fontColor)
+            assertEquals(beforeColor, GameUiStyle.surface)
+            assertEquals(beforeProbe, BaseScreen.skinStrings.getUIColor("Probe"))
+            assertNotEquals(Color.valueOf("F2EBDD"), after.fontColor)
+        }
+    }
+
+    @Test fun semanticColorsAndSharedStylesRemainIndependent() {
+        selectSkin("Atlas")
+        val red = "✘ Invalid".toLabel(Color.RED)
+        val nationColor = Color.valueOf("7254CB")
+        val nation = "Rome".toLabel(nationColor)
+        val shared = BaseScreen.skin.get(TextField.TextFieldStyle::class.java)
+        val field = TextField("draft", BaseScreen.skin)
+        GameUiStyle.applyWidget(red)
+        GameUiStyle.applyWidget(nation)
+        GameUiStyle.applyWidget(field)
+        assertEquals(Color.RED, red.style.fontColor)
+        assertEquals(nationColor, nation.style.fontColor)
+        assertNotSame(shared, field.style)
+        field.style.fontColor.a = 0.2f
+        assertEquals(1f, shared.fontColor.a, 0f)
+        assertEquals(1f, GameUiStyle.ink.a, 0f)
+        val negative = TextButton("Delete", BaseScreen.skin, "negative")
+        val negativeBackground = negative.style.up
+        GameUiStyle.applyWidget(negative)
+        assertSame(negativeBackground, negative.style.up)
+        red.style.fontColor.a = 0.1f
+        assertEquals(1f, Color.RED.a, 0f)
+    }
+
+    @Test fun buildersKeepCallbacksShortcutsAndAccessibleTargets() {
+        selectSkin("Atlas")
+        var calls = 0
+        val action = GameUiStyle.button("Confirm").apply { onActivation { calls++ }; keyShortcuts.add('c') }
+        val listeners = action.listeners.toList()
+        val footer = AtlasWidgets.footer(action, listOf(GameUiStyle.button("Cancel")))
+        footer.pack()
+        assertEquals(listeners, action.listeners.toList())
+        assertTrue(KeyCharAndCode('c') in action.keyShortcuts)
+        assertTrue(action.height >= 40f)
+        action.silenceSetupActivationSounds()
+        action.listeners.filterIsInstance<ActivationListener>().single()
+            .tap(InputEvent().apply { listenerActor = action }, 1f, 1f, 1, 0)
+        assertEquals(1, calls)
+        val compact = GameUiStyle.button("+", size = GameUiStyle.ButtonSize.Compact)
+        assertTrue(compact.height >= 32f)
+        val input = TextField("draft", BaseScreen.skin)
+        val form = AtlasWidgets.field("Message", input)
+        form.pack()
+        assertSame(input, form.cells.last().actor)
+        assertTrue(input.height >= 40f)
+        val checkBox = "Enabled".toCheckBox()
+        checkBox.pack()
+        assertTrue(checkBox.height >= 40f)
+        var tab = -1
+        val tabs = AtlasWidgets.tabs(listOf("Economy", "Science"), 0) { tab = it }
+        val second = tabs.children.filterIsInstance<TextButton>().last()
+        second.silenceSetupActivationSounds()
+        second.listeners.filterIsInstance<ActivationListener>().single()
+            .tap(InputEvent().apply { listenerActor = second }, 1f, 1f, 1, 0)
+        assertEquals(1, tab)
+        assertTrue(second.isChecked)
+        assertTrue(second.text.startsWith("✓"))
+    }
+
+    @Test fun detachedAndAttachedDisclosureContentIsVisitedExactlyOnce() {
+        selectSkin("Atlas")
+        val button = Mockito.spy(TextButton("Action", BaseScreen.skin))
+        val disclosure = ExpanderTab("Details", startsOutOpened = false) { it.add(button) }
+        for (open in listOf(false, true)) {
+            disclosure.isOpen = open
+            Mockito.clearInvocations(button)
+            GameUiStyle.applyWidget(disclosure)
+            Mockito.verify(button, Mockito.times(1)).setStyle(Mockito.any(com.badlogic.gdx.scenes.scene2d.ui.Button.ButtonStyle::class.java))
+        }
+    }
+
+    @Test fun selectedSkinDiscoveryAndColorCopiesRetainModOverrides() {
+        assertTrue("Atlas" in ImageGetter.getAvailableSkins().toList())
+        selectSkin("Atlas")
+        SkinCache["Atlas"] = json().fromJson(SkinConfig::class.java,
+            """{"skinVariants":{"Probe":{"tint":{"r":0.2,"g":0.6,"b":0.3,"a":1},"foregroundColor":{"r":0.4,"g":0.3,"b":0.2,"a":1}}}}""")
+        BaseScreen.setSkin()
+        val before = BaseScreen.skinStrings.getUIColor("Probe")
+        val returned = BaseScreen.skinStrings.getUIColor("Probe")
+        returned.a = 0f
+        assertEquals(before, BaseScreen.skinStrings.getUIColor("Probe"))
+        val foreground = BaseScreen.skinStrings.getUIFontColor("Probe")!!
+        foreground.a = 0f
+        assertEquals(1f, BaseScreen.skinStrings.getUIFontColor("Probe")!!.a, 0f)
+        assertSame(com.unciv.ui.components.fonts.Fonts.font, BaseScreen.skin.get(Label.LabelStyle::class.java).font)
+    }
+
+    @Test fun stylingPreservesRealStageKeyboardFocus() {
+        selectSkin("Atlas")
+        val stage = Stage(ScreenViewport(), Mockito.mock(Batch::class.java))
+        try {
+            stage.viewport.update(800, 500, true)
+            val field = TextField("draft", BaseScreen.skin)
+            stage.addActor(field)
+            stage.keyboardFocus = field
+            val listeners = field.listeners.toList()
+            BaseScreen.setSkin()
+            GameUiStyle.applyWidget(stage.root)
+            assertSame(field, stage.keyboardFocus)
+            assertEquals("draft", field.text)
+            assertEquals(listeners, field.listeners.toList())
+        } finally { stage.dispose() }
+    }
+
+    companion object {
+        fun composite(foreground: Color, background: Color) = Color(
+            foreground.r * foreground.a + background.r * (1 - foreground.a),
+            foreground.g * foreground.a + background.g * (1 - foreground.a),
+            foreground.b * foreground.a + background.b * (1 - foreground.a), 1f)
+        fun contrast(a: Color, b: Color): Double {
+            fun luminance(c: Color): Double {
+                fun channel(v: Float) = if (v <= 0.04045f) v / 12.92 else ((v + 0.055) / 1.055).pow(2.4)
+                return 0.2126 * channel(c.r) + 0.7152 * channel(c.g) + 0.0722 * channel(c.b)
+            }
+            val x = luminance(a); val y = luminance(b)
+            return (maxOf(x, y) + 0.05) / (minOf(x, y) + 0.05)
+        }
+    }
+}

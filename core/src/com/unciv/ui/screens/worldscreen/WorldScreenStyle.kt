@@ -8,6 +8,7 @@ import com.unciv.ui.components.GameUiStyle
 
 /** Compatible HUD facade for the scoped style shared with nation setup. */
 object WorldScreenStyle {
+    val inset get() = GameUiStyle.inset
     val surface get() = GameUiStyle.surface
     val raised get() = GameUiStyle.raised
     val hover get() = GameUiStyle.hover

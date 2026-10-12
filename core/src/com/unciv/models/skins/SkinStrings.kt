@@ -5,7 +5,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable
 import com.unciv.UncivGame
 import com.unciv.ui.images.ImageGetter
 
-class SkinStrings(skin: String = UncivGame.Current.settings.skin) {
+class SkinStrings(val skin: String = UncivGame.Current.settings.skin) {
+    val isAtlas get() = skin == "Atlas"
     private val skinLocation = "Skins/$skin/"
     val skinConfig = SkinCache[skin] ?: SkinConfig()
     private val fallbackSkinLocation = if (skinConfig.fallbackSkin != null) "Skins/${skinConfig.fallbackSkin}/" else null
@@ -53,7 +54,7 @@ class SkinStrings(skin: String = UncivGame.Current.settings.skin) {
         val skinVariant = skinConfig.skinVariants[path]
         val locationByConfigVariant = if (skinVariant?.image != null) skinLocation + skinVariant.image else null
         val tint = (skinVariant?.tint ?: skinConfig.defaultVariantTint ?: tintColor)?.run {
-            if (skinVariant?.alpha == null) this
+            if (skinVariant?.alpha == null) cpy()
             else cpy().apply { a = skinVariant.alpha }
         }
         
@@ -80,7 +81,7 @@ class SkinStrings(skin: String = UncivGame.Current.settings.skin) {
         else 
             null
         val fallbackTint = (fallbackSkinVariant?.tint ?: tintColor)?.run {
-            if (fallbackSkinVariant?.alpha == null) this
+            if (fallbackSkinVariant?.alpha == null) cpy()
             else cpy().apply { a = fallbackSkinVariant.alpha }
         }
 
@@ -98,14 +99,12 @@ class SkinStrings(skin: String = UncivGame.Current.settings.skin) {
     }
 
     fun getUIColor(path: String, default: Color? = null) =
-            skinConfig.skinVariants[path]?.tint
-                ?: default
-                ?: skinConfig.clearColor
+        (skinConfig.skinVariants[path]?.tint ?: default ?: skinConfig.clearColor).cpy()
 
     
-    fun getUIFontColor(path: String) = skinConfig.skinVariants[path]?.foregroundColor
+    fun getUIFontColor(path: String) = skinConfig.skinVariants[path]?.foregroundColor?.cpy()
     
     fun getUIIconColor(path: String) = 
-        skinConfig.skinVariants[path]?.iconColor ?: skinConfig.skinVariants[path]?.foregroundColor
+        (skinConfig.skinVariants[path]?.iconColor ?: skinConfig.skinVariants[path]?.foregroundColor)?.cpy()
 
 }

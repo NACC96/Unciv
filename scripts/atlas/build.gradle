@@ -13,3 +13,32 @@ gradle.taskGraph.whenReady { graph ->
         it.name.toLowerCase().contains('install') || it.name.toLowerCase().contains('publish') })
         throw new GradleException('Atlas verification cannot run, install, package or publish the app')
 }
+
+// Pack only the built-in skin sources, without a launcher, Android SDK or mod scan.
+// Uses the same libGDX TexturePacker/settings as the existing AndroidImagePacker.
+gradle.projectsEvaluated {
+    rootProject.tasks.register('packAtlasSkin') {
+        doLast {
+            def loader = rootProject.buildscript.classLoader
+            def packer = loader.loadClass('com.badlogic.gdx.tools.texturepacker.TexturePacker')
+            def settingsType = loader.loadClass('com.badlogic.gdx.tools.texturepacker.TexturePacker$Settings')
+            def jsonType = loader.loadClass('com.badlogic.gdx.utils.Json')
+            def settings = jsonType.getDeclaredConstructor().newInstance().fromJson(settingsType,
+                new File(rootProject.rootDir, 'android/Images.Skin/TexturePacker.settings').text)
+            def evidence = new File(System.getenv('UNCIV_ATLAS_OUTPUT') ?: '/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/checks').canonicalFile
+            def boundary = new File('/Volumes/Lexar/Unciv/.superpowers/civ6-atlas').canonicalFile
+            if (!(evidence.path == boundary.path || evidence.path.startsWith(boundary.path + File.separator)))
+                throw new GradleException('Skin packing evidence must remain within the approved Lexar root')
+            def source = new File(evidence, 'packed-skin/Images.Skin')
+            def output = new File(evidence, 'packed-skin/assets')
+            rootProject.sync { from new File(rootProject.rootDir, 'android/Images.Skin'); into source; exclude '**/._*' }
+            // exFAT stores copied macOS metadata in AppleDouble files, which are not PNG sources.
+            source.eachFileRecurse { if (it.name.startsWith('._')) it.delete() }
+            output.mkdirs()
+            packer.getMethod('process', settingsType, String, String, String).invoke(null, settings,
+                source.path, output.path, 'Skin')
+            // These two tracked runtime inputs accompany their authored source, not an installed app.
+            rootProject.copy { from output; include 'Skin.atlas', 'Skin.png'; into new File(rootProject.rootDir, 'android/assets') }
+        }
+    }
+}

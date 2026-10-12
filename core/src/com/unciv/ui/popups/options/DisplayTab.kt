@@ -169,7 +169,9 @@ internal class DisplayTab(
     }
 
     private fun addSkinSelectBox() {
-        addSelectBox("UI Skin", settings::skin, ImageGetter.getAvailableSkins().asIterable()) { _, _ ->
+        // Keep a selected mod skin visible even while its asset pack is temporarily unavailable.
+        val choices = (sequenceOf(settings.skin) + ImageGetter.getAvailableSkins()).distinct().sorted().toList()
+        addSelectBox("UI Skin", settings::skin, choices) { _, _ ->
             // ImageGetter ruleset should be correct no matter what screen we're on
             SkinCache.assembleSkinConfigs(ImageGetter.ruleset.mods)
             reloadWorldAndOptions()

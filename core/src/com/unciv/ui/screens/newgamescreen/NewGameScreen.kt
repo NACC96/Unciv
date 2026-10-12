@@ -541,6 +541,10 @@ internal fun Table.configureStackedSetup(options: GameOptionsTable, map: MapOpti
 
 /** Presentation-only traversal keeps option-table listeners and mod-specific contents intact. */
 internal fun Actor.polishSetupWidgets() {
+    if (GameUiStyle.isAtlas) {
+        GameUiStyle.applyWidget(this)
+        return
+    }
     if (this is PlayerPickerTable) return  // Nation cards already own their hierarchy and semantic colors.
     when (this) {
         is CheckBox -> {
