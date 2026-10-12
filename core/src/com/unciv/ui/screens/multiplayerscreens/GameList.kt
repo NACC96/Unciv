@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup
 import com.unciv.UncivGame
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.logic.GameInfoPreview
 import com.unciv.logic.event.EventBus
 import com.unciv.logic.multiplayer.HasMultiplayerGameName
@@ -33,6 +34,7 @@ class GameList(
     init {
         padTop(10f)
         padBottom(10f)
+        if (GameUiStyle.isAtlas) fill().expand().space(8f)
 
         events.receive(MultiplayerGameNameChanged::class) {
             update()
@@ -76,6 +78,11 @@ private class GameDisplay(
         updateErrorIndicator(error != null)
         add(statusIndicators)
         add(gameButton)
+        if (GameUiStyle.isAtlas) {
+            GameUiStyle.apply(gameButton)
+            gameButton.label.wrap = true
+            getCell(gameButton).minWidth(0f).growX().minHeight(GameUiStyle.standardControlHeight)
+        }
         onClick { onSelected(gameName) }
 
         val isOurGame: (HasMultiplayerGameName) -> Boolean = { it.name == gameName }
@@ -109,7 +116,7 @@ private class GameDisplay(
 
     private fun createIndicator(imagePath: String): Actor {
         val image = ImageGetter.getImage(imagePath)
-        image.setSize(50f)
+        image.setSize(if (GameUiStyle.isAtlas) 24f else 50f)
         val container = Container(image)
         container.padRight(5f)
         return container

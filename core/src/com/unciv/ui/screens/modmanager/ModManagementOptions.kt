@@ -6,6 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.unciv.Constants
 import com.unciv.models.metadata.ModCategories
 import com.unciv.models.translations.tr
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.widgets.ExpanderTab
 import com.unciv.ui.components.widgets.UncivTextField
 import com.unciv.ui.components.UncivTooltip.Companion.addTooltip
@@ -126,18 +127,30 @@ internal class ModManagementOptions(private val modManagementScreen: ModManageme
 
         expander = ExpanderTab(
             "Sort and Filter",
-            fontSize = Constants.defaultFontSize,
+            fontSize = if (GameUiStyle.isAtlas) GameUiStyle.Type.label else Constants.defaultFontSize,
             startsOutOpened = false,
             defaultPad = 2.5f,
             headerPad = 15f,
-            expanderWidth = 360f,
+            expanderWidth = if (GameUiStyle.isAtlas) (modManagementScreen.stage.width - 48f).coerceIn(120f, 520f) else 360f,
             onChange = { expanderChangeEvent?.invoke() }
         ) {
-            it.background = BaseScreen.skinStrings.getUiBackground(
-                "ModManagementOptions/ExpanderTab",
-                tintColor = Color(0x203050ff)
-            )
+            it.background = if (GameUiStyle.isAtlas) GameUiStyle.panelBackground("Atlas/Mods/Filters", 1f)
+                else BaseScreen.skinStrings.getUiBackground("ModManagementOptions/ExpanderTab", tintColor = Color(0x203050ff))
             it.pad(7.5f)
+            if (GameUiStyle.isAtlas) {
+                it.defaults().left().growX().minWidth(0f).padBottom(4f)
+                it.add("Filter:".toLabel()).row()
+                it.add(textField).row()
+                it.add(searchIcon).size(32f).right().row()
+                it.add("Category:".toLabel()).row()
+                it.add(categorySelect).row()
+                it.add("Sort Current:".toLabel()).row()
+                it.add(sortInstalledSelect).row()
+                it.add("Sort Downloadable:".toLabel()).row()
+                it.add(sortOnlineSelect).row()
+                GameUiStyle.applyWidget(it)
+                return@ExpanderTab
+            }
             it.add(Table().apply {
                 add("Filter:".toLabel()).left()
                 add(textField).pad(0f, 5f, 0f, 5f).growX()

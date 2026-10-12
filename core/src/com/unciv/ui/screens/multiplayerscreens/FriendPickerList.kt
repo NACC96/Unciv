@@ -4,6 +4,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup
 import com.unciv.logic.multiplayer.FriendList
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.screens.newgamescreen.PlayerPickerTable
 import com.unciv.ui.screens.basescreen.BaseScreen
 import com.unciv.ui.components.input.onClick
@@ -46,6 +47,11 @@ private class FriendDisplay(
         padBottom(5f)
 
         add(friendButton)
+        if (GameUiStyle.isAtlas) {
+            GameUiStyle.apply(friendButton)
+            friendButton.label.wrap = true
+            getCell(friendButton).minWidth(0f).growX().minHeight(GameUiStyle.standardControlHeight)
+        }
         onClick { onSelected(friendName) }
     }
 }
