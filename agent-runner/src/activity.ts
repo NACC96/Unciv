@@ -3,14 +3,17 @@ import { summarizeTool, toolResult } from "./tool-summary.js";
 /** Image bytes are transport-only; provider/activity logs retain metadata. */
 const imageBlockMarker = /\\*"type\\*"\s*:\s*\\*"(?:image|input_image|image_url)\\*"/;
 
+const imageDataUriMarker = /data:image\/[a-z0-9.+-]+(?:;[^,\s]*)?,/i;
+const containsImage = (value: string) => imageBlockMarker.test(value) || imageDataUriMarker.test(value);
+
 export function redactImageData(value: unknown): any {
   if (typeof value === "string") {
-    if (!/^[\s]*[\[{]/.test(value)) return value;
+    if (!/^[\s]*[\[{"]/.test(value)) return containsImage(value) ? "[image-containing text omitted]" : value;
     try {
       const parsed = JSON.parse(value);
       const redacted = redactImageData(parsed);
       return JSON.stringify(redacted) === JSON.stringify(parsed) ? value : JSON.stringify(redacted);
-    } catch { return imageBlockMarker.test(value) ? "[unparseable image event omitted]" : value; }
+    } catch { return containsImage(value) ? "[unparseable image event omitted]" : value; }
   }
   if (Array.isArray(value)) return value.map(redactImageData);
   if (!value || typeof value !== "object") return value;
@@ -29,7 +32,7 @@ export function redactImageLine(line: string): string {
     const parsed = JSON.parse(line);
     const redacted = redactImageData(parsed);
     return JSON.stringify(redacted) === JSON.stringify(parsed) ? line : JSON.stringify(redacted);
-  } catch { return imageBlockMarker.test(line) ? "[unparseable image event omitted]" : line; }
+  } catch { return containsImage(line) ? "[unparseable image event omitted]" : line; }
 }
 
 /** Only provider-exposed content is displayed; image bytes are omitted. */

@@ -97,3 +97,29 @@ it("redacts native/Claude image blocks and nested serialized OpenCode results be
   expect(redactImageLine(JSON.stringify(nested).slice(0, -10))).not.toContain(image.data);
   expect(redactImageLine('{"type":"image","data":"' + image.data)).not.toContain(image.data);
 });
+
+it.each([
+  ["prefixed", (encoded: string) => "tool result: " + encoded],
+  ["JSON-quoted", (encoded: string) => JSON.stringify(encoded)],
+])("redacts %s serialized image output while preserving outer tool/session identity", (_label, wrap) => {
+  const encoded = JSON.stringify({ content: [{ type: "image", mimeType: "image/png", data: image.data }] });
+  const event = { type: "tool_use", sessionID: "session-image-privacy", part: { id: "call-image-privacy", tool: "game.message_image",
+    state: { status: "completed", input: { messageId: "mail", attachmentId }, output: wrap(encoded), ordinaryText: "A plain diplomatic note." } } };
+  const line = redactImageLine(JSON.stringify(event)), cleaned = JSON.parse(line);
+  expect(line).not.toContain(image.data);
+  expect(cleaned).toMatchObject({ type: "tool_use", sessionID: event.sessionID, part: { id: event.part.id, tool: event.part.tool,
+    state: { input: event.part.state.input, ordinaryText: event.part.state.ordinaryText } } });
+  expect(JSON.stringify(new ActivityNormalizer().fromLine(JSON.stringify(event)))).not.toContain(image.data);
+  expect(new ActivityNormalizer().fromLine(JSON.stringify(event))[0]?.id).toBe("part-call-image-privacy");
+});
+
+it("redacts image data URIs in file-shaped provider parts while retaining IDs and ordinary strings", () => {
+  const event = { type: "tool_use", sessionID: "session-file-image", part: { id: "call-file-image", tool: "game.message_image", state: { status: "completed",
+    output: "metadata available", attachments: [{ type: "file", id: "file-image", mime: "image/png", url: `data:image/png;base64,${image.data}` }],
+    text: "plain text", quotedText: JSON.stringify("ordinary quoted text"), url: "https://example.invalid/image.png" } } };
+  const line = redactImageLine(JSON.stringify(event)), cleaned = JSON.parse(line);
+  expect(line).not.toContain(image.data);
+  expect(cleaned.part.state.attachments[0]).toMatchObject({ type: "file", id: "file-image", mime: "image/png" });
+  expect(cleaned).toMatchObject({ sessionID: event.sessionID, part: { id: event.part.id, state: { text: "plain text", quotedText: event.part.state.quotedText, url: event.part.state.url } } });
+  expect(JSON.stringify(new ActivityNormalizer().fromLine(JSON.stringify(event)))).not.toContain(image.data);
+});
