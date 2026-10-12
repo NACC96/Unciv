@@ -2,5 +2,7 @@
   "useColorAsBaseTerrain": false,
   "useSummaryImages": false,
   "fallbackTileSet": "FantasyHex",
-  "tileScale": 1.0
+  "tileScale": 1.0,
+  "fogOfWarColor": { "r": 0.18, "g": 0.24, "b": 0.28, "a": 1.0 },
+  "unexploredTileColor": { "r": 0.72, "g": 0.77, "b": 0.79, "a": 1.0 }
 }
