@@ -191,9 +191,13 @@ export async function main(): Promise<void> {
     process.exit(0);
   };
   const requestShutdown = (transportDisconnected = false) => {
-    // EOF cannot carry further engine responses. A shutdown control can, so
-    // keep that channel alive until the current provider finishes normally.
-    if (transportDisconnected) backend.disconnect();
+    // EOF means the desktop is gone (exit or crash) and no engine response can
+    // arrive, so the provider could only fail every remaining call: stop it now.
+    // A shutdown control can still be answered, so that drains the turn instead.
+    if (transportDisconnected) {
+      backend.disconnect();
+      activeRun?.cancel.abort();
+    }
     if (shuttingDown) return;
     shuttingDown = true;
     if (activeTurn) void activeTurn.then(finish, finish);
