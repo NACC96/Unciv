@@ -25,6 +25,7 @@ import com.unciv.ui.screens.worldscreen.worldmap.WorldMapHolder
 class MinimapHolder(val mapHolder: WorldMapHolder) : Table() {
     private val worldScreen = mapHolder.worldScreen
     private var minimapSize = Int.MIN_VALUE
+    private var sizeBeforeMaximize = Int.MIN_VALUE
     private var maximized = false
     val isMaximized get() = maximized
     private var lastCutoutSetting = false
@@ -146,11 +147,16 @@ class MinimapHolder(val mapHolder: WorldMapHolder) : Table() {
     private fun getMaximizeToggleButton(civInfo: Civilization?, alignment: Int): Actor {
 
         val toggle = fun() {
+            if (!maximized) sizeBeforeMaximize = minimapSize
             maximized = !maximized
             minimapSize = if (maximized && stage!=null) {
                 minimap.getClosestMinimapSize(Vector2(stage.width, stage.height), touchInside = true)
+            } else if (com.unciv.ui.components.GameUiStyle.isAtlas) {
+                // Restore the already fitted size, not chrome measured in the expanded
+                // layout. Resize/settings changes rebuild and establish a new fitted size.
+                sizeBeforeMaximize
             } else {
-                atlasFittedSize(worldScreen.game.settings.minimapSize)
+                worldScreen.game.settings.minimapSize
             }
             rebuildAndUpdateMap(civInfo)
             worldScreen.shouldUpdate = true

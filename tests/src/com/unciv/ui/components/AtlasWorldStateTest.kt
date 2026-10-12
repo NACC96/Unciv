@@ -77,7 +77,14 @@ class AtlasWorldStateTest {
         assertSame(BaseScreen.skin.get("disabled", com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle::class.java).up, button.style.up)
     }
 
-    @Test fun minimapExpandReduceRestoresFitWithoutOtherInvalidation() {
+    @Test fun minimapExpandReduceRestoresFitWithoutOtherInvalidation() = assertMinimapRoundTrip(1440f, 900f, 30)
+
+    @Test fun minimapNarrowViewportRestoresSameFittedSize() = assertMinimapRoundTrip(960f, 720f, 12)
+
+    private fun assertMinimapRoundTrip(width: Float, height: Float, requestedSize: Int) {
+        Mockito.`when`(fixture.stage.width).thenReturn(width)
+        Mockito.`when`(fixture.stage.height).thenReturn(height)
+        fixture.root.setSize(width, height)
         val game = fixture.game
         game.makeRectangularMap(20, 32)
         game.tileMap.mapParameters.shape = com.unciv.logic.map.MapShape.rectangular
@@ -87,12 +94,12 @@ class AtlasWorldStateTest {
         val map = Mockito.mock(WorldMapHolder::class.java)
         getter(map, "getWorldScreen", screen)
         getter(map, "getTileMap", game.tileMap)
-        UncivGame.Current.settings.minimapSize = 30
+        UncivGame.Current.settings.minimapSize = requestedSize
         val holder = MinimapHolder(map)
         fixture.stage.addActor(holder)
         holder.update(viewer)
         val before = Vector2(holder.width, holder.height)
-        val allocation = com.unciv.ui.screens.worldscreen.WorldHudLayout.calculate(1440f, 900f, 1f, true).minimap
+        val allocation = com.unciv.ui.screens.worldscreen.WorldHudLayout.calculate(width, height, 1f, true).minimap
         assertTrue("map and layer controls exceed their host: ${holder.height}", holder.height + 8f <= allocation.height + .5f)
         fun pressToggle() {
             val toggle = descendants(holder).filterIsInstance<com.badlogic.gdx.scenes.scene2d.ui.Table>().first { actor -> actor.listeners.any { it is ActivationListener } }
@@ -112,10 +119,10 @@ class AtlasWorldStateTest {
         assertFalse(holder.isMaximized)
         assertEquals(before.x, holder.width, .01f)
         assertEquals(before.y, holder.height, .01f)
-        assertEquals(30, UncivGame.Current.settings.minimapSize)
+        assertEquals(requestedSize, UncivGame.Current.settings.minimapSize)
         assertSame(game.tileMap, map.javaClass.methods.single { it.name.substringBefore('$') == "getTileMap" }.invoke(map))
-        assertEquals(1440f, screen.stage.width, 0f)
-        assertEquals(900f, screen.stage.height, 0f)
+        assertEquals(width, screen.stage.width, 0f)
+        assertEquals(height, screen.stage.height, 0f)
         assertFalse(Mockito.mockingDetails(map).invocations.any { it.method.name.startsWith("setCenterPosition") })
         val settings = UncivGame.Current.settings
         val readers = listOf<() -> Boolean>({ settings.showUnitMovements }, { settings.showTileYields },
