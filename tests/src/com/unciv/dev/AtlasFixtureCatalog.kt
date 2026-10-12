@@ -261,8 +261,11 @@ object AtlasFixtureCatalog {
         scroll.setPosition(12f, 12f)
         screen.stage.addActor(scroll)
         scroll.validate()
-        if (scrolled) { scroll.scrollPercentY = 1f; scroll.updateVisualScroll() }
         screen.stage.keyboardFocus = field
+        // UncivTextField's real focus listener may scroll its ancestor. Capture each
+        // requested endpoint explicitly after focus so the top heading stays inspectable.
+        scroll.scrollPercentY = if (scrolled) 1f else 0f
+        scroll.updateVisualScroll()
         // This complementary panel is over the map too, exposing the same opacity on a second biome.
         if (width >= 960) {
             val notes = Table().apply {
