@@ -21,6 +21,7 @@ import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.nio.file.Files
+import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.TimeUnit
@@ -38,8 +39,14 @@ class DesktopNationControlTest {
         Mockito.doAnswer { invocation -> invocation.getArgument<Runnable>(0).run(); null }
             .`when`(Gdx.app).postRunnable(Mockito.any(Runnable::class.java))
     }
-    private inner class Fixture(human: Boolean = false, wrongViewer: Boolean = false, failProvider: Boolean = false, attachScreen: Boolean = false, includeSpectator: Boolean = true) {
+    private inner class Fixture(human: Boolean = false, wrongViewer: Boolean = false, failProvider: Boolean = false, attachScreen: Boolean = false, includeSpectator: Boolean = true, stallSupervisor: Boolean = false) {
         lateinit var host: DesktopAgentMatch
+        val supervisorEntered = CountDownLatch(1)
+        val releaseSupervisor = CountDownLatch(if (stallSupervisor) 1 else 0)
+        val installAttempts = AtomicInteger()
+        val installFence = AgentPublicationFence()
+        val acceptedGenerations = CopyOnWriteArrayList<Long>()
+        var installFailure: String? = null
         val started = CountDownLatch(1)
         val release = CountDownLatch(1)
         val returned = CountDownLatch(1)
@@ -76,6 +83,11 @@ class DesktopNationControlTest {
             renderedViewer.set(match.localViewingCivId)
             screen = if (attachScreen) Mockito.mock(WorldScreen::class.java) { invocation ->
                 if (invocation.method.name == "installAgentSnapshot") {
+                    installAttempts.incrementAndGet()
+                    val generation = invocation.getArgument<Long>(2)
+                    if (!installFence.accept(generation)) return@mock null
+                    acceptedGenerations.add(generation)
+                    installFailure?.let { throw IllegalStateException(it) }
                     publishedViewers.add(invocation.getArgument(3)); null
                 } else Answers.RETURNS_DEFAULTS.answer(invocation)
             }.also {
@@ -83,6 +95,8 @@ class DesktopNationControlTest {
             } else null
             host = DesktopAgentMatch(game.gameInfo, match, AgentMatchSetup(),
                 Files.createTempDirectory("unciv-nation-boundary-").toFile(), worldScreen = screen, supervisorFactory = {
+                    supervisorEntered.countDown()
+                    check(releaseSupervisor.await(10, TimeUnit.SECONDS))
                     object : SupervisorRunner {
                         override fun isAlive() = true
                         override fun runTurn(control: Map<String, Any?>): SupervisorProcess.TurnOutcome {
@@ -119,7 +133,7 @@ class DesktopNationControlTest {
         fun sessions(): HashMap<String, String> = DesktopAgentMatch::class.java.getDeclaredField("sessions").apply { isAccessible = true }.get(host) as HashMap<String, String>
     }
     @After fun drain() {
-        fixtures.forEach { it.release.countDown(); it.host.pause(); it.host.close() }
+        fixtures.forEach { it.releaseSupervisor.countDown(); it.release.countDown(); it.host.pause(); it.host.close() }
         fixtures.forEach { f -> if (f.started.count == 0L) assertTrue(f.returned.await(5, TimeUnit.SECONDS)) }
         Gdx.app = previousApp; Gdx.graphics = previousGraphics
     }
@@ -149,6 +163,58 @@ class DesktopNationControlTest {
         assertEquals(AgentRunState.PAUSED, f.host.getRunState()); assertNull(f.host.getPendingNationChange())
         assertEquals(epoch + 1, f.epoch()); assertNull(f.sessions()[f.greece]); assertEquals("resume-rome", f.sessions()[f.rome])
         assertEquals(0, f.kills.get())
+    }
+
+    @Test fun `request during supervisor setup prevents final provider admission`() {
+        val f = Fixture(stallSupervisor = true)
+        f.host.startAutomaticPlay(); assertTrue(f.supervisorEntered.await(5, TimeUnit.SECONDS))
+        val revision = f.host.coordinator.getStateRevision()
+        f.request(); assertEquals(AgentRunState.PAUSING, f.host.getRunState())
+        assertEquals(revision, f.host.coordinator.getStateRevision()); assertEquals(0, f.calls.get())
+        f.releaseSupervisor.countDown()
+        assertTrue("A pending request must apply without admitting a provider", f.completed.await(5, TimeUnit.SECONDS))
+        assertNull(f.error); assertEquals(0, f.calls.get()); assertEquals(0, f.kills.get())
+        assertEquals(ControllerKind.HUMAN, f.host.coordinator.getController(f.greece)!!.kind)
+        assertEquals(AgentRunState.PAUSED, f.host.getRunState()); assertEquals(1, f.callbacks.get())
+    }
+
+    @Test fun `queued GL install failure reports saved change and Retry installs without provider dispatch`() {
+        val queued = ConcurrentLinkedQueue<Runnable>()
+        Mockito.doAnswer { invocation -> queued.add(invocation.getArgument(0)); null }
+            .`when`(Gdx.app).postRunnable(Mockito.any(Runnable::class.java))
+        fun drainGl(): Throwable? {
+            var thrown: Throwable? = null
+            while (true) {
+                val runnable = queued.poll() ?: break
+                try { runnable.run() } catch (error: Throwable) { thrown = error }
+            }
+            return thrown
+        }
+        val f = Fixture(attachScreen = true)
+        f.installFailure = "injected queued install failure"
+        val epoch = f.epoch(); f.sessions()[f.rome] = "old-rome"
+        f.request(f.rome)
+        assertTrue(awaitCondition { f.host.coordinator.getController(f.rome)!!.kind == ControllerKind.HUMAN && queued.size >= 2 })
+        assertEquals(0, f.callbacks.get()); assertEquals(epoch + 1, f.epoch()); assertNull(f.sessions()[f.rome])
+        val resumableBeforeInstall = f.host.canResume()
+        val globalFailure = drainGl()
+        assertNull("Install failure must stay in the host, not reach global crash handling", globalFailure)
+        assertFalse("Scheduling waits for GL installation", resumableBeforeInstall)
+        assertTrue(f.completed.await(5, TimeUnit.SECONDS)); assertTrue(f.error, f.error?.contains("was saved") == true)
+        assertEquals(AgentRunState.NEEDS_ATTENTION, f.host.getRunState()); assertEquals(1, f.callbacks.get())
+        f.installFailure = null; f.host.retry()
+        assertFalse(f.host.canResume()); assertNull(drainGl())
+        assertEquals(AgentRunState.PAUSED, f.host.getRunState()); assertEquals(listOf(f.rome), f.publishedViewers)
+        assertEquals(2, f.acceptedGenerations.size)
+        assertTrue("Retry must pass a fence that accepted the failed frame", f.acceptedGenerations[1] > f.acceptedGenerations[0])
+        assertEquals(0, f.calls.get()); assertEquals(1, f.callbacks.get())
+        f.renderedViewer.set(f.rome); assertTrue(f.host.isHumanInputAllowed())
+        // A queued committed view must never install into a screen after its host closes.
+        val closed = Fixture(attachScreen = true)
+        closed.request(closed.rome)
+        assertTrue(awaitCondition { closed.host.coordinator.getController(closed.rome)!!.kind == ControllerKind.HUMAN && queued.size >= 2 })
+        closed.host.close(); assertNull(drainGl())
+        assertEquals(0, closed.installAttempts.get()); assertEquals(1, closed.callbacks.get()); assertNotNull(closed.error)
     }
 
     @Test fun `selected but not admitted turn is rejected after a nation request`() {

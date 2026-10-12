@@ -195,12 +195,16 @@ class DesktopAgentMatch(
     private var matchOpen = true // protected by lock
     private data class PendingNationChange(
         val civId: String?, val change: NationControlChange, val profile: AgentProfile?,
-        val origin: String?, val viewer: String?, val onComplete: (String?) -> Unit
+        val origin: String?, val viewer: String?, val onComplete: (String?) -> Unit,
+        var committed: Boolean = false
     )
     private var pendingNationChange: PendingNationChange? = null
     private var pendingNationReason: String? = null
     /** A committed assignment can outlive a failed render payload; Retry republishes without dispatch. */
     private var pendingViewRefresh = false
+    private var viewInstallInFlight = false
+    /** Render attempts advance independently so a failed accepted frame can be retried. */
+    private var publicationSequence = 0L
 
     /** Production requires the actual rendered viewer; explicit injected fixtures can be headless. */
     private fun actualViewerLocked(): String? {
@@ -230,7 +234,7 @@ class DesktopAgentMatch(
         try {
             synchronized(lock) {
                 check(!closed.get() && matchOpen) { "This match is not open" }
-                check(pendingNationChange == null) { "Another nation change is pending" }
+                check(pendingNationChange == null && !viewInstallInFlight) { "Another nation change or view refresh is pending" }
                 val viewer = actualViewerLocked()
                 require(viewer != null) { "Nation settings require an attached player or spectator" }
                 coordinator.validateNationChange(civId, change, copiedProfile)
@@ -269,47 +273,73 @@ class DesktopAgentMatch(
         val pending = pendingNationChange ?: return
         pendingNationChange = null
         pendingNationReason = null
-        completeNationChange(pending.onComplete, reason)
+        completeNationChange(pending.onComplete, if (pending.committed)
+            "The nation change was saved, but the match was closed or left before its view was installed" else reason)
+    }
+
+    private fun markViewRefreshFailedLocked(details: String?): String {
+        pendingViewRefresh = true
+        val saved = if (pendingNationChange?.committed == true) "The nation change" else "The committed state"
+        failureReason = "$saved was saved, but the view refresh failed: $details. Retry to refresh the view."
+        runState = if (isLoopRunning.get()) AgentRunState.PAUSING else AgentRunState.NEEDS_ATTENTION
+        return failureReason!!
+    }
+
+    private fun finishPendingNationChangeLocked(pending: PendingNationChange, error: String?) {
+        if (pendingNationChange !== pending) return // Close/navigation already completed it.
+        val completion = if (error != null && pending.committed) {
+            if (error.contains("was saved")) error else markViewRefreshFailedLocked(error)
+        } else error
+        if (completion == null) {
+            pendingViewRefresh = false
+            failureReason = coordinator.getPausedReason()
+            runState = if (coordinator.isPaused()) AgentRunState.NEEDS_ATTENTION else AgentRunState.PAUSED
+        } else if (!pending.committed) {
+            failureReason = coordinator.getPausedReason() ?: completion
+            runState = if (coordinator.isPaused()) AgentRunState.NEEDS_ATTENTION else AgentRunState.PAUSED
+        }
+        pendingNationChange = null
+        pendingNationReason = null
+        refreshUi()
+        completeNationChange(pending.onComplete, completion)
     }
 
     /** Always holds the same lock as Resume, and runs only after loop ownership is released. */
     private fun applyPendingNationChangeLocked() {
         val pending = pendingNationChange ?: return
+        if (pending.committed) return // The durable change is waiting for its GL installation.
         check(!isLoopRunning.get() && providerRunCivId == null)
-        var committed = false
-        val error = try {
+        val beforeGeneration = coordinator.getPublicationGeneration()
+        try {
             check(!closed.get() && matchOpen) { "This match is not open" }
             check(coordinator.getLocalControlCivId() == pending.origin) { "The local player has changed" }
             check(actualViewerLocked() == pending.viewer) { "The viewing nation has changed" }
-            publishCommittedChangesLocked {
-                coordinator.applyNationChange(pending.civId, pending.change, pending.profile)
-                committed = true
-                if (pending.change != NationControlChange.SPECTATE) {
-                    // Revoke only after durable success, before render delivery can fail in finally.
-                    authorityEpoch = AgentRunControls.nextEpoch(authorityEpoch)
-                    pending.civId?.let { sessions.remove(it) }
+            coordinator.applyNationChange(pending.civId, pending.change, pending.profile)
+            pending.committed = true
+            if (pending.change != NationControlChange.SPECTATE) {
+                authorityEpoch = AgentRunControls.nextEpoch(authorityEpoch)
+                pending.civId?.let { sessions.remove(it) }
+            }
+            pendingViewRefresh = true
+            viewInstallInFlight = true
+            runState = AgentRunState.PAUSING
+            pendingNationReason = "The nation change was saved; updating the view."
+            publishSnapshotLocked { error ->
+                synchronized(lock) {
+                    viewInstallInFlight = false
+                    finishPendingNationChangeLocked(pending, error)
                 }
             }
-            pendingViewRefresh = false
-            failureReason = null
-            runState = AgentRunState.PAUSED
-            null
         } catch (ex: Exception) {
-            if (committed) {
-                pendingViewRefresh = true
-                failureReason = "The nation change was saved, but the view refresh failed: ${ex.message}. Retry to refresh the view."
-                runState = AgentRunState.NEEDS_ATTENTION
-                failureReason
-            } else {
-                failureReason = coordinator.getPausedReason() ?: ex.message
-                runState = if (coordinator.isPaused()) AgentRunState.NEEDS_ATTENTION else AgentRunState.PAUSED
-                ex.message ?: "Could not save nation settings"
+            viewInstallInFlight = false
+            if (!pending.committed && coordinator.getPublicationGeneration() != beforeGeneration) {
+                // Preserve publication of checkpoint-failure metadata without misreporting the assignment.
+                try { publishSnapshotLocked() } catch (publicationError: Exception) {
+                    Log.error("Could not publish checkpoint-failure metadata", publicationError)
+                }
             }
+            finishPendingNationChangeLocked(pending, ex.message ?: "Could not save nation settings")
         }
-        pendingNationChange = null
-        pendingNationReason = null
-        refreshUi()
-        completeNationChange(pending.onComplete, error)
     }
 
     companion object {
@@ -503,9 +533,16 @@ class DesktopAgentMatch(
         }
     }
 
-    private fun publishSnapshotLocked() {
-        if (closed.get()) return
-        val screen = worldScreen ?: return
+    private fun publishSnapshotLocked(onInstalled: ((String?) -> Unit)? = null) {
+        if (closed.get() || onInstalled != null && !matchOpen) {
+            onInstalled?.invoke("The match was closed or left")
+            return
+        }
+        val screen = worldScreen
+        if (screen == null) {
+            onInstalled?.invoke(null)
+            return
+        }
         val payload = AgentSnapshotPublication.buildPayload(
             coordinator,
             viewerCivId = coordinator.getLocalViewingCivId() ?: screen.currentViewerCivId(),
@@ -513,12 +550,25 @@ class DesktopAgentMatch(
             selectedCityId = screen.currentSelectedCityId(),
             selectedTile = screen.currentSelectedTilePos()
         )
+        publicationSequence = maxOf(publicationSequence + 1, payload.generation)
+        payload.generation = publicationSequence
         val snapshot = AgentSnapshotPublication.deserializeGame(payload)
         val selection = AgentSnapshotPublication.resolveSelection(snapshot, payload)
         Concurrency.runOnGLThread {
-            if (closed.get()) return@runOnGLThread
-            screen.installAgentSnapshot(snapshot, selection, payload.generation, payload.viewerCivId)
-            Gdx.graphics.requestRendering()
+            synchronized(lock) {
+                if (closed.get() || onInstalled != null && !matchOpen) {
+                    onInstalled?.invoke("The match was closed or left")
+                    return@synchronized
+                }
+                val error = try {
+                    screen.installAgentSnapshot(snapshot, selection, payload.generation, payload.viewerCivId)
+                    Gdx.graphics.requestRendering()
+                    null
+                } catch (ex: Exception) {
+                    markViewRefreshFailedLocked(ex.message ?: "Could not install the committed view")
+                }
+                onInstalled?.invoke(error)
+            }
         }
     }
 
@@ -526,6 +576,7 @@ class DesktopAgentMatch(
         val idleSupervisor = synchronized(lock) {
             if (!closed.compareAndSet(false, true)) return
             matchOpen = false
+            viewInstallInFlight = false
             cancelPendingNationChangeLocked("The match closed before the nation change was saved")
             // Keep engine RPCs alive for an admitted turn. Its existing worker owns shutdown.
             runState = if (isLoopRunning.get()) AgentRunState.PAUSING else AgentRunState.PAUSED
@@ -540,6 +591,7 @@ class DesktopAgentMatch(
     override fun onMatchLeft() {
         synchronized(lock) {
             matchOpen = false
+            viewInstallInFlight = false
             cancelPendingNationChangeLocked("The match was left before the nation change was saved")
         }
         pause()
@@ -549,6 +601,7 @@ class DesktopAgentMatch(
         synchronized(lock) {
             if (closed.get()) return
             matchOpen = true
+            if (pendingViewRefresh) runState = AgentRunState.NEEDS_ATTENTION
             if (coordinator.isPaused()) {
                 failureReason = coordinator.getPausedReason()
                 runState = AgentRunState.NEEDS_ATTENTION
@@ -600,16 +653,27 @@ class DesktopAgentMatch(
             if (closed.get() || !matchOpen || isLoopRunning.get()) return
             if (runState != AgentRunState.NEEDS_ATTENTION) return
             if (pendingViewRefresh) {
-                try { publishSnapshotLocked() }
-                catch (ex: Exception) {
-                    failureReason = "The nation change was saved, but the view refresh failed: ${ex.message}. Retry to refresh the view."
+                viewInstallInFlight = true
+                runState = AgentRunState.PAUSING
+                try {
+                    publishSnapshotLocked { error ->
+                        synchronized(lock) {
+                            viewInstallInFlight = false
+                            if (closed.get() || !matchOpen) return@synchronized
+                            if (error == null) {
+                                pendingViewRefresh = false
+                                failureReason = coordinator.getPausedReason()
+                                runState = if (coordinator.isPaused() || pendingNationChange != null)
+                                    AgentRunState.NEEDS_ATTENTION else AgentRunState.PAUSED
+                            }
+                            refreshUi()
+                        }
+                    }
+                } catch (ex: Exception) {
+                    viewInstallInFlight = false
+                    markViewRefreshFailedLocked(ex.message)
                     refreshUi()
-                    return
                 }
-                pendingViewRefresh = false
-                failureReason = coordinator.getPausedReason()
-                runState = if (coordinator.isPaused()) AgentRunState.NEEDS_ATTENTION else AgentRunState.PAUSED
-                refreshUi()
                 return
             }
             try {
@@ -714,6 +778,8 @@ class DesktopAgentMatch(
                         } else {
                             if (coordinator.isPaused()) {
                                 failureReason = coordinator.getPausedReason()
+                                runState = AgentRunState.NEEDS_ATTENTION
+                            } else if (pendingViewRefresh && !viewInstallInFlight) {
                                 runState = AgentRunState.NEEDS_ATTENTION
                             }
                             if (pendingNationChange != null) {
@@ -916,6 +982,8 @@ class DesktopAgentMatch(
         }
         val runId = "run-${UUID.randomUUID()}"
         val control: Map<String, Any?> = try { synchronized(lock) {
+            if (closed.get() || !matchOpen || pendingNationChange != null || pendingViewRefresh ||
+                runState !in setOf(AgentRunState.STARTING, AgentRunState.AGENT_DECIDING, AgentRunState.APPLYING)) return
             val turnGuidance = publishCommittedChangesLocked { coordinator.takeGuidanceForDelivery(civId) }
             mapOf(
                 "protocol" to 1,
@@ -937,13 +1005,15 @@ class DesktopAgentMatch(
                 "context" to mapOf("rulesetName" to coordinator.getRulesetName(),
                     "protocolVersion" to 1, "civId" to civId,
                     "turnSerial" to coordinator.getTurnSerial()),
-                "guidance" to turnGuidance)
+                "guidance" to turnGuidance).also {
+                    // From this reservation onward a later pause must drain, never cancel this run.
+                    providerRunCivId = civId
+                }
         } } catch (ex: Exception) {
             fail(coordinator.getPausedReason() ?: "Cannot prepare agent turn: ${ex.message}")
             return
         }
         val outcome = try {
-            synchronized(lock) { providerRunCivId = civId }
             proc.runTurn(control)
         } finally {
             synchronized(lock) { providerRunCivId = null }

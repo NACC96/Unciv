@@ -22,7 +22,7 @@ object NationControl {
     private fun isSpectator(civ: Civilization) = civ.civName == Constants.spectator
     private fun isMajor(game: GameInfo, civ: Civilization): Boolean =
         runCatching { civ.nation.isMajorCiv }.getOrNull()
-            ?: (RulesetCache[game.gameParameters.baseRuleset]?.nations?.get(civ.civName)?.isMajorCiv == true)
+            ?: (RulesetCache.getComplexRuleset(game.gameParameters).nations[civ.civName]?.isMajorCiv == true)
     private fun isSavedNation(game: GameInfo, civ: Civilization, match: AgentMatchState): Boolean =
         isMajor(game, civ) && civ.playerType == PlayerType.Human &&
             match.controllers[civ.civID]?.kind in setOf(ControllerKind.HUMAN, ControllerKind.EXTERNAL_AGENT)

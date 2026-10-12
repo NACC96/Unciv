@@ -4,6 +4,9 @@ import com.unciv.Constants
 import com.unciv.json.json
 import com.unciv.logic.GameInfo
 import com.unciv.models.metadata.BaseRuleset
+import com.unciv.models.ruleset.Ruleset
+import com.unciv.models.ruleset.RulesetCache
+import com.unciv.models.ruleset.nation.Nation
 import com.unciv.testing.BaseTestRunner
 import com.unciv.testing.TestGame
 import org.junit.Assert.*
@@ -143,6 +146,38 @@ class NationControlTest {
         assertEquals("historical-provider", restored.retainedAgentProfiles[f.rome]!!.provider)
         try { NationControl.validateProfile(restored.retainedAgentProfiles[f.rome]!!); fail("New request accepted unsupported profile") }
         catch (_: IllegalArgumentException) {}
+    }
+
+    @Test fun `raw saves resolve extension mod major nations for origin and viewer`() {
+        val f = Fixture(); val modName = "nation-control-extension-test"
+        val previous = RulesetCache[modName]
+        try {
+            val nation = Nation().apply {
+                name = "Extension Major"
+                outerColor = listOf(90, 120, 150)
+                cities = arrayListOf("Extension Capital")
+            }
+            RulesetCache[modName] = Ruleset().apply { name = modName; nations[nation.name] = nation }
+            f.game.gameInfo.gameParameters.mods.add(modName)
+            f.game.ruleset.nations[nation.name] = nation
+            val civ = f.game.addCiv(nation, isPlayer = true)
+            f.game.addUnit("Warrior", civ, f.game.getTile(-2, 0))
+            val match = f.saved().apply { controllers[civ.civID] = CivilizationController(civ.civID, ControllerKind.HUMAN) }
+            val coordinator = MatchCoordinator(f.game.gameInfo, match)
+            coordinator.applyNationChange(civ.civID, NationControlChange.PLAY_AS, null)
+            for (origin in listOf(f.spectator, civ.civID)) {
+                val saved = json().fromJson(AgentMatchState::class.java, coordinator.serializeCommittedMatchForPublication()).apply {
+                    localControlCivId = origin
+                }
+                val raw = json().fromJson(GameInfo::class.java, coordinator.serializeCommittedGameForPublication())
+                raw.agentMatchStateJson = AgentOrdinarySave.encode(saved)
+                val restored = AgentOrdinarySave.read(raw)!!
+                assertEquals(origin, restored.localControlCivId)
+                assertEquals(civ.civID, NationControl.savedViewerCivId(raw, restored))
+            }
+        } finally {
+            if (previous == null) RulesetCache.remove(modName) else RulesetCache[modName] = previous
+        }
     }
 
     @Test fun `attached ordinary human binds own scope even with spectator in roster`() {
