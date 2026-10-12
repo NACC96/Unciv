@@ -1,0 +1,7 @@
+Use this reference sheet as the exact identity, equipment, lighting and painting style. Create a new authored transparent motion sheet for Great Merchant. All32 poses face NE consistently in the same elevated historical map projection, upper-right diagonally away from camera, clearly show back-right three-quarter view, hide front chest. Subject a prosperous Renaissance travelling merchant, plum velvet coat, cream tunic, soft brown cap, leather satchel, small balance scales and ledger, royal-blue sash, on foot; no weapon. Do not rotate the entire raster; author every pose in this direction.
+Exactly8 equal columns x4 equal rows, landscape2:1 PNG, fixed cell scale and ground pivot50%width/78%height. Complete model/equipment in every cell; no overlaps/gutters/text/borders/paper/matte.
+Row1 four idle breath/cloth poses then four hit impact/recoil/stagger/recovery.
+Row2 eight actual MOVE phases alternating planted feet, raised knees, arm and travel-gear motion, smooth walking loop, all facing NE.
+Row3 eight WORK phases opens the ledger, weighs a coin with tiny scales, gestures a bargain and closes the ledger with real body/object changes.
+Row4 eight defeat stages stagger, buckle, kneel, tip, fall, ground contact, settle, prone, complete inside cell, no blood.
+Royal-blue #2166B4 cloth is the nation material only. Soft violet #A04FA0 ground ellipse shadows only beneath root. Surrounding alpha fully transparent. All4 rows and8 columns required.

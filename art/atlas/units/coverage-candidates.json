@@ -2,6 +2,2586 @@
   "schemaVersion": 1,
   "rows": [
     {
+      "id": "unit-clip|Great General|DEFEAT|E",
+      "rulesetKey": "Great General",
+      "category": "unit-clip",
+      "assetKey": "Great General|DEFEAT|E",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-general/frames/defeat-e.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/e-color.png",
+          "sha256": "6258b6c0796d6e1e9ed9eb1e43ab7b77db0811d5c12f3a16d83d4de982e3f037",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/e-nation.png",
+          "sha256": "b693b068e6638e7e73bd8e5d2d39bbeaaf70d47fd58d13e50b14d7e04e42ec55",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/e-shadow.png",
+          "sha256": "26ce4552e90d33561dba134d2b5f96e119cc0436c08553d00bbdfeafaf4daf10",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great General",
+      "state": "DEFEAT",
+      "facing": "E",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great General|DEFEAT|NE",
+      "rulesetKey": "Great General",
+      "category": "unit-clip",
+      "assetKey": "Great General|DEFEAT|NE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-general/frames/defeat-ne.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/ne-color.png",
+          "sha256": "872892d2e745291a3050be834775db696971b5efa4a9b7dfd7ad539ab84d92a1",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/ne-nation.png",
+          "sha256": "e30e68c9068b059174d66938a492f520421e0fa558032dc84b557626c7cf9b94",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/ne-shadow.png",
+          "sha256": "582222b27163debbbc08839c38ed0472426e926efe6d4c2c0698023c1534c858",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great General",
+      "state": "DEFEAT",
+      "facing": "NE",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great General|DEFEAT|NW",
+      "rulesetKey": "Great General",
+      "category": "unit-clip",
+      "assetKey": "Great General|DEFEAT|NW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-general/frames/defeat-nw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/ne-color.png",
+          "sha256": "872892d2e745291a3050be834775db696971b5efa4a9b7dfd7ad539ab84d92a1",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/ne-nation.png",
+          "sha256": "e30e68c9068b059174d66938a492f520421e0fa558032dc84b557626c7cf9b94",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/ne-shadow.png",
+          "sha256": "582222b27163debbbc08839c38ed0472426e926efe6d4c2c0698023c1534c858",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great General",
+      "state": "DEFEAT",
+      "facing": "NW",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great General|DEFEAT|SE",
+      "rulesetKey": "Great General",
+      "category": "unit-clip",
+      "assetKey": "Great General|DEFEAT|SE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-general/frames/defeat-se.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/se-color.png",
+          "sha256": "bb817e088aa47210c7d5417ed42d770c521f1e12249b50c3af16d0f89821a829",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/se-nation.png",
+          "sha256": "6ab3439345113176225b9a6d68a4e097315d231032443e36c1739229472a36f1",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/se-shadow.png",
+          "sha256": "53bad6efac07704d6a4351fe180ec083f43fc30408c71a8773f94ea3a4cfb20c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great General",
+      "state": "DEFEAT",
+      "facing": "SE",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great General|DEFEAT|SW",
+      "rulesetKey": "Great General",
+      "category": "unit-clip",
+      "assetKey": "Great General|DEFEAT|SW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-general/frames/defeat-sw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/se-color.png",
+          "sha256": "bb817e088aa47210c7d5417ed42d770c521f1e12249b50c3af16d0f89821a829",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/se-nation.png",
+          "sha256": "6ab3439345113176225b9a6d68a4e097315d231032443e36c1739229472a36f1",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/se-shadow.png",
+          "sha256": "53bad6efac07704d6a4351fe180ec083f43fc30408c71a8773f94ea3a4cfb20c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great General",
+      "state": "DEFEAT",
+      "facing": "SW",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great General|DEFEAT|W",
+      "rulesetKey": "Great General",
+      "category": "unit-clip",
+      "assetKey": "Great General|DEFEAT|W",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-general/frames/defeat-w.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/e-color.png",
+          "sha256": "6258b6c0796d6e1e9ed9eb1e43ab7b77db0811d5c12f3a16d83d4de982e3f037",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/e-nation.png",
+          "sha256": "b693b068e6638e7e73bd8e5d2d39bbeaaf70d47fd58d13e50b14d7e04e42ec55",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/e-shadow.png",
+          "sha256": "26ce4552e90d33561dba134d2b5f96e119cc0436c08553d00bbdfeafaf4daf10",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great General",
+      "state": "DEFEAT",
+      "facing": "W",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great General|HIT|E",
+      "rulesetKey": "Great General",
+      "category": "unit-clip",
+      "assetKey": "Great General|HIT|E",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-general/frames/hit-e.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/e-color.png",
+          "sha256": "6258b6c0796d6e1e9ed9eb1e43ab7b77db0811d5c12f3a16d83d4de982e3f037",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/e-nation.png",
+          "sha256": "b693b068e6638e7e73bd8e5d2d39bbeaaf70d47fd58d13e50b14d7e04e42ec55",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/e-shadow.png",
+          "sha256": "26ce4552e90d33561dba134d2b5f96e119cc0436c08553d00bbdfeafaf4daf10",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great General",
+      "state": "HIT",
+      "facing": "E",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great General|HIT|NE",
+      "rulesetKey": "Great General",
+      "category": "unit-clip",
+      "assetKey": "Great General|HIT|NE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-general/frames/hit-ne.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/ne-color.png",
+          "sha256": "872892d2e745291a3050be834775db696971b5efa4a9b7dfd7ad539ab84d92a1",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/ne-nation.png",
+          "sha256": "e30e68c9068b059174d66938a492f520421e0fa558032dc84b557626c7cf9b94",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/ne-shadow.png",
+          "sha256": "582222b27163debbbc08839c38ed0472426e926efe6d4c2c0698023c1534c858",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great General",
+      "state": "HIT",
+      "facing": "NE",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great General|HIT|NW",
+      "rulesetKey": "Great General",
+      "category": "unit-clip",
+      "assetKey": "Great General|HIT|NW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-general/frames/hit-nw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/ne-color.png",
+          "sha256": "872892d2e745291a3050be834775db696971b5efa4a9b7dfd7ad539ab84d92a1",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/ne-nation.png",
+          "sha256": "e30e68c9068b059174d66938a492f520421e0fa558032dc84b557626c7cf9b94",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/ne-shadow.png",
+          "sha256": "582222b27163debbbc08839c38ed0472426e926efe6d4c2c0698023c1534c858",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great General",
+      "state": "HIT",
+      "facing": "NW",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great General|HIT|SE",
+      "rulesetKey": "Great General",
+      "category": "unit-clip",
+      "assetKey": "Great General|HIT|SE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-general/frames/hit-se.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/se-color.png",
+          "sha256": "bb817e088aa47210c7d5417ed42d770c521f1e12249b50c3af16d0f89821a829",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/se-nation.png",
+          "sha256": "6ab3439345113176225b9a6d68a4e097315d231032443e36c1739229472a36f1",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/se-shadow.png",
+          "sha256": "53bad6efac07704d6a4351fe180ec083f43fc30408c71a8773f94ea3a4cfb20c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great General",
+      "state": "HIT",
+      "facing": "SE",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great General|HIT|SW",
+      "rulesetKey": "Great General",
+      "category": "unit-clip",
+      "assetKey": "Great General|HIT|SW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-general/frames/hit-sw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/se-color.png",
+          "sha256": "bb817e088aa47210c7d5417ed42d770c521f1e12249b50c3af16d0f89821a829",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/se-nation.png",
+          "sha256": "6ab3439345113176225b9a6d68a4e097315d231032443e36c1739229472a36f1",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/se-shadow.png",
+          "sha256": "53bad6efac07704d6a4351fe180ec083f43fc30408c71a8773f94ea3a4cfb20c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great General",
+      "state": "HIT",
+      "facing": "SW",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great General|HIT|W",
+      "rulesetKey": "Great General",
+      "category": "unit-clip",
+      "assetKey": "Great General|HIT|W",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-general/frames/hit-w.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/e-color.png",
+          "sha256": "6258b6c0796d6e1e9ed9eb1e43ab7b77db0811d5c12f3a16d83d4de982e3f037",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/e-nation.png",
+          "sha256": "b693b068e6638e7e73bd8e5d2d39bbeaaf70d47fd58d13e50b14d7e04e42ec55",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/e-shadow.png",
+          "sha256": "26ce4552e90d33561dba134d2b5f96e119cc0436c08553d00bbdfeafaf4daf10",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great General",
+      "state": "HIT",
+      "facing": "W",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great General|IDLE|E",
+      "rulesetKey": "Great General",
+      "category": "unit-clip",
+      "assetKey": "Great General|IDLE|E",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-general/frames/idle-e.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/e-color.png",
+          "sha256": "6258b6c0796d6e1e9ed9eb1e43ab7b77db0811d5c12f3a16d83d4de982e3f037",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/e-nation.png",
+          "sha256": "b693b068e6638e7e73bd8e5d2d39bbeaaf70d47fd58d13e50b14d7e04e42ec55",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/e-shadow.png",
+          "sha256": "26ce4552e90d33561dba134d2b5f96e119cc0436c08553d00bbdfeafaf4daf10",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great General",
+      "state": "IDLE",
+      "facing": "E",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great General|IDLE|NE",
+      "rulesetKey": "Great General",
+      "category": "unit-clip",
+      "assetKey": "Great General|IDLE|NE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-general/frames/idle-ne.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/ne-color.png",
+          "sha256": "872892d2e745291a3050be834775db696971b5efa4a9b7dfd7ad539ab84d92a1",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/ne-nation.png",
+          "sha256": "e30e68c9068b059174d66938a492f520421e0fa558032dc84b557626c7cf9b94",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/ne-shadow.png",
+          "sha256": "582222b27163debbbc08839c38ed0472426e926efe6d4c2c0698023c1534c858",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great General",
+      "state": "IDLE",
+      "facing": "NE",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great General|IDLE|NW",
+      "rulesetKey": "Great General",
+      "category": "unit-clip",
+      "assetKey": "Great General|IDLE|NW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-general/frames/idle-nw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/ne-color.png",
+          "sha256": "872892d2e745291a3050be834775db696971b5efa4a9b7dfd7ad539ab84d92a1",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/ne-nation.png",
+          "sha256": "e30e68c9068b059174d66938a492f520421e0fa558032dc84b557626c7cf9b94",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/ne-shadow.png",
+          "sha256": "582222b27163debbbc08839c38ed0472426e926efe6d4c2c0698023c1534c858",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great General",
+      "state": "IDLE",
+      "facing": "NW",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great General|IDLE|SE",
+      "rulesetKey": "Great General",
+      "category": "unit-clip",
+      "assetKey": "Great General|IDLE|SE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-general/frames/idle-se.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/se-color.png",
+          "sha256": "bb817e088aa47210c7d5417ed42d770c521f1e12249b50c3af16d0f89821a829",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/se-nation.png",
+          "sha256": "6ab3439345113176225b9a6d68a4e097315d231032443e36c1739229472a36f1",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/se-shadow.png",
+          "sha256": "53bad6efac07704d6a4351fe180ec083f43fc30408c71a8773f94ea3a4cfb20c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great General",
+      "state": "IDLE",
+      "facing": "SE",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great General|IDLE|SW",
+      "rulesetKey": "Great General",
+      "category": "unit-clip",
+      "assetKey": "Great General|IDLE|SW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-general/frames/idle-sw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/se-color.png",
+          "sha256": "bb817e088aa47210c7d5417ed42d770c521f1e12249b50c3af16d0f89821a829",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/se-nation.png",
+          "sha256": "6ab3439345113176225b9a6d68a4e097315d231032443e36c1739229472a36f1",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/se-shadow.png",
+          "sha256": "53bad6efac07704d6a4351fe180ec083f43fc30408c71a8773f94ea3a4cfb20c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great General",
+      "state": "IDLE",
+      "facing": "SW",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great General|IDLE|W",
+      "rulesetKey": "Great General",
+      "category": "unit-clip",
+      "assetKey": "Great General|IDLE|W",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-general/frames/idle-w.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/e-color.png",
+          "sha256": "6258b6c0796d6e1e9ed9eb1e43ab7b77db0811d5c12f3a16d83d4de982e3f037",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/e-nation.png",
+          "sha256": "b693b068e6638e7e73bd8e5d2d39bbeaaf70d47fd58d13e50b14d7e04e42ec55",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/e-shadow.png",
+          "sha256": "26ce4552e90d33561dba134d2b5f96e119cc0436c08553d00bbdfeafaf4daf10",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great General",
+      "state": "IDLE",
+      "facing": "W",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great General|MOVE|E",
+      "rulesetKey": "Great General",
+      "category": "unit-clip",
+      "assetKey": "Great General|MOVE|E",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-general/frames/move-e.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/e-color.png",
+          "sha256": "6258b6c0796d6e1e9ed9eb1e43ab7b77db0811d5c12f3a16d83d4de982e3f037",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/e-nation.png",
+          "sha256": "b693b068e6638e7e73bd8e5d2d39bbeaaf70d47fd58d13e50b14d7e04e42ec55",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/e-shadow.png",
+          "sha256": "26ce4552e90d33561dba134d2b5f96e119cc0436c08553d00bbdfeafaf4daf10",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great General",
+      "state": "MOVE",
+      "facing": "E",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great General|MOVE|NE",
+      "rulesetKey": "Great General",
+      "category": "unit-clip",
+      "assetKey": "Great General|MOVE|NE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-general/frames/move-ne.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/ne-color.png",
+          "sha256": "872892d2e745291a3050be834775db696971b5efa4a9b7dfd7ad539ab84d92a1",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/ne-nation.png",
+          "sha256": "e30e68c9068b059174d66938a492f520421e0fa558032dc84b557626c7cf9b94",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/ne-shadow.png",
+          "sha256": "582222b27163debbbc08839c38ed0472426e926efe6d4c2c0698023c1534c858",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great General",
+      "state": "MOVE",
+      "facing": "NE",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great General|MOVE|NW",
+      "rulesetKey": "Great General",
+      "category": "unit-clip",
+      "assetKey": "Great General|MOVE|NW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-general/frames/move-nw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/ne-color.png",
+          "sha256": "872892d2e745291a3050be834775db696971b5efa4a9b7dfd7ad539ab84d92a1",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/ne-nation.png",
+          "sha256": "e30e68c9068b059174d66938a492f520421e0fa558032dc84b557626c7cf9b94",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/ne-shadow.png",
+          "sha256": "582222b27163debbbc08839c38ed0472426e926efe6d4c2c0698023c1534c858",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great General",
+      "state": "MOVE",
+      "facing": "NW",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great General|MOVE|SE",
+      "rulesetKey": "Great General",
+      "category": "unit-clip",
+      "assetKey": "Great General|MOVE|SE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-general/frames/move-se.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/se-color.png",
+          "sha256": "bb817e088aa47210c7d5417ed42d770c521f1e12249b50c3af16d0f89821a829",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/se-nation.png",
+          "sha256": "6ab3439345113176225b9a6d68a4e097315d231032443e36c1739229472a36f1",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/se-shadow.png",
+          "sha256": "53bad6efac07704d6a4351fe180ec083f43fc30408c71a8773f94ea3a4cfb20c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great General",
+      "state": "MOVE",
+      "facing": "SE",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great General|MOVE|SW",
+      "rulesetKey": "Great General",
+      "category": "unit-clip",
+      "assetKey": "Great General|MOVE|SW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-general/frames/move-sw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/se-color.png",
+          "sha256": "bb817e088aa47210c7d5417ed42d770c521f1e12249b50c3af16d0f89821a829",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/se-nation.png",
+          "sha256": "6ab3439345113176225b9a6d68a4e097315d231032443e36c1739229472a36f1",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/se-shadow.png",
+          "sha256": "53bad6efac07704d6a4351fe180ec083f43fc30408c71a8773f94ea3a4cfb20c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great General",
+      "state": "MOVE",
+      "facing": "SW",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great General|MOVE|W",
+      "rulesetKey": "Great General",
+      "category": "unit-clip",
+      "assetKey": "Great General|MOVE|W",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-general/frames/move-w.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/e-color.png",
+          "sha256": "6258b6c0796d6e1e9ed9eb1e43ab7b77db0811d5c12f3a16d83d4de982e3f037",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/e-nation.png",
+          "sha256": "b693b068e6638e7e73bd8e5d2d39bbeaaf70d47fd58d13e50b14d7e04e42ec55",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/e-shadow.png",
+          "sha256": "26ce4552e90d33561dba134d2b5f96e119cc0436c08553d00bbdfeafaf4daf10",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great General",
+      "state": "MOVE",
+      "facing": "W",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great General|WORK|E",
+      "rulesetKey": "Great General",
+      "category": "unit-clip",
+      "assetKey": "Great General|WORK|E",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-general/frames/work-e.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/e-color.png",
+          "sha256": "6258b6c0796d6e1e9ed9eb1e43ab7b77db0811d5c12f3a16d83d4de982e3f037",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/e-nation.png",
+          "sha256": "b693b068e6638e7e73bd8e5d2d39bbeaaf70d47fd58d13e50b14d7e04e42ec55",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/e-shadow.png",
+          "sha256": "26ce4552e90d33561dba134d2b5f96e119cc0436c08553d00bbdfeafaf4daf10",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great General",
+      "state": "WORK",
+      "facing": "E",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great General|WORK|NE",
+      "rulesetKey": "Great General",
+      "category": "unit-clip",
+      "assetKey": "Great General|WORK|NE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-general/frames/work-ne.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/ne-color.png",
+          "sha256": "872892d2e745291a3050be834775db696971b5efa4a9b7dfd7ad539ab84d92a1",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/ne-nation.png",
+          "sha256": "e30e68c9068b059174d66938a492f520421e0fa558032dc84b557626c7cf9b94",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/ne-shadow.png",
+          "sha256": "582222b27163debbbc08839c38ed0472426e926efe6d4c2c0698023c1534c858",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great General",
+      "state": "WORK",
+      "facing": "NE",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great General|WORK|NW",
+      "rulesetKey": "Great General",
+      "category": "unit-clip",
+      "assetKey": "Great General|WORK|NW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-general/frames/work-nw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/ne-color.png",
+          "sha256": "872892d2e745291a3050be834775db696971b5efa4a9b7dfd7ad539ab84d92a1",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/ne-nation.png",
+          "sha256": "e30e68c9068b059174d66938a492f520421e0fa558032dc84b557626c7cf9b94",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/ne-shadow.png",
+          "sha256": "582222b27163debbbc08839c38ed0472426e926efe6d4c2c0698023c1534c858",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great General",
+      "state": "WORK",
+      "facing": "NW",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great General|WORK|SE",
+      "rulesetKey": "Great General",
+      "category": "unit-clip",
+      "assetKey": "Great General|WORK|SE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-general/frames/work-se.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/se-color.png",
+          "sha256": "bb817e088aa47210c7d5417ed42d770c521f1e12249b50c3af16d0f89821a829",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/se-nation.png",
+          "sha256": "6ab3439345113176225b9a6d68a4e097315d231032443e36c1739229472a36f1",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/se-shadow.png",
+          "sha256": "53bad6efac07704d6a4351fe180ec083f43fc30408c71a8773f94ea3a4cfb20c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great General",
+      "state": "WORK",
+      "facing": "SE",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great General|WORK|SW",
+      "rulesetKey": "Great General",
+      "category": "unit-clip",
+      "assetKey": "Great General|WORK|SW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-general/frames/work-sw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/se-color.png",
+          "sha256": "bb817e088aa47210c7d5417ed42d770c521f1e12249b50c3af16d0f89821a829",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/se-nation.png",
+          "sha256": "6ab3439345113176225b9a6d68a4e097315d231032443e36c1739229472a36f1",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/se-shadow.png",
+          "sha256": "53bad6efac07704d6a4351fe180ec083f43fc30408c71a8773f94ea3a4cfb20c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great General",
+      "state": "WORK",
+      "facing": "SW",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great General|WORK|W",
+      "rulesetKey": "Great General",
+      "category": "unit-clip",
+      "assetKey": "Great General|WORK|W",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-general/frames/work-w.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/e-color.png",
+          "sha256": "6258b6c0796d6e1e9ed9eb1e43ab7b77db0811d5c12f3a16d83d4de982e3f037",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/e-nation.png",
+          "sha256": "b693b068e6638e7e73bd8e5d2d39bbeaaf70d47fd58d13e50b14d7e04e42ec55",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/e-shadow.png",
+          "sha256": "26ce4552e90d33561dba134d2b5f96e119cc0436c08553d00bbdfeafaf4daf10",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great General",
+      "state": "WORK",
+      "facing": "W",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Merchant|DEFEAT|E",
+      "rulesetKey": "Great Merchant",
+      "category": "unit-clip",
+      "assetKey": "Great Merchant|DEFEAT|E",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-merchant/frames/defeat-e.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/e-color.png",
+          "sha256": "f137173dbd193e78bc27705ed201a90d6f5c3bd0f9fcfec6d18ade50529dd855",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/e-nation.png",
+          "sha256": "4361abe6d7e510f382be98059eaa0a34140ab8f113b0bf9b007c5219cee230af",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/e-shadow.png",
+          "sha256": "9af02083b5038973420ea7e059003ef8786d3e77d3a057ed43e7a5026315b4b7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Merchant",
+      "state": "DEFEAT",
+      "facing": "E",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Merchant|DEFEAT|NE",
+      "rulesetKey": "Great Merchant",
+      "category": "unit-clip",
+      "assetKey": "Great Merchant|DEFEAT|NE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-merchant/frames/defeat-ne.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/ne-color.png",
+          "sha256": "af4a3b6e77f9e8ed23592df2d0699326a9617d317afd2b3d055e62d15e748409",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/ne-nation.png",
+          "sha256": "4f61648f4358abe7e4cf4a2df243608a644c619d8eacdb39b9819ea57c079de5",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/ne-shadow.png",
+          "sha256": "b3e2a776716b9ca3c1046e3653d3689d40eab699c1bda322fea1d2aa8de84e87",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Merchant",
+      "state": "DEFEAT",
+      "facing": "NE",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Merchant|DEFEAT|NW",
+      "rulesetKey": "Great Merchant",
+      "category": "unit-clip",
+      "assetKey": "Great Merchant|DEFEAT|NW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-merchant/frames/defeat-nw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/ne-color.png",
+          "sha256": "af4a3b6e77f9e8ed23592df2d0699326a9617d317afd2b3d055e62d15e748409",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/ne-nation.png",
+          "sha256": "4f61648f4358abe7e4cf4a2df243608a644c619d8eacdb39b9819ea57c079de5",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/ne-shadow.png",
+          "sha256": "b3e2a776716b9ca3c1046e3653d3689d40eab699c1bda322fea1d2aa8de84e87",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Merchant",
+      "state": "DEFEAT",
+      "facing": "NW",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Merchant|DEFEAT|SE",
+      "rulesetKey": "Great Merchant",
+      "category": "unit-clip",
+      "assetKey": "Great Merchant|DEFEAT|SE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-merchant/frames/defeat-se.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/se-color.png",
+          "sha256": "687c0e97dc73d37523d2cefd401024b42952509a193d83203d18b0349b8a100b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/se-nation.png",
+          "sha256": "3015fa2f4fc4ff89ed55866647aa8aa54ce01ead53a0a06e063feb43a1125660",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/se-shadow.png",
+          "sha256": "273ac0f80a872affc5ac9f06980e08c6b68803ed36a87eb4032d5e386c80a330",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Merchant",
+      "state": "DEFEAT",
+      "facing": "SE",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Merchant|DEFEAT|SW",
+      "rulesetKey": "Great Merchant",
+      "category": "unit-clip",
+      "assetKey": "Great Merchant|DEFEAT|SW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-merchant/frames/defeat-sw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/se-color.png",
+          "sha256": "687c0e97dc73d37523d2cefd401024b42952509a193d83203d18b0349b8a100b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/se-nation.png",
+          "sha256": "3015fa2f4fc4ff89ed55866647aa8aa54ce01ead53a0a06e063feb43a1125660",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/se-shadow.png",
+          "sha256": "273ac0f80a872affc5ac9f06980e08c6b68803ed36a87eb4032d5e386c80a330",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Merchant",
+      "state": "DEFEAT",
+      "facing": "SW",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Merchant|DEFEAT|W",
+      "rulesetKey": "Great Merchant",
+      "category": "unit-clip",
+      "assetKey": "Great Merchant|DEFEAT|W",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-merchant/frames/defeat-w.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/e-color.png",
+          "sha256": "f137173dbd193e78bc27705ed201a90d6f5c3bd0f9fcfec6d18ade50529dd855",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/e-nation.png",
+          "sha256": "4361abe6d7e510f382be98059eaa0a34140ab8f113b0bf9b007c5219cee230af",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/e-shadow.png",
+          "sha256": "9af02083b5038973420ea7e059003ef8786d3e77d3a057ed43e7a5026315b4b7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Merchant",
+      "state": "DEFEAT",
+      "facing": "W",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Merchant|HIT|E",
+      "rulesetKey": "Great Merchant",
+      "category": "unit-clip",
+      "assetKey": "Great Merchant|HIT|E",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-merchant/frames/hit-e.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/e-color.png",
+          "sha256": "f137173dbd193e78bc27705ed201a90d6f5c3bd0f9fcfec6d18ade50529dd855",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/e-nation.png",
+          "sha256": "4361abe6d7e510f382be98059eaa0a34140ab8f113b0bf9b007c5219cee230af",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/e-shadow.png",
+          "sha256": "9af02083b5038973420ea7e059003ef8786d3e77d3a057ed43e7a5026315b4b7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Merchant",
+      "state": "HIT",
+      "facing": "E",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great Merchant|HIT|NE",
+      "rulesetKey": "Great Merchant",
+      "category": "unit-clip",
+      "assetKey": "Great Merchant|HIT|NE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-merchant/frames/hit-ne.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/ne-color.png",
+          "sha256": "af4a3b6e77f9e8ed23592df2d0699326a9617d317afd2b3d055e62d15e748409",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/ne-nation.png",
+          "sha256": "4f61648f4358abe7e4cf4a2df243608a644c619d8eacdb39b9819ea57c079de5",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/ne-shadow.png",
+          "sha256": "b3e2a776716b9ca3c1046e3653d3689d40eab699c1bda322fea1d2aa8de84e87",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Merchant",
+      "state": "HIT",
+      "facing": "NE",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great Merchant|HIT|NW",
+      "rulesetKey": "Great Merchant",
+      "category": "unit-clip",
+      "assetKey": "Great Merchant|HIT|NW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-merchant/frames/hit-nw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/ne-color.png",
+          "sha256": "af4a3b6e77f9e8ed23592df2d0699326a9617d317afd2b3d055e62d15e748409",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/ne-nation.png",
+          "sha256": "4f61648f4358abe7e4cf4a2df243608a644c619d8eacdb39b9819ea57c079de5",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/ne-shadow.png",
+          "sha256": "b3e2a776716b9ca3c1046e3653d3689d40eab699c1bda322fea1d2aa8de84e87",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Merchant",
+      "state": "HIT",
+      "facing": "NW",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great Merchant|HIT|SE",
+      "rulesetKey": "Great Merchant",
+      "category": "unit-clip",
+      "assetKey": "Great Merchant|HIT|SE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-merchant/frames/hit-se.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/se-color.png",
+          "sha256": "687c0e97dc73d37523d2cefd401024b42952509a193d83203d18b0349b8a100b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/se-nation.png",
+          "sha256": "3015fa2f4fc4ff89ed55866647aa8aa54ce01ead53a0a06e063feb43a1125660",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/se-shadow.png",
+          "sha256": "273ac0f80a872affc5ac9f06980e08c6b68803ed36a87eb4032d5e386c80a330",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Merchant",
+      "state": "HIT",
+      "facing": "SE",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great Merchant|HIT|SW",
+      "rulesetKey": "Great Merchant",
+      "category": "unit-clip",
+      "assetKey": "Great Merchant|HIT|SW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-merchant/frames/hit-sw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/se-color.png",
+          "sha256": "687c0e97dc73d37523d2cefd401024b42952509a193d83203d18b0349b8a100b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/se-nation.png",
+          "sha256": "3015fa2f4fc4ff89ed55866647aa8aa54ce01ead53a0a06e063feb43a1125660",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/se-shadow.png",
+          "sha256": "273ac0f80a872affc5ac9f06980e08c6b68803ed36a87eb4032d5e386c80a330",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Merchant",
+      "state": "HIT",
+      "facing": "SW",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great Merchant|HIT|W",
+      "rulesetKey": "Great Merchant",
+      "category": "unit-clip",
+      "assetKey": "Great Merchant|HIT|W",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-merchant/frames/hit-w.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/e-color.png",
+          "sha256": "f137173dbd193e78bc27705ed201a90d6f5c3bd0f9fcfec6d18ade50529dd855",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/e-nation.png",
+          "sha256": "4361abe6d7e510f382be98059eaa0a34140ab8f113b0bf9b007c5219cee230af",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/e-shadow.png",
+          "sha256": "9af02083b5038973420ea7e059003ef8786d3e77d3a057ed43e7a5026315b4b7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Merchant",
+      "state": "HIT",
+      "facing": "W",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great Merchant|IDLE|E",
+      "rulesetKey": "Great Merchant",
+      "category": "unit-clip",
+      "assetKey": "Great Merchant|IDLE|E",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-merchant/frames/idle-e.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/e-color.png",
+          "sha256": "f137173dbd193e78bc27705ed201a90d6f5c3bd0f9fcfec6d18ade50529dd855",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/e-nation.png",
+          "sha256": "4361abe6d7e510f382be98059eaa0a34140ab8f113b0bf9b007c5219cee230af",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/e-shadow.png",
+          "sha256": "9af02083b5038973420ea7e059003ef8786d3e77d3a057ed43e7a5026315b4b7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Merchant",
+      "state": "IDLE",
+      "facing": "E",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great Merchant|IDLE|NE",
+      "rulesetKey": "Great Merchant",
+      "category": "unit-clip",
+      "assetKey": "Great Merchant|IDLE|NE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-merchant/frames/idle-ne.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/ne-color.png",
+          "sha256": "af4a3b6e77f9e8ed23592df2d0699326a9617d317afd2b3d055e62d15e748409",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/ne-nation.png",
+          "sha256": "4f61648f4358abe7e4cf4a2df243608a644c619d8eacdb39b9819ea57c079de5",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/ne-shadow.png",
+          "sha256": "b3e2a776716b9ca3c1046e3653d3689d40eab699c1bda322fea1d2aa8de84e87",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Merchant",
+      "state": "IDLE",
+      "facing": "NE",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great Merchant|IDLE|NW",
+      "rulesetKey": "Great Merchant",
+      "category": "unit-clip",
+      "assetKey": "Great Merchant|IDLE|NW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-merchant/frames/idle-nw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/ne-color.png",
+          "sha256": "af4a3b6e77f9e8ed23592df2d0699326a9617d317afd2b3d055e62d15e748409",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/ne-nation.png",
+          "sha256": "4f61648f4358abe7e4cf4a2df243608a644c619d8eacdb39b9819ea57c079de5",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/ne-shadow.png",
+          "sha256": "b3e2a776716b9ca3c1046e3653d3689d40eab699c1bda322fea1d2aa8de84e87",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Merchant",
+      "state": "IDLE",
+      "facing": "NW",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great Merchant|IDLE|SE",
+      "rulesetKey": "Great Merchant",
+      "category": "unit-clip",
+      "assetKey": "Great Merchant|IDLE|SE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-merchant/frames/idle-se.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/se-color.png",
+          "sha256": "687c0e97dc73d37523d2cefd401024b42952509a193d83203d18b0349b8a100b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/se-nation.png",
+          "sha256": "3015fa2f4fc4ff89ed55866647aa8aa54ce01ead53a0a06e063feb43a1125660",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/se-shadow.png",
+          "sha256": "273ac0f80a872affc5ac9f06980e08c6b68803ed36a87eb4032d5e386c80a330",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Merchant",
+      "state": "IDLE",
+      "facing": "SE",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great Merchant|IDLE|SW",
+      "rulesetKey": "Great Merchant",
+      "category": "unit-clip",
+      "assetKey": "Great Merchant|IDLE|SW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-merchant/frames/idle-sw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/se-color.png",
+          "sha256": "687c0e97dc73d37523d2cefd401024b42952509a193d83203d18b0349b8a100b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/se-nation.png",
+          "sha256": "3015fa2f4fc4ff89ed55866647aa8aa54ce01ead53a0a06e063feb43a1125660",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/se-shadow.png",
+          "sha256": "273ac0f80a872affc5ac9f06980e08c6b68803ed36a87eb4032d5e386c80a330",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Merchant",
+      "state": "IDLE",
+      "facing": "SW",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great Merchant|IDLE|W",
+      "rulesetKey": "Great Merchant",
+      "category": "unit-clip",
+      "assetKey": "Great Merchant|IDLE|W",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-merchant/frames/idle-w.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/e-color.png",
+          "sha256": "f137173dbd193e78bc27705ed201a90d6f5c3bd0f9fcfec6d18ade50529dd855",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/e-nation.png",
+          "sha256": "4361abe6d7e510f382be98059eaa0a34140ab8f113b0bf9b007c5219cee230af",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/e-shadow.png",
+          "sha256": "9af02083b5038973420ea7e059003ef8786d3e77d3a057ed43e7a5026315b4b7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Merchant",
+      "state": "IDLE",
+      "facing": "W",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great Merchant|MOVE|E",
+      "rulesetKey": "Great Merchant",
+      "category": "unit-clip",
+      "assetKey": "Great Merchant|MOVE|E",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-merchant/frames/move-e.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/e-color.png",
+          "sha256": "f137173dbd193e78bc27705ed201a90d6f5c3bd0f9fcfec6d18ade50529dd855",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/e-nation.png",
+          "sha256": "4361abe6d7e510f382be98059eaa0a34140ab8f113b0bf9b007c5219cee230af",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/e-shadow.png",
+          "sha256": "9af02083b5038973420ea7e059003ef8786d3e77d3a057ed43e7a5026315b4b7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Merchant",
+      "state": "MOVE",
+      "facing": "E",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Merchant|MOVE|NE",
+      "rulesetKey": "Great Merchant",
+      "category": "unit-clip",
+      "assetKey": "Great Merchant|MOVE|NE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-merchant/frames/move-ne.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/ne-color.png",
+          "sha256": "af4a3b6e77f9e8ed23592df2d0699326a9617d317afd2b3d055e62d15e748409",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/ne-nation.png",
+          "sha256": "4f61648f4358abe7e4cf4a2df243608a644c619d8eacdb39b9819ea57c079de5",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/ne-shadow.png",
+          "sha256": "b3e2a776716b9ca3c1046e3653d3689d40eab699c1bda322fea1d2aa8de84e87",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Merchant",
+      "state": "MOVE",
+      "facing": "NE",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Merchant|MOVE|NW",
+      "rulesetKey": "Great Merchant",
+      "category": "unit-clip",
+      "assetKey": "Great Merchant|MOVE|NW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-merchant/frames/move-nw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/ne-color.png",
+          "sha256": "af4a3b6e77f9e8ed23592df2d0699326a9617d317afd2b3d055e62d15e748409",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/ne-nation.png",
+          "sha256": "4f61648f4358abe7e4cf4a2df243608a644c619d8eacdb39b9819ea57c079de5",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/ne-shadow.png",
+          "sha256": "b3e2a776716b9ca3c1046e3653d3689d40eab699c1bda322fea1d2aa8de84e87",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Merchant",
+      "state": "MOVE",
+      "facing": "NW",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Merchant|MOVE|SE",
+      "rulesetKey": "Great Merchant",
+      "category": "unit-clip",
+      "assetKey": "Great Merchant|MOVE|SE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-merchant/frames/move-se.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/se-color.png",
+          "sha256": "687c0e97dc73d37523d2cefd401024b42952509a193d83203d18b0349b8a100b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/se-nation.png",
+          "sha256": "3015fa2f4fc4ff89ed55866647aa8aa54ce01ead53a0a06e063feb43a1125660",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/se-shadow.png",
+          "sha256": "273ac0f80a872affc5ac9f06980e08c6b68803ed36a87eb4032d5e386c80a330",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Merchant",
+      "state": "MOVE",
+      "facing": "SE",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Merchant|MOVE|SW",
+      "rulesetKey": "Great Merchant",
+      "category": "unit-clip",
+      "assetKey": "Great Merchant|MOVE|SW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-merchant/frames/move-sw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/se-color.png",
+          "sha256": "687c0e97dc73d37523d2cefd401024b42952509a193d83203d18b0349b8a100b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/se-nation.png",
+          "sha256": "3015fa2f4fc4ff89ed55866647aa8aa54ce01ead53a0a06e063feb43a1125660",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/se-shadow.png",
+          "sha256": "273ac0f80a872affc5ac9f06980e08c6b68803ed36a87eb4032d5e386c80a330",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Merchant",
+      "state": "MOVE",
+      "facing": "SW",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Merchant|MOVE|W",
+      "rulesetKey": "Great Merchant",
+      "category": "unit-clip",
+      "assetKey": "Great Merchant|MOVE|W",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-merchant/frames/move-w.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/e-color.png",
+          "sha256": "f137173dbd193e78bc27705ed201a90d6f5c3bd0f9fcfec6d18ade50529dd855",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/e-nation.png",
+          "sha256": "4361abe6d7e510f382be98059eaa0a34140ab8f113b0bf9b007c5219cee230af",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/e-shadow.png",
+          "sha256": "9af02083b5038973420ea7e059003ef8786d3e77d3a057ed43e7a5026315b4b7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Merchant",
+      "state": "MOVE",
+      "facing": "W",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Merchant|WORK|E",
+      "rulesetKey": "Great Merchant",
+      "category": "unit-clip",
+      "assetKey": "Great Merchant|WORK|E",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-merchant/frames/work-e.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/e-color.png",
+          "sha256": "f137173dbd193e78bc27705ed201a90d6f5c3bd0f9fcfec6d18ade50529dd855",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/e-nation.png",
+          "sha256": "4361abe6d7e510f382be98059eaa0a34140ab8f113b0bf9b007c5219cee230af",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/e-shadow.png",
+          "sha256": "9af02083b5038973420ea7e059003ef8786d3e77d3a057ed43e7a5026315b4b7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Merchant",
+      "state": "WORK",
+      "facing": "E",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Merchant|WORK|NE",
+      "rulesetKey": "Great Merchant",
+      "category": "unit-clip",
+      "assetKey": "Great Merchant|WORK|NE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-merchant/frames/work-ne.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/ne-color.png",
+          "sha256": "af4a3b6e77f9e8ed23592df2d0699326a9617d317afd2b3d055e62d15e748409",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/ne-nation.png",
+          "sha256": "4f61648f4358abe7e4cf4a2df243608a644c619d8eacdb39b9819ea57c079de5",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/ne-shadow.png",
+          "sha256": "b3e2a776716b9ca3c1046e3653d3689d40eab699c1bda322fea1d2aa8de84e87",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Merchant",
+      "state": "WORK",
+      "facing": "NE",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Merchant|WORK|NW",
+      "rulesetKey": "Great Merchant",
+      "category": "unit-clip",
+      "assetKey": "Great Merchant|WORK|NW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-merchant/frames/work-nw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/ne-color.png",
+          "sha256": "af4a3b6e77f9e8ed23592df2d0699326a9617d317afd2b3d055e62d15e748409",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/ne-nation.png",
+          "sha256": "4f61648f4358abe7e4cf4a2df243608a644c619d8eacdb39b9819ea57c079de5",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/ne-shadow.png",
+          "sha256": "b3e2a776716b9ca3c1046e3653d3689d40eab699c1bda322fea1d2aa8de84e87",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Merchant",
+      "state": "WORK",
+      "facing": "NW",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Merchant|WORK|SE",
+      "rulesetKey": "Great Merchant",
+      "category": "unit-clip",
+      "assetKey": "Great Merchant|WORK|SE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-merchant/frames/work-se.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/se-color.png",
+          "sha256": "687c0e97dc73d37523d2cefd401024b42952509a193d83203d18b0349b8a100b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/se-nation.png",
+          "sha256": "3015fa2f4fc4ff89ed55866647aa8aa54ce01ead53a0a06e063feb43a1125660",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/se-shadow.png",
+          "sha256": "273ac0f80a872affc5ac9f06980e08c6b68803ed36a87eb4032d5e386c80a330",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Merchant",
+      "state": "WORK",
+      "facing": "SE",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Merchant|WORK|SW",
+      "rulesetKey": "Great Merchant",
+      "category": "unit-clip",
+      "assetKey": "Great Merchant|WORK|SW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-merchant/frames/work-sw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/se-color.png",
+          "sha256": "687c0e97dc73d37523d2cefd401024b42952509a193d83203d18b0349b8a100b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/se-nation.png",
+          "sha256": "3015fa2f4fc4ff89ed55866647aa8aa54ce01ead53a0a06e063feb43a1125660",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/se-shadow.png",
+          "sha256": "273ac0f80a872affc5ac9f06980e08c6b68803ed36a87eb4032d5e386c80a330",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Merchant",
+      "state": "WORK",
+      "facing": "SW",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Merchant|WORK|W",
+      "rulesetKey": "Great Merchant",
+      "category": "unit-clip",
+      "assetKey": "Great Merchant|WORK|W",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-merchant/frames/work-w.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/e-color.png",
+          "sha256": "f137173dbd193e78bc27705ed201a90d6f5c3bd0f9fcfec6d18ade50529dd855",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/e-nation.png",
+          "sha256": "4361abe6d7e510f382be98059eaa0a34140ab8f113b0bf9b007c5219cee230af",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/e-shadow.png",
+          "sha256": "9af02083b5038973420ea7e059003ef8786d3e77d3a057ed43e7a5026315b4b7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Merchant",
+      "state": "WORK",
+      "facing": "W",
+      "minimumFrames": 8
+    },
+    {
       "id": "unit-clip|Horseman|ATTACK|E",
       "rulesetKey": "Horseman",
       "category": "unit-clip",
@@ -7740,6 +10320,70 @@
       "state": "WORK",
       "facing": "W",
       "minimumFrames": 8
+    },
+    {
+      "id": "unit-static|TileSets/AtlasUnits/Units/Great General",
+      "rulesetKey": "Great General",
+      "category": "unit-static",
+      "assetKey": "TileSets/AtlasUnits/Units/Great General",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Great General.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Great General.png",
+          "sha256": "b790ea563ef06ccb119909ebb0f851e67f44c13fbd56a030f9c5d067139965c9",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Great General-1.png",
+          "sha256": "423f6efa43069f8462526b88faca306d0cdeff2cf76b363c9904185eeac901f7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null
+    },
+    {
+      "id": "unit-static|TileSets/AtlasUnits/Units/Great Merchant",
+      "rulesetKey": "Great Merchant",
+      "category": "unit-static",
+      "assetKey": "TileSets/AtlasUnits/Units/Great Merchant",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Great Merchant.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Great Merchant.png",
+          "sha256": "424717f025928828e49fae2356badb187e83cb89487758f29ffb1f4dc9dad77a",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Great Merchant-1.png",
+          "sha256": "1a36508b53db5e484d4818a377aa47800567b418dfb003e08e70ad7c40e06153",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null
     },
     {
       "id": "unit-static|TileSets/AtlasUnits/Units/Horseman",

@@ -1,19 +1,95 @@
 {
-"schemaVersion": 1,
-"unitName": "Great General",
-"assetId": "great-general",
-"reviewState": "missing",
-"canvasWidth": 128,
-"canvasHeight": 128,
-"anchorX": 64,
-"anchorY": 96,
-"clippingMargin": 2,
-"uniqueUnitIdentity": null,
-"uniqueTo": null,
-"replaces": null,
-"staticFallbackKey": "TileSets/AtlasUnits/Units/Great General",
-"framesDirectory": "frames/",
-"applicableStates": [ "IDLE", "MOVE", "HIT", "DEFEAT", "WORK" ],
-"facings": [ "E", "NE", "NW", "W", "SW", "SE" ],
-"minimumFrames": { "IDLE": 4, "MOVE": 8, "HIT": 4, "DEFEAT": 8, "WORK": 8 }
+  "schemaVersion": 1,
+  "unitName": "Great General",
+  "assetId": "great-general",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": null,
+  "uniqueTo": null,
+  "replaces": null,
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Great General",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "HIT",
+    "DEFEAT",
+    "WORK"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "HIT": 4,
+    "DEFEAT": 8,
+    "WORK": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/great-general/e-motion-v1.png",
+      "rawHash": "70b76d32bd86eb1f78f28e77231334c082eb4e980c1f9506917a9e1d576a8c49",
+      "promptPath": "art/atlas/units/great-general/prompts/e-v1.txt",
+      "promptHash": "035952406f9fcc62f9ffc56c7e5710c7e907ceee8d63b41be85b3e5bb53335cc",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/great-general/ne-motion-v1.png",
+      "rawHash": "98af37aff78805c416714bb1f026cdcd8e0dce48d93df0a5b6a8cb1838e72c4d",
+      "promptPath": "art/atlas/units/great-general/prompts/ne-v1.txt",
+      "promptHash": "2322870378b953a0e50c14ac1b23d9b4d09f0f9506b68251f43fa9c71430c670",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/great-general/se-motion-v1.png",
+      "rawHash": "e836640528c27546576792cd007f9edaf5638de17a252b29ec76d4f7ed9fabfe",
+      "promptPath": "art/atlas/units/great-general/prompts/se-v1.txt",
+      "promptHash": "d2e14f0040fe198195987b6f45ca4d3e43de3367b0207336ad8447fee9de491a",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
 }

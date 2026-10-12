@@ -15,6 +15,54 @@
   },
   "units": [
     {
+      "unitName": "Great General",
+      "assetId": "great-general",
+      "canvasWidth": 128,
+      "canvasHeight": 128,
+      "anchorX": 64,
+      "anchorY": 96,
+      "staticLayers": [
+        "TileSets/AtlasUnits/Units/Great General"
+      ],
+      "maskKeys": [
+        "TileSets/AtlasUnits/Units/Great General-1"
+      ],
+      "shadowKey": null,
+      "clippingMargin": 2,
+      "uniqueUnitIdentity": null,
+      "applicableStates": [
+        "IDLE",
+        "MOVE",
+        "HIT",
+        "DEFEAT",
+        "WORK"
+      ]
+    },
+    {
+      "unitName": "Great Merchant",
+      "assetId": "great-merchant",
+      "canvasWidth": 128,
+      "canvasHeight": 128,
+      "anchorX": 64,
+      "anchorY": 96,
+      "staticLayers": [
+        "TileSets/AtlasUnits/Units/Great Merchant"
+      ],
+      "maskKeys": [
+        "TileSets/AtlasUnits/Units/Great Merchant-1"
+      ],
+      "shadowKey": null,
+      "clippingMargin": 2,
+      "uniqueUnitIdentity": null,
+      "applicableStates": [
+        "IDLE",
+        "MOVE",
+        "HIT",
+        "DEFEAT",
+        "WORK"
+      ]
+    },
+    {
       "unitName": "Horseman",
       "assetId": "horseman",
       "canvasWidth": 128,
@@ -160,6 +208,6384 @@
     }
   ],
   "clips": [
+    {
+      "unitName": "Great General",
+      "state": "DEFEAT",
+      "facing": "E",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Great General",
+      "looping": false,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/e-color.png",
+            "x": 0,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/e-nation.png",
+                "x": 0,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/e-shadow.png",
+            "x": 0,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/e-color.png",
+            "x": 128,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/e-nation.png",
+                "x": 128,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/e-shadow.png",
+            "x": 128,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/e-color.png",
+            "x": 256,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/e-nation.png",
+                "x": 256,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/e-shadow.png",
+            "x": 256,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/e-color.png",
+            "x": 384,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/e-nation.png",
+                "x": 384,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/e-shadow.png",
+            "x": 384,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/e-color.png",
+            "x": 512,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/e-nation.png",
+                "x": 512,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/e-shadow.png",
+            "x": 512,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/e-color.png",
+            "x": 640,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/e-nation.png",
+                "x": 640,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/e-shadow.png",
+            "x": 640,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/e-color.png",
+            "x": 768,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/e-nation.png",
+                "x": 768,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/e-shadow.png",
+            "x": 768,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/e-color.png",
+            "x": 896,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/e-nation.png",
+                "x": 896,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/e-shadow.png",
+            "x": 896,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Great General",
+      "state": "DEFEAT",
+      "facing": "NE",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Great General",
+      "looping": false,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/ne-color.png",
+            "x": 0,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/ne-nation.png",
+                "x": 0,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/ne-shadow.png",
+            "x": 0,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/ne-color.png",
+            "x": 128,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/ne-nation.png",
+                "x": 128,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/ne-shadow.png",
+            "x": 128,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/ne-color.png",
+            "x": 256,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/ne-nation.png",
+                "x": 256,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/ne-shadow.png",
+            "x": 256,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/ne-color.png",
+            "x": 384,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/ne-nation.png",
+                "x": 384,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/ne-shadow.png",
+            "x": 384,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/ne-color.png",
+            "x": 512,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/ne-nation.png",
+                "x": 512,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/ne-shadow.png",
+            "x": 512,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/ne-color.png",
+            "x": 640,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/ne-nation.png",
+                "x": 640,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/ne-shadow.png",
+            "x": 640,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/ne-color.png",
+            "x": 768,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/ne-nation.png",
+                "x": 768,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/ne-shadow.png",
+            "x": 768,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/ne-color.png",
+            "x": 896,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/ne-nation.png",
+                "x": 896,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/ne-shadow.png",
+            "x": 896,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Great General",
+      "state": "DEFEAT",
+      "facing": "NW",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Great General",
+      "looping": false,
+      "mirroredFacing": "NE",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Great General",
+      "state": "DEFEAT",
+      "facing": "SE",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Great General",
+      "looping": false,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/se-color.png",
+            "x": 0,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/se-nation.png",
+                "x": 0,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/se-shadow.png",
+            "x": 0,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/se-color.png",
+            "x": 128,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/se-nation.png",
+                "x": 128,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/se-shadow.png",
+            "x": 128,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/se-color.png",
+            "x": 256,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/se-nation.png",
+                "x": 256,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/se-shadow.png",
+            "x": 256,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/se-color.png",
+            "x": 384,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/se-nation.png",
+                "x": 384,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/se-shadow.png",
+            "x": 384,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/se-color.png",
+            "x": 512,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/se-nation.png",
+                "x": 512,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/se-shadow.png",
+            "x": 512,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/se-color.png",
+            "x": 640,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/se-nation.png",
+                "x": 640,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/se-shadow.png",
+            "x": 640,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/se-color.png",
+            "x": 768,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/se-nation.png",
+                "x": 768,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/se-shadow.png",
+            "x": 768,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/se-color.png",
+            "x": 896,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/se-nation.png",
+                "x": 896,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/se-shadow.png",
+            "x": 896,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Great General",
+      "state": "DEFEAT",
+      "facing": "SW",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Great General",
+      "looping": false,
+      "mirroredFacing": "SE",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Great General",
+      "state": "DEFEAT",
+      "facing": "W",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Great General",
+      "looping": false,
+      "mirroredFacing": "E",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Great General",
+      "state": "HIT",
+      "facing": "E",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Great General",
+      "looping": false,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 95,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/e-color.png",
+            "x": 512,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/e-nation.png",
+                "x": 512,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/e-shadow.png",
+            "x": 512,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 95,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/e-color.png",
+            "x": 640,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/e-nation.png",
+                "x": 640,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/e-shadow.png",
+            "x": 640,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 95,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/e-color.png",
+            "x": 768,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/e-nation.png",
+                "x": 768,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/e-shadow.png",
+            "x": 768,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 95,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/e-color.png",
+            "x": 896,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/e-nation.png",
+                "x": 896,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/e-shadow.png",
+            "x": 896,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Great General",
+      "state": "HIT",
+      "facing": "NE",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Great General",
+      "looping": false,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 95,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/ne-color.png",
+            "x": 512,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/ne-nation.png",
+                "x": 512,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/ne-shadow.png",
+            "x": 512,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 95,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/ne-color.png",
+            "x": 640,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/ne-nation.png",
+                "x": 640,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/ne-shadow.png",
+            "x": 640,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 95,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/ne-color.png",
+            "x": 768,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/ne-nation.png",
+                "x": 768,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/ne-shadow.png",
+            "x": 768,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 95,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/ne-color.png",
+            "x": 896,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/ne-nation.png",
+                "x": 896,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/ne-shadow.png",
+            "x": 896,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Great General",
+      "state": "HIT",
+      "facing": "NW",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Great General",
+      "looping": false,
+      "mirroredFacing": "NE",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Great General",
+      "state": "HIT",
+      "facing": "SE",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Great General",
+      "looping": false,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 95,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/se-color.png",
+            "x": 512,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/se-nation.png",
+                "x": 512,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/se-shadow.png",
+            "x": 512,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 95,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/se-color.png",
+            "x": 640,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/se-nation.png",
+                "x": 640,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/se-shadow.png",
+            "x": 640,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 95,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/se-color.png",
+            "x": 768,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/se-nation.png",
+                "x": 768,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/se-shadow.png",
+            "x": 768,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 95,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/se-color.png",
+            "x": 896,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/se-nation.png",
+                "x": 896,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/se-shadow.png",
+            "x": 896,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Great General",
+      "state": "HIT",
+      "facing": "SW",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Great General",
+      "looping": false,
+      "mirroredFacing": "SE",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Great General",
+      "state": "HIT",
+      "facing": "W",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Great General",
+      "looping": false,
+      "mirroredFacing": "E",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Great General",
+      "state": "IDLE",
+      "facing": "E",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Great General",
+      "looping": true,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 160,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/e-color.png",
+            "x": 0,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/e-nation.png",
+                "x": 0,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/e-shadow.png",
+            "x": 0,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 160,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/e-color.png",
+            "x": 128,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/e-nation.png",
+                "x": 128,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/e-shadow.png",
+            "x": 128,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 160,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/e-color.png",
+            "x": 256,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/e-nation.png",
+                "x": 256,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/e-shadow.png",
+            "x": 256,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 160,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/e-color.png",
+            "x": 384,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/e-nation.png",
+                "x": 384,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/e-shadow.png",
+            "x": 384,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Great General",
+      "state": "IDLE",
+      "facing": "NE",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Great General",
+      "looping": true,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 160,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/ne-color.png",
+            "x": 0,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/ne-nation.png",
+                "x": 0,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/ne-shadow.png",
+            "x": 0,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 160,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/ne-color.png",
+            "x": 128,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/ne-nation.png",
+                "x": 128,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/ne-shadow.png",
+            "x": 128,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 160,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/ne-color.png",
+            "x": 256,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/ne-nation.png",
+                "x": 256,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/ne-shadow.png",
+            "x": 256,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 160,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/ne-color.png",
+            "x": 384,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/ne-nation.png",
+                "x": 384,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/ne-shadow.png",
+            "x": 384,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Great General",
+      "state": "IDLE",
+      "facing": "NW",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Great General",
+      "looping": true,
+      "mirroredFacing": "NE",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Great General",
+      "state": "IDLE",
+      "facing": "SE",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Great General",
+      "looping": true,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 160,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/se-color.png",
+            "x": 0,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/se-nation.png",
+                "x": 0,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/se-shadow.png",
+            "x": 0,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 160,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/se-color.png",
+            "x": 128,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/se-nation.png",
+                "x": 128,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/se-shadow.png",
+            "x": 128,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 160,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/se-color.png",
+            "x": 256,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/se-nation.png",
+                "x": 256,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/se-shadow.png",
+            "x": 256,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 160,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/se-color.png",
+            "x": 384,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/se-nation.png",
+                "x": 384,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/se-shadow.png",
+            "x": 384,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Great General",
+      "state": "IDLE",
+      "facing": "SW",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Great General",
+      "looping": true,
+      "mirroredFacing": "SE",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Great General",
+      "state": "IDLE",
+      "facing": "W",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Great General",
+      "looping": true,
+      "mirroredFacing": "E",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Great General",
+      "state": "MOVE",
+      "facing": "E",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Great General",
+      "looping": true,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/e-color.png",
+            "x": 0,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/e-nation.png",
+                "x": 0,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/e-shadow.png",
+            "x": 0,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/e-color.png",
+            "x": 128,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/e-nation.png",
+                "x": 128,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/e-shadow.png",
+            "x": 128,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/e-color.png",
+            "x": 256,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/e-nation.png",
+                "x": 256,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/e-shadow.png",
+            "x": 256,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/e-color.png",
+            "x": 384,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/e-nation.png",
+                "x": 384,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/e-shadow.png",
+            "x": 384,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/e-color.png",
+            "x": 512,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/e-nation.png",
+                "x": 512,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/e-shadow.png",
+            "x": 512,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/e-color.png",
+            "x": 640,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/e-nation.png",
+                "x": 640,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/e-shadow.png",
+            "x": 640,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/e-color.png",
+            "x": 768,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/e-nation.png",
+                "x": 768,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/e-shadow.png",
+            "x": 768,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/e-color.png",
+            "x": 896,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/e-nation.png",
+                "x": 896,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/e-shadow.png",
+            "x": 896,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Great General",
+      "state": "MOVE",
+      "facing": "NE",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Great General",
+      "looping": true,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/ne-color.png",
+            "x": 0,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/ne-nation.png",
+                "x": 0,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/ne-shadow.png",
+            "x": 0,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/ne-color.png",
+            "x": 128,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/ne-nation.png",
+                "x": 128,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/ne-shadow.png",
+            "x": 128,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/ne-color.png",
+            "x": 256,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/ne-nation.png",
+                "x": 256,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/ne-shadow.png",
+            "x": 256,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/ne-color.png",
+            "x": 384,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/ne-nation.png",
+                "x": 384,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/ne-shadow.png",
+            "x": 384,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/ne-color.png",
+            "x": 512,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/ne-nation.png",
+                "x": 512,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/ne-shadow.png",
+            "x": 512,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/ne-color.png",
+            "x": 640,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/ne-nation.png",
+                "x": 640,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/ne-shadow.png",
+            "x": 640,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/ne-color.png",
+            "x": 768,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/ne-nation.png",
+                "x": 768,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/ne-shadow.png",
+            "x": 768,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/ne-color.png",
+            "x": 896,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/ne-nation.png",
+                "x": 896,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/ne-shadow.png",
+            "x": 896,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Great General",
+      "state": "MOVE",
+      "facing": "NW",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Great General",
+      "looping": true,
+      "mirroredFacing": "NE",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Great General",
+      "state": "MOVE",
+      "facing": "SE",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Great General",
+      "looping": true,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/se-color.png",
+            "x": 0,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/se-nation.png",
+                "x": 0,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/se-shadow.png",
+            "x": 0,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/se-color.png",
+            "x": 128,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/se-nation.png",
+                "x": 128,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/se-shadow.png",
+            "x": 128,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/se-color.png",
+            "x": 256,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/se-nation.png",
+                "x": 256,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/se-shadow.png",
+            "x": 256,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/se-color.png",
+            "x": 384,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/se-nation.png",
+                "x": 384,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/se-shadow.png",
+            "x": 384,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/se-color.png",
+            "x": 512,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/se-nation.png",
+                "x": 512,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/se-shadow.png",
+            "x": 512,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/se-color.png",
+            "x": 640,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/se-nation.png",
+                "x": 640,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/se-shadow.png",
+            "x": 640,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/se-color.png",
+            "x": 768,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/se-nation.png",
+                "x": 768,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/se-shadow.png",
+            "x": 768,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/se-color.png",
+            "x": 896,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/se-nation.png",
+                "x": 896,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/se-shadow.png",
+            "x": 896,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Great General",
+      "state": "MOVE",
+      "facing": "SW",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Great General",
+      "looping": true,
+      "mirroredFacing": "SE",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Great General",
+      "state": "MOVE",
+      "facing": "W",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Great General",
+      "looping": true,
+      "mirroredFacing": "E",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Great General",
+      "state": "WORK",
+      "facing": "E",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Great General",
+      "looping": true,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 110,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/e-color.png",
+            "x": 0,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/e-nation.png",
+                "x": 0,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/e-shadow.png",
+            "x": 0,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 110,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/e-color.png",
+            "x": 128,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/e-nation.png",
+                "x": 128,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/e-shadow.png",
+            "x": 128,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 110,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/e-color.png",
+            "x": 256,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/e-nation.png",
+                "x": 256,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/e-shadow.png",
+            "x": 256,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 110,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/e-color.png",
+            "x": 384,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/e-nation.png",
+                "x": 384,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/e-shadow.png",
+            "x": 384,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 110,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/e-color.png",
+            "x": 512,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/e-nation.png",
+                "x": 512,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/e-shadow.png",
+            "x": 512,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 110,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/e-color.png",
+            "x": 640,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/e-nation.png",
+                "x": 640,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/e-shadow.png",
+            "x": 640,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 110,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/e-color.png",
+            "x": 768,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/e-nation.png",
+                "x": 768,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/e-shadow.png",
+            "x": 768,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 110,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/e-color.png",
+            "x": 896,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/e-nation.png",
+                "x": 896,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/e-shadow.png",
+            "x": 896,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Great General",
+      "state": "WORK",
+      "facing": "NE",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Great General",
+      "looping": true,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 110,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/ne-color.png",
+            "x": 0,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/ne-nation.png",
+                "x": 0,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/ne-shadow.png",
+            "x": 0,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 110,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/ne-color.png",
+            "x": 128,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/ne-nation.png",
+                "x": 128,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/ne-shadow.png",
+            "x": 128,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 110,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/ne-color.png",
+            "x": 256,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/ne-nation.png",
+                "x": 256,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/ne-shadow.png",
+            "x": 256,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 110,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/ne-color.png",
+            "x": 384,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/ne-nation.png",
+                "x": 384,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/ne-shadow.png",
+            "x": 384,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 110,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/ne-color.png",
+            "x": 512,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/ne-nation.png",
+                "x": 512,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/ne-shadow.png",
+            "x": 512,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 110,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/ne-color.png",
+            "x": 640,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/ne-nation.png",
+                "x": 640,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/ne-shadow.png",
+            "x": 640,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 110,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/ne-color.png",
+            "x": 768,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/ne-nation.png",
+                "x": 768,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/ne-shadow.png",
+            "x": 768,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 110,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/ne-color.png",
+            "x": 896,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/ne-nation.png",
+                "x": 896,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/ne-shadow.png",
+            "x": 896,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Great General",
+      "state": "WORK",
+      "facing": "NW",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Great General",
+      "looping": true,
+      "mirroredFacing": "NE",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Great General",
+      "state": "WORK",
+      "facing": "SE",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Great General",
+      "looping": true,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 110,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/se-color.png",
+            "x": 0,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/se-nation.png",
+                "x": 0,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/se-shadow.png",
+            "x": 0,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 110,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/se-color.png",
+            "x": 128,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/se-nation.png",
+                "x": 128,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/se-shadow.png",
+            "x": 128,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 110,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/se-color.png",
+            "x": 256,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/se-nation.png",
+                "x": 256,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/se-shadow.png",
+            "x": 256,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 110,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/se-color.png",
+            "x": 384,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/se-nation.png",
+                "x": 384,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/se-shadow.png",
+            "x": 384,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 110,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/se-color.png",
+            "x": 512,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/se-nation.png",
+                "x": 512,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/se-shadow.png",
+            "x": 512,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 110,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/se-color.png",
+            "x": 640,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/se-nation.png",
+                "x": 640,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/se-shadow.png",
+            "x": 640,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 110,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/se-color.png",
+            "x": 768,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/se-nation.png",
+                "x": 768,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/se-shadow.png",
+            "x": 768,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 110,
+          "color": {
+            "path": "art/atlas/units/great-general/frames/se-color.png",
+            "x": 896,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-general/frames/se-nation.png",
+                "x": 896,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-general/frames/se-shadow.png",
+            "x": 896,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Great General",
+      "state": "WORK",
+      "facing": "SW",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Great General",
+      "looping": true,
+      "mirroredFacing": "SE",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Great General",
+      "state": "WORK",
+      "facing": "W",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Great General",
+      "looping": true,
+      "mirroredFacing": "E",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Great Merchant",
+      "state": "DEFEAT",
+      "facing": "E",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Great Merchant",
+      "looping": false,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/e-color.png",
+            "x": 0,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/e-nation.png",
+                "x": 0,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/e-shadow.png",
+            "x": 0,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/e-color.png",
+            "x": 128,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/e-nation.png",
+                "x": 128,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/e-shadow.png",
+            "x": 128,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/e-color.png",
+            "x": 256,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/e-nation.png",
+                "x": 256,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/e-shadow.png",
+            "x": 256,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/e-color.png",
+            "x": 384,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/e-nation.png",
+                "x": 384,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/e-shadow.png",
+            "x": 384,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/e-color.png",
+            "x": 512,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/e-nation.png",
+                "x": 512,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/e-shadow.png",
+            "x": 512,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/e-color.png",
+            "x": 640,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/e-nation.png",
+                "x": 640,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/e-shadow.png",
+            "x": 640,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/e-color.png",
+            "x": 768,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/e-nation.png",
+                "x": 768,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/e-shadow.png",
+            "x": 768,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/e-color.png",
+            "x": 896,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/e-nation.png",
+                "x": 896,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/e-shadow.png",
+            "x": 896,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Great Merchant",
+      "state": "DEFEAT",
+      "facing": "NE",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Great Merchant",
+      "looping": false,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/ne-color.png",
+            "x": 0,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/ne-nation.png",
+                "x": 0,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/ne-shadow.png",
+            "x": 0,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/ne-color.png",
+            "x": 128,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/ne-nation.png",
+                "x": 128,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/ne-shadow.png",
+            "x": 128,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/ne-color.png",
+            "x": 256,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/ne-nation.png",
+                "x": 256,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/ne-shadow.png",
+            "x": 256,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/ne-color.png",
+            "x": 384,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/ne-nation.png",
+                "x": 384,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/ne-shadow.png",
+            "x": 384,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/ne-color.png",
+            "x": 512,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/ne-nation.png",
+                "x": 512,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/ne-shadow.png",
+            "x": 512,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/ne-color.png",
+            "x": 640,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/ne-nation.png",
+                "x": 640,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/ne-shadow.png",
+            "x": 640,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/ne-color.png",
+            "x": 768,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/ne-nation.png",
+                "x": 768,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/ne-shadow.png",
+            "x": 768,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/ne-color.png",
+            "x": 896,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/ne-nation.png",
+                "x": 896,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/ne-shadow.png",
+            "x": 896,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Great Merchant",
+      "state": "DEFEAT",
+      "facing": "NW",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Great Merchant",
+      "looping": false,
+      "mirroredFacing": "NE",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Great Merchant",
+      "state": "DEFEAT",
+      "facing": "SE",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Great Merchant",
+      "looping": false,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/se-color.png",
+            "x": 0,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/se-nation.png",
+                "x": 0,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/se-shadow.png",
+            "x": 0,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/se-color.png",
+            "x": 128,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/se-nation.png",
+                "x": 128,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/se-shadow.png",
+            "x": 128,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/se-color.png",
+            "x": 256,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/se-nation.png",
+                "x": 256,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/se-shadow.png",
+            "x": 256,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/se-color.png",
+            "x": 384,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/se-nation.png",
+                "x": 384,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/se-shadow.png",
+            "x": 384,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/se-color.png",
+            "x": 512,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/se-nation.png",
+                "x": 512,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/se-shadow.png",
+            "x": 512,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/se-color.png",
+            "x": 640,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/se-nation.png",
+                "x": 640,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/se-shadow.png",
+            "x": 640,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/se-color.png",
+            "x": 768,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/se-nation.png",
+                "x": 768,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/se-shadow.png",
+            "x": 768,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/se-color.png",
+            "x": 896,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/se-nation.png",
+                "x": 896,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/se-shadow.png",
+            "x": 896,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Great Merchant",
+      "state": "DEFEAT",
+      "facing": "SW",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Great Merchant",
+      "looping": false,
+      "mirroredFacing": "SE",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Great Merchant",
+      "state": "DEFEAT",
+      "facing": "W",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Great Merchant",
+      "looping": false,
+      "mirroredFacing": "E",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Great Merchant",
+      "state": "HIT",
+      "facing": "E",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Great Merchant",
+      "looping": false,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 95,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/e-color.png",
+            "x": 512,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/e-nation.png",
+                "x": 512,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/e-shadow.png",
+            "x": 512,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 95,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/e-color.png",
+            "x": 640,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/e-nation.png",
+                "x": 640,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/e-shadow.png",
+            "x": 640,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 95,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/e-color.png",
+            "x": 768,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/e-nation.png",
+                "x": 768,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/e-shadow.png",
+            "x": 768,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 95,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/e-color.png",
+            "x": 896,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/e-nation.png",
+                "x": 896,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/e-shadow.png",
+            "x": 896,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Great Merchant",
+      "state": "HIT",
+      "facing": "NE",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Great Merchant",
+      "looping": false,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 95,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/ne-color.png",
+            "x": 512,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/ne-nation.png",
+                "x": 512,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/ne-shadow.png",
+            "x": 512,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 95,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/ne-color.png",
+            "x": 640,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/ne-nation.png",
+                "x": 640,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/ne-shadow.png",
+            "x": 640,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 95,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/ne-color.png",
+            "x": 768,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/ne-nation.png",
+                "x": 768,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/ne-shadow.png",
+            "x": 768,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 95,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/ne-color.png",
+            "x": 896,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/ne-nation.png",
+                "x": 896,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/ne-shadow.png",
+            "x": 896,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Great Merchant",
+      "state": "HIT",
+      "facing": "NW",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Great Merchant",
+      "looping": false,
+      "mirroredFacing": "NE",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Great Merchant",
+      "state": "HIT",
+      "facing": "SE",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Great Merchant",
+      "looping": false,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 95,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/se-color.png",
+            "x": 512,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/se-nation.png",
+                "x": 512,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/se-shadow.png",
+            "x": 512,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 95,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/se-color.png",
+            "x": 640,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/se-nation.png",
+                "x": 640,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/se-shadow.png",
+            "x": 640,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 95,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/se-color.png",
+            "x": 768,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/se-nation.png",
+                "x": 768,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/se-shadow.png",
+            "x": 768,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 95,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/se-color.png",
+            "x": 896,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/se-nation.png",
+                "x": 896,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/se-shadow.png",
+            "x": 896,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Great Merchant",
+      "state": "HIT",
+      "facing": "SW",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Great Merchant",
+      "looping": false,
+      "mirroredFacing": "SE",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Great Merchant",
+      "state": "HIT",
+      "facing": "W",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Great Merchant",
+      "looping": false,
+      "mirroredFacing": "E",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Great Merchant",
+      "state": "IDLE",
+      "facing": "E",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Great Merchant",
+      "looping": true,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 160,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/e-color.png",
+            "x": 0,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/e-nation.png",
+                "x": 0,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/e-shadow.png",
+            "x": 0,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 160,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/e-color.png",
+            "x": 128,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/e-nation.png",
+                "x": 128,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/e-shadow.png",
+            "x": 128,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 160,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/e-color.png",
+            "x": 256,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/e-nation.png",
+                "x": 256,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/e-shadow.png",
+            "x": 256,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 160,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/e-color.png",
+            "x": 384,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/e-nation.png",
+                "x": 384,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/e-shadow.png",
+            "x": 384,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Great Merchant",
+      "state": "IDLE",
+      "facing": "NE",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Great Merchant",
+      "looping": true,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 160,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/ne-color.png",
+            "x": 0,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/ne-nation.png",
+                "x": 0,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/ne-shadow.png",
+            "x": 0,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 160,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/ne-color.png",
+            "x": 128,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/ne-nation.png",
+                "x": 128,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/ne-shadow.png",
+            "x": 128,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 160,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/ne-color.png",
+            "x": 256,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/ne-nation.png",
+                "x": 256,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/ne-shadow.png",
+            "x": 256,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 160,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/ne-color.png",
+            "x": 384,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/ne-nation.png",
+                "x": 384,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/ne-shadow.png",
+            "x": 384,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Great Merchant",
+      "state": "IDLE",
+      "facing": "NW",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Great Merchant",
+      "looping": true,
+      "mirroredFacing": "NE",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Great Merchant",
+      "state": "IDLE",
+      "facing": "SE",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Great Merchant",
+      "looping": true,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 160,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/se-color.png",
+            "x": 0,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/se-nation.png",
+                "x": 0,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/se-shadow.png",
+            "x": 0,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 160,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/se-color.png",
+            "x": 128,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/se-nation.png",
+                "x": 128,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/se-shadow.png",
+            "x": 128,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 160,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/se-color.png",
+            "x": 256,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/se-nation.png",
+                "x": 256,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/se-shadow.png",
+            "x": 256,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 160,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/se-color.png",
+            "x": 384,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/se-nation.png",
+                "x": 384,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/se-shadow.png",
+            "x": 384,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Great Merchant",
+      "state": "IDLE",
+      "facing": "SW",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Great Merchant",
+      "looping": true,
+      "mirroredFacing": "SE",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Great Merchant",
+      "state": "IDLE",
+      "facing": "W",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Great Merchant",
+      "looping": true,
+      "mirroredFacing": "E",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Great Merchant",
+      "state": "MOVE",
+      "facing": "E",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Great Merchant",
+      "looping": true,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/e-color.png",
+            "x": 0,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/e-nation.png",
+                "x": 0,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/e-shadow.png",
+            "x": 0,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/e-color.png",
+            "x": 128,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/e-nation.png",
+                "x": 128,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/e-shadow.png",
+            "x": 128,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/e-color.png",
+            "x": 256,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/e-nation.png",
+                "x": 256,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/e-shadow.png",
+            "x": 256,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/e-color.png",
+            "x": 384,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/e-nation.png",
+                "x": 384,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/e-shadow.png",
+            "x": 384,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/e-color.png",
+            "x": 512,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/e-nation.png",
+                "x": 512,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/e-shadow.png",
+            "x": 512,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/e-color.png",
+            "x": 640,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/e-nation.png",
+                "x": 640,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/e-shadow.png",
+            "x": 640,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/e-color.png",
+            "x": 768,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/e-nation.png",
+                "x": 768,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/e-shadow.png",
+            "x": 768,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/e-color.png",
+            "x": 896,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/e-nation.png",
+                "x": 896,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/e-shadow.png",
+            "x": 896,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Great Merchant",
+      "state": "MOVE",
+      "facing": "NE",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Great Merchant",
+      "looping": true,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/ne-color.png",
+            "x": 0,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/ne-nation.png",
+                "x": 0,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/ne-shadow.png",
+            "x": 0,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/ne-color.png",
+            "x": 128,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/ne-nation.png",
+                "x": 128,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/ne-shadow.png",
+            "x": 128,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/ne-color.png",
+            "x": 256,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/ne-nation.png",
+                "x": 256,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/ne-shadow.png",
+            "x": 256,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/ne-color.png",
+            "x": 384,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/ne-nation.png",
+                "x": 384,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/ne-shadow.png",
+            "x": 384,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/ne-color.png",
+            "x": 512,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/ne-nation.png",
+                "x": 512,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/ne-shadow.png",
+            "x": 512,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/ne-color.png",
+            "x": 640,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/ne-nation.png",
+                "x": 640,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/ne-shadow.png",
+            "x": 640,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/ne-color.png",
+            "x": 768,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/ne-nation.png",
+                "x": 768,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/ne-shadow.png",
+            "x": 768,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/ne-color.png",
+            "x": 896,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/ne-nation.png",
+                "x": 896,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/ne-shadow.png",
+            "x": 896,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Great Merchant",
+      "state": "MOVE",
+      "facing": "NW",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Great Merchant",
+      "looping": true,
+      "mirroredFacing": "NE",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Great Merchant",
+      "state": "MOVE",
+      "facing": "SE",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Great Merchant",
+      "looping": true,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/se-color.png",
+            "x": 0,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/se-nation.png",
+                "x": 0,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/se-shadow.png",
+            "x": 0,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/se-color.png",
+            "x": 128,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/se-nation.png",
+                "x": 128,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/se-shadow.png",
+            "x": 128,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/se-color.png",
+            "x": 256,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/se-nation.png",
+                "x": 256,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/se-shadow.png",
+            "x": 256,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/se-color.png",
+            "x": 384,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/se-nation.png",
+                "x": 384,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/se-shadow.png",
+            "x": 384,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/se-color.png",
+            "x": 512,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/se-nation.png",
+                "x": 512,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/se-shadow.png",
+            "x": 512,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/se-color.png",
+            "x": 640,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/se-nation.png",
+                "x": 640,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/se-shadow.png",
+            "x": 640,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/se-color.png",
+            "x": 768,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/se-nation.png",
+                "x": 768,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/se-shadow.png",
+            "x": 768,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/se-color.png",
+            "x": 896,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/se-nation.png",
+                "x": 896,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/se-shadow.png",
+            "x": 896,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Great Merchant",
+      "state": "MOVE",
+      "facing": "SW",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Great Merchant",
+      "looping": true,
+      "mirroredFacing": "SE",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Great Merchant",
+      "state": "MOVE",
+      "facing": "W",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Great Merchant",
+      "looping": true,
+      "mirroredFacing": "E",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Great Merchant",
+      "state": "WORK",
+      "facing": "E",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Great Merchant",
+      "looping": true,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 110,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/e-color.png",
+            "x": 0,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/e-nation.png",
+                "x": 0,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/e-shadow.png",
+            "x": 0,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 110,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/e-color.png",
+            "x": 128,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/e-nation.png",
+                "x": 128,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/e-shadow.png",
+            "x": 128,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 110,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/e-color.png",
+            "x": 256,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/e-nation.png",
+                "x": 256,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/e-shadow.png",
+            "x": 256,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 110,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/e-color.png",
+            "x": 384,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/e-nation.png",
+                "x": 384,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/e-shadow.png",
+            "x": 384,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 110,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/e-color.png",
+            "x": 512,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/e-nation.png",
+                "x": 512,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/e-shadow.png",
+            "x": 512,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 110,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/e-color.png",
+            "x": 640,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/e-nation.png",
+                "x": 640,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/e-shadow.png",
+            "x": 640,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 110,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/e-color.png",
+            "x": 768,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/e-nation.png",
+                "x": 768,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/e-shadow.png",
+            "x": 768,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 110,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/e-color.png",
+            "x": 896,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/e-nation.png",
+                "x": 896,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/e-shadow.png",
+            "x": 896,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Great Merchant",
+      "state": "WORK",
+      "facing": "NE",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Great Merchant",
+      "looping": true,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 110,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/ne-color.png",
+            "x": 0,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/ne-nation.png",
+                "x": 0,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/ne-shadow.png",
+            "x": 0,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 110,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/ne-color.png",
+            "x": 128,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/ne-nation.png",
+                "x": 128,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/ne-shadow.png",
+            "x": 128,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 110,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/ne-color.png",
+            "x": 256,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/ne-nation.png",
+                "x": 256,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/ne-shadow.png",
+            "x": 256,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 110,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/ne-color.png",
+            "x": 384,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/ne-nation.png",
+                "x": 384,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/ne-shadow.png",
+            "x": 384,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 110,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/ne-color.png",
+            "x": 512,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/ne-nation.png",
+                "x": 512,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/ne-shadow.png",
+            "x": 512,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 110,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/ne-color.png",
+            "x": 640,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/ne-nation.png",
+                "x": 640,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/ne-shadow.png",
+            "x": 640,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 110,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/ne-color.png",
+            "x": 768,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/ne-nation.png",
+                "x": 768,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/ne-shadow.png",
+            "x": 768,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 110,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/ne-color.png",
+            "x": 896,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/ne-nation.png",
+                "x": 896,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/ne-shadow.png",
+            "x": 896,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Great Merchant",
+      "state": "WORK",
+      "facing": "NW",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Great Merchant",
+      "looping": true,
+      "mirroredFacing": "NE",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Great Merchant",
+      "state": "WORK",
+      "facing": "SE",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Great Merchant",
+      "looping": true,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 110,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/se-color.png",
+            "x": 0,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/se-nation.png",
+                "x": 0,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/se-shadow.png",
+            "x": 0,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 110,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/se-color.png",
+            "x": 128,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/se-nation.png",
+                "x": 128,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/se-shadow.png",
+            "x": 128,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 110,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/se-color.png",
+            "x": 256,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/se-nation.png",
+                "x": 256,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/se-shadow.png",
+            "x": 256,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 110,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/se-color.png",
+            "x": 384,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/se-nation.png",
+                "x": 384,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/se-shadow.png",
+            "x": 384,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 110,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/se-color.png",
+            "x": 512,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/se-nation.png",
+                "x": 512,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/se-shadow.png",
+            "x": 512,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 110,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/se-color.png",
+            "x": 640,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/se-nation.png",
+                "x": 640,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/se-shadow.png",
+            "x": 640,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 110,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/se-color.png",
+            "x": 768,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/se-nation.png",
+                "x": 768,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/se-shadow.png",
+            "x": 768,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 110,
+          "color": {
+            "path": "art/atlas/units/great-merchant/frames/se-color.png",
+            "x": 896,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/great-merchant/frames/se-nation.png",
+                "x": 896,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/great-merchant/frames/se-shadow.png",
+            "x": 896,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Great Merchant",
+      "state": "WORK",
+      "facing": "SW",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Great Merchant",
+      "looping": true,
+      "mirroredFacing": "SE",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Great Merchant",
+      "state": "WORK",
+      "facing": "W",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Great Merchant",
+      "looping": true,
+      "mirroredFacing": "E",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
     {
       "unitName": "Horseman",
       "state": "ATTACK",

@@ -104920,8 +104920,30 @@
       ],
       "intendedSource": "art/atlas/units/great-general/frames/defeat-e.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/e-color.png",
+          "sha256": "6258b6c0796d6e1e9ed9eb1e43ab7b77db0811d5c12f3a16d83d4de982e3f037",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/e-nation.png",
+          "sha256": "b693b068e6638e7e73bd8e5d2d39bbeaaf70d47fd58d13e50b14d7e04e42ec55",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/e-shadow.png",
+          "sha256": "26ce4552e90d33561dba134d2b5f96e119cc0436c08553d00bbdfeafaf4daf10",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -104941,8 +104963,30 @@
       ],
       "intendedSource": "art/atlas/units/great-general/frames/defeat-ne.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/ne-color.png",
+          "sha256": "872892d2e745291a3050be834775db696971b5efa4a9b7dfd7ad539ab84d92a1",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/ne-nation.png",
+          "sha256": "e30e68c9068b059174d66938a492f520421e0fa558032dc84b557626c7cf9b94",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/ne-shadow.png",
+          "sha256": "582222b27163debbbc08839c38ed0472426e926efe6d4c2c0698023c1534c858",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -104962,8 +105006,30 @@
       ],
       "intendedSource": "art/atlas/units/great-general/frames/defeat-nw.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/ne-color.png",
+          "sha256": "872892d2e745291a3050be834775db696971b5efa4a9b7dfd7ad539ab84d92a1",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/ne-nation.png",
+          "sha256": "e30e68c9068b059174d66938a492f520421e0fa558032dc84b557626c7cf9b94",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/ne-shadow.png",
+          "sha256": "582222b27163debbbc08839c38ed0472426e926efe6d4c2c0698023c1534c858",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -104983,8 +105049,30 @@
       ],
       "intendedSource": "art/atlas/units/great-general/frames/defeat-se.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/se-color.png",
+          "sha256": "bb817e088aa47210c7d5417ed42d770c521f1e12249b50c3af16d0f89821a829",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/se-nation.png",
+          "sha256": "6ab3439345113176225b9a6d68a4e097315d231032443e36c1739229472a36f1",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/se-shadow.png",
+          "sha256": "53bad6efac07704d6a4351fe180ec083f43fc30408c71a8773f94ea3a4cfb20c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -105004,8 +105092,30 @@
       ],
       "intendedSource": "art/atlas/units/great-general/frames/defeat-sw.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/se-color.png",
+          "sha256": "bb817e088aa47210c7d5417ed42d770c521f1e12249b50c3af16d0f89821a829",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/se-nation.png",
+          "sha256": "6ab3439345113176225b9a6d68a4e097315d231032443e36c1739229472a36f1",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/se-shadow.png",
+          "sha256": "53bad6efac07704d6a4351fe180ec083f43fc30408c71a8773f94ea3a4cfb20c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -105025,8 +105135,30 @@
       ],
       "intendedSource": "art/atlas/units/great-general/frames/defeat-w.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/e-color.png",
+          "sha256": "6258b6c0796d6e1e9ed9eb1e43ab7b77db0811d5c12f3a16d83d4de982e3f037",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/e-nation.png",
+          "sha256": "b693b068e6638e7e73bd8e5d2d39bbeaaf70d47fd58d13e50b14d7e04e42ec55",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/e-shadow.png",
+          "sha256": "26ce4552e90d33561dba134d2b5f96e119cc0436c08553d00bbdfeafaf4daf10",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -105046,8 +105178,30 @@
       ],
       "intendedSource": "art/atlas/units/great-general/frames/hit-e.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/e-color.png",
+          "sha256": "6258b6c0796d6e1e9ed9eb1e43ab7b77db0811d5c12f3a16d83d4de982e3f037",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/e-nation.png",
+          "sha256": "b693b068e6638e7e73bd8e5d2d39bbeaaf70d47fd58d13e50b14d7e04e42ec55",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/e-shadow.png",
+          "sha256": "26ce4552e90d33561dba134d2b5f96e119cc0436c08553d00bbdfeafaf4daf10",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -105067,8 +105221,30 @@
       ],
       "intendedSource": "art/atlas/units/great-general/frames/hit-ne.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/ne-color.png",
+          "sha256": "872892d2e745291a3050be834775db696971b5efa4a9b7dfd7ad539ab84d92a1",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/ne-nation.png",
+          "sha256": "e30e68c9068b059174d66938a492f520421e0fa558032dc84b557626c7cf9b94",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/ne-shadow.png",
+          "sha256": "582222b27163debbbc08839c38ed0472426e926efe6d4c2c0698023c1534c858",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -105088,8 +105264,30 @@
       ],
       "intendedSource": "art/atlas/units/great-general/frames/hit-nw.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/ne-color.png",
+          "sha256": "872892d2e745291a3050be834775db696971b5efa4a9b7dfd7ad539ab84d92a1",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/ne-nation.png",
+          "sha256": "e30e68c9068b059174d66938a492f520421e0fa558032dc84b557626c7cf9b94",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/ne-shadow.png",
+          "sha256": "582222b27163debbbc08839c38ed0472426e926efe6d4c2c0698023c1534c858",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -105109,8 +105307,30 @@
       ],
       "intendedSource": "art/atlas/units/great-general/frames/hit-se.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/se-color.png",
+          "sha256": "bb817e088aa47210c7d5417ed42d770c521f1e12249b50c3af16d0f89821a829",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/se-nation.png",
+          "sha256": "6ab3439345113176225b9a6d68a4e097315d231032443e36c1739229472a36f1",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/se-shadow.png",
+          "sha256": "53bad6efac07704d6a4351fe180ec083f43fc30408c71a8773f94ea3a4cfb20c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -105130,8 +105350,30 @@
       ],
       "intendedSource": "art/atlas/units/great-general/frames/hit-sw.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/se-color.png",
+          "sha256": "bb817e088aa47210c7d5417ed42d770c521f1e12249b50c3af16d0f89821a829",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/se-nation.png",
+          "sha256": "6ab3439345113176225b9a6d68a4e097315d231032443e36c1739229472a36f1",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/se-shadow.png",
+          "sha256": "53bad6efac07704d6a4351fe180ec083f43fc30408c71a8773f94ea3a4cfb20c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -105151,8 +105393,30 @@
       ],
       "intendedSource": "art/atlas/units/great-general/frames/hit-w.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/e-color.png",
+          "sha256": "6258b6c0796d6e1e9ed9eb1e43ab7b77db0811d5c12f3a16d83d4de982e3f037",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/e-nation.png",
+          "sha256": "b693b068e6638e7e73bd8e5d2d39bbeaaf70d47fd58d13e50b14d7e04e42ec55",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/e-shadow.png",
+          "sha256": "26ce4552e90d33561dba134d2b5f96e119cc0436c08553d00bbdfeafaf4daf10",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -105172,8 +105436,30 @@
       ],
       "intendedSource": "art/atlas/units/great-general/frames/idle-e.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/e-color.png",
+          "sha256": "6258b6c0796d6e1e9ed9eb1e43ab7b77db0811d5c12f3a16d83d4de982e3f037",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/e-nation.png",
+          "sha256": "b693b068e6638e7e73bd8e5d2d39bbeaaf70d47fd58d13e50b14d7e04e42ec55",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/e-shadow.png",
+          "sha256": "26ce4552e90d33561dba134d2b5f96e119cc0436c08553d00bbdfeafaf4daf10",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -105193,8 +105479,30 @@
       ],
       "intendedSource": "art/atlas/units/great-general/frames/idle-ne.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/ne-color.png",
+          "sha256": "872892d2e745291a3050be834775db696971b5efa4a9b7dfd7ad539ab84d92a1",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/ne-nation.png",
+          "sha256": "e30e68c9068b059174d66938a492f520421e0fa558032dc84b557626c7cf9b94",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/ne-shadow.png",
+          "sha256": "582222b27163debbbc08839c38ed0472426e926efe6d4c2c0698023c1534c858",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -105214,8 +105522,30 @@
       ],
       "intendedSource": "art/atlas/units/great-general/frames/idle-nw.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/ne-color.png",
+          "sha256": "872892d2e745291a3050be834775db696971b5efa4a9b7dfd7ad539ab84d92a1",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/ne-nation.png",
+          "sha256": "e30e68c9068b059174d66938a492f520421e0fa558032dc84b557626c7cf9b94",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/ne-shadow.png",
+          "sha256": "582222b27163debbbc08839c38ed0472426e926efe6d4c2c0698023c1534c858",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -105235,8 +105565,30 @@
       ],
       "intendedSource": "art/atlas/units/great-general/frames/idle-se.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/se-color.png",
+          "sha256": "bb817e088aa47210c7d5417ed42d770c521f1e12249b50c3af16d0f89821a829",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/se-nation.png",
+          "sha256": "6ab3439345113176225b9a6d68a4e097315d231032443e36c1739229472a36f1",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/se-shadow.png",
+          "sha256": "53bad6efac07704d6a4351fe180ec083f43fc30408c71a8773f94ea3a4cfb20c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -105256,8 +105608,30 @@
       ],
       "intendedSource": "art/atlas/units/great-general/frames/idle-sw.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/se-color.png",
+          "sha256": "bb817e088aa47210c7d5417ed42d770c521f1e12249b50c3af16d0f89821a829",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/se-nation.png",
+          "sha256": "6ab3439345113176225b9a6d68a4e097315d231032443e36c1739229472a36f1",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/se-shadow.png",
+          "sha256": "53bad6efac07704d6a4351fe180ec083f43fc30408c71a8773f94ea3a4cfb20c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -105277,8 +105651,30 @@
       ],
       "intendedSource": "art/atlas/units/great-general/frames/idle-w.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/e-color.png",
+          "sha256": "6258b6c0796d6e1e9ed9eb1e43ab7b77db0811d5c12f3a16d83d4de982e3f037",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/e-nation.png",
+          "sha256": "b693b068e6638e7e73bd8e5d2d39bbeaaf70d47fd58d13e50b14d7e04e42ec55",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/e-shadow.png",
+          "sha256": "26ce4552e90d33561dba134d2b5f96e119cc0436c08553d00bbdfeafaf4daf10",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -105298,8 +105694,30 @@
       ],
       "intendedSource": "art/atlas/units/great-general/frames/move-e.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/e-color.png",
+          "sha256": "6258b6c0796d6e1e9ed9eb1e43ab7b77db0811d5c12f3a16d83d4de982e3f037",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/e-nation.png",
+          "sha256": "b693b068e6638e7e73bd8e5d2d39bbeaaf70d47fd58d13e50b14d7e04e42ec55",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/e-shadow.png",
+          "sha256": "26ce4552e90d33561dba134d2b5f96e119cc0436c08553d00bbdfeafaf4daf10",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -105319,8 +105737,30 @@
       ],
       "intendedSource": "art/atlas/units/great-general/frames/move-ne.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/ne-color.png",
+          "sha256": "872892d2e745291a3050be834775db696971b5efa4a9b7dfd7ad539ab84d92a1",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/ne-nation.png",
+          "sha256": "e30e68c9068b059174d66938a492f520421e0fa558032dc84b557626c7cf9b94",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/ne-shadow.png",
+          "sha256": "582222b27163debbbc08839c38ed0472426e926efe6d4c2c0698023c1534c858",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -105340,8 +105780,30 @@
       ],
       "intendedSource": "art/atlas/units/great-general/frames/move-nw.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/ne-color.png",
+          "sha256": "872892d2e745291a3050be834775db696971b5efa4a9b7dfd7ad539ab84d92a1",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/ne-nation.png",
+          "sha256": "e30e68c9068b059174d66938a492f520421e0fa558032dc84b557626c7cf9b94",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/ne-shadow.png",
+          "sha256": "582222b27163debbbc08839c38ed0472426e926efe6d4c2c0698023c1534c858",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -105361,8 +105823,30 @@
       ],
       "intendedSource": "art/atlas/units/great-general/frames/move-se.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/se-color.png",
+          "sha256": "bb817e088aa47210c7d5417ed42d770c521f1e12249b50c3af16d0f89821a829",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/se-nation.png",
+          "sha256": "6ab3439345113176225b9a6d68a4e097315d231032443e36c1739229472a36f1",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/se-shadow.png",
+          "sha256": "53bad6efac07704d6a4351fe180ec083f43fc30408c71a8773f94ea3a4cfb20c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -105382,8 +105866,30 @@
       ],
       "intendedSource": "art/atlas/units/great-general/frames/move-sw.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/se-color.png",
+          "sha256": "bb817e088aa47210c7d5417ed42d770c521f1e12249b50c3af16d0f89821a829",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/se-nation.png",
+          "sha256": "6ab3439345113176225b9a6d68a4e097315d231032443e36c1739229472a36f1",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/se-shadow.png",
+          "sha256": "53bad6efac07704d6a4351fe180ec083f43fc30408c71a8773f94ea3a4cfb20c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -105403,8 +105909,30 @@
       ],
       "intendedSource": "art/atlas/units/great-general/frames/move-w.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/e-color.png",
+          "sha256": "6258b6c0796d6e1e9ed9eb1e43ab7b77db0811d5c12f3a16d83d4de982e3f037",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/e-nation.png",
+          "sha256": "b693b068e6638e7e73bd8e5d2d39bbeaaf70d47fd58d13e50b14d7e04e42ec55",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/e-shadow.png",
+          "sha256": "26ce4552e90d33561dba134d2b5f96e119cc0436c08553d00bbdfeafaf4daf10",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -105424,8 +105952,30 @@
       ],
       "intendedSource": "art/atlas/units/great-general/frames/work-e.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/e-color.png",
+          "sha256": "6258b6c0796d6e1e9ed9eb1e43ab7b77db0811d5c12f3a16d83d4de982e3f037",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/e-nation.png",
+          "sha256": "b693b068e6638e7e73bd8e5d2d39bbeaaf70d47fd58d13e50b14d7e04e42ec55",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/e-shadow.png",
+          "sha256": "26ce4552e90d33561dba134d2b5f96e119cc0436c08553d00bbdfeafaf4daf10",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -105445,8 +105995,30 @@
       ],
       "intendedSource": "art/atlas/units/great-general/frames/work-ne.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/ne-color.png",
+          "sha256": "872892d2e745291a3050be834775db696971b5efa4a9b7dfd7ad539ab84d92a1",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/ne-nation.png",
+          "sha256": "e30e68c9068b059174d66938a492f520421e0fa558032dc84b557626c7cf9b94",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/ne-shadow.png",
+          "sha256": "582222b27163debbbc08839c38ed0472426e926efe6d4c2c0698023c1534c858",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -105466,8 +106038,30 @@
       ],
       "intendedSource": "art/atlas/units/great-general/frames/work-nw.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/ne-color.png",
+          "sha256": "872892d2e745291a3050be834775db696971b5efa4a9b7dfd7ad539ab84d92a1",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/ne-nation.png",
+          "sha256": "e30e68c9068b059174d66938a492f520421e0fa558032dc84b557626c7cf9b94",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/ne-shadow.png",
+          "sha256": "582222b27163debbbc08839c38ed0472426e926efe6d4c2c0698023c1534c858",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -105487,8 +106081,30 @@
       ],
       "intendedSource": "art/atlas/units/great-general/frames/work-se.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/se-color.png",
+          "sha256": "bb817e088aa47210c7d5417ed42d770c521f1e12249b50c3af16d0f89821a829",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/se-nation.png",
+          "sha256": "6ab3439345113176225b9a6d68a4e097315d231032443e36c1739229472a36f1",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/se-shadow.png",
+          "sha256": "53bad6efac07704d6a4351fe180ec083f43fc30408c71a8773f94ea3a4cfb20c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -105508,8 +106124,30 @@
       ],
       "intendedSource": "art/atlas/units/great-general/frames/work-sw.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/se-color.png",
+          "sha256": "bb817e088aa47210c7d5417ed42d770c521f1e12249b50c3af16d0f89821a829",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/se-nation.png",
+          "sha256": "6ab3439345113176225b9a6d68a4e097315d231032443e36c1739229472a36f1",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/se-shadow.png",
+          "sha256": "53bad6efac07704d6a4351fe180ec083f43fc30408c71a8773f94ea3a4cfb20c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -105529,8 +106167,30 @@
       ],
       "intendedSource": "art/atlas/units/great-general/frames/work-w.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/e-color.png",
+          "sha256": "6258b6c0796d6e1e9ed9eb1e43ab7b77db0811d5c12f3a16d83d4de982e3f037",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/e-nation.png",
+          "sha256": "b693b068e6638e7e73bd8e5d2d39bbeaaf70d47fd58d13e50b14d7e04e42ec55",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-general/frames/e-shadow.png",
+          "sha256": "26ce4552e90d33561dba134d2b5f96e119cc0436c08553d00bbdfeafaf4daf10",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -105550,8 +106210,30 @@
       ],
       "intendedSource": "art/atlas/units/great-merchant/frames/defeat-e.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/e-color.png",
+          "sha256": "f137173dbd193e78bc27705ed201a90d6f5c3bd0f9fcfec6d18ade50529dd855",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/e-nation.png",
+          "sha256": "4361abe6d7e510f382be98059eaa0a34140ab8f113b0bf9b007c5219cee230af",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/e-shadow.png",
+          "sha256": "9af02083b5038973420ea7e059003ef8786d3e77d3a057ed43e7a5026315b4b7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -105571,8 +106253,30 @@
       ],
       "intendedSource": "art/atlas/units/great-merchant/frames/defeat-ne.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/ne-color.png",
+          "sha256": "af4a3b6e77f9e8ed23592df2d0699326a9617d317afd2b3d055e62d15e748409",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/ne-nation.png",
+          "sha256": "4f61648f4358abe7e4cf4a2df243608a644c619d8eacdb39b9819ea57c079de5",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/ne-shadow.png",
+          "sha256": "b3e2a776716b9ca3c1046e3653d3689d40eab699c1bda322fea1d2aa8de84e87",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -105592,8 +106296,30 @@
       ],
       "intendedSource": "art/atlas/units/great-merchant/frames/defeat-nw.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/ne-color.png",
+          "sha256": "af4a3b6e77f9e8ed23592df2d0699326a9617d317afd2b3d055e62d15e748409",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/ne-nation.png",
+          "sha256": "4f61648f4358abe7e4cf4a2df243608a644c619d8eacdb39b9819ea57c079de5",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/ne-shadow.png",
+          "sha256": "b3e2a776716b9ca3c1046e3653d3689d40eab699c1bda322fea1d2aa8de84e87",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -105613,8 +106339,30 @@
       ],
       "intendedSource": "art/atlas/units/great-merchant/frames/defeat-se.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/se-color.png",
+          "sha256": "687c0e97dc73d37523d2cefd401024b42952509a193d83203d18b0349b8a100b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/se-nation.png",
+          "sha256": "3015fa2f4fc4ff89ed55866647aa8aa54ce01ead53a0a06e063feb43a1125660",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/se-shadow.png",
+          "sha256": "273ac0f80a872affc5ac9f06980e08c6b68803ed36a87eb4032d5e386c80a330",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -105634,8 +106382,30 @@
       ],
       "intendedSource": "art/atlas/units/great-merchant/frames/defeat-sw.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/se-color.png",
+          "sha256": "687c0e97dc73d37523d2cefd401024b42952509a193d83203d18b0349b8a100b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/se-nation.png",
+          "sha256": "3015fa2f4fc4ff89ed55866647aa8aa54ce01ead53a0a06e063feb43a1125660",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/se-shadow.png",
+          "sha256": "273ac0f80a872affc5ac9f06980e08c6b68803ed36a87eb4032d5e386c80a330",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -105655,8 +106425,30 @@
       ],
       "intendedSource": "art/atlas/units/great-merchant/frames/defeat-w.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/e-color.png",
+          "sha256": "f137173dbd193e78bc27705ed201a90d6f5c3bd0f9fcfec6d18ade50529dd855",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/e-nation.png",
+          "sha256": "4361abe6d7e510f382be98059eaa0a34140ab8f113b0bf9b007c5219cee230af",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/e-shadow.png",
+          "sha256": "9af02083b5038973420ea7e059003ef8786d3e77d3a057ed43e7a5026315b4b7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -105676,8 +106468,30 @@
       ],
       "intendedSource": "art/atlas/units/great-merchant/frames/hit-e.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/e-color.png",
+          "sha256": "f137173dbd193e78bc27705ed201a90d6f5c3bd0f9fcfec6d18ade50529dd855",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/e-nation.png",
+          "sha256": "4361abe6d7e510f382be98059eaa0a34140ab8f113b0bf9b007c5219cee230af",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/e-shadow.png",
+          "sha256": "9af02083b5038973420ea7e059003ef8786d3e77d3a057ed43e7a5026315b4b7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -105697,8 +106511,30 @@
       ],
       "intendedSource": "art/atlas/units/great-merchant/frames/hit-ne.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/ne-color.png",
+          "sha256": "af4a3b6e77f9e8ed23592df2d0699326a9617d317afd2b3d055e62d15e748409",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/ne-nation.png",
+          "sha256": "4f61648f4358abe7e4cf4a2df243608a644c619d8eacdb39b9819ea57c079de5",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/ne-shadow.png",
+          "sha256": "b3e2a776716b9ca3c1046e3653d3689d40eab699c1bda322fea1d2aa8de84e87",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -105718,8 +106554,30 @@
       ],
       "intendedSource": "art/atlas/units/great-merchant/frames/hit-nw.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/ne-color.png",
+          "sha256": "af4a3b6e77f9e8ed23592df2d0699326a9617d317afd2b3d055e62d15e748409",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/ne-nation.png",
+          "sha256": "4f61648f4358abe7e4cf4a2df243608a644c619d8eacdb39b9819ea57c079de5",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/ne-shadow.png",
+          "sha256": "b3e2a776716b9ca3c1046e3653d3689d40eab699c1bda322fea1d2aa8de84e87",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -105739,8 +106597,30 @@
       ],
       "intendedSource": "art/atlas/units/great-merchant/frames/hit-se.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/se-color.png",
+          "sha256": "687c0e97dc73d37523d2cefd401024b42952509a193d83203d18b0349b8a100b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/se-nation.png",
+          "sha256": "3015fa2f4fc4ff89ed55866647aa8aa54ce01ead53a0a06e063feb43a1125660",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/se-shadow.png",
+          "sha256": "273ac0f80a872affc5ac9f06980e08c6b68803ed36a87eb4032d5e386c80a330",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -105760,8 +106640,30 @@
       ],
       "intendedSource": "art/atlas/units/great-merchant/frames/hit-sw.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/se-color.png",
+          "sha256": "687c0e97dc73d37523d2cefd401024b42952509a193d83203d18b0349b8a100b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/se-nation.png",
+          "sha256": "3015fa2f4fc4ff89ed55866647aa8aa54ce01ead53a0a06e063feb43a1125660",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/se-shadow.png",
+          "sha256": "273ac0f80a872affc5ac9f06980e08c6b68803ed36a87eb4032d5e386c80a330",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -105781,8 +106683,30 @@
       ],
       "intendedSource": "art/atlas/units/great-merchant/frames/hit-w.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/e-color.png",
+          "sha256": "f137173dbd193e78bc27705ed201a90d6f5c3bd0f9fcfec6d18ade50529dd855",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/e-nation.png",
+          "sha256": "4361abe6d7e510f382be98059eaa0a34140ab8f113b0bf9b007c5219cee230af",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/e-shadow.png",
+          "sha256": "9af02083b5038973420ea7e059003ef8786d3e77d3a057ed43e7a5026315b4b7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -105802,8 +106726,30 @@
       ],
       "intendedSource": "art/atlas/units/great-merchant/frames/idle-e.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/e-color.png",
+          "sha256": "f137173dbd193e78bc27705ed201a90d6f5c3bd0f9fcfec6d18ade50529dd855",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/e-nation.png",
+          "sha256": "4361abe6d7e510f382be98059eaa0a34140ab8f113b0bf9b007c5219cee230af",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/e-shadow.png",
+          "sha256": "9af02083b5038973420ea7e059003ef8786d3e77d3a057ed43e7a5026315b4b7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -105823,8 +106769,30 @@
       ],
       "intendedSource": "art/atlas/units/great-merchant/frames/idle-ne.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/ne-color.png",
+          "sha256": "af4a3b6e77f9e8ed23592df2d0699326a9617d317afd2b3d055e62d15e748409",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/ne-nation.png",
+          "sha256": "4f61648f4358abe7e4cf4a2df243608a644c619d8eacdb39b9819ea57c079de5",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/ne-shadow.png",
+          "sha256": "b3e2a776716b9ca3c1046e3653d3689d40eab699c1bda322fea1d2aa8de84e87",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -105844,8 +106812,30 @@
       ],
       "intendedSource": "art/atlas/units/great-merchant/frames/idle-nw.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/ne-color.png",
+          "sha256": "af4a3b6e77f9e8ed23592df2d0699326a9617d317afd2b3d055e62d15e748409",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/ne-nation.png",
+          "sha256": "4f61648f4358abe7e4cf4a2df243608a644c619d8eacdb39b9819ea57c079de5",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/ne-shadow.png",
+          "sha256": "b3e2a776716b9ca3c1046e3653d3689d40eab699c1bda322fea1d2aa8de84e87",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -105865,8 +106855,30 @@
       ],
       "intendedSource": "art/atlas/units/great-merchant/frames/idle-se.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/se-color.png",
+          "sha256": "687c0e97dc73d37523d2cefd401024b42952509a193d83203d18b0349b8a100b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/se-nation.png",
+          "sha256": "3015fa2f4fc4ff89ed55866647aa8aa54ce01ead53a0a06e063feb43a1125660",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/se-shadow.png",
+          "sha256": "273ac0f80a872affc5ac9f06980e08c6b68803ed36a87eb4032d5e386c80a330",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -105886,8 +106898,30 @@
       ],
       "intendedSource": "art/atlas/units/great-merchant/frames/idle-sw.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/se-color.png",
+          "sha256": "687c0e97dc73d37523d2cefd401024b42952509a193d83203d18b0349b8a100b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/se-nation.png",
+          "sha256": "3015fa2f4fc4ff89ed55866647aa8aa54ce01ead53a0a06e063feb43a1125660",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/se-shadow.png",
+          "sha256": "273ac0f80a872affc5ac9f06980e08c6b68803ed36a87eb4032d5e386c80a330",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -105907,8 +106941,30 @@
       ],
       "intendedSource": "art/atlas/units/great-merchant/frames/idle-w.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/e-color.png",
+          "sha256": "f137173dbd193e78bc27705ed201a90d6f5c3bd0f9fcfec6d18ade50529dd855",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/e-nation.png",
+          "sha256": "4361abe6d7e510f382be98059eaa0a34140ab8f113b0bf9b007c5219cee230af",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/e-shadow.png",
+          "sha256": "9af02083b5038973420ea7e059003ef8786d3e77d3a057ed43e7a5026315b4b7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -105928,8 +106984,30 @@
       ],
       "intendedSource": "art/atlas/units/great-merchant/frames/move-e.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/e-color.png",
+          "sha256": "f137173dbd193e78bc27705ed201a90d6f5c3bd0f9fcfec6d18ade50529dd855",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/e-nation.png",
+          "sha256": "4361abe6d7e510f382be98059eaa0a34140ab8f113b0bf9b007c5219cee230af",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/e-shadow.png",
+          "sha256": "9af02083b5038973420ea7e059003ef8786d3e77d3a057ed43e7a5026315b4b7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -105949,8 +107027,30 @@
       ],
       "intendedSource": "art/atlas/units/great-merchant/frames/move-ne.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/ne-color.png",
+          "sha256": "af4a3b6e77f9e8ed23592df2d0699326a9617d317afd2b3d055e62d15e748409",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/ne-nation.png",
+          "sha256": "4f61648f4358abe7e4cf4a2df243608a644c619d8eacdb39b9819ea57c079de5",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/ne-shadow.png",
+          "sha256": "b3e2a776716b9ca3c1046e3653d3689d40eab699c1bda322fea1d2aa8de84e87",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -105970,8 +107070,30 @@
       ],
       "intendedSource": "art/atlas/units/great-merchant/frames/move-nw.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/ne-color.png",
+          "sha256": "af4a3b6e77f9e8ed23592df2d0699326a9617d317afd2b3d055e62d15e748409",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/ne-nation.png",
+          "sha256": "4f61648f4358abe7e4cf4a2df243608a644c619d8eacdb39b9819ea57c079de5",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/ne-shadow.png",
+          "sha256": "b3e2a776716b9ca3c1046e3653d3689d40eab699c1bda322fea1d2aa8de84e87",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -105991,8 +107113,30 @@
       ],
       "intendedSource": "art/atlas/units/great-merchant/frames/move-se.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/se-color.png",
+          "sha256": "687c0e97dc73d37523d2cefd401024b42952509a193d83203d18b0349b8a100b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/se-nation.png",
+          "sha256": "3015fa2f4fc4ff89ed55866647aa8aa54ce01ead53a0a06e063feb43a1125660",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/se-shadow.png",
+          "sha256": "273ac0f80a872affc5ac9f06980e08c6b68803ed36a87eb4032d5e386c80a330",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -106012,8 +107156,30 @@
       ],
       "intendedSource": "art/atlas/units/great-merchant/frames/move-sw.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/se-color.png",
+          "sha256": "687c0e97dc73d37523d2cefd401024b42952509a193d83203d18b0349b8a100b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/se-nation.png",
+          "sha256": "3015fa2f4fc4ff89ed55866647aa8aa54ce01ead53a0a06e063feb43a1125660",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/se-shadow.png",
+          "sha256": "273ac0f80a872affc5ac9f06980e08c6b68803ed36a87eb4032d5e386c80a330",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -106033,8 +107199,30 @@
       ],
       "intendedSource": "art/atlas/units/great-merchant/frames/move-w.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/e-color.png",
+          "sha256": "f137173dbd193e78bc27705ed201a90d6f5c3bd0f9fcfec6d18ade50529dd855",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/e-nation.png",
+          "sha256": "4361abe6d7e510f382be98059eaa0a34140ab8f113b0bf9b007c5219cee230af",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/e-shadow.png",
+          "sha256": "9af02083b5038973420ea7e059003ef8786d3e77d3a057ed43e7a5026315b4b7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -106054,8 +107242,30 @@
       ],
       "intendedSource": "art/atlas/units/great-merchant/frames/work-e.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/e-color.png",
+          "sha256": "f137173dbd193e78bc27705ed201a90d6f5c3bd0f9fcfec6d18ade50529dd855",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/e-nation.png",
+          "sha256": "4361abe6d7e510f382be98059eaa0a34140ab8f113b0bf9b007c5219cee230af",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/e-shadow.png",
+          "sha256": "9af02083b5038973420ea7e059003ef8786d3e77d3a057ed43e7a5026315b4b7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -106075,8 +107285,30 @@
       ],
       "intendedSource": "art/atlas/units/great-merchant/frames/work-ne.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/ne-color.png",
+          "sha256": "af4a3b6e77f9e8ed23592df2d0699326a9617d317afd2b3d055e62d15e748409",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/ne-nation.png",
+          "sha256": "4f61648f4358abe7e4cf4a2df243608a644c619d8eacdb39b9819ea57c079de5",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/ne-shadow.png",
+          "sha256": "b3e2a776716b9ca3c1046e3653d3689d40eab699c1bda322fea1d2aa8de84e87",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -106096,8 +107328,30 @@
       ],
       "intendedSource": "art/atlas/units/great-merchant/frames/work-nw.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/ne-color.png",
+          "sha256": "af4a3b6e77f9e8ed23592df2d0699326a9617d317afd2b3d055e62d15e748409",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/ne-nation.png",
+          "sha256": "4f61648f4358abe7e4cf4a2df243608a644c619d8eacdb39b9819ea57c079de5",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/ne-shadow.png",
+          "sha256": "b3e2a776716b9ca3c1046e3653d3689d40eab699c1bda322fea1d2aa8de84e87",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -106117,8 +107371,30 @@
       ],
       "intendedSource": "art/atlas/units/great-merchant/frames/work-se.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/se-color.png",
+          "sha256": "687c0e97dc73d37523d2cefd401024b42952509a193d83203d18b0349b8a100b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/se-nation.png",
+          "sha256": "3015fa2f4fc4ff89ed55866647aa8aa54ce01ead53a0a06e063feb43a1125660",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/se-shadow.png",
+          "sha256": "273ac0f80a872affc5ac9f06980e08c6b68803ed36a87eb4032d5e386c80a330",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -106138,8 +107414,30 @@
       ],
       "intendedSource": "art/atlas/units/great-merchant/frames/work-sw.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/se-color.png",
+          "sha256": "687c0e97dc73d37523d2cefd401024b42952509a193d83203d18b0349b8a100b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/se-nation.png",
+          "sha256": "3015fa2f4fc4ff89ed55866647aa8aa54ce01ead53a0a06e063feb43a1125660",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/se-shadow.png",
+          "sha256": "273ac0f80a872affc5ac9f06980e08c6b68803ed36a87eb4032d5e386c80a330",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -106159,8 +107457,30 @@
       ],
       "intendedSource": "art/atlas/units/great-merchant/frames/work-w.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/e-color.png",
+          "sha256": "f137173dbd193e78bc27705ed201a90d6f5c3bd0f9fcfec6d18ade50529dd855",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/e-nation.png",
+          "sha256": "4361abe6d7e510f382be98059eaa0a34140ab8f113b0bf9b007c5219cee230af",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-merchant/frames/e-shadow.png",
+          "sha256": "9af02083b5038973420ea7e059003ef8786d3e77d3a057ed43e7a5026315b4b7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -161880,8 +163200,23 @@
       ],
       "intendedSource": "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Great General.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Great General.png",
+          "sha256": "b790ea563ef06ccb119909ebb0f851e67f44c13fbd56a030f9c5d067139965c9",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Great General-1.png",
+          "sha256": "423f6efa43069f8462526b88faca306d0cdeff2cf76b363c9904185eeac901f7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null
@@ -161897,8 +163232,23 @@
       ],
       "intendedSource": "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Great Merchant.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Great Merchant.png",
+          "sha256": "424717f025928828e49fae2356badb187e83cb89487758f29ffb1f4dc9dad77a",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Great Merchant-1.png",
+          "sha256": "1a36508b53db5e484d4818a377aa47800567b418dfb003e08e70ad7c40e06153",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null

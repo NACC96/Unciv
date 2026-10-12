@@ -2,6 +2,111 @@
   "schemaVersion": 1,
   "entries": [
     {
+      "assetId": "great-general",
+      "creator": "OpenAI image generation",
+      "source": "art/atlas/units/great-general/creation-record.json",
+      "promptPath": "art/atlas/units/great-general/prompts/e-v1.txt",
+      "rights": "original-generated",
+      "sourceHash": "f6354f9a45849034ba75253134153711f89781ae6f0ac88aaa7635a58f013593",
+      "outputHashes": {
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Great General-1.png": "423f6efa43069f8462526b88faca306d0cdeff2cf76b363c9904185eeac901f7",
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Great General.png": "b790ea563ef06ccb119909ebb0f851e67f44c13fbd56a030f9c5d067139965c9",
+        "art/atlas/units/great-general/frames/e-color.png": "6258b6c0796d6e1e9ed9eb1e43ab7b77db0811d5c12f3a16d83d4de982e3f037",
+        "art/atlas/units/great-general/frames/e-nation.png": "b693b068e6638e7e73bd8e5d2d39bbeaaf70d47fd58d13e50b14d7e04e42ec55",
+        "art/atlas/units/great-general/frames/e-shadow.png": "26ce4552e90d33561dba134d2b5f96e119cc0436c08553d00bbdfeafaf4daf10",
+        "art/atlas/units/great-general/frames/ne-color.png": "872892d2e745291a3050be834775db696971b5efa4a9b7dfd7ad539ab84d92a1",
+        "art/atlas/units/great-general/frames/ne-nation.png": "e30e68c9068b059174d66938a492f520421e0fa558032dc84b557626c7cf9b94",
+        "art/atlas/units/great-general/frames/ne-shadow.png": "582222b27163debbbc08839c38ed0472426e926efe6d4c2c0698023c1534c858",
+        "art/atlas/units/great-general/frames/se-color.png": "bb817e088aa47210c7d5417ed42d770c521f1e12249b50c3af16d0f89821a829",
+        "art/atlas/units/great-general/frames/se-nation.png": "6ab3439345113176225b9a6d68a4e097315d231032443e36c1739229472a36f1",
+        "art/atlas/units/great-general/frames/se-shadow.png": "53bad6efac07704d6a4351fe180ec083f43fc30408c71a8773f94ea3a4cfb20c"
+      }
+    },
+    {
+      "assetId": "great-merchant",
+      "creator": "OpenAI image generation",
+      "source": "art/atlas/units/great-merchant/creation-record.json",
+      "promptPath": "art/atlas/units/great-merchant/prompts/e-v1.txt",
+      "rights": "original-generated",
+      "sourceHash": "e1a448a10a09c1412ff02568da003e09c30db9ea627eb97c6b4755582d7ff76c",
+      "outputHashes": {
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Great Merchant-1.png": "1a36508b53db5e484d4818a377aa47800567b418dfb003e08e70ad7c40e06153",
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Great Merchant.png": "424717f025928828e49fae2356badb187e83cb89487758f29ffb1f4dc9dad77a",
+        "art/atlas/units/great-merchant/frames/e-color.png": "f137173dbd193e78bc27705ed201a90d6f5c3bd0f9fcfec6d18ade50529dd855",
+        "art/atlas/units/great-merchant/frames/e-nation.png": "4361abe6d7e510f382be98059eaa0a34140ab8f113b0bf9b007c5219cee230af",
+        "art/atlas/units/great-merchant/frames/e-shadow.png": "9af02083b5038973420ea7e059003ef8786d3e77d3a057ed43e7a5026315b4b7",
+        "art/atlas/units/great-merchant/frames/ne-color.png": "af4a3b6e77f9e8ed23592df2d0699326a9617d317afd2b3d055e62d15e748409",
+        "art/atlas/units/great-merchant/frames/ne-nation.png": "4f61648f4358abe7e4cf4a2df243608a644c619d8eacdb39b9819ea57c079de5",
+        "art/atlas/units/great-merchant/frames/ne-shadow.png": "b3e2a776716b9ca3c1046e3653d3689d40eab699c1bda322fea1d2aa8de84e87",
+        "art/atlas/units/great-merchant/frames/se-color.png": "687c0e97dc73d37523d2cefd401024b42952509a193d83203d18b0349b8a100b",
+        "art/atlas/units/great-merchant/frames/se-nation.png": "3015fa2f4fc4ff89ed55866647aa8aa54ce01ead53a0a06e063feb43a1125660",
+        "art/atlas/units/great-merchant/frames/se-shadow.png": "273ac0f80a872affc5ac9f06980e08c6b68803ed36a87eb4032d5e386c80a330"
+      }
+    },
+    {
+      "assetId": "horseman",
+      "creator": "OpenAI image generation",
+      "source": "art/atlas/units/horseman/creation-record.json",
+      "promptPath": "art/atlas/units/horseman/prompts/e-v1.txt",
+      "rights": "original-generated",
+      "sourceHash": "9823cda131984d0d38f6be73e809e9e4019f44ed280e551af59a82bee42301c7",
+      "outputHashes": {
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Horseman-1.png": "176f512c6bd61fe6d00a4c02cbfc6804984888ea4a0d915782ba53531ac01011",
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Horseman.png": "569762d0a82b0f96784cb9de75bb741ad0ed035bb70dc56f76d698ac76b36726",
+        "art/atlas/units/horseman/frames/e-color.png": "e175d43b1c4246e35cea934f4adabe2ea09a14cac6647b3f1024b1504c2361c8",
+        "art/atlas/units/horseman/frames/e-nation.png": "6304e671c47820f8e8d7b8929228611317c7b8428b8399857bcf451258d420f2",
+        "art/atlas/units/horseman/frames/e-shadow.png": "12108703a35d07dcc47d7c4d35990305d729e3a9af68be574883698937b47faa",
+        "art/atlas/units/horseman/frames/ne-color.png": "ca76498a32c2093f12719015b6d7f17207604527800b49108c5c0f018813c6bf",
+        "art/atlas/units/horseman/frames/ne-nation.png": "3da9b93001020259a33a9fe5b413db38a03fa520334a52ad63898a133e0471b3",
+        "art/atlas/units/horseman/frames/ne-shadow.png": "5466a26b85d5b1ff61e13ff5a54fe780136c6a1be31dade5461f3cb126a90aef",
+        "art/atlas/units/horseman/frames/se-color.png": "81798dc716cb45b21d091f393c8825883f52553f019daa31ce84dc1128ac4c11",
+        "art/atlas/units/horseman/frames/se-nation.png": "1b8f832a7bdbe2848b4a5c27f76ecfe3acea6217069794e7babed5c0dbb9716d",
+        "art/atlas/units/horseman/frames/se-shadow.png": "1ec174fb8ef04d734c71bd28f3a2a8c98e37ab071921f62d5bcdb2f99e13a1b3"
+      }
+    },
+    {
+      "assetId": "rifleman",
+      "creator": "OpenAI image generation",
+      "source": "art/atlas/units/rifleman/creation-record.json",
+      "promptPath": "art/atlas/units/rifleman/prompts/e-v1.txt",
+      "rights": "original-generated",
+      "sourceHash": "98062d911dbecc9e37f0567ddb7c5191cd4667b18517761994bcb51e2ba6e51a",
+      "outputHashes": {
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Rifleman-1.png": "61bba667a4368da17d55dd260b7545e96b8c19a37a823a489af8e1d16e608793",
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Rifleman.png": "d355f229a2d28ce5f4df44909b2c0faa91ec02b00841de4c1fc0ace784d75d49",
+        "art/atlas/units/rifleman/frames/e-color.png": "0aac76b5e8b835da1509a5ca85644a5d14a18c09cb7140dceef080a52f06f3b1",
+        "art/atlas/units/rifleman/frames/e-nation.png": "4ebc795add3c61460c2faa210f0d98fee17de9554920c31ba9db11cc384251be",
+        "art/atlas/units/rifleman/frames/e-shadow.png": "15316b56fbb5a7a71613315946e5b438e9b6dd9e829752a0024d9ba7f13fbc87",
+        "art/atlas/units/rifleman/frames/ne-color.png": "b07164091e1da82c6ffeb78ff0acafa7926289932da73ac02e0fd6daf032a3ab",
+        "art/atlas/units/rifleman/frames/ne-nation.png": "a550015780385bb58330d257719d57955c20db599cb64b791f7e289b017fceee",
+        "art/atlas/units/rifleman/frames/ne-shadow.png": "b6bd83fb527ac61832d92022336db58e6a136f64f46539197a09ee57ba195b82",
+        "art/atlas/units/rifleman/frames/se-color.png": "116ef0e27a51462056a602be68176c77e1d2463774075f84213fdc1fa9acc5ec",
+        "art/atlas/units/rifleman/frames/se-nation.png": "c23625e2a443980508ee75208e596ba957917bec6562e00f1d7a04871ee23dd9",
+        "art/atlas/units/rifleman/frames/se-shadow.png": "4bf88ac2904f4254ffb0ca86b35bc4d00015a91d1ccecea1115a4b70b46f5b6d"
+      }
+    },
+    {
+      "assetId": "tank",
+      "creator": "OpenAI image generation",
+      "source": "art/atlas/units/tank/creation-record.json",
+      "promptPath": "art/atlas/units/tank/prompts/e-v1.txt",
+      "rights": "original-generated",
+      "sourceHash": "dbf309fe51e82d259df7be12e79267ba58cb82aa54cc093bfb2c3726c9f6b1c2",
+      "outputHashes": {
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Tank-1.png": "ccf654c30a4b353d0b5ed1f0ae5d4b606d2f75c38249cf1c5b9fca44e6d835c5",
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Tank.png": "85e394552f970edb5470ffa85a63ea8ae0552886c6aaf36d3909b679ad8bc43d",
+        "art/atlas/units/tank/frames/e-color.png": "4a78959fa778ae4c6bae110c88c5c4dd8593933b3d4a06ee7e0ea8de852a8048",
+        "art/atlas/units/tank/frames/e-nation.png": "255d5e095d261b5b3e0286b841be6c95566103b08849a1517e97f53200782fc1",
+        "art/atlas/units/tank/frames/e-shadow.png": "8c3249ab8dc5e4fab00eaa463159bf736a7af135ae4a89658692de3288ed8bf5",
+        "art/atlas/units/tank/frames/ne-color.png": "7505a9419e64416a860d96679ce4fa537fd5c84a84e6faea92131067c0ef0f11",
+        "art/atlas/units/tank/frames/ne-nation.png": "fc8de4eb8d9fb03c4fa880868d53ab616f2e3e87083eebb66daf03a8d2025d13",
+        "art/atlas/units/tank/frames/ne-shadow.png": "ab3f4a22c0873628a5c9b663fcb708d1e59b13cff44bd1477e4697c140b3fef9",
+        "art/atlas/units/tank/frames/se-color.png": "de788dfb4a790218974c80cc4d004a67e7cd32081892786c355cffe22326f732",
+        "art/atlas/units/tank/frames/se-nation.png": "7d4a3dd8b27c743a7607af9d94fa28d3e6f8d1481a6488ae3e39fb633f6cdca1",
+        "art/atlas/units/tank/frames/se-shadow.png": "6fd57c69681be93ecc7aa5741e3bd09aab3e893009561c6d754916826b025ef1"
+      }
+    },
+    {
       "assetId": "terrain-batch-bases",
       "creator": "OpenAI built-in image_gen",
       "source": "art/atlas/terrain/bases-source.json",
@@ -18,6 +123,65 @@
         "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Plains.png": "8f2bd505df37497845714f029ed71443f22fa64d303ccc1d6a7526ff7934a955",
         "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Snow.png": "b0e7feef705e7129c7f926ec60e60bc123d91c46e51bc788761095c9574ab472",
         "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Tundra.png": "ddddd18acaaa2892bb875a83427dc385b13bd0b44546986e4770886e5a5a8f29"
+      }
+    },
+    {
+      "assetId": "terrain-batch-borders",
+      "creator": "OpenAI built-in image_gen",
+      "source": "art/atlas/terrain/borders-source.json",
+      "promptPath": "art/atlas/terrain/borders-prompt.txt",
+      "rights": "original-generated",
+      "sourceHash": "5e2ed321b009407cab71846cb0db0ad947ba8efb36d5e0c7330970608693b47d",
+      "outputHashes": {
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Borders/ConcaveInner.png": "9e2f6b4f77bad6d0ab012ed0a7037ca0808f498aaad8ee44e273189efc1157d9",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Borders/ConcaveOuter.png": "b7f33e76978a59da4137ce14f9afc6444af130f42494b3523971a53f58e104d0",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Borders/ConvexInner.png": "62f1678b7bc595a22b1c58e4e0dfd5f310d1989337eff907a5a581f6c479761f",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Borders/ConvexOuter.png": "241ad2dd58326a4871113a810f7220ddaa564ab9893a417c0b79993dd1c566d2",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Borders/ConcaveConvexInner.png": "1a4a52cfd448e5e7b6a648f293e8ee27063255d056f1a5277d6b40be2d94bf6f",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Borders/ConcaveConvexOuter.png": "ce7caf76bcf0de2310e9c4cf0a9a44dfc6a7dd5cbe0419e70bc3fb8225b40c46",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Borders/ConvexConcaveInner.png": "5bdb977abcf8394824013fb143437f1f81f3a8e56c2053b472149055648a151a",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Borders/ConvexConcaveOuter.png": "8f4b672f9c7bdd0f53d701790b5bf6d400786327b82e3eb1ecc76a261e8ed955"
+      }
+    },
+    {
+      "assetId": "terrain-batch-damaged-cities",
+      "creator": "OpenAI built-in image_gen",
+      "source": "art/atlas/terrain/damaged-cities-source.json",
+      "promptPath": "art/atlas/terrain/damaged-cities-prompt.txt",
+      "rights": "original-generated",
+      "sourceHash": "40788d0fba5b782956086de06d00f416c23fa7e4fd74379dfbed913ddad588df",
+      "outputHashes": {
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/City center-Damaged-Ancient era.png": "a3d8788dfc6bba781895f126a1184b7a163e18479084931c089834bcd6976495",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/City center-Damaged-Classical era.png": "314b1cec845d9fd1fef81a5c69b965694c6dab159053fe7896b3fa73deaa36a3",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/City center-Damaged-Medieval era.png": "cea097e270915b4f471fe145c8f2e66cddc48af6a355b21e988582ef53c97095",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/City center-Damaged-Renaissance era.png": "66bd91a766cc23195d897dcee81cf4adb27e288b393d315033482fceeaeaa342",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/City center-Damaged-Industrial era.png": "f7cab24a566074292075c03c79a22c02cb0c8089102ea6b357fcd12402e78efa",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/City center-Damaged-Modern era.png": "ae9aba0b6634dea036f3f9da85dd4214d5c133eb3a88642d1affbd50a692ed5b",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/City center-Damaged-Atomic era.png": "0c16a3464a4ff663de93c658809808f74d442610db34a681f4ab3096845f6ccf",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/City center-Damaged-Information era.png": "fe8c58ea50b7356198262ce859434c0b58fba652c9f9675bbad5fef483341769",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/City center-Damaged-Future era.png": "df70e8996c785d7fbf238521900b245f372b5a4e95c5aee6c232bb895dc8b76a",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Terrace farm-Pillaged.png": "fd163be995c9660fdd2055b80291a9daf0e09fd790ff7384be4466bb687572a2",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Trading post-Pillaged.png": "20982a2175b9f64244d6bd2ad80ebab78fb0ead7088d6a8e681e4b8b8a60073e",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/City center-Damaged.png": "8c97f5e8c5d5d744fb3f1022eb64d5ea209b4e57903bc57e31d764eeaf9bf403"
+      }
+    },
+    {
+      "assetId": "terrain-batch-era-cities",
+      "creator": "OpenAI built-in image_gen",
+      "source": "art/atlas/terrain/era-cities-source.json",
+      "promptPath": "art/atlas/terrain/era-cities-prompt.txt",
+      "rights": "original-generated",
+      "sourceHash": "f6478ca891033b8faf0c46669b3f29e21e5902c1140ba07f71c78d1c82bd5df4",
+      "outputHashes": {
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/City center-Ancient era.png": "d93d430a57a6127f4c60f5896405d2de812f9500ccf06f2b0276d0a787bc72c5",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/City center-Classical era.png": "a9ff7f30b273078ebf4899d97d5df4ea7cbf45320be211d91f5033b0a02fc104",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/City center-Medieval era.png": "729f9e98bac6eadc4bda1950ce0471645483865e9650a4a8bdf48494a88ab940",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/City center-Renaissance era.png": "1ac17701699248f7bc59e293ea1f8400f88dfca66895b9d99a312360cd39f9f0",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/City center-Industrial era.png": "26736a7c10303ddfd7a381bb5440819dd78327d0959206c894a3f25b57a961c3",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/City center-Modern era.png": "29173fa30e96f2030a60ff5c4510cac7f1faf6114b3879fa616fc4445b37a024",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/City center-Atomic era.png": "65521b747073bb0e6783507b56a9f83fda069469ee416c8e417fccaac6879575",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/City center-Information era.png": "b0c68e7d096404808f9e06a0e5b402005c72639d62031a7d3eae4411263b5d37",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/City center-Future era.png": "da7896dff3062f68e1d371b63b74077c2eda42304c42f44f09f187bc7d4b1682"
       }
     },
     {
@@ -40,103 +204,6 @@
         "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/River.png": "d4485541090b3ef8cea2236ae3d343acc5760f76f09ec58e4ba1397645b56bdb",
         "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Hexagon.png": "39c1af45767dd5bf8a0d1813c936e060f59ec8aedc1c11ad245b9c620c2a5a20",
         "android/Images.AtlasTerrain/TileSets/AtlasTerrain/UnexploredTile.png": "5212894aaef81fd2253337c806bab5cc014581d0f011fcf9aec02f5b90f09811"
-      }
-    },
-    {
-      "assetId": "terrain-batch-wonders",
-      "creator": "OpenAI built-in image_gen",
-      "source": "art/atlas/terrain/wonders-source.json",
-      "promptPath": "art/atlas/terrain/wonders-prompt.txt",
-      "rights": "original-generated",
-      "sourceHash": "586351be099ecdb8a7311eec8a21c166db20aec30edadae07cfd40fc7f92ad9a",
-      "outputHashes": {
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Barringer Crater.png": "9de65b968a72404f3e94b60d17be97f09f79352c5c99ec5559b28dc7ddfeb0d7",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Cerro de Potosi.png": "2e916263a6093ad64a498ceb43dea3bb1a31056b233be2b99ed6643c6e36905f",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/El Dorado.png": "49458f2fe8731930750c50e79171cf8eb541565a517efab2cff5e59187463ccb",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Fountain of Youth.png": "64e00b9b6d66cdc215942bddc0e88f3ab499db40f9a4e2aaf6be750d77de02dd",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Grand Mesa.png": "0696e803208bdd798452c936386f8ceb9019034b421cc1e2d8f7f0c3231c3a1f",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Great Barrier Reef.png": "3f8a40753b17a852cb5653a7fc42a936e3c7fe3044e429cbcb1a33a3a92f0589",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Krakatoa.png": "0696b56a672ff3ea6978801d9e1b9212cb219d8b4639f886219616e30b43164b",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Mount Fuji.png": "f04535209641f421da4098fd89b0fa8819fd848c9d7b78851479de6c3bd690b9",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Mount Kailash.png": "8d42ae7fe7badffe6bce15b45c06a757b621de137a7e87484429f466e6c117a4",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Mount Sinai.png": "327edae3524a45da5799b7938164c997b8af94ba72ea6ea5b87d74324ec31590",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Old Faithful.png": "1e467a8e289499118a37dee0e50daa0567b7ba0163b687dd75fec3727d79ede4",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Rock of Gibraltar.png": "5f181587423a82edb45f8a3a7ed9c568f5f8b405901f646a38b50e9b9331c981",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Sri Pada.png": "4233fa54422cedd3aa43325da3d506db5cdc896b46c8646e5f809afe3773f4d2",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Uluru.png": "f1887c02fa99de702056aaec6b2e2a771033d6ade972655c28f806341116bb2e",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/NaturalWonder.png": "79b316cc7622f02e325febed705775ce21ab6bff0f0bfb182badd910c37dc276",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/City damage.png": "033b2d95a975a7f04f80cc8b71d496bf418fff5b94246638eb19cd9647a2a8a9"
-      }
-    },
-    {
-      "assetId": "terrain-batch-resources-1",
-      "creator": "OpenAI built-in image_gen",
-      "source": "art/atlas/terrain/resources-1-source.json",
-      "promptPath": "art/atlas/terrain/resources-1-prompt.txt",
-      "rights": "original-generated",
-      "sourceHash": "05d133d13111219b2040acbaf11c0d538f8d6af77fc9b583c129aba3cc113ef3",
-      "outputHashes": {
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Aluminum.png": "a38b10c9e0aee9f7cb0e417c779ef6d022b3913bf1e65c80a1f9ae4439d52b95",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Bananas.png": "9f6ffaee53d4c294bc643122cd9921ae3811dfdbe1e5cd933301aec153ffe106",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Cattle.png": "b2e20f9721ffb544d98d460267d100de889f48e905ba4390fe1a09b8ba9c38ee",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Citrus.png": "38820c0d724a62c603b931a31dc92c651e7fa3000884fac5a1ed31a9d5a8c0a0",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Coal.png": "ed185f5401d3a2326805eace63a1d79ad49823863461bc5b3eaf4389b81c28a8",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Copper.png": "9554c2db065370eb91c0c1ce86cadb3cb7e57744e489cb51cb7d793239024a2c",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Cotton.png": "295292f934d84790ddcc040ddd2c9a6a421e0a67d43284d66e95ba3b26b068f7",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Crab.png": "79b46b03fcfe698e2a2ee2e0cb465d39d0347169036117f25c239f267c2aaf92",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Deer.png": "f184448f045d1ec4133cb05172cf602223a8c10e5b31417fe9ae766609f41178",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Dyes.png": "d740ec6746e6d8960c60f850dc7db0d961776f210a004c828982a2bee3c85570",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Fish.png": "b9fd1d1f05201297bfc2fba35c18255ee99544117b64c2a7baca5962e71f2d3d",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Furs.png": "070694f84a0d49970132695146ca659add596a808705dce9700b62c04e41a039",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Gems.png": "7621669cc4d21fd1e81a129e1bb28ef1f2ab8c02dd9b185ffdf4e9117d015340",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Gold Ore.png": "53787f92592713fee26c4f3bd3c75535cdad2648e37c65084fb409fc8586d354",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Horses.png": "e91d77e09244f409b4b693af0fcb85e896c399f87c06f9db495e982a2d3c2e56",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Incense.png": "8fec74b43e7603527d1d79aa03bd790dfb28fc7f0d05b9e74ee131f6dfb8f5d3"
-      }
-    },
-    {
-      "assetId": "terrain-batch-resources-2",
-      "creator": "OpenAI built-in image_gen",
-      "source": "art/atlas/terrain/resources-2-source.json",
-      "promptPath": "art/atlas/terrain/resources-2-prompt.txt",
-      "rights": "original-generated",
-      "sourceHash": "42518fe622250f236f6663d3879511d134f89940a020e57d3db14b56151677d4",
-      "outputHashes": {
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Iron.png": "5fa10e18568bd9e04eb09d6739fa6a58674a833be8b06cb66c4aa37a900c0fbb",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Ivory.png": "416b77eaff59d2f2447913aaca6e58c0783adf2db6741a031a1eb2efca8b64b5",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Jewelry.png": "a228ed53951f50101779931897f3a263ae67a013fc9ae9113b175af2435d7cbc",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Marble.png": "67ded84b214a6e0251bab5652e0989cffdfadb21ecb0e2d8b65ddf511186a437",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Oil.png": "fe25b311f194593483c2cf4dc506ed969ad2f305d9da3cb9c727d6182a86ec5d",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Pearls.png": "b920cef263eba9788ee9ed520b4c2bfe53688c6356d0eeb4762ee73b39a971e4",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Porcelain.png": "79555ad5b1db93ca6b4129ad521f5eecee3d9d91ea78aa41ba23d519d2ff26b8",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Salt.png": "25a33870e3aac5dc7028d318004a6836ad5b5d6ec5069e149f8c543f43c20c9d",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Sheep.png": "4497ab87d2b51bb17de44ef3e1427d96dcbf16d3d2a47be3b63e64070e923d57",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Silk.png": "c56b55553090131df8ec43c59202d4903aae465b2cc6e5fda6a4b4e9c5305bdc",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Silver.png": "8b91556c944852c16167f25d0cd10f71969b54704df5d5e90a90df1d4e86f0d1",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Spices.png": "58cf26f2306f79bca5299fa1b47d05ea5316422b0ff07a4f7e3bc2fb74d34570",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Stone.png": "1c3cdf21197d96ea307e958aee9555c995087860c3cec8b669826f69a636c951",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Sugar.png": "450d80f208054144747bb8219eb4f4530ccd1d174977f79ed299d4ed6390d7d0",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Truffles.png": "4eaf957a6fb2eb972ee272cd1be78309e98e060e70668eb36a258f65ef1aae52",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Uranium.png": "aafcbc0425e0c3e0f9aa1d1c32917c69a6a3a2935e4ef5b94af7179dcfa6b24e"
-      }
-    },
-    {
-      "assetId": "terrain-batch-resources-overlays",
-      "creator": "OpenAI built-in image_gen",
-      "source": "art/atlas/terrain/resources-overlays-source.json",
-      "promptPath": "art/atlas/terrain/resources-overlays-prompt.txt",
-      "rights": "original-generated",
-      "sourceHash": "066aa7ea25e003b02479783454e7e96b3ef2142b61d123c95b153b11d1f8b518",
-      "outputHashes": {
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Whales.png": "42bf791fd190ac8c158a3b6d70f225cf08b2e615193583a7cbce91bca84a2c6a",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Wheat.png": "95576698ee6ba56e8274a6306052748ac0c60e7467b8573774fa2a112da3b006",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Wine.png": "5b609f01cde8fd93311c22351a4ae21a6b89579526d66eb2da2da6c6214f7500",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Road.png": "8a8007248bffd1b1a2b381c3002003b9c613cfd4d5806f39c64a544b7068e563",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Railroad.png": "dc7af874696356a849165b981543579019869d8138a06927a7b7031985a15d04",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Crosshair.png": "9145ccc3b889467f5767ad83349fd3bf48248b4d70d3af4710c3b2a6be1117ea",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/CrosshatchHexagon.png": "b901bd4f0508cd356331532eac19b5a2712f1817de3b9c2f016f2d7962ca0082",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Highlight.png": "2cc32ccede2bca8bb1bd5dd5d9f73137305f198f081d57cca86167af52719d34",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/RememberedFog.png": "7ad4ece109345226ce95a6f5070894d3934575ce3eb06f80540ae95f54ba8e1f"
       }
     },
     {
@@ -218,62 +285,100 @@
       }
     },
     {
-      "assetId": "terrain-batch-era-cities",
+      "assetId": "terrain-batch-resources-1",
       "creator": "OpenAI built-in image_gen",
-      "source": "art/atlas/terrain/era-cities-source.json",
-      "promptPath": "art/atlas/terrain/era-cities-prompt.txt",
+      "source": "art/atlas/terrain/resources-1-source.json",
+      "promptPath": "art/atlas/terrain/resources-1-prompt.txt",
       "rights": "original-generated",
-      "sourceHash": "f6478ca891033b8faf0c46669b3f29e21e5902c1140ba07f71c78d1c82bd5df4",
+      "sourceHash": "05d133d13111219b2040acbaf11c0d538f8d6af77fc9b583c129aba3cc113ef3",
       "outputHashes": {
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/City center-Ancient era.png": "d93d430a57a6127f4c60f5896405d2de812f9500ccf06f2b0276d0a787bc72c5",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/City center-Classical era.png": "a9ff7f30b273078ebf4899d97d5df4ea7cbf45320be211d91f5033b0a02fc104",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/City center-Medieval era.png": "729f9e98bac6eadc4bda1950ce0471645483865e9650a4a8bdf48494a88ab940",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/City center-Renaissance era.png": "1ac17701699248f7bc59e293ea1f8400f88dfca66895b9d99a312360cd39f9f0",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/City center-Industrial era.png": "26736a7c10303ddfd7a381bb5440819dd78327d0959206c894a3f25b57a961c3",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/City center-Modern era.png": "29173fa30e96f2030a60ff5c4510cac7f1faf6114b3879fa616fc4445b37a024",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/City center-Atomic era.png": "65521b747073bb0e6783507b56a9f83fda069469ee416c8e417fccaac6879575",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/City center-Information era.png": "b0c68e7d096404808f9e06a0e5b402005c72639d62031a7d3eae4411263b5d37",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/City center-Future era.png": "da7896dff3062f68e1d371b63b74077c2eda42304c42f44f09f187bc7d4b1682"
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Aluminum.png": "a38b10c9e0aee9f7cb0e417c779ef6d022b3913bf1e65c80a1f9ae4439d52b95",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Bananas.png": "9f6ffaee53d4c294bc643122cd9921ae3811dfdbe1e5cd933301aec153ffe106",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Cattle.png": "b2e20f9721ffb544d98d460267d100de889f48e905ba4390fe1a09b8ba9c38ee",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Citrus.png": "38820c0d724a62c603b931a31dc92c651e7fa3000884fac5a1ed31a9d5a8c0a0",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Coal.png": "ed185f5401d3a2326805eace63a1d79ad49823863461bc5b3eaf4389b81c28a8",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Copper.png": "9554c2db065370eb91c0c1ce86cadb3cb7e57744e489cb51cb7d793239024a2c",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Cotton.png": "295292f934d84790ddcc040ddd2c9a6a421e0a67d43284d66e95ba3b26b068f7",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Crab.png": "79b46b03fcfe698e2a2ee2e0cb465d39d0347169036117f25c239f267c2aaf92",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Deer.png": "f184448f045d1ec4133cb05172cf602223a8c10e5b31417fe9ae766609f41178",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Dyes.png": "d740ec6746e6d8960c60f850dc7db0d961776f210a004c828982a2bee3c85570",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Fish.png": "b9fd1d1f05201297bfc2fba35c18255ee99544117b64c2a7baca5962e71f2d3d",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Furs.png": "070694f84a0d49970132695146ca659add596a808705dce9700b62c04e41a039",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Gems.png": "7621669cc4d21fd1e81a129e1bb28ef1f2ab8c02dd9b185ffdf4e9117d015340",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Gold Ore.png": "53787f92592713fee26c4f3bd3c75535cdad2648e37c65084fb409fc8586d354",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Horses.png": "e91d77e09244f409b4b693af0fcb85e896c399f87c06f9db495e982a2d3c2e56",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Incense.png": "8fec74b43e7603527d1d79aa03bd790dfb28fc7f0d05b9e74ee131f6dfb8f5d3"
       }
     },
     {
-      "assetId": "terrain-batch-damaged-cities",
+      "assetId": "terrain-batch-resources-2",
       "creator": "OpenAI built-in image_gen",
-      "source": "art/atlas/terrain/damaged-cities-source.json",
-      "promptPath": "art/atlas/terrain/damaged-cities-prompt.txt",
+      "source": "art/atlas/terrain/resources-2-source.json",
+      "promptPath": "art/atlas/terrain/resources-2-prompt.txt",
       "rights": "original-generated",
-      "sourceHash": "40788d0fba5b782956086de06d00f416c23fa7e4fd74379dfbed913ddad588df",
+      "sourceHash": "42518fe622250f236f6663d3879511d134f89940a020e57d3db14b56151677d4",
       "outputHashes": {
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/City center-Damaged-Ancient era.png": "a3d8788dfc6bba781895f126a1184b7a163e18479084931c089834bcd6976495",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/City center-Damaged-Classical era.png": "314b1cec845d9fd1fef81a5c69b965694c6dab159053fe7896b3fa73deaa36a3",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/City center-Damaged-Medieval era.png": "cea097e270915b4f471fe145c8f2e66cddc48af6a355b21e988582ef53c97095",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/City center-Damaged-Renaissance era.png": "66bd91a766cc23195d897dcee81cf4adb27e288b393d315033482fceeaeaa342",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/City center-Damaged-Industrial era.png": "f7cab24a566074292075c03c79a22c02cb0c8089102ea6b357fcd12402e78efa",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/City center-Damaged-Modern era.png": "ae9aba0b6634dea036f3f9da85dd4214d5c133eb3a88642d1affbd50a692ed5b",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/City center-Damaged-Atomic era.png": "0c16a3464a4ff663de93c658809808f74d442610db34a681f4ab3096845f6ccf",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/City center-Damaged-Information era.png": "fe8c58ea50b7356198262ce859434c0b58fba652c9f9675bbad5fef483341769",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/City center-Damaged-Future era.png": "df70e8996c785d7fbf238521900b245f372b5a4e95c5aee6c232bb895dc8b76a",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Terrace farm-Pillaged.png": "fd163be995c9660fdd2055b80291a9daf0e09fd790ff7384be4466bb687572a2",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Trading post-Pillaged.png": "20982a2175b9f64244d6bd2ad80ebab78fb0ead7088d6a8e681e4b8b8a60073e",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/City center-Damaged.png": "8c97f5e8c5d5d744fb3f1022eb64d5ea209b4e57903bc57e31d764eeaf9bf403"
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Iron.png": "5fa10e18568bd9e04eb09d6739fa6a58674a833be8b06cb66c4aa37a900c0fbb",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Ivory.png": "416b77eaff59d2f2447913aaca6e58c0783adf2db6741a031a1eb2efca8b64b5",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Jewelry.png": "a228ed53951f50101779931897f3a263ae67a013fc9ae9113b175af2435d7cbc",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Marble.png": "67ded84b214a6e0251bab5652e0989cffdfadb21ecb0e2d8b65ddf511186a437",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Oil.png": "fe25b311f194593483c2cf4dc506ed969ad2f305d9da3cb9c727d6182a86ec5d",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Pearls.png": "b920cef263eba9788ee9ed520b4c2bfe53688c6356d0eeb4762ee73b39a971e4",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Porcelain.png": "79555ad5b1db93ca6b4129ad521f5eecee3d9d91ea78aa41ba23d519d2ff26b8",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Salt.png": "25a33870e3aac5dc7028d318004a6836ad5b5d6ec5069e149f8c543f43c20c9d",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Sheep.png": "4497ab87d2b51bb17de44ef3e1427d96dcbf16d3d2a47be3b63e64070e923d57",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Silk.png": "c56b55553090131df8ec43c59202d4903aae465b2cc6e5fda6a4b4e9c5305bdc",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Silver.png": "8b91556c944852c16167f25d0cd10f71969b54704df5d5e90a90df1d4e86f0d1",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Spices.png": "58cf26f2306f79bca5299fa1b47d05ea5316422b0ff07a4f7e3bc2fb74d34570",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Stone.png": "1c3cdf21197d96ea307e958aee9555c995087860c3cec8b669826f69a636c951",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Sugar.png": "450d80f208054144747bb8219eb4f4530ccd1d174977f79ed299d4ed6390d7d0",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Truffles.png": "4eaf957a6fb2eb972ee272cd1be78309e98e060e70668eb36a258f65ef1aae52",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Uranium.png": "aafcbc0425e0c3e0f9aa1d1c32917c69a6a3a2935e4ef5b94af7179dcfa6b24e"
       }
     },
     {
-      "assetId": "terrain-batch-borders",
+      "assetId": "terrain-batch-resources-overlays",
       "creator": "OpenAI built-in image_gen",
-      "source": "art/atlas/terrain/borders-source.json",
-      "promptPath": "art/atlas/terrain/borders-prompt.txt",
+      "source": "art/atlas/terrain/resources-overlays-source.json",
+      "promptPath": "art/atlas/terrain/resources-overlays-prompt.txt",
       "rights": "original-generated",
-      "sourceHash": "5e2ed321b009407cab71846cb0db0ad947ba8efb36d5e0c7330970608693b47d",
+      "sourceHash": "066aa7ea25e003b02479783454e7e96b3ef2142b61d123c95b153b11d1f8b518",
       "outputHashes": {
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Borders/ConcaveInner.png": "9e2f6b4f77bad6d0ab012ed0a7037ca0808f498aaad8ee44e273189efc1157d9",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Borders/ConcaveOuter.png": "b7f33e76978a59da4137ce14f9afc6444af130f42494b3523971a53f58e104d0",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Borders/ConvexInner.png": "62f1678b7bc595a22b1c58e4e0dfd5f310d1989337eff907a5a581f6c479761f",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Borders/ConvexOuter.png": "241ad2dd58326a4871113a810f7220ddaa564ab9893a417c0b79993dd1c566d2",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Borders/ConcaveConvexInner.png": "1a4a52cfd448e5e7b6a648f293e8ee27063255d056f1a5277d6b40be2d94bf6f",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Borders/ConcaveConvexOuter.png": "ce7caf76bcf0de2310e9c4cf0a9a44dfc6a7dd5cbe0419e70bc3fb8225b40c46",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Borders/ConvexConcaveInner.png": "5bdb977abcf8394824013fb143437f1f81f3a8e56c2053b472149055648a151a",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Borders/ConvexConcaveOuter.png": "8f4b672f9c7bdd0f53d701790b5bf6d400786327b82e3eb1ecc76a261e8ed955"
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Whales.png": "42bf791fd190ac8c158a3b6d70f225cf08b2e615193583a7cbce91bca84a2c6a",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Wheat.png": "95576698ee6ba56e8274a6306052748ac0c60e7467b8573774fa2a112da3b006",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Wine.png": "5b609f01cde8fd93311c22351a4ae21a6b89579526d66eb2da2da6c6214f7500",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Road.png": "8a8007248bffd1b1a2b381c3002003b9c613cfd4d5806f39c64a544b7068e563",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Railroad.png": "dc7af874696356a849165b981543579019869d8138a06927a7b7031985a15d04",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Crosshair.png": "9145ccc3b889467f5767ad83349fd3bf48248b4d70d3af4710c3b2a6be1117ea",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/CrosshatchHexagon.png": "b901bd4f0508cd356331532eac19b5a2712f1817de3b9c2f016f2d7962ca0082",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Highlight.png": "2cc32ccede2bca8bb1bd5dd5d9f73137305f198f081d57cca86167af52719d34",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/RememberedFog.png": "7ad4ece109345226ce95a6f5070894d3934575ce3eb06f80540ae95f54ba8e1f"
+      }
+    },
+    {
+      "assetId": "terrain-batch-wonders",
+      "creator": "OpenAI built-in image_gen",
+      "source": "art/atlas/terrain/wonders-source.json",
+      "promptPath": "art/atlas/terrain/wonders-prompt.txt",
+      "rights": "original-generated",
+      "sourceHash": "586351be099ecdb8a7311eec8a21c166db20aec30edadae07cfd40fc7f92ad9a",
+      "outputHashes": {
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Barringer Crater.png": "9de65b968a72404f3e94b60d17be97f09f79352c5c99ec5559b28dc7ddfeb0d7",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Cerro de Potosi.png": "2e916263a6093ad64a498ceb43dea3bb1a31056b233be2b99ed6643c6e36905f",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/El Dorado.png": "49458f2fe8731930750c50e79171cf8eb541565a517efab2cff5e59187463ccb",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Fountain of Youth.png": "64e00b9b6d66cdc215942bddc0e88f3ab499db40f9a4e2aaf6be750d77de02dd",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Grand Mesa.png": "0696e803208bdd798452c936386f8ceb9019034b421cc1e2d8f7f0c3231c3a1f",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Great Barrier Reef.png": "3f8a40753b17a852cb5653a7fc42a936e3c7fe3044e429cbcb1a33a3a92f0589",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Krakatoa.png": "0696b56a672ff3ea6978801d9e1b9212cb219d8b4639f886219616e30b43164b",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Mount Fuji.png": "f04535209641f421da4098fd89b0fa8819fd848c9d7b78851479de6c3bd690b9",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Mount Kailash.png": "8d42ae7fe7badffe6bce15b45c06a757b621de137a7e87484429f466e6c117a4",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Mount Sinai.png": "327edae3524a45da5799b7938164c997b8af94ba72ea6ea5b87d74324ec31590",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Old Faithful.png": "1e467a8e289499118a37dee0e50daa0567b7ba0163b687dd75fec3727d79ede4",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Rock of Gibraltar.png": "5f181587423a82edb45f8a3a7ed9c568f5f8b405901f646a38b50e9b9331c981",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Sri Pada.png": "4233fa54422cedd3aa43325da3d506db5cdc896b46c8646e5f809afe3773f4d2",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Uluru.png": "f1887c02fa99de702056aaec6b2e2a771033d6ade972655c28f806341116bb2e",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/NaturalWonder.png": "79b316cc7622f02e325febed705775ce21ab6bff0f0bfb182badd910c37dc276",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/City damage.png": "033b2d95a975a7f04f80cc8b71d496bf418fff5b94246638eb19cd9647a2a8a9"
       }
     },
     {
@@ -2810,90 +2915,6 @@
       }
     },
     {
-      "assetId": "warrior",
-      "creator": "OpenAI image generation",
-      "source": "art/atlas/units/warrior/creation-record.json",
-      "promptPath": "art/atlas/units/warrior/prompts/e-v2.txt",
-      "rights": "original-generated",
-      "sourceHash": "2c17129d8eaaebadae0f534eeeecf8901195c018996ec58f73fdcb9a1444d992",
-      "outputHashes": {
-        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Warrior-1.png": "410c487110423ff7d3cad58a077c781b550d0c87033788118bfea2ec2e834077",
-        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Warrior.png": "761aa9fc783ddc7934e0b94e8354cceb3522df41774111d8a5f026ac98d4749e",
-        "art/atlas/units/warrior/frames/e-color.png": "138f95d69506e7f7c0295ef8d9dccb0861649a84fada6fbebc9c94f8a2f00f05",
-        "art/atlas/units/warrior/frames/e-nation.png": "1381337b6b8e77e309861ac52cb8c91e7cae5e4fe49b345f18afd09852e31fd9",
-        "art/atlas/units/warrior/frames/e-shadow.png": "beba6a37c6a15ff512db33c3b245d2b4f5a0e977d27598ce971c9d056b488521",
-        "art/atlas/units/warrior/frames/ne-color.png": "db0509950f67233d717aa0b03d109d90a1c5bf02d2bb45b7aab9d200ed863265",
-        "art/atlas/units/warrior/frames/ne-nation.png": "fe5de8a6d9142965fb60647f382f6f1699114a1886dd664d5bef19ecee1fa23b",
-        "art/atlas/units/warrior/frames/ne-shadow.png": "5bcc3ec2f60e8b0800872e9849f97dc3254b506f7687cb34a6f402757f03ea5c",
-        "art/atlas/units/warrior/frames/se-color.png": "d3b6b501b008531fd56a7095e28b9c788b682c5db47ec6b45535a06ea6ab46b0",
-        "art/atlas/units/warrior/frames/se-nation.png": "db1ccff337f9e000bea0b2c434f9f70cd71b5263cbaf6178aa9923b2eee7e13a",
-        "art/atlas/units/warrior/frames/se-shadow.png": "7567bcda9a881c10e8dd93c9cb23105359eb1ede9833a1f1d535ee78bb47b5bf"
-      }
-    },
-    {
-      "assetId": "horseman",
-      "creator": "OpenAI image generation",
-      "source": "art/atlas/units/horseman/creation-record.json",
-      "promptPath": "art/atlas/units/horseman/prompts/e-v1.txt",
-      "rights": "original-generated",
-      "sourceHash": "9823cda131984d0d38f6be73e809e9e4019f44ed280e551af59a82bee42301c7",
-      "outputHashes": {
-        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Horseman-1.png": "176f512c6bd61fe6d00a4c02cbfc6804984888ea4a0d915782ba53531ac01011",
-        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Horseman.png": "569762d0a82b0f96784cb9de75bb741ad0ed035bb70dc56f76d698ac76b36726",
-        "art/atlas/units/horseman/frames/e-color.png": "e175d43b1c4246e35cea934f4adabe2ea09a14cac6647b3f1024b1504c2361c8",
-        "art/atlas/units/horseman/frames/e-nation.png": "6304e671c47820f8e8d7b8929228611317c7b8428b8399857bcf451258d420f2",
-        "art/atlas/units/horseman/frames/e-shadow.png": "12108703a35d07dcc47d7c4d35990305d729e3a9af68be574883698937b47faa",
-        "art/atlas/units/horseman/frames/ne-color.png": "ca76498a32c2093f12719015b6d7f17207604527800b49108c5c0f018813c6bf",
-        "art/atlas/units/horseman/frames/ne-nation.png": "3da9b93001020259a33a9fe5b413db38a03fa520334a52ad63898a133e0471b3",
-        "art/atlas/units/horseman/frames/ne-shadow.png": "5466a26b85d5b1ff61e13ff5a54fe780136c6a1be31dade5461f3cb126a90aef",
-        "art/atlas/units/horseman/frames/se-color.png": "81798dc716cb45b21d091f393c8825883f52553f019daa31ce84dc1128ac4c11",
-        "art/atlas/units/horseman/frames/se-nation.png": "1b8f832a7bdbe2848b4a5c27f76ecfe3acea6217069794e7babed5c0dbb9716d",
-        "art/atlas/units/horseman/frames/se-shadow.png": "1ec174fb8ef04d734c71bd28f3a2a8c98e37ab071921f62d5bcdb2f99e13a1b3"
-      }
-    },
-    {
-      "assetId": "rifleman",
-      "creator": "OpenAI image generation",
-      "source": "art/atlas/units/rifleman/creation-record.json",
-      "promptPath": "art/atlas/units/rifleman/prompts/e-v1.txt",
-      "rights": "original-generated",
-      "sourceHash": "98062d911dbecc9e37f0567ddb7c5191cd4667b18517761994bcb51e2ba6e51a",
-      "outputHashes": {
-        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Rifleman-1.png": "61bba667a4368da17d55dd260b7545e96b8c19a37a823a489af8e1d16e608793",
-        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Rifleman.png": "d355f229a2d28ce5f4df44909b2c0faa91ec02b00841de4c1fc0ace784d75d49",
-        "art/atlas/units/rifleman/frames/e-color.png": "0aac76b5e8b835da1509a5ca85644a5d14a18c09cb7140dceef080a52f06f3b1",
-        "art/atlas/units/rifleman/frames/e-nation.png": "4ebc795add3c61460c2faa210f0d98fee17de9554920c31ba9db11cc384251be",
-        "art/atlas/units/rifleman/frames/e-shadow.png": "15316b56fbb5a7a71613315946e5b438e9b6dd9e829752a0024d9ba7f13fbc87",
-        "art/atlas/units/rifleman/frames/ne-color.png": "b07164091e1da82c6ffeb78ff0acafa7926289932da73ac02e0fd6daf032a3ab",
-        "art/atlas/units/rifleman/frames/ne-nation.png": "a550015780385bb58330d257719d57955c20db599cb64b791f7e289b017fceee",
-        "art/atlas/units/rifleman/frames/ne-shadow.png": "b6bd83fb527ac61832d92022336db58e6a136f64f46539197a09ee57ba195b82",
-        "art/atlas/units/rifleman/frames/se-color.png": "116ef0e27a51462056a602be68176c77e1d2463774075f84213fdc1fa9acc5ec",
-        "art/atlas/units/rifleman/frames/se-nation.png": "c23625e2a443980508ee75208e596ba957917bec6562e00f1d7a04871ee23dd9",
-        "art/atlas/units/rifleman/frames/se-shadow.png": "4bf88ac2904f4254ffb0ca86b35bc4d00015a91d1ccecea1115a4b70b46f5b6d"
-      }
-    },
-    {
-      "assetId": "tank",
-      "creator": "OpenAI image generation",
-      "source": "art/atlas/units/tank/creation-record.json",
-      "promptPath": "art/atlas/units/tank/prompts/e-v1.txt",
-      "rights": "original-generated",
-      "sourceHash": "dbf309fe51e82d259df7be12e79267ba58cb82aa54cc093bfb2c3726c9f6b1c2",
-      "outputHashes": {
-        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Tank-1.png": "ccf654c30a4b353d0b5ed1f0ae5d4b606d2f75c38249cf1c5b9fca44e6d835c5",
-        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Tank.png": "85e394552f970edb5470ffa85a63ea8ae0552886c6aaf36d3909b679ad8bc43d",
-        "art/atlas/units/tank/frames/e-color.png": "4a78959fa778ae4c6bae110c88c5c4dd8593933b3d4a06ee7e0ea8de852a8048",
-        "art/atlas/units/tank/frames/e-nation.png": "255d5e095d261b5b3e0286b841be6c95566103b08849a1517e97f53200782fc1",
-        "art/atlas/units/tank/frames/e-shadow.png": "8c3249ab8dc5e4fab00eaa463159bf736a7af135ae4a89658692de3288ed8bf5",
-        "art/atlas/units/tank/frames/ne-color.png": "7505a9419e64416a860d96679ce4fa537fd5c84a84e6faea92131067c0ef0f11",
-        "art/atlas/units/tank/frames/ne-nation.png": "fc8de4eb8d9fb03c4fa880868d53ab616f2e3e87083eebb66daf03a8d2025d13",
-        "art/atlas/units/tank/frames/ne-shadow.png": "ab3f4a22c0873628a5c9b663fcb708d1e59b13cff44bd1477e4697c140b3fef9",
-        "art/atlas/units/tank/frames/se-color.png": "de788dfb4a790218974c80cc4d004a67e7cd32081892786c355cffe22326f732",
-        "art/atlas/units/tank/frames/se-nation.png": "7d4a3dd8b27c743a7607af9d94fa28d3e6f8d1481a6488ae3e39fb633f6cdca1",
-        "art/atlas/units/tank/frames/se-shadow.png": "6fd57c69681be93ecc7aa5741e3bd09aab3e893009561c6d754916826b025ef1"
-      }
-    },
-    {
       "assetId": "trireme",
       "creator": "OpenAI image generation",
       "source": "art/atlas/units/trireme/creation-record.json",
@@ -2912,6 +2933,27 @@
         "art/atlas/units/trireme/frames/se-color.png": "eb483d4bd5158929175ee8b945b85c20f5853ad79c4094a5080ba6e873aa2c03",
         "art/atlas/units/trireme/frames/se-nation.png": "2193e97a62603c64bce070b713a58c5a67669518392d171421bbb35245a361b7",
         "art/atlas/units/trireme/frames/se-shadow.png": "e2a6a0cc9f03792ca17a93f74aae04d68064d88bdd51d23b63cce62cbceaed7a"
+      }
+    },
+    {
+      "assetId": "warrior",
+      "creator": "OpenAI image generation",
+      "source": "art/atlas/units/warrior/creation-record.json",
+      "promptPath": "art/atlas/units/warrior/prompts/e-v2.txt",
+      "rights": "original-generated",
+      "sourceHash": "2c17129d8eaaebadae0f534eeeecf8901195c018996ec58f73fdcb9a1444d992",
+      "outputHashes": {
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Warrior-1.png": "410c487110423ff7d3cad58a077c781b550d0c87033788118bfea2ec2e834077",
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Warrior.png": "761aa9fc783ddc7934e0b94e8354cceb3522df41774111d8a5f026ac98d4749e",
+        "art/atlas/units/warrior/frames/e-color.png": "138f95d69506e7f7c0295ef8d9dccb0861649a84fada6fbebc9c94f8a2f00f05",
+        "art/atlas/units/warrior/frames/e-nation.png": "1381337b6b8e77e309861ac52cb8c91e7cae5e4fe49b345f18afd09852e31fd9",
+        "art/atlas/units/warrior/frames/e-shadow.png": "beba6a37c6a15ff512db33c3b245d2b4f5a0e977d27598ce971c9d056b488521",
+        "art/atlas/units/warrior/frames/ne-color.png": "db0509950f67233d717aa0b03d109d90a1c5bf02d2bb45b7aab9d200ed863265",
+        "art/atlas/units/warrior/frames/ne-nation.png": "fe5de8a6d9142965fb60647f382f6f1699114a1886dd664d5bef19ecee1fa23b",
+        "art/atlas/units/warrior/frames/ne-shadow.png": "5bcc3ec2f60e8b0800872e9849f97dc3254b506f7687cb34a6f402757f03ea5c",
+        "art/atlas/units/warrior/frames/se-color.png": "d3b6b501b008531fd56a7095e28b9c788b682c5db47ec6b45535a06ea6ab46b0",
+        "art/atlas/units/warrior/frames/se-nation.png": "db1ccff337f9e000bea0b2c434f9f70cd71b5263cbaf6178aa9923b2eee7e13a",
+        "art/atlas/units/warrior/frames/se-shadow.png": "7567bcda9a881c10e8dd93c9cb23105359eb1ede9833a1f1d535ee78bb47b5bf"
       }
     },
     {
