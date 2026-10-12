@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Let a spectator play any living major nation, explicitly hand it back to an agent, and change agent configuration mid-game.
+**Goal:** Let a spectator play any living major human or agent-run nation, explicitly hand it back to an agent, and change agent configuration mid-game.
 
 **Architecture:** A trusted, viewer-authorized host API queues one copied change until the provider/loop finishes, then commits it before revoking old session authority. Saved management/view identities and retained profiles preserve control and personality across reload; a modeless world panel consumes copied DTOs and publishes the selected committed view on GL.
 
@@ -12,11 +12,11 @@
 
 ## Global Constraints
 
-- Offline agent-enabled matches only; spectators manage any living major nation, ordinary humans only their own.
+- Offline agent-enabled matches only; spectators manage any living major human or agent-run nation, ordinary humans only their own.
 - Actual nation view uses ordinary fog, private mail/activity and viewer-equals-active-Human input restrictions; management identity is separate.
 - No kill, cancellation or stdin input to running providers. One transient pending change; only durable application counts as success.
 - Preserve moves, map memory, mail, notes, decisions and saved personalities. Epoch/session invalidation happens after durable success.
-- Changing settings while Human keeps Human. Spectate never implicitly hands a nation back. Native-AI takeover converts PlayerType atomically.
+- Changing settings while Human keeps Human. Spectate never implicitly hands a nation back. Built-in game-AI nations are excluded; do not convert PlayerType or difficulty rules.
 - New unreleased match format stays 3; existing GameInfo protection floor stays 5. Old nullable fields initialize deterministically or fail closed on ambiguity.
 - Root alone runs Gradle. No live-app operation, installation or restart during implementation.
 
@@ -34,7 +34,7 @@
 
 **Interfaces:** Produce `enum NationControlChange { SAVE_AGENT_SETTINGS, PLAY_AS, HAND_TO_AGENT, SPECTATE }`; `data class NationSetting(val civId: String, val nationName: String, val kind: ControllerKind, val profile: AgentProfile?, val isActive: Boolean)`; session `getNationSettings(): List<NationSetting>`, `getPendingNationChange(): String?`, `canSpectate(): Boolean`, and `requestNationChange(civId: String?, change: NationControlChange, profile: AgentProfile?, onComplete: (String?) -> Unit)`. Interface defaults return empty/unavailable so unrelated hosts/mocks remain compatible. Produce a pure saved-view lookup helper in NationControl for Task 2, named `NationControl.savedViewerCivId(game: GameInfo, match: AgentMatchState): String?`. Consume Task 2 `WorldScreen.installAgentSnapshot(..., viewerCivId: String? = null)` as optional final parameter, passing the committed requested viewer from publication.
 
-- [ ] Write failing tests: spectator takes current/inactive/native-AI major; handback retains personality; human cannot manage another nation; online/dead/barbarian/city-state reject; wrong viewer cannot mutate/end turn; reload retains identities/profile; injected failed checkpoint leaves assignment/epoch/session unchanged.
+- [ ] Write failing tests: spectator takes current/inactive human-rule major; handback retains personality; human cannot manage another nation; online/dead/barbarian/city-state/built-in-AI reject; wrong viewer cannot mutate/end turn; reload retains identities/profile; injected failed checkpoint leaves assignment/epoch/session unchanged.
 - [ ] Add deterministic latch/fake-runner tests for pending-after-admission and dispatch-gap rejection, with no kill/overlap, exactly one apply/callback and close/navigation cancellation. Ask root to run selectors and record actual RED evidence.
 - [ ] Implement copied DTOs/nullable saved fields/deep copies/validation and host-only coordinator commit. Initialize old identities without granting online/ambiguous control. Add bounded profile validation via catalog.
 - [ ] Implement host queue/PAUSING/boundary drain and actual-viewer gating. Publish only committed viewer. Keep controller changes and profile retention atomic; leave scheduling paused after application, clear only the affected provider resume session after success.
