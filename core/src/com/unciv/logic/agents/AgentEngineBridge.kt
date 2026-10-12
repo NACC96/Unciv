@@ -208,7 +208,7 @@ class AgentEngineBridge(val coordinator: MatchCoordinator) {
                         unitId,
                         requireEnum<UnitOrder>(args, "order"))) as UnitOrderResult
                     receiptMap(result.receipt,
-                        mapOf("action" to result.action, "disbanded" to result.disbanded),
+                        mapOf("action" to result.action, "disbanded" to result.disbanded, "foundedCityId" to result.foundedCityId),
                         decisionsFor(actorCivId))
                 }
                 "unit.attack" -> {

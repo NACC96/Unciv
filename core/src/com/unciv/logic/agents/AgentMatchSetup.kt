@@ -69,7 +69,8 @@ class AgentMatchSetup(
         val match = AgentMatchState(
             matchId = "match-${UUID.randomUUID()}",
             timelineId = "timeline-${UUID.randomUUID()}",
-            turnPhase = TurnPhase.READY_TO_START
+            turnPhase = TurnPhase.READY_TO_START,
+            vision = MatchVision.FULL
         )
         for (civ in game.civilizations) {
             if (civ.isSpectator()) continue

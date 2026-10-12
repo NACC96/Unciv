@@ -282,4 +282,39 @@ class AgentNationViewTest {
         assertSame(newer, f.screen.gameInfo)
         assertEquals(f.rome.civID, f.screen.currentViewerCivId())
     }
+
+    @Test fun `match vision widens the played nation's own view for every player`() {
+        val f = Fixture()
+        UncivGame.Current.settings.tutorialTasksCompleted.add("Meet another civilization")
+        f.game.makeHexagonalMap(5)
+        val greece = f.game.addCiv(f.game.ruleset.nations["Greece"]!!)
+        f.game.addCity(f.rome, f.game.tileMap[0, 0])
+        val farTile = f.game.tileMap[0, -5]
+        f.game.addUnit("Warrior", greece, farTile)
+        var vision = MatchVision.MAP
+        Mockito.`when`(f.session.getVision()).thenAnswer { vision }
+        f.screen.fogOfWar = true
+        installWithViewer(f.screen, f.snapshot(), ResolvedSelection(null, null, null), 1, f.rome.civID)
+        val mapView = f.screen.getGameViewConsideringForOfWar()
+        assertSame("Fog on still shows the match's vision", f.screen.selectedGameView, mapView)
+        assertTrue(mapView.revealMap); assertFalse(mapView.revealUnits)
+        val revealed = mapView.getTile(f.screen.gameInfo.tileMap[0, -5])
+        assertTrue("Every tile counts as explored", revealed.isExplored())
+        assertTrue(mapView.civView.hasExplored(revealed))
+        assertFalse("Out of sight keeps fog shading", revealed.isForceVisible())
+        assertTrue("Units outside real sight stay hidden", revealed.getVisibleUnits().isEmpty())
+
+        vision = MatchVision.FULL
+        installWithViewer(f.screen, f.snapshot(), ResolvedSelection(null, null, null), 2, f.rome.civID)
+        val fullView = f.screen.selectedGameView
+        assertTrue(fullView.revealUnits)
+        val seen = fullView.getTile(f.screen.gameInfo.tileMap[0, -5])
+        assertTrue(seen.isForceVisible())
+        assertEquals(1, seen.getVisibleUnits().size)
+
+        vision = MatchVision.FOG
+        installWithViewer(f.screen, f.snapshot(), ResolvedSelection(null, null, null), 3, f.rome.civID)
+        assertFalse(f.screen.selectedGameView.revealMap)
+        assertFalse(f.screen.selectedGameView.getTile(f.screen.gameInfo.tileMap[0, -5]).isExplored())
+    }
 }

@@ -23,7 +23,7 @@ class AgentMapKnowledge(
 
 fun buildPermittedTile(game: GameInfo, match: AgentMatchState, actorCivId: String, position: HexCoord): ObservedTile? {
     val civ = game.getCivilizationOrNull(actorCivId) ?: return null
-    return buildPermittedTile(game, match, actorCivId, position, normalViewableTiles(civ))
+    return buildPermittedTile(game, match, actorCivId, position, observedSight(game, match, civ))
 }
 
 internal fun buildPermittedTile(
@@ -32,6 +32,8 @@ internal fun buildPermittedTile(
     val civ = game.getCivilizationOrNull(actorCivId) ?: return null
     val tile = game.tileMap.getIfTileExistsOrNull(position.x, position.y) ?: return null
     if (tile in visible) return exportVisibleTile(game, civ, tile, match.stateRevision)
+    if (match.vision == MatchVision.MAP) return exportVisibleTile(game, civ, tile, match.stateRevision)
+        .also { it.visibility = TileKnowledgeVisibility.REVEALED }
     match.mapKnowledge.get(actorCivId, tile.position)?.let { known ->
         return known.copy().also { it.visibility = TileKnowledgeVisibility.REMEMBERED }
     }

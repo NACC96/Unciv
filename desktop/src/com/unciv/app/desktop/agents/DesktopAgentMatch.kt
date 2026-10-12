@@ -29,6 +29,7 @@ import com.unciv.logic.agents.EngineCallException
 import com.unciv.logic.agents.FileCheckpointStore
 import com.unciv.logic.agents.HumanCommandExecutor
 import com.unciv.logic.agents.MatchCoordinator
+import com.unciv.logic.agents.MatchVision
 import com.unciv.logic.agents.SetControllerCommand
 import com.unciv.logic.agents.NationControl
 import com.unciv.logic.agents.NationControlChange
@@ -180,6 +181,27 @@ class DesktopAgentMatch(
         }
     }
 
+    override fun getVision(): MatchVision = vision
+
+    override fun setVision(vision: MatchVision, onComplete: (String?) -> Unit) {
+        Concurrency.runOnNonDaemonThreadPool("Change map vision") {
+            val error = try {
+                synchronized(lock) {
+                    check(!closed.get()) { "The match is closed" }
+                    publishCommittedChangesLocked {
+                        coordinator.setVision(vision)
+                        this@DesktopAgentMatch.vision = vision
+                    }
+                }
+                null
+            } catch (ex: Exception) { ex.message ?: "Could not change map vision" }
+            Concurrency.runOnGLThread {
+                onComplete(error)
+                Gdx.graphics.requestRendering()
+            }
+        }
+    }
+
     override fun readMessageImage(messageId: String, attachmentId: String,
                                   onComplete: (MessageImageDraft?, String?) -> Unit) {
         val viewer = worldScreen?.currentViewerCivId()
@@ -215,6 +237,8 @@ class DesktopAgentMatch(
     val coordinator = MatchCoordinator(game, match.deepCopy().also {
         NationControl.initialize(game, it, if (recoveryLineage == null) worldScreen?.currentViewerCivId() else null)
     }, fileStore(dataDir, recoveryDirectory, match.matchId))
+    /** Read by snapshot installation on the GL thread without taking the host or coordinator lock. */
+    @Volatile private var vision = coordinator.getVision()
     private val imageStore = FileMessageImageStore(dataDir)
     private val bridge = AgentEngineBridge(coordinator)
     private val humanExecutor = HumanCommandExecutor(coordinator)

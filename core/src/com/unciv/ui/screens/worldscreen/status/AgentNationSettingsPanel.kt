@@ -32,10 +32,13 @@ class AgentNationSettingsPanel(private val screen: WorldScreen, private val sess
         override fun toString() = if (customEntry) "Custom model…" else spec.label
     }
     private data class EffortChoice(val wireValue: String?, val label: String) { override fun toString() = label }
+    private data class VisionChoice(val vision: MatchVision) { override fun toString() = vision.label }
     private val nation = AgentNationSelectBox<NationChoice>().apply { name = "NationPicker" }
     private val provider = AgentNationSelectBox<String>().apply { name = "NationProvider" }
     private val model = AgentNationSelectBox<ModelChoice>().apply { name = "NationModel" }
     private val reasoning = AgentNationSelectBox<EffortChoice>().apply { name = "NationReasoning" }
+    private val vision = AgentNationSelectBox<VisionChoice>().apply { name = "MatchVision" }
+    private var changingVision = false
     private val displayName = TextField("", skin).apply { name = "NationDisplayName"; maxLength = 256 }
     private val customModel = TextField("", skin).apply { name = "NationCustomModel"; maxLength = 256 }
     private val personality = TextArea("", skin).apply { name = "NationPersonality"; maxLength = 16 * 1024 }
@@ -85,6 +88,8 @@ class AgentNationSettingsPanel(private val screen: WorldScreen, private val sess
         })
         add(header).growX().row()
         add(identity).growX().left().padTop(6f).padBottom(8f).row()
+        add("Map vision · all players".toLabel(WorldScreenStyle.muted, 11)).left().padBottom(4f).row()
+        add(vision).minWidth(0f).growX().height(32f).padBottom(10f).row()
         add(nation).minWidth(0f).growX().height(32f).row()
         add(status).minWidth(0f).growX().left().padTop(6f).padBottom(6f).row()
         scroll.setScrollingDisabled(true, false); scroll.setFadeScrollBars(false); scroll.setOverscroll(false, false)
@@ -107,7 +112,13 @@ class AgentNationSettingsPanel(private val screen: WorldScreen, private val sess
         form.add("Spectate changes your view. Human nations wait for you until explicitly handed to an agent. " +
             "While playing a nation, Fog of War (top left) shows the whole map."
             .toLabel(WorldScreenStyle.muted, 11).apply { wrap = true }).padTop(10f).padBottom(8f).row()
-        for (picker in listOf(nation, provider, model, reasoning)) stylePicker(picker)
+        for (picker in listOf(vision, nation, provider, model, reasoning)) stylePicker(picker)
+        // Programmatic selection fires change events; only the user's pick may commit.
+        updating = true
+        vision.setItems(GdxArray(MatchVision.entries.map { VisionChoice(it) }.toTypedArray()))
+        vision.selected = vision.items.firstOrNull { it.vision == session.getVision() }
+        updating = false
+        vision.onChange { if (!updating) vision.selected?.let { changeVision(it.vision) } }
         for (editor in listOf(displayName, customModel, personality)) {
             editor.style = TextField.TextFieldStyle(editor.style).apply {
                 background = WorldScreenStyle.background("WorldScreen/NationSettings/Field", WorldScreenStyle.raised)
@@ -223,7 +234,7 @@ class AgentNationSettingsPanel(private val screen: WorldScreen, private val sess
     } }
     fun hide() {
         isVisible = false
-        for (picker in listOf(nation, provider, model, reasoning)) picker.hideList()
+        for (picker in listOf(vision, nation, provider, model, reasoning)) picker.hideList()
         if (screen.stage.scrollFocus?.isDescendantOf(this) == true) screen.stage.scrollFocus = null
         if (screen.stage.keyboardFocus?.isDescendantOf(this) == true) screen.stage.keyboardFocus = null
         Gdx.graphics.requestRendering()
@@ -242,6 +253,11 @@ class AgentNationSettingsPanel(private val screen: WorldScreen, private val sess
             if (nation.selected?.id != selectedId) loadDraft(nation.selected?.id)
         }
         identity.setText("Viewing ${screen.viewingCiv.civID} · changes apply immediately")
+        if (!changingVision && vision.selected?.vision != session.getVision()) {
+            updating = true
+            vision.selected = vision.items.firstOrNull { it.vision == session.getVision() }
+            updating = false
+        }
         session.getPendingNationChange()?.let { status.setText(it); status.color = WorldScreenStyle.warning }
         val w = minOf(480f, screen.stage.width - 16f).coerceAtLeast(1f)
         val anchorTop = if (isVisible) controlsAnchor?.localToStageCoordinates(Vector2())?.y?.minus(8f) else null
@@ -265,6 +281,7 @@ class AgentNationSettingsPanel(private val screen: WorldScreen, private val sess
         val busy = requesting || session.getPendingNationChange() != null
         val eligible = selectedId != null
         nation.isDisabled = busy || choices.isEmpty()
+        vision.isDisabled = changingVision
         provider.isDisabled = busy || !eligible; model.isDisabled = busy || !eligible; reasoning.isDisabled = busy || !eligible
         displayName.isDisabled = busy || !eligible; customModel.isDisabled = busy || !eligible; personality.isDisabled = busy || !eligible
         for (button in listOf(save, play, handback)) WorldScreenStyle.setEnabled(button, !busy && eligible)
@@ -288,6 +305,18 @@ class AgentNationSettingsPanel(private val screen: WorldScreen, private val sess
             if (!disposed) {
                 requesting = false
                 status.setText(error ?: if (agentMidTurn) "Saved. The agent finishes this turn with its previous settings." else "Applied.")
+                status.color = if (error == null) WorldScreenStyle.accent else WorldScreenStyle.error
+                refresh()
+            }
+        }
+    }
+    private fun changeVision(choice: MatchVision) {
+        if (disposed || changingVision || choice == session.getVision()) return
+        changingVision = true; status.setText("Applying…"); status.color = WorldScreenStyle.warning; updateEnabled()
+        session.setVision(choice) { error ->
+            if (!disposed) {
+                changingVision = false
+                status.setText(error ?: "Map vision: ${choice.label}. Agents see it from their next observation.")
                 status.color = if (error == null) WorldScreenStyle.accent else WorldScreenStyle.error
                 refresh()
             }

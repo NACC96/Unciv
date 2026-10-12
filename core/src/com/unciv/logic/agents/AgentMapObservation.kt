@@ -15,7 +15,8 @@ const val AGENT_OBSERVATION_VERSION = 2
 const val AGENT_READ_BYTE_BUDGET = 96 * 1024
 
 enum class MapQueryMode { KNOWN, VISIBLE }
-enum class TileKnowledgeVisibility { VISIBLE, REMEMBERED }
+/** REVEALED: current tile facts under [MatchVision.MAP], outside real sight, so units there stay unseen. */
+enum class TileKnowledgeVisibility { VISIBLE, REMEMBERED, REVEALED }
 enum class ResourceKnowledgeSource { SIGHTING, TECHNOLOGY }
 enum class TileYieldContext { ACTOR_CITY, ACTOR_GENERAL }
 
@@ -106,10 +107,15 @@ class MapPage(
 
 class MapSummary(
     var observationVersion: Int = AGENT_OBSERVATION_VERSION, var coordinateSystem: String = "UNCIV_HEX",
-    var knownTileCount: Int = 0, var visibleTileCount: Int = 0, var worldWrap: Boolean = false
+    var knownTileCount: Int = 0, var visibleTileCount: Int = 0, var worldWrap: Boolean = false,
+    var vision: MatchVision = MatchVision.FOG
 )
 
 fun normalViewableTiles(civ: Civilization): Set<Tile> = civ.cache.normalViewableTiles()
+
+/** Tiles observed live with their units: real sight, or the whole map under [MatchVision.FULL]. */
+internal fun observedSight(game: GameInfo, match: AgentMatchState, civ: Civilization): Set<Tile> =
+    if (match.vision == MatchVision.FULL) game.tileMap.values.toSet() else normalViewableTiles(civ)
 
 /** Caller establishes normal sight. Hidden resources are removed even from yield filter contexts. */
 internal fun exportVisibleTile(game: GameInfo, civ: Civilization, tile: Tile, revision: Int): ObservedTile {
@@ -141,12 +147,13 @@ internal fun exportVisibleTile(game: GameInfo, civ: Civilization, tile: Tile, re
 
 fun buildMapSummary(game: GameInfo, match: AgentMatchState, actorCivId: String): MapSummary {
     val civ = game.getCivilizationOrNull(actorCivId) ?: invalidMap("Unknown civilization")
-    val visible = normalViewableTiles(civ)
+    val visible = observedSight(game, match, civ)
     return MapSummary(knownTileCount = permittedPositions(game, match, civ, visible).size,
-        visibleTileCount = visible.size, worldWrap = game.tileMap.mapParameters.worldWrap)
+        visibleTileCount = visible.size, worldWrap = game.tileMap.mapParameters.worldWrap, vision = match.vision)
 }
 
 internal fun permittedPositions(game: GameInfo, match: AgentMatchState, civ: Civilization, visible: Set<Tile>): Set<HexCoord> {
+    if (match.vision != MatchVision.FOG) return game.tileMap.values.mapTo(HashSet()) { it.position }
     val positions = HashSet<HexCoord>()
     positions.addAll(visible.map { it.position })
     positions.addAll(game.tileMap.values.asSequence().filter { it.isExploredNormally(civ) }.map { it.position })
@@ -177,7 +184,7 @@ fun buildMapPage(game: GameInfo, match: AgentMatchState, actorCivId: String, que
             "Map cursor revision is stale", match.stateRevision)
         start = parts[2].toIntOrNull()?.takeIf { it >= 0 } ?: invalidMap("Invalid map cursor")
     }
-    val visible = normalViewableTiles(civ)
+    val visible = observedSight(game, match, civ)
     val positions = if (query.mode == MapQueryMode.VISIBLE) visible.map { it.position }.toSet()
         else permittedPositions(game, match, civ, visible)
     val center = query.center?.let { position ->

@@ -16,6 +16,7 @@ import com.unciv.logic.GameInfo
 import com.unciv.logic.agents.AgentMatchSession
 import com.unciv.logic.agents.AgentCommand
 import com.unciv.logic.agents.AgentSnapshotPublication
+import com.unciv.logic.agents.MatchVision
 import com.unciv.logic.agents.ResolvedSelection
 import com.unciv.view.GameView
 import com.unciv.logic.UncivShowableException
@@ -135,8 +136,15 @@ class WorldScreen(
         internal set
     /** The [selectedCiv]'s perspective. For non-spectators this this equals the viewingGameView.
      *  Only ever differs from [unfoggedGameView] for viewers with [hasSpectatorVision]. */
-    var selectedGameView = GameView(gameInfo, selectedCiv, spectatorMode = viewingCiv.isSpectator())
+    var selectedGameView = perspectiveOf(gameInfo, selectedCiv)
         internal set
+
+    /** [civ]'s own perspective, widened by the agent match's map vision. Spectators always see everything unfogged. */
+    private fun perspectiveOf(game: GameInfo, civ: Civilization): GameView {
+        val vision = if (civ.isSpectator()) MatchVision.FOG else agentSession?.getVision() ?: MatchVision.FOG
+        return GameView(game, civ, spectatorMode = viewingCiv.isSpectator(),
+            revealMap = vision != MatchVision.FOG, revealUnits = vision == MatchVision.FULL)
+    }
 
     /** The unrestricted perspective behind the fog toggle, for specific UI elements only: a spectator's own
      *  view, or the played nation's own view with the map revealed. Null without [hasSpectatorVision]. */
@@ -173,6 +181,15 @@ class WorldScreen(
      * remaining unsupported paths are documented in docs/agent-mutation-audit.md.
      */
     var agentSession: AgentMatchSession? = null
+        set(value) {
+            field = value
+            // Map vision belongs to the session; views built before it attached used plain fog.
+            val vision: MatchVision? = value?.getVision()
+            if (vision != null && vision != MatchVision.FOG) {
+                selectedGameView = perspectiveOf(gameInfo, selectedCiv)
+                cachedUnfoggedGameView = null
+            }
+        }
 
     /** The session owns asynchronous work, so detach it before releasing this screen's resources. */
     fun closeAgentSession() {
@@ -281,7 +298,7 @@ class WorldScreen(
         viewingCiv = newViewer
         selectedCiv = if (viewerChanged || !newViewer.isSpectator()) newViewer else
             snapshot.civilizations.firstOrNull { it.civID == selectedCiv.civID } ?: newViewer
-        selectedGameView = GameView(snapshot, selectedCiv, spectatorMode = viewingCiv.isSpectator())
+        selectedGameView = perspectiveOf(snapshot, selectedCiv)
         // Unrestricted vision is re-resolved for the new viewer, so it never outlives the local spectator.
         cachedUnfoggedGameView = null
         isPlayersTurn = viewingCiv.isCurrentPlayer()
@@ -780,7 +797,7 @@ class WorldScreen(
 
     fun setSelectedCiv(civ: Civilization) {
         selectedCiv = if (viewingCiv.isSpectator()) civ else viewingCiv
-        selectedGameView = GameView(gameInfo, selectedCiv, viewingCiv.isSpectator())
+        selectedGameView = perspectiveOf(gameInfo, selectedCiv)
     }
 
     private fun updateSelectedCiv() {
