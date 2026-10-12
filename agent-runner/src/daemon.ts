@@ -120,6 +120,20 @@ export function buildSpawnForProvider(
   }
 }
 
+/**
+ * Codex (developer_instructions) and Claude (--append-system-prompt) receive
+ * GAME_INSTRUCTIONS on every invocation, so their turn prompt omits the copy.
+ * OpenCode has no system-prompt flag here: a fresh session needs it in the prompt.
+ */
+export function promptCarriesStaticInstructions(provider: RunTurnControl["provider"], resumeId: string | undefined): boolean {
+  if (provider === "codex" || provider === "claude") return false;
+  if (provider === "opencode") return !resumeId;
+  return true;
+}
+
+/** The leader's closing summary seeds the next fresh session; bounded so it cannot crowd the prompt. */
+export const MAX_TURN_SUMMARY_CHARS = 2000;
+
 function parseForProvider(provider: RunTurnControl["provider"]): (jsonl: string) => NormalizedRun {
   switch (provider) {
     case "codex":
@@ -238,7 +252,9 @@ export async function main(): Promise<void> {
       (prompt, resumeId, serverUrl, bearer) => {
         const built = buildSpawnForProvider(control.provider, prompt, resumeId, serverUrl, bearer, control.providerConfig, scratch);
         return { ...built, spec: { ...built.spec, context: { ...control.binding, turnSerial: control.context.turnSerial,
-          provider: control.provider, model: control.providerConfig.model, reasoning: control.providerConfig.reasoning } } };
+          provider: control.provider, model: control.providerConfig.model, reasoning: control.providerConfig.reasoning,
+          resumed: Boolean(resumeId),
+          ...(control.context.session ? { sessionArm: control.context.session.arm, sessionAge: control.context.session.age } : {}) } } };
       },
       parseForProvider(control.provider),
     );
@@ -255,6 +271,7 @@ export async function main(): Promise<void> {
         guidance: control.guidance,
         resumeId: control.providerConfig.resumeId,
         cwd: scratch,
+        includeStaticInstructions: promptCarriesStaticInstructions(control.provider, control.providerConfig.resumeId),
       });
       if (outcome.run.sessionId) {
         emit("session_bound", { sessionId: outcome.run.sessionId });
@@ -265,6 +282,7 @@ export async function main(): Promise<void> {
         turnEnded: outcome.turnEnded,
         detail: outcome.detail,
         toolCalls: outcome.run.toolCalls.map((t) => t.tool),
+        ...(outcome.run.finalText?.trim() ? { summary: outcome.run.finalText.trim().slice(0, MAX_TURN_SUMMARY_CHARS) } : {}),
       });
     } catch (error) {
       emit("run_failed", { reason: error instanceof Error ? error.message : String(error) });

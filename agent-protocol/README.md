@@ -3,7 +3,7 @@
 **Protocol version:** `1` (see `protocol-version.json`).
 **Contract source:** `AI_AGENT_PLAN.md` §5.
 
-- `schemas/mutation-envelope.schema.json` — the single-mutation request envelope for `game.act` (plan §5.1). No batching in v1.
+- `schemas/mutation-envelope.schema.json` — the single-mutation request envelope for `game.act` (plan §5.1). The engine still commits one mutation per envelope; the supervisor's `game.act_batch({expectedRevision, actions:[{actionId,type,args}]})` submits up to 12 such envelopes in order, chains each receipt's revision into the next and stops at the first rejection.
 - `schemas/action-receipt.schema.json` — success receipt returned by `game.act` / `game.action_result` (plan §5.1).
 - `schemas/error-envelope.schema.json` — structured rejection/error body; exhaustive v1 `code` enum.
 - `schemas/supervisor-events.schema.json` — normalized provider-adapter events (§7.1) and authoritative engine events. Provider streams and engine commits stay in separate namespaces.

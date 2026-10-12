@@ -62,6 +62,7 @@ class AgentOrchestrationLoopTest {
         val maxConcurrentInvocations = AtomicInteger(0)
         val completedInvocations = CopyOnWriteArrayList<String>()
         val allTurnInvocations = CopyOnWriteArrayList<String>()
+        val controls = CopyOnWriteArrayList<Map<String, Any?>>()
 
         @Volatile
         var onTurnInvoked: ((civId: String, runner: TestSupervisor) -> Unit)? = null
@@ -79,6 +80,7 @@ class AgentOrchestrationLoopTest {
             val binding = control["binding"] as Map<String, Any?>
             val civId = binding["civId"] as String
             allTurnInvocations.add(civId)
+            controls.add(control)
 
             val current = activeInvocations.incrementAndGet()
             maxConcurrentInvocations.updateAndGet { maxOf(it, current) }
@@ -100,7 +102,8 @@ class AgentOrchestrationLoopTest {
                     revision = null,
                     turnEnded = true,
                     toolCalls = listOf("observe", "end_turn"),
-                    detail = "completed"
+                    detail = "completed",
+                    summary = "Closing summary ${completedInvocations.size} for $civId."
                 )
             } finally {
                 activeInvocations.decrementAndGet()
@@ -214,6 +217,48 @@ class AgentOrchestrationLoopTest {
             "Game turn counter should have advanced across rounds",
             desktopMatch.coordinator.getGameTurns() >= initialTurn + 2
         )
+    }
+
+    @Test
+    fun `session rotation starts alternate civs fresh with their closing summary and resumes the others`() {
+        val fixture = MatchFixture(listOf(
+            "Rome" to ControllerKind.EXTERNAL_AGENT,
+            "Greece" to ControllerKind.EXTERNAL_AGENT
+        ))
+        lateinit var desktopMatch: DesktopAgentMatch
+        val supervisor = TestSupervisor { method, params -> desktopMatch.answerEngineRequest(method, params) }
+        desktopMatch = fixture.createMatch(supervisor)
+        val turnLatch = CountDownLatch(4)
+        supervisor.onTurnCompleted = { _ -> turnLatch.countDown() }
+
+        desktopMatch.startAutomaticPlay()
+        Assert.assertTrue("Expected 4 turns to complete within timeout", turnLatch.await(10, TimeUnit.SECONDS))
+        desktopMatch.pause()
+
+        @Suppress("UNCHECKED_CAST")
+        fun turn(index: Int): Triple<Any?, Map<String, Any?>, Map<String, Any?>> = supervisor.controls[index].let {
+            val context = it["context"] as Map<String, Any?>
+            Triple((it["providerConfig"] as Map<String, Any?>)["resumeId"], context, context["session"] as Map<String, Any?>)
+        }
+        val (romeFirstResume, romeFirstContext, romeFirstSession) = turn(0)
+        Assert.assertNull(romeFirstResume)
+        Assert.assertNull(romeFirstContext["continuityNote"])
+        Assert.assertEquals(mapOf("arm" to "rotate-1", "age" to 0), romeFirstSession)
+
+        val (greeceFirstResume, _, greeceFirstSession) = turn(1)
+        Assert.assertNull(greeceFirstResume)
+        Assert.assertEquals(mapOf("arm" to AgentSessionPolicy.ARM_RESUME, "age" to 0), greeceFirstSession)
+
+        val (romeSecondResume, romeSecondContext, romeSecondSession) = turn(2)
+        Assert.assertNull("The rotating arm starts a fresh session every turn", romeSecondResume)
+        Assert.assertEquals("Your closing summary from your previous turn: Closing summary 1 for ${fixture.romeId}.",
+            romeSecondContext["continuityNote"])
+        Assert.assertEquals(mapOf("arm" to "rotate-1", "age" to 0), romeSecondSession)
+
+        val (greeceSecondResume, greeceSecondContext, greeceSecondSession) = turn(3)
+        Assert.assertEquals("session-${fixture.greeceId}", greeceSecondResume)
+        Assert.assertNull("A resumed session already holds its own summary", greeceSecondContext["continuityNote"])
+        Assert.assertEquals(mapOf("arm" to AgentSessionPolicy.ARM_RESUME, "age" to 1), greeceSecondSession)
     }
 
     @Test

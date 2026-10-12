@@ -30,7 +30,6 @@ import com.unciv.models.ruleset.Building
 import com.unciv.models.ruleset.INonPerpetualConstruction
 import com.unciv.models.ruleset.PerpetualConstruction
 import com.unciv.models.ruleset.tile.ResourceType
-import com.unciv.models.ruleset.unique.UniqueTarget
 import com.unciv.models.ruleset.unique.UniqueType
 import com.unciv.models.stats.Stat
 
@@ -252,6 +251,12 @@ class MatchCoordinator(
     fun getControllers(): Map<String, CivilizationController> =
         committedMatch.controllers.mapValues { it.value.copy() }
 
+    /** Agent-controlled civs in turn order; session A/B arms stay stable while controllers do not change. */
+    @Synchronized
+    fun getAgentCivsInTurnOrder(): List<String> = committedGame.civilizations
+        .filter { committedMatch.controllers[it.civID]?.kind == ControllerKind.EXTERNAL_AGENT }
+        .map { it.civID }
+
     /** Host visibility depends on the real viewing civilization, never a caller-supplied mode flag. */
     @Synchronized
     fun isSpectatorViewer(viewerCivId: String): Boolean =
@@ -360,6 +365,12 @@ class MatchCoordinator(
             if (unit.ownerCivId == actorCivId)
                 unit.tile = buildPermittedTile(committedGame, committedMatch, actorCivId, HexCoord(unit.x, unit.y))
         }
+    }
+
+    /** Committed position/movement of an own unit without tile detail; null once consumed or destroyed. */
+    fun ownUnitState(actorCivId: String, unitId: Int): ObservedUnit? {
+        requireController(actorCivId)
+        return buildUnitInspection(committedGame, actorCivId, unitId)?.takeIf { it.ownerCivId == actorCivId }
     }
 
     fun inspectTile(actorCivId: String, position: HexCoord): ObservedTile? {
@@ -1141,24 +1152,10 @@ class MatchCoordinator(
             val unit = requireOwnUnit(candidateGame, command.actorCivId, command.unitId)
             val civ = candidateGame.getCivilization(command.actorCivId)
             val tile = unit.getTile()
+            // Same checks legal_actions reports as canFound/foundBlockedReason.
+            foundCityBlocker(unit)?.let { throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, it) }
             val unique = unit.getMatchingUniques(UniqueType.FoundCity).firstOrNull()
-                ?: unit.getMatchingUniques(UniqueType.FoundPuppetCity).firstOrNull()
-                ?: throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Unit cannot found cities")
-            if (unique.modifiers.any {
-                    it.type?.targetTypes?.contains(UniqueTarget.UnitActionModifier) == true
-                        && it.type != UniqueType.UnitActionConsumeUnit
-                })
-                throw AgentCommandException(
-                    AgentCommandError.ILLEGAL_ACTION, "Complex founding rites are unsupported in v1"
-                )
-            if (tile.isWater || tile.isImpassible())
-                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Cannot found a city here")
-            if (civ.isOneCityChallenger() && civ.hasEverOwnedOriginalCapital)
-                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Cannot found another city")
-            if (!unit.hasMovement())
-                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Unit has no movement left")
-            if (!tile.canBeSettled(civ))
-                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Too close to another city")
+                ?: unit.getMatchingUniques(UniqueType.FoundPuppetCity).first()
             // Engine path mirrors UnitActionsFromUniques without its tutorial/
             // render side effects (those belong to snapshot publication).
             // "By consuming this unit" is the standard modifier and maps to

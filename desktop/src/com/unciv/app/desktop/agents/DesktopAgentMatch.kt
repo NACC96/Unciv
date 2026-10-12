@@ -7,6 +7,7 @@ import com.unciv.logic.agents.AgentCommand
 import com.unciv.logic.agents.AgentControl
 import com.unciv.logic.agents.AgentEngineBridge
 import com.unciv.logic.agents.AgentJson
+import com.unciv.logic.agents.AgentSessionPolicy
 import com.unciv.logic.agents.MessageImageDraft
 import com.unciv.logic.agents.AgentMatchSession
 import com.unciv.logic.agents.AgentMatchState
@@ -192,6 +193,11 @@ class DesktopAgentMatch(
     private var providerRunCivId: String? = null
     private val runTimer = AgentRunTimer(clockNanos)
     private val sessions = HashMap<String, String>() // civId -> provider session ID
+    /** Turns the civ's current provider session has served (session rotation). */
+    private val sessionTurns = HashMap<String, Int>()
+    /** Each civ's latest closing summary, seeded into its next fresh session. */
+    private val lastSummaries = HashMap<String, String>()
+    private val sessionSettingsFile = File(dataDir, ".agent-data/${AgentSessionPolicy.SETTINGS_FILE}")
     private var supervisor: SupervisorRunner? = null
     private var failureReason: String? = match.matchPausedReason
     private val isLoopRunning = AtomicBoolean(false)
@@ -323,7 +329,11 @@ class DesktopAgentMatch(
             pending.committed = true
             if (pending.change != NationControlChange.SPECTATE) {
                 authorityEpoch = AgentRunControls.nextEpoch(authorityEpoch)
-                pending.civId?.let { sessions.remove(it) }
+                pending.civId?.let {
+                    sessions.remove(it)
+                    sessionTurns.remove(it)
+                    lastSummaries.remove(it)
+                }
             }
             pendingViewRefresh = true
             viewInstallInFlight = true
@@ -992,10 +1002,20 @@ class DesktopAgentMatch(
             return
         }
         val runId = "run-${UUID.randomUUID()}"
+        // Read per turn so the session experiment can change without restarting the app.
+        val sessionSettings = AgentSessionPolicy.parseSettings(
+            try { sessionSettingsFile.takeIf { it.isFile }?.readText() } catch (_: Exception) { null })
+        var resumeId: String? = null
+        var sessionAge = 0
         val control: Map<String, Any?> = try { synchronized(lock) {
             if (closed.get() || !matchOpen || pendingNationChange != null || pendingViewRefresh ||
                 runState !in setOf(AgentRunState.STARTING, AgentRunState.AGENT_DECIDING, AgentRunState.APPLYING)) return
             val turnGuidance = publishCommittedChangesLocked { coordinator.takeGuidanceForDelivery(civId) }
+            val sessionArm = AgentSessionPolicy.armFor(civId, coordinator.getAgentCivsInTurnOrder(), sessionSettings)
+            resumeId = sessions[civId]?.takeIf {
+                AgentSessionPolicy.shouldResume(sessionArm, sessionTurns[civId] ?: 0, sessionSettings)
+            }
+            sessionAge = if (resumeId != null) sessionTurns[civId] ?: 0 else 0
             mapOf(
                 "protocol" to 1,
                 "kind" to "control",
@@ -1005,7 +1025,7 @@ class DesktopAgentMatch(
                 "providerConfig" to mapOf(
                     "model" to profile.modelId,
                     "reasoning" to profile.reasoning,
-                    "resumeId" to sessions[civId]),
+                    "resumeId" to resumeId),
                 "binding" to mapOf("matchId" to matchId,
                     "timelineId" to coordinator.getTimelineId(),
                     "civId" to civId, "runId" to runId,
@@ -1015,7 +1035,9 @@ class DesktopAgentMatch(
                     "modelLabel" to profile.modelId),
                 "context" to mapOf("rulesetName" to coordinator.getRulesetName(),
                     "protocolVersion" to 1, "civId" to civId,
-                    "turnSerial" to coordinator.getTurnSerial()),
+                    "turnSerial" to coordinator.getTurnSerial(),
+                    "continuityNote" to (if (resumeId == null) lastSummaries[civId] else null),
+                    "session" to mapOf("arm" to sessionArm, "age" to sessionAge)),
                 "guidance" to turnGuidance).also {
                     // From this reservation onward a later pause must drain, never cancel this run.
                     providerRunCivId = civId
@@ -1034,8 +1056,15 @@ class DesktopAgentMatch(
         }
         synchronized(lock) {
             val session = outcome.sessionId
-            if (session != null) sessions[civId] = session
+            if (session != null) {
+                sessionTurns[civId] = if (session == resumeId) sessionAge + 1 else 1
+                sessions[civId] = session
+            }
             if (outcome.status == "completed_turn") {
+                // A turn without a closing summary must not relabel an older one as "previous".
+                val summary = outcome.summary
+                if (summary == null) lastSummaries.remove(civId)
+                else lastSummaries[civId] = "Your closing summary from your previous turn: $summary"
                 publishSnapshotLocked()
                 if (!closed.get() && coordinator.isPaused()) {
                     failureReason = coordinator.getPausedReason()

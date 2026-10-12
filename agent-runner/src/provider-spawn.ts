@@ -21,6 +21,7 @@ export const GAME_TOOL_ALLOWLIST = [
   "game.rules",
   "game.legal_actions",
   "game.act",
+  "game.act_batch",
   "game.action_result",
   "game.notes",
   "game.end_turn",
@@ -30,7 +31,8 @@ export interface SpawnSpec {
   executable: string;
   argv: string[];
   cwd: string;
-  context?: { matchId: string; civId: string; turnSerial: number; runId: string; provider?: string; model?: string; reasoning?: string };
+  context?: { matchId: string; civId: string; turnSerial: number; runId: string; provider?: string; model?: string; reasoning?: string;
+    sessionArm?: string; sessionAge?: number; resumed?: boolean };
 }
 
 type Provider = "codex" | "claude" | "opencode";

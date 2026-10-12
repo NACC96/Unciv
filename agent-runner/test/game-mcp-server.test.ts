@@ -101,7 +101,7 @@ describe("game MCP transport guards (plan §7.3)", () => {
     expect([413, 400]).toContain(big.status);
   });
 
-  it("exposes exactly the 11 game tools and round-trips observe/act", async () => {
+  it("exposes exactly the 12 game tools and round-trips observe/act", async () => {
     server = await startGameMcpServer(new FakeGameService(), {
       matchId: "m", timelineId: "t", civId: "civ", runId: "r", authorityEpoch: 1,
     });
@@ -109,7 +109,7 @@ describe("game MCP transport guards (plan §7.3)", () => {
     const list = await rpc(server.url, server.bearer, call("tools/list"));
     const names = ((list.json?.["result"] as { tools: { name: string }[] }).tools).map((t) => t.name).sort();
     expect(names).toEqual([
-      "game.act", "game.action_result", "game.end_turn", "game.inspect",
+      "game.act", "game.act_batch", "game.action_result", "game.end_turn", "game.inspect",
       "game.legal_actions", "game.map", "game.message_image", "game.notes", "game.observe", "game.rules", "game.tile",
     ]);
     const obs = await rpc(server.url, server.bearer, call("tools/call", { name: "game.observe", arguments: {} }));

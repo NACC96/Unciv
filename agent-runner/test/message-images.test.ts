@@ -73,7 +73,7 @@ describe("private correspondence and leader replies", () => {
     const prompt = buildTurnPrompt({ ...context, inbox: [{ ...message, attachments: [{ ...metadata, data: image.data } as any] }], diplomaticHistory: [...history, answer, { ...message, messageId: "foreign", senderCivId: "China", targetCivId: "Greece" }, { ...message, messageId: "future", deliveredTurnSerial: 4 }, { ...message, messageId: "pending", deliveredTurnSerial: null }] });
     expect(prompt).toContain("old-answer"); expect(prompt).toContain(answer.acknowledgementText); expect(prompt).not.toContain(image.data);
     for (const hidden of ["foreign", "future", "pending", "own-0"]) expect(prompt).not.toContain(`"messageId":"${hidden}"`);
-    expect(prompt.match(/"messageId":"(?:own-\d+|old-answer)"/g)).toHaveLength(12);
+    expect(prompt.match(/"messageId":"(?:own-\d+|old-answer)"/g)).toHaveLength(6);
     expect(prompt).toContain(context.personality); expect(prompt).toContain("game.message_image"); expect(prompt).toContain("cannot view");
     expect(GAME_INSTRUCTIONS).not.toContain("Message received. I will consider"); expect(prompt).toContain("answer the actual proposal"); expect(prompt).toContain("no automatic reply");
   });

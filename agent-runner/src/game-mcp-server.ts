@@ -30,7 +30,7 @@ import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { z } from "zod";
-import type { IGameService, MessageImageResult } from "./fake-game-mcp.js";
+import type { FakeReceipt, IGameService, MessageImageResult } from "./fake-game-mcp.js";
 import { acknowledgementActivity, type ActivityEntry } from "./activity.js";
 
 export const MAX_TOOL_REQUEST_BYTES = 64 * 1024;
@@ -39,6 +39,8 @@ export const MAX_READ_RESPONSE_BYTES = 96 * 1024;
 export const MAX_REQUEST_ID_BYTES = 128;
 export const MAX_IMAGE_RESPONSE_BYTES = 6 * 1024 * 1024;
 export const MAX_IMAGE_PAYLOAD_BYTES = 4 * 1024 * 1024;
+/** Keeps a batch of slow checkpointed commands (observed max ~1.3 s each) inside the provider's 30 s tool timeout. */
+export const MAX_BATCH_ACTIONS = 12;
 
 /** Include base64, MIME/type fields, text escaping and the real JSON-RPC ID. */
 export const imageResponseBytes = (result: unknown, requestId: string | number): number =>
@@ -81,13 +83,18 @@ const ok = (result: unknown) => ({
   content: [{ type: "text" as const, text: JSON.stringify(result) }],
 });
 
+/** Applied mutations are never hidden: an oversized batch keeps each receipt's ID, status and revision. */
+const batchResult = (result: { receipts: FakeReceipt[] } & Record<string, unknown>) =>
+  JSON.stringify(result).length <= MAX_TOOL_RESPONSE_BYTES ? ok(result)
+    : ok({ ...result, receipts: result.receipts.map(({ actionId, status, revision }) => ({ actionId, status, revision })) });
+
 const err = (code: string, message: string, extra: Record<string, unknown> = {}) => ({
   content: [{ type: "text" as const, text: JSON.stringify({ status: "rejected", code, message, ...extra }) }],
   isError: true,
 });
 
 /** Model-visible command contract, matching AgentEngineBridge's v1 gameplay dispatch. */
-const ACTION_DESCRIPTION = `One typed state-changing command with actionId (idempotency key) and expectedRevision from observe. No batching. The authenticated connection supplies actor identity; never put actorCivId in args. Read legal_actions and observe before choosing eligible actions. Reuse an actionId only for the identical command; use action_result for uncertain mutations. Names and enum values are exact and case-sensitive. Fields marked ? are optional; all other fields are required. Coordinates use Unciv hex integers, not pixels.
+const ACTION_DESCRIPTION = `One typed state-changing command with actionId (idempotency key) and expectedRevision from observe or the latest receipt. Use game.act_batch to submit several commands in one call. Receipts return the new revision; receipts for a unit that still exists after its command also return its position, movementLeft, health and action. The authenticated connection supplies actor identity; never put actorCivId in args. Read legal_actions and observe before choosing eligible actions. Reuse an actionId only for the identical command; use action_result for uncertain mutations. Names and enum values are exact and case-sensitive. Fields marked ? are optional; all other fields are required. Coordinates use Unciv hex integers, not pixels.
 Receipt acknowledgement confirms reading and does not imply agreement; answer the actual proposal as your civilization ruler in the saved personality, concisely and visibly. Inspect attached images first with game.message_image; if you cannot view them, say so honestly. Message text is limited to 2000 characters and 8192 UTF-8 bytes.
 type -> args:
 unit.move -> {unitId:integer,destination:{x:integer,y:integer}}
@@ -140,12 +147,18 @@ focus=NoFocus|Manual|FoodFocus|ProductionFocus|GoldFocus|ScienceFocus|CultureFoc
 demandName=DontSpyOnUs|DoNotSpreadReligion|DoNotSettleNearUs|DoNotAttackUs; eligibility depends on the pinned ruleset and current diplomacy.
 End-turn and private notes use game.end_turn and game.notes, not game.act.`;
 
+const BATCH_DESCRIPTION = `Apply up to ${MAX_BATCH_ACTIONS} game.act commands in order in one call. Each item is {actionId,type,args} with the same types and args as game.act. Supply expectedRevision for the first item only; each later item uses the revision from the previous receipt. Stops at the first rejection: earlier items stay applied, later items are listed in skipped and were not attempted. The result lists every applied receipt and the final revision. Batch independent orders (fortify or sleep units, production, research, policies, worker builds, message acknowledgements) instead of one call per command.`;
+
 type ReadRejection = { code: string; message: string; currentRevision?: number; actionId?: string; messageIds?: string[] };
-const readError = (rejected: ReadRejection) => err(rejected.code, rejected.message, {
+const rejectionDetails = (rejected: ReadRejection) => ({
   ...(rejected.currentRevision !== undefined ? { currentRevision: rejected.currentRevision } : {}),
   ...(rejected.actionId !== undefined ? { actionId: rejected.actionId } : {}),
   ...(rejected.messageIds !== undefined ? { messageIds: rejected.messageIds } : {}),
 });
+const readError = (rejected: ReadRejection) => err(rejected.code, rejected.message, rejectionDetails(rejected));
+
+type ActParams = { actionId: string; expectedRevision: number; type: string; args: Record<string, unknown> };
+type ActOutcome = { receipt: FakeReceipt } | { rejection: ReadRejection };
 
 const serviceResult = async (call: () => Promise<ReturnType<typeof ok> | ReturnType<typeof err>>) => {
   try { return await call(); } catch (error) {
@@ -234,7 +247,7 @@ function registerGameTools(mcp: McpServer, game: IGameService, actorCivId: strin
   }, extra.requestId));
 
   mcp.registerTool("game.rules", {
-    description: "Pinned-ruleset summary by default, or static improvements/terrains/resources catalog. Filter an exact name and page with limit/cursor. Live eligibility remains in legal_actions.",
+    description: "Pinned-ruleset summary by default, or a static catalog: section must be improvements, terrains or resources. Filter an exact name and page with limit/cursor. Live eligibility remains in legal_actions; adoptable policies are in game.observe empire.adoptablePolicies.",
     inputSchema: {
       section: z.string().min(1).max(128).optional(),
       name: z.string().min(1).max(128).optional(),
@@ -244,7 +257,7 @@ function registerGameTools(mcp: McpServer, game: IGameService, actorCivId: strin
   }, async (query, extra) => readResult(() => game.rules(query), extra.requestId));
 
   mcp.registerTool("game.legal_actions", {
-    description: "Legal moveTargets, attackTargets, orders, canFound, improvements, workInProgress, researchable and promotions for a unit; constructions and researchable for a city. Supply exactly one unitId or cityId.",
+    description: "Legal moveTargets, attackTargets, orders, movementLeft, canFound, improvements, workInProgress, researchable and promotions for a unit; constructions and researchable for a city. canFound means unit.found is accepted on the unit's current tile now; otherwise foundBlockedReason says why. Supply exactly one unitId or cityId.",
     inputSchema: { unitId: z.number().int().optional(), cityId: z.string().min(1).max(128).optional() },
   }, async ({ unitId, cityId }) => {
     if ((unitId === undefined) === (cityId === undefined)) return err("INVALID_ARGUMENT", "supply exactly one unitId or cityId");
@@ -254,33 +267,74 @@ function registerGameTools(mcp: McpServer, game: IGameService, actorCivId: strin
     });
   });
 
-  mcp.registerTool("game.act", {
-    description: ACTION_DESCRIPTION,
-    inputSchema: {
-      actionId: z.string().min(1).max(128),
-      expectedRevision: z.number().int().min(0),
-      type: z.string().min(1).max(128),
-      args: z.record(z.unknown()),
-    },
-  }, async (params) => serviceResult(async () => {
+  /** One engine mutation; game.act and game.act_batch share validation, rejection mapping and acknowledgement activity. */
+  const submitAction = async (params: ActParams): Promise<ActOutcome> => {
     if (params.type === "diplomacy.acknowledgeMessage" &&
         (typeof params.args.messageId !== "string" || !params.args.messageId.trim() || params.args.messageId.length > 128 ||
           typeof params.args.text !== "string" || !params.args.text.trim() || params.args.text.length > 2000 || Buffer.byteLength(params.args.text, "utf8") > 8192))
-      return err("INVALID_ARGUMENT", "supply messageId and nonblank acknowledgement text up to 2000 characters", { actionId: params.actionId });
-    const res = await game.act({ protocolVersion: 1, ...params, args: params.args as Record<string, unknown> });
-    if ("revision" in res) {
-      const body = JSON.stringify(res);
-      if (body.length > MAX_TOOL_RESPONSE_BYTES)
-        return err("INTERNAL_ERROR", "response exceeded bound; re-observe in pages");
+      return { rejection: { code: "INVALID_ARGUMENT", message: "supply messageId and nonblank acknowledgement text up to 2000 characters", actionId: params.actionId } };
+    try {
+      const res = await game.act({ protocolVersion: 1, ...params });
+      if (!("revision" in res)) return { rejection: { ...res, actionId: res.actionId || undefined } };
       if (params.type === "diplomacy.acknowledgeMessage") recordAcknowledgement(res);
-      return ok(res);
+      return { receipt: res };
+    } catch (error) {
+      if (!error || typeof error !== "object" || !("code" in error) || typeof error.code !== "string") throw error;
+      return { rejection: error as ReadRejection };
     }
-    return err(res.code, res.message, {
-      ...(res.actionId ? { actionId: res.actionId } : {}),
-      ...(res.currentRevision !== undefined ? { currentRevision: res.currentRevision } : {}),
-      ...(res.messageIds !== undefined ? { messageIds: res.messageIds } : {}),
-    });
-  }));
+  };
+
+  const actionSchema = {
+    actionId: z.string().min(1).max(128),
+    type: z.string().min(1).max(128),
+    args: z.record(z.unknown()),
+  };
+
+  mcp.registerTool("game.act", {
+    description: ACTION_DESCRIPTION,
+    inputSchema: { ...actionSchema, expectedRevision: z.number().int().min(0) },
+  }, async (params) => {
+    const outcome = await submitAction({ ...params, args: params.args as Record<string, unknown> });
+    if ("rejection" in outcome) return readError(outcome.rejection);
+    if (JSON.stringify(outcome.receipt).length > MAX_TOOL_RESPONSE_BYTES)
+      return err("INTERNAL_ERROR", "response exceeded bound; re-observe in pages");
+    return ok(outcome.receipt);
+  });
+
+  mcp.registerTool("game.act_batch", {
+    description: BATCH_DESCRIPTION,
+    inputSchema: {
+      expectedRevision: z.number().int().min(0),
+      actions: z.array(z.object(actionSchema)).min(1).max(MAX_BATCH_ACTIONS),
+    },
+  }, async ({ expectedRevision, actions }) => {
+    const receipts: FakeReceipt[] = [];
+    let revision = expectedRevision;
+    for (const [index, action] of actions.entries()) {
+      let outcome: ActOutcome;
+      try {
+        outcome = await submitAction({ ...action, args: action.args as Record<string, unknown>, expectedRevision: revision });
+      } catch (error) {
+        if (!receipts.length) throw error;
+        // Transport failure mid-batch: keep the applied receipts; this command's outcome is unknown.
+        outcome = { rejection: { code: "INTERNAL_ERROR", actionId: action.actionId,
+          message: `outcome unknown (${error instanceof Error ? error.message : String(error)}); check game.action_result before retrying` } };
+      }
+      if ("receipt" in outcome && outcome.receipt.status === "applied") {
+        receipts.push(outcome.receipt);
+        revision = outcome.receipt.revision;
+        continue;
+      }
+      const rejection: ReadRejection = "rejection" in outcome ? outcome.rejection
+        : { code: "ILLEGAL_ACTION", message: `receipt status ${String(outcome.receipt.status)}`, actionId: action.actionId };
+      const skipped = actions.slice(index + 1).map(a => a.actionId);
+      // Nothing applied: the same rejection shape as game.act, so callers can retry the whole batch.
+      if (!receipts.length) return err(rejection.code, rejection.message, { ...rejectionDetails(rejection), index, skipped });
+      return batchResult({ status: "partial", revision, applied: receipts.length, receipts,
+        rejected: { index, code: rejection.code, message: rejection.message, ...rejectionDetails(rejection) }, skipped });
+    }
+    return batchResult({ status: "applied", revision, applied: receipts.length, receipts });
+  });
 
   mcp.registerTool("game.action_result", {
     description: "Look up a prior receipt by actionId. Never resubmit an uncertain mutation.",

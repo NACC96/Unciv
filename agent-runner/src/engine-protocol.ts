@@ -80,6 +80,8 @@ export interface RunTurnControl {
     civId: string;
     turnSerial: number;
     continuityNote?: string;
+    /** Desktop session policy for this run, recorded in run metadata for A/B analysis. */
+    session?: { arm: string; age: number };
   };
   guidance: string[];
 }
