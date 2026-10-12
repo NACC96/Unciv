@@ -5,6 +5,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.unciv.Constants
 import com.unciv.GUI
 import com.unciv.models.Religion
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.extensions.addSeparator
 import com.unciv.ui.components.extensions.addSeparatorVertical
 import com.unciv.ui.components.extensions.toLabel
@@ -23,7 +24,7 @@ class CityReligionInfoTable(
 ) : Table(BaseScreen.skin) {
 
     init {
-        val gridColor = Color.DARK_GRAY
+        val gridColor = if (GameUiStyle.isAtlas) GameUiStyle.hover else Color.DARK_GRAY
         val followers = cityView.getNumberOfFollowers()
         val futurePressures = cityView.getPressuresFromSurroundingCities()
 
@@ -68,6 +69,7 @@ class CityReligionInfoTable(
                 row()
             }
         }
+        if (GameUiStyle.isAtlas) GameUiStyle.applyWidget(this)
     }
 
     private fun getIconAndLabel(religionName: String?) =
