@@ -447,7 +447,8 @@ class WorldScreen(
         globalShortcuts.add(KeyboardBinding.QuickSave) { QuickSave.save(gameInfo, this) }
         globalShortcuts.add(KeyboardBinding.QuickLoad) { QuickSave.load(this) }
         globalShortcuts.add(KeyboardBinding.ViewCapitalCity) {
-            val capital = gameInfo.getCurrentPlayerCivilization().getCapital()
+            // A private inactive viewer must never open the active foreign nation's full CityView.
+            val capital = (if (viewingCiv.isSpectator()) gameInfo.getCurrentPlayerCivilization() else viewingCiv).getCapital()
             if (capital != null && !mapHolder.setCenterPosition(capital.location.toHexCoord()))
                 game.pushScreen{ CityScreen(selectedGameView.getCityView(capital)) }
         }

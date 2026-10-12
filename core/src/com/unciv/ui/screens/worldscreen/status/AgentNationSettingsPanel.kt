@@ -25,7 +25,7 @@ import com.unciv.ui.screens.worldscreen.WorldScreen
 import com.unciv.ui.screens.worldscreen.WorldScreenStyle
 
 /** Modeless local controls. Only the host may commit these copied, per-nation drafts. */
-class AgentNationSettingsPanel(private val screen: WorldScreen, private val session: AgentMatchSession) :
+class AgentNationSettingsPanel(private val screen: WorldScreen, private val session: AgentMatchSession, private val controlsAnchor: Actor? = null) :
     Table(BaseScreen.skin), Disposable {
     private data class NationChoice(val id: String, val label: String) { override fun toString() = label }
     private data class ModelChoice(val spec: ModelSpec, val customEntry: Boolean = false) {
@@ -56,6 +56,7 @@ class AgentNationSettingsPanel(private val screen: WorldScreen, private val sess
     private var requesting = false
     private var disposed = false
     private var positioned = false
+    private var userDragged = false
     private val task = object : Timer.Task() {
         override fun run() { if (disposed) cancel() else if (isVisible) refresh() }
     }
@@ -77,6 +78,7 @@ class AgentNationSettingsPanel(private val screen: WorldScreen, private val sess
                 pointerOrigin.set(event.stageX, event.stageY); toFront(); return true
             }
             override fun touchDragged(event: InputEvent, x: Float, y: Float, pointer: Int) {
+                userDragged = true
                 setPosition(origin.x + event.stageX - pointerOrigin.x, origin.y + event.stageY - pointerOrigin.y)
                 clampPosition(); Gdx.graphics.requestRendering()
             }
@@ -135,7 +137,10 @@ class AgentNationSettingsPanel(private val screen: WorldScreen, private val sess
         displayName.onChange { if (!updating) currentDraft()?.displayName = displayName.text }
         personality.onChange { if (!updating) currentDraft()?.personality = personality.text }
         customModel.onChange {
-            if (!updating && model.selected?.customEntry == true) currentDraft()?.modelId = customModel.text.trim()
+            if (!updating && model.selected?.customEntry == true) currentDraft()?.let {
+                it.modelId = customModel.text.trim()
+                populateReasoning(it)
+            }
         }
         save.onClick { request(NationControlChange.SAVE_AGENT_SETTINGS) }
         play.onClick { request(NationControlChange.PLAY_AS) }
@@ -238,9 +243,15 @@ class AgentNationSettingsPanel(private val screen: WorldScreen, private val sess
         identity.setText("Viewing ${screen.viewingCiv.civID} · changes apply after the current agent finishes")
         session.getPendingNationChange()?.let { status.setText(it); status.color = WorldScreenStyle.warning }
         val w = minOf(480f, screen.stage.width - 16f).coerceAtLeast(1f)
-        val h = minOf(650f, screen.stage.height - 130f).coerceAtLeast(1f)
+        val anchorTop = if (isVisible) controlsAnchor?.localToStageCoordinates(Vector2())?.y?.minus(8f) else null
+        val h = minOf(650f, screen.stage.height - 130f, anchorTop?.minus(8f) ?: Float.MAX_VALUE).coerceAtLeast(1f)
         setSize(w, h)
-        if (!positioned) { setPosition(screen.stage.width - width - 8f, screen.stage.height - height - 116f); positioned = true }
+        // Controls are not mounted/laid out during hidden construction. Follow their real stage
+        // bottom only after showing; an explicit drag preserves the user's placement on resize.
+        if (isVisible && (!positioned || controlsAnchor != null && !userDragged)) {
+            setPosition(screen.stage.width - width - 8f, (anchorTop ?: (screen.stage.height - 116f)) - height)
+            positioned = true
+        }
         // Bound wrapped labels to the scroll pane; long identities must never drive its preferred width.
         val contentWidth = (w - 46f).coerceAtLeast(1f)
         form.cells.forEach { it.width(contentWidth) }

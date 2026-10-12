@@ -184,6 +184,58 @@ class AgentNationSettingsPanelTest {
         } finally { panel.dispose() }
     }
 
+    @Test fun `editing custom ID from nonthinking model restores custom reasoning choices`() {
+        val f = Fixture(); f.profile.modelId = "gpt-4o"; f.profile.reasoning = null
+        val panel = AgentNationSettingsPanel(f.screen, f.session)
+        try {
+            panel.toggle(); panel.select("NationModel", "Custom model")
+            panel.edit("NationCustomModel", "local/my-model")
+            val choices = (panel.named("NationReasoning") as SelectBox<*>).items.map { it.toString() }
+            assertEquals(listOf("Provider default", "Low", "Medium", "High"), choices)
+            panel.select("NationReasoning", "High"); panel.named("NationSave").press()
+            assertEquals("high", f.requests.single().profile!!.reasoning)
+            assertTrue(AgentModelCatalog.validateProfile(f.requests.single().profile!!).isEmpty())
+        } finally { panel.dispose() }
+    }
+
+    @Test fun `editing custom ID revalidates Luna XHigh so save uses actual capabilities`() {
+        val f = Fixture(); f.profile.modelId = "gpt-6-luna"; f.profile.reasoning = "xhigh"
+        val panel = AgentNationSettingsPanel(f.screen, f.session)
+        try {
+            panel.toggle(); panel.select("NationModel", "Custom model")
+            panel.edit("NationCustomModel", "local/my-model")
+            assertFalse((panel.named("NationReasoning") as SelectBox<*>).items.any { it.toString() == "XHigh" })
+            panel.named("NationSave").press()
+            assertEquals(1, f.requests.size)
+            assertTrue(AgentModelCatalog.validateProfile(f.requests.single().profile!!).isEmpty())
+            f.callback!!(null)
+            panel.edit("NationCustomModel", "gpt-4o")
+            assertEquals(listOf("Provider default"), (panel.named("NationReasoning") as SelectBox<*>).items.map { it.toString() })
+        } finally { panel.dispose() }
+    }
+
+    @Test fun `settings first shown and refreshed fit below laid out match controls`() {
+        val f = Fixture(420f, 600f)
+        val anchor = Actor().apply { setBounds(20f, 420f, 380f, 100f) }
+        f.root.addActor(anchor)
+        val panel = AgentNationSettingsPanel(f.screen, f.session, anchor)
+        try {
+            // Hidden construction must not freeze its position before the controls are laid out.
+            anchor.y = 390f; panel.toggle(); panel.validate()
+            assertTrue(panel.y + panel.height <= anchor.y - 8f)
+            assertTrue(panel.y >= 0f)
+            anchor.y = 370f; panel.refresh()
+            assertTrue(panel.y + panel.height <= anchor.y - 8f)
+            val header = panel.children.first()
+            val drag = header.listeners.filterIsInstance<com.badlogic.gdx.scenes.scene2d.InputListener>().single()
+            drag.touchDown(InputEvent().apply { target = header; stageX = 100f; stageY = 100f }, 0f, 0f, 0, 0)
+            drag.touchDragged(InputEvent().apply { stageX = 100f; stageY = 120f }, 0f, 0f, 0)
+            val draggedY = panel.y
+            anchor.y = 340f; panel.refresh()
+            assertEquals("Explicit dragging retains panel position", draggedY, panel.y)
+        } finally { panel.dispose() }
+    }
+
     @Test fun `compact panel and wrapped match controls stay in the viewport`() {
         val f = Fixture(420f, 600f)
         f.profile.displayName = "A very long imperial identity that must fit within the available glass"

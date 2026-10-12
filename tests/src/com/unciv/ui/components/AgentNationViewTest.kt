@@ -135,6 +135,59 @@ class AgentNationViewTest {
         assertEquals(1, Mockito.mockingDetails(game).invocations.count { it.method.name == "pushScreen" })
     }
 
+    private fun pressCapitalShortcut(f: Fixture, renderedGame: com.unciv.logic.GameInfo): List<com.unciv.view.CityView> {
+        val game = Mockito.mock(UncivGame::class.java)
+        Mockito.`when`(game.gameInfo).thenReturn(renderedGame)
+        field(BaseScreen::class.java, "game").set(f.screen, game)
+        val shortcuts = com.unciv.ui.components.input.KeyShortcutDispatcher()
+        field(BaseScreen::class.java, "globalShortcuts").set(f.screen, shortcuts)
+        WorldScreen::class.java.getDeclaredMethod("addKeyboardPresses").apply { isAccessible = true }.invoke(f.screen)
+        val cities = ArrayList<com.unciv.view.CityView>()
+        Mockito.mockConstruction(com.unciv.ui.screens.cityscreen.CityScreen::class.java) { _, context ->
+            cities.add(context.arguments().first() as com.unciv.view.CityView)
+        }.use {
+            Mockito.doAnswer { invocation -> invocation.getArgument<() -> BaseScreen>(0).invoke() }.`when`(game)
+                .pushScreen(Mockito.any<() -> BaseScreen>() ?: { Mockito.mock(BaseScreen::class.java) })
+            val resolver = com.unciv.ui.components.input.KeyShortcutDispatcher.Resolver(
+                com.unciv.ui.components.input.KeyboardBindings[com.unciv.ui.components.input.KeyboardBinding.ViewCapitalCity])
+            resolver.updateFor(shortcuts); resolver.triggeredActions.forEach { it() }
+        }
+        return cities
+    }
+
+    @Test fun `private Home targets own capital while another nation owns the active turn`() {
+        val f = Fixture(); f.game.makeHexagonalMap(5, Constants.grassland)
+        val greece = f.game.addCiv(f.game.ruleset.nations["Greece"]!!)
+        f.game.addCity(f.rome, f.game.tileMap[0, 0]); f.game.addCity(greece, f.game.tileMap[3, 0])
+        f.game.gameInfo.currentPlayer = greece.civID
+        UncivGame.Current.settings.tutorialTasksCompleted.add("Meet another civilization")
+        val snapshot = f.snapshot()
+        installWithViewer(f.screen, snapshot, ResolvedSelection(null, null, null), 1, f.rome.civID)
+        val cities = pressCapitalShortcut(f, snapshot)
+        val center = Mockito.mockingDetails(f.map).invocations.single { it.method.name == "setCenterPosition" }.arguments.first()
+        assertEquals(snapshot.getCivilization(f.rome.civID).getCapital()!!.location.toHexCoord(), center)
+        assertEquals(listOf(f.rome.civID), cities.map { it.owningCiv().getCiv().civID })
+    }
+
+    @Test fun `private Home without own capital does not center or open active foreign capital`() {
+        val f = Fixture(); f.game.makeHexagonalMap(5, Constants.grassland)
+        val greece = f.game.addCiv(f.game.ruleset.nations["Greece"]!!)
+        f.game.addCity(greece, f.game.tileMap[3, 0]); f.game.gameInfo.currentPlayer = greece.civID
+        UncivGame.Current.settings.tutorialTasksCompleted.add("Meet another civilization")
+        val snapshot = f.snapshot()
+        installWithViewer(f.screen, snapshot, ResolvedSelection(null, null, null), 1, f.rome.civID)
+        assertTrue(pressCapitalShortcut(f, snapshot).isEmpty())
+        assertFalse(Mockito.mockingDetails(f.map).invocations.any { it.method.name == "setCenterPosition" })
+    }
+
+    @Test fun `spectator Home still uses active nation capital`() {
+        val f = Fixture(); f.game.addCity(f.rome, f.game.tileMap[0, 0])
+        UncivGame.Current.settings.tutorialTasksCompleted.add("Meet another civilization")
+        val snapshot = f.snapshot()
+        f.screen.installAgentSnapshot(snapshot, ResolvedSelection(null, null, null), 1)
+        assertEquals(listOf(f.rome.civID), pressCapitalShortcut(f, snapshot).map { it.owningCiv().getCiv().civID })
+    }
+
     @Test fun `same viewer snapshot keeps selection and older publications cannot switch back`() {
         val f = Fixture(); val snapshot = f.snapshot()
         f.screen.installAgentSnapshot(snapshot, ResolvedSelection(null, null, f.game.tileMap[0, 0].position), 2)
