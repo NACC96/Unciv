@@ -28,6 +28,7 @@ import com.unciv.ui.components.extensions.*
 import com.unciv.ui.components.fonts.FontRulesetIcons
 import com.unciv.ui.components.fonts.Fonts
 import com.unciv.ui.screens.basescreen.BaseScreen
+import com.unciv.ui.images.atlas.AtlasClipCache
 import com.unciv.utils.Concurrency
 import com.unciv.utils.debug
 import kotlinx.coroutines.runBlocking
@@ -44,6 +45,7 @@ object ImageGetter {
     // We use texture atlases to minimize texture swapping - see https://yairm210.medium.com/the-libgdx-performance-guide-1d068a84e181
     lateinit var atlas: TextureAtlas
     private val atlases = HashMap<String, TextureAtlas>()
+    private var atlasClipCache: AtlasClipCache? = null
     var ruleset = Ruleset()
 
     // We then shove all the drawables into a hashmap, because the atlas specifically tells us
@@ -54,16 +56,33 @@ object ImageGetter {
     fun getSpecificAtlas(name: String): TextureAtlas? = atlases[name]
 
     fun resetAtlases() {
+        atlasClipCache?.reset()
         atlases.values.forEach { it.dispose() }
         atlases.clear()
     }
 
     fun reloadImages() = setNewRuleset(ruleset)
 
+    /** Lazy animation residency only when an explicit Atlas playback consumer requests it. */
+    @Synchronized fun getAtlasClipCache(): AtlasClipCache {
+        val current = atlasClipCache
+        if (current != null) {
+            val metrics = current.metrics()
+            // A disposed cache with old pins/staging still owns its budget; do not create overlapping owners.
+            if (!metrics.disposed || metrics.budgetedBytes > 0 || metrics.pendingDecodedBytes > 0) return current
+        }
+        return AtlasClipCache().also { atlasClipCache = it }
+    }
+
+    /** Playback closes its handles before shutdown; texture disposal drains outside actor draw. */
+    fun disposeAtlasClipCache() { atlasClipCache?.dispose() }
+
     /** Required every time the ruleset changes, in order to load mod-specific images */
     fun setNewRuleset(ruleset: Ruleset, ignoreIfModsAreEqual: Boolean = false) {
         if (ignoreIfModsAreEqual && ruleset.mods == ImageGetter.ruleset.mods)
             return
+
+        atlasClipCache?.reset()
             
         ImageGetter.ruleset = ruleset
         textureRegionDrawables.clear()
