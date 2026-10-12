@@ -7,6 +7,28 @@ import java.nio.file.Files
 import java.io.File
 
 class AgentActivityJournalTest {
+    @Test fun `run duration entry is replaced by the final turn outcome after provider exit`() {
+        val root = Files.createTempDirectory("unciv-run-outcome").toFile()
+        try {
+            val run = File(root, "run-a").apply { mkdirs() }
+            File(run, "meta.json").writeText("{\"civId\":\"Rome\",\"turnSerial\":2}")
+            val file = File(run, "activity.jsonl")
+            fun append(title: String, status: String) = file.appendText(AgentJson.stringify(mapOf(
+                "id" to "run-end", "kind" to "run", "title" to title, "status" to status,
+                "text" to title, "durationMs" to 83000, "timestamp" to "2026-10-12T01:00:00Z")) + "\n")
+            append("Provider exited in 01:23", "exited")
+            val journal = AgentActivityJournal(root); journal.refresh()
+            append("Provider incomplete in 01:23", "incomplete_turn"); journal.refresh()
+            val entry = journal.entries().single()
+            assertEquals("run", entry.kind)
+            assertEquals("incomplete_turn", entry.status)
+            assertEquals("Provider incomplete in 01:23", entry.title)
+            assertEquals(entry.title, journal.details(entry.id))
+            val reopened = AgentActivityJournal(root); reopened.refresh()
+            assertEquals(listOf(entry), reopened.entries())
+        } finally { root.deleteRecursively() }
+    }
+
     @Test
     fun `journal keeps readable summary and call status separate from raw details`() {
         val root = Files.createTempDirectory("unciv-activity-summary").toFile()

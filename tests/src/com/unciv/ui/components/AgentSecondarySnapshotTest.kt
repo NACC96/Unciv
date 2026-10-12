@@ -59,7 +59,7 @@ class AgentSecondarySnapshotTest {
     private fun put(type: Class<*>, name: String, target: Any, value: Any) =
         type.getDeclaredField(name).apply { isAccessible = true }.set(target, value)
 
-    private inner class Fixture(spectatorView: Boolean = false) {
+    private inner class Fixture(spectatorView: Boolean = false, denounced: Boolean = false) {
         val test = TestGame(baseRuleset = BaseRuleset.Civ_V_Vanilla)
         val rome = test.addCiv(test.ruleset.nations["Rome"]!!, isPlayer = true)
         val greece = test.addCiv(test.ruleset.nations["Greece"]!!)
@@ -73,6 +73,7 @@ class AgentSecondarySnapshotTest {
         val unitId: Int
         val app = UncivGame.Current
         init {
+            Mockito.doReturn(Mockito.mock(com.unciv.ui.screens.worldscreen.unit.AutoPlay::class.java)).`when`(world).autoPlay
             test.gameInfo.gameParameters.baseRuleset = BaseRuleset.Civ_V_Vanilla.fullName
             test.makeHexagonalMap(4)
             cityId = test.addCity(rome, test.getTile(0, 0)).id
@@ -80,6 +81,7 @@ class AgentSecondarySnapshotTest {
             rome.addGold(100)
             test.addUnit("Warrior", greece, test.getTile(3, 0))
             rome.diplomacyFunctions.makeCivilizationsMeet(greece)
+            if (denounced) rome.popupAlerts.add(com.unciv.logic.civilization.PopupAlert(com.unciv.logic.civilization.AlertType.Denounced, greece.civID))
             rome.policies.freePolicies = 2
             test.gameInfo.currentPlayer = rome.civID
             test.gameInfo.currentPlayerCiv = rome
@@ -127,7 +129,7 @@ class AgentSecondarySnapshotTest {
         }
         fun openCity() = app.pushScreen { CityScreen(world.selectedGameView.getCityView(world.gameInfo.getCities().first { it.id == cityId })) }
     }
-    private fun withFixture(spectator: Boolean = false, block: (Fixture) -> Unit) {
+    private fun withFixture(spectator: Boolean = false, denounced: Boolean = false, block: (Fixture) -> Unit) {
         val previousGraphics = Gdx.graphics
         val previousTileSets = TileSetCache.toMap()
         val previousIconNames = FontRulesetIcons.rulesetObjectNameToChar.toMap()
@@ -137,7 +139,7 @@ class AgentSecondarySnapshotTest {
         Mockito.`when`(graphics.height).thenReturn(600)
         Gdx.graphics = graphics
         try {
-            Mockito.mockConstruction(SpriteBatch::class.java).use { block(Fixture(spectator)) }
+            Mockito.mockConstruction(SpriteBatch::class.java).use { block(Fixture(spectator, denounced)) }
         } finally {
             Gdx.graphics = previousGraphics
             TileSetCache.clear()
@@ -259,6 +261,32 @@ class AgentSecondarySnapshotTest {
         f.world.installAgentSnapshot(AgentSnapshotPublication.deserializeGame(before), ResolvedSelection(null, null, null), before.generation, f.rome.civID)
         assertSame(f.world, f.app.screen)
         assertEquals(f.greece.civID, f.world.currentViewerCivId())
+    }
+
+    @Test fun `native Human handoff replaces private city with retained privacy cover`() = withFixture { f ->
+        val filesField = UncivGame::class.java.getDeclaredField("files").apply { isAccessible = true }
+        val previousFiles = filesField.get(f.app)
+        val directory = java.nio.file.Files.createTempDirectory("unciv-native-handoff-test-").toFile()
+        f.app.files = com.unciv.logic.files.UncivFiles(Gdx.files, directory.absolutePath)
+        try {
+            f.openCity()
+            val payload = AgentSnapshotPublication.buildPayload(f.coordinator, f.rome.civID)
+            val snapshot = AgentSnapshotPublication.deserializeGame(payload)
+            val state = migrateAgentMatchStateJson(payload.serializedMatchState)
+            state.controllers[f.greece.civID] = CivilizationController(f.greece.civID, ControllerKind.HUMAN, null)
+            state.localControlCivId = f.greece.civID
+            state.localViewingCivId = f.greece.civID
+            snapshot.agentMatchStateJson = com.badlogic.gdx.utils.Json().toJson(state)
+            f.world.installAgentSnapshot(snapshot, ResolvedSelection(null, null, null), payload.generation + 1, f.greece.civID)
+            val ready = f.app.screen as com.unciv.ui.screens.worldscreen.PlayerReadyScreen
+            assertTrue(ready.retainedWorldInStack)
+            assertEquals(f.greece.civID, f.world.currentViewerCivId())
+            f.app.popScreen()
+            assertSame(f.world, f.app.screen)
+        } finally {
+            filesField.set(f.app, previousFiles)
+            directory.deleteRecursively()
+        }
     }
 
     @Test fun `removed unit closes promotion screen instead of retaining orphan`() = withFixture { f ->
@@ -385,6 +413,104 @@ class AgentSecondarySnapshotTest {
         assertEquals(listOf("Warrior", "Monument"), fresh.cityView.constructions.constructionQueue)
         assertEquals(1, fresh.selectedQueueEntry)
         assertEquals("Monument", fresh.selectedConstruction?.name)
+    }
+
+    @Test fun `two stale queue removes cannot delete the next unseen entry`() = withFixture { f ->
+        f.command { CityProductionCommand(f.rome.civID, "first", it, f.cityId, ProductionOp.ADD_BOTTOM, name = "Monument") }
+        f.command { CityProductionCommand(f.rome.civID, "second", it, f.cityId, ProductionOp.ADD_BOTTOM, name = "Warrior") }
+        f.publish()
+        val pending = LinkedBlockingQueue<(Int) -> List<(Int) -> AgentCommand>>()
+        Mockito.doAnswer { call -> pending.put(call.getArgument(0)); null }.`when`(f.session).executeHumanAction(
+            Mockito.any<(Int) -> List<(Int) -> AgentCommand>>() ?: { emptyList() })
+        val old = f.openCity()
+        old.cityView.tryRemoveFromQueue(0, false); old.cityView.tryRemoveFromQueue(0, false)
+        val first = pending.poll(5, TimeUnit.SECONDS)!!; val second = pending.poll(5, TimeUnit.SECONDS)!!
+        assertNull(HumanCommandExecutor(f.coordinator).executeAll(f.rome.civID, first))
+        assertNotNull("Second click refers to the stale displayed queue", HumanCommandExecutor(f.coordinator).executeAll(f.rome.civID, second))
+        val snapshot = f.coordinator.deserializeForPublication(f.coordinator.serializeCommittedGameForPublication())
+        assertEquals(listOf("Warrior"), snapshot.getCities().first { it.id == f.cityId }.cityConstructions.constructionQueue)
+    }
+
+    @Test fun `buy captures selected queue entry and currency before GL clears selection`() = withFixture { f ->
+        val pending = LinkedBlockingQueue<(Int) -> List<(Int) -> AgentCommand>>()
+        Mockito.doAnswer { call -> pending.put(call.getArgument(0)); null }.`when`(f.session).executeHumanAction(
+            Mockito.any<(Int) -> List<(Int) -> AgentCommand>>() ?: { emptyList() })
+        val city = f.openCity(); city.selectedQueueEntry = 1
+        val factory = com.unciv.ui.screens.cityscreen.BuyButtonFactory(city)
+        val buy = factory.javaClass.getDeclaredMethod("purchaseConstruction",
+            com.unciv.models.ruleset.INonPerpetualConstruction::class.java, com.unciv.models.stats.Stat::class.java, com.unciv.view.TileView::class.java)
+            .apply { isAccessible = true }
+        buy.invoke(factory, f.test.ruleset.units["Warrior"], com.unciv.models.stats.Stat.Faith, null)
+        assertEquals(-1, city.selectedQueueEntry)
+        val build = pending.poll(5, TimeUnit.SECONDS)!!
+        val command = build(0).single()(0) as CityProductionCommand
+        assertEquals(1, command.index)
+        assertEquals(com.unciv.models.stats.Stat.Faith, command.javaClass.getDeclaredField("purchaseStat").apply { isAccessible = true }.get(command))
+    }
+
+    @Test fun `free great person picker routes choice without mutating its snapshot`() = withFixture { f ->
+        f.rome.greatPeople.freeGreatPeople = 1
+        val pending = LinkedBlockingQueue<(Int) -> List<(Int) -> AgentCommand>>()
+        Mockito.doAnswer { call -> pending.put(call.getArgument(0)); null }.`when`(f.session).executeHumanAction(
+            Mockito.any<(Int) -> List<(Int) -> AgentCommand>>() ?: { emptyList() })
+        val picker = f.app.pushScreen { com.unciv.ui.screens.pickerscreens.GreatPersonPickerScreen(f.world, f.rome) }
+        val chosen = f.rome.greatPeople.getFreeGreatPersonOptions().first()
+        picker.javaClass.getDeclaredField("theChosenOne").apply { isAccessible = true }.set(picker, chosen)
+        picker.javaClass.getDeclaredMethod("confirmAction").apply { isAccessible = true }.invoke(picker)
+        assertEquals(1, f.rome.greatPeople.freeGreatPeople)
+        val build = pending.poll(5, TimeUnit.SECONDS)
+        assertNotNull("Great person choice must be sent to the durable coordinator", build)
+        assertEquals("ChooseFreeGreatPersonCommand", build!!(0).single()(0).javaClass.simpleName)
+    }
+
+    @Test fun `war denounce and branch adoption wait for confirmation before dispatch`() = withFixture { f ->
+        val pending = LinkedBlockingQueue<(Int) -> List<(Int) -> AgentCommand>>()
+        Mockito.doAnswer { call -> pending.put(call.getArgument(0)); null }.`when`(f.session).executeHumanAction(
+            Mockito.any<(Int) -> List<(Int) -> AgentCommand>>() ?: { emptyList() })
+        val diplomacy = f.app.pushScreen { DiplomacyScreen(f.world.selectedGameView.civView, f.world.selectedGameView.getForeignCivView(f.greece)) }
+        val war = diplomacy.stage.root.descendants().filterIsInstance<TextButton>().first { it.text.toString() == "Declare war" }
+        war.press()
+        assertNull("Opening confirmation must not dispatch war", pending.poll(300, TimeUnit.MILLISECONDS))
+        assertTrue(diplomacy.stage.root.children.any { it is com.unciv.ui.popups.ConfirmPopup })
+        diplomacy.stage.root.children.filterIsInstance<com.unciv.ui.popups.Popup>().toList().forEach { it.close() }
+        val denounce = diplomacy.stage.root.descendants().filterIsInstance<TextButton>().first { it.text.toString().startsWith("Denounce") }
+        denounce.press()
+        assertNull("Opening confirmation must not dispatch denouncement", pending.poll(300, TimeUnit.MILLISECONDS))
+        f.app.popScreen()
+        val policy = f.app.pushScreen { PolicyPickerScreen(f.rome, true) }
+        val top = PolicyPickerScreen::class.java.getDeclaredMethod("getTopButton", com.unciv.models.ruleset.PolicyBranch::class.java)
+            .apply { isAccessible = true }.invoke(policy, f.test.ruleset.policyBranches["Tradition"]) as Table
+        policy.stage.addActor(top); top.press()
+        assertNull("Opening branch confirmation must not adopt", pending.poll(300, TimeUnit.MILLISECONDS))
+        assertTrue(policy.stage.root.children.any { it is com.unciv.ui.popups.ConfirmPopup })
+    }
+
+    @Test fun `denouncement war response batches war before durable dismissal`() = withFixture(denounced = true) { f ->
+        f.publish()
+        val pending = LinkedBlockingQueue<(Int) -> List<(Int) -> AgentCommand>>()
+        Mockito.doAnswer { call -> pending.put(call.getArgument(0)); null }.`when`(f.session).executeHumanAction(
+            Mockito.any<(Int) -> List<(Int) -> AgentCommand>>() ?: { emptyList() })
+        val alert = f.world.viewingCiv.popupAlerts.single { it.type == com.unciv.logic.civilization.AlertType.Denounced }
+        val popup = com.unciv.ui.screens.worldscreen.AlertPopup(f.world, alert)
+        popup.descendants().filterIsInstance<TextButton>().single { it.text.toString() == "THIS MEANS WAR! (Declare war)" }.press()
+        val build = pending.poll(5, TimeUnit.SECONDS)!!
+        assertEquals(listOf("DeclareWarCommand", "DismissAlertCommand"), build(0).map { it(0).javaClass.simpleName })
+        assertNull(HumanCommandExecutor(f.coordinator).executeAll(f.rome.civID, build))
+        assertEquals(2, f.writer.writeCount)
+        assertEquals("War", f.coordinator.getDiplomaticStatus(f.rome.civID, f.greece.civID))
+        val committed = f.coordinator.deserializeForPublication(f.coordinator.serializeCommittedGameForPublication())
+        assertFalse(committed.getCivilization(f.rome.civID).popupAlerts.any { it.type == com.unciv.logic.civilization.AlertType.Denounced })
+        assertNull("Closing this response must not dispatch a competing acknowledgement", pending.poll())
+    }
+
+    @Test fun `snapshot city replacement transfers ambience ownership before old disposal`() = withFixture { f ->
+        val old = f.openCity()
+        Mockito.clearInvocations(f.app.musicController)
+        val fresh = old.recreateForSnapshot(f.world) as CityScreen
+        old.dispose()
+        Mockito.verify(f.app.musicController, Mockito.never()).stopOverlay()
+        fresh.dispose()
+        Mockito.verify(f.app.musicController).stopOverlay()
     }
 
     private fun cityConstructions(screen: CityScreen) = CityScreen::class.java.getDeclaredField("constructionsTable")

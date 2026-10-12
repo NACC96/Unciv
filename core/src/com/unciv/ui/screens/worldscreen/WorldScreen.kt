@@ -5,6 +5,11 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.utils.Align
+import com.badlogic.gdx.utils.JsonReader
+import com.unciv.logic.agents.AgentCommandException
+import com.unciv.logic.agents.AgentCommandError
+import com.unciv.logic.agents.ControllerKind
+import com.unciv.logic.agents.migrateAgentMatchStateJson
 import com.unciv.Constants
 import com.unciv.UncivGame
 import com.unciv.logic.GameInfo
@@ -196,15 +201,36 @@ class WorldScreen(
      */
     fun routeThroughAgentSession(
         buildCommands: (expectedRevision: Int) -> List<(Int) -> AgentCommand>
+    ): Boolean = routeThroughAgentSession({}, buildCommands)
+
+    fun routeThroughAgentSession(
+        onComplete: (String?) -> Unit,
+        buildCommands: (expectedRevision: Int) -> List<(Int) -> AgentCommand>
     ): Boolean {
         val session = agentSession ?: return false
+        val clickedViewerId = currentViewerCivId()
+        // Bind UI indices and choices to the frame on which the user clicked.
+        val displayedRevision = gameInfo.agentMatchStateJson?.let { JsonReader().parse(it).getInt("stateRevision", 0) }
+        val commands = try { buildCommands(displayedRevision ?: 0) } catch (ex: Exception) {
+            val error = ex.message ?: "This action could not be prepared."
+            ToastPopup(error, this).open(force = true)
+            onComplete(error)
+            return true
+        }
         // Never run coordinator mutations on the GL thread (serialization +
         // checkpoint I/O): dispatch to a worker, report back on the GL thread.
         Concurrency.runOnNonDaemonThreadPool("HumanAction") {
-            val error = session.executeHumanAction(buildCommands)
+            val error = session.executeHumanAction { revision ->
+                if (displayedRevision != null && displayedRevision != revision)
+                    listOf({ _: Int -> throw AgentCommandException(AgentCommandError.STALE_STATE,
+                        "The displayed game has changed. Please try this action again.", revision) })
+                else commands
+            }
             Concurrency.runOnGLThread {
+                if (game.worldScreen !== this@WorldScreen || agentSession !== session || currentViewerCivId() != clickedViewerId) return@runOnGLThread
                 if (error != null) ToastPopup(error, this@WorldScreen).open(force = true)
                 shouldUpdate = true
+                onComplete(error)
             }
         }
         return true
@@ -251,6 +277,7 @@ class WorldScreen(
             hideCivilizationOverview()
             stage.root.children.filterIsInstance<AgentMessagesPanel>().forEach { it.hide(); it.refresh() }
             stage.root.children.filterIsInstance<AgentActivityFeed>().forEach { it.hide() }
+            stage.root.children.filterIsInstance<AgentNationSettingsPanel>().forEach { it.hide() }
             stage.root.children.filterIsInstance<Popup>().toList().forEach { it.close() }
             stage.keyboardFocus = null
             stage.scrollFocus = null
@@ -277,7 +304,22 @@ class WorldScreen(
             val tile = snapshot.tileMap.values.firstOrNull { it.position == pos }
             tile?.let { selectedGameView.getTile(it) }
         }
-        game.screen?.refreshAgentSnapshot()
+        val nativeHumanHandoff = if (viewerChanged && !newViewer.isSpectator()) snapshot.agentMatchStateJson?.let { encoded ->
+            val state = migrateAgentMatchStateJson(encoded)
+            val principal = snapshot.civilizations.firstOrNull { it.civID == state.localControlCivId }
+            principal?.isSpectator() == false && state.controllers[newViewer.civID]?.kind == ControllerKind.HUMAN &&
+                snapshot.civilizations.count { !it.isSpectator() && state.controllers[it.civID]?.kind == ControllerKind.HUMAN } > 1
+        } == true else false
+        if (nativeHumanHandoff) {
+            // Retain the world in the stack; the privacy cover must also replace any old private screen.
+            val readyScreen = game.screen as? PlayerReadyScreen
+            if (readyScreen != null && !readyScreen.retainedWorldInStack)
+                game.replaceCurrentScreen { PlayerReadyScreen(this) }
+            else {
+                game.resetToWorldScreen()
+                game.pushScreen { PlayerReadyScreen(this, retainedWorldInStack = true) }
+            }
+        } else game.screen?.refreshAgentSnapshot()
         shouldUpdate = true
         Gdx.graphics.requestRendering()
     }

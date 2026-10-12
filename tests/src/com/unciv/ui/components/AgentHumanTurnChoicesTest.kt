@@ -25,6 +25,8 @@ class AgentHumanTurnChoicesTest {
             val game = Mockito.mock(UncivGame::class.java)
             Mockito.`when`(game.settings).thenReturn(GameSettings().apply { checkForDueUnits = false })
             Mockito.`when`(screen.game).thenReturn(game)
+            val gameInfo = Mockito.mock(com.unciv.logic.GameInfo::class.java)
+            Mockito.`when`(screen.gameInfo).thenReturn(gameInfo)
             val view = Mockito.mock(GameView::class.java)
             Mockito.`when`(screen.agentSession).thenReturn(session)
             Mockito.`when`(screen.selectedGameView).thenReturn(view)
@@ -50,6 +52,20 @@ class AgentHumanTurnChoicesTest {
         val f = Fixture()
         Mockito.`when`(f.civ.shouldOpenTechPicker()).thenReturn(true)
         assertEquals(NextTurnAction.PickTech, f.choice())
+    }
+
+    @Test fun `unsupported pantheon choice blocks session end turn explicitly`() {
+        val f = Fixture(); Mockito.`when`(f.civ.canFoundPantheon()).thenReturn(true)
+        assertNotEquals(NextTurnAction.AgentMatch, f.choice())
+        assertTrue(f.choice().getText(f.screen).contains("Unsupported"))
+    }
+
+    @Test fun `unsupported spy choice blocks session end turn explicitly`() {
+        val f = Fixture()
+        Mockito.`when`(f.screen.gameInfo.isEspionageEnabled()).thenReturn(true)
+        Mockito.`when`(f.civ.shouldShowMoveSpies()).thenReturn(true)
+        assertNotEquals(NextTurnAction.AgentMatch, f.choice())
+        assertTrue(f.choice().getText(f.screen).contains("Unsupported"))
     }
 
     @Test fun `nonhuman view retains session status even with pending choices`() {

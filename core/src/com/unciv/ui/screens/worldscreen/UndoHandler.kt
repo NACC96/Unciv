@@ -11,13 +11,15 @@ import yairm210.purity.annotations.Readonly
 class UndoHandler(private val worldScreen: WorldScreen) {
     private var preActionGameInfo = worldScreen.gameInfo
 
-    @Readonly fun canUndo() = preActionGameInfo != worldScreen.gameInfo && worldScreen.canChangeState
+    @Readonly fun canUndo() = worldScreen.agentSession == null && preActionGameInfo != worldScreen.gameInfo && worldScreen.canChangeState
 
     fun recordCheckpoint() {
+        if (worldScreen.agentSession != null) return
         preActionGameInfo = worldScreen.gameInfo.clone()
     }
 
     fun restoreCheckpoint() {
+        if (!canUndo()) return
         Concurrency.run {
             // Most of the time we won't load this, so we only set transients once we see it's relevant
             preActionGameInfo.setTransients()

@@ -2,7 +2,8 @@ import { expect, it, vi } from "vitest";
 import { mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
-import { NodeRunner } from "../src/supervisor.js";
+import { NodeRunner, Supervisor } from "../src/supervisor.js";
+import { FakeGameService } from "../src/fake-game-mcp.js";
 
 it("persists each run's monotonic duration on successful and failed exits despite wall-clock shifts", async () => {
   const root = mkdtempSync(join(tmpdir(), "unciv-run-duration-test-"));
@@ -19,9 +20,9 @@ const timer=setInterval(()=>{if(existsSync(process.env.RELEASE_FILE)){clearInter
   vi.useFakeTimers({ toFake: ["Date"] });
   try {
     for (const fixture of [
-      { runId: "completed-run", code: 0, durationMs: 3723456, readable: "1:02:03", status: "completed" },
+      { runId: "completed-run", code: 0, durationMs: 3723456, readable: "1:02:03", status: "exited" },
       { runId: "failed-run", code: 7, durationMs: 12500, readable: "00:12", status: "failed" },
-      { runId: "instant-run", code: 0, durationMs: 0, readable: "00:00", status: "completed" },
+      { runId: "instant-run", code: 0, durationMs: 0, readable: "00:00", status: "exited" },
     ]) {
       vi.setSystemTime(new Date("2026-10-11T12:00:00Z"));
       const release = join(root, fixture.runId);
@@ -71,6 +72,41 @@ const timer=setInterval(()=>{if(existsSync(process.env.RELEASE_FILE)){clearInter
   }
 }, 10000);
 
+it.each([
+  { code: 0, commitEndTurn: false, outcome: "incomplete_turn", title: "Provider incomplete" },
+  { code: 0, commitEndTurn: true, outcome: "completed_turn", title: "Provider completed" },
+  { code: 7, commitEndTurn: false, outcome: "failed", title: "Provider failed" },
+])("records authoritative turn outcome for exit $code and end-turn $commitEndTurn", async fixture => {
+  const root = mkdtempSync(join(tmpdir(), "unciv-turn-outcome-log-test-"));
+  const logRoot = join(root, "logs");
+  const engine = new FakeGameService();
+  const observe = engine.observe.bind(engine);
+  let observationCount = 0;
+  engine.observe = async () => {
+    if (++observationCount === 2 && fixture.commitEndTurn) await engine.endTurn();
+    return observe();
+  };
+  const supervisor = new Supervisor(() => ({ spec: { executable: process.execPath,
+    argv: ["-e", `process.exit(${fixture.code})`], cwd: root }, env: {} }),
+    () => ({ provider: "scripted", sessionId: null, model: null, toolCalls: [], finalText: null,
+      usage: null, completed: true, errorText: null, advertisedTools: null }), new NodeRunner(logRoot));
+  try {
+    const outcome = await supervisor.runLeaderTurn({ engine,
+      binding: { matchId: "m", timelineId: "t", civId: "Rome", runId: "outcome", authorityEpoch: 1 },
+      profile: { displayName: "Augustus", personality: "", modelLabel: "fixture" },
+      context: { rulesetName: "Vanilla", protocolVersion: 1, civId: "Rome", turnSerial: 3 }, guidance: [], cwd: root });
+    expect(outcome.status).toBe(fixture.outcome);
+    const runDir = join(logRoot, readdirSync(logRoot)[0]!);
+    const final = readFileSync(join(runDir, "activity.jsonl"), "utf8").trim().split("\n")
+      .map(line => JSON.parse(line)).filter(entry => entry.id === "run-end").at(-1);
+    expect(final.status).toBe(fixture.outcome);
+    expect(final.title).toContain(fixture.title);
+    expect(final.durationMs).toBeGreaterThanOrEqual(0);
+    expect(final.summary).toContain(outcome.detail);
+    expect(JSON.parse(readFileSync(join(runDir, "meta.json"), "utf8"))).toMatchObject({ turnOutcome: fixture.outcome });
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
 it("persists process identity and streamed events before the provider exits", async () => {
   const root = mkdtempSync(join(tmpdir(), "unciv-run-logging-test-"));
   const release = join(root, "release");
@@ -111,7 +147,7 @@ const timer=setInterval(()=>{if(existsSync(${JSON.stringify(release)})){clearInt
 it("redacts split native image events before raw logs, activity and stream callbacks", async () => {
   const root = mkdtempSync(join(tmpdir(), "unciv-image-logging-test-"));
   const script = join(root, "fixture.mjs");
-  const secret = "PRIVATE_IMAGE_BYTES_".repeat(2000);
+  const secret = Buffer.from("PRIVATE_IMAGE_BYTES_".repeat(2000)).toString("base64");
   const event = JSON.stringify({ type: "item.completed", item: { id: "image-read", type: "mcp_tool_call",
     tool: "game.message_image", status: "completed", result: { content: [{ type: "text", text: "image metadata" },
       { type: "image", mimeType: "image/png", data: secret }] } } });
@@ -124,7 +160,8 @@ process.stderr.write(nested.slice(0,100));
 setTimeout(() => {
   process.stdout.write(event.slice(100)+'\\n'+nested+'\\n');
   process.stderr.write(nested.slice(100)+'\\n');
-  process.stdout.write('{"type":"image","data":"'+${JSON.stringify(secret)});
+  process.stdout.write('{"data":"'+${JSON.stringify(secret)});
+  process.stderr.write('{"data":"'+${JSON.stringify(secret)});
 }, 20);
 `);
   const logRoot = join(root, "logs"), streamed: string[] = [];
@@ -136,11 +173,11 @@ setTimeout(() => {
     const runDir = join(logRoot, readdirSync(logRoot)[0]!);
     for (const name of ["events.jsonl", "activity.jsonl", "stderr.log"]) {
       const stored = readFileSync(join(runDir, name), "utf8");
-      expect(stored).not.toContain("PRIVATE_IMAGE_BYTES_"); expect(stored.length).toBeLessThan(5000);
+      expect(stored).not.toContain(secret); expect(stored.length).toBeLessThan(5000);
     }
-    expect(streamed).toHaveLength(2); expect(streamed.join("\n")).not.toContain("PRIVATE_IMAGE_BYTES_");
+    expect(streamed).toHaveLength(2); expect(streamed.join("\n")).not.toContain(secret);
     expect(readFileSync(join(runDir, "events.jsonl"), "utf8")).toContain("image metadata");
     expect(readFileSync(join(runDir, "events.jsonl"), "utf8")).toContain("unparseable image event omitted");
-    expect(child.stderrText()).not.toContain("PRIVATE_IMAGE_BYTES_");
+    expect(child.stderrText()).not.toContain(secret);
   } finally { await exited; rmSync(root, { recursive: true, force: true }); }
 }, 10000);

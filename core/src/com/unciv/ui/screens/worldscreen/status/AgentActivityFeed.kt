@@ -330,7 +330,7 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
         .toLabel(color, size, hideIcons = true).apply { wrap = true; setAlignment(Align.topLeft) }
 
     // Translation normalizes numeric tokens (01:05 -> 1:5); journal durations are fixed-format text.
-    private fun runText(value: String, color: Color, size: Int) = text(value, color, size).apply { setText(value) }
+    private fun runText(value: String, color: Color, size: Int) = text(value, color, size).apply { setText(value.replace(Regex("\\*\\*(.*?)\\*\\*"), "$1")) }
 
     /** A message, error, turn boundary or different agent ends a run of tool calls. */
     private fun groupTools(entries: List<AgentActivityEntry>): List<FeedRow> {
@@ -408,7 +408,14 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
                     }
                     "run" -> {
                         val failed = entry.status == "failed"
-                        addSpeaker(entry, if (failed) "Run failed" else "Run completed", rowWidth)
+                        val caption = when (entry.status) {
+                            "failed" -> "Run failed"
+                            "completed_turn", "completed" -> "Run completed"
+                            "incomplete_turn" -> "Run ended without ending turn"
+                            "guard_paused" -> "Run paused"
+                            else -> "Run exited"
+                        }
+                        addSpeaker(entry, caption, rowWidth)
                         val color = if (failed) WorldScreenStyle.error else AgentActivityAppearance.color(screen.gameInfo, entry.civId)
                         addRow(runText(entry.title, color, 12), entry.id, rowWidth, bottom = 4f)
                         if (entry.summary.isNotBlank())

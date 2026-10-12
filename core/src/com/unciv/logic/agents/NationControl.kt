@@ -37,11 +37,31 @@ object NationControl {
         val humans = game.civilizations.filter { isSavedNation(game, it, match) && match.controllers[it.civID]?.kind == ControllerKind.HUMAN }
         if (humans.size == 1) return humans.single().civID
         return humans.firstOrNull { it.civID == attachedViewer }?.civID
+            ?: if (game.civilizations.none(::isSpectator))
+                (humans.firstOrNull { it.civID == game.currentPlayer } ?: humans.firstOrNull())?.civID
+            else null
+    }
+
+    /** Without a spectator principal, native local humans take turns at the same device. */
+    private fun nativeCurrentHuman(game: GameInfo, match: AgentMatchState): String? {
+        if (game.gameParameters.isOnlineMultiplayer || game.civilizations.any(::isSpectator)) return null
+        return game.civilizations.firstOrNull {
+            it.civID == game.currentPlayer && isSavedNation(game, it, match) &&
+                match.controllers[it.civID]?.kind == ControllerKind.HUMAN
+        }?.civID
+    }
+
+    /** Called on the unpublished turn candidate, so viewer/management handoff is checkpointed. */
+    fun handoffToCurrentHuman(game: GameInfo, match: AgentMatchState) {
+        val human = nativeCurrentHuman(game, match) ?: return
+        match.localControlCivId = human
+        match.localViewingCivId = human
     }
 
     /** Pure pre-screen lookup: missing or ambiguous identities grant no management rights. */
     fun savedViewerCivId(game: GameInfo, match: AgentMatchState): String? {
         if (game.gameParameters.isOnlineMultiplayer) return null
+        nativeCurrentHuman(game, match)?.let { return it }
         val origin = match.localControlCivId ?: oldOrigin(game, match) ?: return null
         val principal = game.civilizations.firstOrNull { it.civID == origin } ?: return null
         val viewer = match.localViewingCivId ?: origin
@@ -58,6 +78,7 @@ object NationControl {
         if (!game.gameParameters.isOnlineMultiplayer) {
             if (match.localControlCivId == null) match.localControlCivId = oldOrigin(game, match, attachedViewer)
             if (match.localViewingCivId == null) match.localViewingCivId = match.localControlCivId
+            handoffToCurrentHuman(game, match)
         }
         for ((id, controller) in match.controllers) {
             if (controller.kind == ControllerKind.EXTERNAL_AGENT && id !in match.retainedAgentProfiles)

@@ -240,7 +240,12 @@ open class UncivGame(val isConsoleMode: Boolean = false) : Game(), PlatformSpeci
             disposeScreens()
             val savedViewer = savedAgentMatch?.let { NationControl.savedViewerCivId(newGameInfo, it) }
                 ?.let { id -> newGameInfo.civilizations.firstOrNull { it.civID == id } }
-            val newWorldScreen = WorldScreen(newGameInfo, autoPlay, savedViewer ?: newGameInfo.getPlayerToViewAs(), worldScreenRestoreState)
+            val defaultViewer = newGameInfo.getPlayerToViewAs()
+            val nativeViewer = if (agentSetup != null && savedAgentMatch == null &&
+                newGameInfo.civilizations.none { it.isSpectator() } && agentSetup.slots.containsKey(defaultViewer.civName))
+                newGameInfo.civilizations.firstOrNull { it.isMajorCiv() && it.playerType == PlayerType.Human && !agentSetup.slots.containsKey(it.civName) }
+            else null
+            val newWorldScreen = WorldScreen(newGameInfo, autoPlay, savedViewer ?: nativeViewer ?: defaultViewer, worldScreenRestoreState)
             if (savedAgentMatch != null) {
                 // No new-game setup/automatic play: exact saved controllers, work and receipts, PAUSED.
                 try {

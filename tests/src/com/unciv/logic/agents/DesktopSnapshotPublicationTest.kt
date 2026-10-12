@@ -77,6 +77,9 @@ class DesktopSnapshotPublicationTest {
                 Files.createTempDirectory("unciv-publication-").toFile(), worldScreen = screen)
             // Match the production attachment: human input requires this host's installed view.
             Mockito.`when`(screen.agentSession).thenReturn(host)
+            if (!humanController)
+                DesktopAgentMatch::class.java.getDeclaredField("providerRunCivId").apply { isAccessible = true }
+                    .set(host, romeId)
         }
 
         fun act(id: String, type: String, args: Map<String, Any?>): Any? = host.answerEngineRequest("act",

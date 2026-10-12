@@ -61,7 +61,7 @@ export function privateCorrespondence(messages: DiplomaticMessage[], civId: stri
     .map((message, index) => ({ message, index }))
     .sort((a, b) => Math.max(b.message.sentTurnSerial, b.message.deliveredTurnSerial ?? -1, b.message.acknowledgedTurnSerial ?? -1) -
       Math.max(a.message.sentTurnSerial, a.message.deliveredTurnSerial ?? -1, a.message.acknowledgedTurnSerial ?? -1) ||
-      (b.message.acknowledgedRevision ?? -1) - (a.message.acknowledgedRevision ?? -1) || b.index - a.index)
+      (b.message.acknowledgedRevision ?? -1) - (a.message.acknowledgedRevision ?? -1) || a.index - b.index)
     .slice(0, 12).map(({ message }) => messageMetadata(message));
 }
 
@@ -346,6 +346,7 @@ export class FakeGameService implements IGameService {
         message.acknowledgedTurnSerial = this.turnSerial;
         message.acknowledgementText = text.trim();
         this.revision += 1;
+        message.acknowledgedRevision = this.revision;
         const receipt: FakeReceipt = { protocolVersion: 1, actionId: envelope.actionId, status: "applied", revision: this.revision,
           result: structuredClone(message) as unknown as Record<string, unknown>, pendingDecisions: [...this.decisionsPending] };
         this.receipts.set(envelope.actionId, { fingerprint, receipt });

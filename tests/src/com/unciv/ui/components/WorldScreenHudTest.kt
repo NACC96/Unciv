@@ -270,7 +270,7 @@ class WorldScreenHudTest {
     @Test fun `run durations remain named visible distinct from collapsed tools and obey nation filters`() {
         val f = Fixture()
         f.activity = listOf(entry("tool-1", "tool"), entry("tool-2", "tool"),
-            entry("run-1", "run").copy(title = "Provider completed in 01:05", summary = "Duration 01:05", status = "completed"),
+            entry("run-1", "run").copy(title = "**Provider** completed in 01:05", summary = "**Duration** 01:05", status = "completed"),
             entry("tool-3", "tool"),
             entry("run-2", "run").copy(civId = "Korea", title = "Provider failed in 1:00:01", summary = "Duration 1:00:01", status = "failed"))
         val feed = f.feed()

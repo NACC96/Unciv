@@ -9,7 +9,7 @@ import com.unciv.ui.components.input.keyShortcuts
 import com.unciv.ui.components.input.onActivation
 import com.unciv.ui.screens.basescreen.BaseScreen
 
-class PlayerReadyScreen(worldScreen: WorldScreen) : BaseScreen() {
+class PlayerReadyScreen(worldScreen: WorldScreen, val retainedWorldInStack: Boolean = false) : BaseScreen() {
     init {
         val table = Table()
         table.touchable = Touchable.enabled
@@ -22,7 +22,7 @@ class PlayerReadyScreen(worldScreen: WorldScreen) : BaseScreen() {
         table.add("[${curCiv.civName}] ready?".toLabel(curCiv.getInnerColor(), Constants.headingFontSize))
 
         table.onActivation {
-            game.replaceCurrentScreen{ worldScreen }
+            if (retainedWorldInStack) game.popScreen() else game.replaceCurrentScreen{ worldScreen }
         }
         // Doing this separately instead of passing the binding to onActivation avoids the tooltip
         table.keyShortcuts.add(KeyboardBinding.NextTurnAlternate)

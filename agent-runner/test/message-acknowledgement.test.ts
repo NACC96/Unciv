@@ -24,7 +24,7 @@ const ackInput = (revision = 42, text = "Message received. I will consider it.")
   actionId: "ack-1", expectedRevision: revision, type: "diplomacy.acknowledgeMessage", args: { messageId: "spectator-mail", text },
 });
 const receipt = { protocolVersion: 1, status: "applied", actionId: "ack-1", revision: 43,
-  result: { ...message(), acknowledgedTurnSerial: 3, acknowledgementText: "Message received. I will consider it." }, pendingDecisions: [] };
+  result: { ...message(), acknowledgedTurnSerial: 3, acknowledgedRevision: 43, acknowledgementText: "Message received. I will consider it." }, pendingDecisions: [] };
 
 describe("explicit message receipt acknowledgements", () => {
   it("retains legacy unacknowledged mail across turns and requires receipt without agreement", () => {

@@ -63,6 +63,8 @@ export interface RunningChild {
   kill(): void;
   /** Committed engine receipts remain visible even if the provider omits its tool-result stream. */
   recordActivity?(entry: ActivityEntry): void;
+  /** Turn completion is classified from engine commits after the process exits. */
+  recordOutcome?(outcome: TurnOutcome): void;
 }
 
 function formatRunDuration(durationMs: number): string {
@@ -136,7 +138,7 @@ export class NodeRunner implements ProviderRunner {
         for (const entry of normalizer.fromLine(line)) appendActivity(entry);
       }
       flushStderr(true);
-      const status = code === 0 ? "completed" : "failed";
+      const status = code === 0 ? "exited" : "failed";
       const duration = formatRunDuration(durationMs);
       appendActivity({ id: "run-end", kind: "run", status, durationMs, title: `Provider ${status} in ${duration}`,
         summary: `Duration ${duration}`, text: JSON.stringify(metadata, null, 2), timestamp: metadata["endedAt"] });
@@ -159,6 +161,16 @@ export class NodeRunner implements ProviderRunner {
     return {
       pid: child.pid,
       recordActivity: appendActivity,
+      recordOutcome(outcome) {
+        Object.assign(metadata, { turnOutcome: outcome.status, turnDetail: outcome.detail });
+        saveMetadata();
+        const label = { completed_turn: "completed", incomplete_turn: "incomplete", guard_paused: "paused", failed: "failed" }[outcome.status];
+        const durationMs = metadata["durationMs"] as number;
+        const duration = formatRunDuration(durationMs);
+        appendActivity({ id: "run-end", kind: "run", status: outcome.status, durationMs,
+          title: `Provider ${label} in ${duration}`, summary: `Duration ${duration}. ${outcome.detail}`,
+          text: JSON.stringify(metadata, null, 2), timestamp: metadata["endedAt"] });
+      },
       stdoutLines(onLine) {
         const decoder = new StringDecoder("utf8");
         let pending = "";
@@ -268,32 +280,36 @@ export class Supervisor {
       const endsBefore = preFlight.endTurnsCommitted;
       const endsAfter = postFlight?.endTurnsCommitted ?? endsBefore;
       const turnEnded = endsAfter > endsBefore;
+      const finish = (outcome: TurnOutcome): TurnOutcome => {
+        child.recordOutcome?.(outcome);
+        return outcome;
+      };
       if (guardHit) {
-        return { status: "guard_paused", revision, turnEnded, run, detail: guardHit };
+        return finish({ status: "guard_paused", revision, turnEnded, run, detail: guardHit });
       }
       // Engine state governs: a completed end-turn commit during THIS
       // invocation means a completed turn even if the provider's own stream
       // is ambiguous; otherwise the turn is incomplete (moves retained) or
       // failed. Counter-based (a sticky boolean lies after the first turn).
       if (turnEnded) {
-        return { status: "completed_turn", revision, turnEnded: true, run, detail: "engine committed end_turn" };
+        return finish({ status: "completed_turn", revision, turnEnded: true, run, detail: "engine committed end_turn" });
       }
       if (exit.code === 0 && !run.errorText) {
-        return {
+        return finish({
           status: "incomplete_turn",
           revision,
           turnEnded: false,
           run,
           detail: "provider exited cleanly without end_turn; committed moves retained",
-        };
+        });
       }
-      return {
+      return finish({
         status: "failed",
         revision,
         turnEnded: false,
         run,
         detail: `provider failed (code=${exit.code} signal=${exit.signal}): ${run.errorText ?? child.stderrText().slice(-300)}`,
-      };
+      });
     } finally {
       await server.close();
     }

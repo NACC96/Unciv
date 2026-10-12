@@ -29,6 +29,16 @@ class DiplomaticMessage(
     )
 }
 
+/** A migrated acknowledgement group with missing revisions retains its complete saved order. */
+fun orderedDiplomaticMessages(messages: List<DiplomaticMessage>): List<DiplomaticMessage> =
+    messages.groupBy { it.acknowledgedTurnSerial }.entries
+        .sortedWith(compareBy<Map.Entry<Int?, List<DiplomaticMessage>>> { it.key == null }
+            .thenBy { it.key ?: Int.MAX_VALUE })
+        .flatMap { (_, group) ->
+            if (group.any { it.acknowledgedRevision == null }) group
+            else group.sortedBy { it.acknowledgedRevision }
+        }
+
 /** Delivered incoming mail is readable only by its target, never by guessed IDs. */
 internal fun DiplomaticMessage.isDeliveredTo(actorCivId: String, turnSerial: Int): Boolean =
     targetCivId == actorCivId && deliveredTurnSerial?.let { it <= turnSerial } == true

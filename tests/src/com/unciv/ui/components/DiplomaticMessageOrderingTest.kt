@@ -1,7 +1,7 @@
 package com.unciv.ui.components
 
 import com.unciv.logic.agents.DiplomaticMessage
-import com.unciv.ui.screens.worldscreen.status.orderedDiplomaticMessages
+import com.unciv.logic.agents.orderedDiplomaticMessages
 import org.junit.Assert.*
 import org.junit.Test
 

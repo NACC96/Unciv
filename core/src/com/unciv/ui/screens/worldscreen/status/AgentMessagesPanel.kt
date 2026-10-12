@@ -27,6 +27,7 @@ import com.badlogic.gdx.utils.Timer
 import com.unciv.logic.agents.AgentMatchSession
 import com.unciv.logic.agents.AgentModelCatalog
 import com.unciv.logic.agents.DiplomaticMessage
+import com.unciv.logic.agents.orderedDiplomaticMessages
 import com.unciv.logic.agents.MessageImageClipboard
 import com.unciv.logic.agents.MessageImageDraft
 import com.unciv.logic.agents.DiplomaticMessageLimits
@@ -39,12 +40,6 @@ import com.unciv.ui.images.ImageGetter
 import com.unciv.ui.screens.basescreen.BaseScreen
 import com.unciv.ui.screens.worldscreen.WorldScreen
 import com.unciv.ui.screens.worldscreen.WorldScreenStyle
-
-/** Stable fallback keeps old saves readable when their acknowledgement revision was not retained. */
-fun orderedDiplomaticMessages(messages: List<DiplomaticMessage>): List<DiplomaticMessage> =
-    messages.sortedWith(compareBy<DiplomaticMessage> { it.acknowledgedTurnSerial == null }
-        .thenBy { it.acknowledgedTurnSerial ?: Int.MAX_VALUE }
-        .thenBy { it.acknowledgedRevision ?: Int.MIN_VALUE })
 
 /** Modeless, viewer-scoped diplomatic mailbox. The session authenticates all sends. */
 class AgentMessagesPanel(
@@ -98,7 +93,8 @@ class AgentMessagesPanel(
     private val visionWarning = "".toLabel(WorldScreenStyle.warning, 11).apply { name = "MessageVisionWarning"; wrap = true }
     private var imageDraft: MessageImageDraft? = null
     private var draftTexture: Texture? = null
-    private val historyTextures = ArrayList<Texture>()
+    private data class HistoryTexture(val texture: Texture, val evict: () -> Unit)
+    private val historyTextures = ArrayList<HistoryTexture>()
     private var clipboardPending = false
     private var clipboardGeneration = 0
     private var historyGeneration = 0
@@ -402,7 +398,7 @@ class AgentMessagesPanel(
     private fun releaseDraftTexture() { draftTexture?.dispose(); draftTexture = null }
     private fun releaseHistoryTextures() {
         historyGeneration++
-        historyTextures.forEach { it.dispose() }; historyTextures.clear()
+        historyTextures.forEach { it.texture.dispose() }; historyTextures.clear()
     }
 
     private fun rebuildDraftPreview() {
@@ -436,6 +432,7 @@ class AgentMessagesPanel(
         val requestHistory = historyGeneration
         val requestViewer = generation
         var requested = false
+        lateinit var showLoadButton: () -> Unit
         fun requestPreview() {
             if (requested || disposed || imagesHidden || requestHistory != historyGeneration ||
                 requestViewer != generation || screen.currentViewerCivId() != viewerId) return
@@ -454,7 +451,16 @@ class AgentMessagesPanel(
                         loading.setText("This image preview could not be displayed."); loading.color = WorldScreenStyle.error
                         return@readMessageImage
                     }
-                    historyTextures.add(texture)
+                    historyTextures.add(HistoryTexture(texture) {
+                        container.clearChildren()
+                        requested = false
+                        showLoadButton()
+                    })
+                    while (historyTextures.size > 16) {
+                        val old = historyTextures.removeAt(0)
+                        old.evict()
+                        old.texture.dispose()
+                    }
                     val image = Image(texture).apply { name = "MessageHistoryImage"; setScaling(Scaling.fit) }
                     container.clearChildren()
                     val aspect = draft.height.toFloat() / draft.width.coerceAtLeast(1)
@@ -471,12 +477,12 @@ class AgentMessagesPanel(
                 history.invalidateHierarchy(); scroll.invalidate(); Gdx.graphics.requestRendering()
             }
         }
-        if (preload) requestPreview()
-        else {
+        showLoadButton = {
             val view = WorldScreenStyle.button("View image").apply { name = "MessageViewImage"; label.setFontSize(11) }
             view.onClick { requestPreview() }
             container.add(view).left()
         }
+        if (preload) requestPreview() else showLoadButton()
     }
 
     private fun rebuildHistory(jump: Boolean = false) {

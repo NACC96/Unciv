@@ -158,6 +158,7 @@ class AgentMessageImagesTest {
             val attachment = FileMessageImageStore(dir).store(png())
             val f = Fixture(); f.state.diplomaticMessages.add(f.mail("incoming", attachment))
             val host = DesktopAgentMatch(f.game.gameInfo, f.state, AgentMatchSetup(), dir)
+            DesktopAgentMatch::class.java.getDeclaredField("providerRunCivId").apply { isAccessible = true }.set(host, f.rome)
             try {
                 val before = host.coordinator.saveToJson()
                 @Suppress("UNCHECKED_CAST")
@@ -170,6 +171,13 @@ class AgentMessageImagesTest {
                     "messageId" to "incoming", "attachmentId" to attachment.attachmentId)); fail("Spoofed read") }
                 catch (expected: EngineCallException) { assertEquals("AUTHORITY_REVOKED", expected.code) }
                 assertEquals(before, host.coordinator.saveToJson())
+                java.io.File(dir, ".agent-data/message-images/${attachment.attachmentId}.png").writeText("corrupt")
+                val inaccessible = assertThrows(EngineCallException::class.java) {
+                    host.answerEngineRequest("message_image", mapOf("civId" to f.rome,
+                        "messageId" to "incoming", "attachmentId" to attachment.attachmentId))
+                }
+                assertEquals("ILLEGAL_ACTION", inaccessible.code)
+                assertEquals("No such accessible message image", inaccessible.message)
             } finally { host.close() }
         } finally { dir.deleteRecursively() }
     }
