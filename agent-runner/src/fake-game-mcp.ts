@@ -71,6 +71,24 @@ export interface MessageContact {
   isAgent: boolean;
 }
 
+export interface ObservedTradeOffer {
+  name: string;
+  type: string;
+  amount: number;
+  /** -1 means an immediate transfer; positive values are turns. */
+  duration: number;
+}
+
+export interface ObservedTradeRequest {
+  requestingCivId: string;
+  /** Includes this first actionable request; re-observe after responding. */
+  pendingRequestsFromCiv: number;
+  /** The observing recipient's commitments. */
+  ourOffers: ObservedTradeOffer[];
+  /** The requesting civilization's commitments. */
+  theirOffers: ObservedTradeOffer[];
+}
+
 export interface GameObserveResult {
   observationVersion?: 2;
   mapSummary?: MapSummary;
@@ -90,6 +108,8 @@ export interface GameObserveResult {
   messageContacts?: MessageContact[];
   /** Bounded private correspondence, including replies stored on own sent mail. */
   diplomaticHistory?: DiplomaticMessage[];
+  /** Recipient-private, first pending request per sender in native queue order. */
+  pendingTradeRequests?: ObservedTradeRequest[];
 }
 
 export interface IGameService {

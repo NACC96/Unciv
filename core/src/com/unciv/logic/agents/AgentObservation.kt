@@ -6,6 +6,8 @@ import com.unciv.logic.civilization.Civilization
 import com.unciv.logic.map.HexCoord
 import com.unciv.logic.map.mapunit.MapUnit
 import com.unciv.logic.city.City
+import com.unciv.logic.trade.TradeOffer
+import com.unciv.logic.trade.TradeOfferType
 import com.unciv.models.ruleset.unique.UniqueType
 
 /**
@@ -78,6 +80,28 @@ class EmpireOverview(
     constructor() : this(0, null, ArrayList(), 0, 0, 0, 0, ArrayList(), 0, 0, LinkedHashMap())
 }
 
+/** Detached terms, including the actual duration of this pending offer. */
+class ObservedTradeOffer(
+    var name: String = "",
+    var type: TradeOfferType = TradeOfferType.Gold,
+    var amount: Int = 0,
+    /** -1 means an immediate transfer; positive values are turns. */
+    var duration: Int = -1
+)
+
+/** Only the first request from each sender is actionable by diplomacy.respondTrade. */
+class ObservedTradeRequest(
+    var requestingCivId: String = "",
+    /** Includes the displayed request; re-observe after responding to see the next one. */
+    var pendingRequestsFromCiv: Int = 0,
+    /** What the observing recipient would give or commit to. */
+    var ourOffers: ArrayList<ObservedTradeOffer> = ArrayList(),
+    /** What the requesting civilization would give or commit to. */
+    var theirOffers: ArrayList<ObservedTradeOffer> = ArrayList()
+)
+
+private fun TradeOffer.toObserved() = ObservedTradeOffer(name, type, amount, duration)
+
 class ObservationDto(
     var protocolVersion: Int = 1,
     var revision: Int = 0,
@@ -102,7 +126,9 @@ class ObservationDto(
     var observationVersion: Int = 2,
     var mapSummary: MapSummary = MapSummary(),
     /** At most twelve recent private records, including replies to the actor's sent mail. */
-    var diplomaticHistory: ArrayList<DiplomaticMessage> = ArrayList()
+    var diplomaticHistory: ArrayList<DiplomaticMessage> = ArrayList(),
+    /** Recipient-private, first pending request per sender in native queue order. */
+    var pendingTradeRequests: ArrayList<ObservedTradeRequest> = ArrayList()
 ) {
     @Suppress("unused")
     constructor() : this(1, 0, "", "", 0, TurnPhase.READY_TO_START, "", false, 0,
@@ -235,6 +261,12 @@ fun buildObservation(
     }.thenByDescending { it.value.acknowledgedRevision ?: -1 }.thenByDescending { it.index })
         .take(12).map { it.value.copy() })
     dto.messageContacts = buildMessageContacts(game, match, actorCivId)
+    dto.pendingTradeRequests = ArrayList(civ.tradeRequests.groupBy { it.requestingCiv }.map { (sender, requests) ->
+        val trade = requests.first().trade
+        ObservedTradeRequest(sender, requests.size,
+            ArrayList(trade.ourOffers.map { it.toObserved() }),
+            ArrayList(trade.theirOffers.map { it.toObserved() }))
+    })
     dto.requiredDecisions = ArrayList(match.pendingDecisions
         .filter { it.owningCivId == actorCivId }.map { it.copy() })
     dto.recentEvents = ArrayList(civ.notifications.takeLast(20).map { it.text })
