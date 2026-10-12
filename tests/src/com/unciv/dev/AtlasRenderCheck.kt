@@ -47,6 +47,7 @@ object AtlasRenderCheck {
                     check(screen.stage.root.children.size > 0) { "$id has no production actors" }
                     frame = FrameBuffer(Pixmap.Format.RGBA8888, width, height, false)
                     var buttonStates: List<Map<String, Any?>> = emptyList()
+                    var worldActions: List<Map<String, Any?>> = emptyList()
                     // Only drain setup errors. Errors from layout, drawing or readback fail the run.
                     while (Gdx.gl.glGetError() != GL20.GL_NO_ERROR) { }
                     repeat(30) { screen.stage.root.act(1f / 60f) }
@@ -58,6 +59,7 @@ object AtlasRenderCheck {
                             check(pixels.width == width && pixels.height == height)
                             check(Gdx.gl.glGetError() == GL20.GL_NO_ERROR) { "Capture readback GL error" }
                             buttonStates = buttonStateEvidence(screen, pixels)
+                            worldActions = worldActionEvidence(screen, pixels)
                             PixmapIO.writePNG(Gdx.files.absolute(output.resolve("$id-${width}x$height-${args[4]}.png").toString()), pixels, -1, true)
                         } finally { pixels.dispose() }
                     } finally { frame.end() }
@@ -87,7 +89,8 @@ object AtlasRenderCheck {
                         "resolvedRoots" to scope.resolvedRoots(),
                         "fixtureSeed" to AtlasFixtureCatalog.SEED,
                         "buttonStateEvidence" to buttonStates,
-                        "worldHud" to if (id.startsWith("world") && id != "world-legacy") worldHudEvidence(screen) else null,
+                        "worldActionEvidence" to worldActions,
+                        "worldHud" to if (id.startsWith("world") && id != "world-legacy") worldHudEvidence(screen, id == "world") else null,
                         "status" to if (id.startsWith("world") && id != "world-legacy") "synthetic Atlas world migration evidence; native input and installation pending" else if (id == "world-legacy") "synthetic Minimal compatibility evidence; native input and installation pending" else "baseline capture; migration and interactions remain pending"))
                     println("ATLAS_CAPTURE_OK $id ${width}x$height ${args[4]} actors=${actors.size} providerCalls=0")
                     code = 0
@@ -104,18 +107,47 @@ object AtlasRenderCheck {
         }, config)
     }
 
-    private fun worldHudEvidence(screen: BaseScreen): Map<String, Any?> {
+    private fun worldHudEvidence(screen: BaseScreen, defaultLayout: Boolean): Map<String, Any?> {
         val occupied = screen.stage.root.children.filter { it.isVisible &&
             (it.name?.startsWith("Atlas") == true || it.javaClass.simpleName in setOf("WorldScreenTopBar", "AgentActivityFeed", "AgentMatchControlTable")) }
         val rectangles = occupied.map { com.badlogic.gdx.math.Rectangle(it.x, it.y, it.width, it.height) }
         val area = com.unciv.ui.screens.worldscreen.WorldHudLayout.unionArea(rectangles)
         val fraction = 1f - area / (screen.stage.width * screen.stage.height)
-        if (screen.stage.width == 1440f && screen.stage.height == 900f) check(fraction >= .45f) { "Actual HUD leaves only $fraction map visible" }
+        if (defaultLayout && screen.stage.width == 1440f && screen.stage.height == 900f) check(fraction >= .45f) { "Actual HUD leaves only $fraction map visible" }
         return linkedMapOf("appearance" to com.unciv.UncivGame.Current.settings.skin,
             "occupiedUnionArea" to area, "unobstructedMapFraction" to fraction,
             "actors" to occupied.map { linkedMapOf("name" to (it.name ?: it.javaClass.simpleName),
                 "x" to it.x, "y" to it.y, "width" to it.width, "height" to it.height) })
     }
+
+    private fun worldActionEvidence(screen: BaseScreen, pixels: Pixmap): List<Map<String, Any?>> =
+        screen.stage.root.atlasDescendants().filterIsInstance<com.unciv.ui.images.IconTextButton>()
+            .filter { it is com.unciv.ui.screens.worldscreen.status.NextTurnButton || it.name?.startsWith("AtlasUnitActionEvidence:") == true }
+            .filter { button -> generateSequence(button as com.badlogic.gdx.scenes.scene2d.Actor?) { it.parent }.all { it.isVisible } }
+            .mapNotNull { button ->
+                val position = button.localToStageCoordinates(Vector2())
+                if (position.x < 0 || position.y < 0 || position.x + button.width > pixels.width || position.y + button.height > pixels.height) return@mapNotNull null
+                val foreground = button.label.style.fontColor.cpy().mul(button.label.color)
+                val points = listOf(Vector2(position.x + 8f, position.y + 8f), Vector2(position.x + button.width - 8f, position.y + 8f))
+                fun luminance(c: Color): Double {
+                    fun channel(v: Float) = if (v <= .04045f) v / 12.92 else Math.pow((v + .055) / 1.055, 2.4)
+                    return .2126 * channel(c.r) + .7152 * channel(c.g) + .0722 * channel(c.b)
+                }
+                val evidence = button.userObject as? AtlasTurnFixtures.Evidence
+                linkedMapOf("name" to button.name, "caption" to button.label.text.toString(),
+                    "selectedAction" to evidence?.selected, "syntheticInput" to evidence?.input,
+                    "route" to evidence?.route, "disabled" to button.isDisabled,
+                    "bounds" to listOf(position.x, position.y, button.width, button.height),
+                    "foreground" to foreground.toString(), "backgroundSamples" to points.map { point ->
+                        val background = Color(pixels.getPixel(point.x.toInt(), point.y.toInt()))
+                        val composite = foreground.cpy().apply {
+                            r = r * a + background.r * (1 - a); g = g * a + background.g * (1 - a); b = b * a + background.b * (1 - a); a = 1f
+                        }
+                        val fg = luminance(composite); val bg = luminance(background)
+                        linkedMapOf("pixel" to listOf(point.x.toInt(), point.y.toInt()), "rgba" to background.toString(),
+                            "contrast" to (maxOf(fg, bg) + .05) / (minOf(fg, bg) + .05))
+                    })
+            }.toList()
 
     /** Controlled native-state evidence, separate from keyboard/mouse interaction tests.
      * Sample empty interior padding, including its actual framebuffer compositing, before PNG flip. */

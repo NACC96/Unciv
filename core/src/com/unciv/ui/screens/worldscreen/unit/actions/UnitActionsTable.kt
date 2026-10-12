@@ -19,6 +19,7 @@ import com.unciv.models.UnitActionType
 import com.unciv.models.UpgradeUnitAction
 import com.unciv.ui.components.extensions.brighten
 import com.unciv.ui.components.extensions.disable
+import com.unciv.ui.components.extensions.setFontColor
 import com.unciv.ui.components.input.keyShortcuts
 import com.unciv.ui.components.input.onActivation
 import com.unciv.ui.images.IconTextButton
@@ -195,7 +196,6 @@ class UnitActionsTable(val worldScreen: WorldScreen) : Table() {
 
         if (com.unciv.ui.components.GameUiStyle.isAtlas) {
             com.unciv.ui.components.GameUiStyle.apply(actionButton, primary = unitAction.isCurrentAction)
-            actionButton.label.color = if (unitAction.isCurrentAction) com.unciv.ui.components.GameUiStyle.surface else com.unciv.ui.components.GameUiStyle.ink
         }
         actionButton.pack()
 
@@ -205,6 +205,17 @@ class UnitActionsTable(val worldScreen: WorldScreen) : Table() {
             actionButton.onActivation(unitAction.uncivSound, binding) {
                 activateAction(unitAction, unit)
             }
+        }
+
+        if (com.unciv.ui.components.GameUiStyle.isAtlas) {
+            // disable() replaces the background; IconTextButton's plain Label needs the
+            // corresponding final foreground, independently of the ButtonStyle.
+            actionButton.label.color = Color.WHITE
+            actionButton.label.setFontColor(when {
+                actionButton.isDisabled -> com.unciv.ui.components.GameUiStyle.muted
+                unitAction.isCurrentAction -> com.unciv.ui.components.GameUiStyle.surface
+                else -> com.unciv.ui.components.GameUiStyle.ink
+            })
         }
 
         return actionButton

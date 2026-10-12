@@ -38,7 +38,7 @@ agent=$(printf '%s' "$classpath" | tr ':' '\n' | awk '/\/mockito-core\// { print
 [[ -f $agent ]] || { echo 'Mockito runtime agent is missing' >&2; exit 1; }
 source_hash=$(git -C "$repo" rev-parse HEAD)
 tree_hash=$(git -C "$repo" diff HEAD -- scripts/atlas tests/src/com/unciv/dev/Atlas* tests/src/com/unciv/ui/components/AtlasCoverageTest.kt docs/atlas | shasum -a 256 | cut -d' ' -f1)
-harness_hash=$(cd "$repo" && git ls-files -co --exclude-standard scripts/atlas tests/src/com/unciv/dev/AtlasFixtureCatalog.kt tests/src/com/unciv/dev/AtlasRenderCheck.kt tests/src/com/unciv/dev/AtlasPerformanceCheck.kt tests/src/com/unciv/ui/components/AtlasCoverageTest.kt tests/build.gradle.kts docs/atlas/screen-coverage.json | sort -u | while IFS= read -r path; do shasum -a 256 "$path"; done | shasum -a 256 | cut -d' ' -f1)
+harness_hash=$(cd "$repo" && git ls-files -co --exclude-standard scripts/atlas tests/src/com/unciv/dev/AtlasFixtureCatalog.kt tests/src/com/unciv/dev/AtlasTurnFixtures.kt tests/src/com/unciv/dev/AtlasRenderCheck.kt tests/src/com/unciv/dev/AtlasPerformanceCheck.kt tests/src/com/unciv/ui/components/AtlasCoverageTest.kt tests/build.gradle.kts docs/atlas/screen-coverage.json | sort -u | while IFS= read -r path; do shasum -a 256 "$path"; done | shasum -a 256 | cut -d' ' -f1)
 cd "$repo/android/assets"
 java_args=(-XstartOnFirstThread -Xmx3g "-javaagent:$agent" "-Dunciv.atlas.sourceHash=$source_hash" "-Dunciv.atlas.diffHash=$tree_hash" "-Dunciv.atlas.harnessHash=$harness_hash" -cp "$classpath")
 if [[ $id == performance ]]; then

@@ -99,12 +99,16 @@ class MinimapHolder(val mapHolder: WorldMapHolder) : Table() {
         lastTileMap = mapHolder.tileMap
         maximized = false
         rebuild(civ)
-        if (com.unciv.ui.components.GameUiStyle.isAtlas) {
-            val r = com.unciv.ui.screens.worldscreen.WorldHudLayout.calculate(worldScreen.stage.width,
-                worldScreen.stage.height, worldScreen.game.settings.fontSizeMultiplier, true).minimap
-            val fitted = minimap.getClosestMinimapSize(Vector2((r.width - 8f).coerceAtLeast(40f), (r.height - 48f).coerceAtLeast(40f)), touchInside = true)
-            if (fitted < minimapSize) { minimapSize = fitted; rebuild(civ) }
-        }
+        val fitted = atlasFittedSize(minimapSize)
+        if (fitted < minimapSize) { minimapSize = fitted; rebuild(civ) }
+    }
+
+    private fun atlasFittedSize(requestedSize: Int): Int {
+        if (!com.unciv.ui.components.GameUiStyle.isAtlas) return requestedSize
+        val r = com.unciv.ui.screens.worldscreen.WorldHudLayout.calculate(worldScreen.stage.width,
+            worldScreen.stage.height, worldScreen.game.settings.fontSizeMultiplier, true).minimap
+        return minOf(requestedSize, minimap.getClosestMinimapSize(
+            Vector2((r.width - 8f).coerceAtLeast(40f), (r.height - 48f).coerceAtLeast(40f)), touchInside = true))
     }
 
     private fun rebuild(civInfo: Civilization?) {
@@ -138,23 +142,23 @@ class MinimapHolder(val mapHolder: WorldMapHolder) : Table() {
 
     private fun getMaximizeToggleButton(civInfo: Civilization?, alignment: Int): Actor {
 
-        // when maximized, collapse map when a location was clicked
-        if (maximized) {
-            minimap.onClick { maximized = false }
-        }
-
         val toggle = fun() {
             maximized = !maximized
             minimapSize = if (maximized && stage!=null) {
                 minimap.getClosestMinimapSize(Vector2(stage.width, stage.height), touchInside = true)
             } else {
-                worldScreen.game.settings.minimapSize
+                atlasFittedSize(worldScreen.game.settings.minimapSize)
             }
             rebuildAndUpdateMap(civInfo)
             worldScreen.shouldUpdate = true
         }
 
-        val table = Table()
+        // A map-location click also collapses the Atlas host and must restore its fit.
+        if (maximized) minimap.onClick {
+            if (com.unciv.ui.components.GameUiStyle.isAtlas) toggle() else maximized = false
+        }
+
+        val table = Table().apply { name = if (maximized) "MinimapReduce" else "MinimapIncrease" }
         if (shouldShowMapButtons()) {
             // table provides larger click area. we want the resize icon to be small to not cover the map,
             // so only a compact plate behind the icon is drawn.
