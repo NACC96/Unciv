@@ -15,6 +15,8 @@ import com.unciv.logic.agents.AgentOrdinarySave
 import com.unciv.logic.agents.AgentProfile
 import com.unciv.logic.agents.AgentRunControls
 import com.unciv.logic.agents.AgentRunState
+import com.unciv.logic.agents.AgentRunTimer
+import com.unciv.logic.agents.AgentRunTiming
 import com.unciv.logic.agents.AgentSnapshotPublication
 import com.unciv.logic.agents.CivilizationController
 import com.unciv.logic.agents.ControllerKind
@@ -71,7 +73,9 @@ class DesktopAgentMatch(
     /** Injected runner (tests, scripted providers); production spawns `node dist/daemon.js`. */
     private val supervisorFactory: (() -> SupervisorRunner)? = null,
     /** Fresh checkpoint namespace when an ordinary save reopens an older branch. */
-    private val recoveryLineage: String? = null
+    private val recoveryLineage: String? = null,
+    /** Transient invocation clock, injected by deterministic tests; never saved with match state. */
+    clockNanos: () -> Long = System::nanoTime
 ) : AgentMatchSession {
 
     override val matchId: String = match.matchId
@@ -186,6 +190,7 @@ class DesktopAgentMatch(
     private var authorityEpoch = 1
     /** Host-side identity remains bound to the admitted run, including its final reads. */
     private var providerRunCivId: String? = null
+    private val runTimer = AgentRunTimer(clockNanos)
     private val sessions = HashMap<String, String>() // civId -> provider session ID
     private var supervisor: SupervisorRunner? = null
     private var failureReason: String? = match.matchPausedReason
@@ -693,6 +698,12 @@ class DesktopAgentMatch(
 
     override fun getRunState(): AgentRunState = synchronized(lock) { runState }
 
+    override fun getActiveRunTiming(): AgentRunTiming? = synchronized(lock) {
+        if (closed.get() || !matchOpen) return@synchronized null
+        val viewer = actualViewerLocked() ?: return@synchronized null
+        runTimer.snapshot()?.takeIf { coordinator.isSpectatorViewer(viewer) || it.civId == viewer }
+    }
+
     override fun getActiveCivId(): String? = synchronized(lock) {
         if (coordinator.getTurnPhase() == TurnPhase.AWAITING_DECISIONS) coordinator.getCurrentCivId() else null
     }
@@ -1014,9 +1025,12 @@ class DesktopAgentMatch(
             return
         }
         val outcome = try {
+            synchronized(lock) { runTimer.start(runId, civId) }
+            // One admission update arms the caption task, independent of activity/map polling.
+            refreshUi()
             proc.runTurn(control)
         } finally {
-            synchronized(lock) { providerRunCivId = null }
+            synchronized(lock) { runTimer.clear(); providerRunCivId = null }
         }
         synchronized(lock) {
             val session = outcome.sessionId

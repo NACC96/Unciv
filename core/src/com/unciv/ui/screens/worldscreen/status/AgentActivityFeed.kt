@@ -213,7 +213,7 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
         val active = session.getActiveCivId()?.takeIf { spectator || it == viewer.civID }
         if (active != null && session.getAgentProfile(active) != null) lastActiveAgentCivId = active
         val activity = session.getActivity().filter {
-            it.kind in setOf("message", "reasoning", "tool", "error") && (spectator || it.civId == viewer.civID)
+            it.kind in setOf("message", "reasoning", "tool", "error", "run") && (spectator || it.civId == viewer.civID)
         }
         if (!spectator && selectedFilter.mode == FilterMode.NATION && selectedFilter.civId != viewer.civID) {
             selectedFilter = activeFilter
@@ -307,6 +307,9 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
     private fun text(value: String, color: Color, size: Int) = value.replace(Regex("\\*\\*(.*?)\\*\\*"), "$1")
         .toLabel(color, size, hideIcons = true).apply { wrap = true; setAlignment(Align.topLeft) }
 
+    // Translation normalizes numeric tokens (01:05 -> 1:5); journal durations are fixed-format text.
+    private fun runText(value: String, color: Color, size: Int) = text(value, color, size).apply { setText(value) }
+
     /** A message, error, turn boundary or different agent ends a run of tool calls. */
     private fun groupTools(entries: List<AgentActivityEntry>): List<FeedRow> {
         val rows = ArrayList<FeedRow>()
@@ -380,6 +383,14 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
                     "reasoning" -> {
                         addSpeaker(entry, "Thinking", rowWidth)
                         addRow(text(body(entry), muted, GameUiStyle.Type.body), entry.id, rowWidth, bottom = 12f)
+                    }
+                    "run" -> {
+                        val failed = entry.status == "failed"
+                        addSpeaker(entry, if (failed) "Run failed" else "Run completed", rowWidth)
+                        val color = if (failed) WorldScreenStyle.error else AgentActivityAppearance.color(screen.gameInfo, entry.civId)
+                        addRow(runText(entry.title, color, 12), entry.id, rowWidth, bottom = 4f)
+                        if (entry.summary.isNotBlank())
+                            addRow(runText(entry.summary, color, 11), "summary/${entry.id}", rowWidth, bottom = 12f)
                     }
                     else -> {
                         addSpeaker(entry, if (entry.kind == "error" || entry.status == "failed") "Error" else "Tools", rowWidth)

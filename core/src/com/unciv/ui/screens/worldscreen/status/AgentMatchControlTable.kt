@@ -1,10 +1,13 @@
 package com.unciv.ui.screens.worldscreen.status
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.scenes.scene2d.ui.Table
+import com.badlogic.gdx.utils.Timer
 import com.unciv.logic.agents.AgentMatchSession
 import com.unciv.logic.agents.AgentModelCatalog
 import com.unciv.logic.agents.AgentRunState
 import com.unciv.logic.agents.ThinkingLevel
+import com.unciv.logic.agents.formatAgentRunDuration
 import com.unciv.ui.components.extensions.toLabel
 import com.unciv.ui.components.input.onClick
 import com.unciv.ui.screens.basescreen.BaseScreen
@@ -18,6 +21,14 @@ class AgentMatchControlTable(
 ) : Table(BaseScreen.skin) {
     private val status = "".toLabel(WorldScreenStyle.ink, 14).apply { wrap = true }
     private val model = "".toLabel(WorldScreenStyle.muted, 12).apply { setEllipsis(true) }
+    private val elapsed = "Elapsed 00:00".toLabel(WorldScreenStyle.accent, 12).apply { name = "AgentRunElapsed"; setEllipsis(true) }
+    private var disposed = false
+    private val timingRefreshTask = object : Timer.Task() {
+        override fun run() {
+            if (disposed) { cancel(); return }
+            if (updateTiming()) Gdx.graphics.requestRendering()
+        }
+    }
     private val actionButton = WorldScreenStyle.button("", primary = true)
     private val activityButton = WorldScreenStyle.button("Activity")
     private val activityFeed = AgentActivityFeed(screen, session)
@@ -25,9 +36,13 @@ class AgentMatchControlTable(
     private val messagesPanel = AgentMessagesPanel(screen, session)
 
     private val settingsButton = WorldScreenStyle.button("Settings")
-    private val settingsPanel = AgentNationSettingsPanel(screen, session)
+    private val settingsPanel = AgentNationSettingsPanel(screen, session, this)
 
-    fun dispose() { activityFeed.dispose(); messagesPanel.dispose(); settingsPanel.dispose() }
+    fun dispose() {
+        disposed = true
+        timingRefreshTask.cancel()
+        activityFeed.dispose(); messagesPanel.dispose(); settingsPanel.dispose()
+    }
 
     init {
         pad(8f)
@@ -46,7 +61,23 @@ class AgentMatchControlTable(
         update()
     }
 
+    /** Only update the caption: no feed polling, screen invalidation or map snapshot publication. */
+    private fun updateTiming(): Boolean {
+        val timing = session.getActiveRunTiming()
+        val viewer = screen.viewingCiv
+        val permitted = timing?.takeIf { viewer.isSpectator() || it.civId == viewer.civID }
+        val visible = permitted != null
+        val caption = permitted?.let { "Elapsed ${formatAgentRunDuration(it.elapsedMillis)} · ${it.civId}" } ?: "Elapsed 00:00"
+        val changed = elapsed.isVisible != visible || elapsed.text.toString() != caption
+        if (changed) { elapsed.isVisible = visible; elapsed.setText(caption) }
+        // Timer posts GL runnables; don't keep waking a retained screen after its run disappears.
+        if (!visible || disposed) timingRefreshTask.cancel()
+        else if (!timingRefreshTask.isScheduled) Timer.schedule(timingRefreshTask, 1f, 1f)
+        return changed
+    }
+
     fun update() {
+        updateTiming()
         val state = session.getRunState()
         val stateText = when (state) {
             AgentRunState.PAUSED -> "Paused"
@@ -88,7 +119,9 @@ class AgentMatchControlTable(
         clearChildren()
         val text = Table()
         text.add(status).minWidth(0f).growX().left().row()
-        text.add(model).minWidth(0f).growX().left().padTop(4f)
+        text.add(model).minWidth(0f).growX().left().padTop(4f).row()
+        // Reserve a caption row so second ticks and run completion never repack the control bar.
+        text.add(elapsed).minWidth(0f).growX().left().padTop(4f)
         val buttons = Table()
         if (action != null) buttons.add(actionButton).padRight(6f)
         buttons.add(activityButton).padRight(6f)

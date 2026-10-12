@@ -65,6 +65,8 @@ interface AgentMatchSession {
     fun getRunState(): AgentRunState
     fun getActiveCivId(): String?
     fun getActiveAgentProfile(): AgentProfile?
+    /** Copied elapsed time for the admitted provider, filtered to the actual viewer. */
+    fun getActiveRunTiming(): AgentRunTiming? = null
     /** Identity for activity from an earlier civilization, independent of the active turn. */
     fun getAgentProfile(civId: String): AgentProfile? =
         if (civId == getActiveCivId()) getActiveAgentProfile() else null

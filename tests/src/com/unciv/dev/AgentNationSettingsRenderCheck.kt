@@ -28,6 +28,7 @@ import com.unciv.ui.components.input.ActivationListener
 import com.unciv.ui.images.ImageGetter
 import com.unciv.ui.screens.basescreen.UncivStage
 import com.unciv.ui.screens.worldscreen.WorldScreen
+import com.unciv.ui.screens.worldscreen.status.AgentActivityFeed
 import com.unciv.ui.screens.worldscreen.status.AgentMatchControlTable
 import com.unciv.ui.screens.worldscreen.status.AgentNationSettingsPanel
 import org.mockito.Mockito
@@ -55,7 +56,7 @@ object AgentNationSettingsRenderCheck {
             var pending: String? = null
             var completion: ((String?) -> Unit)? = null
             var requests = 0
-            val states = listOf("form", "models", "actions", "pending", "error")
+            val states = listOf("form", "models", "actions", "pending", "error", "timing-activity")
             override fun create() {
                 try {
                     val game = TestGame()
@@ -82,10 +83,18 @@ object AgentNationSettingsRenderCheck {
                             }, index == 0)
                     }
                     Mockito.`when`(session.getNationSettings()).thenReturn(settings)
-                    Mockito.`when`(session.getRunState()).thenReturn(AgentRunState.PAUSED)
+                    Mockito.`when`(session.getRunState()).thenReturn(AgentRunState.AGENT_DECIDING)
+                    Mockito.`when`(session.getActiveRunTiming()).thenReturn(AgentRunTiming("synthetic-long-run", "America", 45_296_000))
+                    Mockito.`when`(session.getAgentProfile(Mockito.anyString())).thenAnswer { call ->
+                        settings.firstOrNull { it.civId == call.getArgument<String>(0) }?.profile
+                    }
+                    Mockito.`when`(session.getActivity()).thenReturn(listOf(
+                        AgentActivityEntry("timing-tool", "America", 1, "tool", "Observe cities", "2 cities", "1", "succeeded"),
+                        AgentActivityEntry("timing-completed", "America", 1, "run", "Provider completed in 01:05", "Duration 01:05", "2", "completed"),
+                        AgentActivityEntry("timing-failed", "America", 2, "run", "Provider failed in 12:34:56", "Duration 12:34:56", "3", "failed")))
                     Mockito.`when`(session.getActiveCivId()).thenReturn("America")
                     Mockito.`when`(session.getActiveAgentProfile()).thenReturn(settings.first().profile)
-                    Mockito.`when`(session.canResume()).thenReturn(true)
+                    Mockito.`when`(session.canPause()).thenReturn(true)
                     val tech = Mockito.mock(com.unciv.ui.screens.worldscreen.TechPolicyDiplomacyButtons::class.java)
                     Mockito.`when`(tech.y).thenAnswer { stage.height - 80f }
                     val getter = screen.javaClass.methods.single { it.name.substringBefore('$') == "getTechPolicyAndDiplomacy" }
@@ -142,7 +151,15 @@ object AgentNationSettingsRenderCheck {
                     val point = button.localToAscendantCoordinates(controls, Vector2())
                     check(point.x >= 0 && point.x + button.width <= controls.width + 0.5f) { "Match controls button exceeds the compact bar" }
                 }
+                val elapsed = controls.descendants().filterIsInstance<Label>().single { it.name == "AgentRunElapsed" }
+                check(elapsed.isVisible && elapsed.text.toString() == "Elapsed 12:34:56 · America")
+                check(elapsed.width >= com.badlogic.gdx.graphics.g2d.GlyphLayout(elapsed.style.font, "Elapsed 12:34:56").width * elapsed.fontScaleX) { "Hour duration was clipped at $width" }
                 check(panel.x >= 0 && panel.y >= 0 && panel.x + panel.width <= stage.width && panel.y + panel.height <= stage.height)
+                if (panel.isVisible) {
+                    val horizontalOverlap = panel.x < controls.x + controls.width && controls.x < panel.x + panel.width
+                    val verticalOverlap = panel.y < controls.y + controls.height && controls.y < panel.y + panel.height
+                    check(!horizontalOverlap || !verticalOverlap) { "Nation settings overlaps live timing controls at $width" }
+                }
                 for (name in listOf("NationPicker", "NationProvider", "NationModel", "NationCustomModel", "NationReasoning", "NationDisplayName", "NationPersonality", "NationSave", "NationPlay", "NationHandback", "NationSpectate")) {
                     val actor = panel.named(name); val point = actor.localToAscendantCoordinates(panel, Vector2())
                     check(point.x >= -0.5f && point.x + actor.width <= panel.width + 0.5f) { "$name exceeds the panel at ${width}x$height" }
@@ -160,6 +177,18 @@ object AgentNationSettingsRenderCheck {
                     check((panel.named("NationStatus") as Label).text.toString() == "Synthetic checkpoint failure")
                     check((panel.named("NationDisplayName") as TextField).text.contains("patient ruler"))
                 }
+                if (stateIndex == 5) {
+                    val feed = stage.root.children.filterIsInstance<AgentActivityFeed>().single()
+                    check(feed.isVisible && !panel.isVisible)
+                    check(feed.x >= 0f && feed.y >= 0f && feed.x + feed.width <= stage.width && feed.y + feed.height <= stage.height)
+                    val labels = feed.descendants().filterIsInstance<Label>().map { it.text.toString() }.toList()
+                    check(labels.any { it.contains("Run completed") } && "Duration 01:05" in labels)
+                    check(labels.any { it.contains("Run failed") } && "Duration 12:34:56" in labels)
+                    for (label in feed.descendants().filterIsInstance<Label>()) {
+                        val point = label.localToAscendantCoordinates(feed, Vector2())
+                        check(point.x >= -0.5f && point.x + label.width <= feed.width + 0.5f) { "Run duration row exceeds glass" }
+                    }
+                }
                 val pixels = Pixmap.createFromFrameBuffer(0, 0, if (synchronous) width else Gdx.graphics.backBufferWidth,
                     if (synchronous) height else Gdx.graphics.backBufferHeight)
                 try { PixmapIO.writePNG(Gdx.files.absolute("${args[0]}/nation-settings-${states[stateIndex]}-$width.png"), pixels, -1, true) }
@@ -176,11 +205,17 @@ object AgentNationSettingsRenderCheck {
                     3 -> { panel.named("NationSave").press(); panel.refresh() }
                     4 -> { pending = null; completion!!("Synthetic checkpoint failure") }
                     5 -> {
+                        controls.descendants().filterIsInstance<TextButton>().single { it.text.toString() == "Settings" }.press()
+                        val feed = stage.root.children.filterIsInstance<AgentActivityFeed>().single()
+                        if (!feed.isVisible) feed.toggle()
+                    }
+                    6 -> {
                         if (++sizeIndex == sizes.size) {
-                            println("NATION_SETTINGS_RENDER_CHECK_PASSED: 960x720 and 420x600, custom model/reasoning, scrollable actions, dropdown bounds, pending duplicate guard and retained error draft; no providers")
+                            println("NATION_SETTINGS_RENDER_CHECK_PASSED: 960x720 and 420x600, custom model/reasoning, scrollable actions, dropdown bounds, pending duplicate guard, retained error draft, hour timer and distinct final run durations with non-overlapping controls; no providers")
                             complete = true; if (!synchronous) Gdx.app.exit()
                         } else {
                             stateIndex = 0
+                            controls.descendants().filterIsInstance<TextButton>().single { it.text.toString() == "Settings" }.press()
                             if (synchronous) resizeLogical(sizes[sizeIndex].first, sizes[sizeIndex].second)
                             else Gdx.graphics.setWindowedMode(sizes[sizeIndex].first, sizes[sizeIndex].second)
                             val scroll = panel.named("NationSettingsScroll") as ScrollPane
@@ -192,7 +227,15 @@ object AgentNationSettingsRenderCheck {
             private fun placeControls() {
                 controls.update(); controls.setPosition(stage.width - controls.width - 8f, stage.height - controls.height - 8f)
             }
-            private fun resizeLogical(width: Int, height: Int) { stage.viewport.update(width, height, true); panel.refresh(); placeControls() }
+            private fun resizeLogical(width: Int, height: Int) {
+                stage.viewport.update(width, height, true)
+                placeControls()
+                // The synchronous loop does not pump Timer's posted GL refreshes. Settle anchors
+                // in production order: WorldScreen places controls before the floating panel refresh.
+                panel.refresh()
+                val feed = stage.root.children.filterIsInstance<AgentActivityFeed>().single()
+                feed.javaClass.getDeclaredMethod("refresh").apply { isAccessible = true }.invoke(feed)
+            }
             override fun resize(width: Int, height: Int) { if (!synchronous && ::panel.isInitialized) resizeLogical(width, height) }
             override fun dispose() { target?.dispose(); if (::controls.isInitialized) controls.dispose() else if (::panel.isInitialized) panel.dispose(); if (::stage.isInitialized) stage.dispose() }
         }, config)

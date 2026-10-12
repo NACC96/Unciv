@@ -16,6 +16,9 @@ import com.unciv.logic.agents.AgentActivityEntry
 import com.unciv.logic.agents.AgentMatchSession
 import com.unciv.logic.agents.AgentProfile
 import com.unciv.logic.agents.AgentRunState
+import com.unciv.logic.agents.AgentRunTiming
+import com.unciv.ui.screens.worldscreen.status.AgentMatchControlTable
+import com.badlogic.gdx.utils.Timer
 import com.unciv.models.translations.tr
 import com.unciv.testing.GdxTestRunner
 import com.unciv.testing.TestGame
@@ -47,6 +50,7 @@ class WorldScreenHudTest {
     private lateinit var priorNames: Map<String, Char>
     private lateinit var priorActors: Map<Char, Actor>
     private val feeds = ArrayList<AgentActivityFeed>()
+    private val controls = ArrayList<AgentMatchControlTable>()
     private val overviews = ArrayList<CivilizationOverviewPanel>()
 
     @Before fun setup() {
@@ -54,6 +58,7 @@ class WorldScreenHudTest {
         priorActors = FontRulesetIcons.charToRulesetImageActor.toMap()
     }
     @After fun cleanup() {
+        controls.forEach { it.dispose() }
         feeds.forEach { it.dispose() }
         overviews.forEach { it.dispose() }
         FontRulesetIcons.rulesetObjectNameToChar.clear()
@@ -74,6 +79,7 @@ class WorldScreenHudTest {
         val screen = Mockito.mock(WorldScreen::class.java)
         var active: String? = "Rome"
         var activity = emptyList<AgentActivityEntry>()
+        var timing: AgentRunTiming? = null
 
         init {
             Fonts.fontImplementation = FontDesktop()
@@ -97,6 +103,11 @@ class WorldScreenHudTest {
             }
             Mockito.`when`(session.getRunState()).thenReturn(AgentRunState.AGENT_DECIDING)
             Mockito.`when`(session.getActivity()).thenAnswer { activity }
+            Mockito.`when`(session.getActiveRunTiming()).thenAnswer { timing }
+            Mockito.`when`(session.getActiveAgentProfile()).thenReturn(AgentProfile.defaultFor("Rome").apply {
+                displayName = "A patient ruler of coastlines, trade routes and a very long imperial title"
+                modelId = "saved-provider/custom-model-with-a-long-identity"
+            })
             Mockito.`when`(session.getActivityDetails(Mockito.anyString())).thenAnswer {
                 val id = it.getArgument<String>(0)
                 if (id == "tool") "RAW TOOL DETAILS" else "Message $id. The Warrior will explore the nearby coast while the city builds a Scout."
@@ -131,6 +142,138 @@ class WorldScreenHudTest {
     private fun Fixture.feed() = AgentActivityFeed(screen, session).also { feeds.add(it) }
     private fun Fixture.overview() = CivilizationOverviewPanel(screen).also { overviews.add(it) }
     private fun entry(id: String, kind: String = "message") = AgentActivityEntry(id, "Rome", 1, kind, "Move Warrior", "Moved to (1, 2)", id, "succeeded")
+
+    private fun Fixture.controls() = AgentMatchControlTable(session, screen).also { controls.add(it) }
+    private fun AgentMatchControlTable.tickTimer() = javaClass.getDeclaredField("timingRefreshTask")
+        .apply { isAccessible = true }.get(this).let { (it as Timer.Task).run() }
+    private fun AgentMatchControlTable.timerScheduled() = javaClass.getDeclaredField("timingRefreshTask")
+        .apply { isAccessible = true }.get(this).let { (it as Timer.Task).isScheduled }
+    private fun AgentMatchControlTable.timerLabel() = descendants().filterIsInstance<Label>().single { it.name == "AgentRunElapsed" }
+
+    @Test fun `elapsed updates while activity is hidden without polling activity or rebuilding status`() {
+        val f = Fixture()
+        f.timing = AgentRunTiming("run-1", "Rome", 65_000)
+        val controls = f.controls()
+        assertTrue(controls.timerScheduled())
+        val feed = f.root.children.filterIsInstance<AgentActivityFeed>().single()
+        feed.hide()
+        val statusLabels = controls.descendants().filterIsInstance<Label>().toList()
+        Mockito.clearInvocations(f.session, f.screen)
+        f.timing = AgentRunTiming("run-1", "Rome", 66_000)
+        controls.tickTimer()
+        assertEquals("Elapsed 01:06 · Rome", controls.timerLabel().text.toString())
+        assertEquals(statusLabels, controls.descendants().filterIsInstance<Label>().toList())
+        Mockito.verify(f.session, Mockito.never()).getActivity()
+        Mockito.verify(f.session, Mockito.never()).getRunState()
+        Mockito.verify(f.screen).viewingCiv
+        Mockito.verifyNoMoreInteractions(f.screen)
+    }
+
+    @Test fun `timer stays visible during pause drains resets on retry and disappears at completion`() {
+        val f = Fixture()
+        f.timing = AgentRunTiming("run-1", "Rome", 3_600_000)
+        val controls = f.controls()
+        Mockito.`when`(f.session.getRunState()).thenReturn(AgentRunState.PAUSING)
+        controls.update()
+        f.timing = AgentRunTiming("run-1", "Rome", 3_601_000)
+        controls.tickTimer()
+        assertEquals("Elapsed 1:00:01 · Rome", controls.timerLabel().text.toString())
+        f.timing = null
+        controls.tickTimer()
+        assertFalse(controls.timerLabel().isVisible)
+        assertFalse(controls.timerScheduled())
+        f.timing = AgentRunTiming("retry-1", "Rome", 0)
+        controls.tickTimer()
+        assertTrue(controls.timerLabel().isVisible)
+        assertTrue(controls.timerScheduled())
+        assertEquals("Elapsed 00:00 · Rome", controls.timerLabel().text.toString())
+        controls.dispose()
+        assertFalse(controls.timerScheduled())
+        Mockito.clearInvocations(f.session)
+        controls.tickTimer()
+        Mockito.verifyNoInteractions(f.session)
+    }
+
+    @Test fun `idle or unchanged timer never requests a redraw`() {
+        val f = Fixture()
+        val controls = f.controls()
+        assertFalse(controls.timerScheduled())
+        val previous = com.badlogic.gdx.Gdx.graphics
+        val graphics = Mockito.mock(com.badlogic.gdx.Graphics::class.java)
+        com.badlogic.gdx.Gdx.graphics = graphics
+        try {
+            controls.tickTimer()
+            Mockito.verifyNoInteractions(graphics)
+            f.timing = AgentRunTiming("run", "Rome", 1_000)
+            controls.tickTimer()
+            Mockito.verify(graphics).requestRendering()
+            Mockito.clearInvocations(graphics)
+            controls.tickTimer()
+            Mockito.verifyNoInteractions(graphics)
+            f.timing = null
+            controls.tickTimer()
+            Mockito.verify(graphics).requestRendering()
+            Mockito.clearInvocations(graphics)
+            controls.tickTimer()
+            Mockito.verifyNoInteractions(graphics)
+        } finally { com.badlogic.gdx.Gdx.graphics = previous }
+    }
+
+    @Test fun `ordinary viewer sees only their own timer and spectator sees every active timer`() {
+        val f = Fixture(spectator = false)
+        f.timing = AgentRunTiming("foreign", "Korea", 65_000)
+        val controls = f.controls()
+        assertFalse(controls.timerLabel().isVisible)
+        f.timing = AgentRunTiming("own", "Rome", 65_000)
+        controls.tickTimer()
+        assertTrue(controls.timerLabel().isVisible)
+        Mockito.`when`(f.screen.viewingCiv).thenReturn(f.spectatorCiv)
+        f.timing = AgentRunTiming("foreign", "Korea", 65_000)
+        controls.tickTimer()
+        assertTrue(controls.timerLabel().isVisible)
+    }
+
+    @Test fun `long agent identity model and hour timer retain their own rows within narrow controls`() {
+        val f = Fixture(width = 420f)
+        f.active = "The Ottomans"
+        f.game.addCiv(f.game.ruleset.nations["The Ottomans"]!!)
+        f.timing = AgentRunTiming("run", "The Ottomans", 45_296_000)
+        val controls = f.controls()
+        controls.validate()
+        val elapsed = controls.timerLabel()
+        assertEquals("Elapsed 12:34:56 · The Ottomans", elapsed.text.toString())
+        assertTrue(elapsed.width >= com.badlogic.gdx.graphics.g2d.GlyphLayout(elapsed.style.font, "Elapsed 12:34:56").width * elapsed.fontScaleX)
+        assertTrue(controls.width <= f.width - 20f)
+        for (label in controls.descendants().filterIsInstance<Label>()) {
+            val point = label.localToAscendantCoordinates(controls, Vector2())
+            assertTrue("Label outside compact controls: ${label.text}", point.x >= -0.1f && point.x + label.width <= controls.width + 0.1f)
+        }
+    }
+
+    @Test fun `run durations remain named visible distinct from collapsed tools and obey nation filters`() {
+        val f = Fixture()
+        f.activity = listOf(entry("tool-1", "tool"), entry("tool-2", "tool"),
+            entry("run-1", "run").copy(title = "Provider completed in 01:05", summary = "Duration 01:05", status = "completed"),
+            entry("tool-3", "tool"),
+            entry("run-2", "run").copy(civId = "Korea", title = "Provider failed in 1:00:01", summary = "Duration 1:00:01", status = "failed"))
+        val feed = f.feed()
+        fun labels() = feed.descendants().filterIsInstance<Label>().map { it.text.toString() }.toList()
+        assertTrue("Completed run identity missing from ${labels()}", labels().contains("Atlas · Run completed"))
+        assertTrue("Completed title must retain padded duration: ${labels()}", labels().contains("Provider completed in 01:05"))
+        assertTrue("Completed duration missing from ${labels()}", labels().contains("Duration 01:05"))
+        assertFalse(labels().any { it.contains("1:00:01") })
+        feed.selectNation("All nations")
+        assertTrue("Failed run identity missing from ${labels()}", labels().contains("Nova · Run failed"))
+        assertTrue("Failed title must retain padded duration: ${labels()}", labels().contains("Provider failed in 1:00:01"))
+        assertTrue("Failed duration missing from ${labels()}", labels().contains("Duration 1:00:01"))
+        val failure = feed.descendants().filterIsInstance<Label>().single { it.text.toString() == "Duration 1:00:01" }
+        assertEquals(WorldScreenStyle.error, failure.style.fontColor)
+        feed.selectNation("Rome · Atlas")
+        assertFalse(labels().any { it.contains("1:00:01") })
+        Mockito.`when`(f.screen.viewingCiv).thenReturn(f.rome)
+        feed.selectNation("All nations")
+        assertFalse(labels().any { it.contains("1:00:01") })
+    }
 
     @Test fun `spectator economy and inspection view follow the active agent without switching the map view`() {
         val f = Fixture()
