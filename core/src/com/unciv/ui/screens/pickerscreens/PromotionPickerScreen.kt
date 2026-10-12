@@ -22,6 +22,7 @@ import com.unciv.models.UncivSound
 import com.unciv.models.ruleset.unit.Promotion
 import com.unciv.models.translations.tr
 import com.unciv.ui.audio.SoundPlayer
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.extensions.isEnabled
 import com.unciv.ui.components.extensions.toCheckBox
 import com.unciv.ui.components.extensions.toTextButton
@@ -68,7 +69,7 @@ class PromotionPickerScreen private constructor(
             selectedPromotion?.node?.promotion?.name?.let { name ->
                 fresh.promotionToButton[name]?.let { fresh.selectPromotion(it) }
             }
-            fresh.setScrollY(scrollPane.scrollY)
+            fresh.setScrollPosition(scrollPane.scrollX, scrollPane.scrollY)
         }
     }
 
@@ -99,6 +100,7 @@ class PromotionPickerScreen private constructor(
     private var pendingPromotionNames: Set<String> = emptySet()
 
     init {
+        setChoiceHeader("Promotions", "${unit.displayName()} · ${unit.promotions.XP} ${"XP".tr()}")
         closeButton.onActivation {
             if (unit.instanceName != originalName)
                 onChange?.invoke()
@@ -128,7 +130,11 @@ class PromotionPickerScreen private constructor(
                         game.replaceCurrentScreen { recreate() }
                 }
             }
-            topTable.add(renameButton).pad(5f).row()
+            if (GameUiStyle.isAtlas) {
+                GameUiStyle.apply(renameButton)
+                renameButton.label.wrap = true
+            }
+            topTable.add(renameButton).minWidth(0f).pad(5f).row()
         }
 
         // Create all buttons without placing them yet, measure
@@ -278,6 +284,7 @@ class PromotionPickerScreen private constructor(
     
     private fun selectPromotion(button: PromotionButton) {
         selectedPromotion = button
+        if (GameUiStyle.isAtlas) stage.keyboardFocus = button
         val node = button.node
         val path = tree.getPathTo(node.promotion)
         val pathAsSet = path.toSet()
@@ -353,6 +360,9 @@ class PromotionPickerScreen private constructor(
                 val isSelectionPath = isNodeInPath &&
                     (prerequisiteNode.isAdopted || prerequisiteNode.promotion in path)
                 val lineColor = when {
+                    GameUiStyle.isAtlas && isSelectionPath -> GameUiStyle.accent
+                    GameUiStyle.isAtlas && isNodeInPath -> GameUiStyle.info
+                    GameUiStyle.isAtlas -> GameUiStyle.muted
                     isSelectionPath -> colors.selected
                     isNodeInPath -> colors.pathToSelection
                     prerequisiteNode.baseName == currentNode.baseName -> colors.groupLines
@@ -413,7 +423,12 @@ class PromotionPickerScreen private constructor(
     }
 
     private fun setScrollY(scrollY: Float) {
+        setScrollPosition(scrollPane.scrollX, scrollY)
+    }
+
+    private fun setScrollPosition(scrollX: Float, scrollY: Float) {
         splitPane.pack()    // otherwise scrollPane.maxY == 0
+        scrollPane.scrollX = scrollX
         scrollPane.scrollY = scrollY
         scrollPane.updateVisualScroll()
     }
@@ -436,7 +451,16 @@ class PromotionPickerScreen private constructor(
             else -> path.joinToString(" → ", ": ") { it.name.tr() }
         }
         val promotionText = node.promotion.getDescription(tree.possiblePromotions)
-        descriptionLabel.setText("$topLine\n$promotionText")
+        val atlasDetails = if (GameUiStyle.isAtlas) buildString {
+            val prerequisites = node.promotion.prerequisites
+            if (prerequisites.isNotEmpty()) append("\n${"Requires".tr()}: ${prerequisites.joinToString(", ") { it.tr() }}")
+            if (!node.isAdopted && path.isNotEmpty()) {
+                val paidSteps = path.count { !it.hasUnique(com.unciv.models.ruleset.unique.UniqueType.FreePromotion) }
+                append("\n${unit.promotions.XP}/${unit.promotions.xpForNextNPromotions(paidSteps)} ${"XP".tr()}")
+            }
+            if (!node.isAdopted && !isPickable) append("\n${"Unavailable".tr()}")
+        } else ""
+        descriptionLabel.setText("$topLine$atlasDetails\n$promotionText")
         descriptionLabel.clearListeners()
         descriptionLabel.onActivation {
             openCivilopedia(node.promotion.makeLink())
@@ -451,7 +475,7 @@ class PromotionPickerScreen private constructor(
         selectedPromotion?.node?.promotion?.name?.let { name ->
             newScreen.promotionToButton[name]?.let { newScreen.selectPromotion(it) }
         }
-        newScreen.setScrollY(scrollPane.scrollY)
+        newScreen.setScrollPosition(scrollPane.scrollX, scrollPane.scrollY)
         return newScreen
     }
 }

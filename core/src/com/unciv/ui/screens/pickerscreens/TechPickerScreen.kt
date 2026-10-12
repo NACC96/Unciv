@@ -21,6 +21,8 @@ import com.unciv.models.ruleset.tech.Technology
 import com.unciv.models.ruleset.unique.UniqueType
 import com.unciv.models.translations.tr
 import com.unciv.ui.components.NonTransformGroup
+import com.unciv.ui.components.GameUiStyle
+import com.unciv.ui.components.atlas.AtlasChoiceState
 import com.unciv.ui.components.extensions.colorFromRGB
 import com.unciv.ui.components.extensions.darken
 import com.unciv.ui.components.extensions.disable
@@ -85,6 +87,7 @@ class TechPickerScreen(
         Gdx.input.inputProcessor = null // Avoid ANRs while building the tech screen
 
         setDefaultCloseAction()
+        setChoiceHeader("Research", "${civInfo.civName} · ${if (freeTechPick) "Pick a free tech" else "Pick a tech"}")
         scrollPane.setOverscroll(false, false)
 
         descriptionLabel.onActivation {
@@ -100,8 +103,10 @@ class TechPickerScreen(
         techTable.addActor(lines)
         techTable.addActor(orderIndicators)
         topTable.add(techTable)
-        techTable.background = skinStrings.getUiBackground("TechPickerScreen/Background", tintColor = skinStrings.skinConfig.clearColor)
-        pickerPane.bottomTable.background = skinStrings.getUiBackground("TechPickerScreen/BottomTable", tintColor = skinStrings.skinConfig.clearColor)
+        techTable.background = if (GameUiStyle.isAtlas) GameUiStyle.background("Atlas/Technology/Tree", GameUiStyle.surface)
+            else skinStrings.getUiBackground("TechPickerScreen/Background", tintColor = skinStrings.skinConfig.clearColor)
+        if (!GameUiStyle.isAtlas)
+            pickerPane.bottomTable.background = skinStrings.getUiBackground("TechPickerScreen/BottomTable", tintColor = skinStrings.skinConfig.clearColor)
 
         rightSideButton.setText(if (freeTechPick) "Pick a free tech".tr() else "Pick a tech".tr())
         rightSideButton.onClick(UncivSound.Paper) { tryExit() }
@@ -129,6 +134,7 @@ class TechPickerScreen(
 
 
     private fun tryExit() {
+        if (rightSideButton.isDisabled) return
         // Agent matches route research through the coordinator (§3.2).
         // Capture the displayed intent before the host dispatches these factories asynchronously.
         val stagedQueue = tempTechsToResearch.toList()
@@ -145,13 +151,17 @@ class TechPickerScreen(
             game.popScreen()
             return
         }
+        val instantResearch = GameUiStyle.isAtlas && civInfo.gameInfo.gameParameters.godMode && !freeTechPick
+        if (instantResearch) {
+            selectedTech?.takeUnless { civTech.isResearched(it.name) }?.let { civTech.addTechnology(it.name) }
+        }
         if (freeTechPick) {
             val freeTech = selectedTech!!.name
             // More evil people fast-clicking to cheat - #4977
             if (!researchableTechs.contains(freeTech)) return
             civTech.getFreeTechnology(selectedTech!!.name)
         }
-        else civTech.techsToResearch = tempTechsToResearch
+        else if (!instantResearch) civTech.techsToResearch = tempTechsToResearch
 
         civTech.updateResearchProgress()
 
@@ -195,10 +205,16 @@ class TechPickerScreen(
 
             table1.background = skinStrings.getUiBackground("General/Border", tintColor = Color.WHITE)
             table2.background = skinStrings.getUiBackground("General/Border", tintColor = color)
+            if (GameUiStyle.isAtlas) {
+                table1.background = GameUiStyle.outlinedBackground("Atlas/Technology/Era", GameUiStyle.raised, GameUiStyle.muted)
+                table2.background = null
+                table2.pad(GameUiStyle.Space.m)
+            }
 
             val label = era.toLabel().apply {
                 setAlignment(Align.center)
-                if (ruleset.eras[era]!!.eraNumber < civTech.era.eraNumber)
+                if (GameUiStyle.isAtlas) this.color = GameUiStyle.ink
+                else if (ruleset.eras[era]!!.eraNumber < civTech.era.eraNumber)
                     this.color = colorFromRGB(120, 46, 16) }
 
             eraLabels.add(label)
@@ -251,7 +267,7 @@ class TechPickerScreen(
                 else -> ImageGetter.CHARCOAL.cpy()
             })
 
-            if (isResearched && techName != Constants.futureTech) {
+            if (!GameUiStyle.isAtlas && isResearched && techName != Constants.futureTech) {
                 techButton.text.color = colorFromRGB(154, 98, 16)
             }
 
@@ -260,6 +276,12 @@ class TechPickerScreen(
             }
 
             techButton.text.setText(techName.tr(true))
+            techButton.setChoiceState(when {
+                isResearched && techName != Constants.futureTech -> AtlasChoiceState.COMPLETED
+                civTech.currentTechnologyName() == techName && !freeTechPick -> AtlasChoiceState.CURRENT
+                researchableTechs.contains(techName) -> AtlasChoiceState.AVAILABLE
+                else -> AtlasChoiceState.LOCKED
+            }, selectedTech?.name == techName, tempTechsToResearch.contains(techName))
         }
 
         addConnectingLines()
@@ -304,6 +326,9 @@ class TechPickerScreen(
                 techTable.stageToLocalCoordinates(prerequisiteCoords)
 
                 val lineColor = when {
+                    GameUiStyle.isAtlas && tempTechsToResearch.contains(tech.name) -> GameUiStyle.accent
+                    GameUiStyle.isAtlas && civTech.isResearched(prerequisite) -> GameUiStyle.positive
+                    GameUiStyle.isAtlas -> GameUiStyle.muted
                     civTech.isResearched(tech.name) && !tech.isContinuallyResearchable() -> Color.WHITE.cpy()
                     civTech.isResearched(prerequisite) -> researchableTechColor
                     tempTechsToResearch.contains(tech.name) -> currentTechColor
@@ -410,7 +435,13 @@ class TechPickerScreen(
 
         val previousSelectedTech = selectedTech
         selectedTech = tech
-        descriptionLabel.setText(tech?.getDescription(civInfo))
+        if (GameUiStyle.isAtlas && tech != null) stage.keyboardFocus = techNameToButton[tech.name]
+        descriptionLabel.setText(tech?.let {
+            val prerequisites = it.prerequisites.joinToString(", ") { name -> name.tr() }
+            if (GameUiStyle.isAtlas && prerequisites.isNotEmpty())
+                "${it.name.tr()}\n${"Requires".tr()}: $prerequisites\n${it.getDescription(civInfo)}"
+            else it.getDescription(civInfo)
+        })
 
         if (!switchFromWorldScreen)
             return
@@ -427,7 +458,7 @@ class TechPickerScreen(
             return
         }
 
-        if (civInfo.gameInfo.gameParameters.godMode && !civInfo.tech.isResearched(tech.name)
+        if (!GameUiStyle.isAtlas && civInfo.gameInfo.gameParameters.godMode && !civInfo.tech.isResearched(tech.name)
                 && selectedTech == previousSelectedTech) {
             civInfo.tech.addTechnology(tech.name)
         }

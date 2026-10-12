@@ -14,6 +14,9 @@ import com.unciv.models.UncivSound
 import com.unciv.models.ruleset.Belief
 import com.unciv.models.ruleset.BeliefType
 import com.unciv.models.translations.tr
+import com.unciv.ui.components.GameUiStyle
+import com.unciv.ui.components.atlas.AtlasChoiceCard
+import com.unciv.ui.components.atlas.AtlasChoiceState
 import com.unciv.ui.components.extensions.darken
 import com.unciv.ui.components.extensions.disable
 import com.unciv.ui.components.extensions.enable
@@ -39,8 +42,10 @@ abstract class ReligionPickerScreenCommon(
             private set
         fun switch(newButton: Button) {
             button?.enable()
+            button?.let { PickerPane.setChoiceSelected(it, false) }
             button = newButton
             newButton.disable()
+            PickerPane.setChoiceSelected(newButton, true)
         }
         fun clear() { button = null }
         @Readonly fun isEmpty() = button == null
@@ -78,6 +83,23 @@ abstract class ReligionPickerScreenCommon(
         beliefType: BeliefType? = null,
         withTypeLabel: Boolean = true
     ): Button {
+        if (GameUiStyle.isAtlas) {
+            val title = belief?.name ?: when (beliefType) {
+                BeliefType.Any -> "Choose any belief!"
+                null -> throw IllegalArgumentException("getBeliefButton must have one non-null parameter")
+                else -> "Choose a [$beliefType] belief!"
+            }
+            val detail = belief?.let {
+                (if (withTypeLabel) "${it.type.name.tr()}\n" else "") +
+                    it.uniqueObjects.filter { unique -> !unique.isHiddenToUsers() }
+                        .joinToString("\n") { unique -> unique.getDisplayText().tr() }
+            }.orEmpty()
+            return Button(skin).apply {
+                pad(0f)
+                add(AtlasChoiceCard(title, detail, AtlasChoiceState.AVAILABLE) {})
+                    .growX().minWidth(0f)
+            }
+        }
         val labelWidth = stage.width * 0.5f - 52f  // 32f empirically measured padding inside button, 20f outside padding
         return Button(skin).apply {
             when {
@@ -123,7 +145,14 @@ abstract class ReligionPickerScreenCommon(
     /** Disable a [Button] by setting its [touchable][Button.touchable] and the given [color] */
     protected fun Button.disable(color: Color) {
         touchable = Touchable.disabled
-        this.color = color
+        if (!GameUiStyle.isAtlas) this.color = color
+    }
+
+    protected fun Button.setBeliefState(state: AtlasChoiceState, reason: String = "") {
+        children.filterIsInstance<AtlasChoiceCard>().firstOrNull()?.let {
+            it.setState(state)
+            it.setReason(reason)
+        }
     }
 
     // This forces this label to use an own clone of the default style. If not, hovering over the button will gray

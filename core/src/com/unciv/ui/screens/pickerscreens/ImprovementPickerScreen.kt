@@ -10,6 +10,8 @@ import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.ui.Table
+import com.badlogic.gdx.scenes.scene2d.ui.Label
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.Align
 import com.unciv.Constants
@@ -24,6 +26,8 @@ import com.unciv.models.stats.Stat
 import com.unciv.models.stats.Stats
 import com.unciv.models.translations.tr
 import com.unciv.ui.components.SmallButtonStyle
+import com.unciv.ui.components.GameUiStyle
+import com.unciv.ui.components.atlas.AtlasChoiceState
 import com.unciv.ui.components.UncivTooltip.Companion.addTooltip
 import com.unciv.ui.components.extensions.disable
 import com.unciv.ui.components.extensions.toLabel
@@ -102,6 +106,7 @@ class ImprovementPickerScreen(
 
     init {
         setDefaultCloseAction()
+        setChoiceHeader("Pick improvement", unit.displayName())
 
         rightSideButton.setText("Pick improvement".tr())
         rightSideButton.onClick {
@@ -147,7 +152,16 @@ class ImprovementPickerScreen(
             ownerTable.add(label).pad(10f)
         }
 
-        topTable.add(ownerTable)
+        if (GameUiStyle.isAtlas) {
+            for (cell in ownerTable.cells) {
+                when (val actor = cell.actor) {
+                    is Label -> actor.wrap = true
+                    is TextButton -> actor.label.wrap = true
+                }
+                cell.minWidth(0f).growX()
+            }
+            topTable.add(ownerTable).width((stage.width - 40f).coerceAtMost(840f)).minWidth(0f)
+        } else topTable.add(ownerTable)
         topTable.row()
         topTable.add(regularImprovements)
     }
@@ -222,16 +236,20 @@ class ImprovementPickerScreen(
         val statsTable = getStatsTable(stats)
         statIcons.add(statsTable).padLeft(13f)
 
-        add(statIcons).align(Align.right)
+        if (!GameUiStyle.isAtlas) add(statIcons).align(Align.right)
 
-        val improvementButton = PickerPane.getPickerOptionButton(image, labelText)
+        val improvementButton = PickerPane.getPickerOptionButton(image, labelText, state = when {
+            improvement.name == tile.improvementInProgress -> AtlasChoiceState.CURRENT
+            !problemReport.isEmpty() || tileMarkedForCreatesOneImprovement -> AtlasChoiceState.LOCKED
+            else -> AtlasChoiceState.AVAILABLE
+        })
         // This is onClick without ActivationTypes.Keystroke equivalence - keys should select *and* close:
         improvementButton.onActivation(type = ActivationTypes.Tap, noEquivalence = true) {
             setDescription(improvement, Color.WHITE)
             pick(improvement.name.tr())
         }
 
-        when {
+        if (!GameUiStyle.isAtlas) when {
             improvement.name == tile.improvementInProgress ->
                 improvementButton.color = Color.GREEN
             problemReport.isQueueable() ->
@@ -258,8 +276,19 @@ class ImprovementPickerScreen(
             }
         }
 
-        add(improvementButton)
-        add(getExplanationActor(improvement, problemReport)).padLeft(10f)
+        if (GameUiStyle.isAtlas) {
+            val card = Table().apply {
+                add(improvementButton).growX().minWidth(0f).row()
+                add(statIcons).left().pad(GameUiStyle.Space.m).row()
+                getExplanationActor(improvement, problemReport)?.let {
+                    add(it).growX().minWidth(0f).pad(GameUiStyle.Space.m).row()
+                }
+            }
+            add(card).width((stage.width - 40f).coerceAtMost(840f)).minWidth(0f)
+        } else {
+            add(improvementButton)
+            add(getExplanationActor(improvement, problemReport)).padLeft(10f)
+        }
         row()
     }
 
@@ -290,7 +319,12 @@ class ImprovementPickerScreen(
     private fun setDescription(improvement: TileImprovement, color: Color) {
         selectedImprovement = improvement
         descriptionLabel.setText(improvement.getDescription(ruleset))
-        descriptionLabel.color = color
+        descriptionLabel.color = if (GameUiStyle.isAtlas) GameUiStyle.ink else color
+        if (GameUiStyle.isAtlas) {
+            // Inspecting a blocked card cannot leave the previous selection's confirm enabled.
+            setRightSideButtonEnabled(getProblemReport(improvement)?.isEmpty() == true &&
+                !tileMarkedForCreatesOneImprovement && GUI.isAllowedChangeState())
+        }
     }
 
     private fun getStatIconsTable(provideResource: Boolean, removeImprovement: Boolean): Table {
@@ -323,7 +357,9 @@ class ImprovementPickerScreen(
             statsTable.add(ImageGetter.getStatIcon(key.name)).size(20f).padRight(3f)
 
             val valueLabel = statValue.tr().toLabel()
-            valueLabel.color = if (statValue < 0) Color.RED else Color.WHITE
+            valueLabel.color = if (GameUiStyle.isAtlas)
+                (if (statValue < 0) GameUiStyle.error else GameUiStyle.ink)
+                else if (statValue < 0) Color.RED else Color.WHITE
 
             statsTable.add(valueLabel).padRight(13f)
         }
@@ -387,7 +423,10 @@ class ImprovementPickerScreen(
     }
 
     private fun getExplanationActor(improvement: TileImprovement, report: ProblemReport): Actor? {
-        fun getPickNowButton(action: ()->Unit) = "Pick now!".toTextButton(SmallButtonStyle()).onClick(action)
+        fun getPickNowButton(action: ()->Unit) = "Pick now!".toTextButton(SmallButtonStyle()).apply {
+            if (GameUiStyle.isAtlas) GameUiStyle.apply(this)
+            onClick(action)
+        }
             // Formerly: "Pick now!".toLabel().onClick(action), with later fillY() to make it easier to hit (#3989)
 
         if (report.isEmpty()) return when {
@@ -400,8 +439,12 @@ class ImprovementPickerScreen(
             defaults().center()
             for ((text, link) in report.proposedSolutions) {
                 val label = text.toLabel()
+                if (GameUiStyle.isAtlas) {
+                    label.wrap = true
+                    label.color = GameUiStyle.warning
+                }
                 if (!link.isNullOrEmpty()) label.onClick { openCivilopedia(link) }
-                add(label).padBottom(5f).row()
+                add(label).growX().minWidth(0f).padBottom(5f).row()
             }
             if (report.isQueueable())
                 add(getPickNowButton { accept(report.removalImprovement, improvement) }).padTop(5f)
