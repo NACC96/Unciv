@@ -250,6 +250,53 @@ class AgentDiplomaticMessagesTest {
     }
 
     @Test
+    fun `senders may delete their own mail only until the recipient's turn delivers it`() {
+        val f = Fixture()
+        fun rejects(actor: String, id: String, code: AgentCommandError) = try {
+            f.coordinator.deletePlayerMessage(actor, id)
+            Assert.fail("$actor must not delete $id")
+        } catch (ex: AgentCommandException) {
+            Assert.assertEquals(code, ex.code)
+        }
+        f.coordinator.queuePlayerMessage(f.egypt, "egypt-draft", f.rome, "Ignore my last note.")
+        f.coordinator.queuePlayerMessage(f.spectator, "observer-draft", f.rome, "Try a scout.")
+        f.send(id = "rome-agent-mail")
+        rejects(f.spectator, "egypt-draft", AgentCommandError.ILLEGAL_ACTION)
+        rejects(f.rome, "rome-agent-mail", AgentCommandError.AUTHORITY_REVOKED)
+        val revision = f.coordinator.getStateRevision()
+        f.coordinator.deletePlayerMessage(f.egypt, "egypt-draft")
+        Assert.assertTrue(f.coordinator.getMessageHistory(f.egypt).isEmpty())
+        Assert.assertEquals("Mail is metadata, not a gameplay revision", revision, f.coordinator.getStateRevision())
+        val restored = MatchCoordinator.loadFromJson(f.coordinator.saveToJson(), InMemoryCheckpointWriter())
+        Assert.assertTrue(restored.getMessageHistory(f.egypt).isEmpty())
+        rejects(f.egypt, "egypt-draft", AgentCommandError.ILLEGAL_ACTION)
+
+        f.end(f.rome, "delete-r"); f.end(f.greece, "delete-g"); f.end(f.egypt, "delete-e")
+        val delivered = f.coordinator.getMessageHistory(f.rome).single { it.targetCivId == f.rome }
+        Assert.assertEquals("observer-draft", delivered.messageId)
+        rejects(f.spectator, "observer-draft", AgentCommandError.ILLEGAL_ACTION)
+        Assert.assertEquals(listOf("observer-draft"),
+            f.coordinator.getMessageHistory(f.rome).filter { it.targetCivId == f.rome }.map { it.messageId })
+    }
+
+    @Test
+    fun `deleting queued mail frees its place in the per-turn limit`() {
+        val f = Fixture()
+        repeat(10) {
+            f.coordinator.queuePlayerMessage(f.spectator, "limit-$it", f.rome, "Note $it")
+        }
+        try {
+            f.coordinator.queuePlayerMessage(f.spectator, "limit-extra", f.rome, "One too many")
+            Assert.fail("The eleventh message should exceed the limit")
+        } catch (ex: AgentCommandException) {
+            Assert.assertEquals(AgentCommandError.ILLEGAL_ACTION, ex.code)
+        }
+        f.coordinator.deletePlayerMessage(f.spectator, "limit-3")
+        f.coordinator.queuePlayerMessage(f.spectator, "limit-extra", f.rome, "One too many")
+        Assert.assertEquals(10, f.coordinator.getMessageHistory(f.spectator).size)
+    }
+
+    @Test
     fun `duplicate IDs are durable and payload changes cannot replace mail`() {
         val f = Fixture()
         f.coordinator.queuePlayerMessage(f.egypt, "durable-player", f.rome, "Border note.")

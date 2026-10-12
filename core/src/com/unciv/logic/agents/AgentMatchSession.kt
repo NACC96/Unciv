@@ -87,6 +87,10 @@ interface AgentMatchSession {
         if (image == null) sendMessage(targetCivId, text, onComplete)
         else onComplete("Image messaging is unavailable for this match")
     }
+    /** Deletes the viewer's own still-queued message off the rendering thread; completion runs on GL. */
+    fun deleteMessage(messageId: String, onComplete: (String?) -> Unit) {
+        onComplete("Deleting messages is unavailable for this match")
+    }
     /** Reads private preview bytes off the rendering thread; desktop completion runs on GL. */
     fun readMessageImage(messageId: String, attachmentId: String,
                          onComplete: (MessageImageDraft?, String?) -> Unit) {

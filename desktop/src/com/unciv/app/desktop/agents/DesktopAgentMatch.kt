@@ -162,6 +162,24 @@ class DesktopAgentMatch(
         }
     }
 
+    override fun deleteMessage(messageId: String, onComplete: (String?) -> Unit) {
+        val viewer = worldScreen?.currentViewerCivId()
+        Concurrency.runOnNonDaemonThreadPool("Delete diplomatic message") {
+            val error = try {
+                synchronized(lock) {
+                    require(viewer != null) { "Messaging requires an attached player or spectator" }
+                    checkMessageViewerLocked(viewer)
+                    publishCommittedChangesLocked { coordinator.deletePlayerMessage(viewer, messageId) }
+                }
+                null
+            } catch (ex: Exception) { ex.message ?: "Could not delete the message" }
+            Concurrency.runOnGLThread {
+                onComplete(error)
+                Gdx.graphics.requestRendering()
+            }
+        }
+    }
+
     override fun readMessageImage(messageId: String, attachmentId: String,
                                   onComplete: (MessageImageDraft?, String?) -> Unit) {
         val viewer = worldScreen?.currentViewerCivId()

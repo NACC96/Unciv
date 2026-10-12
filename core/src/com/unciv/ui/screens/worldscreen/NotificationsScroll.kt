@@ -90,6 +90,11 @@ class NotificationsScroll(
 
     //region private fields
     private var notificationsHash: Int = 0
+    /** What the list showed at the last update. Agent snapshots reload unchanged notifications
+     *  as new objects (Notification has no equality contract), so identity alone means nothing new. */
+    private var contentSignature: Int = 0
+    /** Turn number and current player at the last update, to notice the viewer's own turn starting. */
+    private var lastTurnKey: String? = null
 
     private var notificationsTable = Table()
     private var topSpacerCell: Cell<Actor?>? = null
@@ -173,6 +178,17 @@ class NotificationsScroll(
 
         enlargeHighlight = GUI.getSettings().enlargeSelectedNotification
 
+        // Hidden by the user or the Hidden setting: a rebuild must never drag it back into view.
+        val keptHidden = restoreButton.isActive && !userSettingChanged
+        val newSignature = notifications.contentSignature()
+        val hasNewContent = newSignature != contentSignature
+        contentSignature = newSignature
+        val gameInfo = worldScreen.gameInfo
+        val turnKey = "${gameInfo.turns}/${gameInfo.currentPlayer}"
+        val ownTurnStarted = turnKey != lastTurnKey && !worldScreen.viewingCiv.isSpectator() &&
+            worldScreen.viewingCiv.civID == gameInfo.currentPlayer
+        lastTurnKey = turnKey
+
         // Remember scroll position _relative to topRight_
         val previousScrollXinv = when {
             isScrollingDisabledX -> 0f  // switching from Permanent - scrollX and maxX are 0
@@ -190,7 +206,7 @@ class NotificationsScroll(
             updateSpacers(coveredNotificationsTop, coveredNotificationsBottom)
         }
 
-        scrollX = maxX - previousScrollXinv
+        scrollX = if (keptHidden) 0f else maxX - previousScrollXinv
         scrollY = if (selectedCell == null) {
             previousScrollY
         } else selectedCell!!.let {
@@ -211,7 +227,7 @@ class NotificationsScroll(
 
         if (!userSetting.static) {
             restoreButton.unblock()
-            if (contentChanged && !userSettingChanged && isHidden)
+            if (contentChanged && !userSettingChanged && isHidden && mayReveal(hasNewContent, keptHidden, ownTurnStarted))
                 isHidden = false
         }
 
@@ -219,6 +235,20 @@ class NotificationsScroll(
         setPosition(stage.width - width * scaleFactor, 0f)
         restoreButton.setPosition(coveredNotificationsBottom)
     }
+
+    /**
+     * New notifications reopen a hidden list, except in agent matches: their many snapshots per turn
+     * (diplomacy between other nations included) would keep reopening it. There a list the user hid
+     * reopens only when the viewer's own human turn starts; the bell still counts and flashes.
+     */
+    private fun mayReveal(hasNewContent: Boolean, keptHidden: Boolean, ownTurnStarted: Boolean): Boolean = when {
+        !hasNewContent -> false
+        worldScreen.agentSession == null || !keptHidden -> true
+        else -> ownTurnStarted
+    }
+
+    private fun List<Notification>.contentSignature(): Int =
+        map { Triple(it.category, it.text, it.icons) }.hashCode()
 
     private fun updateContent(
         notifications: List<Notification>,
@@ -267,6 +297,9 @@ class NotificationsScroll(
         notificationsTable.row()
 
         val backgroundDrawable = BaseScreen.skinStrings.getUiBackground("WorldScreen/Notification", BaseScreen.skinStrings.roundedEdgeRectangleShape)
+
+        // Sliding the list sideways also hides it, but nothing on screen says so.
+        if (!userSetting.static) notificationsTable.add(HideButton(backgroundDrawable)).right().row()
 
         val orderedNotifications = (additionalNotification + notifications)
             .groupBy { it.category }
@@ -365,6 +398,19 @@ class NotificationsScroll(
         }
     }
 
+    private inner class HideButton(backgroundDrawable: NinePatchDrawable) : Table() {
+        init {
+            val pill = Table()
+            pill.background = backgroundDrawable
+            pill.add(ImageGetter.getImage("OtherIcons/Close").apply { color = ImageGetter.CHARCOAL })
+                .size(iconSize * 0.6f).padRight(8f)
+            pill.add("Hide".toLabel(ImageGetter.CHARCOAL, fontSize))
+            add(pill).pad(listItemPad, listItemPad, listItemPad, rightPadToScreenEdge)
+            touchable = Touchable.enabled
+            onClick { isHidden = true }
+        }
+    }
+
     private inner class ListItem(
         notification: Notification,
         backgroundDrawable: NinePatchDrawable
@@ -441,6 +487,8 @@ class NotificationsScroll(
         private var blockCheck = true
         private var blockAct = true
         private var active = false
+        /** The list is hidden and this bell stands in for it. */
+        val isActive get() = active
         private var shownCount = -1
         private val countLabel: Label
         private val bellIcon = ImageGetter.getImage("OtherIcons/Notifications")
