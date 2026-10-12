@@ -15,6 +15,7 @@ import com.unciv.logic.github.GithubAPI
 import com.unciv.logic.github.GithubAPI.downloadAndExtract
 import com.unciv.models.ruleset.RulesetCache
 import com.unciv.models.translations.tr
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.UncivTooltip.Companion.addTooltip
 import com.unciv.ui.components.extensions.disable
 import com.unciv.ui.components.extensions.enable
@@ -53,8 +54,11 @@ class LoadGameScreen : LoadOrSaveScreen() {
         rightSideButton.onActivation { onLoadGame(selectedSave) }
         rightSideButton.keyShortcuts.add(KeyCharAndCode.RETURN)
         rightSideButton.isVisible = false
-        pickerPane.bottomTable.background = skinStrings.getUiBackground("LoadGameScreen/BottomTable", tintColor = skinStrings.skinConfig.clearColor)
-        pickerPane.topTable.background = skinStrings.getUiBackground("LoadGameScreen/TopTable", tintColor = skinStrings.skinConfig.clearColor)
+        if (!GameUiStyle.isAtlas) {
+            pickerPane.bottomTable.background = skinStrings.getUiBackground("LoadGameScreen/BottomTable", tintColor = skinStrings.skinConfig.clearColor)
+            pickerPane.topTable.background = skinStrings.getUiBackground("LoadGameScreen/TopTable", tintColor = skinStrings.skinConfig.clearColor)
+        }
+        finishAtlasSaveLayout(loadGame)
     }
 
     override fun resetWindowState() {

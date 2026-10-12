@@ -37,6 +37,8 @@ class PickerPane(
 
     private val screenSplit = 0.85f
     internal var maxBottomTableHeight = 150f   // about 7 lines of normal text; setup can reserve larger captions
+    /** Bespoke screen footers retain their own action composition and width constraints. */
+    internal var hasCustomFooter = false
 
     /**
      * The table displaying the choices from which to pick (usually).
@@ -92,6 +94,15 @@ class PickerPane(
 
     override fun layout() {
         if (GameUiStyle.isAtlas) {
+            if (hasCustomFooter) {
+                val available = (height - header.prefHeight).coerceAtLeast(1f)
+                val footerHeight = bottomTable.prefHeight.coerceAtMost(available * 0.6f)
+                splitPane.setMinSplitAmount(0.2f)
+                splitPane.setMaxSplitAmount(0.95f)
+                splitPane.splitAmount = ((available - footerHeight) / available).coerceIn(0.2f, 0.95f)
+                super.layout()
+                return
+            }
             val actionWidth = (width - 3 * GameUiStyle.Space.m).coerceAtLeast(1f)
             bottomTable.getCell(closeButton).width((actionWidth * 0.28f).coerceAtMost(160f))
             // Wrapping is width-driven; a long confirm label grows the fixed footer instead of

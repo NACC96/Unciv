@@ -61,7 +61,8 @@ import com.unciv.ui.components.widgets.AutoScrollPane as ScrollPane
 
 class NewGameScreen(
     defaultGameSetupInfo: GameSetupInfo? = null,
-    private val savedAgentSlots: List<com.unciv.logic.files.PresetAgentSlot> = emptyList()
+    private val savedAgentSlots: List<com.unciv.logic.files.PresetAgentSlot> = emptyList(),
+    private var selectedSetupSection: Int = 0,
 ): IPreviousScreen, PickerScreen(), RecreateOnResize {
 
     override val gameSetupInfo = defaultGameSetupInfo ?: GameSetupInfo.fromSettings()
@@ -73,7 +74,8 @@ class NewGameScreen(
     private var startBlockedReason: String? = null
 
     init {
-        val isPortrait = usesStackedLayout(stage.width, stage.height)
+        val isPortrait = usesCurrentStackedLayout()
+        setChoiceHeader("Start new game")
 
         // The mods loaded here may come from the last-started game (see GameSetupInfo.fromSettings) -
         // if that combination is now broken (e.g. a mod was updated/removed), silently fall back to
@@ -91,7 +93,9 @@ class NewGameScreen(
         setStartEnabled(true)  // PlayerPickerTable init may disable this same visible action
         playerPickerTable = PlayerPickerTable(
             this, gameSetupInfo.gameParameters,
-            if (isPortrait) stackedContentWidth(stage.width) else 0f
+            if (GameUiStyle.isAtlas) {
+                if (isPortrait) minOf(stage.width - 48f, MAX_STACKED_WIDTH) else stage.width / 3f - 40f
+            } else if (isPortrait) stackedContentWidth(stage.width) else 0f
         )
         playerPickerTable.restoreAgentSlots(savedAgentSlots)
         newGameOptionsTable = GameOptionsTable(
@@ -107,7 +111,8 @@ class NewGameScreen(
         }
         closeButton.keyShortcuts.add(KeyCharAndCode.BACK)
 
-        if (isPortrait) initPortrait()
+        if (GameUiStyle.isAtlas) initAtlas(isPortrait)
+        else if (isPortrait) initPortrait()
         else initLandscape()
         topTable.polishSetupWidgets()
         topTable.background = GameUiStyle.background("NewGameScreen/TopTable")
@@ -251,8 +256,13 @@ class NewGameScreen(
 
     /** Subtables may need an upper limit to their width - they can ask this function. */
     internal fun getColumnWidth() = floor(
-        if (usesStackedLayout(stage.width, stage.height)) minOf(stage.width, stackedContentWidth(stage.width) + 20f)
+        if (GameUiStyle.isAtlas) {
+            if (usesCurrentStackedLayout()) minOf(stage.width - 48f, MAX_STACKED_WIDTH) else stage.width / 3f - 40f
+        } else if (usesStackedLayout(stage.width, stage.height)) minOf(stage.width, stackedContentWidth(stage.width) + 20f)
         else stage.width / 3)
+
+    private fun usesCurrentStackedLayout() = usesStackedLayout(stage.width, stage.height) ||
+        GameUiStyle.isAtlas && stage.width < 1200f * game.settings.fontSizeMultiplier
 
     internal fun setStartEnabled(enabled: Boolean) {
         GameUiStyle.apply(rightSideButton, primary = true)
@@ -284,6 +294,13 @@ class NewGameScreen(
     internal fun refreshExampleMap() {
         if (mapOptionsTableInitialized)
             mapOptionsTable.refreshExampleMap()
+    }
+
+    private fun initAtlas(stacked: Boolean) {
+        scrollPane.setScrollingDisabled(true, true)
+        topTable.add(AtlasSetupLayout(newGameOptionsTable, mapOptionsTable, playerPickerTable,
+            stacked, selectedSetupSection) { selectedSetupSection = it })
+            .grow().minWidth(0f).minHeight(0f)
     }
 
     private fun initLandscape() {
@@ -523,7 +540,7 @@ class NewGameScreen(
         game.replaceCurrentScreen { NewGameScreen(preset.setup, preset.agents) }
     }
 
-    override fun recreate(): BaseScreen = NewGameScreen(gameSetupInfo, playerPickerTable.snapshotAgentSlots())
+    override fun recreate(): BaseScreen = NewGameScreen(gameSetupInfo, playerPickerTable.snapshotAgentSlots(), selectedSetupSection)
 }
 
 internal fun Table.configureStackedSetup(options: GameOptionsTable, map: MapOptionsTable, players: PlayerPickerTable) {
@@ -577,6 +594,7 @@ internal fun PickerPane.configureSetupFooter(
     onPresets: () -> Unit,
     onReset: (() -> Unit)? = null
 ) {
+    hasCustomFooter = true
     GameUiStyle.apply(closeButton)
     GameUiStyle.apply(rightSideButton, primary = true)
     GameUiStyle.setEnabled(rightSideButton, !rightSideButton.isDisabled)
@@ -587,6 +605,7 @@ internal fun PickerPane.configureSetupFooter(
     if (onReset != null) secondary.add(GameUiStyle.button("Reset to defaults").apply { onClick(onReset) })
     secondary.add(GameUiStyle.button("Presets").apply { onClick(onPresets) })
     val buttons = listOf(closeButton) + secondary + rightSideButton
+    buttons.forEach { it.label.wrap = false }
 
     val gap = 8f
     val spacer = 16f

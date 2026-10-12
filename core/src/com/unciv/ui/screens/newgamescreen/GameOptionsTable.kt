@@ -20,6 +20,7 @@ import com.unciv.models.translations.tr
 import com.unciv.ui.audio.MusicMood
 import com.unciv.ui.audio.MusicTrackChooserFlags
 import com.unciv.ui.components.InputDisabling
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.extensions.getCloseButton
 import com.unciv.ui.components.extensions.pad
 import com.unciv.ui.components.extensions.toCheckBox
@@ -402,7 +403,12 @@ class GameOptionsTable(
     }
 
     private fun Table.addSelectBox(text: String, values: Collection<String>, initialState: String, onChange: (newValue: String) -> String?): TranslatedSelectBox {
-        add(text.toLabel(hideIcons = true)).left()
+        val label = text.toLabel(hideIcons = true)
+        if (GameUiStyle.isAtlas) {
+            label.wrap = true
+            val cell = add(label).minWidth(0f).growX().left()
+            if (isPortrait) cell.colspan(2).row()
+        } else add(label).left()
         val selectBox = TranslatedSelectBox(values, initialState)
         selectBox.isDisabled = locked
         selectBox.onChange {
@@ -410,7 +416,13 @@ class GameOptionsTable(
             if (changedValue != null) selectBox.setSelected(changedValue)
         }
         onChange(selectBox.selected.value)
-        add(selectBox).fillX().row()
+        val cell = add(selectBox).fillX()
+        if (GameUiStyle.isAtlas) {
+            GameUiStyle.applyWidget(selectBox)
+            cell.minWidth(0f).growX()
+            if (isPortrait) cell.colspan(2)
+        }
+        cell.row()
         return selectBox
     }
 

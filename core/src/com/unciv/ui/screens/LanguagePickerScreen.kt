@@ -2,6 +2,7 @@ package com.unciv.ui.screens
 
 import com.unciv.models.metadata.LocaleCode
 import com.unciv.models.translations.tr
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.extensions.enable
 import com.unciv.ui.components.extensions.scrollTo
 import com.unciv.ui.components.input.KeyCharAndCode
@@ -30,6 +31,7 @@ class LanguagePickerScreen : PickerScreen() {
 
     init {
         chosenLanguage = LocaleCode.getSystemLanguage()
+        setChoiceHeader("Pick language")
 
         closeButton.isVisible = false
 
@@ -54,6 +56,7 @@ class LanguagePickerScreen : PickerScreen() {
         }
         rightSideButton.keyShortcuts.add(KeyCharAndCode.RETURN)
         if (chosenLanguage.isNotEmpty()) onChoice()
+        GameUiStyle.applyWidget(topTable)
     }
 
     private fun onChoice(choice: String) {

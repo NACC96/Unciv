@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.Align
 import com.unciv.Constants
 import com.unciv.models.ruleset.Ruleset
 import com.unciv.models.ruleset.nation.Nation
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.widgets.WrappableLabel
 import com.unciv.ui.components.extensions.pad
 import com.unciv.ui.images.ImageGetter
@@ -22,13 +23,14 @@ class NationTable(val nation: Nation, width: Float, minHeight: Float, ruleset: R
     init {
         val innerColor = nation.getInnerColor()
         val outerColor = nation.getOuterColor()
-        val textBackgroundColor = Color(0x002042ff)
-        val borderWidth = 5f
+        val textBackgroundColor = if (GameUiStyle.isAtlas) GameUiStyle.inset else Color(0x002042ff)
+        val borderWidth = if (GameUiStyle.isAtlas) 1f else 5f
         val totalPadding = 10f + 4 * borderWidth // pad*2 + innerTable.pad*2 + borderTable.pad*2
         val internalWidth = width - totalPadding
 
         val titleTable = Table()
-        titleTable.background = BaseScreen.skinStrings.getUiBackground(
+        titleTable.background = if (GameUiStyle.isAtlas) GameUiStyle.background("Atlas/Setup/Nation/Title", GameUiStyle.raised)
+        else BaseScreen.skinStrings.getUiBackground(
             "NewGameScreen/NationTable/Title", tintColor = outerColor
         )
         val nationIndicator = ImageGetter.getNationPortrait(nation, 50f)  // Works for Random too
@@ -37,7 +39,9 @@ class NationTable(val nation: Nation, width: Float, minHeight: Float, ruleset: R
         val titleText = if (ruleset == null || nation.name == Constants.random || nation.name == Constants.spectator)
             nation.name else nation.getLeaderDisplayName()
         val leaderDisplayNameMaxWidth = internalWidth - 70f // for the nation indicator with padding
-        val leaderDisplayLabel = WrappableLabel(titleText, leaderDisplayNameMaxWidth, innerColor, Constants.headingFontSize, hideIcons = true)
+        val leaderDisplayLabel = WrappableLabel(titleText, leaderDisplayNameMaxWidth,
+            if (GameUiStyle.isAtlas) GameUiStyle.ink else innerColor,
+            if (GameUiStyle.isAtlas) GameUiStyle.Type.title else Constants.headingFontSize, hideIcons = true)
         if (leaderDisplayLabel.prefWidth > leaderDisplayNameMaxWidth - 2f) {
             leaderDisplayLabel.wrap = true
             titleTable.add(leaderDisplayLabel).width(leaderDisplayNameMaxWidth)
@@ -68,7 +72,8 @@ class NationTable(val nation: Nation, width: Float, minHeight: Float, ruleset: R
         }
 
         touchable = Touchable.enabled
-        background = BaseScreen.skinStrings.getUiBackground(
+        background = if (GameUiStyle.isAtlas) GameUiStyle.panelBackground("Atlas/Setup/Nation", 1f)
+        else BaseScreen.skinStrings.getUiBackground(
             "NewGameScreen/NationTable/Background",
             tintColor = innerColor
         )

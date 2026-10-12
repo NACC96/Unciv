@@ -49,7 +49,8 @@ class AgentProfilePopup(
     }
 
     init {
-        innerTable.background = GameUiStyle.background("NewGameScreen/AgentProfilePopup")
+        innerTable.background = if (GameUiStyle.isAtlas) GameUiStyle.panelBackground("Atlas/Setup/AgentProfile", 1f)
+            else GameUiStyle.background("NewGameScreen/AgentProfilePopup")
         // Initialize working profile with Luna defaults if blank
         if (workingProfile.provider.isBlank()) {
             workingProfile.provider = AgentModelCatalog.PROVIDER_CODEX

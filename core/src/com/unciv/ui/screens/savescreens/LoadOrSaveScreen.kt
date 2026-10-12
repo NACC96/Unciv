@@ -16,6 +16,7 @@ import com.unciv.logic.github.Github.folderNameToRepoName
 import com.unciv.logic.github.GithubAPI
 import com.unciv.logic.github.GithubAPI.downloadAndExtract
 import com.unciv.models.translations.tr
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.UncivTooltip.Companion.addTooltip
 import com.unciv.ui.components.extensions.UncivDateFormat.formatDate
 import com.unciv.ui.components.extensions.disable
@@ -80,14 +81,43 @@ abstract class LoadOrSaveScreen(
         deleteSaveButton.keyShortcuts.add(KeyCharAndCode.DEL)
         deleteSaveButton.addTooltip(KeyCharAndCode.DEL)
 
-        if (fileListHeaderText != null)
+        if (fileListHeaderText != null && !GameUiStyle.isAtlas)
             topTable.add(fileListHeaderText.toLabel()).pad(10f).row()
 
         updateShownSaves(showAutosavesCheckbox.isChecked)
 
-        topTable.add(savesScrollPane)
-        topTable.add(rightSideTable)
+        if (GameUiStyle.isAtlas) {
+            rightSideTable.defaults().minWidth(0f).growX().pad(6f)
+            rightSideTable.top()
+            errorLabel.color = Color.WHITE
+            errorLabel.style = com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle(errorLabel.style).apply {
+                fontColor = GameUiStyle.error
+            }
+            topTable.add(AtlasSaveBrowser(savesScrollPane, rightSideTable, game.settings.fontSizeMultiplier))
+                .grow().minWidth(0f).minHeight(0f)
+        } else {
+            topTable.add(savesScrollPane)
+            topTable.add(rightSideTable)
+        }
         topTable.pack()
+    }
+
+    /** Run after a concrete save/load screen has installed its existing actions. */
+    protected fun finishAtlasSaveLayout(title: String) {
+        if (!GameUiStyle.isAtlas) return
+        setChoiceHeader(title)
+        rightSideTable.cells.forEach { cell ->
+            val actor = cell.actor ?: return@forEach
+            cell.minWidth(0f).prefWidth(0f).growX()
+            if (actor is TextButton) {
+                actor.label.wrap = true
+                cell.minHeight(GameUiStyle.standardControlHeight)
+            }
+        }
+        GameUiStyle.applyWidget(rightSideTable)
+        GameUiStyle.applyWidget(deleteSaveButton)
+        GameUiStyle.apply(rightSideButton, primary = true)
+        topTable.invalidateHierarchy()
     }
 
     open fun resetWindowState() {
