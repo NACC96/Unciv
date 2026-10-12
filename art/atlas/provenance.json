@@ -2,6 +2,90 @@
   "schemaVersion": 1,
   "entries": [
     {
+      "assetId": "anti-aircraft-gun",
+      "creator": "OpenAI image generation",
+      "source": "art/atlas/units/anti-aircraft-gun/creation-record.json",
+      "promptPath": "art/atlas/units/anti-aircraft-gun/prompts/e-v1.txt",
+      "rights": "original-generated",
+      "sourceHash": "2f502838f54576f8db95ce9bd286734e8e007285a0a6a134c620ce6c554df7da",
+      "outputHashes": {
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Anti-Aircraft Gun-1.png": "50e9b7535e98a4ab987a0aec012b0e3bb93cdcd862f02fffab254a77690c3bf3",
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Anti-Aircraft Gun.png": "7b1c0e0e9cc7cc594b0290e3dbe6b2144fb1fafd8d42ca1d28537d54577a4240",
+        "art/atlas/units/anti-aircraft-gun/frames/e-color.png": "a3567d69951ea9d6f751bb9dda92193a10a9c786c98e4913a6bb607afd8d5227",
+        "art/atlas/units/anti-aircraft-gun/frames/e-nation.png": "58730a590c9e8807b437c64e17d0beaf51a3ce0b1512002f8b0ba44b30c65fc5",
+        "art/atlas/units/anti-aircraft-gun/frames/e-shadow.png": "82393c76640f3ee63d4d07021bd25fbdcf569d3dcfc07faa1ab44d63a518115e",
+        "art/atlas/units/anti-aircraft-gun/frames/ne-color.png": "6b82774b53184fb5eb6c39e117c5894f507e30b166e5fcce073bc167a2dea424",
+        "art/atlas/units/anti-aircraft-gun/frames/ne-nation.png": "301ad6b13e6affadecc306035a07f1a1d4930de64592fb8a6bec1441fcd19b01",
+        "art/atlas/units/anti-aircraft-gun/frames/ne-shadow.png": "2e2f03b5ae6e5e2c18a6d668a874091862539687dbac4a2e2237b2e43633992e",
+        "art/atlas/units/anti-aircraft-gun/frames/se-color.png": "d47625a5b9bded036cc94bf612c4fc9d0a8aababb23049103261a6fce7693fad",
+        "art/atlas/units/anti-aircraft-gun/frames/se-nation.png": "e19691be5e1ff36fea27a970334e5bb7ac0e91326baa38119d85e0b630c83e84",
+        "art/atlas/units/anti-aircraft-gun/frames/se-shadow.png": "39804e3710bb871a1df236bd9ba2bfc23b9445bbb1934abfd6170690b2e2da71"
+      }
+    },
+    {
+      "assetId": "anti-tank-gun",
+      "creator": "OpenAI image generation",
+      "source": "art/atlas/units/anti-tank-gun/creation-record.json",
+      "promptPath": "art/atlas/units/anti-tank-gun/prompts/e-v1.txt",
+      "rights": "original-generated",
+      "sourceHash": "a1fe6a7a93e165e190fbfbfeae690e9ffba850a3b46e9f3ccb6377299e4a1a93",
+      "outputHashes": {
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Anti-Tank Gun-1.png": "9563d18e07a04dd5d36da4f2226c37568f3ef99e09d2a193ae6b7ba5dd00ac9d",
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Anti-Tank Gun.png": "1e6522032ebc906cace42c83fdbfcb5935e3c5c52b1076980f04dbd0382895de",
+        "art/atlas/units/anti-tank-gun/frames/e-color.png": "d44311383141c85dd613498f725d968bc64200ee50e4a7978e6e7e76acd3aa79",
+        "art/atlas/units/anti-tank-gun/frames/e-nation.png": "bdb01241252a4248c6c2e919855a5b365a4d56ba98697478fc44a086130f0351",
+        "art/atlas/units/anti-tank-gun/frames/e-shadow.png": "3c27621ab0dec5bb7e5add3814e3b1d5223e2872bf6e5aae457ef9742c7d0c4f",
+        "art/atlas/units/anti-tank-gun/frames/ne-color.png": "f34adb177cfbfa88ad658b82ff505752df1b1335c96b0851aae58f7691dc2bc4",
+        "art/atlas/units/anti-tank-gun/frames/ne-nation.png": "e4c4038ed693b7e9c73354d2716482bb734dfd9c40383dd2279e4cb140cd0a7c",
+        "art/atlas/units/anti-tank-gun/frames/ne-shadow.png": "010a24a0c29af4747c7a35470165ca728f4bff57ffc18a40fba902fd0fe54d41",
+        "art/atlas/units/anti-tank-gun/frames/se-color.png": "6850fd1f5bffbf7ebf7ead3f4cafbda978dfd4c2484e7417a5e001a2f8db73d8",
+        "art/atlas/units/anti-tank-gun/frames/se-nation.png": "169e3696040ac66b13acd9f8f3ec041e94c387abc6115253431b9a1d51db13f4",
+        "art/atlas/units/anti-tank-gun/frames/se-shadow.png": "957600501aacfa0163030acff1269c548e1232c869ad64f7e2779d076c047cd3"
+      }
+    },
+    {
+      "assetId": "artillery",
+      "creator": "OpenAI image generation",
+      "source": "art/atlas/units/artillery/creation-record.json",
+      "promptPath": "art/atlas/units/artillery/prompts/e-v1.txt",
+      "rights": "original-generated",
+      "sourceHash": "f623ad920fa3c7ae383fbbdbba179ced274d411b511c2cae3b982c292f130754",
+      "outputHashes": {
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Artillery-1.png": "d54b3aaab1e3fa3ebfa6c737f8f49bcd08456bc6a39581bf53fa3e0e3de381f8",
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Artillery.png": "b824cfa44e98bde03e34320596c7fc12ba5428627065443af2dc417039144e03",
+        "art/atlas/units/artillery/frames/e-color.png": "22c6c8002393e4b9172d5f47b41fb39ed51776dca0b37237ec1c9630e2d5e328",
+        "art/atlas/units/artillery/frames/e-nation.png": "47812ea6cebda7190c1e88628fe29ce13c17c0c0fa83fd0f43c983d3ef5c8206",
+        "art/atlas/units/artillery/frames/e-shadow.png": "71ed59d737ee4b4ae0b7ca59e9adeea78241074d023e75e8c8aca8a093bce3d4",
+        "art/atlas/units/artillery/frames/ne-color.png": "fc440168fd2d373204c02d4dcd423d5708fffa2ad3fe67577ec94d24d48aed6d",
+        "art/atlas/units/artillery/frames/ne-nation.png": "25b1b283a47dd53dba39badb747b633f2b76907afdb794cad94bc2b83fbf9982",
+        "art/atlas/units/artillery/frames/ne-shadow.png": "7e8f5f49c5dbedc4325082c53b627c67302eebd0729fb6ae82958303e0d747ba",
+        "art/atlas/units/artillery/frames/se-color.png": "cd142d3afacc1e5a29620bb94686fbcd753f336eb2521a2f2a546147302f0a0a",
+        "art/atlas/units/artillery/frames/se-nation.png": "f0c0fcae9eb01673b7a4c3af8db85a29c56dab42da5d9368458120a19122d6d0",
+        "art/atlas/units/artillery/frames/se-shadow.png": "12e2ebdba5bb183ed26add00f5c338d9c66ab39c431505e093fee5e60daa2c09"
+      }
+    },
+    {
+      "assetId": "cannon",
+      "creator": "OpenAI image generation",
+      "source": "art/atlas/units/cannon/creation-record.json",
+      "promptPath": "art/atlas/units/cannon/prompts/e-v1.txt",
+      "rights": "original-generated",
+      "sourceHash": "f1d2d0871d9a2b90a83c41aad04bad9ad13dd41ab16fdf283b587950490f221a",
+      "outputHashes": {
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Cannon-1.png": "9b3e84d778ef0ea67076bd17321a4572115ff1d82896ab441d3e312311a0def1",
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Cannon.png": "0d8e7e7e96594d0a10577ae0710284ef9a4642b0c9c0b170ce3d86bfeadb20c9",
+        "art/atlas/units/cannon/frames/e-color.png": "5f54a6c64991be5d39cbd62f99e69bb56cd4b46b70aa0c35aedcb0353dc9c85b",
+        "art/atlas/units/cannon/frames/e-nation.png": "31acc194786adf359f975866fae5ac4b55c1f58512b7d4433288345325e6fa15",
+        "art/atlas/units/cannon/frames/e-shadow.png": "804aad81ded18428e134454ba4a864e089104cee95797a993e540fd8491cbfd9",
+        "art/atlas/units/cannon/frames/ne-color.png": "11e591b6b499033d1fa1d09aa399a373df14d17842ee458cc01b0d9d2535b982",
+        "art/atlas/units/cannon/frames/ne-nation.png": "b803bf6ba91854a9ace58178733f020a8a64ce6ccab51fd2fb165608c2e1beaf",
+        "art/atlas/units/cannon/frames/ne-shadow.png": "9bd738544fee870a64d3a406892cbce298a28e7ecb4da591cf99453e8667f827",
+        "art/atlas/units/cannon/frames/se-color.png": "3652111fbebc8222b19f2c2df41e0f0858ebf65c301c75f59f5fd9e4c5e5dcb6",
+        "art/atlas/units/cannon/frames/se-nation.png": "c96e514be97e4b9c024877e78e5bd03835a362812c938ff5afb718e954bb7d23",
+        "art/atlas/units/cannon/frames/se-shadow.png": "b1ccbdc98eb590d02744000d4144117b4cbae63022f626a8554931697c2381cd"
+      }
+    },
+    {
       "assetId": "caravel",
       "creator": "OpenAI image generation",
       "source": "art/atlas/units/caravel/creation-record.json",
@@ -107,6 +191,27 @@
       }
     },
     {
+      "assetId": "gatling-gun",
+      "creator": "OpenAI image generation",
+      "source": "art/atlas/units/gatling-gun/creation-record.json",
+      "promptPath": "art/atlas/units/gatling-gun/prompts/e-v1.txt",
+      "rights": "original-generated",
+      "sourceHash": "f462422c8481cb54f65946d1bb244ec85fcd108d90f80f2cdcf28a532cfb82bf",
+      "outputHashes": {
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Gatling Gun-1.png": "385d17f996f9c9d8cea1e96729925919bb8286fbc2345f968d97bb7a2d5aa8a9",
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Gatling Gun.png": "a38eed08e5cda49f7f2de2cb2b377dd50613462be6972e5ab4fdbe7771186c2b",
+        "art/atlas/units/gatling-gun/frames/e-color.png": "4dcffe0767db57d839f63337cd548e3b3071e430247884673fb93a117062f280",
+        "art/atlas/units/gatling-gun/frames/e-nation.png": "f3da7d6f963c4655ebcc92a00acd3c073c80c398b4d98dd503a8dc206e7f94b9",
+        "art/atlas/units/gatling-gun/frames/e-shadow.png": "2550a495e6512b90b765888ba4bd8dee39adaa8829bbdb4a30a20bbda6b96092",
+        "art/atlas/units/gatling-gun/frames/ne-color.png": "a2854b8a41c06d8360101ac60b11a511562a87a4bf903a6921736d701442f8ee",
+        "art/atlas/units/gatling-gun/frames/ne-nation.png": "2bc725a5aee8de4c70c2209aa206db131fc036eac5aa34add35678bae4786efe",
+        "art/atlas/units/gatling-gun/frames/ne-shadow.png": "3d09434aca8e762caa35462ce7b0716b4d305729d268a8414498b665945cf3d4",
+        "art/atlas/units/gatling-gun/frames/se-color.png": "c074da8847a5e03913782e535de49be8decfb5e249249d1f2940f3f80240bfe7",
+        "art/atlas/units/gatling-gun/frames/se-nation.png": "9980ae95b08bc2fc4ed09652cb9fa1a481ac3bde66b6fdedba9a417f6b72564a",
+        "art/atlas/units/gatling-gun/frames/se-shadow.png": "d3c1bbf790fdd8d4f11e15867d31f1263c82bf16a142edc77ef4af64753eb42d"
+      }
+    },
+    {
       "assetId": "great-artist",
       "creator": "OpenAI image generation",
       "source": "art/atlas/units/great-artist/creation-record.json",
@@ -191,6 +296,48 @@
       }
     },
     {
+      "assetId": "great-prophet",
+      "creator": "OpenAI image generation",
+      "source": "art/atlas/units/great-prophet/creation-record.json",
+      "promptPath": "art/atlas/units/great-prophet/prompts/e-v1.txt",
+      "rights": "original-generated",
+      "sourceHash": "cb33ae33c99a15728e999db22bb31bec77583accc2f0ee8f4f6a06f12f8e0f21",
+      "outputHashes": {
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Great Prophet-1.png": "8ad5c48295be108d4583693090c3f10f016b2ea343cbe2b7afbb92f7e903244f",
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Great Prophet.png": "0442e82d138fc9f5acfa97f4bb924355cf6dfba0e046fc819bd0283e519ab947",
+        "art/atlas/units/great-prophet/frames/e-color.png": "da8701173d65b580b643844c2d1ebc8e17c80724782db7aff6ee212c0673a4e6",
+        "art/atlas/units/great-prophet/frames/e-nation.png": "fd6c34ae899e44ce379d7b9b911093a391ff7566abbaff0042adde21fdaa5c7f",
+        "art/atlas/units/great-prophet/frames/e-shadow.png": "3db2b41208b17aae126e2e96bc1f0a6f5937500b85ff19cd58e65ddc77281e71",
+        "art/atlas/units/great-prophet/frames/ne-color.png": "e20145577416de6678a607ad51d785b93137ab851ada38f3a121245f0ec985d7",
+        "art/atlas/units/great-prophet/frames/ne-nation.png": "defa093d5750849871aee0573973ac6f560e20a2453128db38c62cc8dd3ba9bd",
+        "art/atlas/units/great-prophet/frames/ne-shadow.png": "ce1c93ab3fb9c095e81142f9ddef06f0b771502ecbc52f4581d098ee4b8b7d5a",
+        "art/atlas/units/great-prophet/frames/se-color.png": "34469ade2621f7e08453d7cec278fb658c895b267ee3908f39478edb117f65c7",
+        "art/atlas/units/great-prophet/frames/se-nation.png": "ff06ffb47477f2810044119d5e36d1cfe501a0ae87da6c5842c67f68fe2b2ee8",
+        "art/atlas/units/great-prophet/frames/se-shadow.png": "f32703954b4a31482405cb6f7bfb6d8bb26d14fddbba3d2ea75171989fb0173e"
+      }
+    },
+    {
+      "assetId": "great-scientist",
+      "creator": "OpenAI image generation",
+      "source": "art/atlas/units/great-scientist/creation-record.json",
+      "promptPath": "art/atlas/units/great-scientist/prompts/e-v1.txt",
+      "rights": "original-generated",
+      "sourceHash": "1a2700c6eefdaab4cecd3e74331029124b040517e4ea86c0ad06094ebfb3ddef",
+      "outputHashes": {
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Great Scientist-1.png": "def17bcc163fa4fc1cb7ee643605e089dc6df9751a8437fda9b199e609e85801",
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Great Scientist.png": "a81890f46fd7ac73ded5d566498681bef4ded19d391194f610b1f28a09302b09",
+        "art/atlas/units/great-scientist/frames/e-color.png": "943e89cb32550a655f2894cf29cdde4d9032dcc1167f67b6d344a70ef1120ed2",
+        "art/atlas/units/great-scientist/frames/e-nation.png": "08f313f3553189d1cd26a17545c4df08690ba5ad0533c77a0a7d5dcafdaa89b3",
+        "art/atlas/units/great-scientist/frames/e-shadow.png": "728b7c99f35ee0ba7c91b1ed12e471e4fcdc21b6eee79443413ce54f4d8453c0",
+        "art/atlas/units/great-scientist/frames/ne-color.png": "1461c0f42e848d8fc526b46713fb20cee31eae4af2e8ea81a709a56f8e61d79c",
+        "art/atlas/units/great-scientist/frames/ne-nation.png": "3c66f7d36af5d8fa6d2c520ed0cc135616300d7903a794ae82418ad3b7376c11",
+        "art/atlas/units/great-scientist/frames/ne-shadow.png": "3c37800be474556b7c94717655cc896c90b40b28566279821e1b504e43836788",
+        "art/atlas/units/great-scientist/frames/se-color.png": "d81d411cb3d9709ba54e5c68929afdd0ca6af8f66a15635f5be627f3c2a31e60",
+        "art/atlas/units/great-scientist/frames/se-nation.png": "cae710d98c43f904826e31b1abf7c18cf78ccc6230ce3aeabfd680e5944dddb4",
+        "art/atlas/units/great-scientist/frames/se-shadow.png": "f114de61c750e97def16deab6ea0406d9bd4b89722901fb7b58becb78c388369"
+      }
+    },
+    {
       "assetId": "horseman",
       "creator": "OpenAI image generation",
       "source": "art/atlas/units/horseman/creation-record.json",
@@ -209,6 +356,48 @@
         "art/atlas/units/horseman/frames/se-color.png": "81798dc716cb45b21d091f393c8825883f52553f019daa31ce84dc1128ac4c11",
         "art/atlas/units/horseman/frames/se-nation.png": "1b8f832a7bdbe2848b4a5c27f76ecfe3acea6217069794e7babed5c0dbb9716d",
         "art/atlas/units/horseman/frames/se-shadow.png": "1ec174fb8ef04d734c71bd28f3a2a8c98e37ab071921f62d5bcdb2f99e13a1b3"
+      }
+    },
+    {
+      "assetId": "khan",
+      "creator": "OpenAI image generation",
+      "source": "art/atlas/units/khan/creation-record.json",
+      "promptPath": "art/atlas/units/khan/prompts/e-v1.txt",
+      "rights": "original-generated",
+      "sourceHash": "ac130863a15e83d9848c744308e38057c902ddd246da4f72022bdb9a988a783c",
+      "outputHashes": {
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Khan-1.png": "eaf5556c63489a920c2c12727d3ab8621c1d5da38028ca9d864d716b28376eb5",
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Khan.png": "ad55558951638f7d5e5b5a7f9a0443f623224b4f06a21885d881b87f54e4ab76",
+        "art/atlas/units/khan/frames/e-color.png": "7b602ce5bd4a41355d7b9d39e6a2f21735e4691c0bacc2d0930d8b0347d7e307",
+        "art/atlas/units/khan/frames/e-nation.png": "d85f0a2642fb484920b0b366e950ef8689b14416a0f93c6e413d9b51f50a3525",
+        "art/atlas/units/khan/frames/e-shadow.png": "59d5b45a64b4e380d82a53f13df31b5d3cef42ab0591cc8a984b35a6663b11cf",
+        "art/atlas/units/khan/frames/ne-color.png": "bf4268b58efb30bb0ab4c9f9d92fd094b93919453165924aa3acd14cbf6cf8cf",
+        "art/atlas/units/khan/frames/ne-nation.png": "709462e4e37d2a0844283ecb89aff77dc6621c62d066597dcd96f8fb15aecee2",
+        "art/atlas/units/khan/frames/ne-shadow.png": "5babefdbc3d3833ba7f7bf70004bbac669945785217df7abc76c1a0d787a240e",
+        "art/atlas/units/khan/frames/se-color.png": "f77c73c099714d393d36eb77b0f6590527f7f8b7ec36d2d1709416868d8fe106",
+        "art/atlas/units/khan/frames/se-nation.png": "2db910e28ebf549465a325d376fda5f3f97b4217043e9b0fcb55cfa8ed1b4cb1",
+        "art/atlas/units/khan/frames/se-shadow.png": "14ffcceaffc0cf49766b0368b0c00948bcaca74cd3c36e1d940c4ddd4e109506"
+      }
+    },
+    {
+      "assetId": "machine-gun",
+      "creator": "OpenAI image generation",
+      "source": "art/atlas/units/machine-gun/creation-record.json",
+      "promptPath": "art/atlas/units/machine-gun/prompts/e-v1.txt",
+      "rights": "original-generated",
+      "sourceHash": "a44a331d936239f30a8f8a54d3d15a321917920e18cf4af820d77a23bf3f4855",
+      "outputHashes": {
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Machine Gun-1.png": "911244fec4c64005e6c00ed7a02f801ce635820396dc52a6515bc7fc98209856",
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Machine Gun.png": "cf87c3a04e0bc099307ef55ef981957ae4569553d703ec7171d8f960b3fc8129",
+        "art/atlas/units/machine-gun/frames/e-color.png": "14cfd8a993815881d73644e7e4ea125b2d7a532ff30be8c8b62b4963c0a9b478",
+        "art/atlas/units/machine-gun/frames/e-nation.png": "c02a3d085b253a6b218bc4a7b7c7f7aa37878f003d0ff30ec6a009b6871e2a9e",
+        "art/atlas/units/machine-gun/frames/e-shadow.png": "1289e7bf4d4f7b675ef98c87946c0f851be3d8bbfa70227316efae214bbb92bb",
+        "art/atlas/units/machine-gun/frames/ne-color.png": "1e873632af26cd06eb9685f4e9a684bc1a18add998242e2ef896cdd8a147f240",
+        "art/atlas/units/machine-gun/frames/ne-nation.png": "9069a724b14a55519a53dc74ac19be72f3d34363dc73a7d12b73961fdca9bb25",
+        "art/atlas/units/machine-gun/frames/ne-shadow.png": "1d34c85b5bb6e6958710766901038e71dd67d91918cd9924e5a7200c2c6ef125",
+        "art/atlas/units/machine-gun/frames/se-color.png": "6e33a8c5f90a0cea55cd61d882386533da86dd01e3f65ea9e22515e0b228e38e",
+        "art/atlas/units/machine-gun/frames/se-nation.png": "8e1d1c86127a43f19f984e3e065bd725ee92f5831833b8471a098997ad6e673c",
+        "art/atlas/units/machine-gun/frames/se-shadow.png": "817f1080ba50bc1ad6f0aa6c3ed2b9da9c117ef056cc26569b61f0d7698bdbaf"
       }
     },
     {
@@ -251,6 +440,27 @@
         "art/atlas/units/rifleman/frames/se-color.png": "116ef0e27a51462056a602be68176c77e1d2463774075f84213fdc1fa9acc5ec",
         "art/atlas/units/rifleman/frames/se-nation.png": "c23625e2a443980508ee75208e596ba957917bec6562e00f1d7a04871ee23dd9",
         "art/atlas/units/rifleman/frames/se-shadow.png": "4bf88ac2904f4254ffb0ca86b35bc4d00015a91d1ccecea1115a4b70b46f5b6d"
+      }
+    },
+    {
+      "assetId": "rocket-artillery",
+      "creator": "OpenAI image generation",
+      "source": "art/atlas/units/rocket-artillery/creation-record.json",
+      "promptPath": "art/atlas/units/rocket-artillery/prompts/e-v1.txt",
+      "rights": "original-generated",
+      "sourceHash": "179e0d42b20122b16298da69623bdd953092cee3f048e4a708fcd265a33e3297",
+      "outputHashes": {
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Rocket Artillery-1.png": "a4c067873a98ab042da680b01689e7b0fcbb334e0247e5154aec7351ae615958",
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Rocket Artillery.png": "816935c3d8d90c4b5df99b23f223b316e04b29ec8e6b4b61dd679d404b0dd197",
+        "art/atlas/units/rocket-artillery/frames/e-color.png": "57486c7083d25f3e0289bfa6d90e696e28933ce9234b31634c853185f955938e",
+        "art/atlas/units/rocket-artillery/frames/e-nation.png": "143ca3e9ebc619132aa087dbdce8d728c93204f70ff565893d5a456fcd972f68",
+        "art/atlas/units/rocket-artillery/frames/e-shadow.png": "5c5f4f918c28681ef86d1fba21efd44688841d1c796adcfb5655d01e50cca768",
+        "art/atlas/units/rocket-artillery/frames/ne-color.png": "4267e2c43a46405f212d5ee92af517481c0a398e14b54adc5d8c6adedf6af7c4",
+        "art/atlas/units/rocket-artillery/frames/ne-nation.png": "9439786fdd11e6d56f3749813e8c4ea93ce9b7664ded7554111d4a421fcca41f",
+        "art/atlas/units/rocket-artillery/frames/ne-shadow.png": "85ed2ea77edb97e3101d12937b990a47c28c84f64d6652b2a74cbbdc1c9c514f",
+        "art/atlas/units/rocket-artillery/frames/se-color.png": "ddce6b6ec747979884b7f9b71cdb39e61dd470f398027633f586825affff9c31",
+        "art/atlas/units/rocket-artillery/frames/se-nation.png": "922d5e17397df1c48cc9d1fdef78c954aaa3f1ad84e2588602a3c81ae4284695",
+        "art/atlas/units/rocket-artillery/frames/se-shadow.png": "a0a639c899ed18c1f36918a14a4c8127709c3e6a089b8344f2000a89204e80cf"
       }
     },
     {

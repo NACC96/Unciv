@@ -1,19 +1,95 @@
 {
-"schemaVersion": 1,
-"unitName": "Artillery",
-"assetId": "artillery",
-"reviewState": "missing",
-"canvasWidth": 128,
-"canvasHeight": 128,
-"anchorX": 64,
-"anchorY": 96,
-"clippingMargin": 2,
-"uniqueUnitIdentity": null,
-"uniqueTo": null,
-"replaces": null,
-"staticFallbackKey": "TileSets/AtlasUnits/Units/Artillery",
-"framesDirectory": "frames/",
-"applicableStates": [ "IDLE", "MOVE", "ATTACK", "HIT", "DEFEAT" ],
-"facings": [ "E", "NE", "NW", "W", "SW", "SE" ],
-"minimumFrames": { "IDLE": 4, "MOVE": 8, "ATTACK": 8, "HIT": 4, "DEFEAT": 8 }
+  "schemaVersion": 1,
+  "unitName": "Artillery",
+  "assetId": "artillery",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": null,
+  "uniqueTo": null,
+  "replaces": null,
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Artillery",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/artillery/e-motion-v1.png",
+      "rawHash": "5d43b7de3ad81c79fab9b58eef2e558a37c4163ba6b203a799620e1426557437",
+      "promptPath": "art/atlas/units/artillery/prompts/e-v1.txt",
+      "promptHash": "f482ff203141f86ef6cab890b3d3964277dff7e3237057076fc3fef104d7dac6",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/artillery/ne-motion-v2.png",
+      "rawHash": "21a5a5446c79844f10e04405ab301522c62393aba9c6a71743adafb280ad870e",
+      "promptPath": "art/atlas/units/artillery/prompts/ne-v2.txt",
+      "promptHash": "1d764c093f308564b22083685688155906a02414a374d0a77b06e6af8599eac0",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/artillery/se-motion-v2.png",
+      "rawHash": "9e76372e51e355e50248be577c4af4684e5738a9e411a029ebe1f7ee14902e01",
+      "promptPath": "art/atlas/units/artillery/prompts/se-v2.txt",
+      "promptHash": "af3b8e3f578130fee5fa4b7e33c8172195f903869a449ff7fd930bc14400cef6",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
 }

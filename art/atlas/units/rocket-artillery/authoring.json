@@ -1,19 +1,95 @@
 {
-"schemaVersion": 1,
-"unitName": "Rocket Artillery",
-"assetId": "rocket-artillery",
-"reviewState": "missing",
-"canvasWidth": 128,
-"canvasHeight": 128,
-"anchorX": 64,
-"anchorY": 96,
-"clippingMargin": 2,
-"uniqueUnitIdentity": null,
-"uniqueTo": null,
-"replaces": null,
-"staticFallbackKey": "TileSets/AtlasUnits/Units/Rocket Artillery",
-"framesDirectory": "frames/",
-"applicableStates": [ "IDLE", "MOVE", "ATTACK", "HIT", "DEFEAT" ],
-"facings": [ "E", "NE", "NW", "W", "SW", "SE" ],
-"minimumFrames": { "IDLE": 4, "MOVE": 8, "ATTACK": 8, "HIT": 4, "DEFEAT": 8 }
+  "schemaVersion": 1,
+  "unitName": "Rocket Artillery",
+  "assetId": "rocket-artillery",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": null,
+  "uniqueTo": null,
+  "replaces": null,
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Rocket Artillery",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/rocket-artillery/e-motion-v1.png",
+      "rawHash": "7a88ef3c1e719614cdb3dea84f7236c6b05539f78da10ebed115e08e503c4348",
+      "promptPath": "art/atlas/units/rocket-artillery/prompts/e-v1.txt",
+      "promptHash": "a5ab23386ec112519c87d4499bad5a1c3e0db66563d8e7ff08633e5aa9b31406",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/rocket-artillery/ne-motion-v1.png",
+      "rawHash": "dcf301a1affb2d6659c781373c88f846c5cd4aff3831f9158ef076f8a69bf860",
+      "promptPath": "art/atlas/units/rocket-artillery/prompts/ne-v1.txt",
+      "promptHash": "d3bdd7ad87fcba29767b2f88aff0b22c3154175f680583993d3abfba95eeecf0",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/rocket-artillery/se-motion-v1.png",
+      "rawHash": "4a650d7bd5e31742604ecbe31fc79058ecd43e83f4fa5cbce60f3bc247b4b305",
+      "promptPath": "art/atlas/units/rocket-artillery/prompts/se-v1.txt",
+      "promptHash": "4957faede9610de13a88b5e533389f7923a03c74dc9a884f5e47b206bb9b1b11",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
 }

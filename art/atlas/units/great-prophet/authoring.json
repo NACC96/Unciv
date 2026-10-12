@@ -1,19 +1,95 @@
 {
-"schemaVersion": 1,
-"unitName": "Great Prophet",
-"assetId": "great-prophet",
-"reviewState": "missing",
-"canvasWidth": 128,
-"canvasHeight": 128,
-"anchorX": 64,
-"anchorY": 96,
-"clippingMargin": 2,
-"uniqueUnitIdentity": null,
-"uniqueTo": null,
-"replaces": null,
-"staticFallbackKey": "TileSets/AtlasUnits/Units/Great Prophet",
-"framesDirectory": "frames/",
-"applicableStates": [ "IDLE", "MOVE", "HIT", "DEFEAT", "WORK" ],
-"facings": [ "E", "NE", "NW", "W", "SW", "SE" ],
-"minimumFrames": { "IDLE": 4, "MOVE": 8, "HIT": 4, "DEFEAT": 8, "WORK": 8 }
+  "schemaVersion": 1,
+  "unitName": "Great Prophet",
+  "assetId": "great-prophet",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": null,
+  "uniqueTo": null,
+  "replaces": null,
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Great Prophet",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "HIT",
+    "DEFEAT",
+    "WORK"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "HIT": 4,
+    "DEFEAT": 8,
+    "WORK": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/great-prophet/e-motion-v1.png",
+      "rawHash": "1af65abb1697de6831451d20f1cb03cd8a860a8db3e54284b747a1bac8c7630c",
+      "promptPath": "art/atlas/units/great-prophet/prompts/e-v1.txt",
+      "promptHash": "dba7c25994c2ac77122577df5f39a4ed60c4cb72696e9700ed4614687bedc089",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/great-prophet/ne-motion-v1.png",
+      "rawHash": "15396cf7d8cdc307619166d67f39e6890d78849c4849996dc27fd2dfccd6a8be",
+      "promptPath": "art/atlas/units/great-prophet/prompts/ne-v1.txt",
+      "promptHash": "56168547bf90fbd869a1c50187ccc60bb8fa8184f0e998804e31694fab74db60",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/great-prophet/se-motion-v1.png",
+      "rawHash": "380c72bd4dd3aa6c8319d3caa931f4242547ced7800894554fcbb41dffd81e96",
+      "promptPath": "art/atlas/units/great-prophet/prompts/se-v1.txt",
+      "promptHash": "25327fc62d986d8845626764b7c48cf37c753fb1b5e6fb44413d8c4ac51ff9fc",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
 }

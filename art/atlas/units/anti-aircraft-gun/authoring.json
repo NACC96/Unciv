@@ -1,19 +1,95 @@
 {
-"schemaVersion": 1,
-"unitName": "Anti-Aircraft Gun",
-"assetId": "anti-aircraft-gun",
-"reviewState": "missing",
-"canvasWidth": 128,
-"canvasHeight": 128,
-"anchorX": 64,
-"anchorY": 96,
-"clippingMargin": 2,
-"uniqueUnitIdentity": null,
-"uniqueTo": null,
-"replaces": null,
-"staticFallbackKey": "TileSets/AtlasUnits/Units/Anti-Aircraft Gun",
-"framesDirectory": "frames/",
-"applicableStates": [ "IDLE", "MOVE", "ATTACK", "HIT", "DEFEAT" ],
-"facings": [ "E", "NE", "NW", "W", "SW", "SE" ],
-"minimumFrames": { "IDLE": 4, "MOVE": 8, "ATTACK": 8, "HIT": 4, "DEFEAT": 8 }
+  "schemaVersion": 1,
+  "unitName": "Anti-Aircraft Gun",
+  "assetId": "anti-aircraft-gun",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": null,
+  "uniqueTo": null,
+  "replaces": null,
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Anti-Aircraft Gun",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/anti-aircraft-gun/e-motion-v1.png",
+      "rawHash": "edc475d840288dfb5e888203a5a2e43dd7a6f5b7b4f4736c6feb1cd77b474145",
+      "promptPath": "art/atlas/units/anti-aircraft-gun/prompts/e-v1.txt",
+      "promptHash": "cbb23950e28e72f735165d6b8ccbd3f6d4508a90d4f5ea5861a2f8dadb693833",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/anti-aircraft-gun/ne-motion-v1.png",
+      "rawHash": "fda54a52b60d32079dcbbcbba2dc509c7a1e85893c2ac676908c5da75551dbd2",
+      "promptPath": "art/atlas/units/anti-aircraft-gun/prompts/ne-v1.txt",
+      "promptHash": "b549dde933b0be5337bedc379cb4fc3b9a0dd7dd266b94ea2376be35bcb7dbf4",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/anti-aircraft-gun/se-motion-v1.png",
+      "rawHash": "ca48bf29b14ee490d1e9556c478ffbd7823cc25d67cf7a4ec5f4149c3fb0c8e5",
+      "promptPath": "art/atlas/units/anti-aircraft-gun/prompts/se-v1.txt",
+      "promptHash": "5fff3e22b34387f75767b8f9467841dc35875232db00c15defebf94c0a1cdc69",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
 }

@@ -5162,6 +5162,2556 @@
       "minimumFrames": 8
     },
     {
+      "id": "unit-clip|Great Prophet|DEFEAT|E",
+      "rulesetKey": "Great Prophet",
+      "category": "unit-clip",
+      "assetKey": "Great Prophet|DEFEAT|E",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/great-prophet/frames/defeat-e.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/e-color.png",
+          "sha256": "da8701173d65b580b643844c2d1ebc8e17c80724782db7aff6ee212c0673a4e6",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/e-nation.png",
+          "sha256": "fd6c34ae899e44ce379d7b9b911093a391ff7566abbaff0042adde21fdaa5c7f",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/e-shadow.png",
+          "sha256": "3db2b41208b17aae126e2e96bc1f0a6f5937500b85ff19cd58e65ddc77281e71",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Prophet",
+      "state": "DEFEAT",
+      "facing": "E",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Prophet|DEFEAT|NE",
+      "rulesetKey": "Great Prophet",
+      "category": "unit-clip",
+      "assetKey": "Great Prophet|DEFEAT|NE",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/great-prophet/frames/defeat-ne.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/ne-color.png",
+          "sha256": "e20145577416de6678a607ad51d785b93137ab851ada38f3a121245f0ec985d7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/ne-nation.png",
+          "sha256": "defa093d5750849871aee0573973ac6f560e20a2453128db38c62cc8dd3ba9bd",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/ne-shadow.png",
+          "sha256": "ce1c93ab3fb9c095e81142f9ddef06f0b771502ecbc52f4581d098ee4b8b7d5a",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Prophet",
+      "state": "DEFEAT",
+      "facing": "NE",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Prophet|DEFEAT|NW",
+      "rulesetKey": "Great Prophet",
+      "category": "unit-clip",
+      "assetKey": "Great Prophet|DEFEAT|NW",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/great-prophet/frames/defeat-nw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/ne-color.png",
+          "sha256": "e20145577416de6678a607ad51d785b93137ab851ada38f3a121245f0ec985d7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/ne-nation.png",
+          "sha256": "defa093d5750849871aee0573973ac6f560e20a2453128db38c62cc8dd3ba9bd",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/ne-shadow.png",
+          "sha256": "ce1c93ab3fb9c095e81142f9ddef06f0b771502ecbc52f4581d098ee4b8b7d5a",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Prophet",
+      "state": "DEFEAT",
+      "facing": "NW",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Prophet|DEFEAT|SE",
+      "rulesetKey": "Great Prophet",
+      "category": "unit-clip",
+      "assetKey": "Great Prophet|DEFEAT|SE",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/great-prophet/frames/defeat-se.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/se-color.png",
+          "sha256": "34469ade2621f7e08453d7cec278fb658c895b267ee3908f39478edb117f65c7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/se-nation.png",
+          "sha256": "ff06ffb47477f2810044119d5e36d1cfe501a0ae87da6c5842c67f68fe2b2ee8",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/se-shadow.png",
+          "sha256": "f32703954b4a31482405cb6f7bfb6d8bb26d14fddbba3d2ea75171989fb0173e",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Prophet",
+      "state": "DEFEAT",
+      "facing": "SE",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Prophet|DEFEAT|SW",
+      "rulesetKey": "Great Prophet",
+      "category": "unit-clip",
+      "assetKey": "Great Prophet|DEFEAT|SW",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/great-prophet/frames/defeat-sw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/se-color.png",
+          "sha256": "34469ade2621f7e08453d7cec278fb658c895b267ee3908f39478edb117f65c7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/se-nation.png",
+          "sha256": "ff06ffb47477f2810044119d5e36d1cfe501a0ae87da6c5842c67f68fe2b2ee8",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/se-shadow.png",
+          "sha256": "f32703954b4a31482405cb6f7bfb6d8bb26d14fddbba3d2ea75171989fb0173e",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Prophet",
+      "state": "DEFEAT",
+      "facing": "SW",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Prophet|DEFEAT|W",
+      "rulesetKey": "Great Prophet",
+      "category": "unit-clip",
+      "assetKey": "Great Prophet|DEFEAT|W",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/great-prophet/frames/defeat-w.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/e-color.png",
+          "sha256": "da8701173d65b580b643844c2d1ebc8e17c80724782db7aff6ee212c0673a4e6",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/e-nation.png",
+          "sha256": "fd6c34ae899e44ce379d7b9b911093a391ff7566abbaff0042adde21fdaa5c7f",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/e-shadow.png",
+          "sha256": "3db2b41208b17aae126e2e96bc1f0a6f5937500b85ff19cd58e65ddc77281e71",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Prophet",
+      "state": "DEFEAT",
+      "facing": "W",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Prophet|HIT|E",
+      "rulesetKey": "Great Prophet",
+      "category": "unit-clip",
+      "assetKey": "Great Prophet|HIT|E",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/great-prophet/frames/hit-e.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/e-color.png",
+          "sha256": "da8701173d65b580b643844c2d1ebc8e17c80724782db7aff6ee212c0673a4e6",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/e-nation.png",
+          "sha256": "fd6c34ae899e44ce379d7b9b911093a391ff7566abbaff0042adde21fdaa5c7f",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/e-shadow.png",
+          "sha256": "3db2b41208b17aae126e2e96bc1f0a6f5937500b85ff19cd58e65ddc77281e71",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Prophet",
+      "state": "HIT",
+      "facing": "E",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great Prophet|HIT|NE",
+      "rulesetKey": "Great Prophet",
+      "category": "unit-clip",
+      "assetKey": "Great Prophet|HIT|NE",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/great-prophet/frames/hit-ne.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/ne-color.png",
+          "sha256": "e20145577416de6678a607ad51d785b93137ab851ada38f3a121245f0ec985d7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/ne-nation.png",
+          "sha256": "defa093d5750849871aee0573973ac6f560e20a2453128db38c62cc8dd3ba9bd",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/ne-shadow.png",
+          "sha256": "ce1c93ab3fb9c095e81142f9ddef06f0b771502ecbc52f4581d098ee4b8b7d5a",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Prophet",
+      "state": "HIT",
+      "facing": "NE",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great Prophet|HIT|NW",
+      "rulesetKey": "Great Prophet",
+      "category": "unit-clip",
+      "assetKey": "Great Prophet|HIT|NW",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/great-prophet/frames/hit-nw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/ne-color.png",
+          "sha256": "e20145577416de6678a607ad51d785b93137ab851ada38f3a121245f0ec985d7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/ne-nation.png",
+          "sha256": "defa093d5750849871aee0573973ac6f560e20a2453128db38c62cc8dd3ba9bd",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/ne-shadow.png",
+          "sha256": "ce1c93ab3fb9c095e81142f9ddef06f0b771502ecbc52f4581d098ee4b8b7d5a",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Prophet",
+      "state": "HIT",
+      "facing": "NW",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great Prophet|HIT|SE",
+      "rulesetKey": "Great Prophet",
+      "category": "unit-clip",
+      "assetKey": "Great Prophet|HIT|SE",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/great-prophet/frames/hit-se.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/se-color.png",
+          "sha256": "34469ade2621f7e08453d7cec278fb658c895b267ee3908f39478edb117f65c7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/se-nation.png",
+          "sha256": "ff06ffb47477f2810044119d5e36d1cfe501a0ae87da6c5842c67f68fe2b2ee8",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/se-shadow.png",
+          "sha256": "f32703954b4a31482405cb6f7bfb6d8bb26d14fddbba3d2ea75171989fb0173e",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Prophet",
+      "state": "HIT",
+      "facing": "SE",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great Prophet|HIT|SW",
+      "rulesetKey": "Great Prophet",
+      "category": "unit-clip",
+      "assetKey": "Great Prophet|HIT|SW",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/great-prophet/frames/hit-sw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/se-color.png",
+          "sha256": "34469ade2621f7e08453d7cec278fb658c895b267ee3908f39478edb117f65c7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/se-nation.png",
+          "sha256": "ff06ffb47477f2810044119d5e36d1cfe501a0ae87da6c5842c67f68fe2b2ee8",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/se-shadow.png",
+          "sha256": "f32703954b4a31482405cb6f7bfb6d8bb26d14fddbba3d2ea75171989fb0173e",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Prophet",
+      "state": "HIT",
+      "facing": "SW",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great Prophet|HIT|W",
+      "rulesetKey": "Great Prophet",
+      "category": "unit-clip",
+      "assetKey": "Great Prophet|HIT|W",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/great-prophet/frames/hit-w.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/e-color.png",
+          "sha256": "da8701173d65b580b643844c2d1ebc8e17c80724782db7aff6ee212c0673a4e6",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/e-nation.png",
+          "sha256": "fd6c34ae899e44ce379d7b9b911093a391ff7566abbaff0042adde21fdaa5c7f",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/e-shadow.png",
+          "sha256": "3db2b41208b17aae126e2e96bc1f0a6f5937500b85ff19cd58e65ddc77281e71",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Prophet",
+      "state": "HIT",
+      "facing": "W",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great Prophet|IDLE|E",
+      "rulesetKey": "Great Prophet",
+      "category": "unit-clip",
+      "assetKey": "Great Prophet|IDLE|E",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/great-prophet/frames/idle-e.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/e-color.png",
+          "sha256": "da8701173d65b580b643844c2d1ebc8e17c80724782db7aff6ee212c0673a4e6",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/e-nation.png",
+          "sha256": "fd6c34ae899e44ce379d7b9b911093a391ff7566abbaff0042adde21fdaa5c7f",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/e-shadow.png",
+          "sha256": "3db2b41208b17aae126e2e96bc1f0a6f5937500b85ff19cd58e65ddc77281e71",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Prophet",
+      "state": "IDLE",
+      "facing": "E",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great Prophet|IDLE|NE",
+      "rulesetKey": "Great Prophet",
+      "category": "unit-clip",
+      "assetKey": "Great Prophet|IDLE|NE",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/great-prophet/frames/idle-ne.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/ne-color.png",
+          "sha256": "e20145577416de6678a607ad51d785b93137ab851ada38f3a121245f0ec985d7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/ne-nation.png",
+          "sha256": "defa093d5750849871aee0573973ac6f560e20a2453128db38c62cc8dd3ba9bd",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/ne-shadow.png",
+          "sha256": "ce1c93ab3fb9c095e81142f9ddef06f0b771502ecbc52f4581d098ee4b8b7d5a",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Prophet",
+      "state": "IDLE",
+      "facing": "NE",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great Prophet|IDLE|NW",
+      "rulesetKey": "Great Prophet",
+      "category": "unit-clip",
+      "assetKey": "Great Prophet|IDLE|NW",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/great-prophet/frames/idle-nw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/ne-color.png",
+          "sha256": "e20145577416de6678a607ad51d785b93137ab851ada38f3a121245f0ec985d7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/ne-nation.png",
+          "sha256": "defa093d5750849871aee0573973ac6f560e20a2453128db38c62cc8dd3ba9bd",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/ne-shadow.png",
+          "sha256": "ce1c93ab3fb9c095e81142f9ddef06f0b771502ecbc52f4581d098ee4b8b7d5a",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Prophet",
+      "state": "IDLE",
+      "facing": "NW",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great Prophet|IDLE|SE",
+      "rulesetKey": "Great Prophet",
+      "category": "unit-clip",
+      "assetKey": "Great Prophet|IDLE|SE",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/great-prophet/frames/idle-se.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/se-color.png",
+          "sha256": "34469ade2621f7e08453d7cec278fb658c895b267ee3908f39478edb117f65c7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/se-nation.png",
+          "sha256": "ff06ffb47477f2810044119d5e36d1cfe501a0ae87da6c5842c67f68fe2b2ee8",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/se-shadow.png",
+          "sha256": "f32703954b4a31482405cb6f7bfb6d8bb26d14fddbba3d2ea75171989fb0173e",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Prophet",
+      "state": "IDLE",
+      "facing": "SE",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great Prophet|IDLE|SW",
+      "rulesetKey": "Great Prophet",
+      "category": "unit-clip",
+      "assetKey": "Great Prophet|IDLE|SW",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/great-prophet/frames/idle-sw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/se-color.png",
+          "sha256": "34469ade2621f7e08453d7cec278fb658c895b267ee3908f39478edb117f65c7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/se-nation.png",
+          "sha256": "ff06ffb47477f2810044119d5e36d1cfe501a0ae87da6c5842c67f68fe2b2ee8",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/se-shadow.png",
+          "sha256": "f32703954b4a31482405cb6f7bfb6d8bb26d14fddbba3d2ea75171989fb0173e",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Prophet",
+      "state": "IDLE",
+      "facing": "SW",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great Prophet|IDLE|W",
+      "rulesetKey": "Great Prophet",
+      "category": "unit-clip",
+      "assetKey": "Great Prophet|IDLE|W",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/great-prophet/frames/idle-w.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/e-color.png",
+          "sha256": "da8701173d65b580b643844c2d1ebc8e17c80724782db7aff6ee212c0673a4e6",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/e-nation.png",
+          "sha256": "fd6c34ae899e44ce379d7b9b911093a391ff7566abbaff0042adde21fdaa5c7f",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/e-shadow.png",
+          "sha256": "3db2b41208b17aae126e2e96bc1f0a6f5937500b85ff19cd58e65ddc77281e71",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Prophet",
+      "state": "IDLE",
+      "facing": "W",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great Prophet|MOVE|E",
+      "rulesetKey": "Great Prophet",
+      "category": "unit-clip",
+      "assetKey": "Great Prophet|MOVE|E",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/great-prophet/frames/move-e.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/e-color.png",
+          "sha256": "da8701173d65b580b643844c2d1ebc8e17c80724782db7aff6ee212c0673a4e6",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/e-nation.png",
+          "sha256": "fd6c34ae899e44ce379d7b9b911093a391ff7566abbaff0042adde21fdaa5c7f",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/e-shadow.png",
+          "sha256": "3db2b41208b17aae126e2e96bc1f0a6f5937500b85ff19cd58e65ddc77281e71",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Prophet",
+      "state": "MOVE",
+      "facing": "E",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Prophet|MOVE|NE",
+      "rulesetKey": "Great Prophet",
+      "category": "unit-clip",
+      "assetKey": "Great Prophet|MOVE|NE",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/great-prophet/frames/move-ne.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/ne-color.png",
+          "sha256": "e20145577416de6678a607ad51d785b93137ab851ada38f3a121245f0ec985d7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/ne-nation.png",
+          "sha256": "defa093d5750849871aee0573973ac6f560e20a2453128db38c62cc8dd3ba9bd",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/ne-shadow.png",
+          "sha256": "ce1c93ab3fb9c095e81142f9ddef06f0b771502ecbc52f4581d098ee4b8b7d5a",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Prophet",
+      "state": "MOVE",
+      "facing": "NE",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Prophet|MOVE|NW",
+      "rulesetKey": "Great Prophet",
+      "category": "unit-clip",
+      "assetKey": "Great Prophet|MOVE|NW",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/great-prophet/frames/move-nw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/ne-color.png",
+          "sha256": "e20145577416de6678a607ad51d785b93137ab851ada38f3a121245f0ec985d7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/ne-nation.png",
+          "sha256": "defa093d5750849871aee0573973ac6f560e20a2453128db38c62cc8dd3ba9bd",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/ne-shadow.png",
+          "sha256": "ce1c93ab3fb9c095e81142f9ddef06f0b771502ecbc52f4581d098ee4b8b7d5a",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Prophet",
+      "state": "MOVE",
+      "facing": "NW",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Prophet|MOVE|SE",
+      "rulesetKey": "Great Prophet",
+      "category": "unit-clip",
+      "assetKey": "Great Prophet|MOVE|SE",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/great-prophet/frames/move-se.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/se-color.png",
+          "sha256": "34469ade2621f7e08453d7cec278fb658c895b267ee3908f39478edb117f65c7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/se-nation.png",
+          "sha256": "ff06ffb47477f2810044119d5e36d1cfe501a0ae87da6c5842c67f68fe2b2ee8",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/se-shadow.png",
+          "sha256": "f32703954b4a31482405cb6f7bfb6d8bb26d14fddbba3d2ea75171989fb0173e",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Prophet",
+      "state": "MOVE",
+      "facing": "SE",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Prophet|MOVE|SW",
+      "rulesetKey": "Great Prophet",
+      "category": "unit-clip",
+      "assetKey": "Great Prophet|MOVE|SW",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/great-prophet/frames/move-sw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/se-color.png",
+          "sha256": "34469ade2621f7e08453d7cec278fb658c895b267ee3908f39478edb117f65c7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/se-nation.png",
+          "sha256": "ff06ffb47477f2810044119d5e36d1cfe501a0ae87da6c5842c67f68fe2b2ee8",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/se-shadow.png",
+          "sha256": "f32703954b4a31482405cb6f7bfb6d8bb26d14fddbba3d2ea75171989fb0173e",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Prophet",
+      "state": "MOVE",
+      "facing": "SW",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Prophet|MOVE|W",
+      "rulesetKey": "Great Prophet",
+      "category": "unit-clip",
+      "assetKey": "Great Prophet|MOVE|W",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/great-prophet/frames/move-w.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/e-color.png",
+          "sha256": "da8701173d65b580b643844c2d1ebc8e17c80724782db7aff6ee212c0673a4e6",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/e-nation.png",
+          "sha256": "fd6c34ae899e44ce379d7b9b911093a391ff7566abbaff0042adde21fdaa5c7f",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/e-shadow.png",
+          "sha256": "3db2b41208b17aae126e2e96bc1f0a6f5937500b85ff19cd58e65ddc77281e71",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Prophet",
+      "state": "MOVE",
+      "facing": "W",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Prophet|WORK|E",
+      "rulesetKey": "Great Prophet",
+      "category": "unit-clip",
+      "assetKey": "Great Prophet|WORK|E",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/great-prophet/frames/work-e.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/e-color.png",
+          "sha256": "da8701173d65b580b643844c2d1ebc8e17c80724782db7aff6ee212c0673a4e6",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/e-nation.png",
+          "sha256": "fd6c34ae899e44ce379d7b9b911093a391ff7566abbaff0042adde21fdaa5c7f",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/e-shadow.png",
+          "sha256": "3db2b41208b17aae126e2e96bc1f0a6f5937500b85ff19cd58e65ddc77281e71",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Prophet",
+      "state": "WORK",
+      "facing": "E",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Prophet|WORK|NE",
+      "rulesetKey": "Great Prophet",
+      "category": "unit-clip",
+      "assetKey": "Great Prophet|WORK|NE",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/great-prophet/frames/work-ne.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/ne-color.png",
+          "sha256": "e20145577416de6678a607ad51d785b93137ab851ada38f3a121245f0ec985d7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/ne-nation.png",
+          "sha256": "defa093d5750849871aee0573973ac6f560e20a2453128db38c62cc8dd3ba9bd",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/ne-shadow.png",
+          "sha256": "ce1c93ab3fb9c095e81142f9ddef06f0b771502ecbc52f4581d098ee4b8b7d5a",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Prophet",
+      "state": "WORK",
+      "facing": "NE",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Prophet|WORK|NW",
+      "rulesetKey": "Great Prophet",
+      "category": "unit-clip",
+      "assetKey": "Great Prophet|WORK|NW",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/great-prophet/frames/work-nw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/ne-color.png",
+          "sha256": "e20145577416de6678a607ad51d785b93137ab851ada38f3a121245f0ec985d7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/ne-nation.png",
+          "sha256": "defa093d5750849871aee0573973ac6f560e20a2453128db38c62cc8dd3ba9bd",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/ne-shadow.png",
+          "sha256": "ce1c93ab3fb9c095e81142f9ddef06f0b771502ecbc52f4581d098ee4b8b7d5a",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Prophet",
+      "state": "WORK",
+      "facing": "NW",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Prophet|WORK|SE",
+      "rulesetKey": "Great Prophet",
+      "category": "unit-clip",
+      "assetKey": "Great Prophet|WORK|SE",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/great-prophet/frames/work-se.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/se-color.png",
+          "sha256": "34469ade2621f7e08453d7cec278fb658c895b267ee3908f39478edb117f65c7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/se-nation.png",
+          "sha256": "ff06ffb47477f2810044119d5e36d1cfe501a0ae87da6c5842c67f68fe2b2ee8",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/se-shadow.png",
+          "sha256": "f32703954b4a31482405cb6f7bfb6d8bb26d14fddbba3d2ea75171989fb0173e",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Prophet",
+      "state": "WORK",
+      "facing": "SE",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Prophet|WORK|SW",
+      "rulesetKey": "Great Prophet",
+      "category": "unit-clip",
+      "assetKey": "Great Prophet|WORK|SW",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/great-prophet/frames/work-sw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/se-color.png",
+          "sha256": "34469ade2621f7e08453d7cec278fb658c895b267ee3908f39478edb117f65c7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/se-nation.png",
+          "sha256": "ff06ffb47477f2810044119d5e36d1cfe501a0ae87da6c5842c67f68fe2b2ee8",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/se-shadow.png",
+          "sha256": "f32703954b4a31482405cb6f7bfb6d8bb26d14fddbba3d2ea75171989fb0173e",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Prophet",
+      "state": "WORK",
+      "facing": "SW",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Prophet|WORK|W",
+      "rulesetKey": "Great Prophet",
+      "category": "unit-clip",
+      "assetKey": "Great Prophet|WORK|W",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/great-prophet/frames/work-w.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/e-color.png",
+          "sha256": "da8701173d65b580b643844c2d1ebc8e17c80724782db7aff6ee212c0673a4e6",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/e-nation.png",
+          "sha256": "fd6c34ae899e44ce379d7b9b911093a391ff7566abbaff0042adde21fdaa5c7f",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-prophet/frames/e-shadow.png",
+          "sha256": "3db2b41208b17aae126e2e96bc1f0a6f5937500b85ff19cd58e65ddc77281e71",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Prophet",
+      "state": "WORK",
+      "facing": "W",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Scientist|DEFEAT|E",
+      "rulesetKey": "Great Scientist",
+      "category": "unit-clip",
+      "assetKey": "Great Scientist|DEFEAT|E",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-scientist/frames/defeat-e.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/e-color.png",
+          "sha256": "943e89cb32550a655f2894cf29cdde4d9032dcc1167f67b6d344a70ef1120ed2",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/e-nation.png",
+          "sha256": "08f313f3553189d1cd26a17545c4df08690ba5ad0533c77a0a7d5dcafdaa89b3",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/e-shadow.png",
+          "sha256": "728b7c99f35ee0ba7c91b1ed12e471e4fcdc21b6eee79443413ce54f4d8453c0",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Scientist",
+      "state": "DEFEAT",
+      "facing": "E",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Scientist|DEFEAT|NE",
+      "rulesetKey": "Great Scientist",
+      "category": "unit-clip",
+      "assetKey": "Great Scientist|DEFEAT|NE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-scientist/frames/defeat-ne.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/ne-color.png",
+          "sha256": "1461c0f42e848d8fc526b46713fb20cee31eae4af2e8ea81a709a56f8e61d79c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/ne-nation.png",
+          "sha256": "3c66f7d36af5d8fa6d2c520ed0cc135616300d7903a794ae82418ad3b7376c11",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/ne-shadow.png",
+          "sha256": "3c37800be474556b7c94717655cc896c90b40b28566279821e1b504e43836788",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Scientist",
+      "state": "DEFEAT",
+      "facing": "NE",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Scientist|DEFEAT|NW",
+      "rulesetKey": "Great Scientist",
+      "category": "unit-clip",
+      "assetKey": "Great Scientist|DEFEAT|NW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-scientist/frames/defeat-nw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/ne-color.png",
+          "sha256": "1461c0f42e848d8fc526b46713fb20cee31eae4af2e8ea81a709a56f8e61d79c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/ne-nation.png",
+          "sha256": "3c66f7d36af5d8fa6d2c520ed0cc135616300d7903a794ae82418ad3b7376c11",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/ne-shadow.png",
+          "sha256": "3c37800be474556b7c94717655cc896c90b40b28566279821e1b504e43836788",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Scientist",
+      "state": "DEFEAT",
+      "facing": "NW",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Scientist|DEFEAT|SE",
+      "rulesetKey": "Great Scientist",
+      "category": "unit-clip",
+      "assetKey": "Great Scientist|DEFEAT|SE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-scientist/frames/defeat-se.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/se-color.png",
+          "sha256": "d81d411cb3d9709ba54e5c68929afdd0ca6af8f66a15635f5be627f3c2a31e60",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/se-nation.png",
+          "sha256": "cae710d98c43f904826e31b1abf7c18cf78ccc6230ce3aeabfd680e5944dddb4",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/se-shadow.png",
+          "sha256": "f114de61c750e97def16deab6ea0406d9bd4b89722901fb7b58becb78c388369",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Scientist",
+      "state": "DEFEAT",
+      "facing": "SE",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Scientist|DEFEAT|SW",
+      "rulesetKey": "Great Scientist",
+      "category": "unit-clip",
+      "assetKey": "Great Scientist|DEFEAT|SW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-scientist/frames/defeat-sw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/se-color.png",
+          "sha256": "d81d411cb3d9709ba54e5c68929afdd0ca6af8f66a15635f5be627f3c2a31e60",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/se-nation.png",
+          "sha256": "cae710d98c43f904826e31b1abf7c18cf78ccc6230ce3aeabfd680e5944dddb4",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/se-shadow.png",
+          "sha256": "f114de61c750e97def16deab6ea0406d9bd4b89722901fb7b58becb78c388369",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Scientist",
+      "state": "DEFEAT",
+      "facing": "SW",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Scientist|DEFEAT|W",
+      "rulesetKey": "Great Scientist",
+      "category": "unit-clip",
+      "assetKey": "Great Scientist|DEFEAT|W",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-scientist/frames/defeat-w.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/e-color.png",
+          "sha256": "943e89cb32550a655f2894cf29cdde4d9032dcc1167f67b6d344a70ef1120ed2",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/e-nation.png",
+          "sha256": "08f313f3553189d1cd26a17545c4df08690ba5ad0533c77a0a7d5dcafdaa89b3",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/e-shadow.png",
+          "sha256": "728b7c99f35ee0ba7c91b1ed12e471e4fcdc21b6eee79443413ce54f4d8453c0",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Scientist",
+      "state": "DEFEAT",
+      "facing": "W",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Scientist|HIT|E",
+      "rulesetKey": "Great Scientist",
+      "category": "unit-clip",
+      "assetKey": "Great Scientist|HIT|E",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-scientist/frames/hit-e.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/e-color.png",
+          "sha256": "943e89cb32550a655f2894cf29cdde4d9032dcc1167f67b6d344a70ef1120ed2",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/e-nation.png",
+          "sha256": "08f313f3553189d1cd26a17545c4df08690ba5ad0533c77a0a7d5dcafdaa89b3",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/e-shadow.png",
+          "sha256": "728b7c99f35ee0ba7c91b1ed12e471e4fcdc21b6eee79443413ce54f4d8453c0",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Scientist",
+      "state": "HIT",
+      "facing": "E",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great Scientist|HIT|NE",
+      "rulesetKey": "Great Scientist",
+      "category": "unit-clip",
+      "assetKey": "Great Scientist|HIT|NE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-scientist/frames/hit-ne.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/ne-color.png",
+          "sha256": "1461c0f42e848d8fc526b46713fb20cee31eae4af2e8ea81a709a56f8e61d79c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/ne-nation.png",
+          "sha256": "3c66f7d36af5d8fa6d2c520ed0cc135616300d7903a794ae82418ad3b7376c11",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/ne-shadow.png",
+          "sha256": "3c37800be474556b7c94717655cc896c90b40b28566279821e1b504e43836788",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Scientist",
+      "state": "HIT",
+      "facing": "NE",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great Scientist|HIT|NW",
+      "rulesetKey": "Great Scientist",
+      "category": "unit-clip",
+      "assetKey": "Great Scientist|HIT|NW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-scientist/frames/hit-nw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/ne-color.png",
+          "sha256": "1461c0f42e848d8fc526b46713fb20cee31eae4af2e8ea81a709a56f8e61d79c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/ne-nation.png",
+          "sha256": "3c66f7d36af5d8fa6d2c520ed0cc135616300d7903a794ae82418ad3b7376c11",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/ne-shadow.png",
+          "sha256": "3c37800be474556b7c94717655cc896c90b40b28566279821e1b504e43836788",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Scientist",
+      "state": "HIT",
+      "facing": "NW",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great Scientist|HIT|SE",
+      "rulesetKey": "Great Scientist",
+      "category": "unit-clip",
+      "assetKey": "Great Scientist|HIT|SE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-scientist/frames/hit-se.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/se-color.png",
+          "sha256": "d81d411cb3d9709ba54e5c68929afdd0ca6af8f66a15635f5be627f3c2a31e60",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/se-nation.png",
+          "sha256": "cae710d98c43f904826e31b1abf7c18cf78ccc6230ce3aeabfd680e5944dddb4",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/se-shadow.png",
+          "sha256": "f114de61c750e97def16deab6ea0406d9bd4b89722901fb7b58becb78c388369",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Scientist",
+      "state": "HIT",
+      "facing": "SE",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great Scientist|HIT|SW",
+      "rulesetKey": "Great Scientist",
+      "category": "unit-clip",
+      "assetKey": "Great Scientist|HIT|SW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-scientist/frames/hit-sw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/se-color.png",
+          "sha256": "d81d411cb3d9709ba54e5c68929afdd0ca6af8f66a15635f5be627f3c2a31e60",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/se-nation.png",
+          "sha256": "cae710d98c43f904826e31b1abf7c18cf78ccc6230ce3aeabfd680e5944dddb4",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/se-shadow.png",
+          "sha256": "f114de61c750e97def16deab6ea0406d9bd4b89722901fb7b58becb78c388369",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Scientist",
+      "state": "HIT",
+      "facing": "SW",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great Scientist|HIT|W",
+      "rulesetKey": "Great Scientist",
+      "category": "unit-clip",
+      "assetKey": "Great Scientist|HIT|W",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-scientist/frames/hit-w.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/e-color.png",
+          "sha256": "943e89cb32550a655f2894cf29cdde4d9032dcc1167f67b6d344a70ef1120ed2",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/e-nation.png",
+          "sha256": "08f313f3553189d1cd26a17545c4df08690ba5ad0533c77a0a7d5dcafdaa89b3",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/e-shadow.png",
+          "sha256": "728b7c99f35ee0ba7c91b1ed12e471e4fcdc21b6eee79443413ce54f4d8453c0",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Scientist",
+      "state": "HIT",
+      "facing": "W",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great Scientist|IDLE|E",
+      "rulesetKey": "Great Scientist",
+      "category": "unit-clip",
+      "assetKey": "Great Scientist|IDLE|E",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-scientist/frames/idle-e.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/e-color.png",
+          "sha256": "943e89cb32550a655f2894cf29cdde4d9032dcc1167f67b6d344a70ef1120ed2",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/e-nation.png",
+          "sha256": "08f313f3553189d1cd26a17545c4df08690ba5ad0533c77a0a7d5dcafdaa89b3",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/e-shadow.png",
+          "sha256": "728b7c99f35ee0ba7c91b1ed12e471e4fcdc21b6eee79443413ce54f4d8453c0",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Scientist",
+      "state": "IDLE",
+      "facing": "E",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great Scientist|IDLE|NE",
+      "rulesetKey": "Great Scientist",
+      "category": "unit-clip",
+      "assetKey": "Great Scientist|IDLE|NE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-scientist/frames/idle-ne.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/ne-color.png",
+          "sha256": "1461c0f42e848d8fc526b46713fb20cee31eae4af2e8ea81a709a56f8e61d79c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/ne-nation.png",
+          "sha256": "3c66f7d36af5d8fa6d2c520ed0cc135616300d7903a794ae82418ad3b7376c11",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/ne-shadow.png",
+          "sha256": "3c37800be474556b7c94717655cc896c90b40b28566279821e1b504e43836788",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Scientist",
+      "state": "IDLE",
+      "facing": "NE",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great Scientist|IDLE|NW",
+      "rulesetKey": "Great Scientist",
+      "category": "unit-clip",
+      "assetKey": "Great Scientist|IDLE|NW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-scientist/frames/idle-nw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/ne-color.png",
+          "sha256": "1461c0f42e848d8fc526b46713fb20cee31eae4af2e8ea81a709a56f8e61d79c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/ne-nation.png",
+          "sha256": "3c66f7d36af5d8fa6d2c520ed0cc135616300d7903a794ae82418ad3b7376c11",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/ne-shadow.png",
+          "sha256": "3c37800be474556b7c94717655cc896c90b40b28566279821e1b504e43836788",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Scientist",
+      "state": "IDLE",
+      "facing": "NW",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great Scientist|IDLE|SE",
+      "rulesetKey": "Great Scientist",
+      "category": "unit-clip",
+      "assetKey": "Great Scientist|IDLE|SE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-scientist/frames/idle-se.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/se-color.png",
+          "sha256": "d81d411cb3d9709ba54e5c68929afdd0ca6af8f66a15635f5be627f3c2a31e60",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/se-nation.png",
+          "sha256": "cae710d98c43f904826e31b1abf7c18cf78ccc6230ce3aeabfd680e5944dddb4",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/se-shadow.png",
+          "sha256": "f114de61c750e97def16deab6ea0406d9bd4b89722901fb7b58becb78c388369",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Scientist",
+      "state": "IDLE",
+      "facing": "SE",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great Scientist|IDLE|SW",
+      "rulesetKey": "Great Scientist",
+      "category": "unit-clip",
+      "assetKey": "Great Scientist|IDLE|SW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-scientist/frames/idle-sw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/se-color.png",
+          "sha256": "d81d411cb3d9709ba54e5c68929afdd0ca6af8f66a15635f5be627f3c2a31e60",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/se-nation.png",
+          "sha256": "cae710d98c43f904826e31b1abf7c18cf78ccc6230ce3aeabfd680e5944dddb4",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/se-shadow.png",
+          "sha256": "f114de61c750e97def16deab6ea0406d9bd4b89722901fb7b58becb78c388369",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Scientist",
+      "state": "IDLE",
+      "facing": "SW",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great Scientist|IDLE|W",
+      "rulesetKey": "Great Scientist",
+      "category": "unit-clip",
+      "assetKey": "Great Scientist|IDLE|W",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-scientist/frames/idle-w.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/e-color.png",
+          "sha256": "943e89cb32550a655f2894cf29cdde4d9032dcc1167f67b6d344a70ef1120ed2",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/e-nation.png",
+          "sha256": "08f313f3553189d1cd26a17545c4df08690ba5ad0533c77a0a7d5dcafdaa89b3",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/e-shadow.png",
+          "sha256": "728b7c99f35ee0ba7c91b1ed12e471e4fcdc21b6eee79443413ce54f4d8453c0",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Scientist",
+      "state": "IDLE",
+      "facing": "W",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great Scientist|MOVE|E",
+      "rulesetKey": "Great Scientist",
+      "category": "unit-clip",
+      "assetKey": "Great Scientist|MOVE|E",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-scientist/frames/move-e.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/e-color.png",
+          "sha256": "943e89cb32550a655f2894cf29cdde4d9032dcc1167f67b6d344a70ef1120ed2",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/e-nation.png",
+          "sha256": "08f313f3553189d1cd26a17545c4df08690ba5ad0533c77a0a7d5dcafdaa89b3",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/e-shadow.png",
+          "sha256": "728b7c99f35ee0ba7c91b1ed12e471e4fcdc21b6eee79443413ce54f4d8453c0",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Scientist",
+      "state": "MOVE",
+      "facing": "E",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Scientist|MOVE|NE",
+      "rulesetKey": "Great Scientist",
+      "category": "unit-clip",
+      "assetKey": "Great Scientist|MOVE|NE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-scientist/frames/move-ne.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/ne-color.png",
+          "sha256": "1461c0f42e848d8fc526b46713fb20cee31eae4af2e8ea81a709a56f8e61d79c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/ne-nation.png",
+          "sha256": "3c66f7d36af5d8fa6d2c520ed0cc135616300d7903a794ae82418ad3b7376c11",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/ne-shadow.png",
+          "sha256": "3c37800be474556b7c94717655cc896c90b40b28566279821e1b504e43836788",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Scientist",
+      "state": "MOVE",
+      "facing": "NE",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Scientist|MOVE|NW",
+      "rulesetKey": "Great Scientist",
+      "category": "unit-clip",
+      "assetKey": "Great Scientist|MOVE|NW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-scientist/frames/move-nw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/ne-color.png",
+          "sha256": "1461c0f42e848d8fc526b46713fb20cee31eae4af2e8ea81a709a56f8e61d79c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/ne-nation.png",
+          "sha256": "3c66f7d36af5d8fa6d2c520ed0cc135616300d7903a794ae82418ad3b7376c11",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/ne-shadow.png",
+          "sha256": "3c37800be474556b7c94717655cc896c90b40b28566279821e1b504e43836788",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Scientist",
+      "state": "MOVE",
+      "facing": "NW",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Scientist|MOVE|SE",
+      "rulesetKey": "Great Scientist",
+      "category": "unit-clip",
+      "assetKey": "Great Scientist|MOVE|SE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-scientist/frames/move-se.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/se-color.png",
+          "sha256": "d81d411cb3d9709ba54e5c68929afdd0ca6af8f66a15635f5be627f3c2a31e60",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/se-nation.png",
+          "sha256": "cae710d98c43f904826e31b1abf7c18cf78ccc6230ce3aeabfd680e5944dddb4",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/se-shadow.png",
+          "sha256": "f114de61c750e97def16deab6ea0406d9bd4b89722901fb7b58becb78c388369",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Scientist",
+      "state": "MOVE",
+      "facing": "SE",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Scientist|MOVE|SW",
+      "rulesetKey": "Great Scientist",
+      "category": "unit-clip",
+      "assetKey": "Great Scientist|MOVE|SW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-scientist/frames/move-sw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/se-color.png",
+          "sha256": "d81d411cb3d9709ba54e5c68929afdd0ca6af8f66a15635f5be627f3c2a31e60",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/se-nation.png",
+          "sha256": "cae710d98c43f904826e31b1abf7c18cf78ccc6230ce3aeabfd680e5944dddb4",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/se-shadow.png",
+          "sha256": "f114de61c750e97def16deab6ea0406d9bd4b89722901fb7b58becb78c388369",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Scientist",
+      "state": "MOVE",
+      "facing": "SW",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Scientist|MOVE|W",
+      "rulesetKey": "Great Scientist",
+      "category": "unit-clip",
+      "assetKey": "Great Scientist|MOVE|W",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-scientist/frames/move-w.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/e-color.png",
+          "sha256": "943e89cb32550a655f2894cf29cdde4d9032dcc1167f67b6d344a70ef1120ed2",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/e-nation.png",
+          "sha256": "08f313f3553189d1cd26a17545c4df08690ba5ad0533c77a0a7d5dcafdaa89b3",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/e-shadow.png",
+          "sha256": "728b7c99f35ee0ba7c91b1ed12e471e4fcdc21b6eee79443413ce54f4d8453c0",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Scientist",
+      "state": "MOVE",
+      "facing": "W",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Scientist|WORK|E",
+      "rulesetKey": "Great Scientist",
+      "category": "unit-clip",
+      "assetKey": "Great Scientist|WORK|E",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-scientist/frames/work-e.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/e-color.png",
+          "sha256": "943e89cb32550a655f2894cf29cdde4d9032dcc1167f67b6d344a70ef1120ed2",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/e-nation.png",
+          "sha256": "08f313f3553189d1cd26a17545c4df08690ba5ad0533c77a0a7d5dcafdaa89b3",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/e-shadow.png",
+          "sha256": "728b7c99f35ee0ba7c91b1ed12e471e4fcdc21b6eee79443413ce54f4d8453c0",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Scientist",
+      "state": "WORK",
+      "facing": "E",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Scientist|WORK|NE",
+      "rulesetKey": "Great Scientist",
+      "category": "unit-clip",
+      "assetKey": "Great Scientist|WORK|NE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-scientist/frames/work-ne.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/ne-color.png",
+          "sha256": "1461c0f42e848d8fc526b46713fb20cee31eae4af2e8ea81a709a56f8e61d79c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/ne-nation.png",
+          "sha256": "3c66f7d36af5d8fa6d2c520ed0cc135616300d7903a794ae82418ad3b7376c11",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/ne-shadow.png",
+          "sha256": "3c37800be474556b7c94717655cc896c90b40b28566279821e1b504e43836788",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Scientist",
+      "state": "WORK",
+      "facing": "NE",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Scientist|WORK|NW",
+      "rulesetKey": "Great Scientist",
+      "category": "unit-clip",
+      "assetKey": "Great Scientist|WORK|NW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-scientist/frames/work-nw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/ne-color.png",
+          "sha256": "1461c0f42e848d8fc526b46713fb20cee31eae4af2e8ea81a709a56f8e61d79c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/ne-nation.png",
+          "sha256": "3c66f7d36af5d8fa6d2c520ed0cc135616300d7903a794ae82418ad3b7376c11",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/ne-shadow.png",
+          "sha256": "3c37800be474556b7c94717655cc896c90b40b28566279821e1b504e43836788",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Scientist",
+      "state": "WORK",
+      "facing": "NW",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Scientist|WORK|SE",
+      "rulesetKey": "Great Scientist",
+      "category": "unit-clip",
+      "assetKey": "Great Scientist|WORK|SE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-scientist/frames/work-se.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/se-color.png",
+          "sha256": "d81d411cb3d9709ba54e5c68929afdd0ca6af8f66a15635f5be627f3c2a31e60",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/se-nation.png",
+          "sha256": "cae710d98c43f904826e31b1abf7c18cf78ccc6230ce3aeabfd680e5944dddb4",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/se-shadow.png",
+          "sha256": "f114de61c750e97def16deab6ea0406d9bd4b89722901fb7b58becb78c388369",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Scientist",
+      "state": "WORK",
+      "facing": "SE",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Scientist|WORK|SW",
+      "rulesetKey": "Great Scientist",
+      "category": "unit-clip",
+      "assetKey": "Great Scientist|WORK|SW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-scientist/frames/work-sw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/se-color.png",
+          "sha256": "d81d411cb3d9709ba54e5c68929afdd0ca6af8f66a15635f5be627f3c2a31e60",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/se-nation.png",
+          "sha256": "cae710d98c43f904826e31b1abf7c18cf78ccc6230ce3aeabfd680e5944dddb4",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/se-shadow.png",
+          "sha256": "f114de61c750e97def16deab6ea0406d9bd4b89722901fb7b58becb78c388369",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Scientist",
+      "state": "WORK",
+      "facing": "SW",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Scientist|WORK|W",
+      "rulesetKey": "Great Scientist",
+      "category": "unit-clip",
+      "assetKey": "Great Scientist|WORK|W",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-scientist/frames/work-w.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/e-color.png",
+          "sha256": "943e89cb32550a655f2894cf29cdde4d9032dcc1167f67b6d344a70ef1120ed2",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/e-nation.png",
+          "sha256": "08f313f3553189d1cd26a17545c4df08690ba5ad0533c77a0a7d5dcafdaa89b3",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-scientist/frames/e-shadow.png",
+          "sha256": "728b7c99f35ee0ba7c91b1ed12e471e4fcdc21b6eee79443413ce54f4d8453c0",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Scientist",
+      "state": "WORK",
+      "facing": "W",
+      "minimumFrames": 8
+    },
+    {
       "id": "unit-clip|Horseman|ATTACK|E",
       "rulesetKey": "Horseman",
       "category": "unit-clip",
@@ -6448,6 +8998,1296 @@
       "uniqueUnitIdentity": null,
       "unitName": "Horseman",
       "state": "MOVE",
+      "facing": "W",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Khan|DEFEAT|E",
+      "rulesetKey": "Khan",
+      "category": "unit-clip",
+      "assetKey": "Khan|DEFEAT|E",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/khan/frames/defeat-e.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/e-color.png",
+          "sha256": "7b602ce5bd4a41355d7b9d39e6a2f21735e4691c0bacc2d0930d8b0347d7e307",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/e-nation.png",
+          "sha256": "d85f0a2642fb484920b0b366e950ef8689b14416a0f93c6e413d9b51f50a3525",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/e-shadow.png",
+          "sha256": "59d5b45a64b4e380d82a53f13df31b5d3cef42ab0591cc8a984b35a6663b11cf",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": "Mongolia",
+      "replaces": "Great General",
+      "uniqueUnitIdentity": "Khan",
+      "unitName": "Khan",
+      "state": "DEFEAT",
+      "facing": "E",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Khan|DEFEAT|NE",
+      "rulesetKey": "Khan",
+      "category": "unit-clip",
+      "assetKey": "Khan|DEFEAT|NE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/khan/frames/defeat-ne.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/ne-color.png",
+          "sha256": "bf4268b58efb30bb0ab4c9f9d92fd094b93919453165924aa3acd14cbf6cf8cf",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/ne-nation.png",
+          "sha256": "709462e4e37d2a0844283ecb89aff77dc6621c62d066597dcd96f8fb15aecee2",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/ne-shadow.png",
+          "sha256": "5babefdbc3d3833ba7f7bf70004bbac669945785217df7abc76c1a0d787a240e",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": "Mongolia",
+      "replaces": "Great General",
+      "uniqueUnitIdentity": "Khan",
+      "unitName": "Khan",
+      "state": "DEFEAT",
+      "facing": "NE",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Khan|DEFEAT|NW",
+      "rulesetKey": "Khan",
+      "category": "unit-clip",
+      "assetKey": "Khan|DEFEAT|NW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/khan/frames/defeat-nw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/ne-color.png",
+          "sha256": "bf4268b58efb30bb0ab4c9f9d92fd094b93919453165924aa3acd14cbf6cf8cf",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/ne-nation.png",
+          "sha256": "709462e4e37d2a0844283ecb89aff77dc6621c62d066597dcd96f8fb15aecee2",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/ne-shadow.png",
+          "sha256": "5babefdbc3d3833ba7f7bf70004bbac669945785217df7abc76c1a0d787a240e",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": "Mongolia",
+      "replaces": "Great General",
+      "uniqueUnitIdentity": "Khan",
+      "unitName": "Khan",
+      "state": "DEFEAT",
+      "facing": "NW",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Khan|DEFEAT|SE",
+      "rulesetKey": "Khan",
+      "category": "unit-clip",
+      "assetKey": "Khan|DEFEAT|SE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/khan/frames/defeat-se.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/se-color.png",
+          "sha256": "f77c73c099714d393d36eb77b0f6590527f7f8b7ec36d2d1709416868d8fe106",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/se-nation.png",
+          "sha256": "2db910e28ebf549465a325d376fda5f3f97b4217043e9b0fcb55cfa8ed1b4cb1",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/se-shadow.png",
+          "sha256": "14ffcceaffc0cf49766b0368b0c00948bcaca74cd3c36e1d940c4ddd4e109506",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": "Mongolia",
+      "replaces": "Great General",
+      "uniqueUnitIdentity": "Khan",
+      "unitName": "Khan",
+      "state": "DEFEAT",
+      "facing": "SE",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Khan|DEFEAT|SW",
+      "rulesetKey": "Khan",
+      "category": "unit-clip",
+      "assetKey": "Khan|DEFEAT|SW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/khan/frames/defeat-sw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/se-color.png",
+          "sha256": "f77c73c099714d393d36eb77b0f6590527f7f8b7ec36d2d1709416868d8fe106",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/se-nation.png",
+          "sha256": "2db910e28ebf549465a325d376fda5f3f97b4217043e9b0fcb55cfa8ed1b4cb1",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/se-shadow.png",
+          "sha256": "14ffcceaffc0cf49766b0368b0c00948bcaca74cd3c36e1d940c4ddd4e109506",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": "Mongolia",
+      "replaces": "Great General",
+      "uniqueUnitIdentity": "Khan",
+      "unitName": "Khan",
+      "state": "DEFEAT",
+      "facing": "SW",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Khan|DEFEAT|W",
+      "rulesetKey": "Khan",
+      "category": "unit-clip",
+      "assetKey": "Khan|DEFEAT|W",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/khan/frames/defeat-w.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/e-color.png",
+          "sha256": "7b602ce5bd4a41355d7b9d39e6a2f21735e4691c0bacc2d0930d8b0347d7e307",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/e-nation.png",
+          "sha256": "d85f0a2642fb484920b0b366e950ef8689b14416a0f93c6e413d9b51f50a3525",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/e-shadow.png",
+          "sha256": "59d5b45a64b4e380d82a53f13df31b5d3cef42ab0591cc8a984b35a6663b11cf",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": "Mongolia",
+      "replaces": "Great General",
+      "uniqueUnitIdentity": "Khan",
+      "unitName": "Khan",
+      "state": "DEFEAT",
+      "facing": "W",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Khan|HIT|E",
+      "rulesetKey": "Khan",
+      "category": "unit-clip",
+      "assetKey": "Khan|HIT|E",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/khan/frames/hit-e.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/e-color.png",
+          "sha256": "7b602ce5bd4a41355d7b9d39e6a2f21735e4691c0bacc2d0930d8b0347d7e307",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/e-nation.png",
+          "sha256": "d85f0a2642fb484920b0b366e950ef8689b14416a0f93c6e413d9b51f50a3525",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/e-shadow.png",
+          "sha256": "59d5b45a64b4e380d82a53f13df31b5d3cef42ab0591cc8a984b35a6663b11cf",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": "Mongolia",
+      "replaces": "Great General",
+      "uniqueUnitIdentity": "Khan",
+      "unitName": "Khan",
+      "state": "HIT",
+      "facing": "E",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Khan|HIT|NE",
+      "rulesetKey": "Khan",
+      "category": "unit-clip",
+      "assetKey": "Khan|HIT|NE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/khan/frames/hit-ne.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/ne-color.png",
+          "sha256": "bf4268b58efb30bb0ab4c9f9d92fd094b93919453165924aa3acd14cbf6cf8cf",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/ne-nation.png",
+          "sha256": "709462e4e37d2a0844283ecb89aff77dc6621c62d066597dcd96f8fb15aecee2",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/ne-shadow.png",
+          "sha256": "5babefdbc3d3833ba7f7bf70004bbac669945785217df7abc76c1a0d787a240e",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": "Mongolia",
+      "replaces": "Great General",
+      "uniqueUnitIdentity": "Khan",
+      "unitName": "Khan",
+      "state": "HIT",
+      "facing": "NE",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Khan|HIT|NW",
+      "rulesetKey": "Khan",
+      "category": "unit-clip",
+      "assetKey": "Khan|HIT|NW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/khan/frames/hit-nw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/ne-color.png",
+          "sha256": "bf4268b58efb30bb0ab4c9f9d92fd094b93919453165924aa3acd14cbf6cf8cf",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/ne-nation.png",
+          "sha256": "709462e4e37d2a0844283ecb89aff77dc6621c62d066597dcd96f8fb15aecee2",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/ne-shadow.png",
+          "sha256": "5babefdbc3d3833ba7f7bf70004bbac669945785217df7abc76c1a0d787a240e",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": "Mongolia",
+      "replaces": "Great General",
+      "uniqueUnitIdentity": "Khan",
+      "unitName": "Khan",
+      "state": "HIT",
+      "facing": "NW",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Khan|HIT|SE",
+      "rulesetKey": "Khan",
+      "category": "unit-clip",
+      "assetKey": "Khan|HIT|SE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/khan/frames/hit-se.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/se-color.png",
+          "sha256": "f77c73c099714d393d36eb77b0f6590527f7f8b7ec36d2d1709416868d8fe106",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/se-nation.png",
+          "sha256": "2db910e28ebf549465a325d376fda5f3f97b4217043e9b0fcb55cfa8ed1b4cb1",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/se-shadow.png",
+          "sha256": "14ffcceaffc0cf49766b0368b0c00948bcaca74cd3c36e1d940c4ddd4e109506",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": "Mongolia",
+      "replaces": "Great General",
+      "uniqueUnitIdentity": "Khan",
+      "unitName": "Khan",
+      "state": "HIT",
+      "facing": "SE",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Khan|HIT|SW",
+      "rulesetKey": "Khan",
+      "category": "unit-clip",
+      "assetKey": "Khan|HIT|SW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/khan/frames/hit-sw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/se-color.png",
+          "sha256": "f77c73c099714d393d36eb77b0f6590527f7f8b7ec36d2d1709416868d8fe106",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/se-nation.png",
+          "sha256": "2db910e28ebf549465a325d376fda5f3f97b4217043e9b0fcb55cfa8ed1b4cb1",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/se-shadow.png",
+          "sha256": "14ffcceaffc0cf49766b0368b0c00948bcaca74cd3c36e1d940c4ddd4e109506",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": "Mongolia",
+      "replaces": "Great General",
+      "uniqueUnitIdentity": "Khan",
+      "unitName": "Khan",
+      "state": "HIT",
+      "facing": "SW",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Khan|HIT|W",
+      "rulesetKey": "Khan",
+      "category": "unit-clip",
+      "assetKey": "Khan|HIT|W",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/khan/frames/hit-w.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/e-color.png",
+          "sha256": "7b602ce5bd4a41355d7b9d39e6a2f21735e4691c0bacc2d0930d8b0347d7e307",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/e-nation.png",
+          "sha256": "d85f0a2642fb484920b0b366e950ef8689b14416a0f93c6e413d9b51f50a3525",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/e-shadow.png",
+          "sha256": "59d5b45a64b4e380d82a53f13df31b5d3cef42ab0591cc8a984b35a6663b11cf",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": "Mongolia",
+      "replaces": "Great General",
+      "uniqueUnitIdentity": "Khan",
+      "unitName": "Khan",
+      "state": "HIT",
+      "facing": "W",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Khan|IDLE|E",
+      "rulesetKey": "Khan",
+      "category": "unit-clip",
+      "assetKey": "Khan|IDLE|E",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/khan/frames/idle-e.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/e-color.png",
+          "sha256": "7b602ce5bd4a41355d7b9d39e6a2f21735e4691c0bacc2d0930d8b0347d7e307",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/e-nation.png",
+          "sha256": "d85f0a2642fb484920b0b366e950ef8689b14416a0f93c6e413d9b51f50a3525",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/e-shadow.png",
+          "sha256": "59d5b45a64b4e380d82a53f13df31b5d3cef42ab0591cc8a984b35a6663b11cf",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": "Mongolia",
+      "replaces": "Great General",
+      "uniqueUnitIdentity": "Khan",
+      "unitName": "Khan",
+      "state": "IDLE",
+      "facing": "E",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Khan|IDLE|NE",
+      "rulesetKey": "Khan",
+      "category": "unit-clip",
+      "assetKey": "Khan|IDLE|NE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/khan/frames/idle-ne.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/ne-color.png",
+          "sha256": "bf4268b58efb30bb0ab4c9f9d92fd094b93919453165924aa3acd14cbf6cf8cf",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/ne-nation.png",
+          "sha256": "709462e4e37d2a0844283ecb89aff77dc6621c62d066597dcd96f8fb15aecee2",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/ne-shadow.png",
+          "sha256": "5babefdbc3d3833ba7f7bf70004bbac669945785217df7abc76c1a0d787a240e",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": "Mongolia",
+      "replaces": "Great General",
+      "uniqueUnitIdentity": "Khan",
+      "unitName": "Khan",
+      "state": "IDLE",
+      "facing": "NE",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Khan|IDLE|NW",
+      "rulesetKey": "Khan",
+      "category": "unit-clip",
+      "assetKey": "Khan|IDLE|NW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/khan/frames/idle-nw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/ne-color.png",
+          "sha256": "bf4268b58efb30bb0ab4c9f9d92fd094b93919453165924aa3acd14cbf6cf8cf",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/ne-nation.png",
+          "sha256": "709462e4e37d2a0844283ecb89aff77dc6621c62d066597dcd96f8fb15aecee2",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/ne-shadow.png",
+          "sha256": "5babefdbc3d3833ba7f7bf70004bbac669945785217df7abc76c1a0d787a240e",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": "Mongolia",
+      "replaces": "Great General",
+      "uniqueUnitIdentity": "Khan",
+      "unitName": "Khan",
+      "state": "IDLE",
+      "facing": "NW",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Khan|IDLE|SE",
+      "rulesetKey": "Khan",
+      "category": "unit-clip",
+      "assetKey": "Khan|IDLE|SE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/khan/frames/idle-se.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/se-color.png",
+          "sha256": "f77c73c099714d393d36eb77b0f6590527f7f8b7ec36d2d1709416868d8fe106",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/se-nation.png",
+          "sha256": "2db910e28ebf549465a325d376fda5f3f97b4217043e9b0fcb55cfa8ed1b4cb1",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/se-shadow.png",
+          "sha256": "14ffcceaffc0cf49766b0368b0c00948bcaca74cd3c36e1d940c4ddd4e109506",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": "Mongolia",
+      "replaces": "Great General",
+      "uniqueUnitIdentity": "Khan",
+      "unitName": "Khan",
+      "state": "IDLE",
+      "facing": "SE",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Khan|IDLE|SW",
+      "rulesetKey": "Khan",
+      "category": "unit-clip",
+      "assetKey": "Khan|IDLE|SW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/khan/frames/idle-sw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/se-color.png",
+          "sha256": "f77c73c099714d393d36eb77b0f6590527f7f8b7ec36d2d1709416868d8fe106",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/se-nation.png",
+          "sha256": "2db910e28ebf549465a325d376fda5f3f97b4217043e9b0fcb55cfa8ed1b4cb1",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/se-shadow.png",
+          "sha256": "14ffcceaffc0cf49766b0368b0c00948bcaca74cd3c36e1d940c4ddd4e109506",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": "Mongolia",
+      "replaces": "Great General",
+      "uniqueUnitIdentity": "Khan",
+      "unitName": "Khan",
+      "state": "IDLE",
+      "facing": "SW",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Khan|IDLE|W",
+      "rulesetKey": "Khan",
+      "category": "unit-clip",
+      "assetKey": "Khan|IDLE|W",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/khan/frames/idle-w.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/e-color.png",
+          "sha256": "7b602ce5bd4a41355d7b9d39e6a2f21735e4691c0bacc2d0930d8b0347d7e307",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/e-nation.png",
+          "sha256": "d85f0a2642fb484920b0b366e950ef8689b14416a0f93c6e413d9b51f50a3525",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/e-shadow.png",
+          "sha256": "59d5b45a64b4e380d82a53f13df31b5d3cef42ab0591cc8a984b35a6663b11cf",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": "Mongolia",
+      "replaces": "Great General",
+      "uniqueUnitIdentity": "Khan",
+      "unitName": "Khan",
+      "state": "IDLE",
+      "facing": "W",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Khan|MOVE|E",
+      "rulesetKey": "Khan",
+      "category": "unit-clip",
+      "assetKey": "Khan|MOVE|E",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/khan/frames/move-e.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/e-color.png",
+          "sha256": "7b602ce5bd4a41355d7b9d39e6a2f21735e4691c0bacc2d0930d8b0347d7e307",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/e-nation.png",
+          "sha256": "d85f0a2642fb484920b0b366e950ef8689b14416a0f93c6e413d9b51f50a3525",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/e-shadow.png",
+          "sha256": "59d5b45a64b4e380d82a53f13df31b5d3cef42ab0591cc8a984b35a6663b11cf",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": "Mongolia",
+      "replaces": "Great General",
+      "uniqueUnitIdentity": "Khan",
+      "unitName": "Khan",
+      "state": "MOVE",
+      "facing": "E",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Khan|MOVE|NE",
+      "rulesetKey": "Khan",
+      "category": "unit-clip",
+      "assetKey": "Khan|MOVE|NE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/khan/frames/move-ne.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/ne-color.png",
+          "sha256": "bf4268b58efb30bb0ab4c9f9d92fd094b93919453165924aa3acd14cbf6cf8cf",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/ne-nation.png",
+          "sha256": "709462e4e37d2a0844283ecb89aff77dc6621c62d066597dcd96f8fb15aecee2",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/ne-shadow.png",
+          "sha256": "5babefdbc3d3833ba7f7bf70004bbac669945785217df7abc76c1a0d787a240e",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": "Mongolia",
+      "replaces": "Great General",
+      "uniqueUnitIdentity": "Khan",
+      "unitName": "Khan",
+      "state": "MOVE",
+      "facing": "NE",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Khan|MOVE|NW",
+      "rulesetKey": "Khan",
+      "category": "unit-clip",
+      "assetKey": "Khan|MOVE|NW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/khan/frames/move-nw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/ne-color.png",
+          "sha256": "bf4268b58efb30bb0ab4c9f9d92fd094b93919453165924aa3acd14cbf6cf8cf",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/ne-nation.png",
+          "sha256": "709462e4e37d2a0844283ecb89aff77dc6621c62d066597dcd96f8fb15aecee2",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/ne-shadow.png",
+          "sha256": "5babefdbc3d3833ba7f7bf70004bbac669945785217df7abc76c1a0d787a240e",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": "Mongolia",
+      "replaces": "Great General",
+      "uniqueUnitIdentity": "Khan",
+      "unitName": "Khan",
+      "state": "MOVE",
+      "facing": "NW",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Khan|MOVE|SE",
+      "rulesetKey": "Khan",
+      "category": "unit-clip",
+      "assetKey": "Khan|MOVE|SE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/khan/frames/move-se.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/se-color.png",
+          "sha256": "f77c73c099714d393d36eb77b0f6590527f7f8b7ec36d2d1709416868d8fe106",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/se-nation.png",
+          "sha256": "2db910e28ebf549465a325d376fda5f3f97b4217043e9b0fcb55cfa8ed1b4cb1",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/se-shadow.png",
+          "sha256": "14ffcceaffc0cf49766b0368b0c00948bcaca74cd3c36e1d940c4ddd4e109506",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": "Mongolia",
+      "replaces": "Great General",
+      "uniqueUnitIdentity": "Khan",
+      "unitName": "Khan",
+      "state": "MOVE",
+      "facing": "SE",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Khan|MOVE|SW",
+      "rulesetKey": "Khan",
+      "category": "unit-clip",
+      "assetKey": "Khan|MOVE|SW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/khan/frames/move-sw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/se-color.png",
+          "sha256": "f77c73c099714d393d36eb77b0f6590527f7f8b7ec36d2d1709416868d8fe106",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/se-nation.png",
+          "sha256": "2db910e28ebf549465a325d376fda5f3f97b4217043e9b0fcb55cfa8ed1b4cb1",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/se-shadow.png",
+          "sha256": "14ffcceaffc0cf49766b0368b0c00948bcaca74cd3c36e1d940c4ddd4e109506",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": "Mongolia",
+      "replaces": "Great General",
+      "uniqueUnitIdentity": "Khan",
+      "unitName": "Khan",
+      "state": "MOVE",
+      "facing": "SW",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Khan|MOVE|W",
+      "rulesetKey": "Khan",
+      "category": "unit-clip",
+      "assetKey": "Khan|MOVE|W",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/khan/frames/move-w.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/e-color.png",
+          "sha256": "7b602ce5bd4a41355d7b9d39e6a2f21735e4691c0bacc2d0930d8b0347d7e307",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/e-nation.png",
+          "sha256": "d85f0a2642fb484920b0b366e950ef8689b14416a0f93c6e413d9b51f50a3525",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/e-shadow.png",
+          "sha256": "59d5b45a64b4e380d82a53f13df31b5d3cef42ab0591cc8a984b35a6663b11cf",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": "Mongolia",
+      "replaces": "Great General",
+      "uniqueUnitIdentity": "Khan",
+      "unitName": "Khan",
+      "state": "MOVE",
+      "facing": "W",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Khan|WORK|E",
+      "rulesetKey": "Khan",
+      "category": "unit-clip",
+      "assetKey": "Khan|WORK|E",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/khan/frames/work-e.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/e-color.png",
+          "sha256": "7b602ce5bd4a41355d7b9d39e6a2f21735e4691c0bacc2d0930d8b0347d7e307",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/e-nation.png",
+          "sha256": "d85f0a2642fb484920b0b366e950ef8689b14416a0f93c6e413d9b51f50a3525",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/e-shadow.png",
+          "sha256": "59d5b45a64b4e380d82a53f13df31b5d3cef42ab0591cc8a984b35a6663b11cf",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": "Mongolia",
+      "replaces": "Great General",
+      "uniqueUnitIdentity": "Khan",
+      "unitName": "Khan",
+      "state": "WORK",
+      "facing": "E",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Khan|WORK|NE",
+      "rulesetKey": "Khan",
+      "category": "unit-clip",
+      "assetKey": "Khan|WORK|NE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/khan/frames/work-ne.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/ne-color.png",
+          "sha256": "bf4268b58efb30bb0ab4c9f9d92fd094b93919453165924aa3acd14cbf6cf8cf",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/ne-nation.png",
+          "sha256": "709462e4e37d2a0844283ecb89aff77dc6621c62d066597dcd96f8fb15aecee2",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/ne-shadow.png",
+          "sha256": "5babefdbc3d3833ba7f7bf70004bbac669945785217df7abc76c1a0d787a240e",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": "Mongolia",
+      "replaces": "Great General",
+      "uniqueUnitIdentity": "Khan",
+      "unitName": "Khan",
+      "state": "WORK",
+      "facing": "NE",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Khan|WORK|NW",
+      "rulesetKey": "Khan",
+      "category": "unit-clip",
+      "assetKey": "Khan|WORK|NW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/khan/frames/work-nw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/ne-color.png",
+          "sha256": "bf4268b58efb30bb0ab4c9f9d92fd094b93919453165924aa3acd14cbf6cf8cf",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/ne-nation.png",
+          "sha256": "709462e4e37d2a0844283ecb89aff77dc6621c62d066597dcd96f8fb15aecee2",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/ne-shadow.png",
+          "sha256": "5babefdbc3d3833ba7f7bf70004bbac669945785217df7abc76c1a0d787a240e",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": "Mongolia",
+      "replaces": "Great General",
+      "uniqueUnitIdentity": "Khan",
+      "unitName": "Khan",
+      "state": "WORK",
+      "facing": "NW",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Khan|WORK|SE",
+      "rulesetKey": "Khan",
+      "category": "unit-clip",
+      "assetKey": "Khan|WORK|SE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/khan/frames/work-se.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/se-color.png",
+          "sha256": "f77c73c099714d393d36eb77b0f6590527f7f8b7ec36d2d1709416868d8fe106",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/se-nation.png",
+          "sha256": "2db910e28ebf549465a325d376fda5f3f97b4217043e9b0fcb55cfa8ed1b4cb1",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/se-shadow.png",
+          "sha256": "14ffcceaffc0cf49766b0368b0c00948bcaca74cd3c36e1d940c4ddd4e109506",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": "Mongolia",
+      "replaces": "Great General",
+      "uniqueUnitIdentity": "Khan",
+      "unitName": "Khan",
+      "state": "WORK",
+      "facing": "SE",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Khan|WORK|SW",
+      "rulesetKey": "Khan",
+      "category": "unit-clip",
+      "assetKey": "Khan|WORK|SW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/khan/frames/work-sw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/se-color.png",
+          "sha256": "f77c73c099714d393d36eb77b0f6590527f7f8b7ec36d2d1709416868d8fe106",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/se-nation.png",
+          "sha256": "2db910e28ebf549465a325d376fda5f3f97b4217043e9b0fcb55cfa8ed1b4cb1",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/se-shadow.png",
+          "sha256": "14ffcceaffc0cf49766b0368b0c00948bcaca74cd3c36e1d940c4ddd4e109506",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": "Mongolia",
+      "replaces": "Great General",
+      "uniqueUnitIdentity": "Khan",
+      "unitName": "Khan",
+      "state": "WORK",
+      "facing": "SW",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Khan|WORK|W",
+      "rulesetKey": "Khan",
+      "category": "unit-clip",
+      "assetKey": "Khan|WORK|W",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/khan/frames/work-w.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/e-color.png",
+          "sha256": "7b602ce5bd4a41355d7b9d39e6a2f21735e4691c0bacc2d0930d8b0347d7e307",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/e-nation.png",
+          "sha256": "d85f0a2642fb484920b0b366e950ef8689b14416a0f93c6e413d9b51f50a3525",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/khan/frames/e-shadow.png",
+          "sha256": "59d5b45a64b4e380d82a53f13df31b5d3cef42ab0591cc8a984b35a6663b11cf",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": "Mongolia",
+      "replaces": "Great General",
+      "uniqueUnitIdentity": "Khan",
+      "unitName": "Khan",
+      "state": "WORK",
       "facing": "W",
       "minimumFrames": 8
     },
@@ -13030,6 +16870,69 @@
       "uniqueUnitIdentity": null
     },
     {
+      "id": "unit-static|TileSets/AtlasUnits/Units/Great Prophet",
+      "rulesetKey": "Great Prophet",
+      "category": "unit-static",
+      "assetKey": "TileSets/AtlasUnits/Units/Great Prophet",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Great Prophet.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Great Prophet.png",
+          "sha256": "0442e82d138fc9f5acfa97f4bb924355cf6dfba0e046fc819bd0283e519ab947",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Great Prophet-1.png",
+          "sha256": "8ad5c48295be108d4583693090c3f10f016b2ea343cbe2b7afbb92f7e903244f",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null
+    },
+    {
+      "id": "unit-static|TileSets/AtlasUnits/Units/Great Scientist",
+      "rulesetKey": "Great Scientist",
+      "category": "unit-static",
+      "assetKey": "TileSets/AtlasUnits/Units/Great Scientist",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Great Scientist.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Great Scientist.png",
+          "sha256": "a81890f46fd7ac73ded5d566498681bef4ded19d391194f610b1f28a09302b09",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Great Scientist-1.png",
+          "sha256": "def17bcc163fa4fc1cb7ee643605e089dc6df9751a8437fda9b199e609e85801",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null
+    },
+    {
       "id": "unit-static|TileSets/AtlasUnits/Units/Horseman",
       "rulesetKey": "Horseman",
       "category": "unit-static",
@@ -13060,6 +16963,38 @@
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null
+    },
+    {
+      "id": "unit-static|TileSets/AtlasUnits/Units/Khan",
+      "rulesetKey": "Khan",
+      "category": "unit-static",
+      "assetKey": "TileSets/AtlasUnits/Units/Khan",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Khan.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Khan.png",
+          "sha256": "ad55558951638f7d5e5b5a7f9a0443f623224b4f06a21885d881b87f54e4ab76",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Khan-1.png",
+          "sha256": "eaf5556c63489a920c2c12727d3ab8621c1d5da38028ca9d864d716b28376eb5",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": "Mongolia",
+      "replaces": "Great General",
+      "uniqueUnitIdentity": "Khan"
     },
     {
       "id": "unit-static|TileSets/AtlasUnits/Units/Rifleman",

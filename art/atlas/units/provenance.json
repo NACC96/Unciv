@@ -86,6 +86,48 @@
       }
     },
     {
+      "assetId": "great-prophet",
+      "creator": "OpenAI image generation",
+      "source": "art/atlas/units/great-prophet/creation-record.json",
+      "promptPath": "art/atlas/units/great-prophet/prompts/e-v1.txt",
+      "rights": "original-generated",
+      "sourceHash": "cb33ae33c99a15728e999db22bb31bec77583accc2f0ee8f4f6a06f12f8e0f21",
+      "outputHashes": {
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Great Prophet-1.png": "8ad5c48295be108d4583693090c3f10f016b2ea343cbe2b7afbb92f7e903244f",
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Great Prophet.png": "0442e82d138fc9f5acfa97f4bb924355cf6dfba0e046fc819bd0283e519ab947",
+        "art/atlas/units/great-prophet/frames/e-color.png": "da8701173d65b580b643844c2d1ebc8e17c80724782db7aff6ee212c0673a4e6",
+        "art/atlas/units/great-prophet/frames/e-nation.png": "fd6c34ae899e44ce379d7b9b911093a391ff7566abbaff0042adde21fdaa5c7f",
+        "art/atlas/units/great-prophet/frames/e-shadow.png": "3db2b41208b17aae126e2e96bc1f0a6f5937500b85ff19cd58e65ddc77281e71",
+        "art/atlas/units/great-prophet/frames/ne-color.png": "e20145577416de6678a607ad51d785b93137ab851ada38f3a121245f0ec985d7",
+        "art/atlas/units/great-prophet/frames/ne-nation.png": "defa093d5750849871aee0573973ac6f560e20a2453128db38c62cc8dd3ba9bd",
+        "art/atlas/units/great-prophet/frames/ne-shadow.png": "ce1c93ab3fb9c095e81142f9ddef06f0b771502ecbc52f4581d098ee4b8b7d5a",
+        "art/atlas/units/great-prophet/frames/se-color.png": "34469ade2621f7e08453d7cec278fb658c895b267ee3908f39478edb117f65c7",
+        "art/atlas/units/great-prophet/frames/se-nation.png": "ff06ffb47477f2810044119d5e36d1cfe501a0ae87da6c5842c67f68fe2b2ee8",
+        "art/atlas/units/great-prophet/frames/se-shadow.png": "f32703954b4a31482405cb6f7bfb6d8bb26d14fddbba3d2ea75171989fb0173e"
+      }
+    },
+    {
+      "assetId": "great-scientist",
+      "creator": "OpenAI image generation",
+      "source": "art/atlas/units/great-scientist/creation-record.json",
+      "promptPath": "art/atlas/units/great-scientist/prompts/e-v1.txt",
+      "rights": "original-generated",
+      "sourceHash": "1a2700c6eefdaab4cecd3e74331029124b040517e4ea86c0ad06094ebfb3ddef",
+      "outputHashes": {
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Great Scientist-1.png": "def17bcc163fa4fc1cb7ee643605e089dc6df9751a8437fda9b199e609e85801",
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Great Scientist.png": "a81890f46fd7ac73ded5d566498681bef4ded19d391194f610b1f28a09302b09",
+        "art/atlas/units/great-scientist/frames/e-color.png": "943e89cb32550a655f2894cf29cdde4d9032dcc1167f67b6d344a70ef1120ed2",
+        "art/atlas/units/great-scientist/frames/e-nation.png": "08f313f3553189d1cd26a17545c4df08690ba5ad0533c77a0a7d5dcafdaa89b3",
+        "art/atlas/units/great-scientist/frames/e-shadow.png": "728b7c99f35ee0ba7c91b1ed12e471e4fcdc21b6eee79443413ce54f4d8453c0",
+        "art/atlas/units/great-scientist/frames/ne-color.png": "1461c0f42e848d8fc526b46713fb20cee31eae4af2e8ea81a709a56f8e61d79c",
+        "art/atlas/units/great-scientist/frames/ne-nation.png": "3c66f7d36af5d8fa6d2c520ed0cc135616300d7903a794ae82418ad3b7376c11",
+        "art/atlas/units/great-scientist/frames/ne-shadow.png": "3c37800be474556b7c94717655cc896c90b40b28566279821e1b504e43836788",
+        "art/atlas/units/great-scientist/frames/se-color.png": "d81d411cb3d9709ba54e5c68929afdd0ca6af8f66a15635f5be627f3c2a31e60",
+        "art/atlas/units/great-scientist/frames/se-nation.png": "cae710d98c43f904826e31b1abf7c18cf78ccc6230ce3aeabfd680e5944dddb4",
+        "art/atlas/units/great-scientist/frames/se-shadow.png": "f114de61c750e97def16deab6ea0406d9bd4b89722901fb7b58becb78c388369"
+      }
+    },
+    {
       "assetId": "horseman",
       "creator": "OpenAI image generation",
       "source": "art/atlas/units/horseman/creation-record.json",
@@ -104,6 +146,27 @@
         "art/atlas/units/horseman/frames/se-color.png": "81798dc716cb45b21d091f393c8825883f52553f019daa31ce84dc1128ac4c11",
         "art/atlas/units/horseman/frames/se-nation.png": "1b8f832a7bdbe2848b4a5c27f76ecfe3acea6217069794e7babed5c0dbb9716d",
         "art/atlas/units/horseman/frames/se-shadow.png": "1ec174fb8ef04d734c71bd28f3a2a8c98e37ab071921f62d5bcdb2f99e13a1b3"
+      }
+    },
+    {
+      "assetId": "khan",
+      "creator": "OpenAI image generation",
+      "source": "art/atlas/units/khan/creation-record.json",
+      "promptPath": "art/atlas/units/khan/prompts/e-v1.txt",
+      "rights": "original-generated",
+      "sourceHash": "ac130863a15e83d9848c744308e38057c902ddd246da4f72022bdb9a988a783c",
+      "outputHashes": {
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Khan-1.png": "eaf5556c63489a920c2c12727d3ab8621c1d5da38028ca9d864d716b28376eb5",
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Khan.png": "ad55558951638f7d5e5b5a7f9a0443f623224b4f06a21885d881b87f54e4ab76",
+        "art/atlas/units/khan/frames/e-color.png": "7b602ce5bd4a41355d7b9d39e6a2f21735e4691c0bacc2d0930d8b0347d7e307",
+        "art/atlas/units/khan/frames/e-nation.png": "d85f0a2642fb484920b0b366e950ef8689b14416a0f93c6e413d9b51f50a3525",
+        "art/atlas/units/khan/frames/e-shadow.png": "59d5b45a64b4e380d82a53f13df31b5d3cef42ab0591cc8a984b35a6663b11cf",
+        "art/atlas/units/khan/frames/ne-color.png": "bf4268b58efb30bb0ab4c9f9d92fd094b93919453165924aa3acd14cbf6cf8cf",
+        "art/atlas/units/khan/frames/ne-nation.png": "709462e4e37d2a0844283ecb89aff77dc6621c62d066597dcd96f8fb15aecee2",
+        "art/atlas/units/khan/frames/ne-shadow.png": "5babefdbc3d3833ba7f7bf70004bbac669945785217df7abc76c1a0d787a240e",
+        "art/atlas/units/khan/frames/se-color.png": "f77c73c099714d393d36eb77b0f6590527f7f8b7ec36d2d1709416868d8fe106",
+        "art/atlas/units/khan/frames/se-nation.png": "2db910e28ebf549465a325d376fda5f3f97b4217043e9b0fcb55cfa8ed1b4cb1",
+        "art/atlas/units/khan/frames/se-shadow.png": "14ffcceaffc0cf49766b0368b0c00948bcaca74cd3c36e1d940c4ddd4e109506"
       }
     },
     {
