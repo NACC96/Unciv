@@ -4,6 +4,10 @@ import com.unciv.logic.agents.RespondTradeCommand
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.ui.Table
+import com.unciv.ui.components.GameUiStyle
+import com.unciv.ui.screens.diplomacyscreen.TradeTermsView
+import com.unciv.ui.screens.diplomacyscreen.ProposalStatusView
+import com.unciv.ui.screens.diplomacyscreen.ProposalDisplayState
 import com.unciv.UncivGame
 import com.unciv.logic.civilization.NotificationCategory
 import com.unciv.logic.civilization.NotificationIcon
@@ -67,7 +71,19 @@ class TradePopup(private val worldScreen: WorldScreen) : Popup(worldScreen) {
             return tradeText
         }
 
-        for (i in 0..max(trade.theirOffers.lastIndex, trade.ourOffers.lastIndex)) {
+        if (GameUiStyle.isAtlas) {
+            tradeOffersTable.clear()
+            val availableWidth = (worldScreen.stage.width * 0.9f - 48f).coerceAtLeast(120f)
+            val stacked = worldScreen.stage.width < 760f
+            val columnWidth = if (stacked) availableWidth else availableWidth / 2f - 12f
+            tradeOffersTable.add(ProposalStatusView.render(ProposalDisplayState.PENDING, null,
+                "They'll decide on their turn")).colspan(if (stacked) 1 else 2).growX().minWidth(0f).row()
+            tradeOffersTable.add(TradeTermsView.render(nation.name, trade.theirOffers, ::getOfferText))
+                .width(columnWidth).minWidth(0f).top()
+            if (stacked) tradeOffersTable.row()
+            tradeOffersTable.add(TradeTermsView.render(viewingCiv.civName, trade.ourOffers, ::getOfferText))
+                .width(columnWidth).minWidth(0f).top()
+        } else for (i in 0..max(trade.theirOffers.lastIndex, trade.ourOffers.lastIndex)) {
             if (trade.theirOffers.lastIndex < i) tradeOffersTable.add()
             else tradeOffersTable.add(getOfferText(trade.theirOffers[i]).toLabel())
             tradeOffersTable.add()
@@ -135,6 +151,17 @@ class TradePopup(private val worldScreen: WorldScreen) : Popup(worldScreen) {
             }
             worldScreen.shouldUpdate = true
         }.row()
+        if (GameUiStyle.isAtlas) {
+            GameUiStyle.applyWidget(this)
+            bottomTable.background = GameUiStyle.panelBackground("Atlas/Trade/ResponseActions", 1f)
+            for (cell in bottomTable.cells) {
+                val button = cell.actor as? com.badlogic.gdx.scenes.scene2d.ui.TextButton ?: continue
+                button.label.wrap = true
+                cell.minWidth(0f).minHeight(GameUiStyle.standardControlHeight).growX()
+            }
+            (bottomTable.cells.firstOrNull()?.actor as? com.badlogic.gdx.scenes.scene2d.ui.TextButton)
+                ?.let { GameUiStyle.apply(it, primary = true) }
+        }
     }
 
     override fun close() {
@@ -146,7 +173,8 @@ class TradePopup(private val worldScreen: WorldScreen) : Popup(worldScreen) {
         init {
             add(leaderIntroTable)
             addSeparator().padBottom(15f)
-            addGoodSizedLabel("Excellent!").row()
+            if (GameUiStyle.isAtlas) add(ProposalStatusView.render(ProposalDisplayState.ACCEPTED, null, "Excellent!")).growX().minWidth(0f).row()
+            else addGoodSizedLabel("Excellent!").row()
             addCloseButton("Farewell.", KeyCharAndCode.SPACE) {
                 worldScreen.shouldUpdate = true
                 // in all cases, worldScreen.shouldUpdate should be set to true when we remove the last of the popups

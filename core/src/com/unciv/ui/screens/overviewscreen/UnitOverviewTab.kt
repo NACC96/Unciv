@@ -5,6 +5,11 @@ import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.utils.Align
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener
+import com.unciv.models.translations.tr
+import com.unciv.ui.components.GameUiStyle
+import com.unciv.ui.components.AtlasWidgets
+import com.unciv.ui.components.widgets.UncivTextField
 import com.unciv.ui.components.extensions.equalizeColumns
 import com.unciv.ui.components.widgets.SortableGrid
 import com.unciv.ui.components.widgets.TabbedPager
@@ -22,6 +27,7 @@ class UnitOverviewTab(
     class UnitTabPersistableData : EmpireOverviewTabPersistableData(), SortableGrid.ISortState<UnitOverviewTabColumn> {
         @Transient
         var scrollY: Float? = null
+        @Transient var query = ""
 
         override var sortedBy: UnitOverviewTabColumn = UnitOverviewTabColumn.Name
         override var direction = SortableGrid.SortDirection.None
@@ -30,6 +36,7 @@ class UnitOverviewTab(
     override val persistableData = (persistedData as? UnitTabPersistableData) ?: UnitTabPersistableData()
 
     private val fixedContent = Table()
+    private val search = UncivTextField("Search", persistableData.query)
 
     // used for select()
     private var blinkAction: Action? = null
@@ -72,6 +79,7 @@ class UnitOverviewTab(
         // horizontal "slack" if available width > content width is taken up between SortableGrid and CityOverviewTab for the details,
         // but not so for the header. We must force the LinkedScrollPane somehow (no? how?) to do so - or the header Table itself.
 
+        AtlasEmpireUi.grid(header, details, totals)
         equalizeColumns(details, header, totals)
         // todo Kludge! Positioning and alignment of the header Table within its parent has quirks when content width < stage width
         //      This code should likely be included in SortableGrid anyway?
@@ -84,10 +92,19 @@ class UnitOverviewTab(
     init {
         val supplyTableWidth = (overviewScreen.stage.width * 0.25f).coerceAtLeast(240f)
         val unitSupplyTable = UnitSupplyTable.create(overviewScreen, this, viewingPlayer.getCiv(), supplyTableWidth)
+        if (GameUiStyle.isAtlas) {
+            fixedContent.add(AtlasWidgets.field("Search", search)).width((overviewScreen.stage.width - 40f).coerceAtMost(720f))
+                .minWidth(0f).left().row()
+            search.addListener(object : ChangeListener() {
+                override fun changed(event: ChangeEvent?, actor: Actor?) { update(true) }
+            })
+        }
         fixedContent.add(unitSupplyTable).align(Align.top).padBottom(10f).row()
         fixedContent.add(grid.getHeader()).grow()
         top()
         add(grid)
+        if (GameUiStyle.isAtlas && persistableData.query.isNotEmpty()) update(true)
+        applyAtlasPresentation()
     }
 
     override fun activated(index: Int, caption: String, pager: TabbedPager) {
@@ -101,8 +118,14 @@ class UnitOverviewTab(
     }
 
     internal fun update(unitsChanged: Boolean = false) {
-        if (unitsChanged) grid.update(viewingPlayer.getUnits().asIterable())
+        if (GameUiStyle.isAtlas) {
+            persistableData.query = search.text
+            grid.update(viewingPlayer.getUnits().filter {
+                it.displayName().tr(hideIcons = true).contains(persistableData.query, ignoreCase = true)
+            }.asIterable())
+        } else if (unitsChanged) grid.update(viewingPlayer.getUnits().asIterable())
         grid.update()
+        applyAtlasPresentation()
     }
 
     override fun select(selection: String): Float? {

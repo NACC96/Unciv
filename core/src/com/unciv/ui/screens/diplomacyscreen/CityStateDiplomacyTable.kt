@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import com.badlogic.gdx.utils.Align
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.Constants
 import com.unciv.UncivGame
 import com.unciv.logic.agents.NegotiateCityStatePeaceCommand
@@ -50,9 +51,9 @@ class CityStateDiplomacyTable(private val diplomacyScreen: DiplomacyScreen) {
 
         val giveGiftButton = "Give a Gift".toTextButton()
         giveGiftButton.onClick {
-            diplomacyScreen.rightSideTable.clear()
-            diplomacyScreen.rightSideTable.add(ScrollPane(getGoldGiftTable(otherCiv)))
+            diplomacyScreen.showConversation(getGoldGiftTable(otherCiv))
         }
+        var primaryAction: TextButton = giveGiftButton
         diplomacyTable.add(giveGiftButton).row()
         if (diplomacyScreen.isNotPlayersTurn() || viewingCiv.isAtWarWith(otherCiv)) giveGiftButton.disable()
 
@@ -66,17 +67,17 @@ class CityStateDiplomacyTable(private val diplomacyScreen: DiplomacyScreen) {
 
         val demandTributeButton = "Demand Tribute".toTextButton()
         demandTributeButton.onClick {
-            diplomacyScreen.rightSideTable.clear()
-            diplomacyScreen.rightSideTable.add(ScrollPane(getDemandTributeTable(otherCiv)))
+            diplomacyScreen.showConversation(getDemandTributeTable(otherCiv))
         }
         diplomacyTable.add(demandTributeButton).row()
         if (diplomacyScreen.isNotPlayersTurn() || viewingCiv.isAtWarWith(otherCiv)) demandTributeButton.disable()
 
         val diplomacyManager = viewingCiv.getDiplomacyManager(otherCiv)!!
         if (!viewingCiv.gameInfo.ruleset.modOptions.hasUnique(UniqueType.DiplomaticRelationshipsCannotChange)) {
-            if (viewingCiv.isAtWarWith(otherCiv))
-                diplomacyTable.add(getNegotiatePeaceCityStateButton(otherCiv, diplomacyManager)).row()
-            else diplomacyTable.add(diplomacyScreen.getDeclareWarButton(diplomacyManager, otherCiv)).row()
+            if (viewingCiv.isAtWarWith(otherCiv)) {
+                primaryAction = getNegotiatePeaceCityStateButton(otherCiv, diplomacyManager)
+                diplomacyTable.add(primaryAction).row()
+            } else diplomacyTable.add(diplomacyScreen.getDeclareWarButton(diplomacyManager, otherCiv)).row()
         }
 
         if (otherCiv.getCapital() != null && viewingCiv.hasExplored(otherCiv.getCapital()!!.getCenterTile()))
@@ -95,7 +96,7 @@ class CityStateDiplomacyTable(private val diplomacyScreen: DiplomacyScreen) {
             diplomacyTable.add(getWarWithMajorTable(target, otherCiv)).row()
         }
 
-        return diplomacyTable
+        return AtlasDiplomacyLayout.panel(diplomacyTable, primaryAction, diplomacyScreen.rightSideLabelWidth())
     }
 
 
@@ -212,6 +213,7 @@ class CityStateDiplomacyTable(private val diplomacyScreen: DiplomacyScreen) {
             diplomacyTable.add("[${otherCiv.civName}] is able to provide [${unitName}] once [${techAndTech}] [${isOrAre}] researched.".toLabel(fontSize = Constants.defaultFontSize)).row()
         }
 
+        AtlasDiplomacyLayout.prepare(diplomacyTable, diplomacyScreen.rightSideLabelWidth())
         return diplomacyTable
     }
 
@@ -390,6 +392,7 @@ class CityStateDiplomacyTable(private val diplomacyScreen: DiplomacyScreen) {
             diplomacyScreen.rightSideTable.add(ScrollPane(getCityStateDiplomacyTable(otherCiv)))
         }
         diplomacyTable.add(backButton)
+        AtlasDiplomacyLayout.prepare(diplomacyTable, diplomacyScreen.rightSideLabelWidth())
         return diplomacyTable
     }
 
@@ -444,6 +447,7 @@ class CityStateDiplomacyTable(private val diplomacyScreen: DiplomacyScreen) {
             diplomacyScreen.rightSideTable.add(ScrollPane(getCityStateDiplomacyTable(otherCiv)))
         }
         improvementGiftTable.add(backButton)
+        AtlasDiplomacyLayout.prepare(improvementGiftTable, diplomacyScreen.rightSideLabelWidth())
         return improvementGiftTable
 
     }
@@ -498,6 +502,7 @@ class CityStateDiplomacyTable(private val diplomacyScreen: DiplomacyScreen) {
             diplomacyScreen.rightSideTable.add(ScrollPane(getCityStateDiplomacyTable(otherCiv)))
         }
         diplomacyTable.add(backButton)
+        AtlasDiplomacyLayout.prepare(diplomacyTable, diplomacyScreen.rightSideLabelWidth())
         return diplomacyTable
     }
 
@@ -527,6 +532,7 @@ class CityStateDiplomacyTable(private val diplomacyScreen: DiplomacyScreen) {
         questTable.onClick {
             assignedQuest.onClickAction()
         }
+        AtlasDiplomacyLayout.prepare(questTable, diplomacyScreen.rightSideLabelWidth())
         return questTable
     }
 
@@ -545,6 +551,7 @@ class CityStateDiplomacyTable(private val diplomacyScreen: DiplomacyScreen) {
         warTable.add(progress.toLabel().apply { wrap = true; setAlignment(Align.center) })
             .width(diplomacyScreen.stage.width / 2).row()
 
+        AtlasDiplomacyLayout.prepare(warTable, diplomacyScreen.rightSideLabelWidth())
         return warTable
     }
 }

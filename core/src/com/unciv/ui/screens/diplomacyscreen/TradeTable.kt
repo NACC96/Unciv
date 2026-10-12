@@ -1,6 +1,9 @@
 package com.unciv.ui.screens.diplomacyscreen
 
 import com.badlogic.gdx.scenes.scene2d.ui.Table
+import com.unciv.ui.components.AtlasWidgets
+import com.unciv.ui.components.GameUiStyle
+import com.unciv.ui.components.widgets.AutoScrollPane
 import com.unciv.Constants
 import com.unciv.UncivGame
 import com.unciv.logic.agents.ProposeTradeCommand
@@ -24,6 +27,18 @@ class TradeTable(
     internal val offerColumnsTable = OfferColumnsTable(tradeView, diplomacyScreen, civ, otherCivilization) { onChange() }
     // This is so that after a trade has been traded, we can switch out the offersToDisplay to start anew - this is the easiest way
     private val offerColumnsTableWrapper = Table()
+    private val proposalStatus = Table()
+
+    private fun refreshProposalStatus() {
+        if (!GameUiStyle.isAtlas) return
+        val pending = tradeView.hasPendingOfferFromUs()
+        proposalStatus.clearChildren()
+        proposalStatus.add(ProposalStatusView.render(
+            if (pending) ProposalDisplayState.PENDING else ProposalDisplayState.DRAFT, null,
+            if (pending) "They'll decide on their turn" else "Offer trade"
+        )).growX().minWidth(0f)
+        offerButton.setText(if (pending) "Retract offer".tr() else offerTradeText.tr())
+    }
 
     val offerTradeText = "{Offer trade}\n({They'll decide on their turn})"
     private val offerButton = offerTradeText.toTextButton()
@@ -37,15 +52,25 @@ class TradeTable(
                 })
             }) {
             offerButton.setText(offerTradeText.tr())
+            refreshProposalStatus()
             return
         }
         tradeView.tryRetractOffer()
         offerButton.setText(offerTradeText.tr())
+        refreshProposalStatus()
     }
 
     init {
-        offerColumnsTableWrapper.add(offerColumnsTable)
-        add(offerColumnsTableWrapper).row()
+        offerColumnsTableWrapper.add(offerColumnsTable).grow().minWidth(0f)
+        if (GameUiStyle.isAtlas) {
+            name = "AtlasTradeEditor"
+            pad(GameUiStyle.Space.m)
+            add(AtlasWidgets.header("Trade", "${civ.civName} → ${otherCivilization.civName}"))
+                .growX().minWidth(0f).row()
+            add(proposalStatus).growX().minWidth(0f).row()
+            add(AutoScrollPane(offerColumnsTableWrapper).apply { setScrollingDisabled(true, false) })
+                .grow().minWidth(0f).minHeight(0f).row()
+        } else add(offerColumnsTableWrapper).row()
 
         val lowerTable = Table().apply { defaults().pad(10f) }
 
@@ -96,13 +121,20 @@ class TradeTable(
                 }) return@onClick
             tradeView.tryProposeStagedTrade()
             offerButton.setText("Retract offer".tr())
+            refreshProposalStatus()
         }
 
-        lowerTable.add(offerButton)
+        if (GameUiStyle.isAtlas) {
+            GameUiStyle.apply(offerButton, primary = true)
+            offerButton.label.wrap = true
+            lowerTable.background = GameUiStyle.panelBackground("Atlas/Trade/Actions", 1f)
+        }
+        lowerTable.add(offerButton).growX().minWidth(0f).minHeight(GameUiStyle.standardControlHeight)
 
         lowerTable.pack()
         lowerTable.y = 10f
-        add(lowerTable)
+        add(lowerTable).growX().minWidth(0f)
+        refreshProposalStatus()
         pack()
     }
 

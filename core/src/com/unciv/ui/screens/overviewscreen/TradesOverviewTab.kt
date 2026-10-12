@@ -2,6 +2,10 @@ package com.unciv.ui.screens.overviewscreen
 
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.utils.Align
+import com.unciv.ui.components.GameUiStyle
+import com.unciv.ui.screens.diplomacyscreen.ProposalStatusView
+import com.unciv.ui.screens.diplomacyscreen.ProposalDisplayState
+import com.unciv.ui.screens.diplomacyscreen.TradeTermsView
 import com.unciv.Constants
 import com.unciv.logic.civilization.Civilization
 import com.unciv.logic.trade.Trade
@@ -25,7 +29,7 @@ class TradesOverviewTab(
             add("Pending trades".toLabel(fontSize = Constants.headingFontSize)).padTop(10f).row()
         for (diplomacy in diplomaciesWithPendingTrade) {
             for (tradeRequest in diplomacy.otherCiv.tradeRequests.filter { it.requestingCiv == viewingPlayer.getCiv().civID })
-                add(createTradeTable(tradeRequest.trade.reverse(), diplomacy.otherCiv)).row()
+                add(createTradeTable(tradeRequest.trade.reverse(), diplomacy.otherCiv, ProposalDisplayState.PENDING)).row()
         }
 
         val diplomaciesWithExistingTrade = viewingPlayer.getCiv().diplomacy.values.filter { it.trades.isNotEmpty() }
@@ -44,13 +48,25 @@ class TradesOverviewTab(
             add("Current trades".toLabel(fontSize = Constants.headingFontSize)).padTop(10f).row()
         for (diplomacy in diplomaciesWithExistingTrade) {
             for (trade in diplomacy.trades)
-                add(createTradeTable(trade, diplomacy.otherCiv)).row()
+                add(createTradeTable(trade, diplomacy.otherCiv, ProposalDisplayState.ACCEPTED)).row()
         }
+        applyAtlasPresentation()
     }
 
-    private fun createTradeTable(trade: Trade, otherCiv: Civilization) = Table().apply {
+    private fun createTradeTable(trade: Trade, otherCiv: Civilization, state: ProposalDisplayState) = Table().apply {
+        if (GameUiStyle.isAtlas) {
+            val availableWidth = overviewScreen.stage.width - 40f
+            val stacked = availableWidth < 720f
+            val columnWidth = if (stacked) availableWidth else availableWidth / 2f - 8f
+            add(ProposalStatusView.render(state, null, otherCiv.civName))
+                .colspan(if (stacked) 1 else 2).growX().minWidth(0f).row()
+            add(TradeTermsView.render(viewingPlayer.civName, trade.ourOffers)).width(columnWidth).minWidth(0f).top()
+            if (stacked) row()
+            add(TradeTermsView.render(otherCiv.civName, trade.theirOffers)).width(columnWidth).minWidth(0f).top()
+        } else {
         add(createOffersTable(viewingPlayer.getCiv(), trade.ourOffers, trade.theirOffers.size)).minWidth(overviewScreen.stage.width/4).fillY()
         add(createOffersTable(otherCiv, trade.theirOffers, trade.ourOffers.size)).minWidth(overviewScreen.stage.width/4).fillY()
+        }
     }
 
     private fun createOffersTable(civ: Civilization, offersList: TradeOffersList, numberOfOtherSidesOffers: Int): Table {

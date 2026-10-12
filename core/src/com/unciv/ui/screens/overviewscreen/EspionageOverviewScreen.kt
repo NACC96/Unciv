@@ -7,6 +7,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.SplitPane
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import com.badlogic.gdx.utils.Align
+import com.unciv.ui.components.GameUiStyle
+import com.unciv.ui.components.AtlasWidgets
 import com.unciv.Constants
 import com.unciv.UncivGame
 import com.unciv.logic.city.City
@@ -46,7 +48,7 @@ class EspionageOverviewScreen(val civInfo: Civilization, val worldScreen: WorldS
     private val spyScrollPane = AutoScrollPane(spySelectionTable)
     private val locationSelectionTable = Table()
     private val locationScrollPane = AutoScrollPane(locationSelectionTable)
-    private val middlePanes = SplitPane(spyScrollPane, locationScrollPane, false, skin)
+    private val middlePanes = SplitPane(spyScrollPane, locationScrollPane, GameUiStyle.isAtlas && stage.width < 760f, skin)
 
     private var selectedSpyButton: TextButton? = null
     private var selectedSpy: Spy? = null
@@ -59,6 +61,7 @@ class EspionageOverviewScreen(val civInfo: Civilization, val worldScreen: WorldS
     private val manager get() = civInfo.espionageManager
 
     init {
+        setChoiceHeader("Espionage", civInfo.civName)
         spySelectionTable.defaults().space(10f)
         spySelectionTable.pad(10f).top()
         locationSelectionTable.defaults().space(5f)
@@ -91,6 +94,7 @@ class EspionageOverviewScreen(val civInfo: Civilization, val worldScreen: WorldS
 
     //region Update
     private fun initSpyHeader() = spySelectionTable.apply {
+        if (GameUiStyle.isAtlas) { add(AtlasWidgets.header("Spies")).growX().minWidth(0f).row(); return@apply }
         add("Spy".toLabel())
         add("Rank".toLabel())
         add() // icon column
@@ -101,6 +105,7 @@ class EspionageOverviewScreen(val civInfo: Civilization, val worldScreen: WorldS
     }
 
     private fun initLocationHeader() = locationSelectionTable.apply {
+        if (GameUiStyle.isAtlas) { add(AtlasWidgets.header("Location")).growX().minWidth(0f).row(); return@apply }
         add() // Empty column for location icon
         add("City".toLabel()).left()
         add("Spy present".toLabel())
@@ -111,6 +116,8 @@ class EspionageOverviewScreen(val civInfo: Civilization, val worldScreen: WorldS
     private fun update() {
         updateSpyList()
         updateLocationList()
+        AtlasEmpireUi.prepare(spySelectionTable)
+        AtlasEmpireUi.prepare(locationSelectionTable)
     }
 
     private fun updateSpyList() {
@@ -125,19 +132,19 @@ class EspionageOverviewScreen(val civInfo: Civilization, val worldScreen: WorldS
 
     private fun addSpyToSelectionTable(spy: Spy) {
         // "Spy" column
-        spySelectionTable.add(spy.name.toLabel(hideIcons = true))
+        if (!GameUiStyle.isAtlas) spySelectionTable.add(spy.name.toLabel(hideIcons = true))
         // "Rank" column — show effective rank (includes counter-intel building bonuses)
-        spySelectionTable.add(spy.getEffectiveRank().toLabel())
+        if (!GameUiStyle.isAtlas) spySelectionTable.add(spy.getEffectiveRank().toLabel())
         // icon column
         val spyLocation = spy.getCityOrNull()
-        spySelectionTable.add(spyLocation.getIcon()).padRight(5f)
+        if (!GameUiStyle.isAtlas) spySelectionTable.add(spyLocation.getIcon()).padRight(5f)
         // "Location" column
-        spySelectionTable.add(spy.getLocationName().toLabel(hideIcons = true)).left()
+        if (!GameUiStyle.isAtlas) spySelectionTable.add(spy.getLocationName().toLabel(hideIcons = true)).left()
         // "Action" column
         val actionString = if (spy.action.showTurns)
             "[${spy.action.displayString}] ${spy.turnsRemainingForAction}${Fonts.turn}"
         else spy.action.displayString
-        spySelectionTable.add(actionString.toLabel())
+        if (!GameUiStyle.isAtlas) spySelectionTable.add(actionString.toLabel())
         // Move button column
         val moveSpyButton = "Move".toTextButton()
         moveSpyButton.onClick {
@@ -150,7 +157,18 @@ class EspionageOverviewScreen(val civInfo: Civilization, val worldScreen: WorldS
             // Spectators aren't allowed to move the spies of the Civs they are viewing
             moveSpyButton.disable()
         }
-        spySelectionTable.add(moveSpyButton).row()
+        if (GameUiStyle.isAtlas) {
+            val card = Table().apply {
+                add(AtlasWidgets.header(spy.name, "${"Rank".tr()}: ${spy.getEffectiveRank()} · ${spy.getLocationName()}"))
+                    .growX().minWidth(0f).row()
+                add(actionString.toLabel(GameUiStyle.muted).apply { wrap = true }).growX().minWidth(0f).left().row()
+                GameUiStyle.apply(moveSpyButton)
+                add(moveSpyButton).growX().minWidth(0f).minHeight(GameUiStyle.standardControlHeight)
+            }
+            AtlasEmpireUi.panel(card, "Spy")
+            spySelectionTable.add(card).width(if (stage.width < 760f) stage.width - 40f else stage.width * 0.42f - 40f)
+                .minWidth(0f).row()
+        } else spySelectionTable.add(moveSpyButton).row()
         moveSpyButtons[spy] = moveSpyButton
     }
 
@@ -181,7 +199,7 @@ class EspionageOverviewScreen(val civInfo: Civilization, val worldScreen: WorldS
     }
 
     private fun addLocationToSelectionTable(location: Location) {
-        locationSelectionTable.add(location.getIcon()).padLeft(20f).padRight(10f)
+        if (!GameUiStyle.isAtlas) locationSelectionTable.add(location.getIcon()).padLeft(20f).padRight(10f)
         val label = location.getLocationName().toLabel(hideIcons = true)
         if (location != null) {
             label.onClick {
@@ -189,19 +207,29 @@ class EspionageOverviewScreen(val civInfo: Civilization, val worldScreen: WorldS
                 worldScreen.mapHolder.setCenterPosition(location.location.toHexCoord())
             }
         }
-        locationSelectionTable.add(label).left()
+        if (!GameUiStyle.isAtlas) locationSelectionTable.add(label).left()
         val spies = location.getSpies()
-        locationSelectionTable.add(getSpyIcons(spies))
+        val rowTable = if (GameUiStyle.isAtlas) Table().apply {
+            label.wrap = true
+            add(location.getIcon()).padRight(GameUiStyle.Space.m)
+            add(label).growX().minWidth(0f).left().row()
+            add(getSpyIcons(spies)).colspan(2).left().row()
+        } else locationSelectionTable
+        if (!GameUiStyle.isAtlas) locationSelectionTable.add(getSpyIcons(spies))
 
         val spy = spies.firstOrNull()
         if (location != null && location.civ.isCityState && spy != null && spy.canDoCoup()) {
             val coupButton = CoupButton(location, spy.action == SpyAction.Coup)
-            locationSelectionTable.add(coupButton)
+            rowTable.add(coupButton).minHeight(GameUiStyle.standardControlHeight)
         } else {
             val moveSpyHereButton = MoveToLocationButton(location)
-            locationSelectionTable.add(moveSpyHereButton)
+            rowTable.add(moveSpyHereButton).minHeight(GameUiStyle.standardControlHeight)
         }
-        locationSelectionTable.row()
+        if (GameUiStyle.isAtlas) {
+            AtlasEmpireUi.panel(rowTable, "SpyLocation")
+            locationSelectionTable.add(rowTable).width(if (stage.width < 760f) stage.width - 40f else stage.width * 0.58f - 40f)
+                .minWidth(0f).row()
+        } else locationSelectionTable.row()
     }
 
     private fun getSpyIcon(spy: Spy) = Table().apply {

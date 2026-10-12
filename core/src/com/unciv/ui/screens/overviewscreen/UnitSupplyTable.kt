@@ -3,6 +3,7 @@ package com.unciv.ui.screens.overviewscreen
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.utils.Align
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.Constants
 import com.unciv.logic.civilization.Civilization
 import com.unciv.ui.components.NonTransformGroup
@@ -27,7 +28,7 @@ internal object UnitSupplyTable {
         val icon = if (deficit <= 0) null else NonTransformGroup().apply {
             setSize(36f, 36f)
             val image = ImageGetter.getImage("OtherIcons/ExclamationMark")
-            image.color = Color.FIREBRICK
+            image.color = if (GameUiStyle.isAtlas) GameUiStyle.error else Color.FIREBRICK
             image.setSize(36f, 36f)
             image.center(this)
             image.setOrigin(Align.center)
@@ -45,7 +46,8 @@ internal object UnitSupplyTable {
             }
         ) {
             it.defaults().pad(5f).fill(false)
-            it.background = BaseScreen.skinStrings.getUiBackground(
+            if (GameUiStyle.isAtlas) AtlasEmpireUi.panel(it, "UnitSupply")
+            else it.background = BaseScreen.skinStrings.getUiBackground(
                 "OverviewScreen/UnitOverviewTab/UnitSupplyTable",
                 tintColor = BaseScreen.skinStrings.skinConfig.baseColor.darken(0.6f)
             )
@@ -60,7 +62,7 @@ internal object UnitSupplyTable {
             it.addLabeledValue("Production Penalty", "${stats.getUnitSupplyProductionPenalty().toInt()}%")
             if (deficit > 0) {
                 val penaltyLabel = "Increase your supply or reduce the amount of units to remove the production penalty"
-                    .toLabel(Color.FIREBRICK)
+                    .toLabel(if (GameUiStyle.isAtlas) GameUiStyle.error else Color.FIREBRICK)
                 penaltyLabel.wrap = true
                 it.add(penaltyLabel).colspan(2).left()
                     .width(supplyTableWidth).row()

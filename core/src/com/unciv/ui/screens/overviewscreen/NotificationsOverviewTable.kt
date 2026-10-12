@@ -8,6 +8,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane
 import com.badlogic.gdx.scenes.scene2d.ui.SelectBox
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.utils.Align
+import com.unciv.ui.components.GameUiStyle
+import com.unciv.ui.components.AtlasWidgets
 import com.unciv.logic.civilization.Civilization
 import com.unciv.logic.civilization.Notification
 import com.unciv.logic.civilization.NotificationCategory
@@ -44,7 +46,7 @@ class NotificationsOverviewTable(
 
     private val notificationLog = viewingPlayer.getCiv().notificationsLog
     private val stageWidth = overviewScreen.stage.width
-    private val notificationWidth = stageWidth / 2
+    private val notificationWidth = if (GameUiStyle.isAtlas) (stageWidth - 40f).coerceAtMost(900f) else stageWidth / 2
     /** Color for notifications that are new this turn but which we have already seen.
      *  Defaults to 'Eggshell'. */
     private val highlightColor1 = skinStrings.getUIColor("OverviewScreen/NotificationLog/HighlightColor1", Color.valueOf("#f0ead6"))
@@ -58,6 +60,8 @@ class NotificationsOverviewTable(
     private val selectItems = mutableListOf<SelectItem>()
     private var selectWidth = 0f
     private val selectBox: SelectBox<SelectItem>
+    private val fixedControls = Table()
+    override fun getFixedContent() = if (GameUiStyle.isAtlas) fixedControls else null
 
     companion object {
         private const val iconSize = 20f
@@ -78,6 +82,11 @@ class NotificationsOverviewTable(
         persistableData.lastTurn = gameInfo.turns
 
         selectBox = getSelectBox()
+        if (GameUiStyle.isAtlas) {
+            fixedControls.add(AtlasWidgets.field("Turn", selectBox)).width(stageWidth - 40f).minWidth(0f)
+            AtlasEmpireUi.panel(fixedControls, "NotificationFilter")
+            applyAtlasPresentation()
+        }
 
         add().row()
 
@@ -88,6 +97,7 @@ class NotificationsOverviewTable(
         if (persistableData.scrollY != null)
             pager.setPageScrollY(index, persistableData.scrollY!!)
         super.activated(index, caption, pager)
+        if (GameUiStyle.isAtlas) { applyAtlasPresentation(); return }
         selectBox.remove()
         selectBox.setPosition(stageWidth - 10f, overviewScreen.centerAreaHeight, Align.topRight)
         selectBox.color.a = 0f
@@ -106,7 +116,7 @@ class NotificationsOverviewTable(
         persistableData.scrollY = pager.getPageScrollY(index)
         persistableData.closedTurns.clear()
         expanders.filterNot { it.value.isOpen }.mapTo(persistableData.closedTurns) { it.key }
-        selectBox.remove()
+        if (!GameUiStyle.isAtlas) selectBox.remove()
     }
 
     private fun generateNotificationTable() {
@@ -134,7 +144,9 @@ class NotificationsOverviewTable(
     private fun refreshSelectBoxItems() {
         selectBox.items = selectItems.toGdxArray()
         val bgWidth = skin[SelectBox.SelectBoxStyle::class.java].background.run { leftWidth + rightWidth }
-        selectBox.width = selectWidth + bgWidth + 10f
+        selectBox.width = if (GameUiStyle.isAtlas) (selectWidth + bgWidth + 10f).coerceAtMost(stageWidth - 40f)
+            else selectWidth + bgWidth + 10f
+        if (GameUiStyle.isAtlas) AtlasEmpireUi.prepare(selectBox)
     }
 
     private fun oneTurnTable(turn: Int, notifications: List<Notification>, doHighlight: Boolean): Table {
@@ -163,6 +175,10 @@ class NotificationsOverviewTable(
         selectItems += SelectItem(turn, selectLabel.text.toString())
         selectWidth = selectWidth.coerceAtLeast(selectLabel.prefWidth)
 
+        if (GameUiStyle.isAtlas) {
+            AtlasEmpireUi.panel(expander.header, "NotificationTurn")
+            AtlasEmpireUi.prepare(expander)
+        }
         return expander
     }
 
@@ -179,14 +195,15 @@ class NotificationsOverviewTable(
 
     private fun getCategoryTable(category: Notification.NotificationCategory) = Table().apply {
         val categoryLabel = category.name.toLabel()
-        val lineLength = (notificationWidth - 6f - categoryLabel.prefWidth) / 2
+        val lineLength = ((notificationWidth - 6f - categoryLabel.prefWidth) / 2).coerceAtLeast(0f)
         add(ImageGetter.getWhiteDot()).minHeight(2f).width(lineLength)
         add(categoryLabel).pad(3f)
         add(ImageGetter.getWhiteDot()).minHeight(2f).width(lineLength)
     }
 
     private fun getNotificationTable(index: Int, notification: Notification, doHighlight: Boolean) = Table(BaseScreen.skin).apply {
-        val label = ColorMarkupLabel(notification.text, ImageGetter.CHARCOAL, fontSize = 20)
+        val label = ColorMarkupLabel(notification.text, if (GameUiStyle.isAtlas) GameUiStyle.ink else ImageGetter.CHARCOAL,
+            fontSize = if (GameUiStyle.isAtlas) GameUiStyle.Type.label else 20)
             .apply { wrap = true }
         add(label).width(notificationWidth - iconSize * notification.icons.size)
 
@@ -196,7 +213,10 @@ class NotificationsOverviewTable(
             index >= highlightCount1 -> highlightColor1
             else -> null
         }
-        background = skinStrings.getUiBackground("OverviewScreen/NotificationOverviewTable/Notification", skinStrings.roundedEdgeRectangleShape, tintColor)
+        background = if (GameUiStyle.isAtlas) GameUiStyle.outlinedBackground("Atlas/Empire/Notification",
+            GameUiStyle.inset, if (tintColor != null) GameUiStyle.accent else GameUiStyle.muted)
+            else skinStrings.getUiBackground("OverviewScreen/NotificationOverviewTable/Notification", skinStrings.roundedEdgeRectangleShape, tintColor)
+        if (GameUiStyle.isAtlas) pad(GameUiStyle.Space.l)
 
         touchable = Touchable.enabled
         if (notification.actions.isNotEmpty())
