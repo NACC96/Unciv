@@ -1,6 +1,38 @@
 import { summarizeTool, toolResult } from "./tool-summary.js";
 
-/** Only content exposed in the provider stream is displayed; raw events stay in events.jsonl. */
+/** Image bytes are transport-only; provider/activity logs retain metadata. */
+const imageBlockMarker = /\\*"type\\*"\s*:\s*\\*"(?:image|input_image|image_url)\\*"/;
+
+export function redactImageData(value: unknown): any {
+  if (typeof value === "string") {
+    if (!/^[\s]*[\[{]/.test(value)) return value;
+    try {
+      const parsed = JSON.parse(value);
+      const redacted = redactImageData(parsed);
+      return JSON.stringify(redacted) === JSON.stringify(parsed) ? value : JSON.stringify(redacted);
+    } catch { return imageBlockMarker.test(value) ? "[unparseable image event omitted]" : value; }
+  }
+  if (Array.isArray(value)) return value.map(redactImageData);
+  if (!value || typeof value !== "object") return value;
+  const block = value as Record<string, unknown>;
+  if (block["type"] === "image" || block["type"] === "input_image" || block["type"] === "image_url") {
+    return { ...Object.fromEntries(Object.entries(block).filter(([key]) => !["data", "source", "url", "image_url"].includes(key)).map(([key, val]) => [key, redactImageData(val)])),
+      ...(typeof block["mimeType"] === "string" ? {} : block["source"] && typeof block["source"] === "object"
+        ? { mimeType: (block["source"] as Record<string, unknown>)["media_type"] } : {}),
+      imageData: "[omitted]" };
+  }
+  return Object.fromEntries(Object.entries(block).map(([key, val]) => [key, redactImageData(val)]));
+}
+
+export function redactImageLine(line: string): string {
+  try {
+    const parsed = JSON.parse(line);
+    const redacted = redactImageData(parsed);
+    return JSON.stringify(redacted) === JSON.stringify(parsed) ? line : JSON.stringify(redacted);
+  } catch { return imageBlockMarker.test(line) ? "[unparseable image event omitted]" : line; }
+}
+
+/** Only provider-exposed content is displayed; image bytes are omitted. */
 export interface ActivityEntry {
   id: string;
   kind: string;
@@ -29,6 +61,7 @@ export class ActivityNormalizer {
   private blocks = new Map<number, { type: string; text: string; id?: string; name?: string; input?: any; json?: string }>();
 
   fromLine(line: string): ActivityEntry[] {
+    line = redactImageLine(line);
     const timestamp = new Date().toISOString();
     const entry = (kind: string, title: string, text: string, id = `event-${++this.seq}`) => ({ id, kind, title, text, timestamp });
     let e: Record<string, any>;

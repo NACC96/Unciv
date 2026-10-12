@@ -10,7 +10,7 @@
  *
  * Provider output and JSONL logs are evidence; engine receipts govern.
  */
-import { ActivityNormalizer, type ActivityEntry } from "./activity.js";
+import { ActivityNormalizer, redactImageLine, type ActivityEntry } from "./activity.js";
 import { StringDecoder } from "node:string_decoder";
 import { spawn, type ChildProcess } from "node:child_process";
 import { appendFileSync, mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
@@ -97,11 +97,12 @@ export class NodeRunner implements ProviderRunner {
     const eventDecoder = new StringDecoder("utf8");
     let eventBuffer = "";
     child.stdout?.on("data", (c: Buffer) => {
-      appendFileSync(join(runDir, "events.jsonl"), c);
       eventBuffer += eventDecoder.write(c);
       const events = eventBuffer.split("\n");
       eventBuffer = events.pop() ?? "";
-      for (const line of events) {
+      for (const rawLine of events) {
+        const line = redactImageLine(rawLine);
+        appendFileSync(join(runDir, "events.jsonl"), line + "\n", { mode: 0o600 });
         if (line.trim()) for (const entry of normalizer.fromLine(line)) appendActivity(entry);
         try {
           const event = JSON.parse(line) as Record<string, unknown>;
@@ -116,18 +117,29 @@ export class NodeRunner implements ProviderRunner {
     child.on("close", (code, signal) => {
       Object.assign(metadata, { endedAt: new Date().toISOString(), exitCode: code, signal });
       saveMetadata();
-      if (eventBuffer.trim()) for (const entry of normalizer.fromLine(eventBuffer)) appendActivity(entry);
+      if (eventBuffer.trim()) {
+        const line = redactImageLine(eventBuffer);
+        appendFileSync(join(runDir, "events.jsonl"), line + "\n", { mode: 0o600 });
+        for (const entry of normalizer.fromLine(line)) appendActivity(entry);
+      }
+      flushStderr(true);
       appendActivity({ id: "run-end", kind: code === 0 ? "system" : "error", title: `Provider exited (${code ?? signal})`, text: JSON.stringify(metadata, null, 2), timestamp: metadata["endedAt"] });
     });
     process.stderr.write(`Provider pid=${child.pid} cwd=${spec.cwd} logs=${runDir}\n`);
     const stderrDecoder = new StringDecoder("utf8");
-    let stderr = "";
-    child.stderr?.on("data", (c: Buffer) => {
-      const decoded = stderrDecoder.write(c);
-      stderr += decoded;
-      appendFileSync(join(runDir, "stderr.log"), c);
-      appendActivity({ id: `stderr-${Date.now()}-${Math.random()}`, kind: "diagnostic", title: "Provider diagnostic", text: decoded, timestamp: new Date().toISOString() });
-    });
+    let stderr = "", stderrBuffer = "";
+    const flushStderr = (final = false) => {
+      const parts = stderrBuffer.split("\n");
+      stderrBuffer = final ? "" : parts.pop() ?? "";
+      for (const part of parts) {
+        if (!part && final) continue;
+        const decoded = redactImageLine(part) + "\n";
+        stderr += decoded;
+        appendFileSync(join(runDir, "stderr.log"), decoded, { mode: 0o600 });
+        appendActivity({ id: `stderr-${Date.now()}-${Math.random()}`, kind: "diagnostic", title: "Provider diagnostic", text: decoded, timestamp: new Date().toISOString() });
+      }
+    };
+    child.stderr?.on("data", (c: Buffer) => { stderrBuffer += stderrDecoder.write(c); flushStderr(); });
     return {
       pid: child.pid,
       recordActivity: appendActivity,
@@ -138,7 +150,7 @@ export class NodeRunner implements ProviderRunner {
           pending += decoder.write(c);
           const parts = pending.split("\n");
           pending = parts.pop() ?? "";
-          for (const line of parts) onLine(line);
+          for (const line of parts) onLine(redactImageLine(line));
         });
       },
       stderrText: () => stderr,
@@ -195,6 +207,7 @@ export class Supervisor {
         : { id: d.decisionId, type: d.decisionType, summary: JSON.stringify({ sourceRef: d.sourceRef, classification: d.classification, options: d.options }) }),
       guidance: args.guidance,
       inbox: preFlight.inbox,
+      diplomaticHistory: preFlight.diplomaticHistory,
       continuityNote: args.resumeId ? `Resumed provider session ${args.resumeId}.` : args.context.continuityNote,
     });
 
@@ -212,7 +225,7 @@ export class Supervisor {
       const toolPattern = /"(?:tool|name)"\s*:\s*"[^"]*game[^"]*"/;
       const done = child.wait();
       child.stdoutLines((line) => {
-        lines.push(line);
+        lines.push(redactImageLine(line));
         if (!guardHit && toolPattern.test(line)) {
           toolCallCount++;
           if (toolCallCount > this.maxToolCallsPerTurn) {
