@@ -4,7 +4,8 @@
  * The desktop launches one daemon per agent match; they speak the private
  * versioned JSON-over-stdio control protocol (engine-protocol.ts):
  * stdout carries engine requests + turn events, stdin carries engine
- * responses + run_turn/shutdown controls, stderr carries human logs only.
+ * responses + run_turn/cancel_run/shutdown controls, stderr carries human
+ * logs only.
  *
  * Provider registry: scripted runs anywhere (tests); codex/claude/opencode
  * use the W1-proven spawn builders (their config file/dir setup is owned by
@@ -14,7 +15,7 @@ import { GAME_TOOL_ALLOWLIST, codexSpawn, claudeSpawn, opencodeSpawn, type Spawn
 import { parseClaudeStream, parseCodexStream, parseOpencodeStream, type NormalizedRun } from "./provider-events.js";
 import { Supervisor } from "./supervisor.js";
 import { StdioEngineBackend } from "./stdio-engine.js";
-import { parseInbound, encodeFrame, type RunTurnControl } from "./engine-protocol.js";
+import { CANCELLED_DETAIL, parseInbound, encodeFrame, type RunTurnControl } from "./engine-protocol.js";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -182,6 +183,8 @@ export async function main(): Promise<void> {
 
   let shuttingDown = false;
   let activeTurn: Promise<void> | null = null;
+  // The only run cancel_run may touch; cleared with activeTurn.
+  let activeRun: { runId: string; cancel: AbortController } | null = null;
 
   const finish = () => {
     backend.disconnect();
@@ -223,6 +226,12 @@ export async function main(): Promise<void> {
       requestShutdown();
       return;
     }
+    if (frame.kind === "control" && frame.op === "cancel_run") {
+      // Stale or unknown runIds are ignored silently; the outcome frame of the
+      // cancelled run is the only reply.
+      if (activeRun?.runId === frame.runId) activeRun.cancel.abort();
+      return;
+    }
     if (frame.kind === "control" && frame.op === "run_turn") {
       if (shuttingDown || activeTurn) {
         process.stdout.write(
@@ -236,13 +245,16 @@ export async function main(): Promise<void> {
         );
         return;
       }
-      activeTurn = runTurn(frame).finally(() => {
+      const run = { runId: frame.runId, cancel: new AbortController() };
+      activeRun = run;
+      activeTurn = runTurn(frame, run.cancel.signal).finally(() => {
         activeTurn = null;
+        if (activeRun === run) activeRun = null;
       });
     }
   }
 
-  async function runTurn(control: RunTurnControl): Promise<void> {
+  async function runTurn(control: RunTurnControl, signal: AbortSignal): Promise<void> {
     currentActorCiv = control.binding.civId;
     const emit = (event: "run_started" | "session_bound" | "tool_activity" | "run_completed" | "run_failed", payload: Record<string, unknown>) => {
       process.stdout.write(encodeFrame({ protocol: 1, kind: "turn_event", runId: control.runId, event, payload }) + "\n");
@@ -272,20 +284,27 @@ export async function main(): Promise<void> {
         resumeId: control.providerConfig.resumeId,
         cwd: scratch,
         includeStaticInstructions: promptCarriesStaticInstructions(control.provider, control.providerConfig.resumeId),
+        signal,
       });
       if (outcome.run.sessionId) {
         emit("session_bound", { sessionId: outcome.run.sessionId });
       }
-      emit(outcome.status === "failed" ? "run_failed" : "run_completed", {
+      const cancelled = outcome.status === "cancelled";
+      emit(outcome.status === "failed" || cancelled ? "run_failed" : "run_completed", {
         status: outcome.status,
         revision: outcome.revision,
         turnEnded: outcome.turnEnded,
         detail: outcome.detail,
         toolCalls: outcome.run.toolCalls.map((t) => t.tool),
-        ...(outcome.run.finalText?.trim() ? { summary: outcome.run.finalText.trim().slice(0, MAX_TURN_SUMMARY_CHARS) } : {}),
+        // A cut-off provider wrote no closing summary; partial text must not seed the next session.
+        ...(!cancelled && outcome.run.finalText?.trim() ? { summary: outcome.run.finalText.trim().slice(0, MAX_TURN_SUMMARY_CHARS) } : {}),
       });
     } catch (error) {
-      emit("run_failed", { reason: error instanceof Error ? error.message : String(error) });
+      if (signal.aborted) {
+        emit("run_failed", { status: "cancelled", revision: null, turnEnded: false, detail: CANCELLED_DETAIL, toolCalls: [] });
+      } else {
+        emit("run_failed", { reason: error instanceof Error ? error.message : String(error) });
+      }
     }
   }
 }

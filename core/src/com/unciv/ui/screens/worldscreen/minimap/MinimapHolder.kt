@@ -28,6 +28,7 @@ class MinimapHolder(val mapHolder: WorldMapHolder) : Table() {
     private var maximized = false
     private var lastCutoutSetting = false
     private var lastTileMap: TileMap? = null
+    private var lastRestrictingCivId: String? = null
     private var resizeDragListener: ResizeDragListener? = null
     lateinit var minimap: Minimap
 
@@ -81,12 +82,13 @@ class MinimapHolder(val mapHolder: WorldMapHolder) : Table() {
     }
 
     private fun rebuildIfSizeChanged(civInfo: Civilization) {
-        // For Spectator should not restrict minimap
-        val civ: Civilization? = civInfo.takeUnless { GUI.getWorldScreen().selectedGameView.spectatorMode }
+        // For Spectator (also one playing a nation with fog lifted) should not restrict minimap
+        val civ: Civilization? = civInfo.takeUnless { it.isSpectator() || GUI.getWorldScreen().selectedGameView.spectatorMode }
         val newMinimapSize = worldScreen.game.settings.minimapSize
         val cutoutSetting = worldScreen.game.settings.androidCutout
         if (newMinimapSize == minimapSize && civ?.exploredRegion?.shouldUpdateMinimap() != true
-            && cutoutSetting == lastCutoutSetting && lastTileMap === mapHolder.tileMap) return
+            && cutoutSetting == lastCutoutSetting && lastTileMap === mapHolder.tileMap && civ?.civID == lastRestrictingCivId) return
+        lastRestrictingCivId = civ?.civID
         lastCutoutSetting = cutoutSetting
         minimapSize = newMinimapSize
         lastTileMap = mapHolder.tileMap

@@ -103,9 +103,10 @@ class AgentNationViewTest {
         assertSame(snapshot, f.screen.gameInfo)
         assertSame(snapshot.getCivilization(f.rome.civID), f.screen.viewingCiv)
         assertSame(f.screen.viewingCiv, f.screen.selectedCiv)
-        assertTrue(f.screen.fogOfWar)
         assertFalse(f.screen.selectedGameView.spectatorMode)
-        assertSame(f.screen.selectedGameView, f.screen.getGameViewConsideringForOfWar())
+        assertFalse(f.screen.hasSpectatorVision())
+        assertSame("Without a local spectator, a lifted-fog preference cannot reveal anything",
+            f.screen.selectedGameView, f.screen.getGameViewConsideringForOfWar())
         assertNull(selectedTile(f.map))
         assertTrue(Mockito.mockingDetails(f.unit).invocations.any {
             it.method.name.substringBefore('$') == "reselectAfterSnapshot" && it.arguments.all { arg -> arg == null }
@@ -148,9 +149,46 @@ class AgentNationViewTest {
             com.unciv.ui.components.input.KeyboardBindings[com.unciv.ui.components.input.KeyboardBinding.TechnologyTree])
         resolver.updateFor(fog.keyShortcuts)
         resolver.updateFor(tech.keyShortcuts)
+        val fogBefore = f.screen.fogOfWar
         resolver.triggeredActions.forEach { it() }
-        assertTrue("Technology shortcut must retain ordinary fog", f.screen.fogOfWar)
+        assertFalse("A private nation has no fog toggle", fog.isVisible)
+        assertEquals("Technology shortcut must not toggle fog", fogBefore, f.screen.fogOfWar)
+        assertSame(f.screen.selectedGameView, f.screen.getGameViewConsideringForOfWar())
         assertEquals(1, Mockito.mockingDetails(game).invocations.count { it.method.name == "pushScreen" })
+    }
+
+    @Test fun `spectator playing a nation can lift fog without losing that nation's view or T`() {
+        val f = Fixture(); Mockito.`when`(f.session.canSpectate()).thenReturn(true)
+        f.game.addCity(f.rome, f.game.tileMap[0, 0])
+        UncivGame.Current.settings.tutorialTasksCompleted.add("Meet another civilization")
+        com.unciv.ui.components.fonts.Fonts.fontImplementation = com.unciv.dev.FontDesktop()
+        com.unciv.ui.images.ImageGetter.setNewRuleset(f.game.ruleset)
+        val snapshot = f.snapshot()
+        installWithViewer(f.screen, snapshot, ResolvedSelection(null, null, null), 1, f.rome.civID)
+        assertTrue(f.screen.hasSpectatorVision())
+        assertFalse("The fog preference survives the takeover", f.screen.fogOfWar)
+        val unfogged = f.screen.getGameViewConsideringForOfWar()
+        assertTrue(unfogged.revealMap); assertFalse(unfogged.spectatorMode)
+        assertEquals("Ownership and controls stay with the played nation", f.rome.civID, unfogged.civView.getCiv().civID)
+        assertFalse(f.screen.selectedGameView.revealMap)
+        val game = Mockito.mock(UncivGame::class.java)
+        Mockito.`when`(game.gameInfo).thenReturn(snapshot)
+        field(BaseScreen::class.java, "game").set(f.screen, game)
+        val controls = com.unciv.ui.screens.worldscreen.TechPolicyDiplomacyButtons(f.screen)
+        for (name in listOf("updateFogOfWarButton", "updateTechButton"))
+            controls.javaClass.getDeclaredMethod(name).apply { isAccessible = true }.invoke(controls)
+        val fog = field(controls.javaClass, "fogOfWarButtonHolder").get(controls) as com.badlogic.gdx.scenes.scene2d.Actor
+        val tech = field(controls.javaClass, "techButtonHolder").get(controls) as com.badlogic.gdx.scenes.scene2d.Actor
+        assertTrue(fog.isVisible)
+        val resolver = com.unciv.ui.components.input.KeyShortcutDispatcher.Resolver(
+            com.unciv.ui.components.input.KeyboardBindings[com.unciv.ui.components.input.KeyboardBinding.TechnologyTree])
+        resolver.updateFor(fog.keyShortcuts)
+        resolver.updateFor(tech.keyShortcuts)
+        resolver.triggeredActions.forEach { it() }
+        assertFalse("T opens the played nation's technology instead of toggling fog", f.screen.fogOfWar)
+        assertEquals(1, Mockito.mockingDetails(game).invocations.count { it.method.name == "pushScreen" })
+        f.screen.fogOfWar = true
+        assertSame(f.screen.selectedGameView, f.screen.getGameViewConsideringForOfWar())
     }
 
     @Test fun `spectator selection keeps fog visible and its shortcut exclusive`() {

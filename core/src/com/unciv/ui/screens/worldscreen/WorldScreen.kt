@@ -134,22 +134,36 @@ class WorldScreen(
     var selectedCiv = viewingCiv
         internal set
     /** The [selectedCiv]'s perspective. For non-spectators this this equals the viewingGameView.
-     *  Only ever differs from [spectatorGameView] for spectators. */
+     *  Only ever differs from [unfoggedGameView] for viewers with [hasSpectatorVision]. */
     var selectedGameView = GameView(gameInfo, selectedCiv, spectatorMode = viewingCiv.isSpectator())
         internal set
 
-    /** The [viewingCiv]'s own perspective.
-     * This should only ever be used A. for spectators B. when forOfWar is false, for specific UI elements */
-    private var cachedSpectatorGameView: GameView? = null
-    private val spectatorGameView get(): GameView {
-        if (!viewingCiv.isSpectator()) throw Exception("Managed to disable fog of war without being spectator?!")
-        return cachedSpectatorGameView ?: GameView(gameInfo, viewingCiv, spectatorMode = true)
-            .also { cachedSpectatorGameView = it }
-    }  
-    fun getGameViewConsideringForOfWar() = if (fogOfWar) selectedGameView else spectatorGameView    
+    /** The unrestricted perspective behind the fog toggle, for specific UI elements only: a spectator's own
+     *  view, or the played nation's own view with the map revealed. Null without [hasSpectatorVision]. */
+    private var cachedUnfoggedGameView: GameView? = null
+    private val unfoggedGameView get(): GameView? {
+        cachedUnfoggedGameView?.let { return it }
+        val view = when {
+            viewingCiv.isSpectator() -> GameView(gameInfo, viewingCiv, spectatorMode = true)
+            hasSpectatorVision() -> GameView(gameInfo, viewingCiv, revealMap = true)
+            else -> return null
+        }
+        return view.also { cachedUnfoggedGameView = it }
+    }
+    fun getGameViewConsideringForOfWar() = if (fogOfWar) selectedGameView else unfoggedGameView ?: selectedGameView
 
-    /** UI toggle only (spectator mode): whether the map/tile panel should show [selectedGameView]'s
-     *  (fogged) vision or [spectatorGameView]'s (the spectator's own, unrestricted) vision. */
+    /** A revealed map shows the minimap as the local spectator sees it. */
+    private fun minimapViewer(): Civilization {
+        val view = getGameViewConsideringForOfWar()
+        val spectator = if (view.revealMap) gameInfo.civilizations.firstOrNull { it.isSpectator() } else null
+        return spectator ?: view.civView.getCiv()
+    }
+
+    /** Spectators, including the local spectator while playing a nation they took over, may lift fog of war. */
+    fun hasSpectatorVision(): Boolean = viewingCiv.isSpectator() || agentSession?.canSpectate() == true
+
+    /** UI toggle only, kept across takeovers: whether the map/tile panel should show [selectedGameView]'s
+     *  (fogged) vision or [unfoggedGameView]'s. Without spectator vision it has no effect. */
     var fogOfWar = true
 
     /**
@@ -264,13 +278,12 @@ class WorldScreen(
         gameInfo = snapshot
         game.gameInfo = snapshot
         val viewerChanged = newViewer.civID != oldViewerId
-        // A spectator's unrestricted view must never survive a committed takeover.
-        if (!newViewer.isSpectator()) fogOfWar = true
         viewingCiv = newViewer
         selectedCiv = if (viewerChanged || !newViewer.isSpectator()) newViewer else
             snapshot.civilizations.firstOrNull { it.civID == selectedCiv.civID } ?: newViewer
         selectedGameView = GameView(snapshot, selectedCiv, spectatorMode = viewingCiv.isSpectator())
-        cachedSpectatorGameView = null
+        // Unrestricted vision is re-resolved for the new viewer, so it never outlives the local spectator.
+        cachedUnfoggedGameView = null
         isPlayersTurn = viewingCiv.isCurrentPlayer()
 
         if (viewerChanged) {
@@ -600,7 +613,7 @@ class WorldScreen(
             updateSelectedCiv()
 
             
-            minimapWrapper.update(getGameViewConsideringForOfWar().civView.getCiv())
+            minimapWrapper.update(minimapViewer())
             bottomTileInfoTable.civView = getGameViewConsideringForOfWar().civView
             bottomTileInfoTable.updateTileTable(mapHolder.selectedTile)
             bottomTileInfoTable.x = stage.width - bottomTileInfoTable.width
@@ -805,7 +818,7 @@ class WorldScreen(
 
         val selected = gameInfo.civilizations.firstOrNull { it.civID == restoreState.selectedCivName }
         setSelectedCiv(if (viewingCiv.isSpectator()) selected ?: viewingCiv else viewingCiv)
-        fogOfWar = !viewingCiv.isSpectator() || restoreState.fogOfWar
+        fogOfWar = restoreState.fogOfWar
     }
 
     fun nextTurn() {

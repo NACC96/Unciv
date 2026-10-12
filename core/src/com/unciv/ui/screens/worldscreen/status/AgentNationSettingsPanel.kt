@@ -104,7 +104,8 @@ class AgentNationSettingsPanel(private val screen: WorldScreen, private val sess
         form.add(play).height(34f).padTop(6f).row()
         form.add(handback).height(34f).padTop(6f).row()
         form.add(spectate).height(34f).padTop(6f).row()
-        form.add("Spectate changes your view. Human nations wait for you until explicitly handed to an agent."
+        form.add("Spectate changes your view. Human nations wait for you until explicitly handed to an agent. " +
+            "While playing a nation, Fog of War (top left) shows the whole map."
             .toLabel(WorldScreenStyle.muted, 11).apply { wrap = true }).padTop(10f).padBottom(8f).row()
         for (picker in listOf(nation, provider, model, reasoning)) stylePicker(picker)
         for (editor in listOf(displayName, customModel, personality)) {
@@ -240,7 +241,7 @@ class AgentNationSettingsPanel(private val screen: WorldScreen, private val sess
             updating = false
             if (nation.selected?.id != selectedId) loadDraft(nation.selected?.id)
         }
-        identity.setText("Viewing ${screen.viewingCiv.civID} · changes apply after the current agent finishes")
+        identity.setText("Viewing ${screen.viewingCiv.civID} · changes apply immediately")
         session.getPendingNationChange()?.let { status.setText(it); status.color = WorldScreenStyle.warning }
         val w = minOf(480f, screen.stage.width - 16f).coerceAtLeast(1f)
         val anchorTop = if (isVisible) controlsAnchor?.localToStageCoordinates(Vector2())?.y?.minus(8f) else null
@@ -279,11 +280,14 @@ class AgentNationSettingsPanel(private val screen: WorldScreen, private val sess
             val error = AgentModelCatalog.validateProfile(profile).joinToString("\n")
             if (error.isNotEmpty()) { status.setText(error); status.color = WorldScreenStyle.error; return }
         }
-        requesting = true; status.setText("Waiting for the current agent turn…"); status.color = WorldScreenStyle.warning; updateEnabled()
+        // Play as cuts off an active agent; settings for one finish its current turn unchanged.
+        val agentMidTurn = change != NationControlChange.PLAY_AS &&
+            settings.any { it.civId == id && it.isActive && it.kind == ControllerKind.EXTERNAL_AGENT }
+        requesting = true; status.setText("Applying…"); status.color = WorldScreenStyle.warning; updateEnabled()
         session.requestNationChange(id, change, profile) { error ->
             if (!disposed) {
                 requesting = false
-                status.setText(error ?: "Applied. The match is paused.")
+                status.setText(error ?: if (agentMidTurn) "Saved. The agent finishes this turn with its previous settings." else "Applied.")
                 status.color = if (error == null) WorldScreenStyle.accent else WorldScreenStyle.error
                 refresh()
             }

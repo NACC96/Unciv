@@ -18,7 +18,8 @@ import java.util.concurrent.TimeUnit
  * responses + controls, stderr is logs only and never parsed.
  *
  * Liveness is read-only (process handle, event timestamps); silence alone is
- * never failure. Cancellation is explicit ([kill]); graceful shutdown
+ * never failure. Cancellation is explicit ([cancelRun] for one takeover,
+ * [kill] for the whole process); graceful shutdown
  * ([shutdown]) drains first. A [turnTimeoutMinutes]-silent turn is reported,
  * never auto-completed.
  */
@@ -171,6 +172,14 @@ class SupervisorProcess(
                     summary = payload["summary"] as? String
                 )
             }
+        }
+    }
+
+    override fun cancelRun(runId: String) {
+        try {
+            sendFrame(mapOf("protocol" to 1, "kind" to "control", "op" to "cancel_run", "runId" to runId))
+        } catch (ex: Exception) {
+            Log.error("Supervisor cancel write failed", ex)
         }
     }
 

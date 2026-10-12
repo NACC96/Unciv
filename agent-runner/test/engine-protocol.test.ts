@@ -17,6 +17,13 @@ describe("engine protocol framing", () => {
       .toMatchObject({ op: "shutdown" });
     expect(parseInbound(JSON.stringify({ protocol: ENGINE_PROTOCOL_VERSION, kind: "nope" }))).toBeNull();
   });
+
+  it("parses host cancel_run controls only when they name a run", () => {
+    expect(parseInbound(JSON.stringify({ protocol: 1, kind: "control", op: "cancel_run", runId: "run-7" })))
+      .toEqual({ protocol: 1, kind: "control", op: "cancel_run", runId: "run-7" });
+    expect(parseInbound(JSON.stringify({ protocol: 1, kind: "control", op: "cancel_run" }))).toBeNull();
+    expect(parseInbound(JSON.stringify({ protocol: 1, kind: "control", op: "cancel_run", runId: 7 }))).toBeNull();
+  });
 });
 
 describe("StdioEngineBackend", () => {
