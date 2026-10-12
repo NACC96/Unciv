@@ -1,4 +1,4 @@
-import { GAME_INSTRUCTIONS, DIPLOMATIC_REPLY_INSTRUCTIONS } from "./game-instructions.js";
+import { GAME_INSTRUCTIONS, DIPLOMATIC_REPLY_INSTRUCTIONS, DIPLOMATIC_OUTREACH_INSTRUCTIONS } from "./game-instructions.js";
 import { messageMetadata, privateCorrespondence, type DiplomaticMessage } from "./fake-game-mcp.js";
 
 /**
@@ -43,6 +43,7 @@ export function buildTurnPrompt(input: TurnPromptInput): string {
     `You are ${input.displayName}, leader of civilization ${input.civId} in a game of Civilization V (ruleset: ${input.rulesetName || "Civ V - Vanilla"}, agent protocol v${input.protocolVersion}).`,
     input.personality ? `Personality: ${input.personality}` : "",
     DIPLOMATIC_REPLY_INSTRUCTIONS,
+    DIPLOMATIC_OUTREACH_INSTRUCTIONS,
     `Turn serial ${input.turnSerial}, state revision ${input.stateRevision}. ` +
       `Act only for ${input.civId}; use only the game.* tools; never invent hidden information.`,
     input.continuityNote ? `Continuity: ${input.continuityNote}` : "",

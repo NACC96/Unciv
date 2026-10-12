@@ -100,3 +100,47 @@ it("summarizes a queued message without exposing its body or calling an unconfir
   expect(rejected).toMatchObject({ title: "Action rejected", summary: "Not a contact.", status: "failed" });
   expect(JSON.stringify(summarizeTool("game.act", input, { status: "applied" }))).not.toContain("secret-body-fingerprint");
 });
+
+const assertPurposefulOutreach = (prompt: string) => {
+  for (const instruction of ["Review game.observe.messageContacts each turn", "concrete mutual opportunities", "cooperation, trade, alliances, borders and geopolitical bargains",
+    "shared objective", "specific asks", "each recipient's role", "credible warnings", "ten messages per turn", "no quota", "nuclear weapons a last resort",
+    "inbox and private correspondence", "separate tailored", "one recipient per call", "fresh actionId", "current expectedRevision"])
+    expect(prompt).toContain(instruction);
+  expect(prompt).toContain("no automatic reply");
+  expect(prompt).toContain("does not prove agreement, enforce a trade, or grant resources");
+};
+
+it("teaches purposeful outreach in shared instructions with the existing one-recipient action contract", () => {
+  assertPurposefulOutreach(GAME_INSTRUCTIONS);
+  const examples = [...GAME_INSTRUCTIONS.matchAll(/game\.act\((\{[^\n]+?\})\)/g)].map(match => JSON.parse(match[1]));
+  const mail = examples.filter(example => example.type === "diplomacy.message");
+  expect(mail.length).toBeGreaterThan(0);
+  for (const call of mail) {
+    expect(Object.keys(call.args).sort()).toEqual(["targetCivId", "text"]);
+    expect(typeof call.args.targetCivId).toBe("string"); expect(Array.isArray(call.args.targetCivId)).toBe(false);
+    expect(typeof call.actionId).toBe("string"); expect(typeof call.expectedRevision).toBe("number");
+  }
+  expect(GAME_INSTRUCTIONS).not.toContain("targetCivIds");
+});
+
+it.each([undefined, "existing-diplomacy-session"])("reasserts outreach and ongoing negotiation context for session %s", async resumeId => {
+  const game = new FakeGameService();
+  game.messages = [{ ...nationMail, senderCivId: "Rome", targetCivId: "Greece", acknowledgedTurnSerial: 3,
+    acknowledgementText: "We can trade iron if Rome protects our eastern border." }];
+  let prompt = "", resumed: string | undefined;
+  const personality = "Peaceful negotiator. Never use nuclear weapons except as a last resort.";
+  const runner: ProviderRunner = { spawn: () => ({ pid: undefined, stdoutLines: () => {}, stderrText: () => "",
+    wait: async () => ({ code: 0, signal: null }), kill: () => { throw Error("must not kill"); } }) };
+  const supervisor = new Supervisor((input, existing) => {
+    prompt = input; resumed = existing;
+    return { spec: { executable: "unused", argv: [], cwd: process.cwd() }, env: {} };
+  }, () => ({ provider: "scripted", sessionId: resumeId ?? null, model: null, toolCalls: [], finalText: null, usage: null,
+    completed: true, errorText: null, advertisedTools: null }), runner);
+  await supervisor.runLeaderTurn({ engine: game, binding: { matchId: "m", timelineId: "t", civId: "Rome", runId: "outreach-test", authorityEpoch: 1 },
+    profile: { displayName: "Ada", personality, modelLabel: "scripted" }, context: promptContext, guidance: [], resumeId, cwd: process.cwd() });
+  assertPurposefulOutreach(prompt);
+  expect(resumed).toBe(resumeId); expect(prompt).toContain(personality);
+  expect(prompt).toContain(game.messages[0]!.acknowledgementText);
+  expect(prompt).toContain("History is context, not a new acknowledgement requirement");
+  if (resumeId) expect(prompt).toContain(`Resumed provider session ${resumeId}`);
+});
