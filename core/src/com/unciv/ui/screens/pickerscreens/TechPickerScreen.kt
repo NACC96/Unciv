@@ -130,16 +130,17 @@ class TechPickerScreen(
 
     private fun tryExit() {
         // Agent matches route research through the coordinator (§3.2).
-        val chosenTech = selectedTech?.name ?: tempTechsToResearch.firstOrNull()
+        // Capture the displayed intent before the host dispatches these factories asynchronously.
+        val stagedQueue = tempTechsToResearch.toList()
+        val freeTech = selectedTech?.name
         if (UncivGame.Current.worldScreen?.routeThroughAgentSession { 
-                listOf({ r: Int ->
-                    SelectResearchCommand(
-                        civInfo.civID, "ui-${System.nanoTime()}", r,
-                        chosenTech ?: "",
-                        queue = !freeTechPick && tempTechsToResearch.size > 1,
-                        useFreeTech = freeTechPick
-                    )
-                })
+                if (freeTechPick) listOf({ r: Int ->
+                    SelectResearchCommand(civInfo.civID, "ui-${System.nanoTime()}", r,
+                        freeTech ?: "", queue = false, useFreeTech = true)
+                }) else stagedQueue.mapIndexed { index, techName ->
+                    { r: Int -> SelectResearchCommand(civInfo.civID, "ui-${System.nanoTime()}", r,
+                        techName, queue = index != 0, useFreeTech = false) }
+                }
             } == true) {
             game.popScreen()
             return

@@ -1,6 +1,7 @@
 package com.unciv.logic.agents
 
 import com.unciv.json.json
+import com.unciv.Constants
 import com.unciv.logic.GameInfo
 import com.unciv.logic.battle.AttackableTile
 import com.unciv.logic.battle.Battle
@@ -15,8 +16,11 @@ import com.unciv.logic.civilization.diplomacy.DeclareWarReason
 import com.unciv.logic.civilization.diplomacy.DiplomaticStatus
 import com.unciv.logic.civilization.diplomacy.WarType
 import com.unciv.logic.civilization.diplomacy.DiplomaticModifiers
+import com.unciv.logic.civilization.diplomacy.DiplomacyFlags
 import com.unciv.logic.civilization.managers.TurnManager
 import com.unciv.logic.civilization.AlertType
+import com.unciv.logic.civilization.CivFlags
+import com.unciv.logic.civilization.managers.ReligionState
 import com.unciv.logic.map.HexCoord
 import com.unciv.logic.map.mapunit.MapUnit
 import com.unciv.logic.map.tile.Tile
@@ -25,9 +29,12 @@ import com.unciv.logic.trade.TradeEvaluation
 import com.unciv.logic.trade.TradeLogic
 import com.unciv.logic.trade.TradeOffer
 import com.unciv.logic.trade.TradeRequest
+import com.unciv.logic.trade.TradeOfferType
 import com.unciv.models.UnitActionType
 import com.unciv.models.ruleset.Building
 import com.unciv.models.ruleset.INonPerpetualConstruction
+import com.unciv.models.ruleset.PerpetualConstruction
+import com.unciv.models.ruleset.tile.ResourceType
 import com.unciv.models.ruleset.unique.UniqueTarget
 import com.unciv.models.ruleset.unique.UniqueType
 import com.unciv.models.stats.Stat
@@ -80,6 +87,7 @@ class MatchCoordinator(
         // Deep-copy inputs so the caller retains no alias into committed state.
         committedGame = deserializeGame(json.toJson(game))
         committedMatch = match.deepCopy()
+        NationControl.initialize(committedGame, committedMatch)
         // Initial/load knowledge is populated once, never by a read tool.
         AgentMapSightings().apply {
             captureAll(committedGame, committedMatch)
@@ -87,6 +95,90 @@ class MatchCoordinator(
         }
         committedMatchJson = AgentOrdinarySave.encode(committedMatch)
         rebuildHotIndex()
+    }
+
+    fun getLocalControlCivId(): String? = committedMatch.localControlCivId
+    fun getLocalViewingCivId(): String? = committedMatch.localViewingCivId
+
+    @Synchronized
+    fun getNationSettings(): List<NationSetting> {
+        if (committedGame.gameParameters.isOnlineMultiplayer) return emptyList()
+        val origin = committedMatch.localControlCivId ?: return emptyList()
+        val principal = committedGame.getCivilizationOrNull(origin) ?: return emptyList()
+        return committedGame.civilizations.filter { NationControl.isEligible(it, committedMatch) &&
+            (principal.isSpectator() || it.civID == origin) }.map { civ ->
+            val controller = committedMatch.controllers[civ.civID]!!
+            NationSetting(civ.civID, civ.civName, controller.kind,
+                (controller.agentProfile ?: committedMatch.retainedAgentProfiles[civ.civID])?.copy(),
+                committedGame.currentPlayer == civ.civID)
+        }
+    }
+
+    fun canSpectate(): Boolean = !committedGame.gameParameters.isOnlineMultiplayer &&
+        committedMatch.localControlCivId?.let { committedGame.getCivilizationOrNull(it)?.isSpectator() } == true
+
+    /** The host supplies no gameplay actor: authority comes only from the saved local principal. */
+    @Synchronized
+    fun validateNationChange(civId: String?, change: NationControlChange, profile: AgentProfile?) {
+        require(!committedGame.gameParameters.isOnlineMultiplayer) { "Online agent matches are unsupported" }
+        check(committedMatch.turnPhase != TurnPhase.COMPLETED) { "This match has finished" }
+        if (change == NationControlChange.SPECTATE) {
+            require(canSpectate()) { "Only the local spectator may return to spectating" }
+            return
+        }
+        require(getNationSettings().any { it.civId == civId }) { "This nation is unavailable to the local player" }
+        if (change == NationControlChange.SAVE_AGENT_SETTINGS) require(profile != null) { "Choose an agent profile" }
+        val desired = profile ?: committedMatch.retainedAgentProfiles[civId]
+            ?: committedMatch.controllers[civId]?.agentProfile
+        if (change in setOf(NationControlChange.SAVE_AGENT_SETTINGS, NationControlChange.HAND_TO_AGENT)) {
+            require(desired != null) { "Choose an agent profile before handing this nation to an agent" }
+            NationControl.validateProfile(desired)
+        }
+    }
+
+    /** Called only at a host-owned idle boundary, never exposed in the provider engine protocol. */
+    @Synchronized
+    fun applyNationChange(civId: String?, change: NationControlChange, profile: AgentProfile?) {
+        check(!committedMatch.matchPaused) { "Resolve the checkpoint failure before changing nation settings" }
+        validateNationChange(civId, change, profile)
+        val candidate = committedMatch.deepCopy()
+        var candidateGame: GameInfo? = null
+        if (change == NationControlChange.SPECTATE) {
+            candidate.localViewingCivId = candidate.localControlCivId
+        } else {
+            val controller = candidate.controllers[civId]!!
+            if (controller.agentProfile != null) candidate.retainedAgentProfiles[civId!!] = controller.agentProfile!!.copy()
+            if (profile != null && change != NationControlChange.PLAY_AS) {
+                val previousRevision = candidate.retainedAgentProfiles[civId]?.profileRevision ?: 0
+                require(previousRevision < Int.MAX_VALUE) { "Agent profile revision is exhausted" }
+                candidate.retainedAgentProfiles[civId!!] = profile.copy().apply {
+                    profileRevision = maxOf(profileRevision, previousRevision + 1)
+                }
+            }
+            when (change) {
+                NationControlChange.PLAY_AS -> {
+                    controller.kind = ControllerKind.HUMAN
+                    controller.agentProfile = null
+                    candidate.localViewingCivId = civId
+                    // Taking control of an existing match is not a new-game introduction.
+                    // Consume only this greeting in the same durable controller/view transaction.
+                    if (committedGame.getCivilization(civId!!).popupAlerts.any { it.type == AlertType.StartIntro }) {
+                        candidateGame = deserializeGame(json.toJson(committedGame))
+                        candidateGame.getCivilization(civId).popupAlerts.removeAll { it.type == AlertType.StartIntro }
+                    }
+                }
+                NationControlChange.HAND_TO_AGENT -> {
+                    controller.kind = ControllerKind.EXTERNAL_AGENT
+                    controller.agentProfile = candidate.retainedAgentProfiles[civId]!!.copy()
+                }
+                NationControlChange.SAVE_AGENT_SETTINGS -> if (controller.kind == ControllerKind.EXTERNAL_AGENT)
+                    controller.agentProfile = candidate.retainedAgentProfiles[civId]!!.copy()
+                else -> {}
+            }
+        }
+        check(candidate.stateRevision < Int.MAX_VALUE) { "Match revision is exhausted" }
+        candidate.stateRevision++
+        commit(candidateGame, candidate)
     }
 
     //region Reads (no mutation)
@@ -188,11 +280,38 @@ class MatchCoordinator(
     @Synchronized
     fun getMessageHistory(viewerCivId: String): List<DiplomaticMessage> {
         val viewer = requireMessageViewer(viewerCivId)
-        return committedMatch.diplomaticMessages.filter { message ->
+        return orderedDiplomaticMessages(committedMatch.diplomaticMessages.filter { message ->
             viewer.isSpectator() || message.senderCivId == viewerCivId ||
-                (message.targetCivId == viewerCivId && message.deliveredTurnSerial != null)
-        }.map { it.copy() }
+                message.isDeliveredTo(viewerCivId, committedMatch.turnSerial)
+        }).map { it.copy() }
     }
+
+    /** Provider reads can access only that actor's delivered incoming attachments. */
+    @Synchronized
+    fun getDeliveredMessageImage(actorCivId: String, messageId: String,
+                                 attachmentId: String): DiplomaticImageAttachment {
+        requireController(actorCivId)
+        val message = committedMatch.diplomaticMessages.firstOrNull {
+            it.messageId == messageId && it.isDeliveredTo(actorCivId, committedMatch.turnSerial)
+        }
+        return requireMessageImage(message, attachmentId)
+    }
+
+    /** Preview access uses the attached viewer's ordinary private history visibility. */
+    @Synchronized
+    fun getViewerMessageImage(viewerCivId: String, messageId: String,
+                              attachmentId: String): DiplomaticImageAttachment {
+        val viewer = requireMessageViewer(viewerCivId)
+        val message = committedMatch.diplomaticMessages.firstOrNull {
+            it.messageId == messageId && (viewer.isSpectator() || it.senderCivId == viewerCivId ||
+                it.isDeliveredTo(viewerCivId, committedMatch.turnSerial))
+        }
+        return requireMessageImage(message, attachmentId)
+    }
+
+    private fun requireMessageImage(message: DiplomaticMessage?, attachmentId: String): DiplomaticImageAttachment =
+        message?.attachments?.firstOrNull { it.attachmentId == attachmentId }?.copy()
+            ?: throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "No such accessible message image")
 
     /**
      * Host-only player/spectator mail may queue between turns, including while play is paused.
@@ -203,8 +322,32 @@ class MatchCoordinator(
         senderCivId: String,
         messageId: String,
         targetCivId: String,
-        text: String
+        text: String,
+        attachments: List<DiplomaticImageAttachment> = emptyList()
     ): DiplomaticMessage {
+        val validated = validatedPlayerMessage(senderCivId, messageId, targetCivId, text, attachments)
+        validated.duplicate?.let { return it.copy() }
+        val candidate = committedMatch.deepCopy()
+        val message = DiplomaticMessage(messageId, senderCivId, targetCivId, validated.body,
+            candidate.turnSerial, null, validated.origin, attachments = ArrayList(validated.images))
+        candidate.diplomaticMessages.add(message)
+        commit(candidateGame = null, candidateMatch = candidate)
+        return message.copy()
+    }
+
+    /** Cheap read-only preflight before a host writes image bytes. Queueing repeats every check. */
+    @Synchronized
+    fun validatePlayerMessage(senderCivId: String, messageId: String, targetCivId: String,
+                              text: String, attachments: List<DiplomaticImageAttachment> = emptyList()) {
+        validatedPlayerMessage(senderCivId, messageId, targetCivId, text, attachments)
+    }
+
+    private data class ValidatedPlayerMessage(val body: String, val origin: String,
+                                             val images: List<DiplomaticImageAttachment>,
+                                             val duplicate: DiplomaticMessage?)
+
+    private fun validatedPlayerMessage(senderCivId: String, messageId: String, targetCivId: String,
+                                       text: String, attachments: List<DiplomaticImageAttachment>): ValidatedPlayerMessage {
         val sender = requireMessageViewer(senderCivId)
         if (!sender.isSpectator() && committedMatch.controllers[senderCivId]?.kind != ControllerKind.HUMAN)
             throw AgentCommandException(AgentCommandError.AUTHORITY_REVOKED,
@@ -214,16 +357,19 @@ class MatchCoordinator(
         if (committedMatch.turnPhase == TurnPhase.COMPLETED || sender.isDefeated())
             throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Cannot send mail after play has ended")
         val origin = if (sender.isSpectator()) "SPECTATOR" else "NATION"
-        val body = validateMessageBody(messageId, text)
-        findDuplicateMessage(messageId, senderCivId, targetCivId, body, origin)?.let { return it.copy() }
+        val images = attachments.map { it.copy() }
+        if (images.size > 1)
+            throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "A message may contain one image")
+        try { images.forEach { it.validate() } } catch (ex: IllegalArgumentException) {
+            throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, ex.message ?: "Invalid message image")
+        }
+        val body = validateMessageBody(messageId, text, allowEmpty = images.isNotEmpty())
+        findDuplicateMessage(messageId, senderCivId, targetCivId, body, origin, images)?.let {
+            return ValidatedPlayerMessage(body, origin, images, it)
+        }
         requireMessageTarget(senderCivId, targetCivId)
         requireMessageLimit(senderCivId)
-        val candidate = committedMatch.deepCopy()
-        val message = DiplomaticMessage(messageId, senderCivId, targetCivId, body,
-            candidate.turnSerial, null, origin)
-        candidate.diplomaticMessages.add(message)
-        commit(candidateGame = null, candidateMatch = candidate)
-        return message.copy()
+        return ValidatedPlayerMessage(body, origin, images, null)
     }
 
     fun getTimelineId(): String = committedMatch.timelineId
@@ -439,12 +585,16 @@ class MatchCoordinator(
             is EndTurnCommand -> executeEndTurn(command)
             is SelectResearchCommand -> executeResearch(command)
             is CityProductionCommand -> executeProduction(command)
+            is CityConstructionSettingsCommand -> executeConstructionSettings(command)
+            is SetCityUnitSavedPromotionCommand -> executeSavedPromotionPreference(command)
+            is SaveUnitPromotionDefaultsCommand -> executeSavePromotionDefaults(command)
             is FoundCityCommand -> executeFound(command)
             is UnitOrderCommand -> executeOrder(command)
             is AttackCommand -> executeAttack(command)
             is ResolveConquestCommand -> executeResolveConquest(command)
             is DeclareWarCommand -> executeDeclareWar(command)
             is MakePeaceCommand -> executeMakePeace(command)
+            is NegotiateCityStatePeaceCommand -> executeNegotiateCityStatePeace(command)
             is ProposeTradeCommand -> executeProposeTrade(command)
             is RespondTradeCommand -> executeRespondTrade(command)
             is AdoptPolicyCommand -> executeAdoptPolicy(command)
@@ -455,7 +605,12 @@ class MatchCoordinator(
             is PromoteUnitCommand -> executePromote(command)
             is UpgradeUnitCommand -> executeUpgrade(command)
             is GreatPersonCommand -> executeGreatPerson(command)
+            is ChooseFreeGreatPersonCommand -> executeChooseFreeGreatPerson(command)
+            is DismissAlertCommand -> executeDismissAlert(command)
+            is DismissDiplomaticVoteResultsCommand -> executeDismissVoteResults(command)
+            is MarkPolicyPickerOpenedCommand -> executeMarkPolicyPickerOpened(command)
             is GiftGoldToCityStateCommand -> executeGiftGold(command)
+            is GiftImprovementToCityStateCommand -> executeGiftImprovement(command)
             is PillageCommand -> executePillage(command)
             is RepairCommand -> executeRepair(command)
             is FriendshipCommand -> executeFriendship(command)
@@ -571,6 +726,8 @@ class MatchCoordinator(
             command.expectedRevision, fingerprint, collectSightings = false,
             rememberReceipt = { candidate, retained ->
                 candidate.diplomaticMessageReceipts[command.actionId] = retained.copy()
+                candidate.diplomaticMessages.first { it.messageId == command.messageId }
+                    .acknowledgedRevision = retained.afterRevision
             }) { _, candidate ->
             val incoming = candidate.diplomaticMessages.first { it.messageId == command.messageId }
             if (incoming.acknowledgedTurnSerial != null)
@@ -597,11 +754,11 @@ class MatchCoordinator(
             throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "No eligible diplomatic contact")
     }
 
-    private fun validateMessageBody(messageId: String, text: String): String {
+    private fun validateMessageBody(messageId: String, text: String, allowEmpty: Boolean = false): String {
         val body = text.trim()
         if (messageId.isBlank() || messageId.length > 128)
             throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Message ID must contain 1–128 characters")
-        if (body.isEmpty() || body.length > DiplomaticMessageLimits.MAX_BODY_CHARS ||
+        if ((!allowEmpty && body.isEmpty()) || body.length > DiplomaticMessageLimits.MAX_BODY_CHARS ||
             body.toByteArray(Charsets.UTF_8).size > DiplomaticMessageLimits.MAX_BODY_BYTES)
             throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT,
                 "Message must contain 1–2000 characters and fit within 8 KiB UTF-8")
@@ -613,11 +770,16 @@ class MatchCoordinator(
         senderCivId: String,
         targetCivId: String,
         body: String,
-        origin: String
+        origin: String,
+        attachments: List<DiplomaticImageAttachment> = emptyList()
     ): DiplomaticMessage? {
         val prior = committedMatch.diplomaticMessages.firstOrNull { it.messageId == messageId } ?: return null
         if (prior.senderCivId != senderCivId || prior.targetCivId != targetCivId ||
-            prior.text != body || prior.origin != origin)
+            prior.text != body || prior.origin != origin ||
+            (prior.attachments.size != attachments.size || prior.attachments.zip(attachments).any { (a, b) ->
+                a.attachmentId != b.attachmentId || a.mimeType != b.mimeType || a.width != b.width ||
+                    a.height != b.height || a.byteLength != b.byteLength
+            }))
             throw AgentCommandException(AgentCommandError.ACTION_ID_CONFLICT,
                 "Message ID was already used for different mail")
         return prior
@@ -828,10 +990,12 @@ class MatchCoordinator(
     private fun executeProduction(command: CityProductionCommand): CityProductionResult {
         val receipt = runGameplayMutation(
             command.actorCivId, command.actionId, command.expectedRevision,
-            "city.produce|${command.cityId}|${command.op}|${command.name}|${command.index}|${command.tilePos}"
+            "city.produce|${command.cityId}|${command.op}|${command.name}|${command.index}|${command.tilePos}" +
+                if (command.purchaseStat != Stat.Gold) "|purchaseStat=${command.purchaseStat}" else ""
         ) { candidateGame, _ ->
             val city = requireOwnCity(candidateGame, command.actorCivId, command.cityId)
             val constructions = city.cityConstructions
+            val previousConstruction = constructions.currentConstructionName()
             when (command.op) {
                 ProductionOp.ADD_TOP, ProductionOp.ADD_BOTTOM -> {
                     val construction = try {
@@ -878,6 +1042,12 @@ class MatchCoordinator(
                     constructions.moveEntryToTop(command.index)
                 }
                 ProductionOp.PURCHASE -> {
+                    if (command.purchaseStat !in Stat.statsUsableToBuy)
+                        throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Invalid purchase currency")
+                    if (command.index < -1 || command.index >= constructions.constructionQueue.size)
+                        throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Queue index out of range")
+                    if (command.index >= 0 && constructions.constructionQueue[command.index] != command.name)
+                        throw AgentCommandException(AgentCommandError.STALE_STATE, "The selected purchase queue entry changed")
                     val construction = try {
                         constructions.getConstruction(command.name)
                     } catch (ex: Exception) {
@@ -888,11 +1058,11 @@ class MatchCoordinator(
                         ?: throw AgentCommandException(
                             AgentCommandError.ILLEGAL_ACTION, "${command.name} cannot be purchased"
                         )
-                    val cost = construction.getStatBuyCost(city, Stat.Gold)
+                    val cost = construction.getStatBuyCost(city, command.purchaseStat)
                         ?: throw AgentCommandException(
                             AgentCommandError.ILLEGAL_ACTION, "${command.name} cannot be purchased"
                         )
-                    if (!constructions.isConstructionPurchaseAllowed(construction, Stat.Gold, cost))
+                    if (!constructions.isConstructionPurchaseAllowed(construction, command.purchaseStat, cost))
                         throw AgentCommandException(
                             AgentCommandError.ILLEGAL_ACTION, "${command.name} cannot be purchased now"
                         )
@@ -902,13 +1072,24 @@ class MatchCoordinator(
                     // automatic=false + suppressed: an emptied queue idles for an
                     // explicit agent choice instead of settings-driven auto-fill.
                     if (!constructions.purchaseConstruction(
-                            construction, command.index, automatic = false, stat = Stat.Gold, tile = tile,
+                            construction, command.index, automatic = false, stat = command.purchaseStat, tile = tile,
                             suppressAutomation = true
                         )
                     )
                         throw AgentCommandException(
                             AgentCommandError.ILLEGAL_ACTION, "${command.name} purchase failed"
                         )
+                }
+                ProductionOp.MOVE_END -> {
+                    if (command.index !in constructions.constructionQueue.indices)
+                        throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Queue index out of range")
+                    if (constructions.getConstruction(constructions.constructionQueue[command.index]) is PerpetualConstruction)
+                        throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Perpetual construction cannot be moved")
+                    constructions.moveEntryToEnd(command.index)
+                }
+                ProductionOp.REMOVE_ALL -> {
+                    requireConstruction(city, command.name)
+                    constructions.removeAllByName(command.name)
                 }
                 ProductionOp.SELL -> {
                     // Gates mirror ConstructionInfoTable's sell button.
@@ -929,9 +1110,69 @@ class MatchCoordinator(
                     city.sellBuilding(building)
                 }
             }
+            // Allocate against the committed queue, rather than an old UI snapshot.
+            if (constructions.currentConstructionName() != previousConstruction)
+                city.reassignPopulation()
             constructions.constructionQueue.joinToString("")
         }
         return CityProductionResult(command.actorCivId, receipt, receipt.resultJson.split(""))
+    }
+
+    private fun requireConstruction(city: City, name: String) = try {
+        city.cityConstructions.getConstruction(name)
+    } catch (ex: Exception) {
+        throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Unknown construction $name")
+    }
+
+    private fun executeConstructionSettings(command: CityConstructionSettingsCommand): CityConstructionSettingsResult {
+        val receipt = runGameplayMutation(command.actorCivId, command.actionId, command.expectedRevision,
+            "city.constructionSettings|${command.cityId}|${command.constructionName}|${command.disabled}") { game, _ ->
+            val civ = game.getCivilization(command.actorCivId)
+            val cities = command.cityId?.let { listOf(requireOwnCity(game, command.actorCivId, it)) } ?: civ.cities
+            val construction = cities.firstOrNull()?.let { requireConstruction(it, command.constructionName) }
+                ?: throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "No city available")
+            if (construction == PerpetualConstruction.Idle)
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Idle cannot be disabled")
+            for (city in cities) {
+                if (command.disabled) city.disabledConstructions.add(command.constructionName)
+                else city.disabledConstructions.remove(command.constructionName)
+            }
+            if (command.cityId == null) {
+                if (command.disabled) civ.disabledCityConstructions.add(command.constructionName)
+                else civ.disabledCityConstructions.remove(command.constructionName)
+            }
+            ""
+        }
+        return CityConstructionSettingsResult(command.actorCivId, receipt)
+    }
+
+    private fun executeSavedPromotionPreference(command: SetCityUnitSavedPromotionCommand): UnitPromotionDefaultsSavedResult {
+        val receipt = runGameplayMutation(command.actorCivId, command.actionId, command.expectedRevision,
+            "city.savedPromotion|${command.cityId}|${command.baseUnit}|${command.enabled}") { game, _ ->
+            val city = requireOwnCity(game, command.actorCivId, command.cityId)
+            if (command.baseUnit !in game.ruleset.units)
+                throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Unknown unit ${command.baseUnit}")
+            if (city.isPuppet || command.baseUnit !in city.unitShouldUseSavedPromotion)
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "No editable saved promotions for ${command.baseUnit}")
+            city.unitShouldUseSavedPromotion[command.baseUnit] = command.enabled
+            city.id
+        }
+        return UnitPromotionDefaultsSavedResult(command.actorCivId, receipt, receipt.resultJson)
+    }
+
+    private fun executeSavePromotionDefaults(command: SaveUnitPromotionDefaultsCommand): UnitPromotionDefaultsSavedResult {
+        val receipt = runGameplayMutation(command.actorCivId, command.actionId, command.expectedRevision,
+            "unit.savePromotionDefaults|${command.unitId}") { game, _ ->
+            val unit = requireOwnUnit(game, command.actorCivId, command.unitId)
+            val city = unit.getTile().getCity()
+                ?: throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Unit is not in a city territory")
+            if (city.civ !== unit.civ || city.isPuppet)
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Unit must be in an owned non-puppet city")
+            city.unitShouldUseSavedPromotion[unit.baseUnit.name] = true
+            city.unitToPromotions[unit.baseUnit.name] = unit.promotions.clone()
+            city.id
+        }
+        return UnitPromotionDefaultsSavedResult(command.actorCivId, receipt, receipt.resultJson)
     }
 
     private fun executeFound(command: FoundCityCommand): CityFoundedResult {
@@ -1272,6 +1513,32 @@ class MatchCoordinator(
         return DiplomacyResult(command.actorCivId, receipt, receipt.resultJson)
     }
 
+    private fun executeNegotiateCityStatePeace(command: NegotiateCityStatePeaceCommand): DiplomacyResult {
+        val receipt = runGameplayMutation(command.actorCivId, command.actionId, command.expectedRevision,
+            "human.citystate.negotiatePeace|${command.cityStateId}") { game, match ->
+            val civ = requireHumanOnCandidate(game, match, command.actorCivId)
+            val cityState = game.getCivilizationOrNull(command.cityStateId)
+                ?: throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Unknown civilization")
+            if (!civ.isMajorCiv() || !cityState.isCityState || cityState.isDefeated())
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "No eligible city-state peace target")
+            val diplomacy = civ.getDiplomacyManager(cityState)
+                ?: throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "No diplomatic contact")
+            val reverse = cityState.getDiplomacyManager(civ)
+                ?: throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "No diplomatic contact")
+            // Mirror the native city-state Negotiate Peace button, including the target's war flag.
+            if (diplomacy.diplomaticStatus != DiplomaticStatus.War ||
+                reverse.hasFlag(DiplomacyFlags.DeclaredWar) ||
+                cityState.allyCiv?.let { ally -> civ.getKnownCivs().any { it == ally && it.isAtWarWith(civ) } } == true)
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "City-state peace cannot be negotiated now")
+            val trade = TradeLogic(civ, cityState)
+            trade.currentTrade.ourOffers.add(TradeOffer(Constants.peaceTreaty, TradeOfferType.Treaty, speed = game.speed))
+            trade.currentTrade.theirOffers.add(TradeOffer(Constants.peaceTreaty, TradeOfferType.Treaty, speed = game.speed))
+            trade.acceptTrade()
+            diplomacy.diplomaticStatus.name
+        }
+        return DiplomacyResult(command.actorCivId, receipt, receipt.resultJson)
+    }
+
     private fun buildTrade(
         candidateGame: GameInfo,
         actor: Civilization,
@@ -1367,6 +1634,58 @@ class MatchCoordinator(
         return PolicyAdoptedResult(command.actorCivId, receipt, adopted)
     }
 
+    private fun requireHumanOnCandidate(game: GameInfo, match: AgentMatchState, actor: String): Civilization {
+        if (match.controllers[actor]?.kind != ControllerKind.HUMAN)
+            throw AgentCommandException(AgentCommandError.AUTHORITY_REVOKED, "This acknowledgement requires a human controller")
+        return game.getCivilization(actor)
+    }
+
+    private fun executeDismissAlert(command: DismissAlertCommand): HumanPresentationResult {
+        val receipt = runGameplayMutation(command.actorCivId, command.actionId, command.expectedRevision,
+            "human.dismissAlert|${command.alertType}|${command.alertValue}", collectSightings = false) { game, match ->
+            val civ = requireHumanOnCandidate(game, match, command.actorCivId)
+            if (!isDismissibleAgentAlert(command.alertType))
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "This alert requires its own decision")
+            val alert = civ.popupAlerts.firstOrNull { it.type == command.alertType && it.value == command.alertValue }
+                ?: throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "No such pending informational alert")
+            civ.popupAlerts.remove(alert)
+            "dismissed"
+        }
+        return HumanPresentationResult(command.actorCivId, receipt)
+    }
+
+    private fun executeDismissVoteResults(command: DismissDiplomaticVoteResultsCommand): HumanPresentationResult {
+        val receipt = runGameplayMutation(command.actorCivId, command.actionId, command.expectedRevision,
+            "human.dismissVoteResults", collectSightings = false) { game, match ->
+            val civ = requireHumanOnCandidate(game, match, command.actorCivId)
+            if (!civ.shouldShowDiplomaticVotingResults())
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "No pending diplomatic voting results")
+            civ.addFlag(CivFlags.ShowDiplomaticVotingResults.name, -1)
+            "dismissed"
+        }
+        return HumanPresentationResult(command.actorCivId, receipt)
+    }
+
+    private fun executeMarkPolicyPickerOpened(command: MarkPolicyPickerOpenedCommand): HumanPresentationResult {
+        val receipt = runGameplayMutation(command.actorCivId, command.actionId, command.expectedRevision,
+            "human.policyPickerOpened", collectSightings = false) { game, match ->
+            requireHumanOnCandidate(game, match, command.actorCivId).policies.shouldOpenPolicyPicker = false
+            "opened"
+        }
+        return HumanPresentationResult(command.actorCivId, receipt)
+    }
+
+    private fun executeChooseFreeGreatPerson(command: ChooseFreeGreatPersonCommand): FreeGreatPersonChosenResult {
+        val receipt = runGameplayMutation(command.actorCivId, command.actionId, command.expectedRevision,
+            "human.chooseFreeGreatPerson|${command.unitName}") { game, match ->
+            val civ = requireHumanOnCandidate(game, match, command.actorCivId)
+            val unit = civ.greatPeople.chooseFreeGreatPerson(command.unitName)
+                ?: throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "No available free great person or space to place it")
+            unit.id.toString()
+        }
+        return FreeGreatPersonChosenResult(command.actorCivId, receipt, receipt.resultJson.toInt())
+    }
+
     private inline fun <T> illegalFromEngine(block: () -> T): T {
         try {
             return block()
@@ -1378,7 +1697,8 @@ class MatchCoordinator(
     private fun executeCitizens(command: CityCitizensCommand): CityCitizensResult {
         val receipt = runGameplayMutation(
             command.actorCivId, command.actionId, command.expectedRevision,
-            "city.citizens|${command.cityId}|${command.op}|${command.tilePos}|${command.specialist}|${command.focus}|${command.flag}"
+            "city.citizens|${command.cityId}|${command.op}|${command.tilePos}|${command.specialist}|${command.focus}|${command.flag}" +
+                if (command.resetLocked) "|resetLocked=true" else ""
         ) { candidateGame, _ ->
             val city = requireOwnCity(candidateGame, command.actorCivId, command.cityId)
             when (command.op) {
@@ -1449,13 +1769,17 @@ class MatchCoordinator(
                 }
                 CitizenOp.SET_MANUAL_SPECIALISTS -> {
                     city.manualSpecialists = command.flag
-                    city.reassignPopulation()
+                    if (!command.flag) city.reassignPopulation()
                 }
                 CitizenOp.SET_AVOID_GROWTH -> {
                     city.avoidGrowth = command.flag
                     city.reassignPopulation()
                 }
-                CitizenOp.REASSIGN -> city.reassignPopulation()
+                CitizenOp.TOGGLE_AVOID_GROWTH -> {
+                    city.avoidGrowth = !city.avoidGrowth
+                    city.reassignPopulation()
+                }
+                CitizenOp.REASSIGN -> city.reassignPopulation(command.resetLocked)
             }
             city.population.getFreePopulation().toString()
         }
@@ -1676,6 +2000,36 @@ class MatchCoordinator(
             influence.toString()
         }
         return GoldGiftedResult(command.actorCivId, receipt, receipt.resultJson.toInt())
+    }
+
+    private fun executeGiftImprovement(command: GiftImprovementToCityStateCommand): ImprovementGiftedResult {
+        val receipt = runGameplayMutation(command.actorCivId, command.actionId, command.expectedRevision,
+            "citystate.giftImprovement|${command.cityStateId}|${command.tilePos}|${command.improvementName}") { game, _ ->
+            val civ = game.getCivilization(command.actorCivId)
+            val cityState = game.getCivilizationOrNull(command.cityStateId)
+                ?: throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Unknown civilization")
+            if (!cityState.isCityState || !civ.knows(cityState) || civ.isAtWarWith(cityState) ||
+                (cityState.getDiplomacyManager(civ)?.getInfluence() ?: 0f) < 60f)
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "City-state improvement gift is unavailable")
+            if (civ.gold < 200)
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Insufficient gold")
+            val tile = resolveTile(game, command.tilePos)
+            val resource = tile.tileResource
+            val improvement = game.ruleset.tileImprovements[command.improvementName]
+                ?: throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Unknown improvement ${command.improvementName}")
+            if (tile.getOwner() !== cityState || resource == null || !cityState.canSeeResource(resource) ||
+                resource.resourceType == ResourceType.Bonus ||
+                (tile.improvement != null && resource.isImprovedBy(tile.improvement!!)) ||
+                !resource.isImprovedBy(improvement.name) || improvement.turnsToBuild == -1 ||
+                !tile.improvementFunctions.canBuildImprovement(improvement, cityState.state))
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Resource cannot receive that improvement")
+            civ.addGold(-200)
+            tile.stopWorkingOnImprovement()
+            tile.setImprovement(improvement, cityState)
+            cityState.cache.updateCivResources()
+            ""
+        }
+        return ImprovementGiftedResult(command.actorCivId, receipt)
     }
 
     private fun executePillage(command: PillageCommand): PillagedResult {
@@ -2360,6 +2714,16 @@ class MatchCoordinator(
                     "Missing decisions are never chosen automatically."
             )
 
+        // Unsupported legacy religion/espionage choices must never fall through to a turn commit.
+        // Normal validated Vanilla matches cannot enter these states.
+        val currentCiv = committedGame.getCivilization(command.actorCivId)
+        val religion = currentCiv.religionManager
+        if (religion.canFoundOrExpandPantheon() || religion.hasFreeBeliefs() ||
+            religion.religionState in setOf(ReligionState.FoundingReligion, ReligionState.EnhancingReligion) ||
+            committedGame.isEspionageEnabled() && currentCiv.espionageManager.shouldShowMoveSpies())
+            throw AgentCommandException(AgentCommandError.DECISIONS_PENDING,
+                "This saved match has an unsupported religion or espionage choice; resolve it outside agent mode")
+
         mutationInFlight = command.actionId
         try {
             val candidateGame = deserializeGame(json.toJson(committedGame), collectSightings = true)
@@ -2485,6 +2849,7 @@ class MatchCoordinator(
         TurnManager(civ).startTurn(null, suppressAutomation = true)
         candidateGame.currentPlayer = civ.civID
         candidateGame.currentPlayerCiv = civ
+        NationControl.handoffToCurrentHuman(candidateGame, candidateMatch)
         candidateGame.currentTurnStartTime = System.currentTimeMillis()
         candidateMatch.turnPhase = TurnPhase.AWAITING_DECISIONS
         candidateMatch.turnSerial++

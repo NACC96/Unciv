@@ -65,6 +65,8 @@ interface AgentMatchSession {
     fun getRunState(): AgentRunState
     fun getActiveCivId(): String?
     fun getActiveAgentProfile(): AgentProfile?
+    /** Copied elapsed time for the admitted provider, filtered to the actual viewer. */
+    fun getActiveRunTiming(): AgentRunTiming? = null
     /** Identity for activity from an earlier civilization, independent of the active turn. */
     fun getAgentProfile(civId: String): AgentProfile? =
         if (civId == getActiveCivId()) getActiveAgentProfile() else null
@@ -80,6 +82,25 @@ interface AgentMatchSession {
     /** Saves off the rendering thread. Callback runs on GL; null means durably queued. */
     fun sendMessage(targetCivId: String, text: String, onComplete: (String?) -> Unit) {
         onComplete("Messaging is unavailable for this match")
+    }
+    fun sendMessage(targetCivId: String, text: String, image: MessageImageDraft?, onComplete: (String?) -> Unit) {
+        if (image == null) sendMessage(targetCivId, text, onComplete)
+        else onComplete("Image messaging is unavailable for this match")
+    }
+    /** Reads private preview bytes off the rendering thread; desktop completion runs on GL. */
+    fun readMessageImage(messageId: String, attachmentId: String,
+                         onComplete: (MessageImageDraft?, String?) -> Unit) {
+        onComplete(null, "Message images are unavailable for this match")
+    }
+    /** Copied settings available to the saved local management origin, not the active provider. */
+    fun getNationSettings(): List<NationSetting> = emptyList()
+    /** Transient intent only: leaving/closing cancels a change before it is durably applied. */
+    fun getPendingNationChange(): String? = null
+    fun canSpectate(): Boolean = false
+    /** Completion means durable application or a terminal error; live providers drain naturally. */
+    fun requestNationChange(civId: String?, change: NationControlChange, profile: AgentProfile?,
+                            onComplete: (String?) -> Unit) {
+        onComplete("Nation settings are unavailable for this match")
     }
     fun startAutomaticPlay()
 }

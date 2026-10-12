@@ -89,9 +89,22 @@ class NextTurnButton(
         pack()
     }
 
-    private fun getNextTurnAction(worldScreen: WorldScreen) =
-        // Guaranteed to return a non-null NextTurnAction because the last isChoice always returns true
-        NextTurnAction.entries.first { it.isChoice(worldScreen) }
+    private fun getNextTurnAction(worldScreen: WorldScreen): NextTurnAction {
+        val session = worldScreen.agentSession
+        if (session != null) {
+            if (!session.isHumanInputAllowed()) return NextTurnAction.AgentMatch
+            if (listOf(NextTurnAction.MoveSpies, NextTurnAction.FoundPantheon, NextTurnAction.ExpandPantheon,
+                    NextTurnAction.FoundReligion, NextTurnAction.EnhanceReligion, NextTurnAction.ReformReligion)
+                    .any { it.isChoice(worldScreen) }) return NextTurnAction.AgentUnsupportedChoice
+            // Human choices must be reachable before the coordinator's end-turn fallback.
+            // Automation and legacy turn advancement remain owned by the session.
+            return listOf(NextTurnAction.PickGreatPerson, NextTurnAction.PickConstruction,
+                NextTurnAction.PickTech, NextTurnAction.PickPolicy,
+                NextTurnAction.WorldCongressVote, NextTurnAction.NextUnit)
+                .firstOrNull { it.isChoice(worldScreen) } ?: NextTurnAction.AgentMatch
+        }
+        return NextTurnAction.entries.first { it.isChoice(worldScreen) }
+    }
 
     @Readonly fun isNextUnitAction(): Boolean = nextTurnAction == NextTurnAction.NextUnit
 

@@ -155,20 +155,20 @@ class AgentMapKnowledgeTest {
         val oldMatch = """{"matchId":"m","timelineId":"t","stateRevision":7,"privateNotes":{"Rome":"notes"}}"""
         val oldBundle = AgentJson.stringify(mapOf("gameJson" to "{}", "matchJson" to oldMatch))
         val upgraded = migrateAgentBundleJson(oldBundle)
-        assertEquals(2, upgraded.bundleVersion)
+        assertEquals(3, upgraded.bundleVersion)
         assertEquals("{}", upgraded.gameJson)
-        assertTrue(upgraded.matchJson.contains("\"formatVersion\":2"))
+        assertTrue(upgraded.matchJson.contains("\"formatVersion\":3"))
         val state = json().fromJson(AgentMatchState::class.java, upgraded.matchJson)
         assertEquals("m", state.matchId); assertEquals("t", state.timelineId)
         assertEquals(7, state.stateRevision); assertEquals("notes", state.privateNotes["Rome"])
         assertTrue(state.mapKnowledge.tilesByCiv.isEmpty())
         val explicitV2 = json().apply { setUsePrototypes(false) }.toJson(upgraded)
-        assertTrue(explicitV2.contains("\"bundleVersion\":2"))
-        assertEquals(2, migrateAgentBundleJson(explicitV2).bundleVersion)
+        assertTrue(explicitV2.contains("\"bundleVersion\":3"))
+        assertEquals(3, migrateAgentBundleJson(explicitV2).bundleVersion)
     }
 
     @Test fun mismatched_and_future_versions_reject() {
-        for ((bundleVersion, stateVersion) in listOf(1 to 2, 2 to 1, 3 to 3)) {
+        for ((bundleVersion, stateVersion) in listOf(1 to 2, 2 to 1, 999 to 999)) {
             val bundle = AgentBundle("{}", "{\"formatVersion\":$stateVersion}", bundleVersion)
             try { migrateAgentBundle(bundle); fail("Expected rejection") }
             catch (expected: IllegalArgumentException) { assertTrue(expected.message!!.isNotBlank()) }

@@ -7,6 +7,8 @@ import com.unciv.logic.agents.BuyTileCommand
 import com.unciv.logic.agents.CitizenOp
 import com.unciv.logic.agents.CityCitizensCommand
 import com.unciv.logic.agents.CityProductionCommand
+import com.unciv.logic.agents.CityConstructionSettingsCommand
+import com.unciv.logic.agents.SetCityUnitSavedPromotionCommand
 import com.unciv.logic.agents.ProductionOp
 import com.unciv.logic.agents.RenameCityCommand
 import com.unciv.logic.agents.SetRazingCommand
@@ -287,11 +289,18 @@ class CityView(city: City,
     }
     fun tryAddToQueueWithTile(construction: IConstruction, tileView: TileView): Boolean {
         if (!canChangeState()) return false
+        if (routeThroughAgentSession { listOf({ r: Int ->
+                CityProductionCommand(city.civ.civID, "ui-${System.nanoTime()}", r, city.id,
+                    ProductionOp.ADD_BOTTOM, name = construction.name, tilePos = tileView.position())
+            }) }) return true
         city.cityConstructions.addToQueue(construction, tile = tileView.unwrap())
         return true
     }
     fun trySetUnitShouldUseSavedPromotion(baseUnit: String, value: Boolean): Boolean {
         if (!canChangeState()) return false
+        if (routeThroughAgentSession { listOf({ r: Int ->
+                SetCityUnitSavedPromotionCommand(city.civ.civID, "ui-${System.nanoTime()}", r, city.id, baseUnit, value)
+            }) }) return true
         city.unitShouldUseSavedPromotion[baseUnit] = value
         return true
     }
@@ -318,48 +327,86 @@ class CityView(city: City,
     }
     fun tryMoveEntryToEnd(index: Int) {
         if (!canChangeState()) return
+        if (routeThroughAgentSession { listOf({ r: Int ->
+                CityProductionCommand(city.civ.civID, "ui-${System.nanoTime()}", r, city.id,
+                    ProductionOp.MOVE_END, index = index)
+            }) }) return
         city.cityConstructions.moveEntryToEnd(index)
     }
     fun tryAddToQueueConstruction(construction: IConstruction, addToTop: Boolean = false) {
         if (!canChangeState()) return
+        if (routeThroughAgentSession { listOf({ r: Int ->
+                CityProductionCommand(city.civ.civID, "ui-${System.nanoTime()}", r, city.id,
+                    if (addToTop) ProductionOp.ADD_TOP else ProductionOp.ADD_BOTTOM, name = construction.name)
+            }) }) return
         city.cityConstructions.addToQueue(construction, addToTop = addToTop)
     }
     fun tryRemoveAllByName(name: String) {
         if (!canChangeState()) return
+        if (routeThroughAgentSession { listOf({ r: Int ->
+                CityProductionCommand(city.civ.civID, "ui-${System.nanoTime()}", r, city.id,
+                    ProductionOp.REMOVE_ALL, name = name)
+            }) }) return
         city.cityConstructions.removeAllByName(name)
     }
     fun tryDisableConstruction(name: String) {
         if (!canChangeState()) return
+        if (routeThroughAgentSession { listOf({ r: Int ->
+                CityConstructionSettingsCommand(city.civ.civID, "ui-${System.nanoTime()}", r, name, true, city.id)
+            }) }) return
         city.disabledConstructions.add(name)
     }
     fun tryEnableConstruction(name: String) {
         if (!canChangeState()) return
+        if (routeThroughAgentSession { listOf({ r: Int ->
+                CityConstructionSettingsCommand(city.civ.civID, "ui-${System.nanoTime()}", r, name, false, city.id)
+            }) }) return
         city.disabledConstructions.remove(name)
     }
     fun tryReassignPopulation(resetLocked: Boolean = false): Boolean {
         if (!canChangeState()) return false
+        if (routeThroughAgentSession { listOf({ r: Int ->
+                CityCitizensCommand(city.civ.civID, "ui-${System.nanoTime()}", r, city.id,
+                    CitizenOp.REASSIGN, resetLocked = resetLocked)
+            }) }) return true
         city.reassignPopulation(resetLocked)
         return true
     }
     fun tryToggleAvoidGrowth(): Boolean {
         if (!canChangeState()) return false
+        if (routeThroughAgentSession { listOf({ r: Int ->
+                CityCitizensCommand(city.civ.civID, "ui-${System.nanoTime()}", r, city.id,
+                    CitizenOp.TOGGLE_AVOID_GROWTH)
+            }) }) return true
         city.avoidGrowth = !city.avoidGrowth
         city.reassignPopulation()
         return true
     }
     fun tryEnableManualSpecialists(): Boolean {
         if (!canChangeState()) return false
+        if (routeThroughAgentSession { listOf({ r: Int ->
+                CityCitizensCommand(city.civ.civID, "ui-${System.nanoTime()}", r, city.id,
+                    CitizenOp.SET_MANUAL_SPECIALISTS, flag = true)
+            }) }) return true
         city.manualSpecialists = true
         return true
     }
     fun tryDisableManualSpecialists(): Boolean {
         if (!canChangeState()) return false
+        if (routeThroughAgentSession { listOf({ r: Int ->
+                CityCitizensCommand(city.civ.civID, "ui-${System.nanoTime()}", r, city.id,
+                    CitizenOp.SET_MANUAL_SPECIALISTS, flag = false)
+            }) }) return true
         city.manualSpecialists = false
         city.reassignPopulation()
         return true
     }
     fun tryAssignSpecialist(specialistName: String): Boolean {
         if (!canChangeState()) return false
+        if (routeThroughAgentSession { listOf({ r: Int ->
+                CityCitizensCommand(city.civ.civID, "ui-${System.nanoTime()}", r, city.id,
+                    CitizenOp.ASSIGN_SPECIALIST, specialist = specialistName)
+            }) }) return true
         city.population.specialistAllocations.add(specialistName, 1)
         city.manualSpecialists = true
         city.cityStats.update()
@@ -367,6 +414,10 @@ class CityView(city: City,
     }
     fun tryUnassignSpecialist(specialistName: String): Boolean {
         if (!canChangeState()) return false
+        if (routeThroughAgentSession { listOf({ r: Int ->
+                CityCitizensCommand(city.civ.civID, "ui-${System.nanoTime()}", r, city.id,
+                    CitizenOp.UNASSIGN_SPECIALIST, specialist = specialistName)
+            }) }) return true
         city.population.specialistAllocations.add(specialistName, -1)
         city.manualSpecialists = true
         city.cityStats.update()
@@ -374,6 +425,10 @@ class CityView(city: City,
     }
     fun trySetCityFocus(focus: CityFocus): Boolean {
         if (!canChangeState()) return false
+        if (routeThroughAgentSession { listOf({ r: Int ->
+                CityCitizensCommand(city.civ.civID, "ui-${System.nanoTime()}", r, city.id,
+                    CitizenOp.SET_FOCUS, focus = focus.name)
+            }) }) return true
         city.setCityFocus(focus)
         city.reassignPopulation()
         return true

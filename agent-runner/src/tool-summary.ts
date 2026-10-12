@@ -16,6 +16,7 @@ export function summarizeTool(rawName: string, input: any = {}, result?: any, st
         summary = `${units} ${units === 1 ? "unit" : "units"} · ${cities} ${cities === 1 ? "city" : "cities"}`;
       }
       break;
+    case "game.message_image": title = active ? "Reading message image" : "Read message image"; break;
     case "game.inspect": title = `${active ? "Inspecting" : "Inspected"} ${unit(input.unitId)}`; break;
     case "game.tile":
       title = active ? "Inspecting tile" : "Inspected tile";

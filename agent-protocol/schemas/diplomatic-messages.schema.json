@@ -1,0 +1,190 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "diplomatic-messages.schema.json",
+  "title": "Agent private diplomatic observation extensions and authorized PNG image read",
+  "type": "object",
+  "properties": {
+    "inbox": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Message"
+      }
+    },
+    "diplomaticHistory": {
+      "type": "array",
+      "maxItems": 12,
+      "items": {
+        "$ref": "#/$defs/Message"
+      }
+    }
+  },
+  "$defs": {
+    "Attachment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "attachmentId",
+        "mimeType",
+        "width",
+        "height",
+        "byteLength"
+      ],
+      "properties": {
+        "attachmentId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "mimeType": {
+          "const": "image/png"
+        },
+        "width": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2048
+        },
+        "height": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2048
+        },
+        "byteLength": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4194304
+        }
+      }
+    },
+    "Message": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "messageId",
+        "senderCivId",
+        "targetCivId",
+        "text",
+        "sentTurnSerial",
+        "deliveredTurnSerial",
+        "origin"
+      ],
+      "properties": {
+        "messageId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "senderCivId": {
+          "type": "string"
+        },
+        "targetCivId": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string",
+          "maxLength": 2000
+        },
+        "sentTurnSerial": {
+          "type": "integer"
+        },
+        "deliveredTurnSerial": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "origin": {
+          "enum": [
+            "NATION",
+            "SPECTATOR"
+          ]
+        },
+        "acknowledgedTurnSerial": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "acknowledgedRevision": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "acknowledgementText": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 2000
+        },
+        "attachments": {
+          "type": "array",
+          "maxItems": 1,
+          "items": {
+            "$ref": "#/$defs/Attachment"
+          }
+        }
+      }
+    },
+    "MessageImageResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "attachmentId",
+        "mimeType",
+        "width",
+        "height",
+        "data"
+      ],
+      "properties": {
+        "attachmentId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "mimeType": {
+          "const": "image/png"
+        },
+        "width": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2048
+        },
+        "height": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2048
+        },
+        "data": {
+          "type": "string",
+          "minLength": 4,
+          "maxLength": 5592408,
+          "pattern": "^[A-Za-z0-9+/]+={0,2}$",
+          "description": "Canonical base64; decoded PNG payload <=4 MiB. Full MCP JSON-RPC image envelope <=6 MiB."
+        }
+      }
+    },
+    "MessageImageParams": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "civId",
+        "messageId",
+        "attachmentId"
+      ],
+      "properties": {
+        "civId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "messageId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "attachmentId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      }
+    }
+  }
+}

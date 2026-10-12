@@ -55,16 +55,18 @@ class DesktopMessageDeliveryTest {
                 ControllerKind.EXTERNAL_AGENT, AgentProfile.defaultFor(greece.civID))
             Mockito.`when`(screen.currentViewerCivId()).thenReturn(viewer)
             host = DesktopAgentMatch(game.gameInfo, match, AgentMatchSetup(), dataDir, worldScreen = screen)
+            Mockito.`when`(screen.agentSession).thenReturn(host)
             writeActivity("roman-run", "Rome", "own", "Own old activity")
             writeActivity("greek-run", "Greece", "secret", "A private diplomatic message body")
             val journal = DesktopAgentMatch::class.java.getDeclaredField("activity").apply { isAccessible = true }
                 .get(host) as AgentActivityJournal
             journal.refresh()
         }
-        fun send(target: String, body: String): String? {
+        fun send(target: String, body: String, image: MessageImageDraft? = null): String? {
             val done = CountDownLatch(1)
             var result: String? = "No callback"
-            host.sendMessage(target, body) { result = it; done.countDown() }
+            if (image == null) host.sendMessage(target, body) { result = it; done.countDown() }
+            else host.sendMessage(target, body, image) { result = it; done.countDown() }
             assertTrue("Send must acknowledge after saving", done.await(10, TimeUnit.SECONDS))
             return result
         }
@@ -74,6 +76,70 @@ class DesktopMessageDeliveryTest {
             File(dir, "activity.jsonl").writeText(AgentJson.stringify(mapOf("id" to id,
                 "kind" to "message", "text" to body, "timestamp" to "2026-10-11T00:00:00Z")) + "\n")
         }
+    }
+
+    private fun imageDraft(): MessageImageDraft {
+        val output = java.io.ByteArrayOutputStream()
+        javax.imageio.ImageIO.write(java.awt.image.BufferedImage(2, 1,
+            java.awt.image.BufferedImage.TYPE_INT_ARGB), "png", output)
+        return MessageImageDraft(output.toByteArray(), "image/png", 2, 1)
+    }
+
+    @Test fun `host image send makes a verified durable blob before checkpoint success`() {
+        val f = Fixture(active = "Greece")
+        try {
+            val draft = imageDraft()
+            assertNull(f.send("Greece", "", draft))
+            val metadata = f.host.getMessages().single().attachments.single()
+            assertArrayEquals(draft.bytes, com.unciv.app.desktop.agents.FileMessageImageStore(f.dataDir).read(metadata).bytes)
+            val recovery = FileCheckpointStore(f.host.recoveryDirectory, f.host.matchId).recover()!!
+            val saved = MatchCoordinator.loadFromJson(recovery.bundleJson).getMessageHistory("Rome").single()
+            assertEquals(metadata.attachmentId, saved.attachments.single().attachmentId)
+            assertEquals("", saved.text)
+        } finally { f.host.close(); f.dataDir.deleteRecursively() }
+    }
+
+    @Test fun `failed blob publication never commits mail and failed checkpoint leaves only an orphan blob`() {
+        for (failBlob in listOf(true, false)) {
+            val f = Fixture(active = "Greece")
+            try {
+                val blocked = if (failBlob) File(f.dataDir, ".agent-data/message-images") else f.host.recoveryDirectory
+                blocked.parentFile.mkdirs()
+                blocked.writeText("Block publication")
+                assertNotNull(f.send("Greece", "", imageDraft()))
+                assertTrue(f.host.getMessages().isEmpty())
+                assertNull(FileCheckpointStore(f.host.recoveryDirectory, f.host.matchId).recover())
+                if (!failBlob) assertEquals(1, File(f.dataDir, ".agent-data/message-images").listFiles()!!.count { it.name.endsWith(".png") })
+            } finally { f.host.close(); f.dataDir.deleteRecursively() }
+        }
+    }
+
+    @Test fun `slow image publication does not hold the host lock and rejected mail never stores blobs`() {
+        val f = Fixture(active = "Greece")
+        val syncEntered = CountDownLatch(1)
+        val releaseSync = CountDownLatch(1)
+        val store = com.unciv.app.desktop.agents.FileMessageImageStore(f.dataDir, directorySync = {
+            syncEntered.countDown()
+            check(releaseSync.await(10, TimeUnit.SECONDS))
+        })
+        DesktopAgentMatch::class.java.getDeclaredField("imageStore").apply { isAccessible = true }.set(f.host, store)
+        val sent = CountDownLatch(1)
+        var sendError: String? = "not called"
+        try {
+            f.host.sendMessage("Greece", "Image", imageDraft()) { sendError = it; sent.countDown() }
+            assertTrue(syncEntered.await(5, TimeUnit.SECONDS))
+            val statusRead = CountDownLatch(1)
+            Thread { f.host.getRunState(); statusRead.countDown() }.start()
+            assertTrue("HUD status must remain responsive while external storage is syncing", statusRead.await(2, TimeUnit.SECONDS))
+            releaseSync.countDown()
+            assertTrue(sent.await(10, TimeUnit.SECONDS)); assertNull(sendError)
+        } finally { releaseSync.countDown(); f.host.close(); sent.await(10, TimeUnit.SECONDS); f.dataDir.deleteRecursively() }
+
+        val rejected = Fixture()
+        try {
+            assertNotNull(rejected.send("Unknown nation", "Rejected", imageDraft()))
+            assertFalse(java.io.File(rejected.dataDir, ".agent-data/message-images").exists())
+        } finally { rejected.host.close(); rejected.dataDir.deleteRecursively() }
     }
 
     @Test fun `human cannot inspect another nations private activity or raw log directory`() {
@@ -93,14 +159,27 @@ class DesktopMessageDeliveryTest {
 
     @Test fun `new map read rpc cannot select a different controller`() {
         val f = Fixture()
+        val admission = DesktopAgentMatch::class.java.getDeclaredField("providerRunCivId").apply { isAccessible = true }
+        for (method in listOf("observe", "rules", "action_result", "map")) {
+            val error = assertThrows(EngineCallException::class.java) {
+                f.host.answerEngineRequest(method, mapOf("civId" to "Rome"))
+            }
+            assertEquals("AUTHORITY_REVOKED", error.code)
+        }
+        admission.set(f.host, "Rome")
         val own = f.host.answerEngineRequest("map", mapOf("civId" to "Rome", "limit" to 1)) as Map<*, *>
         assertEquals(2, own["observationVersion"])
-        for (method in listOf("map", "inspect_tile")) {
+        for (method in listOf("map", "inspect_tile", "observe", "inspect", "legal_actions", "notes_get", "notes_put", "end_turn", "act", "action_result", "rules")) {
             try {
-                f.host.answerEngineRequest(method, mapOf("civId" to "Greece", "x" to 3, "y" to 0))
+                f.host.answerEngineRequest(method, mapOf("civId" to "Greece", "actorCivId" to "Greece", "x" to 3, "y" to 0))
                 fail("RPC may not choose another civilization")
             } catch (error: EngineCallException) { assertEquals("AUTHORITY_REVOKED", error.code) }
         }
+        for (params in listOf(emptyMap(), mapOf("civId" to 42))) {
+            val error = assertThrows(EngineCallException::class.java) { f.host.answerEngineRequest("observe", params) }
+            assertEquals("INVALID_ARGUMENT", error.code)
+        }
+        admission.set(f.host, null)
         f.host.close()
     }
 

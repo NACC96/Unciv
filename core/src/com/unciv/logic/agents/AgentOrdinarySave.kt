@@ -59,6 +59,8 @@ object AgentOrdinarySave {
                 it.actorCivId in civs && it.timelineId == match.timelineId &&
                     it.beforeRevision >= 0 && it.afterRevision >= it.beforeRevision && it.afterRevision <= match.stateRevision
             }) { "Receipts do not match this saved timeline" }
+            NationControl.initialize(game, match)
+            NationControl.validateSaved(game, match)
             match
         } catch (ex: Exception) {
             throw UncivShowableException("Cannot restore this agent save: ${ex.message}")

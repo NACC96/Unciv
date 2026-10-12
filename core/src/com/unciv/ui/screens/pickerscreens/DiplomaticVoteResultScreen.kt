@@ -1,6 +1,7 @@
 package com.unciv.ui.screens.pickerscreens
 
 import com.badlogic.gdx.utils.Align
+import com.unciv.logic.agents.DismissDiplomaticVoteResultsCommand
 import com.unciv.logic.civilization.CivFlags
 import com.unciv.logic.civilization.Civilization
 import com.unciv.models.UncivSound
@@ -38,6 +39,9 @@ class DiplomaticVoteResultScreen(
         descriptionLabel.setText(winnerText.tr())
 
         rightSideButton.onActivation(UncivSound.Click) {
+            if (game.worldScreen?.routeThroughAgentSession(onComplete = { error ->
+                    if (error == null && game.screen === this) game.popScreen()
+                }) { listOf({ r: Int -> DismissDiplomaticVoteResultsCommand(viewingCiv.civID, "ui-${System.nanoTime()}", r) }) } == true) return@onActivation
             viewingCiv.addFlag(CivFlags.ShowDiplomaticVotingResults.name, -1)
             game.popScreen()
         }

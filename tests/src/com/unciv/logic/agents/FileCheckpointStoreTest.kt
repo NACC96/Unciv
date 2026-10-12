@@ -217,7 +217,7 @@ class FileCheckpointStoreTest {
             val store = FileCheckpointStore(dir, "m1", maxRetainedGenerations = 3)
             repeat(3) { store.writeBundle(currentBundle("good-$it")) }
             val serializer = com.unciv.json.json().apply { setUsePrototypes(false) }
-            store.writeBundle(serializer.toJson(AgentBundle("future", "{\"formatVersion\":3}", 3)))
+            store.writeBundle(serializer.toJson(AgentBundle("future", "{\"formatVersion\":999}", 999)))
             store.writeBundle(serializer.toJson(AgentBundle("mismatched", "{\"formatVersion\":2}", 1)))
             Assert.assertEquals(5, generationFiles(dir).size)
             val recovery = FileCheckpointStore(dir, "m1", maxRetainedGenerations = 3).recover()!!

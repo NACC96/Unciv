@@ -33,7 +33,8 @@ import com.unciv.ui.screens.worldscreen.WorldScreenStyle
 import java.io.File
 
 /** Floating transcript: compact tools, readable agent identity, and live following. */
-class AgentActivityFeed(private val screen: WorldScreen, private val session: AgentMatchSession) : Table(BaseScreen.skin), Disposable {
+class AgentActivityFeed(private val screen: WorldScreen, private val session: AgentMatchSession,
+                        private val controlsAnchor: Actor? = null) : Table(BaseScreen.skin), Disposable {
     private val muted = WorldScreenStyle.muted
     private val ink = WorldScreenStyle.ink
     private val entriesTable = Table(skin)
@@ -177,6 +178,7 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
     }
 
     fun toggle() = setShown(!isVisible)
+    fun hide() { setShown(false); nationPicker.hideList() }
 
     private fun setShown(shown: Boolean) {
         isVisible = shown
@@ -193,7 +195,11 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
 
     private fun refresh() {
         val width = minOf(300f, maxOf(230f, screen.stage.width * 0.26f), screen.stage.width - 20f)
-        val top = screen.techPolicyAndDiplomacy.y - 8f
+        val controls = controlsAnchor?.takeIf { it.stage != null && it.height > 0f }
+        val controlsBottom = controls?.localToStageCoordinates(Vector2())
+        val overlapsControls = controls != null && controlsBottom != null && controlsBottom.x < 10f + width && controlsBottom.x + controls.width > 10f
+        val top = minOf(screen.techPolicyAndDiplomacy.y - 8f,
+            if (overlapsControls) controlsBottom!!.y - 8f else Float.MAX_VALUE)
         val height = (top - 16f).coerceAtLeast(160f).coerceAtMost(screen.stage.height - 32f)
         val resized = width != panelWidth || height != panelHeight
         if (resized) { panelWidth = width; panelHeight = height; setSize(width, height) }
@@ -212,14 +218,14 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
         val active = session.getActiveCivId()?.takeIf { spectator || it == viewer.civID }
         if (active != null && session.getAgentProfile(active) != null) lastActiveAgentCivId = active
         val activity = session.getActivity().filter {
-            it.kind in setOf("message", "reasoning", "tool", "error") && (spectator || it.civId == viewer.civID)
+            it.kind in setOf("message", "reasoning", "tool", "error", "run") && (spectator || it.civId == viewer.civID)
         }
         if (!spectator && selectedFilter.mode == FilterMode.NATION && selectedFilter.civId != viewer.civID) {
             selectedFilter = activeFilter
             deliberateFilterSwitch = true
             followLive = true
         }
-        updateNationPicker(activity)
+        updateNationPicker(activity, active)
         val viewedCiv = when (selectedFilter.mode) {
             FilterMode.ALL -> null
             FilterMode.NATION -> selectedFilter.civId
@@ -266,17 +272,34 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
         updateFooter()
     }
 
-    private fun updateNationPicker(activity: List<AgentActivityEntry>) {
+    private fun updateNationPicker(activity: List<AgentActivityEntry>, activeCivId: String?) {
         val viewer = screen.viewingCiv
+        // Both native and agent turn rotation traverse this saved list, not alphabetical names.
         val majorNations = screen.gameInfo.civilizations.filter {
             it.isMajorCiv() && (viewer.isSpectator() || it.civID == viewer.civID)
-        }.map { it.civID }.toSet()
-        val agentNations = majorNations.filter { session.getAgentProfile(it) != null }
-        val historicalNations = activity.map { it.civId }.toSet().filter { it in majorNations }
-        val selectedNation = selectedFilter.civId?.takeIf { it in majorNations }?.let { setOf(it) }.orEmpty()
-        val nations = (agentNations + historicalNations + selectedNation).distinct().sorted().map { id ->
+        }
+        val majorIds = majorNations.map { it.civID }.toSet()
+        val agentNations = majorIds.filter { session.getAgentProfile(it) != null }
+        val historicalNations = activity.map { it.civId }.toSet().filter { it in majorIds }
+        val selectedNation = selectedFilter.civId?.takeIf { it in majorIds }?.let { setOf(it) }.orEmpty()
+        val included = (agentNations + historicalNations + selectedNation).toSet()
+        val livingNations = majorNations.filterNot { it.isDefeated() }
+        val activeIndex = livingNations.indexOfFirst { it.civID == activeCivId }
+        // This marks the cyclic roster predecessor, not a claim that a provider ended its turn.
+        val previousCivId = if (activeIndex >= 0 && livingNations.size > 1)
+            livingNations[(activeIndex + livingNations.size - 1) % livingNations.size].civID else null
+        val nations = majorNations.mapIndexedNotNull { index, civ ->
+            val id = civ.civID
+            if (id !in included) return@mapIndexedNotNull null
             val name = agentName(id)
-            NationFilter(FilterMode.NATION, if (name == id) id else "$id · $name", id)
+            val identity = if (name == id) id else "$id · $name"
+            val marker = when {
+                id == activeCivId -> "Current · "
+                civ.isDefeated() -> "Eliminated · "
+                id == previousCivId -> "Previous in order · "
+                else -> ""
+            }
+            NationFilter(FilterMode.NATION, "${index + 1}. $marker$identity", id)
         }
         val choices = listOf(activeFilter, allFilter) + nations
         if (nationPicker.items.toList() == choices) return
@@ -305,6 +328,9 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
 
     private fun text(value: String, color: Color, size: Int) = value.replace(Regex("\\*\\*(.*?)\\*\\*"), "$1")
         .toLabel(color, size, hideIcons = true).apply { wrap = true; setAlignment(Align.topLeft) }
+
+    // Translation normalizes numeric tokens (01:05 -> 1:5); journal durations are fixed-format text.
+    private fun runText(value: String, color: Color, size: Int) = text(value, color, size).apply { setText(value.replace(Regex("\\*\\*(.*?)\\*\\*"), "$1")) }
 
     /** A message, error, turn boundary or different agent ends a run of tool calls. */
     private fun groupTools(entries: List<AgentActivityEntry>): List<FeedRow> {
@@ -379,6 +405,21 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
                     "reasoning" -> {
                         addSpeaker(entry, "Thinking", rowWidth)
                         addRow(text(body(entry), muted, GameUiStyle.Type.body), entry.id, rowWidth, bottom = 12f)
+                    }
+                    "run" -> {
+                        val failed = entry.status == "failed"
+                        val caption = when (entry.status) {
+                            "failed" -> "Run failed"
+                            "completed_turn", "completed" -> "Run completed"
+                            "incomplete_turn" -> "Run ended without ending turn"
+                            "guard_paused" -> "Run paused"
+                            else -> "Run exited"
+                        }
+                        addSpeaker(entry, caption, rowWidth)
+                        val color = if (failed) WorldScreenStyle.error else AgentActivityAppearance.color(screen.gameInfo, entry.civId)
+                        addRow(runText(entry.title, color, 12), entry.id, rowWidth, bottom = 4f)
+                        if (entry.summary.isNotBlank())
+                            addRow(runText(entry.summary, color, 11), "summary/${entry.id}", rowWidth, bottom = 12f)
                     }
                     else -> {
                         addSpeaker(entry, if (entry.kind == "error" || entry.status == "failed") "Error" else "Tools", rowWidth)

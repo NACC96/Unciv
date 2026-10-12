@@ -16,6 +16,7 @@ import type {
   LegalActionsResult,
   GameObserveResult,
   IGameService,
+  MessageImageResult,
 } from "./fake-game-mcp.js";
 
 import type { HexPosition, MapQuery, MapPage, ObservedTile, RulesQuery, RulesResult } from "./map-types.js";
@@ -124,6 +125,10 @@ export class StdioEngineBackend implements IGameService {
 
   observe(): Promise<GameObserveResult> {
     return this.call("observe", { civId: this.actorCivId() });
+  }
+
+  async messageImage(messageId: string, attachmentId: string): Promise<MessageImageResult | FakeError> {
+    return this.call("message_image", { civId: this.actorCivId(), messageId, attachmentId });
   }
 
   async inspect(unitId: number): Promise<FakeUnit | ObservedUnit | FakeError | null> {

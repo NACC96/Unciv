@@ -183,7 +183,7 @@ class AgentMapTransactionsTest {
             val historical = loaded.inspectTile(f.actor.civID, HexCoord(-3, 0))!!
             assertFalse(historical.detailsKnown)
             assertNull(historical.terrain); assertNull(historical.lastSeenRevision)
-            assertEquals(2, after.formatVersion)
+            assertEquals(3, after.formatVersion)
             assertEquals(legacy, dir.resolve("legacy-copy-gen-000001.unciv-agent").readText())
         } finally { dir.deleteRecursively() }
     }

@@ -1,7 +1,12 @@
 package com.unciv.ui.screens.pickerscreens
 
+import com.unciv.ui.screens.worldscreen.AgentSnapshotScreen
+import com.unciv.ui.screens.worldscreen.WorldScreen
+import com.unciv.ui.screens.worldscreen.refreshAgentSnapshot
 import com.unciv.UncivGame
 import com.unciv.logic.agents.PromoteUnitCommand
+import com.unciv.logic.agents.AgentCommand
+import com.unciv.logic.agents.SaveUnitPromotionDefaultsCommand
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.math.Vector2
@@ -31,8 +36,9 @@ class PromotionPickerScreen private constructor(
     val unit: MapUnit,
     private val closeOnPick: Boolean,
     private val originalName: String?,
-    private val onChange: (() -> Unit)?
-) : PickerScreen(), RecreateOnResize {
+    private val onChange: (() -> Unit)?,
+    private var saveUnitPromotion: Boolean = false
+) : PickerScreen(), RecreateOnResize, AgentSnapshotScreen {
     /** Show promotions organized by depencencies, allow picking new ones, allow unit rename
      *  @param unit The MapUnit to work with
      *  @param closeOnPick Should picking a new promotion close the screen?
@@ -40,6 +46,31 @@ class PromotionPickerScreen private constructor(
      */
     constructor(unit: MapUnit, closeOnPick: Boolean = true, onChange: (() -> Unit)? = null)
         : this(unit, closeOnPick, unit.instanceName, onChange)
+
+    override val snapshotGameInfo = unit.civ.gameInfo
+    override val snapshotViewerCivId = game.worldScreen?.takeIf { it.gameInfo.gameId == snapshotGameInfo.gameId }?.currentViewerCivId() ?: unit.civ.civID
+
+    override fun show() = refreshAgentSnapshot()
+
+    override fun recreateForSnapshot(worldScreen: WorldScreen): BaseScreen? {
+        val freshUnit = worldScreen.gameInfo.civilizations.asSequence().flatMap { it.units.getCivUnits() }
+            .firstOrNull { it.id == unit.id } ?: return null
+        if (!worldScreen.viewingCiv.isSpectator() && freshUnit.civ !== worldScreen.viewingCiv) return null
+        val promotionCommitted = pendingPromotionNames.isNotEmpty() &&
+            freshUnit.promotions.promotions.containsAll(pendingPromotionNames) &&
+            !unit.promotions.promotions.containsAll(pendingPromotionNames)
+        if (promotionCommitted) {
+            onChange?.invoke()
+            if (closeOnPick && !freshUnit.promotions.canBePromoted()) return null
+        }
+        return PromotionPickerScreen(freshUnit, closeOnPick, originalName, onChange, saveUnitPromotion).also { fresh ->
+            fresh.pendingPromotionNames = if (promotionCommitted) emptySet() else pendingPromotionNames
+            selectedPromotion?.node?.promotion?.name?.let { name ->
+                fresh.promotionToButton[name]?.let { fresh.selectPromotion(it) }
+            }
+            fresh.setScrollY(scrollPane.scrollY)
+        }
+    }
 
     // Style stuff
     private val colors = skin[PromotionScreenColors::class.java]
@@ -65,7 +96,7 @@ class PromotionPickerScreen private constructor(
     private val tree = PromotionTree(unit)
 
     // This if we should save the unit promotion or not.
-    private var saveUnitPromotion = false
+    private var pendingPromotionNames: Set<String> = emptySet()
 
     init {
         closeButton.onActivation {
@@ -93,7 +124,8 @@ class PromotionPickerScreen private constructor(
             val renameButton = "Choose name for [${unit.name}]".toTextButton()
             renameButton.onClick {
                 UnitRenamePopup(this, unit) {
-                    game.replaceCurrentScreen{ recreate() }
+                    if (game.worldScreen?.agentSession == null && game.screen === this)
+                        game.replaceCurrentScreen { recreate() }
                 }
             }
             topTable.add(renameButton).pad(5f).row()
@@ -121,19 +153,21 @@ class PromotionPickerScreen private constructor(
         val path = tree.getPathTo(button.node.promotion)
         // Agent matches route promotions through the coordinator (§3.2):
         // one command per step of the promotion path.
-        if (UncivGame.Current.worldScreen?.routeThroughAgentSession {
-                path.map { promotion ->
-                    { r: Int ->
-                        PromoteUnitCommand(unit.civ.civID, "ui-${System.nanoTime()}", r,
-                            unit.id, promotion.name)
+        val world = UncivGame.Current.worldScreen
+        if (world?.agentSession != null) {
+            val saveDefaults = saveUnitPromotion
+            pendingPromotionNames = path.map { it.name }.toSet()
+            world.routeThroughAgentSession {
+                buildList<(Int) -> AgentCommand> {
+                    for (promotion in path) add { r ->
+                        PromoteUnitCommand(unit.civ.civID, "ui-${System.nanoTime()}", r, unit.id, promotion.name)
+                    }
+                    if (saveDefaults) add { r ->
+                        SaveUnitPromotionDefaultsCommand(unit.civ.civID, "ui-${System.nanoTime()}", r, unit.id)
                     }
                 }
-            } == true) {
-            onChange?.invoke()
-            if (!closeOnPick || unit.promotions.canBePromoted())
-                game.replaceCurrentScreen{ recreate(false) }
-            else
-                game.popScreen()
+            }
+            // The committed publication refreshes this picker. A rejection keeps the draft intact.
             return
         }
         SoundPlayer.playRepeated(UncivSound.Promote, path.size.coerceAtMost(2))
@@ -232,6 +266,7 @@ class PromotionPickerScreen private constructor(
     
     // going to re-use this bit of code 2 time so turn it into a funtion
     private fun checkSaveUnitPromotion() {
+        if (game.worldScreen?.agentSession != null) return
         if (!saveUnitPromotion)  return
         val unitCurrentCity = unit.currentTile.getCity()
         if (unitCurrentCity != null) {
@@ -241,6 +276,19 @@ class PromotionPickerScreen private constructor(
         }
     }
     
+    private fun selectPromotion(button: PromotionButton) {
+        selectedPromotion = button
+        val node = button.node
+        val path = tree.getPathTo(node.promotion)
+        val pathAsSet = path.toSet()
+        for (btn in promotionToButton.values)
+            btn.updateColor(btn == selectedPromotion, pathAsSet, node.parents)
+        rightSideButton.isEnabled = button.isPickable
+        rightSideButton.setText(node.promotion.name.tr())
+        updateDescriptionLabel(button.isPickable, tree, node, path)
+        addConnectingLines(pathAsSet)
+    }
+
     private fun getButton(tree: PromotionTree, node: PromotionTree.PromotionNode) : PromotionButton {
         val isPickable = canPromoteNow &&
             (!node.pathIsAmbiguous || node.distanceToAdopted == 1) &&
@@ -248,22 +296,7 @@ class PromotionPickerScreen private constructor(
 
         val button = PromotionButton(node, isPickable, promotedLabelStyle, buttonCellMaxWidth - 60f)
 
-        button.onClick {
-            selectedPromotion = button
-
-            val path = tree.getPathTo(button.node.promotion)
-            val pathAsSet = path.toSet()
-            val prerequisites = button.node.parents
-
-            for (btn in promotionToButton.values)
-                btn.updateColor(btn == selectedPromotion, pathAsSet, prerequisites)
-
-            rightSideButton.isEnabled = isPickable
-            rightSideButton.setText(node.promotion.name.tr())
-            updateDescriptionLabel(isPickable, tree, node, path)
-
-            addConnectingLines(pathAsSet)
-        }
+        button.onClick { selectPromotion(button) }
 
         if (isPickable)
             button.onDoubleClick(UncivSound.Silent) {
@@ -413,7 +446,11 @@ class PromotionPickerScreen private constructor(
 
     override fun recreate() = recreate(closeOnPick)
     fun recreate(closeOnPick: Boolean): BaseScreen {
-        val newScreen = PromotionPickerScreen(unit, closeOnPick, originalName, onChange)
+        val newScreen = PromotionPickerScreen(unit, closeOnPick, originalName, onChange, saveUnitPromotion)
+        newScreen.pendingPromotionNames = pendingPromotionNames
+        selectedPromotion?.node?.promotion?.name?.let { name ->
+            newScreen.promotionToButton[name]?.let { newScreen.selectPromotion(it) }
+        }
         newScreen.setScrollY(scrollPane.scrollY)
         return newScreen
     }
