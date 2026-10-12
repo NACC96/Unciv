@@ -228,7 +228,8 @@ object AtlasFixtureCatalog {
                         hud.layout()
                         val section = when (id) { "world-selection" -> "Selection"; "world-activity" -> "Activity"; "world-map" -> "Map"; else -> null }
                         if (width < 960 && section != null) {
-                            val tab = screen.stage.root.atlasDescendants().filterIsInstance<TextButton>().first { it.text.toString() == section }
+                            val tabs = screen.stage.root.atlasDescendants().first { it.name == "AtlasWorldTabs" }
+                            val tab = tabs.atlasDescendants().filterIsInstance<TextButton>().first { it.text.toString() == section }
                             tab.listeners.filterIsInstance<com.unciv.ui.components.input.ActivationListener>().single().tap(
                                 com.badlogic.gdx.scenes.scene2d.InputEvent().apply { listenerActor = tab }, 1f, 1f, 1, 0)
                         }
