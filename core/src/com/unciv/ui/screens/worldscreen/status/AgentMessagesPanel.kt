@@ -600,16 +600,18 @@ class AgentMessagesPanel(
             getCell(scroll).height(regions.content.height).minHeight(0f)
             getCell(composerScroll).height(regions.composer.height).minHeight(0f)
             getCell(footer).height(regions.footer.height).minHeight(0f)
-            val inputWidth = (availableWidth - 16f).coerceAtLeast(1f)
+            val inputWidth = (availableWidth - 16f - (composerScroll.style.vScroll?.minWidth ?: 0f)).coerceAtLeast(1f)
             composer.cells.forEach { it.width(inputWidth) }
         }
         super.layout()
         // Parent bounds and wrapped labels must settle before calculating the final scroll range.
         scroll.validate()
-        val anchor = pendingScrollAnchor ?: return
+        val anchor = pendingScrollAnchor
         pendingScrollAnchor = null
-        scroll.scrollY = if (anchor.atEnd) scroll.maxY else
+        if (anchor != null) scroll.scrollY = if (anchor.atEnd) scroll.maxY else
             (anchor.id?.let { historyAnchors[it] }?.let { rowTop(it) + anchor.offset } ?: anchor.position).coerceIn(0f, scroll.maxY)
+        // Wrapped rows may require a second layout pass after the anchor was consumed.
+        // ScrollPane clamps its target then, but retains the old visual offset until explicitly synced.
         scroll.updateVisualScroll()
     }
 

@@ -88,6 +88,11 @@ object AtlasRenderCheck {
                         "providerCalls" to scope.providerCalls, "dataRoot" to scope.dataRoot.toString(),
                         "resolvedRoots" to scope.resolvedRoots(),
                         "fixtureSeed" to AtlasFixtureCatalog.SEED,
+                        "panelLayoutEvidence" to actors.filter { actor -> actor.name?.startsWith("Message") == true || actor.name?.startsWith("Nation") == true }.map { actor ->
+                            val p = actor.localToStageCoordinates(Vector2())
+                            linkedMapOf("name" to actor.name, "bounds" to listOf(p.x, p.y, actor.width, actor.height),
+                                "scroll" to (actor as? com.badlogic.gdx.scenes.scene2d.ui.ScrollPane)?.let { listOf(it.scrollY, it.maxY, it.visualScrollY, it.actor.height) })
+                        },
                         "buttonStateEvidence" to buttonStates,
                         "worldActionEvidence" to worldActions,
                         "worldLayerBounds" to if (id.startsWith("world") && id != "world-legacy") worldLayerBounds(screen) else null,

@@ -154,6 +154,23 @@ class AtlasAgentPanelsTest {
         }
     }
 
+    @Test fun readingPaneUsesSettledVisualPositionAfterReflow() {
+        val f = Fixture()
+        Mockito.`when`(f.session.getMessages()).thenReturn((1..6).map {
+            DiplomaticMessage("dispatch-$it", "Rome", "Greece", "A long diplomatic dispatch from the river frontier. ".repeat(8), it, null)
+        })
+        Mockito.`when`(f.session.getMessageContacts()).thenReturn(listOf(MessageContact("Greece", "Athena", true)))
+        val panel = com.unciv.ui.screens.worldscreen.status.AgentMessagesPanel(f.screen, f.session)
+        try {
+            panel.toggle()
+            val scroll = panel.descendants().single { it.name == "MessageReadingPane" } as AutoScrollPane
+            repeat(3) { panel.validate(); panel.invalidateHierarchy() }
+            panel.validate(); scroll.validate()
+            assertEquals(scroll.maxY, scroll.scrollY, 1f)
+            assertEquals("The rendered reading position must settle with the target", scroll.scrollY, scroll.visualScrollY, 1f)
+        } finally { panel.dispose() }
+    }
+
     @Test fun boundedHistoryStillReachesTheOldestEntries() {
         val f = Fixture(); f.entries = (1..1000).map { AgentActivityEntry("message-$it", f.rome.civID, 1, "message", "", "", "time-$it") }
         val feed = AgentActivityFeed(f.screen, f.session)
