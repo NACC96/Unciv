@@ -91,7 +91,7 @@ object AtlasFixtureCatalog {
             val fixture = scope.seedGame(large)
             val game = UncivGame.Current
             game.settings.apply {
-                skin = if (id.startsWith("supporting-atlas")) "Atlas" else "Minimal"
+                skin = if (id == "world" || id.startsWith("supporting-atlas")) "Atlas" else "Minimal"
                 fontSizeMultiplier = fontScale
                 showTutorials = false
                 enableEasterEggs = false
@@ -107,7 +107,7 @@ object AtlasFixtureCatalog {
             // A new JVM per matrix cell owns Fonts, atlases and this sole GL context.
             Fonts.fontImplementation = DesktopFont()
             ImageGetter.setNewRuleset(fixture.ruleset)
-            if (id.startsWith("supporting-atlas")) {
+            if (id == "world" || id.startsWith("supporting-atlas")) {
                 SkinCache.loadSkinConfigs()
                 BaseScreen.setSkin()
                 FontRulesetIcons.addRulesetImages(fixture.ruleset)
@@ -119,7 +119,7 @@ object AtlasFixtureCatalog {
             val host = AtlasActorScreen(scope)
             host.stage.viewport = ScreenViewport()
             host.stage.viewport.update(width, height, true)
-            val viewer = if (id in setOf("world", "terrain", "units", "promotions", "city", "research", "policies", "religion", "diplomacy")) civ else observer
+            val viewer = if (id in setOf("terrain", "units", "promotions", "city", "research", "policies", "religion", "diplomacy")) civ else observer
             val facade = worldFacade(host, scope, fixture, viewer)
             val screen: BaseScreen = when (id) {
                 "city" -> CityScreen(humanView.getCityView(civ.cities.first()), playCelebrationSound = false)
@@ -197,6 +197,25 @@ object AtlasFixtureCatalog {
                         screen.stage.addActor(unit)
                         unit.selectUnit(view.getMapUnitView(civ.units.getCivUnits().first()))
                         unit.update()
+                    }
+                    if (id == "world") {
+                        val unit = UnitTable(facade)
+                        getter(facade, "getBottomUnitTable", unit)
+                        screen.stage.addActor(unit)
+                        val selectedView = facade.selectedGameView
+                        unit.selectUnit(selectedView.getMapUnitView(civ.units.getCivUnits().first()))
+                        unit.update()
+                        val actions = com.unciv.ui.screens.worldscreen.unit.actions.UnitActionsTable(facade)
+                        actions.update(unit.selectedUnit?.getUnit())
+                        val next = NextTurnButton(facade)
+                        getter(facade, "getSmallUnitButton", Mockito.mock(SmallUnitButton::class.java))
+                        next.update()
+                        val status = StatusButtons(next, facade)
+                        status.update(false)
+                        screen.cleanup += { status.dispose() }
+                        val tileInfo = com.unciv.ui.screens.worldscreen.bottombar.TileInfoTable(facade)
+                        val hud = com.unciv.ui.screens.worldscreen.AtlasWorldHud(facade, tech, unit, actions, minimap, status, tileInfo)
+                        hud.layout()
                     }
                     val panel: Disposable? = when (id) {
                         "activity" -> AgentActivityFeed(facade, scope.session)

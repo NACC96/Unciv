@@ -1,6 +1,7 @@
 package com.unciv.ui.screens.worldscreen.status
 
 import com.badlogic.gdx.scenes.scene2d.ui.Table
+import com.unciv.ui.components.input.onActivation
 import com.badlogic.gdx.utils.Disposable
 import com.unciv.ui.screens.worldscreen.WorldScreen
 
@@ -12,6 +13,13 @@ class StatusButtons(
     var multiplayerStatusButton: MultiplayerStatusButton? = null
     var smallUnitButton: SmallUnitButton? = null
     var agentMatchControlTable: AgentMatchControlTable? = null
+    private var controlsOpen = false
+    private val controlsButton = com.unciv.ui.components.GameUiStyle.button("Control").apply {
+        onActivation {
+            controlsOpen = !controlsOpen
+            agentMatchControlTable?.isVisible = controlsOpen
+        }
+    }
     private val padXSpace = 10f
     private val padYSpace = 5f
     
@@ -36,7 +44,21 @@ class StatusButtons(
             agentMatchControlTable = null
         }
 
-        if (verticalWrap) {
+        if (com.unciv.ui.components.GameUiStyle.isAtlas && worldScreen != null) {
+            add(nextTurnButton)
+            agentMatchControlTable?.let {
+                add(controlsButton).padLeft(6f)
+                if (it.parent !== worldScreen.stage.root) worldScreen.stage.addActor(it)
+                it.isVisible = controlsOpen
+                val regions = com.unciv.ui.screens.worldscreen.WorldHudLayout.calculate(worldScreen.stage.width,
+                    worldScreen.stage.height, worldScreen.game.settings.fontSizeMultiplier, true)
+                it.setPosition((worldScreen.stage.width - it.width - 8f).coerceAtLeast(0f),
+                    (regions.header.y - it.height - 8f).coerceAtLeast(regions.turnAction.y + regions.turnAction.height))
+            }
+            smallUnitButton?.let { add(it).padLeft(6f) }
+            autoPlayStatusButton?.let { add(it).padLeft(6f) }
+            multiplayerStatusButton?.let { add(it).padLeft(6f) }
+        } else if (verticalWrap) {
             agentMatchControlTable?.let {
                 add(it).padBottom(padYSpace).right().row()
             }

@@ -87,6 +87,7 @@ object AtlasRenderCheck {
                         "resolvedRoots" to scope.resolvedRoots(),
                         "fixtureSeed" to AtlasFixtureCatalog.SEED,
                         "buttonStateEvidence" to buttonStates,
+                        "worldHud" to if (id == "world") worldHudEvidence(screen) else null,
                         "status" to "baseline capture; migration and interactions remain pending"))
                     println("ATLAS_CAPTURE_OK $id ${width}x$height ${args[4]} actors=${actors.size} providerCalls=0")
                     code = 0
@@ -101,6 +102,19 @@ object AtlasRenderCheck {
                 }
             }
         }, config)
+    }
+
+    private fun worldHudEvidence(screen: BaseScreen): Map<String, Any?> {
+        val occupied = screen.stage.root.children.filter { it.isVisible &&
+            (it.name?.startsWith("Atlas") == true || it.javaClass.simpleName in setOf("WorldScreenTopBar", "AgentActivityFeed", "AgentMatchControlTable")) }
+        val rectangles = occupied.map { com.badlogic.gdx.math.Rectangle(it.x, it.y, it.width, it.height) }
+        val area = com.unciv.ui.screens.worldscreen.WorldHudLayout.unionArea(rectangles)
+        val fraction = 1f - area / (screen.stage.width * screen.stage.height)
+        if (screen.stage.width == 1440f && screen.stage.height == 900f) check(fraction >= .45f) { "Actual HUD leaves only $fraction map visible" }
+        return linkedMapOf("appearance" to com.unciv.UncivGame.Current.settings.skin,
+            "occupiedUnionArea" to area, "unobstructedMapFraction" to fraction,
+            "actors" to occupied.map { linkedMapOf("name" to (it.name ?: it.javaClass.simpleName),
+                "x" to it.x, "y" to it.y, "width" to it.width, "height" to it.height) })
     }
 
     /** Controlled native-state evidence, separate from keyboard/mouse interaction tests.

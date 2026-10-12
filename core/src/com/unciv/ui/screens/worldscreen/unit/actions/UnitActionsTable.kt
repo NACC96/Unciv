@@ -131,7 +131,10 @@ class UnitActionsTable(val worldScreen: WorldScreen) : Table() {
                     }
                 }
             }
-            add(button).colspan(2).row()
+            if (com.unciv.ui.components.GameUiStyle.isAtlas) {
+                add(button).padRight(4f)
+                if (children.size % 2 == 0) row()
+            } else add(button).colspan(2).row()
         }
 
         // show page navigation
@@ -167,6 +170,10 @@ class UnitActionsTable(val worldScreen: WorldScreen) : Table() {
     }
 
     private fun updateButtonsPerPage(button: Button) {
+        if (com.unciv.ui.components.GameUiStyle.isAtlas) {
+            buttonsPerPage = maxButtonsPerPage
+            return
+        }
         val upperLimit = worldScreen.techPolicyAndDiplomacy.y
         val lowerLimit = this.y
         val availableHeight = upperLimit - lowerLimit - padBetweenButtons
@@ -186,6 +193,10 @@ class UnitActionsTable(val worldScreen: WorldScreen) : Table() {
         if (unitAction.type == UnitActionType.Promote && unitAction.action != null)
             actionButton.color = Color.GREEN.brighten(0.5f)
 
+        if (com.unciv.ui.components.GameUiStyle.isAtlas) {
+            com.unciv.ui.components.GameUiStyle.apply(actionButton, primary = unitAction.isCurrentAction)
+            actionButton.label.color = com.unciv.ui.components.GameUiStyle.ink
+        }
         actionButton.pack()
 
         if (unitAction.action == null) {

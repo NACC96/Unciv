@@ -350,6 +350,8 @@ class WorldScreen(
     }
     private var tutorialTaskTableHash = 0
 
+    private var atlasHud: AtlasWorldHud? = null
+
     private var nextTurnUpdateJob: Job? = null
 
     private val events = EventBus.EventReceiver()
@@ -388,6 +390,9 @@ class WorldScreen(
         stage.addActor(unitActionsTable)
         stage.addActor(bottomTileInfoTable)
         stage.addActor(minimapWrapper)
+        if (com.unciv.ui.components.GameUiStyle.isAtlas)
+            atlasHud = AtlasWorldHud(this, techPolicyAndDiplomacy, bottomUnitTable, unitActionsTable, minimapWrapper, statusButtons, bottomTileInfoTable)
+
         battleTable.width = stage.width / 3
         battleTable.x = stage.width / 3
         stage.addActor(battleTable)
@@ -538,6 +543,7 @@ class WorldScreen(
         notificationsScroll.isVisible = uiEnabled
         minimapWrapper.isVisible = uiEnabled
         bottomUnitTable.isVisible = uiEnabled
+        atlasHud?.setVisible(uiEnabled)
         if (uiEnabled) battleTable.update() else battleTable.isVisible = false
     }
 
@@ -673,14 +679,15 @@ class WorldScreen(
 
         updateGameplayButtons()
 
-        val coveredNotificationsTop = stage.height - statusButtons.y
-        val coveredNotificationsBottom = (bottomTileInfoTable.height + bottomTileInfoTable.y)
+        val coveredNotificationsTop = atlasHud?.regions?.header?.height ?: (stage.height - statusButtons.y)
+        val coveredNotificationsBottom = atlasHud?.regions?.minimap?.let { it.y + it.height } ?: (bottomTileInfoTable.height + bottomTileInfoTable.y)
 //                (if (game.settings.showMinimap) minimapWrapper.height else 0f)
         notificationsScroll.update(viewingCiv.notifications, coveredNotificationsTop, coveredNotificationsBottom)
 
         val posZoomFromRight = if (game.settings.showMinimap) minimapWrapper.width
         else bottomTileInfoTable.width
         zoomController.setPosition(stage.width - posZoomFromRight - 10f, 10f, Align.bottomRight)
+        if (uiEnabled) atlasHud?.layout()
     }
 
     @Readonly

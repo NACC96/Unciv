@@ -29,6 +29,9 @@ class WorldScreenTopBar(internal val worldScreen: WorldScreen) : Table() {
     internal val displayedGameView get() = if (displayedCiv === worldScreen.selectedCiv)
         worldScreen.selectedGameView else GameView(worldScreen.gameInfo, displayedCiv, spectatorMode = true)
 
+    private val ribbon = NationTurnRibbon()
+    private val economy = Table()
+    private val economyScroll = com.unciv.ui.components.widgets.AutoScrollPane(economy).apply { setScrollingDisabled(false, true); setOverscroll(false, false) }
     private val statsTable = WorldScreenTopBarStats(this)
     private val resourceTable = WorldScreenTopBarResources(this)
     private val identity = Table()
@@ -69,7 +72,7 @@ class WorldScreenTopBar(internal val worldScreen: WorldScreen) : Table() {
 
     internal fun update(civInfo: Civilization) {
         // Displaying an agent never switches the spectator's map view or grants human turn authority.
-        displayedCiv = if (worldScreen.viewingCiv.isSpectator())
+        displayedCiv = if (!GameUiStyle.isAtlas && worldScreen.viewingCiv.isSpectator())
             worldScreen.gameInfo.civilizations.firstOrNull { it.civID == worldScreen.agentSession?.getActiveCivId() } ?: civInfo
         else civInfo
         statsTable.update(displayedCiv)
@@ -82,10 +85,35 @@ class WorldScreenTopBar(internal val worldScreen: WorldScreen) : Table() {
         }
         val deficit = displayedCiv.stats.getUnitSupplyDeficit() > 0
         supplyCell.setActor(if (deficit) supply else null).size(if (deficit) 18f else 0f).padRight(if (deficit) 8f else 0f)
-        updateLayout()
+        if (GameUiStyle.isAtlas) { ribbon.update(worldScreen); updateAtlasLayout() } else updateLayout()
     }
 
     internal fun getYForTutorialTask(): Float = y
+
+    private fun updateAtlasLayout() {
+        val regions = com.unciv.ui.screens.worldscreen.WorldHudLayout.calculate(stage.width, stage.height,
+            worldScreen.game.settings.fontSizeMultiplier, true)
+        val scale = worldScreen.game.settings.fontSizeMultiplier
+        clearChildren()
+        pad(6f, 8f, 6f, 8f)
+        statsTable.resetScale(); resourceTable.resetScale()
+        economy.clearChildren()
+        economy.add(statsTable).left().row()
+        economy.add(resourceTable).left()
+        if (regions.compact) {
+            add(identity).minWidth(0f).growX()
+            add(overview).right().row()
+            // Economy remains reachable through Overview at compact widths.
+        } else {
+            add(identity).width(220f * scale).left()
+            add(economyScroll).minWidth(0f).growX().height(54f * scale)
+            add(overview).right().row()
+        }
+        add(ribbon).colspan(if (regions.compact) 2 else 3).growX().minWidth(0f).height(60f * scale)
+        val tabsHeight = if (regions.compact) 44f * scale else 0f
+        setBounds(0f, regions.header.y + tabsHeight, stage.width, regions.header.height - tabsHeight)
+        validate()
+    }
 
     private fun updateLayout() {
         val available = (stage.width - 20f).coerceAtLeast(1f)

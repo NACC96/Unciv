@@ -177,11 +177,24 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
         }
     }
 
-    fun toggle() = setShown(!isVisible)
+    private var atlasViewport: com.badlogic.gdx.math.Rectangle? = null
+    private var atlasTabVisible = true
+    private var atlasUserVisible = true
+
+    /** A collapsed viewport keeps filter, reading position and the user's visibility preference. */
+    fun setAtlasViewport(bounds: com.badlogic.gdx.math.Rectangle, shown: Boolean) {
+        atlasViewport = com.badlogic.gdx.math.Rectangle(bounds)
+        atlasTabVisible = shown
+        isVisible = atlasUserVisible && shown
+        if (isVisible) refresh()
+    }
+
+    fun toggle() = setShown(if (atlasViewport != null) !atlasUserVisible else !isVisible)
     fun hide() { setShown(false); nationPicker.hideList() }
 
     private fun setShown(shown: Boolean) {
-        isVisible = shown
+        atlasUserVisible = shown
+        isVisible = shown && (atlasViewport == null || atlasTabVisible)
         if (!shown && screen.stage.scrollFocus?.isDescendantOf(this) == true) screen.stage.scrollFocus = screen.mapHolder
         if (shown) { toFront(); refresh(); if (followLive) jumpToLive() }
         Gdx.graphics.requestRendering()
@@ -194,16 +207,16 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
     }
 
     private fun refresh() {
-        val width = minOf(300f, maxOf(230f, screen.stage.width * 0.26f), screen.stage.width - 20f)
+        val width = atlasViewport?.width ?: minOf(300f, maxOf(230f, screen.stage.width * 0.26f), screen.stage.width - 20f)
         val controls = controlsAnchor?.takeIf { it.stage != null && it.height > 0f }
         val controlsBottom = controls?.localToStageCoordinates(Vector2())
         val overlapsControls = controls != null && controlsBottom != null && controlsBottom.x < 10f + width && controlsBottom.x + controls.width > 10f
         val top = minOf(screen.techPolicyAndDiplomacy.y - 8f,
             if (overlapsControls) controlsBottom!!.y - 8f else Float.MAX_VALUE)
-        val height = (top - 16f).coerceAtLeast(160f).coerceAtMost(screen.stage.height - 32f)
+        val height = atlasViewport?.height ?: (top - 16f).coerceAtLeast(160f).coerceAtMost(screen.stage.height - 32f)
         val resized = width != panelWidth || height != panelHeight
         if (resized) { panelWidth = width; panelHeight = height; setSize(width, height) }
-        setPosition(10f, (top - height).coerceAtLeast(8f))
+        setPosition(atlasViewport?.x ?: 10f, atlasViewport?.y ?: (top - height).coerceAtLeast(8f))
         val state = when (session.getRunState()) {
             AgentRunState.AGENT_DECIDING -> "Thinking"
             AgentRunState.PAUSED -> "Paused"
@@ -273,32 +286,19 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
     }
 
     private fun updateNationPicker(activity: List<AgentActivityEntry>, activeCivId: String?) {
-        val viewer = screen.viewingCiv
-        // Both native and agent turn rotation traverse this saved list, not alphabetical names.
-        val majorNations = screen.gameInfo.civilizations.filter {
-            it.isMajorCiv() && (viewer.isSpectator() || it.civID == viewer.civID)
-        }
+        val roster = com.unciv.ui.screens.worldscreen.topbar.NationTurnRoster.read(screen.gameInfo, screen.viewingCiv, activeCivId)
+        val majorNations = roster.map { it.civ }
         val majorIds = majorNations.map { it.civID }.toSet()
         val agentNations = majorIds.filter { session.getAgentProfile(it) != null }
         val historicalNations = activity.map { it.civId }.toSet().filter { it in majorIds }
         val selectedNation = selectedFilter.civId?.takeIf { it in majorIds }?.let { setOf(it) }.orEmpty()
         val included = (agentNations + historicalNations + selectedNation).toSet()
-        val livingNations = majorNations.filterNot { it.isDefeated() }
-        val activeIndex = livingNations.indexOfFirst { it.civID == activeCivId }
-        // This marks the cyclic roster predecessor, not a claim that a provider ended its turn.
-        val previousCivId = if (activeIndex >= 0 && livingNations.size > 1)
-            livingNations[(activeIndex + livingNations.size - 1) % livingNations.size].civID else null
         val nations = majorNations.mapIndexedNotNull { index, civ ->
             val id = civ.civID
             if (id !in included) return@mapIndexedNotNull null
             val name = agentName(id)
             val identity = if (name == id) id else "$id · $name"
-            val marker = when {
-                id == activeCivId -> "Current · "
-                civ.isDefeated() -> "Eliminated · "
-                id == previousCivId -> "Previous in order · "
-                else -> ""
-            }
+            val marker = roster[index].marker.takeIf { it.isNotEmpty() && it != "Next in order" }?.let { "$it · " }.orEmpty()
             NationFilter(FilterMode.NATION, "${index + 1}. $marker$identity", id)
         }
         val choices = listOf(activeFilter, allFilter) + nations

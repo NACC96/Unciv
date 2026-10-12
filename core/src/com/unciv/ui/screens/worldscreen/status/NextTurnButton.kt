@@ -28,7 +28,7 @@ class NextTurnButton(
     private val unitsDueCell: Cell<Label>
 
     init {
-        WorldScreenStyle.apply(this)
+        WorldScreenStyle.apply(this, primary = com.unciv.ui.components.GameUiStyle.isAtlas)
         onActivation { nextTurnAction.action(worldScreen) }
         addContextMenu { NextTurnMenu(stage, this, worldScreen) }
         keyShortcuts.add(KeyboardBinding.NextTurn)
