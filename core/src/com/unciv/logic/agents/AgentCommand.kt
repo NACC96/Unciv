@@ -136,7 +136,7 @@ class ResearchSelectedResult(
     val currentTech: String?
 ) : CommandResult
 
-enum class ProductionOp { ADD_TOP, ADD_BOTTOM, REMOVE, RAISE, LOWER, MOVE_TOP, PURCHASE, SELL }
+enum class ProductionOp { ADD_TOP, ADD_BOTTOM, REMOVE, RAISE, LOWER, MOVE_TOP, MOVE_END, REMOVE_ALL, PURCHASE, SELL }
 
 /**
  * City production-queue edits (game.act type `city.produce`). [name] is the
@@ -159,6 +159,45 @@ class CityProductionResult(
     override val actorCivId: String,
     val receipt: ActionReceipt,
     val queue: List<String>
+) : CommandResult
+
+/** Human construction-menu intent. Null [cityId] includes the civ's persistent new-city setting. */
+class CityConstructionSettingsCommand(
+    override val actorCivId: String,
+    val actionId: String,
+    val expectedRevision: Int,
+    val constructionName: String,
+    val disabled: Boolean,
+    val cityId: String? = null
+) : AgentCommand
+
+class CityConstructionSettingsResult(
+    override val actorCivId: String,
+    val receipt: ActionReceipt
+) : CommandResult
+
+/** Human checkbox for an existing saved unit-promotion preference in an owned city. */
+class SetCityUnitSavedPromotionCommand(
+    override val actorCivId: String,
+    val actionId: String,
+    val expectedRevision: Int,
+    val cityId: String,
+    val baseUnit: String,
+    val enabled: Boolean
+) : AgentCommand
+
+/** Save defaults from the authoritative unit, after any requested promotion path has committed. */
+class SaveUnitPromotionDefaultsCommand(
+    override val actorCivId: String,
+    val actionId: String,
+    val expectedRevision: Int,
+    val unitId: Int
+) : AgentCommand
+
+class UnitPromotionDefaultsSavedResult(
+    override val actorCivId: String,
+    val receipt: ActionReceipt,
+    val cityId: String
 ) : CommandResult
 
 /** Settler founding (game.act type `unit.found`). Puppet founding included where the unit carries it. */
@@ -341,7 +380,9 @@ class CityCitizensCommand(
     val tilePos: HexCoord? = null,
     val specialist: String = "",
     val focus: String = "",
-    val flag: Boolean = false
+    val flag: Boolean = false,
+    /** Reset Citizens explicitly unlocks all tiles before reassignment. */
+    val resetLocked: Boolean = false
 ) : AgentCommand
 
 class CityCitizensResult(
@@ -454,6 +495,21 @@ class GoldGiftedResult(
     override val actorCivId: String,
     val receipt: ActionReceipt,
     val influenceGained: Int
+) : CommandResult
+
+/** Human city-state resource-improvement gift, including its fixed 200-gold cost. */
+class GiftImprovementToCityStateCommand(
+    override val actorCivId: String,
+    val actionId: String,
+    val expectedRevision: Int,
+    val cityStateId: String,
+    val tilePos: HexCoord,
+    val improvementName: String
+) : AgentCommand
+
+class ImprovementGiftedResult(
+    override val actorCivId: String,
+    val receipt: ActionReceipt
 ) : CommandResult
 
 /** Denounce a known civilization (game.act type `diplomacy.denounce`). */

@@ -1,6 +1,8 @@
 package com.unciv.view
 
 import com.unciv.Constants
+import com.unciv.UncivGame
+import com.unciv.logic.agents.CityConstructionSettingsCommand
 import com.unciv.logic.city.City
 import com.unciv.logic.civilization.Civilization
 import com.unciv.logic.civilization.managers.ReligionState
@@ -115,11 +117,20 @@ class CivView(civ: Civilization,
     @Readonly fun calculateScoreBreakdown(): HashMap<String, Double> = civ.calculateScoreBreakdown()
 
     // Actions
+    private fun routeConstructionSetting(name: String, disabled: Boolean): Boolean =
+        UncivGame.Current.worldScreen?.routeThroughAgentSession { listOf({ r: Int ->
+            CityConstructionSettingsCommand(civ.civID, "ui-${System.nanoTime()}", r, name, disabled)
+        }) } == true
+
     fun tryDisableCivConstruction(name: String) {
+        if (civ !== viewer || !viewer.isCurrentPlayer()) return
+        if (routeConstructionSetting(name, true)) return
         civ.cities.forEach { it.disabledConstructions.add(name) }
         civ.disabledCityConstructions.add(name)
     }
     fun tryEnableCivConstruction(name: String) {
+        if (civ !== viewer || !viewer.isCurrentPlayer()) return
+        if (routeConstructionSetting(name, false)) return
         civ.cities.forEach { it.disabledConstructions.remove(name) }
         civ.disabledCityConstructions.remove(name)
     }

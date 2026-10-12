@@ -21,17 +21,22 @@ check inherits the gate for free.
 | Movement stop (button) | `UnitActionsTable.activateAction` | `UnitActionType.StopMovement` → `UnitOrder.WAKE` |
 | Unit movement (right-click, move-here button, single-tap, multi-unit) | `WorldMapHolder.moveUnitToTargetTile`, single-tap branch | `MoveUnitCommand` per unit, batch factories with fresh revisions |
 | Unit attacks incl. nukes (right-click path) | `WorldMapHolder.onTileRightClicked` | `AttackCommand` |
-| City production queue add/remove/raise/lower | `CityView.tryAddToQueue/tryRemoveFromQueue/tryRaisePriority/tryLowerPriority` | `CityProductionCommand` (ADD_BOTTOM/REMOVE/RAISE/LOWER) |
+| City production queue add/remove/reorder, construction context menu and target-tile addition | `CityView` queue helpers | `CityProductionCommand` (ADD_TOP/ADD_BOTTOM/REMOVE/REMOVE_ALL/RAISE/LOWER/MOVE_TOP/MOVE_END), stable city ID and target tile |
+| Construction disable/enable in one or all cities | `CityView.tryDisableConstruction/tryEnableConstruction`, `CivView.tryDisableCivConstruction/tryEnableCivConstruction` | `CityConstructionSettingsCommand`; civ-wide command includes the persistent new-city setting |
 | City purchase (gold) | `BuyButtonFactory.purchaseConstruction` | `CityProductionCommand` PURCHASE |
 | Citizen work/stop/lock/unlock, tile purchase, rename | `CityView.tryWorkTile/tryStopWorkingTile/tryLockTile/tryUnlockTile/tryBuyTile/tryRenameCity` | `CityCitizensCommand`, `BuyTileCommand`, `RenameCityCommand` |
-| Research selection (pick/queue/free tech) | `TechPickerScreen.tryExit` | `SelectResearchCommand` |
+| Citizen focus, avoid-growth, manual-specialist/assignment and Reset Citizens | `CityView` citizen helpers | `CityCitizensCommand`; Reset Citizens preserves `resetLocked=true` |
+| Found City after the existing promise confirmation | `UnitActionsFromUniques.getFoundCityAction` | `FoundCityCommand` in the confirmed callback; cancelling routes nothing |
+| Research selection (pick/queue/free tech) | `TechPickerScreen.tryExit` | Copies the complete staged queue; first `SelectResearchCommand` replaces, later entries append; free tech remains one explicit choice |
 | Policy adoption (branch + member) | `PolicyPickerScreen` (branch onClick, confirmAction) | `AdoptPolicyCommand` |
 | Declare war | `DiplomacyScreen.getDeclareWarButton` | `DeclareWarCommand` |
 | Denounce | `MajorCivDiplomacyTable.getDenounceButton` | `DenounceCommand` |
 | Declaration of friendship | `MajorCivDiplomacyTable.getDeclareFriendshipButton` | `FriendshipCommand` |
 | Incoming trade accept/decline | `TradePopup` buttons | `RespondTradeCommand` |
 | Demand answers (agree/refuse) | `AlertPopup.addDemand` buttons | `RespondDemandCommand` |
-| Human-command execution core | `logic/agents/HumanCommandExecutor.kt` | single coordinator entry: revision stamping per command, HUMAN-controller verification, batch all-or-nothing — headless-tested |
+| Human-command execution core | `logic/agents/HumanCommandExecutor.kt` | revision stamping per command and HUMAN-controller verification; each command commits separately, first failure stops later commands |
+| Saved unit promotion defaults and city preference | `PromotionPickerScreen`, `CityView.trySetUnitShouldUseSavedPromotion` | `SaveUnitPromotionDefaultsCommand` copies candidate unit promotions; `SetCityUnitSavedPromotionCommand` updates the existing preference |
+| City-state resource improvement gift | `CityStateDiplomacyTable` Gift Improvement callback | `GiftImprovementToCityStateCommand`, validates ownership/resource/buildability, influence and gold before one atomic cost/improvement commit |
 | Promotion adoption (whole path) | `PromotionPickerScreen.acceptPromotion` | one `PromoteUnitCommand` per path step |
 | Unit upgrades (button + menu + upgrade-all) | `UnitActionsTable.activateAction`, `UnitUpgradeMenu.doUpgrade/doAllUpgrade` | `UpgradeUnitCommand` (coordinator revalidates gold/movement/requirements) |
 | Unit disband (confirm popup) | `UnitActions.addDisbandAction` | `UnitOrderCommand` DISBAND; popup cancel routes nothing |
@@ -92,10 +97,13 @@ check inherits the gate for free.
 
 ## Human Mutation Routing Closure (CP-033)
 
-All applicable human mutation routes in the Vanilla scope have now been routed
-through the authoritative `MatchCoordinator` via `WorldScreen.routeThroughAgentSession`,
-publishing fresh snapshots to the GL thread upon completion. In ordinary (non-agent)
-matches, each interceptor safely yields false and executes legacy callbacks untouched.
+The routed entries listed above use the authoritative `MatchCoordinator` via
+`WorldScreen.routeThroughAgentSession`. The October 2026 takeover audit found
+legacy snapshot-only dependencies in citizen controls, founding, construction
+menus and city-state gifts, plus incomplete research intent. The listed routes
+now cover those confirmed controls. This is a bounded Vanilla audit, not proof
+that every legacy or mod mutation has been exercised. In ordinary (non-agent)
+matches, interceptors yield false and execute the legacy callbacks.
 
 ### 1. Unit Orders & Actions (`UnitActionsTable.kt`)
 - **Unit orders**: `EXPLORE`, `STOP_EXPLORATION`, `AUTOMATE`, `STOP_AUTOMATION`,
@@ -176,6 +184,6 @@ none of them can change match state in an agent-enabled match:
 | Spectator perspective controls | presentation-only observation; `canChangeState` is false for spectators so no mutation control is reachable |
 | Minimap, tile info, overlay toggles, save/load, options, civilopedia | read-only or out of match scope |
 
-There is no residual list of gameplay controls bypassing the coordinator:
-every entry point that can mutate match state in a Vanilla agent match is
-either ROUTED above or FORBIDDEN above.
+Unlisted controls require source and executable verification before claiming
+complete mutation coverage. Secondary-screen rebinding and mandatory-choice
+reachability are separate integration requirements from durable route handling.

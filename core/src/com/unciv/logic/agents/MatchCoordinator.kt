@@ -28,6 +28,8 @@ import com.unciv.logic.trade.TradeRequest
 import com.unciv.models.UnitActionType
 import com.unciv.models.ruleset.Building
 import com.unciv.models.ruleset.INonPerpetualConstruction
+import com.unciv.models.ruleset.PerpetualConstruction
+import com.unciv.models.ruleset.tile.ResourceType
 import com.unciv.models.ruleset.unique.UniqueTarget
 import com.unciv.models.ruleset.unique.UniqueType
 import com.unciv.models.stats.Stat
@@ -553,6 +555,9 @@ class MatchCoordinator(
             is EndTurnCommand -> executeEndTurn(command)
             is SelectResearchCommand -> executeResearch(command)
             is CityProductionCommand -> executeProduction(command)
+            is CityConstructionSettingsCommand -> executeConstructionSettings(command)
+            is SetCityUnitSavedPromotionCommand -> executeSavedPromotionPreference(command)
+            is SaveUnitPromotionDefaultsCommand -> executeSavePromotionDefaults(command)
             is FoundCityCommand -> executeFound(command)
             is UnitOrderCommand -> executeOrder(command)
             is AttackCommand -> executeAttack(command)
@@ -570,6 +575,7 @@ class MatchCoordinator(
             is UpgradeUnitCommand -> executeUpgrade(command)
             is GreatPersonCommand -> executeGreatPerson(command)
             is GiftGoldToCityStateCommand -> executeGiftGold(command)
+            is GiftImprovementToCityStateCommand -> executeGiftImprovement(command)
             is PillageCommand -> executePillage(command)
             is RepairCommand -> executeRepair(command)
             is FriendshipCommand -> executeFriendship(command)
@@ -1031,6 +1037,17 @@ class MatchCoordinator(
                             AgentCommandError.ILLEGAL_ACTION, "${command.name} purchase failed"
                         )
                 }
+                ProductionOp.MOVE_END -> {
+                    if (command.index !in constructions.constructionQueue.indices)
+                        throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Queue index out of range")
+                    if (constructions.getConstruction(constructions.constructionQueue[command.index]) is PerpetualConstruction)
+                        throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Perpetual construction cannot be moved")
+                    constructions.moveEntryToEnd(command.index)
+                }
+                ProductionOp.REMOVE_ALL -> {
+                    requireConstruction(city, command.name)
+                    constructions.removeAllByName(command.name)
+                }
                 ProductionOp.SELL -> {
                     // Gates mirror ConstructionInfoTable's sell button.
                     val building = candidateGame.ruleset.buildings[command.name]
@@ -1053,6 +1070,63 @@ class MatchCoordinator(
             constructions.constructionQueue.joinToString("")
         }
         return CityProductionResult(command.actorCivId, receipt, receipt.resultJson.split(""))
+    }
+
+    private fun requireConstruction(city: City, name: String) = try {
+        city.cityConstructions.getConstruction(name)
+    } catch (ex: Exception) {
+        throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Unknown construction $name")
+    }
+
+    private fun executeConstructionSettings(command: CityConstructionSettingsCommand): CityConstructionSettingsResult {
+        val receipt = runGameplayMutation(command.actorCivId, command.actionId, command.expectedRevision,
+            "city.constructionSettings|${command.cityId}|${command.constructionName}|${command.disabled}") { game, _ ->
+            val civ = game.getCivilization(command.actorCivId)
+            val cities = command.cityId?.let { listOf(requireOwnCity(game, command.actorCivId, it)) } ?: civ.cities
+            val construction = cities.firstOrNull()?.let { requireConstruction(it, command.constructionName) }
+                ?: throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "No city available")
+            if (construction == PerpetualConstruction.Idle)
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Idle cannot be disabled")
+            for (city in cities) {
+                if (command.disabled) city.disabledConstructions.add(command.constructionName)
+                else city.disabledConstructions.remove(command.constructionName)
+            }
+            if (command.cityId == null) {
+                if (command.disabled) civ.disabledCityConstructions.add(command.constructionName)
+                else civ.disabledCityConstructions.remove(command.constructionName)
+            }
+            ""
+        }
+        return CityConstructionSettingsResult(command.actorCivId, receipt)
+    }
+
+    private fun executeSavedPromotionPreference(command: SetCityUnitSavedPromotionCommand): UnitPromotionDefaultsSavedResult {
+        val receipt = runGameplayMutation(command.actorCivId, command.actionId, command.expectedRevision,
+            "city.savedPromotion|${command.cityId}|${command.baseUnit}|${command.enabled}") { game, _ ->
+            val city = requireOwnCity(game, command.actorCivId, command.cityId)
+            if (command.baseUnit !in game.ruleset.units)
+                throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Unknown unit ${command.baseUnit}")
+            if (city.isPuppet || command.baseUnit !in city.unitShouldUseSavedPromotion)
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "No editable saved promotions for ${command.baseUnit}")
+            city.unitShouldUseSavedPromotion[command.baseUnit] = command.enabled
+            city.id
+        }
+        return UnitPromotionDefaultsSavedResult(command.actorCivId, receipt, receipt.resultJson)
+    }
+
+    private fun executeSavePromotionDefaults(command: SaveUnitPromotionDefaultsCommand): UnitPromotionDefaultsSavedResult {
+        val receipt = runGameplayMutation(command.actorCivId, command.actionId, command.expectedRevision,
+            "unit.savePromotionDefaults|${command.unitId}") { game, _ ->
+            val unit = requireOwnUnit(game, command.actorCivId, command.unitId)
+            val city = unit.getTile().getCity()
+                ?: throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Unit is not in a city territory")
+            if (city.civ !== unit.civ || city.isPuppet)
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Unit must be in an owned non-puppet city")
+            city.unitShouldUseSavedPromotion[unit.baseUnit.name] = true
+            city.unitToPromotions[unit.baseUnit.name] = unit.promotions.clone()
+            city.id
+        }
+        return UnitPromotionDefaultsSavedResult(command.actorCivId, receipt, receipt.resultJson)
     }
 
     private fun executeFound(command: FoundCityCommand): CityFoundedResult {
@@ -1499,7 +1573,8 @@ class MatchCoordinator(
     private fun executeCitizens(command: CityCitizensCommand): CityCitizensResult {
         val receipt = runGameplayMutation(
             command.actorCivId, command.actionId, command.expectedRevision,
-            "city.citizens|${command.cityId}|${command.op}|${command.tilePos}|${command.specialist}|${command.focus}|${command.flag}"
+            "city.citizens|${command.cityId}|${command.op}|${command.tilePos}|${command.specialist}|${command.focus}|${command.flag}" +
+                if (command.resetLocked) "|resetLocked=true" else ""
         ) { candidateGame, _ ->
             val city = requireOwnCity(candidateGame, command.actorCivId, command.cityId)
             when (command.op) {
@@ -1570,13 +1645,13 @@ class MatchCoordinator(
                 }
                 CitizenOp.SET_MANUAL_SPECIALISTS -> {
                     city.manualSpecialists = command.flag
-                    city.reassignPopulation()
+                    if (!command.flag) city.reassignPopulation()
                 }
                 CitizenOp.SET_AVOID_GROWTH -> {
                     city.avoidGrowth = command.flag
                     city.reassignPopulation()
                 }
-                CitizenOp.REASSIGN -> city.reassignPopulation()
+                CitizenOp.REASSIGN -> city.reassignPopulation(command.resetLocked)
             }
             city.population.getFreePopulation().toString()
         }
@@ -1797,6 +1872,36 @@ class MatchCoordinator(
             influence.toString()
         }
         return GoldGiftedResult(command.actorCivId, receipt, receipt.resultJson.toInt())
+    }
+
+    private fun executeGiftImprovement(command: GiftImprovementToCityStateCommand): ImprovementGiftedResult {
+        val receipt = runGameplayMutation(command.actorCivId, command.actionId, command.expectedRevision,
+            "citystate.giftImprovement|${command.cityStateId}|${command.tilePos}|${command.improvementName}") { game, _ ->
+            val civ = game.getCivilization(command.actorCivId)
+            val cityState = game.getCivilizationOrNull(command.cityStateId)
+                ?: throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Unknown civilization")
+            if (!cityState.isCityState || !civ.knows(cityState) || civ.isAtWarWith(cityState) ||
+                (cityState.getDiplomacyManager(civ)?.getInfluence() ?: 0f) < 60f)
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "City-state improvement gift is unavailable")
+            if (civ.gold < 200)
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Insufficient gold")
+            val tile = resolveTile(game, command.tilePos)
+            val resource = tile.tileResource
+            val improvement = game.ruleset.tileImprovements[command.improvementName]
+                ?: throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Unknown improvement ${command.improvementName}")
+            if (tile.getOwner() !== cityState || resource == null || !cityState.canSeeResource(resource) ||
+                resource.resourceType == ResourceType.Bonus ||
+                (tile.improvement != null && resource.isImprovedBy(tile.improvement!!)) ||
+                !resource.isImprovedBy(improvement.name) || improvement.turnsToBuild == -1 ||
+                !tile.improvementFunctions.canBuildImprovement(improvement, cityState.state))
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Resource cannot receive that improvement")
+            civ.addGold(-200)
+            tile.stopWorkingOnImprovement()
+            tile.setImprovement(improvement, cityState)
+            cityState.cache.updateCivResources()
+            ""
+        }
+        return ImprovementGiftedResult(command.actorCivId, receipt)
     }
 
     private fun executePillage(command: PillageCommand): PillagedResult {
