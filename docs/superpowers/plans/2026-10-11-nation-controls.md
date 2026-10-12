@@ -42,7 +42,7 @@
 
 ### Task 2: Floating settings and actual play view
 
-**Files:** Create core/src/com/unciv/ui/screens/worldscreen/status/AgentNationSettingsPanel.kt and tests/src/com/unciv/ui/components/AgentNationSettingsPanelTest.kt. Modify WorldScreen.kt, UncivGame.kt, status/AgentMatchControlTable.kt, AgentMessagesPanel.kt only as needed for mutual hiding, and tests/dev/AgentNationSettingsRenderCheck.kt. May create one reusable profile-form component when it avoids duplicating setup selector logic; preserve existing setup behavior and tests if refactored.
+**Files:** Create core/src/com/unciv/ui/screens/worldscreen/status/AgentNationSettingsPanel.kt and tests/src/com/unciv/ui/components/AgentNationSettingsPanelTest.kt. Modify WorldScreen.kt, UncivGame.kt, status/AgentMatchControlTable.kt, AgentMessagesPanel.kt only as needed for mutual hiding, and tests/src/com/unciv/dev/AgentNationSettingsRenderCheck.kt. May create one reusable profile-form component when it avoids duplicating setup selector logic; preserve existing setup behavior and tests if refactored.
 
 **Interfaces:** Consume Task 1 DTO/session API and `NationControl.savedViewerCivId`. Extend `WorldScreen.installAgentSnapshot(snapshot, selection, publicationGeneration = 0, viewerCivId: String? = null)` with the optional final viewer. Panel `toggle()`, `hide()`, `dispose()` match other modeless panels.
 
