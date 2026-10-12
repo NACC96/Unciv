@@ -61,8 +61,7 @@ class NationTurnRibbon : Table() {
                 // Resolve against the current committed snapshot, never retain an old civ instance.
                 val current = NationTurnRoster.read(worldScreen.gameInfo, worldScreen.viewingCiv,
                     worldScreen.gameInfo.currentPlayer).firstOrNull { it.civ.civID == id } ?: return@onActivation
-                worldScreen.setSelectedCiv(current.civ)
-                worldScreen.shouldUpdate = true
+                worldScreen.inspectNation(current.civ.civID)
             }
             entries.add(button).width(210f * worldScreen.game.settings.fontSizeMultiplier).padRight(6f)
         }

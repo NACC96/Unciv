@@ -71,6 +71,20 @@ class AgentNationViewTest {
         method!!.invoke(screen, game, selection, generation, viewer)
     }
 
+    @Test fun `ribbon inspection survives HUD refresh without changing viewer or controller`() {
+        val f = Fixture()
+        f.screen.inspectNation(f.rome.civID)
+        WorldScreen::class.java.getDeclaredMethod("updateSelectedCiv").apply { isAccessible = true }.invoke(f.screen)
+        assertSame(f.rome, f.screen.selectedCiv)
+        assertSame(f.spectator, f.screen.viewingCiv)
+        assertTrue(f.screen.selectedGameView.spectatorMode)
+        Mockito.verifyNoInteractions(f.session)
+        installWithViewer(f.screen, f.snapshot(), ResolvedSelection(null, null, null), 1, f.rome.civID)
+        f.screen.inspectNation(f.spectator.civID)
+        assertEquals(f.rome.civID, f.screen.selectedCiv.civID)
+        assertFalse(f.screen.selectedGameView.spectatorMode)
+    }
+
     @Test fun `host always consumes Next Turn even when current viewer cannot end it`() {
         val f = Fixture()
         Mockito.`when`(f.session.onNextTurnPressed()).thenReturn(false)

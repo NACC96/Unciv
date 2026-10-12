@@ -69,7 +69,7 @@ object AtlasFixtureCatalog {
     const val SEED = 20261012
     val nations = listOf("America", "Arabia", "Germany", "China", "Russia", "The Ottomans",
         "Persia", "England", "France", "Rome", "Korea", "Babylon", "Polynesia", "Mongolia", "Egypt")
-    private val registered = linkedSetOf("world", "activity", "messages", "overview", "nation-control",
+    private val registered = linkedSetOf("world", "world-selection", "world-activity", "world-map", "world-legacy", "activity", "messages", "overview", "nation-control",
         "terrain", "units", "city", "research", "policies", "religion", "promotions", "diplomacy",
         "setup", "menu", "supporting", "supporting-atlas", "supporting-atlas-end", "supporting-atlas-states")
     private val scopes = IdentityHashMap<BaseScreen, AtlasDataScope>()
@@ -91,7 +91,7 @@ object AtlasFixtureCatalog {
             val fixture = scope.seedGame(large)
             val game = UncivGame.Current
             game.settings.apply {
-                skin = if (id == "world" || id.startsWith("supporting-atlas")) "Atlas" else "Minimal"
+                skin = if ((id.startsWith("world") && id != "world-legacy") || id.startsWith("supporting-atlas")) "Atlas" else "Minimal"
                 fontSizeMultiplier = fontScale
                 showTutorials = false
                 enableEasterEggs = false
@@ -107,7 +107,7 @@ object AtlasFixtureCatalog {
             // A new JVM per matrix cell owns Fonts, atlases and this sole GL context.
             Fonts.fontImplementation = DesktopFont()
             ImageGetter.setNewRuleset(fixture.ruleset)
-            if (id == "world" || id.startsWith("supporting-atlas")) {
+            if ((id.startsWith("world") && id != "world-legacy") || id.startsWith("supporting-atlas")) {
                 SkinCache.loadSkinConfigs()
                 BaseScreen.setSkin()
                 FontRulesetIcons.addRulesetImages(fixture.ruleset)
@@ -119,7 +119,7 @@ object AtlasFixtureCatalog {
             val host = AtlasActorScreen(scope)
             host.stage.viewport = ScreenViewport()
             host.stage.viewport.update(width, height, true)
-            val viewer = if (id in setOf("terrain", "units", "promotions", "city", "research", "policies", "religion", "diplomacy")) civ else observer
+            val viewer = if (id in setOf("world-selection", "world-legacy", "terrain", "units", "promotions", "city", "research", "policies", "religion", "diplomacy")) civ else observer
             val facade = worldFacade(host, scope, fixture, viewer)
             val screen: BaseScreen = when (id) {
                 "city" -> CityScreen(humanView.getCityView(civ.cities.first()), playCelebrationSound = false)
@@ -198,10 +198,17 @@ object AtlasFixtureCatalog {
                         unit.selectUnit(view.getMapUnitView(civ.units.getCivUnits().first()))
                         unit.update()
                     }
-                    if (id == "world") {
+                    if (id.startsWith("world") && id != "world-legacy") {
                         // World review camera is interior; the immutable F1 performance camera is unchanged.
                         holder.setCenterPosition(fixture.tileMap[0, 0].position, immediately = true, selectUnit = false)
                         Mockito.`when`(scope.session.statusText()).thenReturn("Paused · America")
+                        if (id == "world-selection") {
+                            Mockito.`when`(scope.session.isHumanInputAllowed()).thenReturn(true)
+                            Mockito.`when`(scope.session.isSpectatorMode()).thenReturn(false)
+                            Mockito.`when`(scope.session.getRunState()).thenReturn(AgentRunState.WAITING_HUMAN)
+                            Mockito.`when`(scope.session.statusText()).thenReturn("Your turn · America")
+                            Mockito.`when`(facade.canChangeState).thenReturn(true)
+                        }
                         val unit = UnitTable(facade)
                         getter(facade, "getBottomUnitTable", unit)
                         screen.stage.addActor(unit)
@@ -219,6 +226,12 @@ object AtlasFixtureCatalog {
                         val tileInfo = com.unciv.ui.screens.worldscreen.bottombar.TileInfoTable(facade)
                         val hud = com.unciv.ui.screens.worldscreen.AtlasWorldHud(facade, tech, unit, actions, minimap, status, tileInfo)
                         hud.layout()
+                        val section = when (id) { "world-selection" -> "Selection"; "world-activity" -> "Activity"; "world-map" -> "Map"; else -> null }
+                        if (width < 960 && section != null) {
+                            val tab = screen.stage.root.atlasDescendants().filterIsInstance<TextButton>().first { it.text.toString() == section }
+                            tab.listeners.filterIsInstance<com.unciv.ui.components.input.ActivationListener>().single().tap(
+                                com.badlogic.gdx.scenes.scene2d.InputEvent().apply { listenerActor = tab }, 1f, 1f, 1, 0)
+                        }
                     }
                     val panel: Disposable? = when (id) {
                         "activity" -> AgentActivityFeed(facade, scope.session)

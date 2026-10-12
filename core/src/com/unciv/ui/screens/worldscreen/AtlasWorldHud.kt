@@ -66,6 +66,7 @@ class AtlasWorldHud(
         trackerPane.isVisible = !regions.compact || selectedTab == 2
         unitPane.isVisible = !regions.compact || selectedTab == 3
         mapPane.isVisible = !regions.compact || selectedTab == 4
+        screen.notificationsScroll?.setAtlasLayerVisible(!regions.compact || selectedTab == 0)
         feed?.setAtlasViewport(regions.activity, !regions.compact || selectedTab == 1)
         // The turn action is last in z-order so optional inspection can never cover it.
         listOf(trackerPane, unitPane, mapPane, turnPane).forEach { it.invalidate(); it.validate() }
@@ -76,6 +77,11 @@ class AtlasWorldHud(
     fun setVisible(visible: Boolean) {
         listOf(trackerPane, unitPane, mapPane, turnPane, tabs).forEach { it.isVisible = visible }
         if (visible) layout()
+        else {
+            screen.notificationsScroll?.setAtlasLayerVisible(false)
+            screen.stage.root.children.filterIsInstance<AgentActivityFeed>().forEach { it.setAtlasViewport(regions.activity, false) }
+            screen.stage.root.children.filterIsInstance<com.unciv.ui.screens.worldscreen.status.AgentMatchControlTable>().forEach { it.isVisible = false }
+        }
     }
 
     /** Actual occupied rectangles, after visibility/collapse, for capture evidence. */

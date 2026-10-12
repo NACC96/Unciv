@@ -4,6 +4,7 @@ import com.badlogic.gdx.math.Rectangle
 import com.unciv.ui.screens.worldscreen.WorldHudLayout
 import org.junit.Assert.*
 import org.junit.Test
+import com.unciv.ui.components.input.onActivation
 
 @org.junit.runner.RunWith(com.unciv.testing.GdxTestRunner::class)
 class AtlasWorldHudTest {
@@ -27,11 +28,11 @@ class AtlasWorldHudTest {
         ribbon.update(screen)
         org.mockito.Mockito.clearInvocations(session)
         fun descendants(actor: com.badlogic.gdx.scenes.scene2d.Actor): List<com.badlogic.gdx.scenes.scene2d.Actor> =
-            listOf(actor) + if (actor is com.badlogic.gdx.scenes.scene2d.Group) actor.children.flatMap { descendants(it) } else emptyList()
+            listOf(actor) + if (actor is com.badlogic.gdx.scenes.scene2d.Group && !org.mockito.Mockito.mockingDetails(actor).isMock) actor.children.flatMap { descendants(it) } else emptyList()
         val button = descendants(ribbon).first { it.name == "NationTurnEntry:Rome" }
         button.listeners.filterIsInstance<com.unciv.ui.components.input.ActivationListener>().single().tap(
             com.badlogic.gdx.scenes.scene2d.InputEvent().apply { listenerActor = button }, 1f, 1f, 1, 0)
-        org.mockito.Mockito.verify(screen).setSelectedCiv(rome)
+        org.mockito.Mockito.verify(screen).inspectNation(rome.civID)
         org.mockito.Mockito.verifyNoInteractions(session)
     }
 
@@ -70,6 +71,43 @@ class AtlasWorldHudTest {
         assertTrue(ribbon.scroll.maxX > 0f)
         ribbon.scroll.scrollX = ribbon.scroll.maxX
         assertEquals(ribbon.scroll.maxX, ribbon.scroll.scrollX, .01f)
+    }
+
+    @Test fun compactTabsRetainActorsScrollPositionAndReachableAction() {
+        val fixture = SetupLayoutFixture(420f, 600f, fontSizeMultiplier = 1.5f)
+        val screen = org.mockito.Mockito.mock(com.unciv.ui.screens.worldscreen.WorldScreen::class.java)
+        org.mockito.Mockito.`when`(screen.stage).thenReturn(fixture.stage)
+        org.mockito.Mockito.`when`(screen.game).thenReturn(com.unciv.UncivGame.Current)
+        val top = org.mockito.Mockito.mock(com.unciv.ui.screens.worldscreen.topbar.WorldScreenTopBar::class.java)
+        val getter = screen.javaClass.methods.single { it.name.substringBefore('$') == "getTopBar" }
+        org.mockito.Mockito.`when`(getter.invoke(screen)).thenReturn(top)
+        val selectedActor = com.badlogic.gdx.scenes.scene2d.ui.Table().apply {
+            add(GameUiStyle.button("Selected committed Warrior")).width(1000f)
+        }
+        val next = GameUiStyle.button("Next decision")
+        var invoked = 0
+        next.onActivation { invoked++ }
+        val hud = com.unciv.ui.screens.worldscreen.AtlasWorldHud(screen,
+            com.badlogic.gdx.scenes.scene2d.ui.Table(), selectedActor, com.badlogic.gdx.scenes.scene2d.ui.Table(),
+            org.mockito.Mockito.mock(com.unciv.ui.screens.worldscreen.minimap.MinimapHolder::class.java), next,
+            com.badlogic.gdx.scenes.scene2d.ui.Table())
+        hud.layout()
+        fun descendants(actor: com.badlogic.gdx.scenes.scene2d.Actor): List<com.badlogic.gdx.scenes.scene2d.Actor> =
+            listOf(actor) + if (actor is com.badlogic.gdx.scenes.scene2d.Group && !org.mockito.Mockito.mockingDetails(actor).isMock) actor.children.flatMap { descendants(it) } else emptyList()
+        fun press(actor: com.badlogic.gdx.scenes.scene2d.Actor) = actor.listeners.filterIsInstance<com.unciv.ui.components.input.ActivationListener>().single().tap(
+            com.badlogic.gdx.scenes.scene2d.InputEvent().apply { listenerActor = actor }, 1f, 1f, 1, 0)
+        fun tab(name: String) = descendants(fixture.root).filterIsInstance<com.badlogic.gdx.scenes.scene2d.ui.TextButton>().single { it.text.toString().removePrefix("✓ ") == name }
+        press(tab("Selection"))
+        val dock = fixture.root.children.single { it.name == "AtlasUnitDock" } as com.unciv.ui.components.widgets.AutoScrollPane
+        dock.scrollX = 120f
+        press(tab("Research")); press(tab("Selection"))
+        assertTrue(selectedActor.isDescendantOf(dock))
+        assertEquals(120f, dock.scrollX, .01f)
+        assertTrue(dock.isVisible)
+        val position = next.localToStageCoordinates(com.badlogic.gdx.math.Vector2())
+        assertTrue(position.x >= 0 && position.y >= 0 && position.x + next.width <= 420f && position.y + next.height <= 600f)
+        press(next)
+        assertEquals(1, invoked)
     }
 
     @Test fun defaultHudLeavesMapVisible() {

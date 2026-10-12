@@ -87,8 +87,8 @@ object AtlasRenderCheck {
                         "resolvedRoots" to scope.resolvedRoots(),
                         "fixtureSeed" to AtlasFixtureCatalog.SEED,
                         "buttonStateEvidence" to buttonStates,
-                        "worldHud" to if (id == "world") worldHudEvidence(screen) else null,
-                        "status" to "baseline capture; migration and interactions remain pending"))
+                        "worldHud" to if (id.startsWith("world") && id != "world-legacy") worldHudEvidence(screen) else null,
+                        "status" to if (id.startsWith("world") && id != "world-legacy") "synthetic Atlas world migration evidence; native input and installation pending" else if (id == "world-legacy") "synthetic Minimal compatibility evidence; native input and installation pending" else "baseline capture; migration and interactions remain pending"))
                     println("ATLAS_CAPTURE_OK $id ${width}x$height ${args[4]} actors=${actors.size} providerCalls=0")
                     code = 0
                 } catch (failure: Throwable) { failure.printStackTrace() }

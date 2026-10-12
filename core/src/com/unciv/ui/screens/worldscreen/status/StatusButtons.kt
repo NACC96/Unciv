@@ -40,6 +40,7 @@ class StatusButtons(
                 agentMatchControlTable?.update()
             }
         } else {
+            agentMatchControlTable?.remove()
             agentMatchControlTable?.dispose()
             agentMatchControlTable = null
         }
@@ -95,6 +96,7 @@ class StatusButtons(
     }
 
     override fun dispose() {
+        agentMatchControlTable?.remove()
         agentMatchControlTable?.dispose()
         autoPlayStatusButton?.dispose()
         multiplayerStatusButton?.dispose()

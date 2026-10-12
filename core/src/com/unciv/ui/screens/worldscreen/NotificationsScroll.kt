@@ -95,7 +95,7 @@ class NotificationsScroll(
     private var topSpacerCell: Cell<Actor?>? = null
     private var bottomSpacerCell: Cell<Actor?>? = null
 
-    private val maxEntryWidth = (if (com.unciv.ui.components.GameUiStyle.isAtlas) minOf(260f, worldScreen.stage.width * .25f) else worldScreen.stage.width * maxWidthOfStage) * inverseScaleFactor
+    private val maxEntryWidth = (if (com.unciv.ui.components.GameUiStyle.isAtlas) (if (worldScreen.stage.width < 960f) worldScreen.stage.width - 32f else minOf(260f, worldScreen.stage.width * .25f)) else worldScreen.stage.width * maxWidthOfStage) * inverseScaleFactor
 
     /** For category header decoration lines */
     private val minCategoryLineWidth = worldScreen.stage.width * 0.075f
@@ -127,6 +127,12 @@ class NotificationsScroll(
         setOverscroll(false, true)
         setScale(scaleFactor)
         height = worldScreen.stage.height * inverseScaleFactor
+    }
+
+    /** Compact inspection tabs temporarily occlude this layer without changing its saved setting. */
+    fun setAtlasLayerVisible(visible: Boolean) {
+        isVisible = visible && (!::userSetting.isInitialized || userSetting != UserSetting.Disabled)
+        restoreButton.isVisible = visible
     }
 
     /**

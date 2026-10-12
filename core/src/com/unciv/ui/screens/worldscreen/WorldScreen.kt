@@ -680,7 +680,7 @@ class WorldScreen(
         updateGameplayButtons()
 
         val coveredNotificationsTop = atlasHud?.regions?.header?.height ?: (stage.height - statusButtons.y)
-        val coveredNotificationsBottom = atlasHud?.regions?.minimap?.let { it.y + it.height } ?: (bottomTileInfoTable.height + bottomTileInfoTable.y)
+        val coveredNotificationsBottom = atlasHud?.regions?.let { if (it.compact) it.turnAction.y + it.turnAction.height else it.minimap.y + it.minimap.height } ?: (bottomTileInfoTable.height + bottomTileInfoTable.y)
 //                (if (game.settings.showMinimap) minimapWrapper.height else 0f)
         notificationsScroll.update(viewingCiv.notifications, coveredNotificationsTop, coveredNotificationsBottom)
 
@@ -772,15 +772,31 @@ class WorldScreen(
         tutorialTaskTable.isVisible = true
     }
 
+    private var inspectedNationId: String? = null
+
+    /** Ribbon inspection is local presentation state, never a viewer/controller handoff. */
+    fun inspectNation(civId: String) {
+        val permitted = com.unciv.ui.screens.worldscreen.topbar.NationTurnRoster.read(gameInfo, viewingCiv, gameInfo.currentPlayer)
+            .firstOrNull { it.civ.civID == civId } ?: return
+        inspectedNationId = permitted.civ.civID
+        bottomUnitTable.selectUnit()
+        setSelectedCiv(permitted.civ)
+        shouldUpdate = true
+    }
+
     fun setSelectedCiv(civ: Civilization) {
         selectedCiv = if (viewingCiv.isSpectator()) civ else viewingCiv
         selectedGameView = GameView(gameInfo, selectedCiv, viewingCiv.isSpectator())
     }
 
     private fun updateSelectedCiv() {
+        if (!viewingCiv.isSpectator() || bottomUnitTable.selectedUnit != null || bottomUnitTable.selectedCity != null)
+            inspectedNationId = null
+        val inspected = inspectedNationId?.let { id -> gameInfo.civilizations.firstOrNull { it.civID == id } }
         setSelectedCiv(when {
             bottomUnitTable.selectedUnit != null -> bottomUnitTable.selectedUnit!!.civ().getCiv()
             bottomUnitTable.selectedCity != null -> bottomUnitTable.selectedCity!!.owningCiv().getCiv()
+            inspected != null -> inspected
             else -> viewingCiv
         })
     }
