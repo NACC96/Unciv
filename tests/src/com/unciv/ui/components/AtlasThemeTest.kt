@@ -423,6 +423,10 @@ class AtlasThemeTest {
                 checkedDownFontColor = GameUiStyle.ink
             })
             GameUiStyle.apply(button, primary = true)
+            button.setSize(150f, 64f)
+            button.validate()
+            assertTrue("Controlled-state text must have a real width", button.label.width > 0f)
+            assertTrue(button.label.height >= button.label.prefHeight)
             assertEquals(state.name, if (state.disabled) GameUiStyle.muted else GameUiStyle.surface, button.resolvedFontColor())
         }
     }

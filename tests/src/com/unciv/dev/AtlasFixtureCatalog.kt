@@ -244,7 +244,6 @@ object AtlasFixtureCatalog {
                 }).apply {
                     name = "AtlasPrimaryState/$panel/${state.name}"
                     imageCell.size(20f)
-                    label.wrap = true
                 }
                 grid.add(AtlasWidgets.footer(button, emptyList())).minWidth(0f).uniformX().growX().minHeight(48f).pad(3f)
                 if (index % 2 == 1) grid.row()
@@ -384,7 +383,13 @@ internal class AtlasStateButton(val preview: AtlasButtonState, style: ImageTextB
     private var previewOver = preview.over
     private var previewPressed = preview.pressed
     private var previewFocused = preview.focused
-    init { isChecked = preview.checked; isDisabled = preview.disabled }
+    init {
+        isChecked = preview.checked; isDisabled = preview.disabled
+        label.wrap = true
+        // Native ImageTextButton does not expand its label cell by default. A wrapping
+        // label needs this bounded width rather than a zero-width preferred size.
+        labelCell.minWidth(0f).growX()
+    }
     override fun isOver() = previewOver
     override fun isPressed() = previewPressed
     override fun hasKeyboardFocus() = previewFocused
