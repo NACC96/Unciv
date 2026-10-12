@@ -4,7 +4,7 @@
  * JSONL event stream on stdout that parseScripted() normalizes.
  *
  * Usage: node probes/scripted-provider.mjs --mcp-url URL --bearer TOKEN
- *   [--resume SESSION] [--plan observe,act,end | loop] [--action-id ID]
+ *   [--resume SESSION] [--plan observe,act,end | loop | persist] [--action-id ID]
  */
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
@@ -50,6 +50,14 @@ const call = async (name, toolArgs) => {
     throw new Error(`tool ${name} returned non-JSON text: ${text.slice(0, 300)}`);
   }
 };
+
+if (plan.includes("persist")) {
+  // Like a model that keeps retrying after the engine has gone away.
+  for (;;) {
+    await client.callTool({ name: "game.observe", arguments: {} }).catch(() => null);
+    await new Promise((resolve) => setTimeout(resolve, 50));
+  }
+}
 
 if (plan.includes("loop")) {
   for (;;) {
