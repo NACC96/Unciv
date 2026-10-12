@@ -3,6 +3,10 @@ package com.unciv.ui.components
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.Texture
+import com.unciv.logic.agents.MessageImageClipboard
+import com.unciv.logic.agents.MessageImageDraft
+import com.unciv.logic.agents.DiplomaticImageAttachment
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.Group
 import com.badlogic.gdx.scenes.scene2d.InputEvent
@@ -72,6 +76,9 @@ class AgentMessagesPanelTest {
         var contacts = listOf(MessageContact("Greece", "Athena", true))
         var completion: ((String?) -> Unit)? = null
         val requests = ArrayList<Pair<String, String>>()
+        val images = ArrayList<MessageImageDraft?>()
+        val imageReads = ArrayList<Pair<String, String>>()
+        var imageReadCompletion: ((MessageImageDraft?, String?) -> Unit)? = null
         val root = Group()
         val stage = Mockito.mock(UncivStage::class.java)
         val session = Mockito.mock(AgentMatchSession::class.java)
@@ -100,6 +107,17 @@ class AgentMessagesPanelTest {
                 completion = it.getArgument(2)
                 null
             }.`when`(session).sendMessage(Mockito.anyString(), Mockito.anyString(), Mockito.any<(String?) -> Unit>() ?: {})
+            Mockito.doAnswer {
+                requests.add(it.getArgument<String>(0) to it.getArgument<String>(1))
+                images.add(it.getArgument(2))
+                completion = it.getArgument(3)
+                null
+            }.`when`(session).sendMessage(Mockito.anyString(), Mockito.anyString(), Mockito.any(MessageImageDraft::class.java), Mockito.any<(String?) -> Unit>() ?: {})
+            Mockito.doAnswer {
+                imageReads.add(it.getArgument<String>(0) to it.getArgument<String>(1))
+                imageReadCompletion = it.getArgument(2)
+                null
+            }.`when`(session).readMessageImage(Mockito.anyString(), Mockito.anyString(), Mockito.any<(MessageImageDraft?, String?) -> Unit>() ?: { _, _ -> })
             val tech = Mockito.mock(TechPolicyDiplomacyButtons::class.java)
             Mockito.`when`(tech.y).thenAnswer { height - 100f }
             val getter = screen.javaClass.methods.single { it.name.substringBefore('$') == "getTechPolicyAndDiplomacy" }
@@ -116,6 +134,16 @@ class AgentMessagesPanelTest {
         descendants().filterIsInstance<TextButton>().single { it.text.toString() == "Messages" }.press()
         return f.root.children.filterIsInstance<AgentMessagesPanel>().single()
     }
+    private class ImageClipboard : MessageImageClipboard {
+        var available = true
+        var reads = 0
+        var completion: ((MessageImageDraft?, String?) -> Unit)? = null
+        override fun hasImageContents() = available
+        override fun readImage(onComplete: (MessageImageDraft?, String?) -> Unit) { reads++; completion = onComplete }
+    }
+    private fun imageDraft() = MessageImageDraft(java.util.Base64.getDecoder().decode(
+        "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVR4nGP4DwQACfsD/fteaysAAAAASUVORK5CYII="), "image/png", 1, 1)
+    private fun Actor.button(label: String) = descendants().filterIsInstance<TextButton>().single { it.text.toString() == label }
     private fun Actor.labels() = descendants().filterIsInstance<Label>().map { it.text.toString() }.toList()
 
     /** Exercise real Scene2D focus and event bubbling; fixture mocks only game/session state. */
@@ -412,4 +440,274 @@ class AgentMessagesPanelTest {
             }
         } finally { controls.dispose() }
     }
+    @Test fun `image only draft previews removes and survives failed send`() {
+        val f = Fixture()
+        val clipboard = ImageClipboard()
+        Mockito.mockConstruction(Texture::class.java).use {
+            val panel = AgentMessagesPanel(f.screen, f.session, clipboard)
+            try {
+                panel.toggle()
+                assertTrue(panel.button("Send").isDisabled)
+                panel.button("Paste image").press()
+                clipboard.completion!!(imageDraft(), null)
+                assertFalse(panel.button("Send").isDisabled)
+                assertNotNull(panel.descendants().singleOrNull { it.name == "MessageImagePreview" })
+                panel.button("Send").press()
+                assertEquals("", f.requests.single().second)
+                assertEquals(1, f.images.size)
+                f.completion!!("Save failed")
+                assertTrue("Save failed" in panel.labels())
+                assertNotNull(panel.descendants().singleOrNull { it.name == "MessageImagePreview" })
+                panel.button("Remove image").press()
+                assertNull(panel.descendants().singleOrNull { it.name == "MessageImagePreview" })
+                assertTrue(panel.button("Send").isDisabled)
+            } finally { panel.dispose() }
+        }
+    }
+
+    @Test fun `failed clipboard replacement preserves draft and stale reads cannot restore it`() {
+        val f = Fixture()
+        val clipboard = ImageClipboard()
+        Mockito.mockConstruction(Texture::class.java).use { textures ->
+            val panel = AgentMessagesPanel(f.screen, f.session, clipboard)
+            try {
+                panel.toggle(); panel.button("Paste image").press()
+                clipboard.completion!!(imageDraft(), null)
+                panel.button("Paste image").press()
+                clipboard.completion!!(null, "Unsupported image")
+                assertNotNull(panel.descendants().singleOrNull { it.name == "MessageImagePreview" })
+                panel.button("Paste image").press()
+                val oldCompletion = clipboard.completion!!
+                panel.button("Remove image").press()
+                oldCompletion(imageDraft(), null)
+                assertNull(panel.descendants().singleOrNull { it.name == "MessageImagePreview" })
+                Mockito.verify(textures.constructed().single()).dispose()
+            } finally { panel.dispose() }
+        }
+    }
+
+    @Test fun `hidden disposed and viewer changed panels reject delayed clipboard reads`() {
+        for (change in listOf("hide", "dispose", "viewer")) {
+            val f = Fixture()
+            val clipboard = ImageClipboard()
+            val panel = AgentMessagesPanel(f.screen, f.session, clipboard)
+            panel.toggle(); panel.button("Paste image").press()
+            when (change) {
+                "hide" -> panel.hide()
+                "dispose" -> panel.dispose()
+                else -> { f.viewer = f.rome; panel.refresh() }
+            }
+            clipboard.completion!!(imageDraft(), null)
+            assertNull(panel.descendants().singleOrNull { it.name == "MessageImagePreview" })
+            panel.dispose()
+        }
+    }
+
+    @Test fun `image paste chord consumes image without native text paste or world shortcut`() {
+        val f = Fixture()
+        val clipboard = ImageClipboard()
+        val priorInput = Gdx.input
+        try {
+            Gdx.input = Mockito.mock(Input::class.java)
+            Mockito.`when`(Gdx.input.isKeyPressed(if (UIUtils.isMac) Input.Keys.SYM else Input.Keys.CONTROL_LEFT)).thenReturn(true)
+            Mockito.mockConstruction(SpriteBatch::class.java).use {
+                val stage = UncivStage(ScreenViewport())
+                Mockito.`when`(f.screen.stage).thenReturn(stage)
+                val panel = AgentMessagesPanel(f.screen, f.session, clipboard)
+                try {
+                    panel.toggle()
+                    val editor = panel.descendants().filterIsInstance<TextArea>().single()
+                    editor.setClipboard(object : Clipboard {
+                        override fun hasContents() = true
+                        override fun getContents() = "native paste"
+                        override fun setContents(content: String?) {}
+                    })
+                    stage.keyboardFocus = editor
+                    var shortcuts = 0
+                    stage.installShortcutDispatcher(KeyShortcutDispatcher().apply { add(KeyCharAndCode.ctrl('V')) { shortcuts++ } }) { null }
+                    stage.keyDown(Input.Keys.V); stage.keyUp(Input.Keys.V)
+                    assertEquals(1, clipboard.reads)
+                    assertEquals("", editor.text)
+                    assertEquals(0, shortcuts)
+                    clipboard.available = false
+                    stage.keyDown(Input.Keys.V); stage.keyUp(Input.Keys.V)
+                    assertEquals("native paste", editor.text)
+                    assertEquals(1, clipboard.reads)
+                } finally { panel.dispose(); stage.dispose(); stage.batch.dispose() }
+            }
+        } finally { Gdx.input = priorInput }
+    }
+
+    @Test fun `history image reads use session and stale callbacks cannot repopulate private history`() {
+        val f = Fixture()
+        f.messages = listOf(DiplomaticMessage("image", "Greece", "Rome", "See coastline", 1, 2).apply {
+            attachments.add(DiplomaticImageAttachment("a".repeat(64), "image/png", 1, 1, 100))
+        })
+        val panel = AgentMessagesPanel(f.screen, f.session)
+        try {
+            panel.toggle()
+            assertTrue(f.imageReads.contains("image" to "a".repeat(64)))
+            val callback = f.imageReadCompletion!!
+            f.viewer = f.rome; f.messages = emptyList(); panel.refresh()
+            callback(imageDraft(), null)
+            assertNull(panel.descendants().singleOrNull { it.name == "MessageHistoryImage" })
+        } finally { panel.dispose() }
+    }
+
+    @Test fun `unknown vision warning persists through failure and still allows image send`() {
+        val f = Fixture()
+        Mockito.`when`(f.session.getAgentProfile("Greece")).thenReturn(com.unciv.logic.agents.AgentProfile(
+            provider = "codex", modelId = "unknown-private-model"))
+        val clipboard = ImageClipboard()
+        Mockito.mockConstruction(Texture::class.java).use {
+            val panel = AgentMessagesPanel(f.screen, f.session, clipboard)
+            try {
+                panel.toggle(); panel.button("Paste image").press(); clipboard.completion!!(imageDraft(), null)
+                assertTrue(panel.labels().any { it.contains("Image support is unknown") })
+                assertFalse(panel.button("Send").isDisabled)
+                panel.button("Send").press(); f.completion!!("Save failed")
+                assertTrue(panel.labels().any { it.contains("Image support is unknown") })
+                assertTrue("Save failed" in panel.labels())
+            } finally { panel.dispose() }
+        }
+    }
+
+    @Test fun `image textures released when hidden recreated when shown and disposed`() {
+        val f = Fixture()
+        val clipboard = ImageClipboard()
+        Mockito.mockConstruction(Texture::class.java).use { textures ->
+            val panel = AgentMessagesPanel(f.screen, f.session, clipboard)
+            panel.toggle(); panel.button("Paste image").press(); clipboard.completion!!(imageDraft(), null)
+            panel.hide()
+            Mockito.verify(textures.constructed().single()).dispose()
+            panel.toggle()
+            assertEquals(2, textures.constructed().size)
+            assertFalse(panel.button("Send").isDisabled)
+            panel.dispose()
+            Mockito.verify(textures.constructed()[1]).dispose()
+        }
+    }
+
+    @Test fun `unsupported vision warns without blocking and successful image send clears draft`() {
+        val f = Fixture()
+        val model = com.unciv.logic.agents.ModelSpec("ui-test-no-vision", "Test model", "ui-test-provider", emptyList(), supportsImages = false)
+        com.unciv.logic.agents.AgentModelCatalog.setDiscoveredModels("ui-test-provider", listOf(model))
+        Mockito.`when`(f.session.getAgentProfile("Greece")).thenReturn(com.unciv.logic.agents.AgentProfile(provider = model.provider, modelId = model.id))
+        val clipboard = ImageClipboard()
+        try {
+            Mockito.mockConstruction(Texture::class.java).use { textures ->
+                val panel = AgentMessagesPanel(f.screen, f.session, clipboard)
+                try {
+                    panel.toggle(); panel.button("Paste image").press(); clipboard.completion!!(imageDraft(), null)
+                    assertTrue(panel.labels().any { it.contains("does not support images") })
+                    assertFalse(panel.button("Send").isDisabled)
+                    panel.button("Send").press(); f.completion!!(null)
+                    assertNull(panel.descendants().singleOrNull { it.name == "MessageImagePreview" })
+                    assertFalse(panel.labels().any { it.contains("does not support images") })
+                    assertTrue(panel.button("Send").isDisabled)
+                    Mockito.verify(textures.constructed().single()).dispose()
+                } finally { panel.dispose() }
+            }
+        } finally { com.unciv.logic.agents.AgentModelCatalog.setDiscoveredModels("ui-test-provider", emptyList()) }
+    }
+
+    @Test fun `history preloads at most four recent images and older images load on demand`() {
+        val f = Fixture()
+        f.messages = (1..10).map { index ->
+            DiplomaticMessage("image-$index", "Greece", "Rome", "Image $index", index, index).apply {
+                attachments.add(DiplomaticImageAttachment(index.toString(16).padStart(64, '0'), "image/png", 1, 1, 100))
+            }
+        }
+        val panel = AgentMessagesPanel(f.screen, f.session)
+        try {
+            panel.toggle()
+            assertEquals(4, f.imageReads.size)
+            assertEquals(listOf("image-7", "image-8", "image-9", "image-10"), f.imageReads.map { it.first })
+            val view = panel.descendants().filterIsInstance<TextButton>().first { it.text.toString() == "View image" }
+            view.press()
+            assertEquals(5, f.imageReads.size)
+            assertEquals("image-1", f.imageReads.last().first)
+        } finally { panel.dispose() }
+    }
+
+    @Test fun `large image draft preview texture is bounded while send preserves original bytes and dimensions`() {
+        val f = Fixture()
+        val clipboard = ImageClipboard()
+        val original = com.unciv.app.desktop.MessageImageNormalizer.normalize(
+            java.awt.image.BufferedImage(1600, 800, java.awt.image.BufferedImage.TYPE_INT_ARGB))
+        val dimensions = ArrayList<Pair<Int, Int>>()
+        Mockito.mockConstruction(Texture::class.java) { _, context ->
+            val pixmap = context.arguments()[0] as com.badlogic.gdx.graphics.Pixmap
+            dimensions.add(pixmap.width to pixmap.height)
+        }.use {
+            val panel = AgentMessagesPanel(f.screen, f.session, clipboard)
+            try {
+                panel.toggle(); panel.button("Paste image").press(); clipboard.completion!!(original, null)
+                assertEquals(listOf(512 to 256), dimensions)
+                panel.button("Send").press()
+                assertEquals(1600, f.images.single()!!.width)
+                assertEquals(800, f.images.single()!!.height)
+                assertArrayEquals(original.bytes, f.images.single()!!.bytes)
+            } finally { panel.dispose() }
+        }
+    }
+
+    @Test fun `pending image paste blocks send until read completes or failed replacement unlocks retained draft`() {
+        val f = Fixture()
+        val clipboard = ImageClipboard()
+        Mockito.mockConstruction(Texture::class.java).use {
+            val panel = AgentMessagesPanel(f.screen, f.session, clipboard)
+            try {
+                panel.toggle()
+                panel.descendants().filterIsInstance<TextArea>().single().apply {
+                    text = "Look at this coast"
+                    fire(com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent())
+                }
+                assertFalse(panel.button("Send").isDisabled)
+                panel.button("Paste image").press()
+                assertTrue(panel.button("Send").isDisabled)
+                assertTrue("Preparing image…" in panel.labels())
+                panel.button("Send").press()
+                assertTrue(f.requests.isEmpty())
+                clipboard.completion!!(imageDraft(), null)
+                assertFalse(panel.button("Send").isDisabled)
+                panel.button("Paste image").press()
+                assertTrue(panel.button("Send").isDisabled)
+                clipboard.completion!!(null, "Clipboard image unavailable")
+                assertFalse(panel.button("Send").isDisabled)
+                assertNotNull(panel.descendants().singleOrNull { it.name == "MessageImagePreview" })
+                panel.button("Send").press()
+                assertEquals(1, f.images.size)
+                assertEquals("Look at this coast", f.requests.single().second)
+            } finally { panel.dispose() }
+        }
+    }
+
+    @Test fun `history preserves bottom or earlier position through image composer changes and compact resize`() {
+        val f = Fixture(420f, 600f)
+        f.messages = (1..20).map { index ->
+            DiplomaticMessage("message-$index", "Greece", "Rome", "Message $index about peaceful borders and future coastal trade.", index, index)
+        }
+        val clipboard = ImageClipboard()
+        Mockito.mockConstruction(Texture::class.java).use {
+            val panel = AgentMessagesPanel(f.screen, f.session, clipboard)
+            try {
+                panel.toggle(); panel.validate()
+                val scroll = panel.descendants().filterIsInstance<AutoScrollPane>().single()
+                assertTrue(scroll.maxY > 100f)
+                scroll.scrollY = scroll.maxY; scroll.updateVisualScroll()
+                panel.button("Paste image").press(); clipboard.completion!!(imageDraft(), null)
+                panel.refresh(); panel.validate()
+                assertEquals("Adding preview and vision warning must keep the newest messages in view", scroll.maxY, scroll.scrollY, 0.5f)
+                f.width = 360f; f.height = 540f
+                panel.refresh(); panel.validate()
+                assertEquals("Compact resizing must preserve end-follow after the parent lays out", scroll.maxY, scroll.scrollY, 0.5f)
+                scroll.scrollY = scroll.maxY / 2f; scroll.updateVisualScroll()
+                val earlierPosition = scroll.scrollY
+                panel.button("Remove image").press(); panel.refresh(); panel.validate()
+                assertEquals("Removing a draft must preserve the reader's earlier scroll position", earlierPosition.coerceAtMost(scroll.maxY), scroll.scrollY, 0.5f)
+            } finally { panel.dispose() }
+        }
+    }
+
 }
