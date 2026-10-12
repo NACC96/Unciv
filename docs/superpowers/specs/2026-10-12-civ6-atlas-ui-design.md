@@ -58,6 +58,8 @@ Separate base art from nation-color masks and stable shadows. Keep consistent fo
 
 Authoring sheets contain aligned frames with manifests declaring dimensions, anchors, facing and state durations. Packing validates frame bounds, missing frames and tint masks. New atlases have their own filtering policy so smooth art does not blur existing pixel-art mods.
 
+The art pipeline must separate small always-available static/preview images from animation clips loaded on demand. The current `ImageGetter.loadModAtlases` eagerly loads every atlas listed in `Atlases.json`; listing the full animated unit library there is not acceptable. A bounded clip cache owns graphics resources, loads only relevant visible unit states, pins clips currently playing, and disposes unused clips safely on the rendering thread. Its allocation ceiling is explicit, measured and tested; cache pressure may fall back to the correct static sprite while a clip loads, but may not remove or misidentify a unit. This is a necessary architectural addition, not an excuse to omit new unit designs or animations from final coverage.
+
 ## Whole-game interface
 
 ### World screen
@@ -126,6 +128,8 @@ Build events through the viewer's existing `GameView` and visibility rules at th
 
 Use one shared presentation path for human commands, agent publications and built-in AI where their committed transition is available. If an intermediate path/event was not retained, display the confirmed current state; never invent a route or combat event from prose in Activity.
 
+The existing human-command route inside an agent match returns before `WorldMapHolder.animateMovement`. Therefore both spectator agent actions and human takeover actions need the shared committed-event integration. A successful legacy human move animation is not evidence that the agent path works. Both paths are separate required verification cases.
+
 Bound the visual queue. When events arrive faster than playback, accelerate/coalesce eligible movement and skip stale cosmetic work, with a visible catch-up affordance. Preserve important outcomes in the activity/notification record. Clear actors/timers and reconcile final positions on load, screen close, nation switch, resize, settings change, skipped animation and resource disposal. The unit dock and hit targets always resolve against the current committed state; ghost actors never accept gameplay clicks.
 
 Render on demand while animations are active. A static screen must return to its current low-work idle behavior. Existing request-rendering/Scene2D infrastructure is preferred over a new always-running render loop.
@@ -134,7 +138,7 @@ Render on demand while animations are active. A static screen must return to its
 
 1. Expand the existing scoped `GameUiStyle` into consistent semantic theme/components, retaining `WorldScreenStyle` compatibility during migration. Apply copied widget styles or a correctly initialized built-in skin; do not mutate a shared skin midway through drawing. All first-party screens migrate deliberately.
 2. Add reusable headers, stat cells, tabs, fields, disclosure groups, tooltips, footers and bounded panels. Separate display data from controls' existing authoritative callbacks.
-3. Add the illustrated terrain/unit set through current atlas and tileset mechanisms. Keep legacy art selectable and honor explicit third-party art selections. New style and animation settings have backward-compatible defaults.
+3. Add the illustrated terrain/unit set through current tileset mechanisms, with static atlas discovery and a bounded on-demand animation-clip cache. Keep legacy art selectable and honor explicit third-party art selections. New style and animation settings have backward-compatible defaults.
 4. Add the transient timeline and sprite animation abstraction at a narrow map/presentation seam. Extend existing movement and battle helpers where appropriate; avoid independent overlapping playback implementations.
 5. Extend GPU fixtures to real mixed-biome scenes and all major screens. Headless tests check behavior; rendered captures and interaction traces check actual presentation.
 
@@ -171,6 +175,7 @@ Stages may overlap after contracts are fixed. Partial stages remain work in prog
 - Measure baseline and changed builds with the same synthetic large Earth-size scene (164×80, 15 civilizations), viewport, camera path and action stream. Record render/CPU frame timings, draw calls, texture memory, heap and idle behavior. Do not infer performance from asset dimensions alone.
 - Desktop target: smooth 60 Hz interaction on this Mac, median frame time no more than 16.7 ms and p95 no more than 33.3 ms during the representative pan/action trace after warm-up. Establish baseline first; if the existing renderer misses this target, report the measured bottleneck and improve it rather than silently weakening acceptance.
 - No sustained memory growth after repeated open/close/resize/view-switch cycles. No framebuffer readback for panel appearance and no continuous rendering on static, hidden or reduced-motion screens. Asset loading/upload is outside per-frame draw paths.
+- Record graphics allocation separately from compressed PNG/download size. Validate animation-cache eviction, pinning, static fallback, atlas-filter isolation and device texture-size limits. Existing packing defaults use 2048-pixel pages; increasing the default for unrelated assets is not part of this design.
 - Run appropriate focused regressions through development, then the complete Gradle check and agent-runner tests after integration. Record exact source tree and capture provenance. Source and native interaction checks are distinct.
 - Review the separate native build while leaving the running app untouched. The final goal is complete only after the full screen/art/animation inventory, performance checks and actual native workflows are verified. Any missing coverage remains explicit unfinished work.
 
