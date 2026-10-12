@@ -69,7 +69,7 @@ object AtlasFixtureCatalog {
     const val SEED = 20261012
     val nations = listOf("America", "Arabia", "Germany", "China", "Russia", "The Ottomans",
         "Persia", "England", "France", "Rome", "Korea", "Babylon", "Polynesia", "Mongolia", "Egypt")
-    private val registered = linkedSetOf("world", "world-selection", "world-activity", "world-map", "world-legacy", "world-fortified", "world-siege", "world-research", "world-notifications", "world-control", "world-map-roundtrip", "activity", "messages", "overview", "nation-control",
+    private val registered = linkedSetOf("world", "world-selection", "world-activity", "world-map", "world-legacy", "world-fortified", "world-siege", "world-promote", "world-exhausted", "world-research", "world-notifications", "world-control", "world-map-roundtrip", "activity", "messages", "overview", "nation-control",
         "terrain", "units", "city", "research", "policies", "religion", "promotions", "diplomacy",
         "setup", "menu", "supporting", "supporting-atlas", "supporting-atlas-end", "supporting-atlas-states")
     private val scopes = IdentityHashMap<BaseScreen, AtlasDataScope>()
@@ -121,8 +121,10 @@ object AtlasFixtureCatalog {
             val host = AtlasActorScreen(scope)
             host.stage.viewport = ScreenViewport()
             host.stage.viewport.update(width, height, true)
-            val viewer = if (id in setOf("world-fortified", "world-siege", "world-notifications") || id.startsWith("world-turn-") || id in setOf("world-selection", "world-legacy", "terrain", "units", "promotions", "city", "research", "policies", "religion", "diplomacy")) civ else observer
+            val viewer = if (id in setOf("world-fortified", "world-siege", "world-promote", "world-exhausted", "world-notifications") || id.startsWith("world-turn-") || id in setOf("world-selection", "world-legacy", "terrain", "units", "promotions", "city", "research", "policies", "religion", "diplomacy")) civ else observer
             val facade = worldFacade(host, scope, fixture, viewer)
+            if (id.startsWith("world-turn-") && !id.startsWith("world-turn-Agent"))
+                Mockito.`when`(facade.agentSession).thenReturn(null)
             val screen: BaseScreen = when (id) {
                 "city" -> CityScreen(humanView.getCityView(civ.cities.first()), playCelebrationSound = false)
                 "research" -> TechPickerScreen(civ)
@@ -204,7 +206,7 @@ object AtlasFixtureCatalog {
                         // World review camera is interior; the immutable F1 performance camera is unchanged.
                         holder.setCenterPosition(if (viewer.isSpectator()) fixture.tileMap[0, 0].position else civ.units.getCivUnits().first().getTile().position, immediately = true, selectUnit = false)
                         Mockito.`when`(scope.session.statusText()).thenReturn("Paused · America")
-                        if (id in setOf("world-selection", "world-fortified", "world-siege")) {
+                        if (id in setOf("world-selection", "world-fortified", "world-siege", "world-promote", "world-exhausted", "world-turn-AgentMatchHuman", "world-turn-AgentPickTech", "world-turn-AgentUnsupportedChoice")) {
                             Mockito.`when`(scope.session.isHumanInputAllowed()).thenReturn(true)
                             Mockito.`when`(scope.session.isSpectatorMode()).thenReturn(false)
                             Mockito.`when`(scope.session.getRunState()).thenReturn(AgentRunState.WAITING_HUMAN)
@@ -220,16 +222,21 @@ object AtlasFixtureCatalog {
                             val tile = original.getTile()
                             original.destroy()
                             fixture.addUnit("Catapult", civ, tile).apply { action = com.unciv.models.UnitActionType.SetUp.value }
-                        } else civ.units.getCivUnits().first().also { if (id == "world-fortified") it.fortify() }
+                        } else civ.units.getCivUnits().first().also {
+                            if (id == "world-fortified") it.fortify()
+                            if (id in setOf("world-promote", "world-exhausted")) it.promotions.XP = 100
+                            if (id == "world-exhausted") it.currentMovement = 0f
+                        }
                         if (id in setOf("world-fortified", "world-siege")) holder.tileGroups.values.forEach { it.update(view.civView) }
                         unit.selectUnit(selectedView.getMapUnitView(selectedUnit))
                         unit.update()
                         val actions = com.unciv.ui.screens.worldscreen.unit.actions.UnitActionsTable(facade)
-                        actions.update(unit.selectedUnit?.getUnit())
+                        actions.update(selectedUnit)
                         actions.children.filterIsInstance<com.unciv.ui.images.IconTextButton>().forEach { it.name = "AtlasUnitActionEvidence:${it.label.text}" }
                         val next = if (id.startsWith("world-turn-")) AtlasTurnFixtures.button(id.removePrefix("world-turn-"), facade) else NextTurnButton(facade)
                         getter(facade, "getSmallUnitButton", Mockito.mock(SmallUnitButton::class.java))
                         if (!id.startsWith("world-turn-")) next.update()
+                        if (id == "world-control") Mockito.`when`(scope.session.canResume()).thenReturn(true)
                         val status = StatusButtons(next, facade)
                         status.update(false)
                         screen.cleanup += { status.dispose() }
@@ -242,8 +249,8 @@ object AtlasFixtureCatalog {
                             screen.stage.addActor(notifications)
                             game.settings.notificationScroll = com.unciv.ui.screens.worldscreen.NotificationsScroll.UserSetting.Permanent.name
                             val entries = listOf(
-                                com.unciv.logic.civilization.Notification("A new unit is ready for orders in Washington", arrayOf("UnitIcons/Warrior"), null, com.unciv.logic.civilization.NotificationCategory.Units),
-                                com.unciv.logic.civilization.Notification("Research completed: Pottery. Choose the next technology for your civilization.", arrayOf("TechIcons/Pottery"), null, com.unciv.logic.civilization.NotificationCategory.General))
+                                com.unciv.logic.civilization.Notification("A new unit is ready for orders in Washington", arrayOf("Warrior"), null, com.unciv.logic.civilization.NotificationCategory.Units),
+                                com.unciv.logic.civilization.Notification("Research completed: Pottery. Choose the next technology for your civilization.", arrayOf("Pottery"), null, com.unciv.logic.civilization.NotificationCategory.General))
                             val r = hud.regions
                             notifications.callInternal("update", entries, r.header.height, if (r.compact) r.turnAction.y + r.turnAction.height else r.minimap.y + r.minimap.height)
                             notifications.updateVisualScroll()
@@ -258,16 +265,19 @@ object AtlasFixtureCatalog {
                         if (id == "world-map-roundtrip") {
                             val before = com.badlogic.gdx.math.Vector2(minimap.width, minimap.height)
                             val saved = game.settings.minimapSize
+                            val camera = listOf(holder.scrollX, holder.scrollY, holder.scaleX, holder.scaleY)
                             for (name in listOf("MinimapIncrease", "MinimapReduce")) {
                                 val toggle = minimap.atlasDescendants().single { it.name == name }
                                 toggle.listeners.filterIsInstance<com.unciv.ui.components.input.ActivationListener>().single().tap(
                                     com.badlogic.gdx.scenes.scene2d.InputEvent().apply { listenerActor = toggle }, 1f, 1f, 1, 0)
+                                minimap.update(viewer)
                                 hud.layout()
                             }
                             check(kotlin.math.abs(minimap.width - before.x) < .01f && kotlin.math.abs(minimap.height - before.y) < .01f)
                             check(game.settings.minimapSize == saved)
+                            check(camera == listOf(holder.scrollX, holder.scrollY, holder.scaleX, holder.scaleY))
                         }
-                        val section = when (id) { "world-selection", "world-fortified", "world-siege" -> "Selection"; "world-research" -> "Research"; "world-activity" -> "Activity"; "world-map", "world-map-roundtrip" -> "Map"; else -> null }
+                        val section = when (id) { "world-selection", "world-fortified", "world-siege", "world-promote", "world-exhausted" -> "Selection"; "world-research" -> "Research"; "world-activity" -> "Activity"; "world-map", "world-map-roundtrip" -> "Map"; else -> null }
                         if (width < 960 && section != null) {
                             val tabs = screen.stage.root.atlasDescendants().first { it.name == "AtlasWorldTabs" }
                             val tab = tabs.atlasDescendants().filterIsInstance<TextButton>().first { it.text.toString() == section }

@@ -11,7 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Container
 import com.badlogic.gdx.scenes.scene2d.ui.Image
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Table
-import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable
 import com.badlogic.gdx.utils.Align
 import com.unciv.GUI
 import com.unciv.logic.civilization.Notification
@@ -272,7 +272,9 @@ class NotificationsScroll(
             .height(coveredNotificationsTop * inverseScaleFactor)
         notificationsTable.row()
 
-        val backgroundDrawable = BaseScreen.skinStrings.getUiBackground("WorldScreen/Notification", BaseScreen.skinStrings.roundedEdgeRectangleShape)
+        val backgroundDrawable = if (com.unciv.ui.components.GameUiStyle.isAtlas)
+            com.unciv.ui.components.GameUiStyle.panelBackground("Atlas/World/Notifications")
+        else BaseScreen.skinStrings.getUiBackground("WorldScreen/Notification", BaseScreen.skinStrings.roundedEdgeRectangleShape)
 
         val orderedNotifications = (additionalNotification + notifications)
             .groupBy { it.category }
@@ -332,7 +334,7 @@ class NotificationsScroll(
 
     private inner class CategoryHeader(
         category: NotificationCategory,
-        backgroundDrawable: NinePatchDrawable
+        backgroundDrawable: Drawable
     ) : Table() {
         private val leftLineCell: Cell<Image>
         private val rightLineCell: Cell<Image>
@@ -345,7 +347,7 @@ class NotificationsScroll(
                 .minHeight(2f).width(minCategoryLineWidth)
             add(Table().apply {
                 background = backgroundDrawable
-                val label = ColorMarkupLabel(category.name, ImageGetter.CHARCOAL, fontSize = fontSize)
+                val label = ColorMarkupLabel(category.name, if (com.unciv.ui.components.GameUiStyle.isAtlas) WorldScreenStyle.ink else ImageGetter.CHARCOAL, fontSize = fontSize)
                 add(label)
                 captionWidth = prefWidth  // of this wrapper including background rims
                 captionWidth
@@ -373,7 +375,7 @@ class NotificationsScroll(
 
     private inner class ListItem(
         notification: Notification,
-        backgroundDrawable: NinePatchDrawable
+        backgroundDrawable: Drawable
     ) : Table() {
         /** Returns width of the visible Notification including background padding but not
          *  including outer touchable area padding */
@@ -387,12 +389,14 @@ class NotificationsScroll(
             val topBottomPad = if (isEnlarged) selectedListItemPad else listItemPad
 
             val listItem = Table()
-            listItem.background = if (!isSelected || !coloredHighlight) backgroundDrawable else {
+            listItem.background = if (!isSelected || !coloredHighlight) backgroundDrawable else if (com.unciv.ui.components.GameUiStyle.isAtlas) {
+                com.unciv.ui.components.GameUiStyle.outlinedBackground("Atlas/World/NotificationSelected", WorldScreenStyle.surface, WorldScreenStyle.warning)
+            } else {
                 BaseScreen.skinStrings.getUiBackground("WorldScreen/Notification", BaseScreen.skinStrings.roundedEdgeRectangleShape, oneTimeNotificationColor)
             }
 
             val maxLabelWidth = maxEntryWidth - (itemIconSize + 5f) * notification.icons.size - 10f
-            val label = WrappableLabel(notification.text, maxLabelWidth, ImageGetter.CHARCOAL, labelFontSize, hideIcons = true)
+            val label = WrappableLabel(notification.text, maxLabelWidth, if (com.unciv.ui.components.GameUiStyle.isAtlas) WorldScreenStyle.ink else ImageGetter.CHARCOAL, labelFontSize, hideIcons = true)
             label.setAlignment(Align.center)
             label.removeFontColorFromStatIcons()
             if (label.prefWidth > maxLabelWidth * scaleFactor) {  // can't explain why the comparison needs scaleFactor
