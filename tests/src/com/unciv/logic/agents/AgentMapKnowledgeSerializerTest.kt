@@ -105,7 +105,7 @@ class AgentMapKnowledgeSerializerTest {
         val legacyState = legacyJson.toJson(state)
         val migrated = migrateAgentBundleJson(legacyJson.toJson(AgentBundle("{}", legacyState)))
         val restored = json().fromJson(AgentMatchState::class.java, migrated.matchJson)
-        assertEquals(2, restored.formatVersion)
+        assertEquals(3, restored.formatVersion)
         assertEquals(sample().toWire(), restored.mapKnowledge.get("Rome", HexCoord(3, -2))!!.toWire())
     }
 

@@ -240,8 +240,8 @@ class AgentOrdinarySaveTest {
         val base = f.snapshot()
         val variants = listOf("", " ", "null", "[]", "{}", "{broken",
             AgentOrdinarySave.encode(savedMatch(base).apply { formatVersion = 999 }),
-            base.agentMatchStateJson!!.replace("\"formatVersion\":2", "\"formatVersion\":1.5"),
-            base.agentMatchStateJson!!.replace("\"formatVersion\":2", "\"formatVersion\":\"2\""),
+            base.agentMatchStateJson!!.replace("\"formatVersion\":3", "\"formatVersion\":1.5"),
+            base.agentMatchStateJson!!.replace("\"formatVersion\":3", "\"formatVersion\":\"2\""),
             base.agentMatchStateJson!!.replace("\"encodingVersion\":1", "\"encodingVersion\":999"),
             AgentOrdinarySave.encode(savedMatch(base).apply { controllers.clear() }),
             AgentOrdinarySave.encode(savedMatch(base).apply { matchId = "../escaped" }),

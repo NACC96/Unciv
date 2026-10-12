@@ -190,9 +190,38 @@ class MatchCoordinator(
         val viewer = requireMessageViewer(viewerCivId)
         return committedMatch.diplomaticMessages.filter { message ->
             viewer.isSpectator() || message.senderCivId == viewerCivId ||
-                (message.targetCivId == viewerCivId && message.deliveredTurnSerial != null)
-        }.map { it.copy() }
+                message.isDeliveredTo(viewerCivId, committedMatch.turnSerial)
+        }.sortedWith(compareBy<DiplomaticMessage> { it.acknowledgedTurnSerial == null }
+            .thenBy { it.acknowledgedTurnSerial ?: Int.MAX_VALUE }
+            .thenBy { it.acknowledgedRevision ?: Int.MAX_VALUE }).map { it.copy() }
     }
+
+    /** Provider reads can access only that actor's delivered incoming attachments. */
+    @Synchronized
+    fun getDeliveredMessageImage(actorCivId: String, messageId: String,
+                                 attachmentId: String): DiplomaticImageAttachment {
+        requireController(actorCivId)
+        val message = committedMatch.diplomaticMessages.firstOrNull {
+            it.messageId == messageId && it.isDeliveredTo(actorCivId, committedMatch.turnSerial)
+        }
+        return requireMessageImage(message, attachmentId)
+    }
+
+    /** Preview access uses the attached viewer's ordinary private history visibility. */
+    @Synchronized
+    fun getViewerMessageImage(viewerCivId: String, messageId: String,
+                              attachmentId: String): DiplomaticImageAttachment {
+        val viewer = requireMessageViewer(viewerCivId)
+        val message = committedMatch.diplomaticMessages.firstOrNull {
+            it.messageId == messageId && (viewer.isSpectator() || it.senderCivId == viewerCivId ||
+                it.isDeliveredTo(viewerCivId, committedMatch.turnSerial))
+        }
+        return requireMessageImage(message, attachmentId)
+    }
+
+    private fun requireMessageImage(message: DiplomaticMessage?, attachmentId: String): DiplomaticImageAttachment =
+        message?.attachments?.firstOrNull { it.attachmentId == attachmentId }?.copy()
+            ?: throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "No such accessible message image")
 
     /**
      * Host-only player/spectator mail may queue between turns, including while play is paused.
@@ -203,7 +232,8 @@ class MatchCoordinator(
         senderCivId: String,
         messageId: String,
         targetCivId: String,
-        text: String
+        text: String,
+        attachments: List<DiplomaticImageAttachment> = emptyList()
     ): DiplomaticMessage {
         val sender = requireMessageViewer(senderCivId)
         if (!sender.isSpectator() && committedMatch.controllers[senderCivId]?.kind != ControllerKind.HUMAN)
@@ -214,13 +244,19 @@ class MatchCoordinator(
         if (committedMatch.turnPhase == TurnPhase.COMPLETED || sender.isDefeated())
             throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Cannot send mail after play has ended")
         val origin = if (sender.isSpectator()) "SPECTATOR" else "NATION"
-        val body = validateMessageBody(messageId, text)
-        findDuplicateMessage(messageId, senderCivId, targetCivId, body, origin)?.let { return it.copy() }
+        val images = attachments.map { it.copy() }
+        if (images.size > 1)
+            throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "A message may contain one image")
+        try { images.forEach { it.validate() } } catch (ex: IllegalArgumentException) {
+            throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, ex.message ?: "Invalid message image")
+        }
+        val body = validateMessageBody(messageId, text, allowEmpty = images.isNotEmpty())
+        findDuplicateMessage(messageId, senderCivId, targetCivId, body, origin, images)?.let { return it.copy() }
         requireMessageTarget(senderCivId, targetCivId)
         requireMessageLimit(senderCivId)
         val candidate = committedMatch.deepCopy()
         val message = DiplomaticMessage(messageId, senderCivId, targetCivId, body,
-            candidate.turnSerial, null, origin)
+            candidate.turnSerial, null, origin, attachments = ArrayList(images))
         candidate.diplomaticMessages.add(message)
         commit(candidateGame = null, candidateMatch = candidate)
         return message.copy()
@@ -571,6 +607,8 @@ class MatchCoordinator(
             command.expectedRevision, fingerprint, collectSightings = false,
             rememberReceipt = { candidate, retained ->
                 candidate.diplomaticMessageReceipts[command.actionId] = retained.copy()
+                candidate.diplomaticMessages.first { it.messageId == command.messageId }
+                    .acknowledgedRevision = retained.afterRevision
             }) { _, candidate ->
             val incoming = candidate.diplomaticMessages.first { it.messageId == command.messageId }
             if (incoming.acknowledgedTurnSerial != null)
@@ -597,11 +635,11 @@ class MatchCoordinator(
             throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "No eligible diplomatic contact")
     }
 
-    private fun validateMessageBody(messageId: String, text: String): String {
+    private fun validateMessageBody(messageId: String, text: String, allowEmpty: Boolean = false): String {
         val body = text.trim()
         if (messageId.isBlank() || messageId.length > 128)
             throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Message ID must contain 1–128 characters")
-        if (body.isEmpty() || body.length > DiplomaticMessageLimits.MAX_BODY_CHARS ||
+        if ((!allowEmpty && body.isEmpty()) || body.length > DiplomaticMessageLimits.MAX_BODY_CHARS ||
             body.toByteArray(Charsets.UTF_8).size > DiplomaticMessageLimits.MAX_BODY_BYTES)
             throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT,
                 "Message must contain 1–2000 characters and fit within 8 KiB UTF-8")
@@ -613,11 +651,16 @@ class MatchCoordinator(
         senderCivId: String,
         targetCivId: String,
         body: String,
-        origin: String
+        origin: String,
+        attachments: List<DiplomaticImageAttachment> = emptyList()
     ): DiplomaticMessage? {
         val prior = committedMatch.diplomaticMessages.firstOrNull { it.messageId == messageId } ?: return null
         if (prior.senderCivId != senderCivId || prior.targetCivId != targetCivId ||
-            prior.text != body || prior.origin != origin)
+            prior.text != body || prior.origin != origin ||
+            (prior.attachments.size != attachments.size || prior.attachments.zip(attachments).any { (a, b) ->
+                a.attachmentId != b.attachmentId || a.mimeType != b.mimeType || a.width != b.width ||
+                    a.height != b.height || a.byteLength != b.byteLength
+            }))
             throw AgentCommandException(AgentCommandError.ACTION_ID_CONFLICT,
                 "Message ID was already used for different mail")
         return prior

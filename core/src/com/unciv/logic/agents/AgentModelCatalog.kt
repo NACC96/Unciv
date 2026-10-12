@@ -36,7 +36,9 @@ data class ModelSpec(
     val supportedThinkingLevels: List<ThinkingLevel>,
     val defaultThinkingLevel: ThinkingLevel = ThinkingLevel.PROVIDER_DEFAULT,
     val isDiscovered: Boolean = false,
-    val isCustom: Boolean = false
+    val isCustom: Boolean = false,
+    /** Null means capability is unknown; sending stays allowed with a UI warning. */
+    val supportsImages: Boolean? = null
 ) {
     val supportsThinking: Boolean get() = supportedThinkingLevels.isNotEmpty()
 }
@@ -58,6 +60,7 @@ object AgentModelCatalog {
     val CODEX_MODELS = listOf(
         ModelSpec(
             id = "gpt-6-luna",
+            supportsImages = true,
             label = "GPT-6 Luna",
             provider = PROVIDER_CODEX,
             supportedThinkingLevels = listOf(ThinkingLevel.PROVIDER_DEFAULT, ThinkingLevel.LOW,
@@ -66,6 +69,7 @@ object AgentModelCatalog {
         ),
         ModelSpec(
             id = "gpt-6.1-sol",
+            supportsImages = true,
             label = "GPT-6.1 Sol",
             provider = PROVIDER_CODEX,
             supportedThinkingLevels = listOf(ThinkingLevel.PROVIDER_DEFAULT, ThinkingLevel.LOW,
@@ -74,6 +78,7 @@ object AgentModelCatalog {
         ),
         ModelSpec(
             id = "gpt-5.6-luna",
+            supportsImages = true,
             label = "GPT-5.6 Luna",
             provider = PROVIDER_CODEX,
             supportedThinkingLevels = listOf(
@@ -150,6 +155,7 @@ object AgentModelCatalog {
     /** OpenCode Go id/efforts verified against its model metadata (2026-10-11). */
     val OPENCODE_GO_DEEPSEEK = ModelSpec(
         id = "opencode-go/deepseek-v4.1-flash",
+        supportsImages = true,
         label = "OpenCode Go: DeepSeek V4.1 Flash",
         provider = PROVIDER_OPENCODE,
         supportedThinkingLevels = listOf(ThinkingLevel.PROVIDER_DEFAULT, ThinkingLevel.LOW,

@@ -7,6 +7,7 @@ import com.unciv.logic.agents.AgentCommand
 import com.unciv.logic.agents.AgentControl
 import com.unciv.logic.agents.AgentEngineBridge
 import com.unciv.logic.agents.AgentJson
+import com.unciv.logic.agents.MessageImageDraft
 import com.unciv.logic.agents.AgentMatchSession
 import com.unciv.logic.agents.AgentMatchState
 import com.unciv.logic.agents.AgentMatchSetup
@@ -112,17 +113,25 @@ class DesktopAgentMatch(
         return synchronized(lock) { coordinator.getMessageHistory(viewer) }
     }
 
-    override fun sendMessage(targetCivId: String, text: String, onComplete: (String?) -> Unit) {
-        // Capture the actual viewing identity before dispatch; the composer cannot supply a sender.
+    override fun sendMessage(targetCivId: String, text: String, onComplete: (String?) -> Unit) =
+        sendMessage(targetCivId, text, null, onComplete)
+
+    override fun sendMessage(targetCivId: String, text: String, image: MessageImageDraft?,
+                             onComplete: (String?) -> Unit) {
+        // Capture the actual viewing identity and own bytes before dispatch.
         val viewer = worldScreen?.currentViewerCivId()
+        val draft = image?.copy()
         val messageId = UUID.randomUUID().toString()
         Concurrency.runOnNonDaemonThreadPool("Save diplomatic message") {
             val error = try {
                 synchronized(lock) {
                     check(!closed.get()) { "This match has closed" }
                     require(viewer != null) { "Messaging requires an attached player or spectator" }
+                    check(worldScreen?.currentViewerCivId() == viewer) { "The message viewer has changed" }
+                    // Store publication completes before a metadata/checkpoint reference can commit.
+                    val attachments = draft?.let { listOf(imageStore.store(it)) } ?: emptyList()
                     publishCommittedChangesLocked {
-                        coordinator.queuePlayerMessage(viewer, messageId, targetCivId, text)
+                        coordinator.queuePlayerMessage(viewer, messageId, targetCivId, text, attachments)
                     }
                 }
                 null
@@ -134,10 +143,34 @@ class DesktopAgentMatch(
         }
     }
 
+    override fun readMessageImage(messageId: String, attachmentId: String,
+                                  onComplete: (MessageImageDraft?, String?) -> Unit) {
+        val viewer = worldScreen?.currentViewerCivId()
+        Concurrency.run("Read message image") {
+            var draft: MessageImageDraft? = null
+            val error = try {
+                synchronized(lock) {
+                    check(!closed.get()) { "This match has closed" }
+                    require(viewer != null) { "Message images require an attached viewer" }
+                    check(worldScreen?.currentViewerCivId() == viewer) { "The message viewer has changed" }
+                    draft = imageStore.read(coordinator.getViewerMessageImage(viewer, messageId, attachmentId))
+                }
+                null
+            } catch (ex: Exception) { ex.message ?: "Could not read the message image" }
+            Concurrency.runOnGLThread {
+                if (closed.get() || worldScreen?.currentViewerCivId() != viewer)
+                    onComplete(null, "The message viewer has changed or closed")
+                else onComplete(draft?.copy(), error)
+                Gdx.graphics.requestRendering()
+            }
+        }
+    }
+
     private val lock = Any()
     val recoveryDirectory: File = recoveryLineage?.let { File(checkpointDir(dataDir, match.matchId), "restores/$it") }
         ?: checkpointDir(dataDir, match.matchId)
     val coordinator = MatchCoordinator(game, match, fileStore(dataDir, recoveryDirectory, match.matchId))
+    private val imageStore = FileMessageImageStore(dataDir)
     private val bridge = AgentEngineBridge(coordinator)
     private val humanExecutor = HumanCommandExecutor(coordinator)
     private var runState: AgentRunState = when {
@@ -833,13 +866,29 @@ class DesktopAgentMatch(
     fun answerEngineRequest(method: String, params: Map<String, Any?>): Any? {
         synchronized(lock) {
             return publishCommittedChangesLocked {
-                val mapActor = if (method == "map" || method == "inspect_tile") {
+                val mapActor = if (method == "map" || method == "inspect_tile" || method == "message_image") {
                     val admitted = providerRunCivId ?: coordinator.getCurrentCivId()
                     if (params["civId"] != admitted)
-                        throw EngineCallException("AUTHORITY_REVOKED", "Map read actor does not match the admitted civilization")
+                        throw EngineCallException("AUTHORITY_REVOKED", "Read actor does not match the admitted civilization")
                     admitted
                 } else null
                 when (method) {
+                    "message_image" -> {
+                        val messageId = params["messageId"] as? String
+                            ?: throw EngineCallException("INVALID_ARGUMENT", "Missing string argument messageId")
+                        val attachmentId = params["attachmentId"] as? String
+                            ?: throw EngineCallException("INVALID_ARGUMENT", "Missing string argument attachmentId")
+                        val metadata = try { coordinator.getDeliveredMessageImage(mapActor!!, messageId, attachmentId) }
+                        catch (ex: com.unciv.logic.agents.AgentCommandException) {
+                            throw EngineCallException(ex.code.name, ex.message ?: "Message image is inaccessible")
+                        }
+                        val image = try { imageStore.read(metadata) } catch (ex: Exception) {
+                            throw EngineCallException("INTERNAL_ERROR", ex.message ?: "Message image is missing or corrupt")
+                        }
+                        mapOf("attachmentId" to metadata.attachmentId, "mimeType" to metadata.mimeType,
+                            "width" to metadata.width, "height" to metadata.height,
+                            "data" to java.util.Base64.getEncoder().encodeToString(image.bytes))
+                    }
                     "observe" -> bridge.observe(params["civId"] as String)
                     "inspect" -> bridge.inspect(params["civId"] as String,
                         (params["unitId"] as Number).toInt())

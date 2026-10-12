@@ -60,11 +60,46 @@ class AgentMessageAcknowledgementTest {
         val result = receipt["result"] as Map<String, Any?>
         Assert.assertEquals("I read your border request.", result["acknowledgementText"])
         Assert.assertEquals(5, (result["acknowledgedTurnSerial"] as Number).toInt())
+        Assert.assertEquals(before + 1, (result["acknowledgedRevision"] as? Number)?.toInt())
         Assert.assertEquals(before + 1, f.coordinator.getStateRevision())
         val writes = f.writer.writeCount
         Assert.assertEquals(receipt, f.ack("incoming", " I read your border request. ", revision = before))
         Assert.assertEquals(writes, f.writer.writeCount)
         Assert.assertEquals(before + 1, f.coordinator.getStateRevision())
+    }
+
+    @Test
+    fun `same turn acknowledgement ordering survives reload and receipt replay`() {
+        val f = Fixture(listOf(mail("first"), mail("second")))
+        f.ack("second", actionId = "ack-second")
+        f.ack("first", actionId = "ack-first")
+        Assert.assertEquals(listOf("second", "first"), f.coordinator.getMessageHistory(f.actor).map { it.messageId })
+        val restored = MatchCoordinator.loadFromJson(f.coordinator.saveToJson())
+        val messages = restored.getMessageHistory(f.actor)
+        Assert.assertEquals(listOf(1, 2), messages.map { it.acknowledgedRevision })
+        AgentEngineBridge(restored).act(mapOf("protocolVersion" to 1, "actorCivId" to f.actor,
+            "actionId" to "ack-second", "expectedRevision" to 0,
+            "type" to "diplomacy.acknowledgeMessage", "args" to mapOf(
+                "messageId" to "second", "text" to "I read your request and will consider it.")))
+        Assert.assertEquals(listOf("second", "first"), restored.getMessageHistory(f.actor).map { it.messageId })
+        Assert.assertEquals(listOf(1, 2), restored.getMessageHistory(f.actor).map { it.acknowledgedRevision })
+    }
+
+    @Test
+    fun `private recent correspondence exposes replies only to sender and delivered recipient`() {
+        val f = Fixture(listOf(mail(), DiplomaticMessage("queued", "Egypt", "Greece", "Hidden", 2),
+            DiplomaticMessage("opponents", "Egypt", "Greece", "Secret", 1, 2)))
+        f.ack("incoming", "I accept peace.")
+        @Suppress("UNCHECKED_CAST")
+        val observation = f.bridge.observe(f.actor) as Map<String, Any?>
+        val history = observation["diplomaticHistory"] as? List<*>
+        Assert.assertNotNull("Observation must include private correspondence", history)
+        Assert.assertEquals(listOf("incoming"), history!!.map { (it as Map<*, *>)["messageId"] })
+        Assert.assertEquals("I accept peace.", (history.single() as Map<*, *>)["acknowledgementText"])
+        @Suppress("UNCHECKED_CAST")
+        val sender = f.bridge.observe(f.other) as Map<String, Any?>
+        Assert.assertEquals(listOf("incoming", "opponents"),
+            (sender["diplomaticHistory"] as List<*>).map { (it as Map<*, *>)["messageId"] })
     }
 
     @Test
@@ -189,6 +224,7 @@ class AgentMessageAcknowledgementTest {
         val message = f.coordinator.getMessageHistory(f.actor).single()
         Assert.assertNull(message.acknowledgedTurnSerial)
         Assert.assertNull(message.acknowledgementText)
+        Assert.assertNull(com.unciv.json.json().toJson(message).let { com.badlogic.gdx.utils.JsonReader().parse(it).get("acknowledgedRevision") })
         Assert.assertEquals(0, f.coordinator.getStateRevision())
         val serializer = com.unciv.json.json()
         val bundle = serializer.fromJson(AgentBundle::class.java, f.coordinator.saveToJson())

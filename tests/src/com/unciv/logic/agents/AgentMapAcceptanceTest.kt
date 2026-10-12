@@ -132,8 +132,8 @@ class AgentMapAcceptanceTest {
         val loaded = MatchCoordinator.loadFromJson(f.coordinator.saveToJson())
         assertEquals(remembered.toWire(), loaded.inspectTile(f.chinaId, previouslySeen)!!.toWire())
         val raw = com.badlogic.gdx.utils.JsonReader().parse(loaded.saveToJson())
-        assertEquals(2, raw.getInt("bundleVersion"))
-        assertEquals(2, com.badlogic.gdx.utils.JsonReader().parse(raw.getString("matchJson")).getInt("formatVersion"))
+        assertEquals(3, raw.getInt("bundleVersion"))
+        assertEquals(3, com.badlogic.gdx.utils.JsonReader().parse(raw.getString("matchJson")).getInt("formatVersion"))
     }
 
     @Test fun `bridge can explicitly stop worker progress before assigning another build`() {

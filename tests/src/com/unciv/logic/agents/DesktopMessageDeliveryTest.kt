@@ -61,10 +61,11 @@ class DesktopMessageDeliveryTest {
                 .get(host) as AgentActivityJournal
             journal.refresh()
         }
-        fun send(target: String, body: String): String? {
+        fun send(target: String, body: String, image: MessageImageDraft? = null): String? {
             val done = CountDownLatch(1)
             var result: String? = "No callback"
-            host.sendMessage(target, body) { result = it; done.countDown() }
+            if (image == null) host.sendMessage(target, body) { result = it; done.countDown() }
+            else host.sendMessage(target, body, image) { result = it; done.countDown() }
             assertTrue("Send must acknowledge after saving", done.await(10, TimeUnit.SECONDS))
             return result
         }
@@ -73,6 +74,42 @@ class DesktopMessageDeliveryTest {
             File(dir, "meta.json").writeText(AgentJson.stringify(mapOf("civId" to civ, "turnSerial" to 1)))
             File(dir, "activity.jsonl").writeText(AgentJson.stringify(mapOf("id" to id,
                 "kind" to "message", "text" to body, "timestamp" to "2026-10-11T00:00:00Z")) + "\n")
+        }
+    }
+
+    private fun imageDraft(): MessageImageDraft {
+        val output = java.io.ByteArrayOutputStream()
+        javax.imageio.ImageIO.write(java.awt.image.BufferedImage(2, 1,
+            java.awt.image.BufferedImage.TYPE_INT_ARGB), "png", output)
+        return MessageImageDraft(output.toByteArray(), "image/png", 2, 1)
+    }
+
+    @Test fun `host image send makes a verified durable blob before checkpoint success`() {
+        val f = Fixture(active = "Greece")
+        try {
+            val draft = imageDraft()
+            assertNull(f.send("Greece", "", draft))
+            val metadata = f.host.getMessages().single().attachments.single()
+            assertArrayEquals(draft.bytes, com.unciv.app.desktop.agents.FileMessageImageStore(f.dataDir).read(metadata).bytes)
+            val recovery = FileCheckpointStore(f.host.recoveryDirectory, f.host.matchId).recover()!!
+            val saved = MatchCoordinator.loadFromJson(recovery.bundleJson).getMessageHistory("Rome").single()
+            assertEquals(metadata.attachmentId, saved.attachments.single().attachmentId)
+            assertEquals("", saved.text)
+        } finally { f.host.close(); f.dataDir.deleteRecursively() }
+    }
+
+    @Test fun `failed blob publication never commits mail and failed checkpoint leaves only an orphan blob`() {
+        for (failBlob in listOf(true, false)) {
+            val f = Fixture(active = "Greece")
+            try {
+                val blocked = if (failBlob) File(f.dataDir, ".agent-data/message-images") else f.host.recoveryDirectory
+                blocked.parentFile.mkdirs()
+                blocked.writeText("Block publication")
+                assertNotNull(f.send("Greece", "", imageDraft()))
+                assertTrue(f.host.getMessages().isEmpty())
+                assertNull(FileCheckpointStore(f.host.recoveryDirectory, f.host.matchId).recover())
+                if (!failBlob) assertEquals(1, File(f.dataDir, ".agent-data/message-images").listFiles()!!.count { it.name.endsWith(".png") })
+            } finally { f.host.close(); f.dataDir.deleteRecursively() }
         }
     }
 

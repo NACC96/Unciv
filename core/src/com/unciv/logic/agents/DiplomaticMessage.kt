@@ -15,14 +15,17 @@ class DiplomaticMessage(
     var origin: String = "NATION",
     /** A durable, explicit response by the recipient; delivery alone does not acknowledge mail. */
     var acknowledgedTurnSerial: Int? = null,
-    var acknowledgementText: String? = null
+    var acknowledgementText: String? = null,
+    var attachments: ArrayList<DiplomaticImageAttachment> = ArrayList(),
+    var acknowledgedRevision: Int? = null
 ) : IsPartOfGameInfoSerialization {
     @Suppress("unused")
     constructor() : this("", "", "", "", 0, null, "NATION")
 
     fun copy(): DiplomaticMessage = DiplomaticMessage(
         messageId, senderCivId, targetCivId, text, sentTurnSerial, deliveredTurnSerial, origin,
-        acknowledgedTurnSerial, acknowledgementText
+        acknowledgedTurnSerial, acknowledgementText, ArrayList(attachments.map { it.copy() }),
+        acknowledgedRevision
     )
 }
 

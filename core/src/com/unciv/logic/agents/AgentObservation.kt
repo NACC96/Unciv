@@ -100,7 +100,9 @@ class ObservationDto(
     var inbox: ArrayList<DiplomaticMessage> = ArrayList(),
     var messageContacts: ArrayList<MessageContact> = ArrayList(),
     var observationVersion: Int = 2,
-    var mapSummary: MapSummary = MapSummary()
+    var mapSummary: MapSummary = MapSummary(),
+    /** At most twelve recent private records, including replies to the actor's sent mail. */
+    var diplomaticHistory: ArrayList<DiplomaticMessage> = ArrayList()
 ) {
     @Suppress("unused")
     constructor() : this(1, 0, "", "", 0, TurnPhase.READY_TO_START, "", false, 0,
@@ -225,6 +227,13 @@ fun buildObservation(
         it.isDeliveredTo(actorCivId, match.turnSerial) &&
             (it.deliveredTurnSerial == match.turnSerial || it.acknowledgedTurnSerial == null)
     }.map { it.copy() })
+    dto.diplomaticHistory = ArrayList(match.diplomaticMessages.withIndex().filter {
+        it.value.senderCivId == actorCivId || it.value.isDeliveredTo(actorCivId, match.turnSerial)
+    }.sortedWith(compareByDescending<IndexedValue<DiplomaticMessage>> {
+        maxOf(it.value.sentTurnSerial, it.value.deliveredTurnSerial ?: -1,
+            it.value.acknowledgedTurnSerial ?: -1)
+    }.thenByDescending { it.value.acknowledgedRevision ?: -1 }.thenByDescending { it.index })
+        .take(12).map { it.value.copy() })
     dto.messageContacts = buildMessageContacts(game, match, actorCivId)
     dto.requiredDecisions = ArrayList(match.pendingDecisions
         .filter { it.owningCivId == actorCivId }.map { it.copy() })

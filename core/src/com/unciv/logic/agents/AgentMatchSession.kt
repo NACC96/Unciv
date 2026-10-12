@@ -81,6 +81,15 @@ interface AgentMatchSession {
     fun sendMessage(targetCivId: String, text: String, onComplete: (String?) -> Unit) {
         onComplete("Messaging is unavailable for this match")
     }
+    fun sendMessage(targetCivId: String, text: String, image: MessageImageDraft?, onComplete: (String?) -> Unit) {
+        if (image == null) sendMessage(targetCivId, text, onComplete)
+        else onComplete("Image messaging is unavailable for this match")
+    }
+    /** Reads private preview bytes off the rendering thread; desktop completion runs on GL. */
+    fun readMessageImage(messageId: String, attachmentId: String,
+                         onComplete: (MessageImageDraft?, String?) -> Unit) {
+        onComplete(null, "Message images are unavailable for this match")
+    }
     fun startAutomaticPlay()
 }
 

@@ -3,7 +3,7 @@ package com.unciv.logic.agents
 import com.unciv.logic.IsPartOfGameInfoSerialization
 
 /** Fork save-format version for agent-match metadata. Reject others explicitly. */
-const val AGENT_MATCH_FORMAT_VERSION = 2
+const val AGENT_MATCH_FORMAT_VERSION = 3
 
 /** Mandatory choices block end-turn; optional ones are deferrable reminders; informational ones log only. */
 enum class DecisionClassification : IsPartOfGameInfoSerialization {
