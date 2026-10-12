@@ -2,6 +2,8 @@
 
 package com.unciv.logic.map.mapunit.movement
 
+import com.unciv.logic.presentation.VisualCapture
+import com.unciv.logic.presentation.VisualMoveKind
 import com.unciv.Constants
 import com.unciv.UncivGame
 import com.unciv.logic.automation.Timers.Companion.timeThis
@@ -427,7 +429,11 @@ class UnitMovement(val unit: MapUnit) {
      * the transporting unit is moved.
      * CAN DESTROY THE UNIT.
      */
-    fun teleportToClosestMoveableTile() {
+    fun teleportToClosestMoveableTile(): Unit = VisualCapture.mutate(unit.civ.gameInfo) {
+        teleportToClosestMoveableTileInternal()
+    }
+
+    private fun teleportToClosestMoveableTileInternal() {
         unit.stopEscorting()
         if (unit.isTransported) return // handled when carrying unit is teleported
         var allowedTile: Tile? = null
@@ -452,6 +458,8 @@ class UnitMovement(val unit: MapUnit) {
             allowedTile = unit.civ.cities.flatMap { it.getTiles() }
                 .sortedBy { it.aerialDistanceTo(origin) }.firstOrNull{ canMoveTo(it) }
 
+        val visualScope = unit.civ.gameInfo.visualCaptureSink
+        val visualBefore = visualScope?.unit(unit)
         if (allowedTile != null) {
             unit.removeFromTile() // we "teleport" them away
             unit.putInTile(allowedTile)
@@ -461,10 +469,14 @@ class UnitMovement(val unit: MapUnit) {
             unit.mostRecentMoveType = UnitMovementMemoryType.UnitTeleported
 
             teleportTransportedUnitsTo(origin, allowedTile)
+            visualScope?.displaced(visualBefore, unit, VisualMoveKind.TELEPORT)
         }
         // it's possible that there is no close tile, and all the guy's cities are full.
         // Nothing we can do.
-        else unit.destroy()
+        else {
+            unit.destroy()
+            visualScope?.removeUnit(visualScope.unit(unit))
+        }
     }
 
     /**
@@ -473,24 +485,37 @@ class UnitMovement(val unit: MapUnit) {
      * Deliberately not [MapUnit.canTransport]: that rejects a unit once the carrier is at capacity,
      * which is true of every payload already aboard a full carrier. These are not new passengers.
      */
-    fun teleportTransportedUnitsTo(origin: Tile, destination: Tile) {
+    fun teleportTransportedUnitsTo(origin: Tile, destination: Tile): Unit = VisualCapture.mutate(unit.civ.gameInfo) {
+        teleportTransportedUnitsToInternal(origin, destination)
+    }
+
+    private fun teleportTransportedUnitsToInternal(origin: Tile, destination: Tile) {
         val payloadUnits = origin.getUnits()
             .filter { it.isTransported && it.owner == unit.owner && unit.isTransportTypeOf(it) }
             .toList()
         for (payload in payloadUnits) {
+            val visualScope = payload.civ.gameInfo.visualCaptureSink
+            val visualBefore = visualScope?.unit(payload)
             payload.removeFromTile()
             payload.putInTile(destination)
             payload.isTransported = true // restore the flag to not leave the payload in the city
             payload.mostRecentMoveType = UnitMovementMemoryType.UnitTeleported
+            visualScope?.displaced(visualBefore, payload, VisualMoveKind.TELEPORT)
         }
     }
 
-    fun moveToTile(destination: Tile, considerZoneOfControl: Boolean = true): Unit = timeThis<Unit>("moveToTile") {
+    fun moveToTile(destination: Tile, considerZoneOfControl: Boolean = true): Unit = VisualCapture.mutate(unit.civ.gameInfo) {
+        moveToTileInternal(destination, considerZoneOfControl)
+    }
+
+    private fun moveToTileInternal(destination: Tile, considerZoneOfControl: Boolean): Unit = timeThis<Unit>("moveToTile") {
         if (destination == unit.getTile() || unit.isDestroyed) return // already here (or dead)!
         // Reset closestEnemy chache
         val escortUnit = if (unit.isEscorting()) unit.getOtherEscortUnit()!! else null
 
         if (unit.baseUnit.isAirUnit()) { // air units move differently from all other units
+            val visualScope = unit.civ.gameInfo.visualCaptureSink
+            val visualBefore = visualScope?.unit(unit)
             if (unit.action != UnitActionType.Automate.value) unit.action = null
             unit.removeFromTile()
             unit.isTransported = false // it has left the carrier by own means
@@ -498,10 +523,13 @@ class UnitMovement(val unit: MapUnit) {
             unit.currentMovement = 0f
             unit.mostRecentMoveType = UnitMovementMemoryType.UnitTeleported
             clearPathfindingCache()
+            visualScope?.displaced(visualBefore, unit, VisualMoveKind.AIR_REBASE)
             return
         }
 
         if (unit.isPreparingParadrop()) { // paradropping units move differently
+            val visualScope = unit.civ.gameInfo.visualCaptureSink
+            val visualBefore = visualScope?.unit(unit)
             val origin = unit.getTile()
             unit.action = null
             unit.removeFromTile()
@@ -521,6 +549,7 @@ class UnitMovement(val unit: MapUnit) {
                 && unit.civ.hasUnique(UniqueType.UnitsInCitiesNoMaintenance)
             ) unit.civ.updateStatsForNextTurn()
             clearPathfindingCache()
+            visualScope?.displaced(visualBefore, unit, VisualMoveKind.PARADROP)
             return
         }
 
@@ -543,6 +572,7 @@ class UnitMovement(val unit: MapUnit) {
         var lastReachedEnterableTile = unit.getTile()
         var previousTile = unit.getTile()
         var passingMovementSpent = 0f // Movement points spent since last tile we could end our turn on
+        val visualMove = unit.civ.gameInfo.visualCaptureSink?.startMove(unit)
 
 
         for (tile in pathToLastReachableTile) {
@@ -560,6 +590,7 @@ class UnitMovement(val unit: MapUnit) {
             if (!unit.civ.gameInfo.gameParameters.godMode)
                 passingMovementSpent += MovementCost.getMovementCostBetweenAdjacentTiles(unit, previousTile, tile)
 
+            var reached = false
             // In case something goes wrong, cache the last tile we were able to end on
             // We can assume we can pass through this tile, as we would have broken earlier
             if (unit.movement.canMoveTo(tile, assumeCanPassThrough = true)) {
@@ -567,6 +598,7 @@ class UnitMovement(val unit: MapUnit) {
                 unit.useMovementPoints(passingMovementSpent)
                 unit.removeFromTile()
                 unit.putInTile(tile) // Required for ruins,
+                reached = true
 
                 if (escortUnit != null) {
                     escortUnit.movement.moveToTile(tile)
@@ -576,6 +608,7 @@ class UnitMovement(val unit: MapUnit) {
                 passingMovementSpent = 0f
             }
 
+            visualMove?.step(unit, tile, reached)
             previousTile = tile
 
             // We can't continue, stop here.
@@ -596,9 +629,11 @@ class UnitMovement(val unit: MapUnit) {
         val payloadUnits = origin.getUnits().filter { it.isTransported && unit.canTransport(it) }.toList()
         // bring along the payloads
         for (payload in payloadUnits) {
+            val visualMove = payload.civ.gameInfo.visualCaptureSink?.startMove(payload)
             payload.removeFromTile()
             for (tile in pathToLastReachableTile) {
                 payload.moveThroughTile(tile)
+                visualMove?.step(payload, tile, true)
                 if (tile == finalTileReached) break // this is the final tile the transport reached
             }
             payload.putInTile(finalTileReached)
@@ -629,7 +664,13 @@ class UnitMovement(val unit: MapUnit) {
      * Swaps this unit with the unit on the given tile
      * Precondition: this unit can swap-move to the given tile, as determined by canUnitSwapTo
      */
-    fun swapMoveToTile(destination: Tile, keepEscorting: Boolean = false) {
+    fun swapMoveToTile(destination: Tile, keepEscorting: Boolean = false): Unit = VisualCapture.mutate(unit.civ.gameInfo) {
+        val capture = unit.civ.gameInfo.visualCaptureSink
+        if (capture == null) swapMoveToTileInternal(destination, keepEscorting)
+        else capture.withMovementKind(VisualMoveKind.SWAP) { swapMoveToTileInternal(destination, keepEscorting) }
+    }
+
+    private fun swapMoveToTileInternal(destination: Tile, keepEscorting: Boolean) {
         if (keepEscorting && unit.isEscorting()) return swapMoveEscortPair(destination)
 
         unit.stopEscorting()

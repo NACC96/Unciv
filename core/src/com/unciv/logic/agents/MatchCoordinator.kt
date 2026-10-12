@@ -3,6 +3,9 @@ package com.unciv.logic.agents
 import com.unciv.Constants
 import com.unciv.json.json
 import com.unciv.logic.GameInfo
+import com.unciv.logic.presentation.CaptureScope
+import com.unciv.logic.presentation.VisualCapture
+import com.unciv.logic.presentation.VisualProvenance
 import com.unciv.logic.battle.AttackableTile
 import com.unciv.logic.battle.Battle
 import com.unciv.logic.battle.CityCombatant
@@ -80,6 +83,27 @@ class MatchCoordinator(
     private var publicationGeneration = 0L
     private val actionReceipts = HashMap<String, ActionReceipt>()
     private var mutationInFlight: String? = null
+    /** Local-only opt-in supplied by V2; absent from game/match JSON, receipts and provider methods. */
+    private var visualCaptureSession: VisualCapture.Session? = null
+
+    @Synchronized
+    fun configureVisualCapture(session: VisualCapture.Session?) {
+        if (session != null) {
+            require(session.journal.gameId == committedGame.gameId)
+            require(session.journal.timelineId == committedMatch.timelineId)
+            require(session.view.viewerCivId == committedMatch.localViewingCivId)
+            require(session.view.spectatorMode == isSpectatorViewer(session.view.viewerCivId))
+        }
+        visualCaptureSession = session
+    }
+
+    private fun beginVisualCapture(game: GameInfo, actionId: String): CaptureScope {
+        val session = visualCaptureSession?.takeIf {
+            it.view.viewerCivId == committedMatch.localViewingCivId &&
+                it.view.spectatorMode == isSpectatorViewer(it.view.viewerCivId)
+        }
+        return VisualCapture.begin(game, session, VisualProvenance(actionId = actionId))
+    }
 
     init {
         match.validateFormat()
@@ -836,8 +860,10 @@ class MatchCoordinator(
                 currentRevision = committedMatch.stateRevision
             )
         mutationInFlight = actionId
+        var visualScope: CaptureScope? = null
         try {
             val candidateGame = deserializeGame(json.toJson(committedGame), collectSightings = collectSightings)
+            visualScope = beginVisualCapture(candidateGame, actionId)
             val candidateMatch = committedMatch.deepCopy()
             val resultJson = apply(candidateGame, candidateMatch)
             val before = committedMatch.stateRevision
@@ -866,6 +892,7 @@ class MatchCoordinator(
             actionReceipts[actionId] = receipt
             return receipt
         } finally {
+            visualScope?.close()
             mutationInFlight = null
         }
     }
@@ -1214,6 +1241,7 @@ class MatchCoordinator(
             val city = civ.addCity(tile.position, unit)
             if (unique.type == UniqueType.FoundPuppetCity) city.isPuppet = true
             unit.consume()
+            candidateGame.visualCaptureSink?.let { it.removeUnit(it.unit(unit)) }
             city.id
         }
         return CityFoundedResult(command.actorCivId, receipt, receipt.resultJson)
@@ -1455,6 +1483,8 @@ class MatchCoordinator(
                 throw AgentCommandException(
                     AgentCommandError.ILLEGAL_ACTION, "${command.disposition} is not available for this city"
                 )
+            val visualScope = candidateGame.visualCaptureSink
+            val visualBefore = visualScope?.city(city)
             when (command.disposition) {
                 ConquestDisposition.PUPPET -> city.puppetCity(conqueringCiv)
                 ConquestDisposition.ANNEX -> {
@@ -1468,6 +1498,7 @@ class MatchCoordinator(
                 }
                 ConquestDisposition.LIBERATE -> city.liberateCity(conqueringCiv)
             }
+            visualScope?.cityChanged(visualBefore?.city, visualScope.city(city))
             candidateMatch.pendingDecisions.remove(decision)
             // AlertPopup.close parity: the answered alert leaves with the decision.
             conqueringCiv.popupAlerts.removeAll {
@@ -2687,44 +2718,49 @@ class MatchCoordinator(
             )
 
         val candidateGame = deserializeGame(json.toJson(committedGame), collectSightings = true)
-        val candidateMatch = committedMatch.deepCopy()
-        if (candidateGame.victoryData != null) {
-            candidateMatch.turnPhase = TurnPhase.COMPLETED
-            candidateMatch.stateRevision = committedMatch.stateRevision + 1
-            commit(candidateGame = candidateGame, candidateMatch = candidateMatch)
-            val receipt = ActionReceipt(
-                actionId = "internal:begin-t${candidateMatch.turnSerial}-completed",
-                actorCivId = "",
-                timelineId = candidateMatch.timelineId,
-                requestFingerprint = "internal:begin",
-                beforeRevision = committedMatch.stateRevision,
-                afterRevision = candidateMatch.stateRevision,
-                outcome = "applied",
-                committedEventIds = ArrayList(),
-                resultJson = ""
-            )
-            return TurnEndedResult("", receipt, null, false, candidateGame.turns)
-        }
-
-        val anchor = candidateGame.civilizations.indexOfFirst { it.civID == candidateGame.currentPlayer }
-        val startAfter = if (anchor >= 0) anchor - 1 else -1
-        val next = rotateToNextCommandable(candidateGame, candidateMatch, startAfter)
-        if (next == null) {
-            pauseCommitted("No eligible civilization to open the match")
-            throw AgentCommandException(
-                AgentCommandError.INTERNAL_ERROR, "No eligible civilization to open the match"
-            )
-        }
-        mutationInFlight = "internal:begin"
+        val visualScope = beginVisualCapture(candidateGame, "internal:begin")
         try {
-            beginTurnOnCandidate(candidateGame, candidateMatch, next.civID)
-            val receipt = candidateMatch.currentTurnReceipts.last()
-            commit(candidateGame = candidateGame, candidateMatch = candidateMatch)
-            actionReceipts.clear()
-            actionReceipts[receipt.actionId] = receipt
-            return TurnEndedResult("", receipt, next.civID, next.wrappedAround, candidateGame.turns)
+            val candidateMatch = committedMatch.deepCopy()
+            if (candidateGame.victoryData != null) {
+                candidateMatch.turnPhase = TurnPhase.COMPLETED
+                candidateMatch.stateRevision = committedMatch.stateRevision + 1
+                commit(candidateGame = candidateGame, candidateMatch = candidateMatch)
+                val receipt = ActionReceipt(
+                    actionId = "internal:begin-t${candidateMatch.turnSerial}-completed",
+                    actorCivId = "",
+                    timelineId = candidateMatch.timelineId,
+                    requestFingerprint = "internal:begin",
+                    beforeRevision = committedMatch.stateRevision,
+                    afterRevision = candidateMatch.stateRevision,
+                    outcome = "applied",
+                    committedEventIds = ArrayList(),
+                    resultJson = ""
+                )
+                return TurnEndedResult("", receipt, null, false, candidateGame.turns)
+            }
+
+            val anchor = candidateGame.civilizations.indexOfFirst { it.civID == candidateGame.currentPlayer }
+            val startAfter = if (anchor >= 0) anchor - 1 else -1
+            val next = rotateToNextCommandable(candidateGame, candidateMatch, startAfter)
+            if (next == null) {
+                pauseCommitted("No eligible civilization to open the match")
+                throw AgentCommandException(
+                    AgentCommandError.INTERNAL_ERROR, "No eligible civilization to open the match"
+                )
+            }
+            mutationInFlight = "internal:begin"
+            try {
+                beginTurnOnCandidate(candidateGame, candidateMatch, next.civID)
+                val receipt = candidateMatch.currentTurnReceipts.last()
+                commit(candidateGame = candidateGame, candidateMatch = candidateMatch)
+                actionReceipts.clear()
+                actionReceipts[receipt.actionId] = receipt
+                return TurnEndedResult("", receipt, next.civID, next.wrappedAround, candidateGame.turns)
+            } finally {
+                mutationInFlight = null
+            }
         } finally {
-            mutationInFlight = null
+            visualScope.close()
         }
     }
 
@@ -2794,8 +2830,10 @@ class MatchCoordinator(
                 "This saved match has an unsupported religion or espionage choice; resolve it outside agent mode")
 
         mutationInFlight = command.actionId
+        var visualScope: CaptureScope? = null
         try {
             val candidateGame = deserializeGame(json.toJson(committedGame), collectSightings = true)
+            visualScope = beginVisualCapture(candidateGame, command.actionId)
             val candidateMatch = committedMatch.deepCopy()
             val civ = candidateGame.getCivilizationOrNull(command.actorCivId)
                 ?: throw AgentCommandException(
@@ -2853,6 +2891,7 @@ class MatchCoordinator(
                 command.actorCivId, endReceipt, next.civID, next.wrappedAround, candidateGame.turns
             )
         } finally {
+            visualScope?.close()
             mutationInFlight = null
         }
     }
@@ -3027,6 +3066,8 @@ class MatchCoordinator(
             sightings.flushInto(candidateMatch, candidateMatch.stateRevision)
             candidateGame.agentMapSightings = null
         }
+        val visualScope = candidateGame?.visualCaptureSink
+        visualScope?.finish(candidateMatch.stateRevision)
         val gameJson = if (candidateGame != null) json.toJson(candidateGame) else json.toJson(committedGame)
         val matchJson = AgentOrdinarySave.encode(candidateMatch)
         try {
@@ -3043,6 +3084,10 @@ class MatchCoordinator(
         committedMatch = candidateMatch
         committedMatchJson = matchJson
         publicationGeneration++
+        // Viewing authority may change during a turn/handoff. Never append old-view facts after that boundary.
+        if (visualCaptureSession?.view?.viewerCivId == committedMatch.localViewingCivId &&
+            visualCaptureSession?.view?.spectatorMode == committedMatch.localViewingCivId?.let { isSpectatorViewer(it) })
+            visualScope?.publishCommitted()
     }
 
     /** Versioned bundle for save/reopen and recovery scans. */
