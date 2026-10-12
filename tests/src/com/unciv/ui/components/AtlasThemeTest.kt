@@ -199,6 +199,13 @@ class AtlasThemeTest {
             add(AtlasWidgets.stat("Wheat", "Wheat 12")).uniformX().growX()
             add(AtlasWidgets.stat("Rome", "● Nation")).uniformX().growX()
         }
+        val checkbox = "Enabled status with a long translated description".toCheckBox()
+        GameUiStyle.applyWidget(checkbox)
+        assertTrue("Checkbox label must wrap at narrow widths", checkbox.label.wrap)
+        checkbox.setSize(width, checkbox.prefHeight)
+        checkbox.validate()
+        assertTrue(checkbox.label.x >= 0f)
+        assertTrue(checkbox.label.x + checkbox.label.width <= width + 0.1f)
         val tabs = AtlasWidgets.tabs(listOf("Civilization details", "Research prerequisites", "International diplomacy"), 0) {}
         for (row in listOf(stats, tabs)) {
             row.setSize(width, row.prefHeight)

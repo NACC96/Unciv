@@ -244,6 +244,10 @@ object GameUiStyle {
                 actor.style = checkBoxStyle(actor.style)
                 if (original != Color.WHITE && original != ink && original != Color.valueOf("eef2f4"))
                     actor.label.style = Label.LabelStyle(actor.label.style).apply { fontColor = original?.cpy() }
+                // Preserve natural preferred width, but permit long translated labels to wrap.
+                if (!actor.label.wrap) actor.labelCell.prefWidth(actor.label.prefWidth)
+                actor.label.wrap = true
+                actor.labelCell.minWidth(0f).growX()
                 actor.pad(Space.m)
                 actor.cells.firstOrNull()?.minHeight(standardControlHeight - 2 * Space.m)
             }
