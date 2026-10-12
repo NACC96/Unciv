@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox syntax for tracking.
 
-**Goal:** Natural leader replies, pasted message images and acknowledgement-ordered conversations.
+**Goal:** Natural leader replies and proactive diplomacy, pasted message images and acknowledgement-ordered conversations.
 
 **Architecture:** Keep the existing durable private mailbox and acknowledgement receipts. Store image blobs once under Lexar userdata, deliver them through an actor-bound MCP read tool, and expose a bounded private conversation history for continuity.
 
@@ -48,7 +48,7 @@
 
 - [ ] Write failing tests for true image content, separate encoded-wire budget, rejection/privacy propagation, prompt metadata without bytes, private correspondence and resumed sessions. Test leader-specific reply instructions and absence of the stock acknowledgement example.
 - [ ] Run focused Vitest tests and inspect failures.
-- [ ] Add the read-only tool and stdio method, validating PNG/base64 and wire bytes before returning. Add the allowlist entry and concise tool summary; strip image bytes from normalized/journaled tool activity. Update all prompt seams to answer as the leader in the saved personality, inspect attachments first, distinguish claimed evidence from facts, state inability honestly and avoid receipt-only boilerplate. Make correspondence responses visible without creating an automatic message loop.
+- [ ] Add the read-only tool and stdio method, validating PNG/base64 and wire bytes before returning. Add the allowlist entry and concise tool summary; strip image bytes from normalized/journaled tool activity. Update all prompt seams to answer as the leader in the saved personality, inspect attachments first, distinguish claimed evidence from facts, state inability honestly and avoid receipt-only boilerplate. Make correspondence responses visible without creating an automatic message loop. Encourage useful proactive cooperation, trade, alliances, geopolitical bargains and credible warnings; coordinate multi-nation plans with tailored single-recipient calls to met nations and concrete roles/terms, respecting ten messages per turn and nuclear last-resort caution. Test that current/resumed prompts retain this instruction and the legal single-recipient contract.
 - [ ] Run runner typecheck/build/full tests, report results and commit owned paths.
 
 ### Task 3: Clipboard and Messages interface
@@ -72,3 +72,9 @@
 - [ ] Obtain independent reviews of host persistence/privacy, Node image transport/prompts and UI asynchronous lifecycle; post findings on PR #4 and fix actionable issues with reproducing tests.
 - [ ] Verify packaged bytecode/runner includes changes, strict native signing and Lexar data configuration; record artifact hash and validation limits.
 - [ ] Update PR #4 title/body to the final scope and pending live check. Request safe pause/save/quit only when ready to install; install and reopen after confirmation, then verify paste, read order and natural replies visibly with the user if Java input remains unavailable.
+
+## Follow-up considered: agent map images
+
+A read-only `game.view` could return a bounded rendered map view using the native image transport added here. It must render a sanitized snapshot for the admitted civilization, with fog of war and no spectator panels, private correspondence or opponent-only information. Capturing the actual spectator window is unsuitable.
+
+Keep structured geography and legal-action tools authoritative. Image capability warnings still apply. This is a separate rendering/privacy task; it is being considered, not implemented as part of the current messaging update.
