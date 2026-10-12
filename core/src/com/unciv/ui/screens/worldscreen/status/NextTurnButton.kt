@@ -93,8 +93,12 @@ class NextTurnButton(
                 setSize(20f)
                 color = nextTurnAction.color
             })
-        } else
+            // A spanning idle-unit subtext row can otherwise collapse this column.
+            if (isAtlas) iconCell.size(20f)
+        } else {
             iconCell.clearActor()
+            if (isAtlas) iconCell.size(0f)
+        }
 
         nextTurnAction.getSubText(worldScreen)?.let {
             unitsDueLabel.setText(it.tr())

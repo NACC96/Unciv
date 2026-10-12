@@ -166,6 +166,7 @@ object AtlasRenderCheck {
                     "route" to evidence?.route, "disabled" to button.isDisabled,
                     "bounds" to listOf(position.x, position.y, button.width, button.height),
                     "icon" to button.iconCell.actor?.let { icon ->
+                        check(icon.width > 0f && icon.height > 0f) { "${button.name} icon collapsed to ${icon.width}x${icon.height}" }
                         val p = icon.localToStageCoordinates(Vector2())
                         linkedMapOf("path" to icon.name, "tint" to icon.color.toString(),
                             "bounds" to listOf(p.x, p.y, icon.width, icon.height))
