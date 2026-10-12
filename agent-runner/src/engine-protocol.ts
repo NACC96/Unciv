@@ -92,7 +92,22 @@ export interface ShutdownControl {
   op: "shutdown";
 }
 
-export type InboundFrame = EngineResponseFrame | RunTurnControl | ShutdownControl;
+/**
+ * Host takeover: cut off the in-flight run NOW (provider killed, or never
+ * spawned) and report run_failed with status "cancelled". A runId that is not
+ * the active run is ignored silently, so a stale cancel never reaches a later run.
+ */
+export interface CancelRunControl {
+  protocol: 1;
+  kind: "control";
+  op: "cancel_run";
+  runId: string;
+}
+
+/** Outcome detail of a host-cancelled run; the desktop maps payload.status, not this text. */
+export const CANCELLED_DETAIL = "cancelled by host";
+
+export type InboundFrame = EngineResponseFrame | RunTurnControl | ShutdownControl | CancelRunControl;
 
 export function parseInbound(line: string): InboundFrame | null {
   const trimmed = line.trim();
@@ -112,6 +127,9 @@ export function parseInbound(line: string): InboundFrame | null {
   }
   if (parsed["kind"] === "control" && parsed["op"] === "shutdown") {
     return parsed as unknown as ShutdownControl;
+  }
+  if (parsed["kind"] === "control" && parsed["op"] === "cancel_run" && typeof parsed["runId"] === "string") {
+    return parsed as unknown as CancelRunControl;
   }
   return null;
 }

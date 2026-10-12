@@ -9,8 +9,11 @@ import com.unciv.logic.map.mapunit.MapUnit
 import com.unciv.logic.map.tile.Tile
 import yairm210.purity.annotations.Readonly
 
-/** View of a [GameInfo] from the perspective of [viewer]. */
-class GameView(gameInfo: GameInfo, override val viewer: Civilization, spectatorMode: Boolean = false) : View<GameInfo>(gameInfo, viewer, spectatorMode) {
+/** View of a [GameInfo] from the perspective of [viewer].
+ *  [revealMap] shows the whole map while keeping [viewer]'s ownership and controls. It is presentation only:
+ *  the local spectator's vision while playing a nation they took over; game rules still use real visibility. */
+class GameView(gameInfo: GameInfo, override val viewer: Civilization, spectatorMode: Boolean = false,
+               val revealMap: Boolean = false) : View<GameInfo>(gameInfo, viewer, spectatorMode) {
     val civView: CivView = CivView(viewer, viewer, spectatorMode, this)
     val tileMapView: TileMapView = TileMapView(gameInfo.tileMap, viewer, spectatorMode, this)
     private val mapVisualization = MapVisualization(gameInfo, viewer)

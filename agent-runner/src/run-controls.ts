@@ -41,6 +41,11 @@ const TRANSITIONS: Transition[] = [
   { from: "needs_attention", control: "switch_provider", to: "starting", guarantee: "revoke old authority + epoch bump; new session with permitted notes/history" },
   { from: "needs_attention", control: "takeover", to: "waiting_human", guarantee: "revoke old authority first, commit controller change, then enable human controls" },
   { from: "paused", control: "takeover", to: "waiting_human", guarantee: "revoke old authority first, commit controller change, then enable human controls" },
+  // Host-initiated cut-off ("Play as" the civ whose agent is mid-turn): the
+  // supervisor's cancel_run kills the run's provider at once (or never spawns
+  // it) and reports status "cancelled"; actions already committed stand.
+  { from: "starting", control: "takeover", to: "waiting_human", guarantee: "revoke old authority + cancel_run the in-flight run (provider killed or never spawned; committed actions stand), then enable human controls" },
+  { from: "agent_deciding", control: "takeover", to: "waiting_human", guarantee: "revoke old authority + cancel_run the in-flight run (provider killed or never spawned; committed actions stand), then enable human controls" },
   { from: "waiting_human", control: "return_to_agent", to: "starting", guarantee: "commit controller assignment at a paused boundary; new authority epoch" },
   { from: "starting", control: "pause", to: "pausing", guarantee: "finish the admitted provider turn normally; no next invocation; provider NOT killed" },
   { from: "agent_deciding", control: "pause", to: "pausing", guarantee: "finish the admitted provider turn normally; no next invocation; provider NOT killed" },

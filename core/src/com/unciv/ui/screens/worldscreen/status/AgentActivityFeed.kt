@@ -413,6 +413,7 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
                             "completed_turn", "completed" -> "Run completed"
                             "incomplete_turn" -> "Run ended without ending turn"
                             "guard_paused" -> "Run paused"
+                            "cancelled" -> "Run stopped by takeover"
                             else -> "Run exited"
                         }
                         addSpeaker(entry, caption, rowWidth)
