@@ -90,6 +90,7 @@ object AtlasRenderCheck {
                         "fixtureSeed" to AtlasFixtureCatalog.SEED,
                         "buttonStateEvidence" to buttonStates,
                         "worldActionEvidence" to worldActions,
+                        "worldLayerBounds" to if (id.startsWith("world") && id != "world-legacy") worldLayerBounds(screen) else null,
                         "worldHud" to if (id.startsWith("world") && id != "world-legacy") worldHudEvidence(screen, id == "world") else null,
                         "status" to if (id.startsWith("world") && id != "world-legacy") "synthetic Atlas world migration evidence; native input and installation pending" else if (id == "world-legacy") "synthetic Minimal compatibility evidence; native input and installation pending" else "baseline capture; migration and interactions remain pending"))
                     println("ATLAS_CAPTURE_OK $id ${width}x$height ${args[4]} actors=${actors.size} providerCalls=0")
@@ -119,6 +120,21 @@ object AtlasRenderCheck {
             "actors" to occupied.map { linkedMapOf("name" to (it.name ?: it.javaClass.simpleName),
                 "x" to it.x, "y" to it.y, "width" to it.width, "height" to it.height) })
     }
+
+    private fun worldLayerBounds(screen: BaseScreen): List<Map<String, Any?>> =
+        screen.stage.root.atlasDescendants().filterIsInstance<com.unciv.ui.screens.worldscreen.minimap.MapOverlayToggleButton>()
+            .filter { button -> generateSequence(button as com.badlogic.gdx.scenes.scene2d.Actor?) { it.parent }.all { it.isVisible } }
+            .map { button ->
+                val p = button.localToStageCoordinates(Vector2())
+                for (host in generateSequence(button.parent) { it.parent }.filterIsInstance<com.badlogic.gdx.scenes.scene2d.ui.ScrollPane>()) {
+                    val h = host.localToStageCoordinates(Vector2())
+                    check(p.x >= h.x - .5f && p.y >= h.y - .5f && p.x + button.width <= h.x + host.width + .5f && p.y + button.height <= h.y + host.height + .5f) {
+                        "Map layer ${button.name} is clipped by ${host.name}"
+                    }
+                }
+                linkedMapOf("name" to button.name, "checked" to button.isChecked,
+                    "bounds" to listOf(p.x, p.y, button.width, button.height))
+            }.toList()
 
     private fun worldActionEvidence(screen: BaseScreen, pixels: Pixmap): List<Map<String, Any?>> =
         screen.stage.root.atlasDescendants().filterIsInstance<com.unciv.ui.images.IconTextButton>()

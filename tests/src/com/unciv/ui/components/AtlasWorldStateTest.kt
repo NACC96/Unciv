@@ -80,6 +80,8 @@ class AtlasWorldStateTest {
     @Test fun minimapExpandReduceRestoresFitWithoutOtherInvalidation() {
         val game = fixture.game
         game.makeRectangularMap(20, 32)
+        game.tileMap.mapParameters.shape = com.unciv.logic.map.MapShape.rectangular
+        game.tileMap.mapParameters.worldWrap = true
         val viewer = game.addCiv(game.ruleset.nations.getValue(com.unciv.Constants.spectator))
         Mockito.`when`(screen.selectedGameView).thenReturn(GameView(game.gameInfo, viewer, true))
         val map = Mockito.mock(WorldMapHolder::class.java)
@@ -90,6 +92,8 @@ class AtlasWorldStateTest {
         fixture.stage.addActor(holder)
         holder.update(viewer)
         val before = Vector2(holder.width, holder.height)
+        val allocation = com.unciv.ui.screens.worldscreen.WorldHudLayout.calculate(1440f, 900f, 1f, true).minimap
+        assertTrue("map and layer controls exceed their host: ${holder.height}", holder.height + 8f <= allocation.height + .5f)
         fun pressToggle() {
             val toggle = descendants(holder).filterIsInstance<com.badlogic.gdx.scenes.scene2d.ui.Table>().first { actor -> actor.listeners.any { it is ActivationListener } }
             toggle.listeners.filterIsInstance<ActivationListener>().single().tap(InputEvent().apply { listenerActor = toggle }, 1f, 1f, 1, 0)

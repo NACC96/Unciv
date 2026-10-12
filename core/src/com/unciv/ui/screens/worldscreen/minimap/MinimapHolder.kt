@@ -107,8 +107,11 @@ class MinimapHolder(val mapHolder: WorldMapHolder) : Table() {
         if (!com.unciv.ui.components.GameUiStyle.isAtlas) return requestedSize
         val r = com.unciv.ui.screens.worldscreen.WorldHudLayout.calculate(worldScreen.stage.width,
             worldScreen.stage.height, worldScreen.game.settings.fontSizeMultiplier, true).minimap
+        // Include the actual skin's layer-button row and borders, plus the host's tile-info
+        // gap. A fixed estimate clips the controls when their skin minimum height is larger.
+        val chromeHeight = height - minimap.height + 8f
         return minOf(requestedSize, minimap.getClosestMinimapSize(
-            Vector2((r.width - 8f).coerceAtLeast(40f), (r.height - 48f).coerceAtLeast(40f)), touchInside = true))
+            Vector2((r.width - 8f).coerceAtLeast(40f), (r.height - chromeHeight).coerceAtLeast(40f)), touchInside = true))
     }
 
     private fun rebuild(civInfo: Civilization?) {
