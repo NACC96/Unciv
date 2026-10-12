@@ -44,6 +44,7 @@ export interface ActivityEntry {
   timestamp: string;
   summary?: string;
   status?: string;
+  durationMs?: number;
 }
 const pretty = (value: unknown): string => typeof value === "string" ? value : JSON.stringify(value, null, 2) ?? "";
 

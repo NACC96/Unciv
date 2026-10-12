@@ -65,12 +65,24 @@ export interface RunningChild {
   recordActivity?(entry: ActivityEntry): void;
 }
 
+function formatRunDuration(durationMs: number): string {
+  const seconds = Math.floor(durationMs / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const remainder = String(seconds % 60).padStart(2, "0");
+  return minutes < 60 ? `${String(minutes).padStart(2, "0")}:${remainder}`
+    : `${Math.floor(minutes / 60)}:${String(minutes % 60).padStart(2, "0")}:${remainder}`;
+}
+
 export class NodeRunner implements ProviderRunner {
-  constructor(private readonly logRoot = process.env["UNCIV_AGENT_LOG_DIR"] ?? join(tmpdir(), "unciv-agent-runs")) {}
+  constructor(
+    private readonly logRoot = process.env["UNCIV_AGENT_LOG_DIR"] ?? join(tmpdir(), "unciv-agent-runs"),
+    private readonly monotonicNow: () => number = () => performance.now(),
+  ) {}
 
   spawn(spec: SpawnSpec, env: NodeJS.ProcessEnv): RunningChild {
     mkdirSync(this.logRoot, { recursive: true, mode: 0o700 });
     const runDir = mkdtempSync(join(this.logRoot, "run-"));
+    const startedAtMonotonic = this.monotonicNow();
     const child: ChildProcess = spawn(spec.executable, spec.argv, {
       cwd: spec.cwd,
       // GUI CLI discovery may find a Node script without node on PATH.
@@ -115,7 +127,8 @@ export class NodeRunner implements ProviderRunner {
       }
     });
     child.on("close", (code, signal) => {
-      Object.assign(metadata, { endedAt: new Date().toISOString(), exitCode: code, signal });
+      const durationMs = Math.max(0, this.monotonicNow() - startedAtMonotonic);
+      Object.assign(metadata, { endedAt: new Date().toISOString(), exitCode: code, signal, durationMs });
       saveMetadata();
       if (eventBuffer.trim()) {
         const line = redactImageLine(eventBuffer);
@@ -123,7 +136,10 @@ export class NodeRunner implements ProviderRunner {
         for (const entry of normalizer.fromLine(line)) appendActivity(entry);
       }
       flushStderr(true);
-      appendActivity({ id: "run-end", kind: code === 0 ? "system" : "error", title: `Provider exited (${code ?? signal})`, text: JSON.stringify(metadata, null, 2), timestamp: metadata["endedAt"] });
+      const status = code === 0 ? "completed" : "failed";
+      const duration = formatRunDuration(durationMs);
+      appendActivity({ id: "run-end", kind: "run", status, durationMs, title: `Provider ${status} in ${duration}`,
+        summary: `Duration ${duration}`, text: JSON.stringify(metadata, null, 2), timestamp: metadata["endedAt"] });
     });
     process.stderr.write(`Provider pid=${child.pid} cwd=${spec.cwd} logs=${runDir}\n`);
     const stderrDecoder = new StringDecoder("utf8");

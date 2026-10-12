@@ -1,8 +1,75 @@
-import { expect, it } from "vitest";
+import { expect, it, vi } from "vitest";
 import { mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { NodeRunner } from "../src/supervisor.js";
+
+it("persists each run's monotonic duration on successful and failed exits despite wall-clock shifts", async () => {
+  const root = mkdtempSync(join(tmpdir(), "unciv-run-duration-test-"));
+  const script = join(root, "provider.mjs");
+  writeFileSync(script, `
+import { existsSync } from 'node:fs';
+process.stdout.write(JSON.stringify({type:'thread.started',thread_id:'duration-session'})+'\\n');
+process.stdout.write(JSON.stringify({type:'image',data:'PRIVATE_DURATION_IMAGE_BYTES'})+'\\n');
+const timer=setInterval(()=>{if(existsSync(process.env.RELEASE_FILE)){clearInterval(timer);process.exit(Number(process.env.EXIT_CODE));}},10);
+`);
+  const logRoot = join(root, "logs");
+  let monotonicMillis = 5000;
+  const runner = new NodeRunner(logRoot, () => monotonicMillis);
+  vi.useFakeTimers({ toFake: ["Date"] });
+  try {
+    for (const fixture of [
+      { runId: "completed-run", code: 0, durationMs: 3723456, readable: "1:02:03", status: "completed" },
+      { runId: "failed-run", code: 7, durationMs: 12500, readable: "00:12", status: "failed" },
+      { runId: "instant-run", code: 0, durationMs: 0, readable: "00:00", status: "completed" },
+    ]) {
+      vi.setSystemTime(new Date("2026-10-11T12:00:00Z"));
+      const release = join(root, fixture.runId);
+      const child = runner.spawn({ executable: process.execPath, argv: [script, "--bearer", "private-bearer"], cwd: root,
+        context: { matchId: "timed-match", civId: "Rome", runId: fixture.runId, turnSerial: 8, provider: "fixture" } },
+        { ...process.env, RELEASE_FILE: release, EXIT_CODE: String(fixture.code) });
+      const exited = child.wait();
+      try {
+        await new Promise<void>(resolve => child.stdoutLines(() => resolve()));
+        const runDir = readdirSync(logRoot).map(name => join(logRoot, name)).find(dir =>
+          JSON.parse(readFileSync(join(dir, "meta.json"), "utf8")).runId === fixture.runId)!;
+        const activeMeta = JSON.parse(readFileSync(join(runDir, "meta.json"), "utf8"));
+        expect(activeMeta.durationMs).toBeUndefined();
+        expect(readFileSync(join(runDir, "pid"), "utf8").trim()).toBe(String(child.pid));
+        monotonicMillis += fixture.durationMs;
+        vi.setSystemTime(new Date("2026-10-10T12:00:00Z"));
+        writeFileSync(release, "go");
+        expect((await exited).code).toBe(fixture.code);
+        const meta = JSON.parse(readFileSync(join(runDir, "meta.json"), "utf8"));
+        expect.soft(meta).toMatchObject({ runId: fixture.runId, civId: "Rome", matchId: "timed-match", turnSerial: 8,
+          sessionId: "duration-session", exitCode: fixture.code, signal: null, durationMs: fixture.durationMs });
+        expect(meta.endedAt < meta.startedAt).toBe(true);
+        expect.soft(Number.isFinite(meta.durationMs)).toBe(true);
+        const storedActivity = readFileSync(join(runDir, "activity.jsonl"), "utf8");
+        const final = storedActivity.trim().split("\n").map(line => JSON.parse(line)).filter(entry => entry.kind === "run");
+        expect.soft(final).toHaveLength(1);
+        if (final[0]) {
+          expect(final[0]).toMatchObject({ id: "run-end", status: fixture.status, durationMs: fixture.durationMs, timestamp: meta.endedAt });
+          expect(final[0].title).toContain(fixture.readable);
+          expect(final[0].summary).toContain(fixture.readable);
+          expect(JSON.parse(final[0].text)).toEqual(meta);
+        }
+        for (const name of ["meta.json", "events.jsonl", "activity.jsonl", "stderr.log"]) {
+          const stored = readFileSync(join(runDir, name), "utf8");
+          expect(stored).not.toContain("private-bearer");
+          expect(stored).not.toContain("PRIVATE_DURATION_IMAGE_BYTES");
+        }
+      } finally {
+        writeFileSync(release, "go");
+        await exited;
+      }
+      monotonicMillis += 60000; // Idle time between invocations must not carry into the next duration.
+    }
+  } finally {
+    vi.useRealTimers();
+    rmSync(root, { recursive: true, force: true });
+  }
+}, 10000);
 
 it("persists process identity and streamed events before the provider exits", async () => {
   const root = mkdtempSync(join(tmpdir(), "unciv-run-logging-test-"));
