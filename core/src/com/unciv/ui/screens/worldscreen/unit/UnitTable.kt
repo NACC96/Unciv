@@ -110,6 +110,11 @@ class UnitTable(val worldScreen: WorldScreen) : Table() {
         background = BaseScreen.skinStrings.getUiBackground(
             "WorldScreen/UnitTable", BaseScreen.skinStrings.roundedEdgeRectangleMidShape
         )
+        if (com.unciv.ui.components.GameUiStyle.isAtlas) {
+            background = com.unciv.ui.components.GameUiStyle.panelBackground("Atlas/World/Unit")
+            bg.isVisible = false
+            unitNameLabel.color = com.unciv.ui.components.GameUiStyle.ink
+        }
         addActor(bg)
 
         promotionsTable.touchable = Touchable.enabled

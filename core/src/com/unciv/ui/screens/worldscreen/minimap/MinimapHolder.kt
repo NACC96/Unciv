@@ -26,8 +26,11 @@ class MinimapHolder(val mapHolder: WorldMapHolder) : Table() {
     private val worldScreen = mapHolder.worldScreen
     private var minimapSize = Int.MIN_VALUE
     private var maximized = false
+    val isMaximized get() = maximized
     private var lastCutoutSetting = false
     private var lastTileMap: TileMap? = null
+    private var lastRequestedSize = Int.MIN_VALUE
+    private var lastViewportSize = Vector2()
     private var resizeDragListener: ResizeDragListener? = null
     lateinit var minimap: Minimap
 
@@ -85,20 +88,30 @@ class MinimapHolder(val mapHolder: WorldMapHolder) : Table() {
         val civ: Civilization? = civInfo.takeUnless { GUI.getWorldScreen().selectedGameView.spectatorMode }
         val newMinimapSize = worldScreen.game.settings.minimapSize
         val cutoutSetting = worldScreen.game.settings.androidCutout
-        if (newMinimapSize == minimapSize && civ?.exploredRegion?.shouldUpdateMinimap() != true
+        val viewportChanged = com.unciv.ui.components.GameUiStyle.isAtlas &&
+            (lastViewportSize.x != worldScreen.stage.width || lastViewportSize.y != worldScreen.stage.height)
+        if (!viewportChanged && newMinimapSize == lastRequestedSize && civ?.exploredRegion?.shouldUpdateMinimap() != true
             && cutoutSetting == lastCutoutSetting && lastTileMap === mapHolder.tileMap) return
+        lastViewportSize.set(worldScreen.stage.width, worldScreen.stage.height)
         lastCutoutSetting = cutoutSetting
+        lastRequestedSize = newMinimapSize
         minimapSize = newMinimapSize
         lastTileMap = mapHolder.tileMap
         maximized = false
         rebuild(civ)
+        if (com.unciv.ui.components.GameUiStyle.isAtlas) {
+            val r = com.unciv.ui.screens.worldscreen.WorldHudLayout.calculate(worldScreen.stage.width,
+                worldScreen.stage.height, worldScreen.game.settings.fontSizeMultiplier, true).minimap
+            val fitted = minimap.getClosestMinimapSize(Vector2((r.width - 8f).coerceAtLeast(40f), (r.height - 48f).coerceAtLeast(40f)), touchInside = true)
+            if (fitted < minimapSize) { minimapSize = fitted; rebuild(civ) }
+        }
     }
 
     private fun rebuild(civInfo: Civilization?) {
         this.clear()
         minimap = Minimap(mapHolder, minimapSize, civInfo)
         val wrappedMinimap = getWrappedMinimap()
-        add(getToggleIcons(wrappedMinimap.height)).bottom().padRight(5f)
+        if (!com.unciv.ui.components.GameUiStyle.isAtlas) add(getToggleIcons(wrappedMinimap.height)).bottom().padRight(5f)
 
         val stack = Stack()
         stack.add(wrappedMinimap)
@@ -106,6 +119,7 @@ class MinimapHolder(val mapHolder: WorldMapHolder) : Table() {
         val alignment = if (worldScreen.game.settings.androidCutout) Align.topRight else Align.bottomRight
         stack.addInTable(getMaximizeToggleButton(civInfo, alignment)).size(40f).align(alignment) // more click area
         add(stack).bottom()
+        if (com.unciv.ui.components.GameUiStyle.isAtlas) { row(); add(getToggleIcons(wrappedMinimap.height)).padTop(4f) }
 
         pack()
         if (stage != null) x = stage.width - width
@@ -137,6 +151,7 @@ class MinimapHolder(val mapHolder: WorldMapHolder) : Table() {
                 worldScreen.game.settings.minimapSize
             }
             rebuildAndUpdateMap(civInfo)
+            worldScreen.shouldUpdate = true
         }
 
         val table = Table()
@@ -207,7 +222,8 @@ class MinimapHolder(val mapHolder: WorldMapHolder) : Table() {
         toggleIconTable.defaults().padTop(paddingBetweenElements)
 
         for (button in buttons) {
-            toggleIconTable.add(button).row()
+            toggleIconTable.add(button)
+            if (!com.unciv.ui.components.GameUiStyle.isAtlas) toggleIconTable.row()
         }
 
         return toggleIconTable

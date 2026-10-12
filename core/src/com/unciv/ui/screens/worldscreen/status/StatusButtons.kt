@@ -45,7 +45,12 @@ class StatusButtons(
         }
 
         if (com.unciv.ui.components.GameUiStyle.isAtlas && worldScreen != null) {
-            add(nextTurnButton)
+            val allocated = com.unciv.ui.screens.worldscreen.WorldHudLayout.calculate(worldScreen.stage.width,
+                worldScreen.stage.height, worldScreen.game.settings.fontSizeMultiplier, true).turnAction
+            nextTurnButton.label.wrap = true
+            nextTurnButton.labelCell.minWidth(0f).growX()
+            val controlWidth = if (agentMatchControlTable != null) controlsButton.prefWidth + 6f else 0f
+            add(nextTurnButton).width((allocated.width - controlWidth).coerceAtLeast(80f)).minWidth(0f)
             agentMatchControlTable?.let {
                 add(controlsButton).padLeft(6f)
                 if (it.parent !== worldScreen.stage.root) worldScreen.stage.addActor(it)

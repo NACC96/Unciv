@@ -11,7 +11,7 @@ import com.unciv.ui.screens.worldscreen.status.AgentActivityFeed
 /** Bounded, scrollable hosts retain the actual gameplay actors, listeners and selection state. */
 class AtlasWorldHud(
     private val screen: WorldScreen,
-    tracker: Actor, unit: Actor, actions: Actor, minimap: Actor, turn: Actor, tileInfo: Actor
+    tracker: Actor, unit: Actor, actions: Actor, private val minimap: com.unciv.ui.screens.worldscreen.minimap.MinimapHolder, turn: Actor, tileInfo: Actor
 ) {
     private fun pane(name: String, content: Actor) = AutoScrollPane(content).apply {
         this.name = name
@@ -20,7 +20,11 @@ class AtlasWorldHud(
         GameUiStyle.applyWidget(this)
         screen.stage.addActor(this)
     }
-    private val trackerPane = pane("AtlasTracker", tracker)
+    private val trackerContent = Table().apply {
+        add(tracker).left().row()
+        screen.chatButton?.let { if (it.isVisible) add(it).left().padTop(6f) }
+    }
+    private val trackerPane = pane("AtlasTracker", trackerContent)
     private val unitContent = Table().apply {
         background = GameUiStyle.panelBackground("Atlas/World/Selection")
         add(unit).top().pad(8f)
@@ -34,10 +38,16 @@ class AtlasWorldHud(
     private val mapPane = pane("AtlasMinimap", mapContent)
     private val turnPane = pane("AtlasTurnAction", turn)
     private var selectedTab = 0
-    private val tabs = AtlasWidgets.tabs(listOf("World", "Activity", "Research", "Selection", "Map"), 0) {
+    private val tabButtons: Table = AtlasWidgets.tabs(listOf("World", "Activity", "Research", "Selection", "Map"), 0) {
         selectedTab = it
         layout()
-    }.also { it.name = "AtlasWorldTabs"; screen.stage.addActor(it) }
+    }.apply {
+        children.filterIsInstance<com.badlogic.gdx.scenes.scene2d.ui.TextButton>().forEach {
+            it.label.wrap = false
+            getCell(it).width(maxOf(84f * screen.game.settings.fontSizeMultiplier, it.prefWidth + 12f))
+        }
+    }
+    private val tabs: AutoScrollPane = pane("AtlasWorldTabs", tabButtons).apply { setScrollingDisabled(false, true) }
     var regions = WorldHudLayout.calculate(screen.stage.width, screen.stage.height, screen.game.settings.fontSizeMultiplier, true)
         private set
 
@@ -47,7 +57,8 @@ class AtlasWorldHud(
         fun Actor.place(r: Rectangle) { setBounds(r.x, r.y, r.width, r.height) }
         trackerPane.place(regions.tracker)
         unitPane.place(regions.unitDock)
-        mapPane.place(regions.minimap)
+        mapPane.place(if (minimap.isMaximized) Rectangle(8f, regions.turnAction.height + 16f,
+            screen.stage.width - 16f, (regions.header.y - regions.turnAction.height - 24f).coerceAtLeast(1f)) else regions.minimap)
         turnPane.place(regions.turnAction)
         tabs.isVisible = regions.compact
         screen.topBar.isVisible = !regions.compact || selectedTab == 0

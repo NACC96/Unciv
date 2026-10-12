@@ -199,6 +199,9 @@ object AtlasFixtureCatalog {
                         unit.update()
                     }
                     if (id == "world") {
+                        // World review camera is interior; the immutable F1 performance camera is unchanged.
+                        holder.setCenterPosition(fixture.tileMap[0, 0].position, immediately = true, selectUnit = false)
+                        Mockito.`when`(scope.session.statusText()).thenReturn("Paused · America")
                         val unit = UnitTable(facade)
                         getter(facade, "getBottomUnitTable", unit)
                         screen.stage.addActor(unit)
