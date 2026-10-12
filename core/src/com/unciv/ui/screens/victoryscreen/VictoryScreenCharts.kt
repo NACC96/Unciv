@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.utils.Align
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.widgets.AutoScrollPane
 import com.unciv.ui.components.widgets.TabbedPager
 import com.unciv.ui.components.input.onChange
@@ -20,6 +21,8 @@ class VictoryScreenCharts(
     worldScreen: WorldScreen
 ) : Table(BaseScreen.skin), TabbedPager.IPageExtensions {
     private val gameInfo = worldScreen.gameInfo
+    private val screenWidth = worldScreen.stage.width
+    private val textScale = worldScreen.game.settings.fontSizeMultiplier
 
     private var rankingType = RankingType.Score
     private var selectedCiv = worldScreen.selectedCiv
@@ -43,11 +46,20 @@ class VictoryScreenCharts(
     private var zoomAtX : IntRange? = null
 
     init {
+        if (GameUiStyle.isAtlas) {
+            background = GameUiStyle.background("Atlas/Victory/Chart", GameUiStyle.inset)
+            controlsColumn.background = GameUiStyle.panelBackground("Atlas/Victory/ChartControls", 1f)
+            controlsColumn.pad(12f)
+            markerIcon.color = GameUiStyle.accent
+            GameUiStyle.applyWidget(rankingTypeSelect)
+            GameUiStyle.applyWidget(civButtonsScroll)
+        }
         civButtonsScroll.setScrollingDisabled(x = true, y = false)
         civButtonsTable.defaults().space(20f).fillX()
         controlsColumn.defaults().space(20f).fillX()
         controlsColumn.add(rankingTypeSelect).right().row()
-        controlsColumn.add(civButtonsScroll).fillY()
+        val nationCell = controlsColumn.add(civButtonsScroll).fillY()
+        if (GameUiStyle.isAtlas) nationCell.growY().minHeight(0f)
         defaults().fill().pad(20f)
         add(controlsColumn)
         updateControls()
@@ -132,11 +144,44 @@ class VictoryScreenCharts(
     }
 
     override fun activated(index: Int, caption: String, pager: TabbedPager) {
-        pager.setScrollDisabled(true)
+        val narrow = GameUiStyle.isAtlas && worldWidthIsNarrow(pager.width)
+        pager.setScrollDisabled(!narrow)
         controlsColumn.height = parent.height
         lineChart.height = parent.height
         update()
         civButtonsTable.invalidateHierarchy()
+    }
+
+    override fun layout() {
+        if (GameUiStyle.isAtlas) {
+            // updateControls validates during construction before the chart cell is installed.
+            if (getCell(controlsColumn) == null || getCell(lineChart) == null) {
+                super.layout()
+                return
+            }
+            val narrow = worldWidthIsNarrow(width)
+            val hasRows = getCell(controlsColumn).row != getCell(lineChart).row
+            if (narrow != hasRows) {
+                clearChildren()
+                if (narrow) {
+                    add(controlsColumn).growX().minWidth(0f).minHeight(0f).row()
+                    add(lineChart).grow().minWidth(0f).minHeight(0f)
+                } else {
+                    add(controlsColumn).minWidth(0f).growY().padRight(12f)
+                    add(lineChart).grow().minWidth(0f).minHeight(0f)
+                }
+            }
+            if (narrow) getCell(controlsColumn).height(160f * textScale)
+        }
+        super.layout()
+    }
+
+    private fun worldWidthIsNarrow(width: Float) = width < 820f * textScale
+
+    override fun getPrefHeight(): Float {
+        if (GameUiStyle.isAtlas && worldWidthIsNarrow(screenWidth))
+            return 160f * textScale + lineChart.minHeight + 32f
+        return super.getPrefHeight()
     }
 
     override fun deactivated(index: Int, caption: String, pager: TabbedPager) {

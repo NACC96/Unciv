@@ -3,6 +3,7 @@ package com.unciv.ui.screens.civilopediascreen
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.utils.Align
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.extensions.addSeparator
 import com.unciv.ui.components.input.onClick
 import com.unciv.ui.components.input.onRightClick
@@ -62,11 +63,13 @@ object MarkupRenderer {
                 continue
             }
             if (line.separator) {
-                table.addSeparator(line.displayColor, 1, if (line.size == Int.MIN_VALUE) 2f else line.size.toFloat())
+                table.addSeparator(if (GameUiStyle.isAtlas && line.displayColor == com.badlogic.gdx.graphics.Color.WHITE)
+                    GameUiStyle.hover else line.displayColor, 1, if (line.size == Int.MIN_VALUE) 2f else line.size.toFloat())
                     .pad(separatorTopPadding, 0f, separatorBottomPadding, 0f)
                 continue
             }
             val actor = line.render(labelWidth, iconDisplay)
+            GameUiStyle.applyWidget(actor)
             if (line.linkType == FormattedLine.LinkType.Internal && linkAction != null)
                 actor.onClick {
                     linkAction(line.link)

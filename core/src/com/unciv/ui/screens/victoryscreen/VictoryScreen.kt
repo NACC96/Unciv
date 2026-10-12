@@ -13,6 +13,7 @@ import com.unciv.logic.civilization.Civilization
 import com.unciv.models.metadata.GameSetupInfo
 import com.unciv.models.ruleset.Victory
 import com.unciv.models.translations.tr
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.audio.MusicMood
 import com.unciv.ui.audio.MusicTrackChooserFlags
 import com.unciv.ui.components.widgets.TabbedPager
@@ -98,6 +99,7 @@ class VictoryScreen(
     }
 
     init {
+        setChoiceHeader("Victory and world history")
         worldScreen.autoPlay.stopAutoPlay()
         //**************** Set up the tabs ****************
         splitPane.setFirstWidget(tabs)
@@ -108,9 +110,12 @@ class VictoryScreen(
             if (tabHidden && !(tab.allowAsSecret && Gdx.input.areSecretKeysPressed()))
                 continue
             val icon = ImageGetter.getImage("VictoryScreenIcons/${tab.name}")
+            val content = tab.getContent(this)
+            GameUiStyle.applyWidget(content)
+            (content as? TabbedPager.IPageExtensions)?.getFixedContent()?.let { GameUiStyle.applyWidget(it) }
             tabs.addPage(
                 tab.caption ?: tab.name,
-                tab.getContent(this),
+                content,
                 icon, iconSize,
                 scrollAlign = Align.topLeft,
                 shortcutKey = KeyCharAndCode(tab.key),
@@ -118,6 +123,7 @@ class VictoryScreen(
             )
         }
         tabs.selectPage(pageNumber)
+        GameUiStyle.applyWidget(tabs)
 
         //**************** Set up bottom area - buttons and description label ****************
         when {
@@ -147,7 +153,7 @@ class VictoryScreen(
         }
         val difficultyLabel = "{Difficulty}: {${gameInfo.difficulty}}".toLabel()
         val neededSpace = topRightPanel.width.coerceAtLeast(difficultyLabel.width) * 2 + tabs.getHeaderPrefWidth()
-        if (neededSpace > stage.width) {
+        if (GameUiStyle.isAtlas || neededSpace > stage.width) {
             // Let additions take part in TabbedPager's header scrolling
             tabs.decorateHeader(difficultyLabel, leftSide = true, fixed = false)
             tabs.decorateHeader(topRightPanel, leftSide = false, fixed = false)

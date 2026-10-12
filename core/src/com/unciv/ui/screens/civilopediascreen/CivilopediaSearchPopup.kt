@@ -13,6 +13,8 @@ import com.unciv.models.ruleset.RulesetCache
 import com.unciv.models.ruleset.unique.IHasUniques
 import com.unciv.models.stats.INamed
 import com.unciv.models.translations.tr
+import com.unciv.ui.components.AtlasWidgets
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.widgets.UncivTextField
 import com.unciv.ui.components.extensions.disable
 import com.unciv.ui.components.extensions.enable
@@ -47,6 +49,10 @@ class CivilopediaSearchPopup(
 
     init {
         searchText.maxLength = 100
+        if (GameUiStyle.isAtlas) {
+            innerTable.background = GameUiStyle.panelBackground("Atlas/Civilopedia/Search", 1f)
+            add(AtlasWidgets.header("Search Civilopedia")).colspan(2).growX().minWidth(0f).row()
+        }
 
         add("Search text:".toLabel())
         add(searchText).growX().row()
@@ -59,6 +65,8 @@ class CivilopediaSearchPopup(
             startSearch(searchText.text)
         }.actor
         addCloseButton()
+        GameUiStyle.applyWidget(innerTable)
+        if (GameUiStyle.isAtlas) GameUiStyle.apply(searchButton, primary = true)
         showListeners.add {
             keyboardFocus = searchText
             searchText.selectAll()
@@ -97,6 +105,7 @@ class CivilopediaSearchPopup(
             resultExpander.innerTable.clear()
         } else {
             resultExpander = ExpanderTab("Results") {}
+            GameUiStyle.applyWidget(resultExpander)
             resultCell.setActor(resultExpander)
             resultExpander.innerTable.defaults().growX().pad(2f)
         }
