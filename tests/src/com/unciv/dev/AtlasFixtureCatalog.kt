@@ -267,7 +267,8 @@ object AtlasFixtureCatalog {
                             val saved = game.settings.minimapSize
                             val camera = listOf(holder.scrollX, holder.scrollY, holder.scaleX, holder.scaleY)
                             for (name in listOf("MinimapIncrease", "MinimapReduce")) {
-                                val toggle = minimap.atlasDescendants().single { it.name == name }
+                                val corner = minimap.atlasDescendants().single { it.name == name }
+                                val toggle = corner.takeIf { it.listeners.any { listener -> listener is com.unciv.ui.components.input.ActivationListener } } ?: minimap
                                 toggle.listeners.filterIsInstance<com.unciv.ui.components.input.ActivationListener>().single().tap(
                                     com.badlogic.gdx.scenes.scene2d.InputEvent().apply { listenerActor = toggle }, 1f, 1f, 1, 0)
                                 minimap.update(viewer)
