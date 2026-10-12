@@ -37,7 +37,7 @@
 - New `core/src/com/unciv/ui/screens/worldscreen/WorldHudLayout.kt`: pure rectangle allocation; `WorldScreen.kt` remains lifecycle owner.
 - Modify `core/src/com/unciv/ui/screens/worldscreen/WorldScreenStyle.kt` as compatibility facade, not a second theme.
 
-## F1: Establish complete coverage and reproducible baseline
+## Task 1: F1: Establish complete coverage and reproducible baseline
 
 **Files:** Create the scripts, coverage inventory and three dev fixtures above. Create `tests/src/com/unciv/ui/components/AtlasCoverageTest.kt`; modify `tests/build.gradle.kts` only to expose a synthetic runtime classpath task if needed.
 
@@ -50,7 +50,7 @@
 - [ ] Run `scripts/atlas/check.sh '*AtlasCoverageTest'` and `scripts/atlas/render.sh performance --output /Volumes/Lexar/Unciv/.superpowers/civ6-atlas/baseline`; expect passing tests and three complete baseline traces. Capture existing screens before style changes. A baseline exceeding target is recorded for E1 optimization.
 - [ ] Commit only scripts, fixtures, inventory and compact baseline metadata: `test: establish atlas screen coverage and rendering baseline`.
 
-## F2: Common atlas skin and reusable controls
+## Task 2: F2: Common atlas skin and reusable controls
 
 **Files:** Modify `GameUiStyle.kt`, `WorldScreenStyle.kt`, `core/src/com/unciv/models/skins/SkinStrings.kt`, `core/src/com/unciv/ui/screens/basescreen/BaseScreen.kt` at style initialization, and `core/src/com/unciv/ui/popups/options/DisplayTab.kt`. Create `AtlasWidgets.kt`, `android/assets/jsons/Skins/Atlas.json`, `android/Images.Skin/Skins/Atlas/` drawables. Create `tests/src/com/unciv/ui/components/AtlasThemeTest.kt`; extend `SetupStyleLifecycleTest.kt`.
 
@@ -63,7 +63,7 @@
 - [ ] Re-run focused tests; capture `supporting --matrix`. Inspect actual widget gallery over bright/dark terrain, long text, diacritics, CJK and resource symbols, with focus and disabled states. Expect no missing glyphs, clipped content or contrast failures.
 - [ ] Commit: `feat: add atlas theme and accessible shared controls`.
 
-## W1: World HUD, ordered nations and contextual command dock
+## Task 3: W1: World HUD, ordered nations and contextual command dock
 
 **Files:** Create `WorldHudLayout.kt` and `core/src/com/unciv/ui/screens/worldscreen/topbar/NationTurnRibbon.kt`. Modify `WorldScreen.kt`, `topbar/WorldScreenTopBar.kt`, `WorldScreenTopBarStats.kt`, `WorldScreenTopBarResources.kt`, `TechPolicyDiplomacyButtons.kt`, `unit/UnitTable.kt`, `unit/actions/UnitActionsTable.kt`, `NotificationsScroll.kt`, `minimap/MinimapHolder.kt`, `minimap/MapOverlayToggleButton.kt`, `status/NextTurnButton.kt`, `status/AgentMatchControlTable.kt`. Create `tests/src/com/unciv/ui/components/AtlasWorldHudTest.kt`; retain `WorldScreenHudTest.kt`.
 
@@ -76,7 +76,7 @@
 - [ ] Run focused tests and `scripts/atlas/render.sh world --matrix --output /Volumes/Lexar/Unciv/.superpowers/civ6-atlas/world`; verify all action states and layouts against the concept, with correct real identities and no overlap.
 - [ ] Commit: `feat: rebuild world HUD around atlas hierarchy`.
 
-## W2: Activity, messages, overview and nation control
+## Task 4: W2: Activity, messages, overview and nation control
 
 **Files:** Modify `status/AgentActivityFeed.kt`, `AgentActivityAppearance.kt`, `AgentNationSelectBox.kt`, `AgentMessagesPanel.kt`, `AgentNationSettingsPanel.kt`, `overview/CivilizationOverviewPanel.kt`. Add `tests/src/com/unciv/ui/components/AtlasAgentPanelsTest.kt`; extend existing `AgentMessagesPanelTest.kt`, `AgentNationSettingsPanelTest.kt`, `AgentSecondarySnapshotTest.kt`.
 

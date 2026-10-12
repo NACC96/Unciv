@@ -36,7 +36,7 @@ Each task updates `docs/atlas/screen-coverage.json` with source entry points, fi
 
 M4 contains independent family deliveries: M4a menu/loading, M4b setup/presets, M4c saves/options/language, M4d Civilopedia/victory, M4e multiplayer/mods, M4f map editor/developer tools/remaining popups. Execute its test–implementation–capture–commit steps separately for each family and review that family before advancing; do not send the whole list to one implementer as an unchecked bulk restyle. The task completes only when all six family records are accepted.
 
-## M1: City management and production
+## Task 1: M1: City management and production
 
 **Files:** Modify `cityscreen/CityScreen.kt`, `CityConstructionsTable.kt`, `CityStatsTable.kt`, `CityScreenCityPickerTable.kt`, `CityScreenTileTable.kt`, `ConstructionInfoTable.kt`, `CitizenManagementTable.kt`, `SpecialistAllocationTable.kt`, `BuyButtonFactory.kt`, `CityReligionInfoTable.kt`, `DetailedStatsPopup.kt`, `GreatPersonPointsBreakdownPopup.kt`. Create `cityscreen/CityScreenLayout.kt`, `tests/src/com/unciv/ui/components/AtlasCityScreenTest.kt`; extend `AgentSecondarySnapshotTest.kt` and city fixture.
 
@@ -49,7 +49,7 @@ M4 contains independent family deliveries: M4a menu/loading, M4b setup/presets, 
 - [ ] Run focused checks and `scripts/atlas/render.sh city --matrix --output /Volumes/Lexar/Unciv/.superpowers/civ6-atlas/city`; exercise queue add/remove/reorder, buy insufficient/sufficient funds, citizen locks, specialists, tile purchase, city switch and agent snapshot refresh. Expected commands/results match the pre-change fixture trace.
 - [ ] Commit `feat: redesign city management and production controls`.
 
-## M2: Technology, policies, religion, promotions and choice screens
+## Task 2: M2: Technology, policies, religion, promotions and choice screens
 
 **Files:** Modify `pickerscreens/PickerPane.kt`, `PickerScreen.kt`, `TechPickerScreen.kt`, `TechButton.kt`, `PolicyPickerScreen.kt`, `PromotionPickerScreen.kt`, `PromotionTree.kt`, `PromotionButton.kt`, `PromotionScreenColors.kt`, `ReligionPickerScreenCommon.kt`, `ReligiousBeliefsPickerScreen.kt`, `PantheonPickerScreen.kt`, `GreatPersonPickerScreen.kt`, `ImprovementPickerScreen.kt`, `DiplomaticVotePickerScreen.kt`, `DiplomaticVoteResultScreen.kt`, `CityRenamePopup.kt`, `UnitRenamePopup.kt`. Create `tests/src/com/unciv/ui/components/AtlasChoiceScreensTest.kt`; expand corresponding fixture IDs.
 
@@ -61,7 +61,7 @@ M4 contains independent family deliveries: M4a menu/loading, M4b setup/presets, 
 - [ ] Run tests and `research`, `policies`, `religion`, `promotions` fixtures with `--matrix`. Include all locked/available/current/completed states, scarce resources, long translated strings and alternative rulesets. Add supporting variants for votes/improvements/great people/rename and inspect their actual actors.
 - [ ] Commit `feat: unify research and choice screens with atlas cards`.
 
-## M3: Diplomacy, trade and empire information
+## Task 3: M3: Diplomacy, trade and empire information
 
 **Files:** Modify `diplomacyscreen/DiplomacyScreen.kt`, `LeaderIntroTable.kt`, `MajorCivDiplomacyTable.kt`, `CityStateDiplomacyTable.kt`, `TradeTable.kt`, `OfferColumnsTable.kt`, `OffersListScroll.kt`, `worldscreen/TradePopup.kt`, `worldscreen/AlertPopup.kt`. Migrate `overviewscreen/EmpireOverviewScreen.kt`, `EmpireOverviewTab.kt`, `CityOverviewTab.kt`, `UnitOverviewTab.kt`, `ResourcesOverviewTab.kt`, `TradesOverviewTab.kt`, `StatsOverviewTab.kt`, `ReligionOverviewTab.kt`, `WonderOverviewTab.kt`, `GlobalPoliticsOverviewTable.kt`, `GlobalPoliticsDiagramGroup.kt`, `NotificationsOverviewTable.kt`, `EspionageOverviewScreen.kt`, `UnitSupplyTable.kt` and their column/helpers. Create `tests/src/com/unciv/ui/components/AtlasDiplomacyTest.kt`, `AtlasEmpireOverviewTest.kt`.
 
@@ -74,7 +74,7 @@ M4 contains independent family deliveries: M4a menu/loading, M4b setup/presets, 
 - [ ] Run focused tests and diplomacy/supporting fixture matrices with pending/accepted/expired offers, 15 nations, long terms, resources, charts and espionage. Inspect stats against source fixture values and verify all tab/tooltip text is readable.
 - [ ] Commit `feat: modernize diplomacy trade and empire overview screens`.
 
-## M4: Main menu, setup, saves, options and remaining tools
+## Task 4: M4: Main menu, setup, saves, options and remaining tools
 
 **Files:** Modify `mainmenuscreen/MainMenuScreen.kt`, `GameStartScreen.kt`, `LoadingScreen.kt`, `LanguagePickerScreen.kt`; `newgamescreen/NewGameScreen.kt`, `GameOptionsTable.kt`, `MapOptionsTable.kt`, `MapParametersTable.kt`, `MapFileSelectTable.kt`, `PlayerPickerTable.kt`, `NationTable.kt`, `NationPickerPopup.kt`, `NationSettingsPopup.kt`, `AgentProfilePopup.kt`, `StartingBonusForm.kt`, `SetupPresetsPopup.kt`, `ScenarioSelectTable.kt`, `AcceptModErrorsPopup.kt`, `FriendTable.kt`, `ModCheckboxTable.kt`, `MultiCheckboxTable.kt`; `savescreens/LoadOrSaveScreen.kt`, `LoadGameScreen.kt`, `SaveGameScreen.kt`, `VerticalFileListScrollPane.kt`; `ui/popups/options/OptionsPopup.kt` and its registered tab factories; `civilopediascreen/CivilopediaScreen.kt`, `CivilopediaSearchPopup.kt`, `MarkupRenderer.kt`; `victoryscreen/VictoryScreen.kt` and its charts/rankings/demographics/replay/illustration tables; `multiplayerscreens/MultiplayerScreen.kt`, `GameList.kt`, `AddMultiplayerGameScreen.kt`, `AddFriendScreen.kt`, `EditFriendScreen.kt`, `ViewFriendsListScreen.kt`, `FriendPickerList.kt`; `modmanager/ModManagementScreen.kt`, `ModInfoAndActionPane.kt`, `ModDecoratedButton.kt`; `mapeditorscreen/MapEditorScreen.kt`, `MapEditorMainTabs.kt`, `MapEditorToolsDrawer.kt` and registered tab factories; `devconsole/DevConsolePopup.kt`, `UniqueBuilderScreen.kt`, `worldscreen/PlayerReadyScreen.kt`, `worldscreen/mainmenu/WorldScreenMenuPopup.kt`, `WorldScreenMusicPopup.kt`, and shared popup/widgets identified by the F1 inventory. Create `tests/src/com/unciv/ui/components/AtlasSupportingScreensTest.kt`; extend setup layout/lifecycle tests.
 

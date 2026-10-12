@@ -29,7 +29,7 @@
 
 ---
 
-## E1: Whole-game regression, visual review and measured optimization
+## Task 1: E1: Whole-game regression, visual review and measured optimization
 
 **Files:** Complete `docs/atlas/screen-coverage.json`, `art/atlas/coverage.json`; create `docs/atlas/acceptance.md`, `tests/src/com/unciv/ui/components/AtlasEndToEndTest.kt`, `scripts/atlas/report.py`, `scripts/atlas/test_report.py` (Python standard-library unittest, no extra dependency). Optimize only source proven by benchmark evidence. Raw evidence root `/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/acceptance/`.
 
@@ -44,7 +44,7 @@
 - [ ] If thresholds miss, profile before changing anything. Address measured sources such as per-frame allocations, overdraw, atlas switches, snapshot rebind or unnecessary actor rebuilds; preserve privacy and complete art. Rerun the identical trace. Never secretly turn off required animations/art to meet the target.
 - [ ] Produce `docs/atlas/acceptance.md` with complete coverage tables, before/after evidence and remaining native checks. Commit `test: verify complete atlas workflows rendering and performance` only when synthetic/source gates pass; native gates remain unchecked.
 
-## E2: Defaults, independent review, PR and native acceptance
+## Task 2: E2: Defaults, independent review, PR and native acceptance
 
 **Files:** Modify `core/src/com/unciv/Constants.kt` defaults and `models/metadata/GameSettings.kt` only after E1; complete `ui/popups/options/DisplayTab.kt` reversible appearance action. Create `tests/src/com/unciv/ui/components/AtlasAppearanceMigrationTest.kt`; update `docs/atlas/acceptance.md`, `docs/world-screen-ui.md` and user-facing appearance/motion documentation.
 

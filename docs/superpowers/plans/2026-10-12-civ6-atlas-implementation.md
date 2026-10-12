@@ -10,7 +10,7 @@
 
 **Spec:** [Approved design](../specs/2026-10-12-civ6-atlas-ui-design.md); [source readiness audit](../specs/2026-10-12-civ6-atlas-readiness-audit.md).
 
-Status: complete planning draft for execution review. No implementation tasks are checked off. Design approved 2026-10-12; this plan does not claim the new UI exists.
+Status: approved for subagent implementation and independent task reviews on 2026-10-12. Execution has started; no implementation task is yet complete. Design approval and implementation-plan approval are both recorded; this document does not claim the new UI exists.
 
 ## Global Constraints
 

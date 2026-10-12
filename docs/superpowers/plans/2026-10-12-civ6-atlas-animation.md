@@ -49,7 +49,7 @@
 
 `VisualCapture.begin(game: GameInfo, view: VisualViewKey): CaptureScope` installs a thread-confined per-instance sink and freezes permitted before-facts at each engine hook. `CaptureScope.finish(): List<VisualEvent>` returns after-projected immutable facts; `close()` clears the sink. The capture owns no durable state. `VisualEventProjector` helpers evaluate `GameView`/existing visibility rules before facts are frozen; no mutable pre-action view reference is stored for later use.
 
-## V1: Capture committed engine transitions with no save growth
+## Task 1: V1: Capture committed engine transitions with no save growth
 
 **Files:** Engine presentation classes, GameInfo transient sink and hook files above; MatchCoordinator mutation/turn-advance boundaries. Create `tests/src/com/unciv/logic/agents/CommittedVisualEventsTest.kt` and `tests/src/com/unciv/logic/presentation/VisualJournalTest.kt`.
 
@@ -62,7 +62,7 @@
 - [ ] Run focused tests plus `*AgentMapTransactionsTest`, `*AgentCommandsTest`, `*AgentOrdinarySaveTest` and `*AgentHumanTurnChoicesTest`. Assert movement final positions, damage, gold, messages and checkpoint counts unchanged with capture enabled/disabled.
 - [ ] Commit `feat: capture bounded transient visuals after committed actions`.
 
-## V2: Privacy-safe snapshot transport and authority changes
+## Task 2: V2: Privacy-safe snapshot transport and authority changes
 
 **Files:** `VisualEventProjector.kt`, publication/desktop/WorldScreen files above. Create `tests/src/com/unciv/logic/presentation/VisualEventPrivacyTest.kt`; extend `DesktopSnapshotPublicationTest.kt`, `AgentNationViewTest.kt`.
 
@@ -75,7 +75,7 @@
 - [ ] Re-run focused tests with rapid publications, late callbacks, identical revision/different generation, spectator fog toggle, spectator→France→spectator, screen closed and game replaced. Also run existing movement visibility tests.
 - [ ] Commit `feat: transport only viewer-authorized animation facts`.
 
-## V3: Shared playback, catch-up and motion settings
+## Task 3: V3: Shared playback, catch-up and motion settings
 
 **Files:** World presentation classes, WorldMapHolder/BattleTableHelpers/TileLayerUnitSprite integration, settings/DisplayTab. Create `tests/src/com/unciv/ui/components/WorldVisualTimelineTest.kt` and `tests/src/com/unciv/dev/AtlasAnimationRenderCheck.kt`.
 

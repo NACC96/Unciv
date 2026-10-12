@@ -43,7 +43,7 @@ Use immutable Kotlin data classes after parsing mutable JSON DTOs. `ArtUnitId` i
 
 `ClipKey(unitName: String, state: UnitVisualState, facing: HexFacing)` identifies a clip. `ClipSpec` holds ordered frame regions, per-frame durationMs, anchor coordinates, static fallback key, page names, optional declared mirrored-facing and looping flag. `UnitArtSpec` holds static layers/masks/shadow, clipping margin, unique-unit identity and applicable states. `AtlasArtManifest.findUnit(name: String): UnitArtSpec?` and `findClip(key: ClipKey): ClipSpec?` never guess a different unit. `AtlasClipCache.request(key: ClipKey): ClipHandle?` returns a pinned loaded handle or null while loading/missing/over budget; `ClipHandle.close()` releases the pin, idempotently. Only the cache owns/disposes textures. `trim()` evicts unpinned pages; `dispose()` tears down all owned resources after playback closes.
 
-## A1: Manifest, coverage inventory and packing contract
+## Task 1: A1: Manifest, coverage inventory and packing contract
 
 **Files:** Manifest/packer classes and JSON files above; add `scripts/atlas/assets.sh` validation/packing entry point. Test `AtlasAssetContractTest.kt` and new buildSrc packer tests.
 
@@ -55,7 +55,7 @@ Use immutable Kotlin data classes after parsing mutable JSON DTOs. `ArtUnitId` i
 - [ ] Generate coverage from both bundled JSON rulesets plus city-era and neighbor-transition requirements. Copy/verify the earlier inventory; do not assume its counts prove final art coverage. Record provenance entries `{assetId, creator, source, promptPath, rights, sourceHash, outputHashes}`; generated images are original, third-party references never silently become shipped assets.
 - [ ] Run focused tests, `scripts/atlas/assets.sh validate` and `pack`; expect valid test manifests, separate clip outputs and explicit missing production coverage. Commit `feat: add validated atlas art manifest and separate clip packing`.
 
-## A2: Complete illustrated map, cities and improvements
+## Task 2: A2: Complete illustrated map, cities and improvements
 
 **Files:** AtlasTerrain sources/config, art coverage/provenance; modify `layers/TileLayerTerrain.kt`, `TileLayerFeatures.kt` only if required by verified layer support, and `tilegroups/citybutton/CityButton.kt` for art bounds. Extend `tests/src/com/unciv/ui/components/AtlasArtCoverageTest.kt`, existing `CityButtonMapLayerCullingTest.kt`, and terrain fixture.
 
@@ -68,7 +68,7 @@ Use immutable Kotlin data classes after parsing mutable JSON DTOs. `ArtUnitId` i
 - [ ] Run focused checks and `scripts/atlas/render.sh terrain --matrix --output /Volumes/Lexar/Unciv/.superpowers/civ6-atlas/terrain`. Inspect mixed-biome adjacency sheets and actual map captures, not only isolated images. Mark rows accepted only after no seams/bleed/missing edges at small/medium/strategic zoom.
 - [ ] Commit final integration `feat: integrate complete illustrated atlas terrain and city art`; task remains open until all map categories pass coverage.
 
-## A3: Bounded asynchronous animation clip residency
+## Task 3: A3: Bounded asynchronous animation clip residency
 
 **Files:** Implement `AtlasClipCache.kt`, `AtlasClipLoader.kt`, extend `AtlasClipCacheTest.kt` and `AtlasRenderCheck.kt`; touch `ImageGetter.kt` only for reset/disposal coordination, never add clip pages to eager atlas discovery.
 
@@ -80,7 +80,7 @@ Use immutable Kotlin data classes after parsing mutable JSON DTOs. `ArtUnitId` i
 - [ ] Re-run tests and a GPU load/play/release/view-switch stress loop using real A4 representative clips when available. Metrics must return to steady baseline after 100 cycles; no unit disappears under pressure. Record at both 128 and 32 MiB budgets.
 - [ ] Commit `feat: bound atlas animation memory with on-demand clip loading`.
 
-## A4: Complete new unit designs and animated states
+## Task 4: A4: Complete new unit designs and animated states
 
 **Files:** AtlasUnits source static art, `art/atlas/units/` clips and manifests/provenance/coverage; extend `AtlasArtCoverageTest.kt` and `units` fixture. Connect static masks via `TileLayerUnitSprite.kt` without changing unit input/authority.
 
