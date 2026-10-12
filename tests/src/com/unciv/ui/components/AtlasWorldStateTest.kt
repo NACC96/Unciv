@@ -147,6 +147,21 @@ class AtlasWorldStateTest {
         }
     }
 
+    @Test fun turnActionFitsFractionalWidthAtNarrowDesktopSize() {
+        Mockito.`when`(screen.gameInfo).thenReturn(fixture.game.gameInfo)
+        Mockito.`when`(fixture.stage.width).thenReturn(960f)
+        for (scale in listOf(1f, 1.5f)) {
+            UncivGame.Current.settings.fontSizeMultiplier = scale
+            val button = com.unciv.dev.AtlasTurnFixtures.button("RetryUpload", screen)
+            val status = com.unciv.ui.screens.worldscreen.status.StatusButtons(button, screen)
+            status.update(false)
+            val region = com.unciv.ui.screens.worldscreen.WorldHudLayout.calculate(960f, 900f, scale, false).turnAction
+            status.setSize(region.width, region.height)
+            status.validate()
+            assertTrue("Button width ${button.width} exceeds host ${status.width}", button.x >= 0f && button.x + button.width <= status.width + .01f)
+        }
+    }
+
     private fun getter(target: Any, name: String, value: Any) {
         val method = target.javaClass.methods.single { it.name.substringBefore('$') == name }
         Mockito.`when`(method.invoke(target)).thenReturn(value)

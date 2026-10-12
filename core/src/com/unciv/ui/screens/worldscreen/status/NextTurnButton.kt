@@ -25,6 +25,7 @@ class NextTurnButton(
     private val worldScreen: WorldScreen
 ) : IconTextButton("", null, 16) {
     private var nextTurnAction = Default
+    private var atlasIconUsesAuthoredColors = false
     private val unitsDueLabel = Label("", BaseScreen.skin)
     private val unitsDueCell: Cell<Label>
 
@@ -74,12 +75,25 @@ class NextTurnButton(
     internal fun updateButton(nextTurnAction: NextTurnAction) {
         label.setText(nextTurnAction.getText(worldScreen).tr())
         label.color = nextTurnAction.color
-        if (nextTurnAction.icon != null && ImageGetter.imageExists(nextTurnAction.icon!!))
-            iconCell.setActor(ImageGetter.getImage(nextTurnAction.icon).apply {
+        var iconName = nextTurnAction.icon
+        val isAtlas = com.unciv.ui.components.GameUiStyle.isAtlas
+        fun isBaseIcon(name: String) = ImageGetter.getDrawable(name).region === ImageGetter.getSpecificAtlas("Icons")?.findRegion(name)
+        // The built-in construction badge is a low-contrast colored circle. Atlas uses
+        // the existing monochrome gear; an authored mod replacement keeps its artwork.
+        if (isAtlas && nextTurnAction == NextTurnAction.PickConstruction && iconName != null && ImageGetter.imageExists(iconName) && isBaseIcon(iconName))
+            iconName = "OtherIcons/Settings"
+        if (iconName != null && ImageGetter.imageExists(iconName)) {
+            atlasIconUsesAuthoredColors = isAtlas && (!isBaseIcon(iconName) || when (nextTurnAction) {
+                NextTurnAction.PickTech, NextTurnAction.PickPolicy, NextTurnAction.FoundPantheon,
+                NextTurnAction.FoundReligion, NextTurnAction.EnhanceReligion, NextTurnAction.ReformReligion -> true
+                else -> false
+            })
+            iconCell.setActor(ImageGetter.getImage(iconName).apply {
+                name = iconName
                 setSize(20f)
                 color = nextTurnAction.color
             })
-        else
+        } else
             iconCell.clearActor()
 
         nextTurnAction.getSubText(worldScreen)?.let {
@@ -103,7 +117,7 @@ class NextTurnButton(
         val foreground = if (isDisabled) WorldScreenStyle.muted else WorldScreenStyle.surface
         label?.let { it.color = com.badlogic.gdx.graphics.Color.WHITE; if (it.style.fontColor != foreground) it.setFontColor(foreground) }
         unitsDueLabel?.let { it.color = com.badlogic.gdx.graphics.Color.WHITE; if (it.style.fontColor != foreground) it.setFontColor(foreground) }
-        iconCell?.actor?.color = foreground
+        iconCell?.actor?.color = if (atlasIconUsesAuthoredColors) com.badlogic.gdx.graphics.Color.WHITE else foreground
     }
 
     private fun getNextTurnAction(worldScreen: WorldScreen): NextTurnAction {

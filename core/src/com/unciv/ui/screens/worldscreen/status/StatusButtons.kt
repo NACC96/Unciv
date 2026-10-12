@@ -29,6 +29,9 @@ class StatusButtons(
     
     fun update(verticalWrap: Boolean) {
         clear()
+        // Atlas regions can have fractional widths. Rounding a child's fixed width up
+        // makes its right edge extend beyond the persistent turn host at 960px.
+        setRound(!com.unciv.ui.components.GameUiStyle.isAtlas)
 
         val agentSession = worldScreen?.agentSession
         val isSpectator = agentSession?.isSpectatorMode() ?: false

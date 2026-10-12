@@ -146,10 +146,14 @@ object AtlasRenderCheck {
                 // Ignore scrolled/clipped children: a framebuffer point outside their host
                 // belongs to another surface and is not a valid button contrast sample.
                 val scrollParents = generateSequence(button.parent) { it.parent }.filterIsInstance<com.badlogic.gdx.scenes.scene2d.ui.ScrollPane>()
-                if (scrollParents.any { parent ->
+                val clipped = scrollParents.any { parent ->
                     val p = parent.localToStageCoordinates(Vector2())
                     position.x < p.x - .5f || position.y < p.y - .5f || position.x + button.width > p.x + parent.width + .5f || position.y + button.height > p.y + parent.height + .5f
-                }) return@mapNotNull null
+                }
+                check(!clipped || button !is com.unciv.ui.screens.worldscreen.status.NextTurnButton) {
+                    "Turn action ${button.name} bounds $position ${button.width}x${button.height} are clipped by its host"
+                }
+                if (clipped) return@mapNotNull null
                 val foreground = button.label.style.fontColor.cpy().mul(button.label.color)
                 val points = listOf(Vector2(position.x + 8f, position.y + 8f), Vector2(position.x + button.width - 8f, position.y + 8f))
                 fun luminance(c: Color): Double {
@@ -161,6 +165,11 @@ object AtlasRenderCheck {
                     "selectedAction" to evidence?.selected, "syntheticInput" to evidence?.input,
                     "route" to evidence?.route, "disabled" to button.isDisabled,
                     "bounds" to listOf(position.x, position.y, button.width, button.height),
+                    "icon" to button.iconCell.actor?.let { icon ->
+                        val p = icon.localToStageCoordinates(Vector2())
+                        linkedMapOf("path" to icon.name, "tint" to icon.color.toString(),
+                            "bounds" to listOf(p.x, p.y, icon.width, icon.height))
+                    },
                     "foreground" to foreground.toString(), "backgroundSamples" to points.map { point ->
                         val background = Color(pixels.getPixel(point.x.toInt(), point.y.toInt()))
                         val composite = foreground.cpy().apply {
