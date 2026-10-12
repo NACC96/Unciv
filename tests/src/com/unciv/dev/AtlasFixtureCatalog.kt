@@ -221,6 +221,7 @@ object AtlasFixtureCatalog {
                             original.destroy()
                             fixture.addUnit("Catapult", civ, tile).apply { action = com.unciv.models.UnitActionType.SetUp.value }
                         } else civ.units.getCivUnits().first().also { if (id == "world-fortified") it.fortify() }
+                        if (id in setOf("world-fortified", "world-siege")) holder.tileGroups.values.forEach { it.update(view.civView) }
                         unit.selectUnit(selectedView.getMapUnitView(selectedUnit))
                         unit.update()
                         val actions = com.unciv.ui.screens.worldscreen.unit.actions.UnitActionsTable(facade)

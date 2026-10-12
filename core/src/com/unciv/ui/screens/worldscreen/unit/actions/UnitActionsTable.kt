@@ -134,7 +134,9 @@ class UnitActionsTable(val worldScreen: WorldScreen) : Table() {
             }
             if (com.unciv.ui.components.GameUiStyle.isAtlas) {
                 add(button).padRight(4f)
-                if (children.size % 2 == 0) row()
+                // At phone widths long current-state captions need the full column.
+                val columns = if (worldScreen.stage.width < 600f) 1 else 2
+                if (children.size % columns == 0) row()
             } else add(button).colspan(2).row()
         }
 

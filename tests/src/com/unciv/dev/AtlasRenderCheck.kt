@@ -127,6 +127,13 @@ object AtlasRenderCheck {
             .mapNotNull { button ->
                 val position = button.localToStageCoordinates(Vector2())
                 if (position.x < 0 || position.y < 0 || position.x + button.width > pixels.width || position.y + button.height > pixels.height) return@mapNotNull null
+                // Ignore scrolled/clipped children: a framebuffer point outside their host
+                // belongs to another surface and is not a valid button contrast sample.
+                val scrollParents = generateSequence(button.parent) { it.parent }.filterIsInstance<com.badlogic.gdx.scenes.scene2d.ui.ScrollPane>()
+                if (scrollParents.any { parent ->
+                    val p = parent.localToStageCoordinates(Vector2())
+                    position.x < p.x || position.y < p.y || position.x + button.width > p.x + parent.width || position.y + button.height > p.y + parent.height
+                }) return@mapNotNull null
                 val foreground = button.label.style.fontColor.cpy().mul(button.label.color)
                 val points = listOf(Vector2(position.x + 8f, position.y + 8f), Vector2(position.x + button.width - 8f, position.y + 8f))
                 fun luminance(c: Color): Double {
