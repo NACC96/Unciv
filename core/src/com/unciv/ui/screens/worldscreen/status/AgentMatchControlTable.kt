@@ -120,7 +120,7 @@ class AgentMatchControlTable(
         val text = Table()
         text.add(status).minWidth(0f).growX().left().row()
         text.add(model).minWidth(0f).growX().left().padTop(4f).row()
-        // Reserve a caption row so second ticks and run completion never repack the control bar.
+        // Keep the caption row stable while the elapsed timer ticks.
         text.add(elapsed).minWidth(0f).growX().left().padTop(4f)
         val buttons = Table()
         if (action != null) buttons.add(actionButton).padRight(6f)

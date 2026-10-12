@@ -54,7 +54,8 @@ class CityScreen(
     /** City ambience sound player proxies can be passed from one CityScreen instance to the next
      *  to avoid premature stops or rewinds. Only the fresh CityScreen from WorldScreen or Overview
      *  will instantiate a new CityAmbiencePlayer and start playing. */
-    ambiencePlayer: CityAmbiencePlayer? = null
+    ambiencePlayer: CityAmbiencePlayer? = null,
+    playCelebrationSound: Boolean = true
 ): BaseScreen(), RecreateOnResize, AgentSnapshotScreen {
     override val snapshotGameInfo = cityView.getCity().civ.gameInfo
     override val snapshotViewerCivId = game.worldScreen?.takeIf { it.gameInfo.gameId == snapshotGameInfo.gameId }?.currentViewerCivId() ?: cityView.gameView.civView.civID
@@ -71,7 +72,7 @@ class CityScreen(
         val construction = selectedConstruction?.name?.let { name ->
             view.constructions.getConstruction(name)
         }
-        return CityScreen(view, construction, tile).also { fresh ->
+        return CityScreen(view, construction, tile, passOnCityAmbiencePlayer(), playCelebrationSound = false).also { fresh ->
             val queuedName = cityView.constructions.constructionQueue.getOrNull(selectedQueueEntry)
             val queue = view.constructions.constructionQueue
             fresh.selectedQueueEntry = when {
@@ -176,7 +177,7 @@ class CityScreen(
     internal var pauseFireworks = false
 
     init {
-        if (isWLTKday && UncivGame.Current.settings.citySoundsVolume > 0) {
+        if (playCelebrationSound && isWLTKday && UncivGame.Current.settings.citySoundsVolume > 0) {
             SoundPlayer.play(UncivSound("WLTK"))
         }
         fireworks = if (isWLTKday) ParticleEffectMapFireworks.create(game, mapScrollPane) else null

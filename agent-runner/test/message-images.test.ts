@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { createHash } from "node:crypto";
 import { ActivityNormalizer, redactImageData, redactImageLine } from "../src/activity.js";
-import { FakeGameService, type DiplomaticMessage } from "../src/fake-game-mcp.js";
+import { FakeGameService, privateCorrespondence, type DiplomaticMessage } from "../src/fake-game-mcp.js";
 import { GAME_TOOL_ALLOWLIST } from "../src/provider-spawn.js";
-import { GAME_INSTRUCTIONS } from "../src/game-instructions.js";
+import { GAME_INSTRUCTIONS, DIPLOMATIC_REPLY_INSTRUCTIONS, DIPLOMATIC_OUTREACH_INSTRUCTIONS } from "../src/game-instructions.js";
 import { MAX_IMAGE_RESPONSE_BYTES, MAX_TOOL_RESPONSE_BYTES, startGameMcpServer, imageResponseBytes } from "../src/game-mcp-server.js";
 import { StdioEngineBackend } from "../src/stdio-engine.js";
 import { buildTurnPrompt } from "../src/turn-prompt.js";
@@ -51,6 +51,18 @@ describe("native diplomatic image reads", () => {
     const game = new FakeGameService(); game.messageImage = async () => ({ ...image, ...invalid });
     const { value } = await call(game); expect(value.isError).toBe(true); expect(value.content.every((c: any) => c.type === "text")).toBe(true); expect(JSON.stringify(value)).not.toContain(image.data);
   });
+  it.each([null, undefined, "not an image", 17, false, [], {}, { ...image, data: "corrupt" }])("makes inaccessible and malformed image responses indistinguishable: %j", async invalid => {
+    const game = new FakeGameService();
+    const missing = (await call(game)).value;
+    game.messageImage = async () => invalid as any;
+    expect((await call(game)).value).toEqual(missing);
+  });
+  it("does not reveal stored image corruption through engine rejection codes", async () => {
+    const game = new FakeGameService();
+    const missing = (await call(game)).value;
+    game.messageImage = async () => { throw { code: "INTERNAL_ERROR", message: "stored PNG is corrupt" }; };
+    expect((await call(game)).value).toEqual(missing);
+  });
   it("rejects decoded PNG payloads above 4 MiB", async () => {
     const game = new FakeGameService(); game.messageImage = async () => ({ ...image, data: Buffer.alloc(4 * 1024 * 1024 + 1).toString("base64") });
     expect((await call(game)).value.isError).toBe(true);
@@ -67,12 +79,32 @@ describe("native diplomatic image reads", () => {
 });
 
 describe("private correspondence and leader replies", () => {
+  it("preserves engine ordering for same-turn same-revision correspondence ties", () => {
+    const newestFirst = ["latest", "middle", "earliest"].map(messageId => ({ ...message, messageId,
+      acknowledgedTurnSerial: 3, acknowledgedRevision: 50 }));
+    expect(privateCorrespondence(newestFirst, "Rome", 3).map(m => m.messageId)).toEqual(["latest", "middle", "earliest"]);
+  });
+  it("includes each inbox message once and injects diplomatic instructions once", () => {
+    const prompt = buildTurnPrompt({ ...context, inbox: [message], diplomaticHistory: [message,
+      { ...message, messageId: "own-sent", senderCivId: "Rome", targetCivId: "Greece" }] });
+    expect(prompt.match(/"messageId":"mail"/g)).toHaveLength(1);
+    expect(prompt).toContain('"messageId":"own-sent"');
+    for (const instructions of [DIPLOMATIC_REPLY_INSTRUCTIONS, DIPLOMATIC_OUTREACH_INSTRUCTIONS])
+      expect(prompt.split(instructions)).toHaveLength(2);
+  });
+  it("fills the bounded history after excluding overlapping inbox messages", () => {
+    const inbox = Array.from({ length: 12 }, (_, i) => ({ ...message, messageId: `incoming-${i}`, sentTurnSerial: 2 }));
+    const own = { ...message, messageId: "older-own", senderCivId: "Rome", targetCivId: "Greece", deliveredTurnSerial: 1 };
+    const prompt = buildTurnPrompt({ ...context, inbox, diplomaticHistory: [...inbox, own] });
+    expect(prompt).toContain('"messageId":"older-own"');
+    for (const incoming of inbox) expect(prompt.split(`"messageId":"${incoming.messageId}"`)).toHaveLength(2);
+  });
   it("projects metadata only and caps recent private history including old sent responses", () => {
     const history = Array.from({ length: 15 }, (_, i) => ({ ...message, messageId: `own-${i}`, senderCivId: "Rome", targetCivId: "Greece", sentTurnSerial: 1 }));
     const answer = { ...message, messageId: "old-answer", senderCivId: "Rome", targetCivId: "Greece", acknowledgedTurnSerial: 3, acknowledgedRevision: 50, acknowledgementText: "We accept your proposed border." };
     const prompt = buildTurnPrompt({ ...context, inbox: [{ ...message, attachments: [{ ...metadata, data: image.data } as any] }], diplomaticHistory: [...history, answer, { ...message, messageId: "foreign", senderCivId: "China", targetCivId: "Greece" }, { ...message, messageId: "future", deliveredTurnSerial: 4 }, { ...message, messageId: "pending", deliveredTurnSerial: null }] });
     expect(prompt).toContain("old-answer"); expect(prompt).toContain(answer.acknowledgementText); expect(prompt).not.toContain(image.data);
-    for (const hidden of ["foreign", "future", "pending", "own-0"]) expect(prompt).not.toContain(`"messageId":"${hidden}"`);
+    for (const hidden of ["foreign", "future", "pending", "own-14"]) expect(prompt).not.toContain(`"messageId":"${hidden}"`);
     expect(prompt.match(/"messageId":"(?:own-\d+|old-answer)"/g)).toHaveLength(12);
     expect(prompt).toContain(context.personality); expect(prompt).toContain("game.message_image"); expect(prompt).toContain("cannot view");
     expect(GAME_INSTRUCTIONS).not.toContain("Message received. I will consider"); expect(prompt).toContain("answer the actual proposal"); expect(prompt).toContain("no automatic reply");
@@ -84,6 +116,14 @@ describe("private correspondence and leader replies", () => {
     await supervisor.runLeaderTurn({ engine: game, binding, profile: { displayName: context.displayName, personality: context.personality, modelLabel: "scripted" }, context, guidance: [], resumeId: "existing", cwd: process.cwd() });
     expect(prompt).toContain("Resumed provider session existing"); expect(prompt).toContain("No, the border remains disputed."); expect(prompt).toContain("answer the actual proposal");
   });
+});
+
+it("redacts truncated data-before-type image payloads while preserving ordinary diagnostic text", () => {
+  const truncated = '{"content":[{"data":"' + image.data;
+  expect(redactImageLine(truncated)).not.toContain(image.data);
+  expect(JSON.stringify(redactImageData({ output: truncated }))).not.toContain(image.data);
+  expect(JSON.stringify(new ActivityNormalizer().fromLine(truncated))).not.toContain(image.data);
+  expect(redactImageLine('{"data":"ordinary incomplete note')).toBe('{"data":"ordinary incomplete note');
 });
 
 it("redacts native/Claude image blocks and nested serialized OpenCode results before activity/logging", () => {

@@ -1,4 +1,4 @@
-import { GAME_INSTRUCTIONS, DIPLOMATIC_REPLY_INSTRUCTIONS, DIPLOMATIC_OUTREACH_INSTRUCTIONS } from "./game-instructions.js";
+import { GAME_INSTRUCTIONS } from "./game-instructions.js";
 import { messageMetadata, privateCorrespondence, type DiplomaticMessage } from "./fake-game-mcp.js";
 
 /**
@@ -37,13 +37,13 @@ export function buildTurnPrompt(input: TurnPromptInput): string {
   const inbox = (input.inbox ?? []).filter((message) =>
     message.targetCivId === input.civId && message.deliveredTurnSerial != null && message.deliveredTurnSerial <= input.turnSerial &&
     (message.deliveredTurnSerial === input.turnSerial || message.acknowledgedTurnSerial == null)).map(messageMetadata);
-  const history = privateCorrespondence(input.diplomaticHistory ?? [], input.civId, input.turnSerial);
+  const inboxIds = new Set(inbox.map(message => message.messageId));
+  const history = privateCorrespondence((input.diplomaticHistory ?? []).filter(message => !inboxIds.has(message.messageId)),
+    input.civId, input.turnSerial);
   const lines = [
     GAME_INSTRUCTIONS,
     `You are ${input.displayName}, leader of civilization ${input.civId} in a game of Civilization V (ruleset: ${input.rulesetName || "Civ V - Vanilla"}, agent protocol v${input.protocolVersion}).`,
     input.personality ? `Personality: ${input.personality}` : "",
-    DIPLOMATIC_REPLY_INSTRUCTIONS,
-    DIPLOMATIC_OUTREACH_INSTRUCTIONS,
     `Turn serial ${input.turnSerial}, state revision ${input.stateRevision}. ` +
       `Act only for ${input.civId}; use only the game.* tools; never invent hidden information.`,
     input.continuityNote ? `Continuity: ${input.continuityNote}` : "",

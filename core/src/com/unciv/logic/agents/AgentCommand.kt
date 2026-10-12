@@ -2,6 +2,8 @@ package com.unciv.logic.agents
 
 import com.unciv.logic.map.HexCoord
 import com.unciv.logic.trade.TradeOfferType
+import com.unciv.logic.civilization.AlertType
+import com.unciv.models.stats.Stat
 
 /**
  * Typed state-changing commands routed through [MatchCoordinator]
@@ -152,7 +154,9 @@ class CityProductionCommand(
     val op: ProductionOp,
     val name: String = "",
     val index: Int = -1,
-    val tilePos: HexCoord? = null
+    val tilePos: HexCoord? = null,
+    /** Currency captured with the displayed purchase intent; legacy callers buy with gold. */
+    val purchaseStat: Stat = Stat.Gold
 ) : AgentCommand
 
 class CityProductionResult(
@@ -294,6 +298,14 @@ class MakePeaceCommand(
     val targetCivId: String
 ) : AgentCommand
 
+/** Native human city-state peace confirmation creates the normal timed bilateral treaty. */
+class NegotiateCityStatePeaceCommand(
+    override val actorCivId: String,
+    val actionId: String,
+    val expectedRevision: Int,
+    val cityStateId: String
+) : AgentCommand
+
 class DiplomacyResult(
     override val actorCivId: String,
     val receipt: ActionReceipt,
@@ -362,7 +374,7 @@ class PolicyAdoptedResult(
 enum class CitizenOp {
     WORK_TILE, STOP_TILE, LOCK_TILE, UNLOCK_TILE,
     ASSIGN_SPECIALIST, UNASSIGN_SPECIALIST,
-    SET_FOCUS, SET_MANUAL_SPECIALISTS, SET_AVOID_GROWTH, REASSIGN
+    SET_FOCUS, SET_MANUAL_SPECIALISTS, SET_AVOID_GROWTH, REASSIGN, TOGGLE_AVOID_GROWTH
 }
 
 /**
@@ -482,6 +494,57 @@ class GreatPersonResult(
     val receipt: ActionReceipt,
     val action: GreatPersonAction
 ) : CommandResult
+
+/** Human free-person picker choice, distinct from an existing unit's special action. */
+class ChooseFreeGreatPersonCommand(
+    override val actorCivId: String,
+    val actionId: String,
+    val expectedRevision: Int,
+    val unitName: String
+) : AgentCommand
+
+class FreeGreatPersonChosenResult(
+    override val actorCivId: String,
+    val receipt: ActionReceipt,
+    val unitId: Int
+) : CommandResult
+
+/** Only informational alerts can be dismissed without answering a gameplay decision. */
+class DismissAlertCommand(
+    override val actorCivId: String,
+    val actionId: String,
+    val expectedRevision: Int,
+    val alertType: AlertType,
+    val alertValue: String
+) : AgentCommand
+
+class DismissDiplomaticVoteResultsCommand(
+    override val actorCivId: String,
+    val actionId: String,
+    val expectedRevision: Int
+) : AgentCommand
+
+/** Consume the optional policy prompt; this never spends culture or free policies. */
+class MarkPolicyPickerOpenedCommand(
+    override val actorCivId: String,
+    val actionId: String,
+    val expectedRevision: Int
+) : AgentCommand
+
+class HumanPresentationResult(
+    override val actorCivId: String,
+    val receipt: ActionReceipt
+) : CommandResult
+
+/** These alerts have a close-only acknowledgement; decision-bearing alerts keep their typed routes. */
+fun isDismissibleAgentAlert(type: AlertType): Boolean = type in setOf(
+    AlertType.Defeated, AlertType.WonderBuilt, AlertType.TechResearched, AlertType.WarDeclaration,
+    AlertType.FirstContact, AlertType.BorderConflict, AlertType.TilesStolen, AlertType.Denounced,
+    AlertType.CitySettledNearOtherCivDespiteOurPromise, AlertType.ReligionSpreadDespiteOurPromise,
+    AlertType.SpyingOnUsDespiteOurPromise, AlertType.AttackedUsDespitePromise,
+    AlertType.AcceptingDemand, AlertType.RejectingDemand, AlertType.GoldenAge,
+    AlertType.StartIntro, AlertType.GameHasBeenWon
+)
 
 /** Gold gift to a city-state (game.act type `citystate.giftGold`). */
 class GiftGoldToCityStateCommand(    override val actorCivId: String,

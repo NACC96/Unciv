@@ -598,10 +598,15 @@ class AgentMessagesPanelTest {
             Mockito.mockConstruction(Texture::class.java).use { textures ->
                 val panel = AgentMessagesPanel(f.screen, f.session, clipboard)
                 try {
-                    panel.toggle(); panel.button("Paste image").press(); clipboard.completion!!(imageDraft(), null)
+                    val original = imageDraft()
+                    panel.toggle(); panel.button("Paste image").press(); clipboard.completion!!(original, null)
                     assertTrue(panel.labels().any { it.contains("does not support images") })
                     assertFalse(panel.button("Send").isDisabled)
-                    panel.button("Send").press(); f.completion!!(null)
+                    panel.button("Send").press()
+                    assertEquals(original.width, f.images.single()!!.width)
+                    assertEquals(original.height, f.images.single()!!.height)
+                    assertArrayEquals(original.bytes, f.images.single()!!.bytes)
+                    f.completion!!(null)
                     assertNull(panel.descendants().singleOrNull { it.name == "MessageImagePreview" })
                     assertFalse(panel.labels().any { it.contains("does not support images") })
                     assertTrue(panel.button("Send").isDisabled)
@@ -609,6 +614,36 @@ class AgentMessagesPanelTest {
                 } finally { panel.dispose() }
             }
         } finally { com.unciv.logic.agents.AgentModelCatalog.setDiscoveredModels("ui-test-provider", emptyList()) }
+    }
+
+    @Test fun `manual history previews evict old textures and keep reload available`() {
+        val f = Fixture()
+        f.messages = (1..20).map { index ->
+            DiplomaticMessage("image-$index", "Greece", "Rome", "Image $index", index, index).apply {
+                attachments.add(DiplomaticImageAttachment(index.toString(16).padStart(64, '0'), "image/png", 1, 1, 100))
+            }
+        }
+        Mockito.doAnswer { call ->
+            call.getArgument<(MessageImageDraft?, String?) -> Unit>(2)(imageDraft(), null)
+            null
+        }.`when`(f.session).readMessageImage(Mockito.anyString(), Mockito.anyString(), Mockito.any<(MessageImageDraft?, String?) -> Unit>() ?: { _, _ -> })
+        Mockito.mockConstruction(Texture::class.java).use { textures ->
+            val panel = AgentMessagesPanel(f.screen, f.session)
+            try {
+                panel.toggle()
+                repeat(16) {
+                    panel.descendants().filterIsInstance<TextButton>().first { it.text.toString() == "View image" }.press()
+                }
+                assertEquals(20, textures.constructed().size)
+                assertEquals(16, panel.descendants().count { it.name == "MessageHistoryImage" })
+                textures.constructed().take(4).forEach { Mockito.verify(it).dispose() }
+                val reload = panel.descendants().filterIsInstance<TextButton>().first { it.text.toString() == "View image" }
+                reload.press()
+                assertEquals(21, textures.constructed().size)
+                assertEquals(16, panel.descendants().count { it.name == "MessageHistoryImage" })
+            } finally { panel.dispose() }
+            textures.constructed().forEach { Mockito.verify(it).dispose() }
+        }
     }
 
     @Test fun `history preloads at most four recent images and older images load on demand`() {

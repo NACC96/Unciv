@@ -20,6 +20,7 @@ import com.unciv.logic.agents.AgentRunTiming
 import com.unciv.logic.agents.AgentSnapshotPublication
 import com.unciv.logic.agents.CivilizationController
 import com.unciv.logic.agents.ControllerKind
+import com.unciv.logic.agents.DiplomaticImageAttachment
 import com.unciv.logic.agents.DiplomaticMessage
 import com.unciv.logic.agents.MessageContact
 import com.unciv.logic.agents.EndTurnCommand
@@ -131,12 +132,22 @@ class DesktopAgentMatch(
         val messageId = UUID.randomUUID().toString()
         Concurrency.runOnNonDaemonThreadPool("Save diplomatic message") {
             val error = try {
+                // Compute the immutable reference and validate cheap rules before any disk I/O.
+                val metadata = draft?.let { DiplomaticImageAttachment(
+                    java.security.MessageDigest.getInstance("SHA-256").digest(it.bytes)
+                        .joinToString("") { byte -> "%02x".format(byte) },
+                    it.mimeType, it.width, it.height, it.bytes.size) }
                 synchronized(lock) {
-                    check(!closed.get()) { "This match has closed" }
                     require(viewer != null) { "Messaging requires an attached player or spectator" }
-                    check(worldScreen?.currentViewerCivId() == viewer) { "The message viewer has changed" }
-                    // Store publication completes before a metadata/checkpoint reference can commit.
-                    val attachments = draft?.let { listOf(imageStore.store(it)) } ?: emptyList()
+                    checkMessageViewerLocked(viewer)
+                    coordinator.validatePlayerMessage(viewer, messageId, targetCivId, text,
+                        listOfNotNull(metadata))
+                }
+                // Store publication completes before a metadata/checkpoint reference can commit.
+                // Slow external-volume writes never hold the host lock used by the HUD.
+                val attachments = draft?.let { listOf(imageStore.store(it)) } ?: emptyList()
+                synchronized(lock) {
+                    checkMessageViewerLocked(viewer!!)
                     publishCommittedChangesLocked {
                         coordinator.queuePlayerMessage(viewer, messageId, targetCivId, text, attachments)
                     }
@@ -156,12 +167,12 @@ class DesktopAgentMatch(
         Concurrency.run("Read message image") {
             var draft: MessageImageDraft? = null
             val error = try {
-                synchronized(lock) {
-                    check(!closed.get()) { "This match has closed" }
+                val metadata = synchronized(lock) {
                     require(viewer != null) { "Message images require an attached viewer" }
-                    check(worldScreen?.currentViewerCivId() == viewer) { "The message viewer has changed" }
-                    draft = imageStore.read(coordinator.getViewerMessageImage(viewer, messageId, attachmentId))
+                    checkMessageViewerLocked(viewer)
+                    coordinator.getViewerMessageImage(viewer, messageId, attachmentId)
                 }
+                draft = imageStore.read(metadata)
                 null
             } catch (ex: Exception) { ex.message ?: "Could not read the message image" }
             Concurrency.runOnGLThread {
@@ -171,6 +182,12 @@ class DesktopAgentMatch(
                 Gdx.graphics.requestRendering()
             }
         }
+    }
+
+    /** Viewer identity is owned by committed host metadata; workers never read GL actor fields. */
+    private fun checkMessageViewerLocked(viewer: String) {
+        check(!closed.get() && matchOpen) { "This match has closed or was left" }
+        check(coordinator.getLocalViewingCivId() == viewer) { "The message viewer has changed" }
     }
 
     private val lock = Any()
@@ -278,6 +295,8 @@ class DesktopAgentMatch(
         val pending = pendingNationChange ?: return
         pendingNationChange = null
         pendingNationReason = null
+        if (!isLoopRunning.get() && providerRunCivId == null)
+            runState = if (pendingViewRefresh || coordinator.isPaused()) AgentRunState.NEEDS_ATTENTION else AgentRunState.PAUSED
         completeNationChange(pending.onComplete, if (pending.committed)
             "The nation change was saved, but the match was closed or left before its view was installed" else reason)
     }
@@ -606,6 +625,7 @@ class DesktopAgentMatch(
         synchronized(lock) {
             if (closed.get()) return
             matchOpen = true
+            if (isLoopRunning.get()) return // The admitted run still owns its pause/drain transition.
             if (pendingViewRefresh) runState = AgentRunState.NEEDS_ATTENTION
             if (coordinator.isPaused()) {
                 failureReason = coordinator.getPausedReason()
@@ -884,8 +904,8 @@ class DesktopAgentMatch(
                         else AgentRunState.PAUSED
                     return
                 }
-                if (coordinator.isPaused()) {
-                    failureReason = coordinator.getPausedReason()
+                if (coordinator.isPaused() || pendingViewRefresh) {
+                    if (coordinator.isPaused()) failureReason = coordinator.getPausedReason()
                     runState = AgentRunState.NEEDS_ATTENTION
                     refreshUi()
                     return
@@ -993,7 +1013,11 @@ class DesktopAgentMatch(
         }
         val runId = "run-${UUID.randomUUID()}"
         val control: Map<String, Any?> = try { synchronized(lock) {
-            if (closed.get() || !matchOpen || pendingNationChange != null || pendingViewRefresh ||
+            if (pendingViewRefresh) {
+                runState = AgentRunState.PAUSING
+                return
+            }
+            if (closed.get() || !matchOpen || pendingNationChange != null ||
                 runState !in setOf(AgentRunState.STARTING, AgentRunState.AGENT_DECIDING, AgentRunState.APPLYING)) return
             val turnGuidance = publishCommittedChangesLocked { coordinator.takeGuidanceForDelivery(civId) }
             mapOf(
@@ -1037,8 +1061,8 @@ class DesktopAgentMatch(
             if (session != null) sessions[civId] = session
             if (outcome.status == "completed_turn") {
                 publishSnapshotLocked()
-                if (!closed.get() && coordinator.isPaused()) {
-                    failureReason = coordinator.getPausedReason()
+                if (!closed.get() && (coordinator.isPaused() || pendingViewRefresh)) {
+                    if (coordinator.isPaused()) failureReason = coordinator.getPausedReason()
                     runState = AgentRunState.NEEDS_ATTENTION
                 } else if (closed.get() || !matchOpen || runState == AgentRunState.PAUSING || runState == AgentRunState.PAUSED) {
                     runState = AgentRunState.PAUSED
@@ -1091,54 +1115,71 @@ class DesktopAgentMatch(
 
     //endregion
 
+    /** Every RPC is bound to a currently admitted provider, including final reads after end_turn. */
+    private fun requireProviderActorLocked(method: String, params: Map<String, Any?>): String {
+        val admitted = providerRunCivId
+            ?: throw EngineCallException("AUTHORITY_REVOKED", "No provider run is admitted")
+        val actorKey = when (method) {
+            "act" -> "actorCivId"
+            "rules", "action_result" -> null
+            else -> "civId"
+        }
+        if (actorKey != null && params[actorKey] !is String)
+            throw EngineCallException("INVALID_ARGUMENT", "Missing string argument $actorKey")
+        if (listOf("civId", "actorCivId").any { it in params && params[it] != admitted })
+            throw EngineCallException("AUTHORITY_REVOKED", "Actor does not match the admitted civilization")
+        return admitted
+    }
+
     /** Engine-RPC dispatch for supervisor frames (called on the RPC thread). */
     fun answerEngineRequest(method: String, params: Map<String, Any?>): Any? {
-        synchronized(lock) {
-            return publishCommittedChangesLocked {
-                val mapActor = if (method == "map" || method == "inspect_tile" || method == "message_image") {
-                    val admitted = providerRunCivId ?: coordinator.getCurrentCivId()
-                    if (params["civId"] != admitted)
-                        throw EngineCallException("AUTHORITY_REVOKED", "Read actor does not match the admitted civilization")
-                    admitted
-                } else null
+        fun string(name: String): String = params[name] as? String
+            ?: throw EngineCallException("INVALID_ARGUMENT", "Missing string argument $name")
+        fun integer(name: String): Int {
+            val number = params[name] as? Number
+                ?: throw EngineCallException("INVALID_ARGUMENT", "Missing integer argument $name")
+            val value = number.toDouble()
+            if (!value.isFinite() || value != number.toInt().toDouble())
+                throw EngineCallException("INVALID_ARGUMENT", "Invalid integer argument $name")
+            return number.toInt()
+        }
+        if (method == "message_image") {
+            val (metadata, actor, epoch) = synchronized(lock) {
+                val admitted = requireProviderActorLocked(method, params)
+                val metadata = try { coordinator.getDeliveredMessageImage(admitted, string("messageId"), string("attachmentId")) }
+                catch (ex: com.unciv.logic.agents.AgentCommandException) {
+                    throw EngineCallException(ex.code.name, ex.message ?: "No such accessible message image")
+                }
+                Triple(metadata, admitted, authorityEpoch)
+            }
+            val image = try { imageStore.read(metadata) } catch (_: Exception) {
+                throw EngineCallException("ILLEGAL_ACTION", "No such accessible message image")
+            }
+            val data = java.util.Base64.getEncoder().encodeToString(image.bytes)
+            synchronized(lock) {
+                if (providerRunCivId != actor || authorityEpoch != epoch)
+                    throw EngineCallException("AUTHORITY_REVOKED", "The provider run has changed")
+            }
+            return mapOf("attachmentId" to metadata.attachmentId, "mimeType" to metadata.mimeType,
+                "width" to metadata.width, "height" to metadata.height, "data" to data)
+        }
+        return synchronized(lock) {
+            val actor = requireProviderActorLocked(method, params)
+            publishCommittedChangesLocked {
                 when (method) {
-                    "message_image" -> {
-                        val messageId = params["messageId"] as? String
-                            ?: throw EngineCallException("INVALID_ARGUMENT", "Missing string argument messageId")
-                        val attachmentId = params["attachmentId"] as? String
-                            ?: throw EngineCallException("INVALID_ARGUMENT", "Missing string argument attachmentId")
-                        val metadata = try { coordinator.getDeliveredMessageImage(mapActor!!, messageId, attachmentId) }
-                        catch (ex: com.unciv.logic.agents.AgentCommandException) {
-                            throw EngineCallException(ex.code.name, ex.message ?: "Message image is inaccessible")
-                        }
-                        val image = try { imageStore.read(metadata) } catch (ex: Exception) {
-                            throw EngineCallException("INTERNAL_ERROR", ex.message ?: "Message image is missing or corrupt")
-                        }
-                        mapOf("attachmentId" to metadata.attachmentId, "mimeType" to metadata.mimeType,
-                            "width" to metadata.width, "height" to metadata.height,
-                            "data" to java.util.Base64.getEncoder().encodeToString(image.bytes))
-                    }
-                    "observe" -> bridge.observe(params["civId"] as String)
-                    "inspect" -> bridge.inspect(params["civId"] as String,
-                        (params["unitId"] as Number).toInt())
-                    "inspect_tile" -> bridge.inspectTile(mapActor!!, params)
-                    "map" -> bridge.map(mapActor!!, params)
+                    "observe" -> bridge.observe(actor)
+                    "inspect" -> bridge.inspect(actor, integer("unitId"))
+                    "inspect_tile" -> bridge.inspectTile(actor, params)
+                    "map" -> bridge.map(actor, params)
                     "rules" -> bridge.rules(params)
-                    "legal_actions" -> bridge.legalActions(
-                        params["civId"] as String,
-                        (params["unitId"] as? Number)?.toInt(),
-                        params["cityId"] as? String)
+                    "legal_actions" -> bridge.legalActions(actor,
+                        if (params["unitId"] == null) null else integer("unitId"),
+                        if (params["cityId"] == null) null else string("cityId"))
                     "act" -> bridge.act(params)
-                    "action_result" -> bridge.actionResult(params["actionId"] as String,
-                        providerRunCivId ?: coordinator.getCurrentCivId())
-                    "notes_get" -> bridge.readNotes(params["civId"] as String)
-                    "notes_put" -> bridge.updateNotes(
-                        params["civId"] as String, params["notes"] as String,
-                        (params["expectedNotesRevision"] as Number).toInt())
-                    "end_turn" -> bridge.endTurn(
-                        params["civId"] as String,
-                        params["actionId"] as String,
-                        coordinator.getStateRevision())
+                    "action_result" -> bridge.actionResult(string("actionId"), actor)
+                    "notes_get" -> bridge.readNotes(actor)
+                    "notes_put" -> bridge.updateNotes(actor, string("notes"), integer("expectedNotesRevision"))
+                    "end_turn" -> bridge.endTurn(actor, string("actionId"), coordinator.getStateRevision())
                     else -> throw EngineCallException("INVALID_ARGUMENT", "Unknown method $method")
                 }
             }

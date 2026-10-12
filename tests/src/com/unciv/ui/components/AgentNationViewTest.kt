@@ -14,6 +14,7 @@ import com.unciv.ui.screens.worldscreen.worldmap.WorldMapHolder
 import com.unciv.ui.screens.worldscreen.unit.UnitTable
 import com.unciv.ui.screens.worldscreen.status.AgentMessagesPanel
 import com.unciv.ui.screens.worldscreen.status.AgentActivityFeed
+import com.unciv.ui.screens.worldscreen.status.AgentNationSettingsPanel
 import com.unciv.view.GameView
 import com.unciv.ui.components.input.keyShortcuts
 import org.junit.Assert.*
@@ -76,6 +77,23 @@ class AgentNationViewTest {
         f.screen.nextTurn()
         Mockito.verify(f.session).onNextTurnPressed()
         assertFalse(f.screen.shouldUpdate)
+    }
+
+    @Test fun `viewer change hides nation settings panel with stale drafts`() {
+        val f = Fixture(); val settings = Mockito.mock(AgentNationSettingsPanel::class.java)
+        f.root.addActor(settings)
+        installWithViewer(f.screen, f.snapshot(), ResolvedSelection(null, null, null), 1, f.rome.civID)
+        Mockito.verify(settings).hide()
+    }
+
+    @Test fun `agent session disables snapshot rewind even on a playable human turn`() {
+        val game = TestGame(); val screen = Mockito.mock(WorldScreen::class.java)
+        Mockito.`when`(screen.gameInfo).thenReturn(game.gameInfo)
+        Mockito.`when`(screen.canChangeState).thenReturn(true)
+        val undo = UndoHandler(screen)
+        Mockito.`when`(screen.gameInfo).thenReturn(game.gameInfo.clone())
+        Mockito.`when`(screen.agentSession).thenReturn(Mockito.mock(AgentMatchSession::class.java))
+        assertFalse(undo.canUndo())
     }
 
     @Test fun `committed takeover resets fog selection and private panels without replacing host`() {

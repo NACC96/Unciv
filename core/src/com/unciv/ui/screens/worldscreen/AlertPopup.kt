@@ -13,6 +13,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.unciv.Constants
 import com.unciv.UncivGame
+import com.unciv.logic.agents.DismissAlertCommand
+import com.unciv.logic.agents.isDismissibleAgentAlert
 import com.unciv.logic.battle.BattleUnitCapture
 import com.unciv.logic.city.City
 import com.unciv.logic.civilization.AlertType
@@ -78,6 +80,9 @@ class AlertPopup(
         private val LIGHTER_GREEN_COLOR = Color(1/3f, 1f, 1/3f, 1f)
         private val LIGHTER_ORANGE_COLOR = Color(1f, 2/5f, 0f, 1f)
     }
+
+    private val openedViewerCivId = worldScreen.currentViewerCivId()
+    private var dismissalPending = false
 
     //region convenience getters
     private val music get() = UncivGame.Current.musicController
@@ -337,13 +342,24 @@ class AlertPopup(
         addGoodSizedLabel(leaderMessage).row()
         val diplomacy = viewingCiv.getDiplomacyManager(denouncer)!!
         if (diplomacy.canDeclareWar()) {
-            addCloseButton("THIS MEANS WAR! (Declare war)") {
-                val routed = worldScreen.routeThroughAgentSession {
-                    listOf({ r: Int ->
-                        DeclareWarCommand(viewingCiv.civID, "ui-${System.nanoTime()}", r, denouncer.civID)
-                    })
+            addButton("THIS MEANS WAR! (Declare war)") {
+                if (dismissalPending) return@addButton
+                val actor = openedViewerCivId
+                dismissalPending = true
+                val routed = worldScreen.routeThroughAgentSession(onComplete = { error ->
+                    dismissalPending = false
+                    if (error == null) closeCommittedAlert()
+                }) {
+                    listOf(
+                        { r: Int -> DeclareWarCommand(actor, "ui-${System.nanoTime()}", r, denouncer.civID) },
+                        { r: Int -> DismissAlertCommand(actor, "ui-${System.nanoTime()}", r, popupAlert.type, popupAlert.value) }
+                    )
                 }
-                if (!routed) diplomacy.declareWar()
+                if (!routed) {
+                    dismissalPending = false
+                    close()
+                    diplomacy.declareWar()
+                }
             }.row()
         }
         addCloseButton("Very well.", KeyboardBinding.Cancel).row()
@@ -772,7 +788,22 @@ class AlertPopup(
     //endregion
 
     override fun close() {
-        viewingCiv.popupAlerts.remove(popupAlert)
+        if (worldScreen.agentSession == null) viewingCiv.popupAlerts.remove(popupAlert)
+        else if (worldScreen.currentViewerCivId() == openedViewerCivId && worldScreen.canChangeState &&
+            isDismissibleAgentAlert(popupAlert.type)) {
+            if (dismissalPending) return
+            dismissalPending = true
+            worldScreen.routeThroughAgentSession(onComplete = { error ->
+                dismissalPending = false
+                if (error == null) closeCommittedAlert()
+            }) { listOf({ r: Int -> DismissAlertCommand(openedViewerCivId, "ui-${System.nanoTime()}", r, popupAlert.type, popupAlert.value) }) }
+            return
+        }
+        worldScreen.shouldUpdate = true
+        super.close()
+    }
+
+    private fun closeCommittedAlert() {
         worldScreen.shouldUpdate = true
         super.close()
     }

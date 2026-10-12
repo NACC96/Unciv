@@ -104,6 +104,16 @@ class AgentNationSettingsPanelTest {
         box.selected = box.items.first { it.toString().startsWith(prefix) }
     }
 
+    @Test fun `saved custom model row is visible and directly editable on opening`() {
+        val f = Fixture(); val panel = AgentNationSettingsPanel(f.screen, f.session)
+        try {
+            panel.toggle()
+            val input = panel.named("NationCustomModel") as TextField
+            assertTrue(input.isVisible)
+            assertEquals("saved-custom-id", input.text)
+        } finally { panel.dispose() }
+    }
+
     @Test fun `custom model and reasoning survive refresh while drafts remain isolated`() {
         val f = Fixture(); val panel = AgentNationSettingsPanel(f.screen, f.session)
         try {

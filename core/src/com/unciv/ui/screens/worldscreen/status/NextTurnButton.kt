@@ -93,6 +93,9 @@ class NextTurnButton(
         val session = worldScreen.agentSession
         if (session != null) {
             if (!session.isHumanInputAllowed()) return NextTurnAction.AgentMatch
+            if (listOf(NextTurnAction.MoveSpies, NextTurnAction.FoundPantheon, NextTurnAction.ExpandPantheon,
+                    NextTurnAction.FoundReligion, NextTurnAction.EnhanceReligion, NextTurnAction.ReformReligion)
+                    .any { it.isChoice(worldScreen) }) return NextTurnAction.AgentUnsupportedChoice
             // Human choices must be reachable before the coordinator's end-turn fallback.
             // Automation and legacy turn advancement remain owned by the session.
             return listOf(NextTurnAction.PickGreatPerson, NextTurnAction.PickConstruction,

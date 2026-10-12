@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import com.badlogic.gdx.utils.Align
 import com.unciv.Constants
 import com.unciv.UncivGame
+import com.unciv.logic.agents.NegotiateCityStatePeaceCommand
 import com.unciv.logic.civilization.AlertType
 import com.unciv.logic.civilization.Civilization
 import com.unciv.logic.civilization.PopupAlert
@@ -271,6 +272,9 @@ class CityStateDiplomacyTable(private val diplomacyScreen: DiplomacyScreen) {
                 "Negotiate Peace",
                 true
             ) {
+                if (UncivGame.Current.worldScreen?.routeThroughAgentSession {
+                        listOf({ r: Int -> NegotiateCityStatePeaceCommand(viewingCiv.civID, "ui-${System.nanoTime()}", r, otherCiv.civID) })
+                    } == true) return@ConfirmPopup
                 val tradeLogic = TradeLogic(viewingCiv, otherCiv)
                 tradeLogic.currentTrade.ourOffers.add(
                     TradeOffer(Constants.peaceTreaty, TradeOfferType.Treaty, speed = viewingCiv.gameInfo.speed)
@@ -426,7 +430,8 @@ class CityStateDiplomacyTable(private val diplomacyScreen: DiplomacyScreen) {
                         diplomacyScreen.rightSideTable.add(ScrollPane(getCityStateDiplomacyTable(otherCiv)))
                     }
                     if (viewingCiv.gold < 200 || diplomacyScreen.isNotPlayersTurn() ||
-                        viewingCiv.isAtWarWith(otherCiv) || otherCiv.getDiplomacyManager(viewingCiv)!!.getInfluence() < 60f)
+                        (UncivGame.Current.worldScreen?.agentSession != null &&
+                            (viewingCiv.isAtWarWith(otherCiv) || otherCiv.getDiplomacyManager(viewingCiv)!!.getInfluence() < 60f)))
                         improveTileButton.disable()
                     improvementGiftTable.add(improveTileButton).row()
                 }

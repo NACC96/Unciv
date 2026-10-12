@@ -26,16 +26,22 @@ Each match saves durable logs under the Unciv data directory:
 
 ```
 .agent-data/logs/<match-id>/run-*/
-  meta.json       # PID, command (bearers redacted), cwd, civilization, turn, model, session, exit
+  meta.json       # PID, command (bearers redacted), cwd, civilization, turn, model, session, exit, duration, turn outcome
   pid
-  events.jsonl    # original provider stream
+  events.jsonl    # provider stream with image payloads redacted
   activity.jsonl # indexed live activity
   stderr.log
 ```
 
 For spectators, **Logs** opens the match's directory. It is disabled for human viewers and when no log directory is available. The directory follows the configured Unciv data root, including `unciv.data.dir` when supplied by the desktop launcher. Full bodies remain on disk; the feed caches only the bodies in its current display window. Hiding the feed does not pause the game. Pause waits for the active agent to finish normally. Startup diagnostics and transport bookkeeping stay in the logs without crowding the feed.
 
+Image bytes are transport-only and are removed before provider events, stderr and activity are retained. Redaction deliberately omits whole text strings containing image data URIs and malformed image-bearing lines, including truncated JSON that writes PNG or long base64 data before its image type. Such text can disappear from the feed even when it was quoted as prose; this fail-closed behavior prevents encoded images leaking through malformed diagnostics.
+
+The active run's elapsed time uses a monotonic clock and updates beside the agent once per second, including while Activity is hidden. A requested pause keeps that admitted run's timer alive until it finishes; the next invocation starts a new timer. Logs retain each process's nonnegative elapsed duration independently of wall-clock changes. A clean process exit first says **Provider exited**. The supervisor then records **completed**, **incomplete**, **paused** or **failed** from its engine-backed turn outcome under the same activity entry ID. Exit code zero without a committed `end_turn` is incomplete; only a new engine end-turn commit establishes a completed turn.
+
 Leaving a match for the main menu, setup, loading or map editor stops new agent turns. An already admitted turn keeps its game tools connected and finishes normally. Returning to the retained match leaves it paused until **Resume**. City, research, policy and diplomacy screens remain part of the open match. Replacing a match or closing the application retires its session: the current turn drains, then its supervisor exits normally. Disposed screens cannot receive queued render updates, and closed sessions cannot restart.
+
+A failed committed-view installation keeps the match blocked until an explicit view retry. Opening another related screen while a provider drains cannot restart its run loop or erase that recovery state. The PR4 timing, image and review-fix checks are source validation; the installed app has not been rebuilt, restarted or accepted by those checks.
 
 Leaders receive shared game instructions on every invocation, plus civilization-scoped turn context and private strategy notes. Codex receives the shared instructions as developer instructions, Claude as appended system instructions, and every provider also receives them with its turn prompt. Examples cover observation, legal unit/city choices, founding, movement, research, production, notes revisions, action receipts and end-turn. Only validated game commands mutate the engine.
 

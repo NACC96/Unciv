@@ -115,6 +115,7 @@ object AgentModelCatalog {
         ),
         ModelSpec(
             id = "gpt-4o",
+            supportsImages = true,
             label = "GPT-4o",
             provider = PROVIDER_CODEX,
             supportedThinkingLevels = emptyList(), // thinking unsupported
@@ -125,6 +126,7 @@ object AgentModelCatalog {
     val CLAUDE_MODELS = listOf(
         ModelSpec(
             id = "claude-3-7-sonnet",
+            supportsImages = true,
             label = "Claude 3.7 Sonnet",
             provider = PROVIDER_CLAUDE,
             supportedThinkingLevels = listOf(
@@ -138,6 +140,7 @@ object AgentModelCatalog {
         ),
         ModelSpec(
             id = "claude-3-5-sonnet",
+            supportsImages = true,
             label = "Claude 3.5 Sonnet",
             provider = PROVIDER_CLAUDE,
             supportedThinkingLevels = emptyList(),
@@ -145,6 +148,7 @@ object AgentModelCatalog {
         ),
         ModelSpec(
             id = "claude-3-5-haiku",
+            supportsImages = true,
             label = "Claude 3.5 Haiku",
             provider = PROVIDER_CLAUDE,
             supportedThinkingLevels = emptyList(),
@@ -166,6 +170,7 @@ object AgentModelCatalog {
     val OPENCODE_MODELS = listOf(
         ModelSpec(
             id = "openai/gpt-5.6-luna",
+            supportsImages = true,
             label = "OpenAI: GPT-5.6 Luna",
             provider = PROVIDER_OPENCODE,
             supportedThinkingLevels = listOf(
@@ -178,6 +183,7 @@ object AgentModelCatalog {
         ),
         ModelSpec(
             id = "anthropic/claude-3-7-sonnet",
+            supportsImages = true,
             label = "Anthropic: Claude 3.7 Sonnet",
             provider = PROVIDER_OPENCODE,
             supportedThinkingLevels = listOf(
@@ -190,6 +196,7 @@ object AgentModelCatalog {
         ),
         ModelSpec(
             id = "google/gemini-2.5-pro",
+            supportsImages = true,
             label = "Google: Gemini 2.5 Pro",
             provider = PROVIDER_OPENCODE,
             supportedThinkingLevels = listOf(
@@ -202,6 +209,7 @@ object AgentModelCatalog {
         ),
         ModelSpec(
             id = "google/gemini-2.5-flash",
+            supportsImages = true,
             label = "Google: Gemini 2.5 Flash",
             provider = PROVIDER_OPENCODE,
             supportedThinkingLevels = emptyList(),
@@ -230,15 +238,23 @@ object AgentModelCatalog {
         synchronized(discoveredModels) {
             val discovered = discoveredModels[provider]
             if (!discovered.isNullOrEmpty()) {
+                // Discovery can omit modalities. Fill only known provider/id matches;
+                // explicit discovery values and unknown/custom models stay authoritative.
+                val withImages = discovered.map { model ->
+                    val fallback = (CODEX_MODELS + CLAUDE_MODELS + OPENCODE_MODELS)
+                        .firstOrNull { it.provider == provider && it.id == model.id }
+                    if (model.supportsImages == null && fallback?.supportsImages != null)
+                        model.copy(supportsImages = fallback.supportsImages) else model
+                }
                 return if (provider == PROVIDER_OPENCODE) {
-                    val verified = discovered.map { model ->
+                    val verified = withImages.map { model ->
                         if (model.id == OPENCODE_GO_DEEPSEEK.id) model.copy(
                             supportedThinkingLevels = OPENCODE_GO_DEEPSEEK.supportedThinkingLevels,
                             defaultThinkingLevel = OPENCODE_GO_DEEPSEEK.defaultThinkingLevel
                         ) else model
                     }
                     verified + listOf(OPENCODE_GO_DEEPSEEK).filter { fallback -> discovered.none { it.id == fallback.id } }
-                } else discovered
+                } else withImages
             }
         }
         return when (provider) {

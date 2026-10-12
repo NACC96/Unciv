@@ -3,6 +3,7 @@ package com.unciv.logic.agents
 import com.unciv.json.json
 import com.unciv.logic.map.HexCoord
 import com.unciv.logic.trade.TradeOfferType
+import com.unciv.models.stats.Stat
 
 /**
  * Protocol-to-coordinator bridge (AI_AGENT_PLAN.md §5.1, desktop-owned in
@@ -175,7 +176,8 @@ class AgentEngineBridge(val coordinator: MatchCoordinator) {
                         requireEnum<ProductionOp>(args, "op"),
                         (args["name"] as? String) ?: "",
                         (args["index"] as? Number)?.toInt() ?: -1,
-                        optionalHex(args, "tilePos"))) as CityProductionResult
+                        optionalHex(args, "tilePos"),
+                        purchaseStat = if (args.containsKey("purchaseStat")) requireEnum<Stat>(args, "purchaseStat") else Stat.Gold)) as CityProductionResult
                     receiptMap(result.receipt, mapOf("queue" to result.queue), decisionsFor(actorCivId))
                 }
                 "unit.found" -> {

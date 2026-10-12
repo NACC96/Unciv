@@ -130,7 +130,7 @@ class AgentNationSettingsPanel(private val screen: WorldScreen, private val sess
             if (!updating) currentDraft()?.let {
                 val choice = model.selected ?: return@let
                 it.modelId = if (choice.customEntry) customModel.text.trim() else choice.spec.id
-                showCustom(choice.customEntry); populateReasoning(it)
+                showCustom(choice.customEntry || choice.spec.isCustom); populateReasoning(it)
             }
         }
         reasoning.onChange { if (!updating) currentDraft()?.reasoning = reasoning.selected?.wireValue }
@@ -190,7 +190,7 @@ class AgentNationSettingsPanel(private val screen: WorldScreen, private val sess
             val options = models.map { ModelChoice(it) } + ModelChoice(AgentModelCatalog.customModel("", draft.provider), true)
             model.setItems(GdxArray(options.toTypedArray()))
             model.selected = options.first { !it.customEntry && it.spec.id == draft.modelId }
-            customModel.text = draft.modelId; showCustom(false); populateReasoning(draft, preserveSaved = true)
+            customModel.text = draft.modelId; showCustom(model.selected.customEntry || model.selected.spec.isCustom); populateReasoning(draft, preserveSaved = true)
         } finally { updating = wasUpdating }
     }
     private fun populateReasoning(draft: AgentProfile, preserveSaved: Boolean = false) {

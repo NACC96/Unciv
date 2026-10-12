@@ -359,13 +359,14 @@ class DiplomacyScreen(
             declareWarButton.setText(declareWarButton.text.toString() + " (${turnsToPeaceTreaty.tr()}${Fonts.turn})")
         }
         declareWarButton.onClick {
-            // Agent matches route war declaration through the coordinator (§3.2).
-            if (UncivGame.Current.worldScreen?.routeThroughAgentSession {
-                    listOf({ r: Int ->
-                        DeclareWarCommand(viewingCiv.civID, "ui-${System.nanoTime()}", r, otherCiv.civID)
-                    })
-                } == true) return@onClick
             ConfirmPopup(this, getDeclareWarButtonText(otherCiv), "Declare war") {
+                // Agent matches route war declaration through the coordinator (§3.2).
+                if (UncivGame.Current.worldScreen?.routeThroughAgentSession {
+                        listOf({ r: Int ->
+                            DeclareWarCommand(viewingCiv.civID, "ui-${System.nanoTime()}", r, otherCiv.civID)
+                        })
+                    } == true) return@ConfirmPopup
+
                 diplomacyManager.declareWar()
                 setRightSideFlavorText(otherCiv, otherCiv.nation.attacked, "Very well.")
                 updateLeftSideTable(otherCiv)

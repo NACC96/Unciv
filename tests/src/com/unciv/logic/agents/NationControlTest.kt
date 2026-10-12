@@ -203,7 +203,7 @@ class NationControlTest {
         assertEquals("Remember every promise", restored.retainedAgentProfiles[f.rome]!!.personality)
     }
 
-    @Test fun `missing old identities choose spectator or unique human and fail closed when ambiguous`() {
+    @Test fun `missing old identities choose spectator or native current human and fail closed without humans`() {
         val f = Fixture(); val match = f.saved()
         match.localControlCivId = null; match.localViewingCivId = null
         assertEquals(f.spectator, NationControl.savedViewerCivId(f.game.gameInfo, match))
@@ -213,6 +213,6 @@ class NationControlTest {
         match.controllers[f.rome]!!.kind = ControllerKind.HUMAN
         assertEquals(f.rome, NationControl.savedViewerCivId(noSpectator, match))
         match.controllers[f.greece]!!.kind = ControllerKind.HUMAN
-        assertNull(NationControl.savedViewerCivId(noSpectator, match))
+        assertEquals(f.rome, NationControl.savedViewerCivId(noSpectator, match))
     }
 }

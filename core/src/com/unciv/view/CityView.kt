@@ -374,10 +374,9 @@ class CityView(city: City,
     }
     fun tryToggleAvoidGrowth(): Boolean {
         if (!canChangeState()) return false
-        val avoidGrowth = !city.avoidGrowth
         if (routeThroughAgentSession { listOf({ r: Int ->
                 CityCitizensCommand(city.civ.civID, "ui-${System.nanoTime()}", r, city.id,
-                    CitizenOp.SET_AVOID_GROWTH, flag = avoidGrowth)
+                    CitizenOp.TOGGLE_AVOID_GROWTH)
             }) }) return true
         city.avoidGrowth = !city.avoidGrowth
         city.reassignPopulation()

@@ -217,6 +217,43 @@ class DesktopNationControlTest {
         assertEquals(0, closed.installAttempts.get()); assertEquals(1, closed.callbacks.get()); assertNotNull(closed.error)
     }
 
+    @Test fun `screen entry during failed provider publication drains once and requires view retry`() {
+        val f = Fixture(attachScreen = true)
+        f.host.startAutomaticPlay(); assertTrue(f.started.await(5, TimeUnit.SECONDS))
+        f.installFailure = "injected publication error"
+        // Reproduce the native navigation callback while the failed run still owns the loop.
+        DesktopAgentMatch::class.java.getDeclaredMethod("markViewRefreshFailedLocked", String::class.java)
+            .apply { isAccessible = true }.invoke(f.host, "injected publication error")
+        assertEquals(AgentRunState.PAUSING, f.host.getRunState())
+        f.host.onMatchEntered()
+        assertEquals(AgentRunState.PAUSING, f.host.getRunState())
+        f.release.countDown(); assertTrue(f.returned.await(5, TimeUnit.SECONDS))
+        assertTrue(awaitCondition { f.host.canRetry() })
+        assertEquals(AgentRunState.NEEDS_ATTENTION, f.host.getRunState())
+        assertEquals(1, f.calls.get()); assertEquals(0, f.kills.get())
+        f.installFailure = null; f.host.retry()
+        assertEquals(AgentRunState.PAUSED, f.host.getRunState())
+        assertEquals(1, f.calls.get())
+    }
+
+    @Test fun `leaving before idle nation worker dispatch returns to a resumable pause`() {
+        val f = Fixture(human = true)
+        // Holding the host monitor deterministically defers the worker until leave cancels it.
+        val lock = DesktopAgentMatch::class.java.getDeclaredField("lock").apply { isAccessible = true }.get(f.host)
+        synchronized(lock) {
+            f.request()
+            assertEquals(AgentRunState.PAUSING, f.host.getRunState())
+            f.host.onMatchLeft()
+            assertEquals(AgentRunState.PAUSED, f.host.getRunState())
+        }
+        assertTrue(f.completed.await(5, TimeUnit.SECONDS)); assertNotNull(f.error)
+        f.host.onMatchEntered()
+        assertTrue(f.host.isHumanInputAllowed())
+        assertTrue(f.host.canResume())
+        assertEquals(ControllerKind.EXTERNAL_AGENT, f.host.coordinator.getController(f.greece)!!.kind)
+        assertEquals(1, f.callbacks.get())
+    }
+
     @Test fun `selected but not admitted turn is rejected after a nation request`() {
         val f = Fixture()
         DesktopAgentMatch::class.java.getDeclaredField("runState").apply { isAccessible = true }.set(f.host, AgentRunState.STARTING)
@@ -296,7 +333,7 @@ class DesktopNationControlTest {
         f.renderedViewer.set(f.rome); assertTrue(f.host.isHumanInputAllowed())
     }
 
-    @Test fun `ambiguous old restore cannot infer local authority from current displayed human`() {
+    @Test fun `old local hotseat restore grants only the active human local authority`() {
         val f = Fixture(human = true, attachScreen = true, includeSpectator = false)
         val game = f.host.coordinator.deserializeForPublication(f.host.coordinator.serializeCommittedGameForPublication())
         val match = json().fromJson(AgentMatchState::class.java, f.host.coordinator.serializeCommittedMatchForPublication()).apply {
@@ -307,8 +344,8 @@ class DesktopNationControlTest {
             worldScreen = f.screen, supervisorFactory = { error("Restoration must not launch providers") })
         Mockito.`when`(f.screen!!.agentSession).thenReturn(restored)
         try {
-            assertTrue(restored.getNationSettings().isEmpty())
-            assertNull(restored.coordinator.getLocalControlCivId())
+            assertEquals(listOf(f.rome), restored.getNationSettings().map { it.civId })
+            assertEquals(f.rome, restored.coordinator.getLocalControlCivId())
             assertTrue("Legacy actual matching Human view remains playable", restored.isHumanInputAllowed())
             assertEquals(AgentRunState.PAUSED, restored.getRunState())
         } finally { restored.close() }
