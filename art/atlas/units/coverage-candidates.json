@@ -2,6 +2,2586 @@
   "schemaVersion": 1,
   "rows": [
     {
+      "id": "unit-clip|Great Artist|DEFEAT|E",
+      "rulesetKey": "Great Artist",
+      "category": "unit-clip",
+      "assetKey": "Great Artist|DEFEAT|E",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-artist/frames/defeat-e.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/e-color.png",
+          "sha256": "e0bcaf81190f10ec9f78158a7603904b618b3006a920a290bb7e6449d1dc0d59",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/e-nation.png",
+          "sha256": "3dcd64b3fb75b98dc1d4c4144cd2b5fd3f6220c40b7493c4d60811cb0e09cc60",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/e-shadow.png",
+          "sha256": "1c2039daf91e1240ce746d17851ba83685e03c25b5d89aac6eed6052307c2d8b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Artist",
+      "state": "DEFEAT",
+      "facing": "E",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Artist|DEFEAT|NE",
+      "rulesetKey": "Great Artist",
+      "category": "unit-clip",
+      "assetKey": "Great Artist|DEFEAT|NE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-artist/frames/defeat-ne.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/ne-color.png",
+          "sha256": "c2ba12961ac4edfb967b2d6562c674b5c9c4665c690bb0214eaddaa12c3e589d",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/ne-nation.png",
+          "sha256": "7fa5dd1fe7ffa0e9e0c62e10232f9a4b962675d0b9c330b9e3cc0e66dea71410",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/ne-shadow.png",
+          "sha256": "b0c116d2a57ef4724583788e883110934b785f0cce7f1aa01fc475f428ae7e7c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Artist",
+      "state": "DEFEAT",
+      "facing": "NE",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Artist|DEFEAT|NW",
+      "rulesetKey": "Great Artist",
+      "category": "unit-clip",
+      "assetKey": "Great Artist|DEFEAT|NW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-artist/frames/defeat-nw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/ne-color.png",
+          "sha256": "c2ba12961ac4edfb967b2d6562c674b5c9c4665c690bb0214eaddaa12c3e589d",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/ne-nation.png",
+          "sha256": "7fa5dd1fe7ffa0e9e0c62e10232f9a4b962675d0b9c330b9e3cc0e66dea71410",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/ne-shadow.png",
+          "sha256": "b0c116d2a57ef4724583788e883110934b785f0cce7f1aa01fc475f428ae7e7c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Artist",
+      "state": "DEFEAT",
+      "facing": "NW",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Artist|DEFEAT|SE",
+      "rulesetKey": "Great Artist",
+      "category": "unit-clip",
+      "assetKey": "Great Artist|DEFEAT|SE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-artist/frames/defeat-se.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/se-color.png",
+          "sha256": "ba60447c4190930de603bc56f4bc07023737c74bac3f2cd9535e09f2ea87f768",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/se-nation.png",
+          "sha256": "960630d9ce4d6d05d3f5412aa1e2ea08c49936ebe5c101c89e3a064b826bddcc",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/se-shadow.png",
+          "sha256": "fdea39212202606866ce43552c2dcfd37c23474675df590687582450ad732a04",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Artist",
+      "state": "DEFEAT",
+      "facing": "SE",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Artist|DEFEAT|SW",
+      "rulesetKey": "Great Artist",
+      "category": "unit-clip",
+      "assetKey": "Great Artist|DEFEAT|SW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-artist/frames/defeat-sw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/se-color.png",
+          "sha256": "ba60447c4190930de603bc56f4bc07023737c74bac3f2cd9535e09f2ea87f768",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/se-nation.png",
+          "sha256": "960630d9ce4d6d05d3f5412aa1e2ea08c49936ebe5c101c89e3a064b826bddcc",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/se-shadow.png",
+          "sha256": "fdea39212202606866ce43552c2dcfd37c23474675df590687582450ad732a04",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Artist",
+      "state": "DEFEAT",
+      "facing": "SW",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Artist|DEFEAT|W",
+      "rulesetKey": "Great Artist",
+      "category": "unit-clip",
+      "assetKey": "Great Artist|DEFEAT|W",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-artist/frames/defeat-w.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/e-color.png",
+          "sha256": "e0bcaf81190f10ec9f78158a7603904b618b3006a920a290bb7e6449d1dc0d59",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/e-nation.png",
+          "sha256": "3dcd64b3fb75b98dc1d4c4144cd2b5fd3f6220c40b7493c4d60811cb0e09cc60",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/e-shadow.png",
+          "sha256": "1c2039daf91e1240ce746d17851ba83685e03c25b5d89aac6eed6052307c2d8b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Artist",
+      "state": "DEFEAT",
+      "facing": "W",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Artist|HIT|E",
+      "rulesetKey": "Great Artist",
+      "category": "unit-clip",
+      "assetKey": "Great Artist|HIT|E",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-artist/frames/hit-e.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/e-color.png",
+          "sha256": "e0bcaf81190f10ec9f78158a7603904b618b3006a920a290bb7e6449d1dc0d59",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/e-nation.png",
+          "sha256": "3dcd64b3fb75b98dc1d4c4144cd2b5fd3f6220c40b7493c4d60811cb0e09cc60",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/e-shadow.png",
+          "sha256": "1c2039daf91e1240ce746d17851ba83685e03c25b5d89aac6eed6052307c2d8b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Artist",
+      "state": "HIT",
+      "facing": "E",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great Artist|HIT|NE",
+      "rulesetKey": "Great Artist",
+      "category": "unit-clip",
+      "assetKey": "Great Artist|HIT|NE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-artist/frames/hit-ne.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/ne-color.png",
+          "sha256": "c2ba12961ac4edfb967b2d6562c674b5c9c4665c690bb0214eaddaa12c3e589d",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/ne-nation.png",
+          "sha256": "7fa5dd1fe7ffa0e9e0c62e10232f9a4b962675d0b9c330b9e3cc0e66dea71410",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/ne-shadow.png",
+          "sha256": "b0c116d2a57ef4724583788e883110934b785f0cce7f1aa01fc475f428ae7e7c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Artist",
+      "state": "HIT",
+      "facing": "NE",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great Artist|HIT|NW",
+      "rulesetKey": "Great Artist",
+      "category": "unit-clip",
+      "assetKey": "Great Artist|HIT|NW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-artist/frames/hit-nw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/ne-color.png",
+          "sha256": "c2ba12961ac4edfb967b2d6562c674b5c9c4665c690bb0214eaddaa12c3e589d",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/ne-nation.png",
+          "sha256": "7fa5dd1fe7ffa0e9e0c62e10232f9a4b962675d0b9c330b9e3cc0e66dea71410",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/ne-shadow.png",
+          "sha256": "b0c116d2a57ef4724583788e883110934b785f0cce7f1aa01fc475f428ae7e7c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Artist",
+      "state": "HIT",
+      "facing": "NW",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great Artist|HIT|SE",
+      "rulesetKey": "Great Artist",
+      "category": "unit-clip",
+      "assetKey": "Great Artist|HIT|SE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-artist/frames/hit-se.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/se-color.png",
+          "sha256": "ba60447c4190930de603bc56f4bc07023737c74bac3f2cd9535e09f2ea87f768",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/se-nation.png",
+          "sha256": "960630d9ce4d6d05d3f5412aa1e2ea08c49936ebe5c101c89e3a064b826bddcc",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/se-shadow.png",
+          "sha256": "fdea39212202606866ce43552c2dcfd37c23474675df590687582450ad732a04",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Artist",
+      "state": "HIT",
+      "facing": "SE",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great Artist|HIT|SW",
+      "rulesetKey": "Great Artist",
+      "category": "unit-clip",
+      "assetKey": "Great Artist|HIT|SW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-artist/frames/hit-sw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/se-color.png",
+          "sha256": "ba60447c4190930de603bc56f4bc07023737c74bac3f2cd9535e09f2ea87f768",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/se-nation.png",
+          "sha256": "960630d9ce4d6d05d3f5412aa1e2ea08c49936ebe5c101c89e3a064b826bddcc",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/se-shadow.png",
+          "sha256": "fdea39212202606866ce43552c2dcfd37c23474675df590687582450ad732a04",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Artist",
+      "state": "HIT",
+      "facing": "SW",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great Artist|HIT|W",
+      "rulesetKey": "Great Artist",
+      "category": "unit-clip",
+      "assetKey": "Great Artist|HIT|W",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-artist/frames/hit-w.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/e-color.png",
+          "sha256": "e0bcaf81190f10ec9f78158a7603904b618b3006a920a290bb7e6449d1dc0d59",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/e-nation.png",
+          "sha256": "3dcd64b3fb75b98dc1d4c4144cd2b5fd3f6220c40b7493c4d60811cb0e09cc60",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/e-shadow.png",
+          "sha256": "1c2039daf91e1240ce746d17851ba83685e03c25b5d89aac6eed6052307c2d8b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Artist",
+      "state": "HIT",
+      "facing": "W",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great Artist|IDLE|E",
+      "rulesetKey": "Great Artist",
+      "category": "unit-clip",
+      "assetKey": "Great Artist|IDLE|E",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-artist/frames/idle-e.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/e-color.png",
+          "sha256": "e0bcaf81190f10ec9f78158a7603904b618b3006a920a290bb7e6449d1dc0d59",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/e-nation.png",
+          "sha256": "3dcd64b3fb75b98dc1d4c4144cd2b5fd3f6220c40b7493c4d60811cb0e09cc60",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/e-shadow.png",
+          "sha256": "1c2039daf91e1240ce746d17851ba83685e03c25b5d89aac6eed6052307c2d8b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Artist",
+      "state": "IDLE",
+      "facing": "E",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great Artist|IDLE|NE",
+      "rulesetKey": "Great Artist",
+      "category": "unit-clip",
+      "assetKey": "Great Artist|IDLE|NE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-artist/frames/idle-ne.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/ne-color.png",
+          "sha256": "c2ba12961ac4edfb967b2d6562c674b5c9c4665c690bb0214eaddaa12c3e589d",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/ne-nation.png",
+          "sha256": "7fa5dd1fe7ffa0e9e0c62e10232f9a4b962675d0b9c330b9e3cc0e66dea71410",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/ne-shadow.png",
+          "sha256": "b0c116d2a57ef4724583788e883110934b785f0cce7f1aa01fc475f428ae7e7c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Artist",
+      "state": "IDLE",
+      "facing": "NE",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great Artist|IDLE|NW",
+      "rulesetKey": "Great Artist",
+      "category": "unit-clip",
+      "assetKey": "Great Artist|IDLE|NW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-artist/frames/idle-nw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/ne-color.png",
+          "sha256": "c2ba12961ac4edfb967b2d6562c674b5c9c4665c690bb0214eaddaa12c3e589d",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/ne-nation.png",
+          "sha256": "7fa5dd1fe7ffa0e9e0c62e10232f9a4b962675d0b9c330b9e3cc0e66dea71410",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/ne-shadow.png",
+          "sha256": "b0c116d2a57ef4724583788e883110934b785f0cce7f1aa01fc475f428ae7e7c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Artist",
+      "state": "IDLE",
+      "facing": "NW",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great Artist|IDLE|SE",
+      "rulesetKey": "Great Artist",
+      "category": "unit-clip",
+      "assetKey": "Great Artist|IDLE|SE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-artist/frames/idle-se.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/se-color.png",
+          "sha256": "ba60447c4190930de603bc56f4bc07023737c74bac3f2cd9535e09f2ea87f768",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/se-nation.png",
+          "sha256": "960630d9ce4d6d05d3f5412aa1e2ea08c49936ebe5c101c89e3a064b826bddcc",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/se-shadow.png",
+          "sha256": "fdea39212202606866ce43552c2dcfd37c23474675df590687582450ad732a04",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Artist",
+      "state": "IDLE",
+      "facing": "SE",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great Artist|IDLE|SW",
+      "rulesetKey": "Great Artist",
+      "category": "unit-clip",
+      "assetKey": "Great Artist|IDLE|SW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-artist/frames/idle-sw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/se-color.png",
+          "sha256": "ba60447c4190930de603bc56f4bc07023737c74bac3f2cd9535e09f2ea87f768",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/se-nation.png",
+          "sha256": "960630d9ce4d6d05d3f5412aa1e2ea08c49936ebe5c101c89e3a064b826bddcc",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/se-shadow.png",
+          "sha256": "fdea39212202606866ce43552c2dcfd37c23474675df590687582450ad732a04",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Artist",
+      "state": "IDLE",
+      "facing": "SW",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great Artist|IDLE|W",
+      "rulesetKey": "Great Artist",
+      "category": "unit-clip",
+      "assetKey": "Great Artist|IDLE|W",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-artist/frames/idle-w.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/e-color.png",
+          "sha256": "e0bcaf81190f10ec9f78158a7603904b618b3006a920a290bb7e6449d1dc0d59",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/e-nation.png",
+          "sha256": "3dcd64b3fb75b98dc1d4c4144cd2b5fd3f6220c40b7493c4d60811cb0e09cc60",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/e-shadow.png",
+          "sha256": "1c2039daf91e1240ce746d17851ba83685e03c25b5d89aac6eed6052307c2d8b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Artist",
+      "state": "IDLE",
+      "facing": "W",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great Artist|MOVE|E",
+      "rulesetKey": "Great Artist",
+      "category": "unit-clip",
+      "assetKey": "Great Artist|MOVE|E",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-artist/frames/move-e.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/e-color.png",
+          "sha256": "e0bcaf81190f10ec9f78158a7603904b618b3006a920a290bb7e6449d1dc0d59",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/e-nation.png",
+          "sha256": "3dcd64b3fb75b98dc1d4c4144cd2b5fd3f6220c40b7493c4d60811cb0e09cc60",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/e-shadow.png",
+          "sha256": "1c2039daf91e1240ce746d17851ba83685e03c25b5d89aac6eed6052307c2d8b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Artist",
+      "state": "MOVE",
+      "facing": "E",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Artist|MOVE|NE",
+      "rulesetKey": "Great Artist",
+      "category": "unit-clip",
+      "assetKey": "Great Artist|MOVE|NE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-artist/frames/move-ne.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/ne-color.png",
+          "sha256": "c2ba12961ac4edfb967b2d6562c674b5c9c4665c690bb0214eaddaa12c3e589d",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/ne-nation.png",
+          "sha256": "7fa5dd1fe7ffa0e9e0c62e10232f9a4b962675d0b9c330b9e3cc0e66dea71410",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/ne-shadow.png",
+          "sha256": "b0c116d2a57ef4724583788e883110934b785f0cce7f1aa01fc475f428ae7e7c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Artist",
+      "state": "MOVE",
+      "facing": "NE",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Artist|MOVE|NW",
+      "rulesetKey": "Great Artist",
+      "category": "unit-clip",
+      "assetKey": "Great Artist|MOVE|NW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-artist/frames/move-nw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/ne-color.png",
+          "sha256": "c2ba12961ac4edfb967b2d6562c674b5c9c4665c690bb0214eaddaa12c3e589d",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/ne-nation.png",
+          "sha256": "7fa5dd1fe7ffa0e9e0c62e10232f9a4b962675d0b9c330b9e3cc0e66dea71410",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/ne-shadow.png",
+          "sha256": "b0c116d2a57ef4724583788e883110934b785f0cce7f1aa01fc475f428ae7e7c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Artist",
+      "state": "MOVE",
+      "facing": "NW",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Artist|MOVE|SE",
+      "rulesetKey": "Great Artist",
+      "category": "unit-clip",
+      "assetKey": "Great Artist|MOVE|SE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-artist/frames/move-se.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/se-color.png",
+          "sha256": "ba60447c4190930de603bc56f4bc07023737c74bac3f2cd9535e09f2ea87f768",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/se-nation.png",
+          "sha256": "960630d9ce4d6d05d3f5412aa1e2ea08c49936ebe5c101c89e3a064b826bddcc",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/se-shadow.png",
+          "sha256": "fdea39212202606866ce43552c2dcfd37c23474675df590687582450ad732a04",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Artist",
+      "state": "MOVE",
+      "facing": "SE",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Artist|MOVE|SW",
+      "rulesetKey": "Great Artist",
+      "category": "unit-clip",
+      "assetKey": "Great Artist|MOVE|SW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-artist/frames/move-sw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/se-color.png",
+          "sha256": "ba60447c4190930de603bc56f4bc07023737c74bac3f2cd9535e09f2ea87f768",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/se-nation.png",
+          "sha256": "960630d9ce4d6d05d3f5412aa1e2ea08c49936ebe5c101c89e3a064b826bddcc",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/se-shadow.png",
+          "sha256": "fdea39212202606866ce43552c2dcfd37c23474675df590687582450ad732a04",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Artist",
+      "state": "MOVE",
+      "facing": "SW",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Artist|MOVE|W",
+      "rulesetKey": "Great Artist",
+      "category": "unit-clip",
+      "assetKey": "Great Artist|MOVE|W",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-artist/frames/move-w.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/e-color.png",
+          "sha256": "e0bcaf81190f10ec9f78158a7603904b618b3006a920a290bb7e6449d1dc0d59",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/e-nation.png",
+          "sha256": "3dcd64b3fb75b98dc1d4c4144cd2b5fd3f6220c40b7493c4d60811cb0e09cc60",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/e-shadow.png",
+          "sha256": "1c2039daf91e1240ce746d17851ba83685e03c25b5d89aac6eed6052307c2d8b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Artist",
+      "state": "MOVE",
+      "facing": "W",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Artist|WORK|E",
+      "rulesetKey": "Great Artist",
+      "category": "unit-clip",
+      "assetKey": "Great Artist|WORK|E",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-artist/frames/work-e.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/e-color.png",
+          "sha256": "e0bcaf81190f10ec9f78158a7603904b618b3006a920a290bb7e6449d1dc0d59",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/e-nation.png",
+          "sha256": "3dcd64b3fb75b98dc1d4c4144cd2b5fd3f6220c40b7493c4d60811cb0e09cc60",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/e-shadow.png",
+          "sha256": "1c2039daf91e1240ce746d17851ba83685e03c25b5d89aac6eed6052307c2d8b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Artist",
+      "state": "WORK",
+      "facing": "E",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Artist|WORK|NE",
+      "rulesetKey": "Great Artist",
+      "category": "unit-clip",
+      "assetKey": "Great Artist|WORK|NE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-artist/frames/work-ne.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/ne-color.png",
+          "sha256": "c2ba12961ac4edfb967b2d6562c674b5c9c4665c690bb0214eaddaa12c3e589d",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/ne-nation.png",
+          "sha256": "7fa5dd1fe7ffa0e9e0c62e10232f9a4b962675d0b9c330b9e3cc0e66dea71410",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/ne-shadow.png",
+          "sha256": "b0c116d2a57ef4724583788e883110934b785f0cce7f1aa01fc475f428ae7e7c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Artist",
+      "state": "WORK",
+      "facing": "NE",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Artist|WORK|NW",
+      "rulesetKey": "Great Artist",
+      "category": "unit-clip",
+      "assetKey": "Great Artist|WORK|NW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-artist/frames/work-nw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/ne-color.png",
+          "sha256": "c2ba12961ac4edfb967b2d6562c674b5c9c4665c690bb0214eaddaa12c3e589d",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/ne-nation.png",
+          "sha256": "7fa5dd1fe7ffa0e9e0c62e10232f9a4b962675d0b9c330b9e3cc0e66dea71410",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/ne-shadow.png",
+          "sha256": "b0c116d2a57ef4724583788e883110934b785f0cce7f1aa01fc475f428ae7e7c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Artist",
+      "state": "WORK",
+      "facing": "NW",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Artist|WORK|SE",
+      "rulesetKey": "Great Artist",
+      "category": "unit-clip",
+      "assetKey": "Great Artist|WORK|SE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-artist/frames/work-se.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/se-color.png",
+          "sha256": "ba60447c4190930de603bc56f4bc07023737c74bac3f2cd9535e09f2ea87f768",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/se-nation.png",
+          "sha256": "960630d9ce4d6d05d3f5412aa1e2ea08c49936ebe5c101c89e3a064b826bddcc",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/se-shadow.png",
+          "sha256": "fdea39212202606866ce43552c2dcfd37c23474675df590687582450ad732a04",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Artist",
+      "state": "WORK",
+      "facing": "SE",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Artist|WORK|SW",
+      "rulesetKey": "Great Artist",
+      "category": "unit-clip",
+      "assetKey": "Great Artist|WORK|SW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-artist/frames/work-sw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/se-color.png",
+          "sha256": "ba60447c4190930de603bc56f4bc07023737c74bac3f2cd9535e09f2ea87f768",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/se-nation.png",
+          "sha256": "960630d9ce4d6d05d3f5412aa1e2ea08c49936ebe5c101c89e3a064b826bddcc",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/se-shadow.png",
+          "sha256": "fdea39212202606866ce43552c2dcfd37c23474675df590687582450ad732a04",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Artist",
+      "state": "WORK",
+      "facing": "SW",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Artist|WORK|W",
+      "rulesetKey": "Great Artist",
+      "category": "unit-clip",
+      "assetKey": "Great Artist|WORK|W",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-artist/frames/work-w.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/e-color.png",
+          "sha256": "e0bcaf81190f10ec9f78158a7603904b618b3006a920a290bb7e6449d1dc0d59",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/e-nation.png",
+          "sha256": "3dcd64b3fb75b98dc1d4c4144cd2b5fd3f6220c40b7493c4d60811cb0e09cc60",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-artist/frames/e-shadow.png",
+          "sha256": "1c2039daf91e1240ce746d17851ba83685e03c25b5d89aac6eed6052307c2d8b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Artist",
+      "state": "WORK",
+      "facing": "W",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Engineer|DEFEAT|E",
+      "rulesetKey": "Great Engineer",
+      "category": "unit-clip",
+      "assetKey": "Great Engineer|DEFEAT|E",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-engineer/frames/defeat-e.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/e-color.png",
+          "sha256": "1253d48308797e76c1ae5f1934bb7c18eeec6e2fedf3480670c96521f643d72f",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/e-nation.png",
+          "sha256": "cbe014e6b28bac7a4d1f0b6fb12bca797fae6d8975ad674b069c50961849ab24",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/e-shadow.png",
+          "sha256": "8352bfe3533900e4df2648714138a1f25c27fa884c246e22392d8494fce65bed",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Engineer",
+      "state": "DEFEAT",
+      "facing": "E",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Engineer|DEFEAT|NE",
+      "rulesetKey": "Great Engineer",
+      "category": "unit-clip",
+      "assetKey": "Great Engineer|DEFEAT|NE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-engineer/frames/defeat-ne.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/ne-color.png",
+          "sha256": "01fd7165e4d4c2cf4140f9b296c9e0d11676e5f999ef5329406d53669ccff455",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/ne-nation.png",
+          "sha256": "5dd89fd7f66c945e32f487582626e44582fc3c2595fccf34ea4adb3558be6a27",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/ne-shadow.png",
+          "sha256": "d02e53028fa77cd9e5b2dadc8b7f34aaec7a58b24cfb8d168b31aa6cd8f1824f",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Engineer",
+      "state": "DEFEAT",
+      "facing": "NE",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Engineer|DEFEAT|NW",
+      "rulesetKey": "Great Engineer",
+      "category": "unit-clip",
+      "assetKey": "Great Engineer|DEFEAT|NW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-engineer/frames/defeat-nw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/ne-color.png",
+          "sha256": "01fd7165e4d4c2cf4140f9b296c9e0d11676e5f999ef5329406d53669ccff455",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/ne-nation.png",
+          "sha256": "5dd89fd7f66c945e32f487582626e44582fc3c2595fccf34ea4adb3558be6a27",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/ne-shadow.png",
+          "sha256": "d02e53028fa77cd9e5b2dadc8b7f34aaec7a58b24cfb8d168b31aa6cd8f1824f",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Engineer",
+      "state": "DEFEAT",
+      "facing": "NW",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Engineer|DEFEAT|SE",
+      "rulesetKey": "Great Engineer",
+      "category": "unit-clip",
+      "assetKey": "Great Engineer|DEFEAT|SE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-engineer/frames/defeat-se.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/se-color.png",
+          "sha256": "3f3704810c3d89bd80e4bdc3b065d1e97dc9e1499e27b375cbc2447193fb27e0",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/se-nation.png",
+          "sha256": "edaccf19bd0989327d8b92618cb38c908416e50bc41c77db2d3d2b30c9eee0fc",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/se-shadow.png",
+          "sha256": "8d3e7e32568c79c7d9a4f266bbb0fd7e2c3f2b793151cfab1a8310cdcdc13707",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Engineer",
+      "state": "DEFEAT",
+      "facing": "SE",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Engineer|DEFEAT|SW",
+      "rulesetKey": "Great Engineer",
+      "category": "unit-clip",
+      "assetKey": "Great Engineer|DEFEAT|SW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-engineer/frames/defeat-sw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/se-color.png",
+          "sha256": "3f3704810c3d89bd80e4bdc3b065d1e97dc9e1499e27b375cbc2447193fb27e0",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/se-nation.png",
+          "sha256": "edaccf19bd0989327d8b92618cb38c908416e50bc41c77db2d3d2b30c9eee0fc",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/se-shadow.png",
+          "sha256": "8d3e7e32568c79c7d9a4f266bbb0fd7e2c3f2b793151cfab1a8310cdcdc13707",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Engineer",
+      "state": "DEFEAT",
+      "facing": "SW",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Engineer|DEFEAT|W",
+      "rulesetKey": "Great Engineer",
+      "category": "unit-clip",
+      "assetKey": "Great Engineer|DEFEAT|W",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-engineer/frames/defeat-w.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/e-color.png",
+          "sha256": "1253d48308797e76c1ae5f1934bb7c18eeec6e2fedf3480670c96521f643d72f",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/e-nation.png",
+          "sha256": "cbe014e6b28bac7a4d1f0b6fb12bca797fae6d8975ad674b069c50961849ab24",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/e-shadow.png",
+          "sha256": "8352bfe3533900e4df2648714138a1f25c27fa884c246e22392d8494fce65bed",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Engineer",
+      "state": "DEFEAT",
+      "facing": "W",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Engineer|HIT|E",
+      "rulesetKey": "Great Engineer",
+      "category": "unit-clip",
+      "assetKey": "Great Engineer|HIT|E",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-engineer/frames/hit-e.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/e-color.png",
+          "sha256": "1253d48308797e76c1ae5f1934bb7c18eeec6e2fedf3480670c96521f643d72f",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/e-nation.png",
+          "sha256": "cbe014e6b28bac7a4d1f0b6fb12bca797fae6d8975ad674b069c50961849ab24",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/e-shadow.png",
+          "sha256": "8352bfe3533900e4df2648714138a1f25c27fa884c246e22392d8494fce65bed",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Engineer",
+      "state": "HIT",
+      "facing": "E",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great Engineer|HIT|NE",
+      "rulesetKey": "Great Engineer",
+      "category": "unit-clip",
+      "assetKey": "Great Engineer|HIT|NE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-engineer/frames/hit-ne.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/ne-color.png",
+          "sha256": "01fd7165e4d4c2cf4140f9b296c9e0d11676e5f999ef5329406d53669ccff455",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/ne-nation.png",
+          "sha256": "5dd89fd7f66c945e32f487582626e44582fc3c2595fccf34ea4adb3558be6a27",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/ne-shadow.png",
+          "sha256": "d02e53028fa77cd9e5b2dadc8b7f34aaec7a58b24cfb8d168b31aa6cd8f1824f",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Engineer",
+      "state": "HIT",
+      "facing": "NE",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great Engineer|HIT|NW",
+      "rulesetKey": "Great Engineer",
+      "category": "unit-clip",
+      "assetKey": "Great Engineer|HIT|NW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-engineer/frames/hit-nw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/ne-color.png",
+          "sha256": "01fd7165e4d4c2cf4140f9b296c9e0d11676e5f999ef5329406d53669ccff455",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/ne-nation.png",
+          "sha256": "5dd89fd7f66c945e32f487582626e44582fc3c2595fccf34ea4adb3558be6a27",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/ne-shadow.png",
+          "sha256": "d02e53028fa77cd9e5b2dadc8b7f34aaec7a58b24cfb8d168b31aa6cd8f1824f",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Engineer",
+      "state": "HIT",
+      "facing": "NW",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great Engineer|HIT|SE",
+      "rulesetKey": "Great Engineer",
+      "category": "unit-clip",
+      "assetKey": "Great Engineer|HIT|SE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-engineer/frames/hit-se.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/se-color.png",
+          "sha256": "3f3704810c3d89bd80e4bdc3b065d1e97dc9e1499e27b375cbc2447193fb27e0",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/se-nation.png",
+          "sha256": "edaccf19bd0989327d8b92618cb38c908416e50bc41c77db2d3d2b30c9eee0fc",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/se-shadow.png",
+          "sha256": "8d3e7e32568c79c7d9a4f266bbb0fd7e2c3f2b793151cfab1a8310cdcdc13707",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Engineer",
+      "state": "HIT",
+      "facing": "SE",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great Engineer|HIT|SW",
+      "rulesetKey": "Great Engineer",
+      "category": "unit-clip",
+      "assetKey": "Great Engineer|HIT|SW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-engineer/frames/hit-sw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/se-color.png",
+          "sha256": "3f3704810c3d89bd80e4bdc3b065d1e97dc9e1499e27b375cbc2447193fb27e0",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/se-nation.png",
+          "sha256": "edaccf19bd0989327d8b92618cb38c908416e50bc41c77db2d3d2b30c9eee0fc",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/se-shadow.png",
+          "sha256": "8d3e7e32568c79c7d9a4f266bbb0fd7e2c3f2b793151cfab1a8310cdcdc13707",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Engineer",
+      "state": "HIT",
+      "facing": "SW",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great Engineer|HIT|W",
+      "rulesetKey": "Great Engineer",
+      "category": "unit-clip",
+      "assetKey": "Great Engineer|HIT|W",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-engineer/frames/hit-w.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/e-color.png",
+          "sha256": "1253d48308797e76c1ae5f1934bb7c18eeec6e2fedf3480670c96521f643d72f",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/e-nation.png",
+          "sha256": "cbe014e6b28bac7a4d1f0b6fb12bca797fae6d8975ad674b069c50961849ab24",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/e-shadow.png",
+          "sha256": "8352bfe3533900e4df2648714138a1f25c27fa884c246e22392d8494fce65bed",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Engineer",
+      "state": "HIT",
+      "facing": "W",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great Engineer|IDLE|E",
+      "rulesetKey": "Great Engineer",
+      "category": "unit-clip",
+      "assetKey": "Great Engineer|IDLE|E",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-engineer/frames/idle-e.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/e-color.png",
+          "sha256": "1253d48308797e76c1ae5f1934bb7c18eeec6e2fedf3480670c96521f643d72f",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/e-nation.png",
+          "sha256": "cbe014e6b28bac7a4d1f0b6fb12bca797fae6d8975ad674b069c50961849ab24",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/e-shadow.png",
+          "sha256": "8352bfe3533900e4df2648714138a1f25c27fa884c246e22392d8494fce65bed",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Engineer",
+      "state": "IDLE",
+      "facing": "E",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great Engineer|IDLE|NE",
+      "rulesetKey": "Great Engineer",
+      "category": "unit-clip",
+      "assetKey": "Great Engineer|IDLE|NE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-engineer/frames/idle-ne.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/ne-color.png",
+          "sha256": "01fd7165e4d4c2cf4140f9b296c9e0d11676e5f999ef5329406d53669ccff455",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/ne-nation.png",
+          "sha256": "5dd89fd7f66c945e32f487582626e44582fc3c2595fccf34ea4adb3558be6a27",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/ne-shadow.png",
+          "sha256": "d02e53028fa77cd9e5b2dadc8b7f34aaec7a58b24cfb8d168b31aa6cd8f1824f",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Engineer",
+      "state": "IDLE",
+      "facing": "NE",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great Engineer|IDLE|NW",
+      "rulesetKey": "Great Engineer",
+      "category": "unit-clip",
+      "assetKey": "Great Engineer|IDLE|NW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-engineer/frames/idle-nw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/ne-color.png",
+          "sha256": "01fd7165e4d4c2cf4140f9b296c9e0d11676e5f999ef5329406d53669ccff455",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/ne-nation.png",
+          "sha256": "5dd89fd7f66c945e32f487582626e44582fc3c2595fccf34ea4adb3558be6a27",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/ne-shadow.png",
+          "sha256": "d02e53028fa77cd9e5b2dadc8b7f34aaec7a58b24cfb8d168b31aa6cd8f1824f",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Engineer",
+      "state": "IDLE",
+      "facing": "NW",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great Engineer|IDLE|SE",
+      "rulesetKey": "Great Engineer",
+      "category": "unit-clip",
+      "assetKey": "Great Engineer|IDLE|SE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-engineer/frames/idle-se.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/se-color.png",
+          "sha256": "3f3704810c3d89bd80e4bdc3b065d1e97dc9e1499e27b375cbc2447193fb27e0",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/se-nation.png",
+          "sha256": "edaccf19bd0989327d8b92618cb38c908416e50bc41c77db2d3d2b30c9eee0fc",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/se-shadow.png",
+          "sha256": "8d3e7e32568c79c7d9a4f266bbb0fd7e2c3f2b793151cfab1a8310cdcdc13707",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Engineer",
+      "state": "IDLE",
+      "facing": "SE",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great Engineer|IDLE|SW",
+      "rulesetKey": "Great Engineer",
+      "category": "unit-clip",
+      "assetKey": "Great Engineer|IDLE|SW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-engineer/frames/idle-sw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/se-color.png",
+          "sha256": "3f3704810c3d89bd80e4bdc3b065d1e97dc9e1499e27b375cbc2447193fb27e0",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/se-nation.png",
+          "sha256": "edaccf19bd0989327d8b92618cb38c908416e50bc41c77db2d3d2b30c9eee0fc",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/se-shadow.png",
+          "sha256": "8d3e7e32568c79c7d9a4f266bbb0fd7e2c3f2b793151cfab1a8310cdcdc13707",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Engineer",
+      "state": "IDLE",
+      "facing": "SW",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great Engineer|IDLE|W",
+      "rulesetKey": "Great Engineer",
+      "category": "unit-clip",
+      "assetKey": "Great Engineer|IDLE|W",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-engineer/frames/idle-w.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/e-color.png",
+          "sha256": "1253d48308797e76c1ae5f1934bb7c18eeec6e2fedf3480670c96521f643d72f",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/e-nation.png",
+          "sha256": "cbe014e6b28bac7a4d1f0b6fb12bca797fae6d8975ad674b069c50961849ab24",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/e-shadow.png",
+          "sha256": "8352bfe3533900e4df2648714138a1f25c27fa884c246e22392d8494fce65bed",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Engineer",
+      "state": "IDLE",
+      "facing": "W",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Great Engineer|MOVE|E",
+      "rulesetKey": "Great Engineer",
+      "category": "unit-clip",
+      "assetKey": "Great Engineer|MOVE|E",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-engineer/frames/move-e.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/e-color.png",
+          "sha256": "1253d48308797e76c1ae5f1934bb7c18eeec6e2fedf3480670c96521f643d72f",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/e-nation.png",
+          "sha256": "cbe014e6b28bac7a4d1f0b6fb12bca797fae6d8975ad674b069c50961849ab24",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/e-shadow.png",
+          "sha256": "8352bfe3533900e4df2648714138a1f25c27fa884c246e22392d8494fce65bed",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Engineer",
+      "state": "MOVE",
+      "facing": "E",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Engineer|MOVE|NE",
+      "rulesetKey": "Great Engineer",
+      "category": "unit-clip",
+      "assetKey": "Great Engineer|MOVE|NE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-engineer/frames/move-ne.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/ne-color.png",
+          "sha256": "01fd7165e4d4c2cf4140f9b296c9e0d11676e5f999ef5329406d53669ccff455",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/ne-nation.png",
+          "sha256": "5dd89fd7f66c945e32f487582626e44582fc3c2595fccf34ea4adb3558be6a27",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/ne-shadow.png",
+          "sha256": "d02e53028fa77cd9e5b2dadc8b7f34aaec7a58b24cfb8d168b31aa6cd8f1824f",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Engineer",
+      "state": "MOVE",
+      "facing": "NE",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Engineer|MOVE|NW",
+      "rulesetKey": "Great Engineer",
+      "category": "unit-clip",
+      "assetKey": "Great Engineer|MOVE|NW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-engineer/frames/move-nw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/ne-color.png",
+          "sha256": "01fd7165e4d4c2cf4140f9b296c9e0d11676e5f999ef5329406d53669ccff455",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/ne-nation.png",
+          "sha256": "5dd89fd7f66c945e32f487582626e44582fc3c2595fccf34ea4adb3558be6a27",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/ne-shadow.png",
+          "sha256": "d02e53028fa77cd9e5b2dadc8b7f34aaec7a58b24cfb8d168b31aa6cd8f1824f",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Engineer",
+      "state": "MOVE",
+      "facing": "NW",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Engineer|MOVE|SE",
+      "rulesetKey": "Great Engineer",
+      "category": "unit-clip",
+      "assetKey": "Great Engineer|MOVE|SE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-engineer/frames/move-se.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/se-color.png",
+          "sha256": "3f3704810c3d89bd80e4bdc3b065d1e97dc9e1499e27b375cbc2447193fb27e0",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/se-nation.png",
+          "sha256": "edaccf19bd0989327d8b92618cb38c908416e50bc41c77db2d3d2b30c9eee0fc",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/se-shadow.png",
+          "sha256": "8d3e7e32568c79c7d9a4f266bbb0fd7e2c3f2b793151cfab1a8310cdcdc13707",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Engineer",
+      "state": "MOVE",
+      "facing": "SE",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Engineer|MOVE|SW",
+      "rulesetKey": "Great Engineer",
+      "category": "unit-clip",
+      "assetKey": "Great Engineer|MOVE|SW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-engineer/frames/move-sw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/se-color.png",
+          "sha256": "3f3704810c3d89bd80e4bdc3b065d1e97dc9e1499e27b375cbc2447193fb27e0",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/se-nation.png",
+          "sha256": "edaccf19bd0989327d8b92618cb38c908416e50bc41c77db2d3d2b30c9eee0fc",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/se-shadow.png",
+          "sha256": "8d3e7e32568c79c7d9a4f266bbb0fd7e2c3f2b793151cfab1a8310cdcdc13707",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Engineer",
+      "state": "MOVE",
+      "facing": "SW",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Engineer|MOVE|W",
+      "rulesetKey": "Great Engineer",
+      "category": "unit-clip",
+      "assetKey": "Great Engineer|MOVE|W",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-engineer/frames/move-w.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/e-color.png",
+          "sha256": "1253d48308797e76c1ae5f1934bb7c18eeec6e2fedf3480670c96521f643d72f",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/e-nation.png",
+          "sha256": "cbe014e6b28bac7a4d1f0b6fb12bca797fae6d8975ad674b069c50961849ab24",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/e-shadow.png",
+          "sha256": "8352bfe3533900e4df2648714138a1f25c27fa884c246e22392d8494fce65bed",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Engineer",
+      "state": "MOVE",
+      "facing": "W",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Engineer|WORK|E",
+      "rulesetKey": "Great Engineer",
+      "category": "unit-clip",
+      "assetKey": "Great Engineer|WORK|E",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-engineer/frames/work-e.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/e-color.png",
+          "sha256": "1253d48308797e76c1ae5f1934bb7c18eeec6e2fedf3480670c96521f643d72f",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/e-nation.png",
+          "sha256": "cbe014e6b28bac7a4d1f0b6fb12bca797fae6d8975ad674b069c50961849ab24",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/e-shadow.png",
+          "sha256": "8352bfe3533900e4df2648714138a1f25c27fa884c246e22392d8494fce65bed",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Engineer",
+      "state": "WORK",
+      "facing": "E",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Engineer|WORK|NE",
+      "rulesetKey": "Great Engineer",
+      "category": "unit-clip",
+      "assetKey": "Great Engineer|WORK|NE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-engineer/frames/work-ne.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/ne-color.png",
+          "sha256": "01fd7165e4d4c2cf4140f9b296c9e0d11676e5f999ef5329406d53669ccff455",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/ne-nation.png",
+          "sha256": "5dd89fd7f66c945e32f487582626e44582fc3c2595fccf34ea4adb3558be6a27",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/ne-shadow.png",
+          "sha256": "d02e53028fa77cd9e5b2dadc8b7f34aaec7a58b24cfb8d168b31aa6cd8f1824f",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Engineer",
+      "state": "WORK",
+      "facing": "NE",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Engineer|WORK|NW",
+      "rulesetKey": "Great Engineer",
+      "category": "unit-clip",
+      "assetKey": "Great Engineer|WORK|NW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-engineer/frames/work-nw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/ne-color.png",
+          "sha256": "01fd7165e4d4c2cf4140f9b296c9e0d11676e5f999ef5329406d53669ccff455",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/ne-nation.png",
+          "sha256": "5dd89fd7f66c945e32f487582626e44582fc3c2595fccf34ea4adb3558be6a27",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/ne-shadow.png",
+          "sha256": "d02e53028fa77cd9e5b2dadc8b7f34aaec7a58b24cfb8d168b31aa6cd8f1824f",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Engineer",
+      "state": "WORK",
+      "facing": "NW",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Engineer|WORK|SE",
+      "rulesetKey": "Great Engineer",
+      "category": "unit-clip",
+      "assetKey": "Great Engineer|WORK|SE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-engineer/frames/work-se.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/se-color.png",
+          "sha256": "3f3704810c3d89bd80e4bdc3b065d1e97dc9e1499e27b375cbc2447193fb27e0",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/se-nation.png",
+          "sha256": "edaccf19bd0989327d8b92618cb38c908416e50bc41c77db2d3d2b30c9eee0fc",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/se-shadow.png",
+          "sha256": "8d3e7e32568c79c7d9a4f266bbb0fd7e2c3f2b793151cfab1a8310cdcdc13707",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Engineer",
+      "state": "WORK",
+      "facing": "SE",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Engineer|WORK|SW",
+      "rulesetKey": "Great Engineer",
+      "category": "unit-clip",
+      "assetKey": "Great Engineer|WORK|SW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-engineer/frames/work-sw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/se-color.png",
+          "sha256": "3f3704810c3d89bd80e4bdc3b065d1e97dc9e1499e27b375cbc2447193fb27e0",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/se-nation.png",
+          "sha256": "edaccf19bd0989327d8b92618cb38c908416e50bc41c77db2d3d2b30c9eee0fc",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/se-shadow.png",
+          "sha256": "8d3e7e32568c79c7d9a4f266bbb0fd7e2c3f2b793151cfab1a8310cdcdc13707",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Engineer",
+      "state": "WORK",
+      "facing": "SW",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Great Engineer|WORK|W",
+      "rulesetKey": "Great Engineer",
+      "category": "unit-clip",
+      "assetKey": "Great Engineer|WORK|W",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/great-engineer/frames/work-w.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/e-color.png",
+          "sha256": "1253d48308797e76c1ae5f1934bb7c18eeec6e2fedf3480670c96521f643d72f",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/e-nation.png",
+          "sha256": "cbe014e6b28bac7a4d1f0b6fb12bca797fae6d8975ad674b069c50961849ab24",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/great-engineer/frames/e-shadow.png",
+          "sha256": "8352bfe3533900e4df2648714138a1f25c27fa884c246e22392d8494fce65bed",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Great Engineer",
+      "state": "WORK",
+      "facing": "W",
+      "minimumFrames": 8
+    },
+    {
       "id": "unit-clip|Great General|DEFEAT|E",
       "rulesetKey": "Great General",
       "category": "unit-clip",
@@ -10320,6 +12900,70 @@
       "state": "WORK",
       "facing": "W",
       "minimumFrames": 8
+    },
+    {
+      "id": "unit-static|TileSets/AtlasUnits/Units/Great Artist",
+      "rulesetKey": "Great Artist",
+      "category": "unit-static",
+      "assetKey": "TileSets/AtlasUnits/Units/Great Artist",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Great Artist.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Great Artist.png",
+          "sha256": "b26f474d76be5cca8ad579140f8e7c7aef10ddb41720dd7b9eff012938f71ec2",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Great Artist-1.png",
+          "sha256": "36556a9dfe4ce968faeb9b7457c7c519ce2d32e7e110152456797ee80764a0cf",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null
+    },
+    {
+      "id": "unit-static|TileSets/AtlasUnits/Units/Great Engineer",
+      "rulesetKey": "Great Engineer",
+      "category": "unit-static",
+      "assetKey": "TileSets/AtlasUnits/Units/Great Engineer",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Great Engineer.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Great Engineer.png",
+          "sha256": "9e7318b3ccacb396a4694f0a0d6a6d1c4221779af9d0864d759f7dc5770a7cab",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Great Engineer-1.png",
+          "sha256": "6a3e54aba731003ccfde180f2648d133bcc72f882ed8e705f759a241943b6ff9",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null
     },
     {
       "id": "unit-static|TileSets/AtlasUnits/Units/Great General",

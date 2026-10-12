@@ -2,6 +2,48 @@
   "schemaVersion": 1,
   "entries": [
     {
+      "assetId": "great-artist",
+      "creator": "OpenAI image generation",
+      "source": "art/atlas/units/great-artist/creation-record.json",
+      "promptPath": "art/atlas/units/great-artist/prompts/e-v1.txt",
+      "rights": "original-generated",
+      "sourceHash": "cdd139c2090c5036b21feffd4892b524f4da3bb90036fa689ee4e4c0c35d7fba",
+      "outputHashes": {
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Great Artist-1.png": "36556a9dfe4ce968faeb9b7457c7c519ce2d32e7e110152456797ee80764a0cf",
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Great Artist.png": "b26f474d76be5cca8ad579140f8e7c7aef10ddb41720dd7b9eff012938f71ec2",
+        "art/atlas/units/great-artist/frames/e-color.png": "e0bcaf81190f10ec9f78158a7603904b618b3006a920a290bb7e6449d1dc0d59",
+        "art/atlas/units/great-artist/frames/e-nation.png": "3dcd64b3fb75b98dc1d4c4144cd2b5fd3f6220c40b7493c4d60811cb0e09cc60",
+        "art/atlas/units/great-artist/frames/e-shadow.png": "1c2039daf91e1240ce746d17851ba83685e03c25b5d89aac6eed6052307c2d8b",
+        "art/atlas/units/great-artist/frames/ne-color.png": "c2ba12961ac4edfb967b2d6562c674b5c9c4665c690bb0214eaddaa12c3e589d",
+        "art/atlas/units/great-artist/frames/ne-nation.png": "7fa5dd1fe7ffa0e9e0c62e10232f9a4b962675d0b9c330b9e3cc0e66dea71410",
+        "art/atlas/units/great-artist/frames/ne-shadow.png": "b0c116d2a57ef4724583788e883110934b785f0cce7f1aa01fc475f428ae7e7c",
+        "art/atlas/units/great-artist/frames/se-color.png": "ba60447c4190930de603bc56f4bc07023737c74bac3f2cd9535e09f2ea87f768",
+        "art/atlas/units/great-artist/frames/se-nation.png": "960630d9ce4d6d05d3f5412aa1e2ea08c49936ebe5c101c89e3a064b826bddcc",
+        "art/atlas/units/great-artist/frames/se-shadow.png": "fdea39212202606866ce43552c2dcfd37c23474675df590687582450ad732a04"
+      }
+    },
+    {
+      "assetId": "great-engineer",
+      "creator": "OpenAI image generation",
+      "source": "art/atlas/units/great-engineer/creation-record.json",
+      "promptPath": "art/atlas/units/great-engineer/prompts/e-v1.txt",
+      "rights": "original-generated",
+      "sourceHash": "74bf42a3e38fb3fdeee114c043c892d7aaf741774354eda151a3b62fcdca0678",
+      "outputHashes": {
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Great Engineer-1.png": "6a3e54aba731003ccfde180f2648d133bcc72f882ed8e705f759a241943b6ff9",
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Great Engineer.png": "9e7318b3ccacb396a4694f0a0d6a6d1c4221779af9d0864d759f7dc5770a7cab",
+        "art/atlas/units/great-engineer/frames/e-color.png": "1253d48308797e76c1ae5f1934bb7c18eeec6e2fedf3480670c96521f643d72f",
+        "art/atlas/units/great-engineer/frames/e-nation.png": "cbe014e6b28bac7a4d1f0b6fb12bca797fae6d8975ad674b069c50961849ab24",
+        "art/atlas/units/great-engineer/frames/e-shadow.png": "8352bfe3533900e4df2648714138a1f25c27fa884c246e22392d8494fce65bed",
+        "art/atlas/units/great-engineer/frames/ne-color.png": "01fd7165e4d4c2cf4140f9b296c9e0d11676e5f999ef5329406d53669ccff455",
+        "art/atlas/units/great-engineer/frames/ne-nation.png": "5dd89fd7f66c945e32f487582626e44582fc3c2595fccf34ea4adb3558be6a27",
+        "art/atlas/units/great-engineer/frames/ne-shadow.png": "d02e53028fa77cd9e5b2dadc8b7f34aaec7a58b24cfb8d168b31aa6cd8f1824f",
+        "art/atlas/units/great-engineer/frames/se-color.png": "3f3704810c3d89bd80e4bdc3b065d1e97dc9e1499e27b375cbc2447193fb27e0",
+        "art/atlas/units/great-engineer/frames/se-nation.png": "edaccf19bd0989327d8b92618cb38c908416e50bc41c77db2d3d2b30c9eee0fc",
+        "art/atlas/units/great-engineer/frames/se-shadow.png": "8d3e7e32568c79c7d9a4f266bbb0fd7e2c3f2b793151cfab1a8310cdcdc13707"
+      }
+    },
+    {
       "assetId": "great-general",
       "creator": "OpenAI image generation",
       "source": "art/atlas/units/great-general/creation-record.json",
