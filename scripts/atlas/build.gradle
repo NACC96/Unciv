@@ -1,0 +1,15 @@
+// APFS compiler/cache scratch only. Evidence remains at the caller's Lexar output.
+def scratch = System.getenv('UNCIV_ATLAS_BUILD_ROOT')
+if (!scratch) throw new GradleException('Set UNCIV_ATLAS_BUILD_ROOT through scripts/atlas/check.sh')
+def configureScratch = { project ->
+    def owner = project.rootProject.name == 'buildSrc' ? 'buildSrc' : 'main'
+    def sub = project.path.replace(':', '_')
+    project.layout.buildDirectory.set(new File(scratch, owner + '/' + (sub ?: 'root')))
+}
+gradle.beforeProject(configureScratch)
+gradle.projectsEvaluated { allprojects(configureScratch) }
+gradle.taskGraph.whenReady { graph ->
+    if (graph.allTasks.any { it.name == 'run' || it.name.toLowerCase().contains('macapp') ||
+        it.name.toLowerCase().contains('install') || it.name.toLowerCase().contains('publish') })
+        throw new GradleException('Atlas verification cannot run, install, package or publish the app')
+}
