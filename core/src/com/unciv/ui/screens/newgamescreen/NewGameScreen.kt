@@ -2,7 +2,14 @@ package com.unciv.ui.screens.newgamescreen
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup
+import com.badlogic.gdx.scenes.scene2d.Actor
+import com.badlogic.gdx.scenes.scene2d.Group
+import com.badlogic.gdx.scenes.scene2d.ui.CheckBox
+import com.badlogic.gdx.scenes.scene2d.ui.Label
+import com.badlogic.gdx.scenes.scene2d.ui.SelectBox
+import com.badlogic.gdx.scenes.scene2d.ui.Table
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton
+import com.badlogic.gdx.scenes.scene2d.ui.TextField
 import com.unciv.Constants
 import com.unciv.UncivGame
 import com.unciv.logic.GameInfo
@@ -24,11 +31,11 @@ import com.unciv.models.ruleset.RulesetCache
 import com.unciv.models.translations.tr
 import com.unciv.ui.components.extensions.addSeparator
 import com.unciv.ui.components.extensions.addSeparatorVertical
-import com.unciv.ui.components.extensions.disable
-import com.unciv.ui.components.extensions.enable
 import com.unciv.ui.components.extensions.pad
+import com.unciv.ui.components.extensions.setFontColor
+import com.unciv.ui.components.extensions.setFontSize
 import com.unciv.ui.components.extensions.toLabel
-import com.unciv.ui.components.extensions.toTextButton
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.input.KeyCharAndCode
 import com.unciv.ui.components.input.keyShortcuts
 import com.unciv.ui.components.input.onActivation
@@ -41,6 +48,7 @@ import com.unciv.ui.popups.ToastPopup
 import com.unciv.ui.screens.basescreen.BaseScreen
 import com.unciv.ui.screens.basescreen.RecreateOnResize
 import com.unciv.ui.screens.pickerscreens.PickerScreen
+import com.unciv.ui.screens.pickerscreens.PickerPane
 import com.unciv.utils.Concurrency
 import com.unciv.utils.Log
 import com.unciv.utils.isUUID
@@ -48,6 +56,7 @@ import com.unciv.utils.launchOnGLThread
 import kotlinx.coroutines.coroutineScope
 import java.net.URI
 import kotlin.math.floor
+import com.badlogic.gdx.utils.Align
 import com.unciv.ui.components.widgets.AutoScrollPane as ScrollPane
 
 class NewGameScreen(
@@ -61,9 +70,10 @@ class NewGameScreen(
     internal val playerPickerTable: PlayerPickerTable
     private val mapOptionsTable: MapOptionsTable
     private var mapOptionsTableInitialized = false
+    private var startBlockedReason: String? = null
 
     init {
-        val isPortrait = isNarrowerThan4to3()
+        val isPortrait = usesStackedLayout(stage.width, stage.height)
 
         // The mods loaded here may come from the last-started game (see GameSetupInfo.fromSettings) -
         // if that combination is now broken (e.g. a mod was updated/removed), silently fall back to
@@ -78,10 +88,10 @@ class NewGameScreen(
         if (gameSetupInfo.gameParameters.victoryTypes.isEmpty())
             gameSetupInfo.gameParameters.victoryTypes.addAll(ruleset.selectableVictories().map { it.name })
 
-        rightSideButton.enable()  // now because PlayerPickerTable init might disable it again
+        setStartEnabled(true)  // PlayerPickerTable init may disable this same visible action
         playerPickerTable = PlayerPickerTable(
             this, gameSetupInfo.gameParameters,
-            if (isPortrait) stage.width - 20f else 0f
+            if (isPortrait) stackedContentWidth(stage.width) else 0f
         )
         playerPickerTable.restoreAgentSlots(savedAgentSlots)
         newGameOptionsTable = GameOptionsTable(
@@ -99,16 +109,11 @@ class NewGameScreen(
 
         if (isPortrait) initPortrait()
         else initLandscape()
-        bottomTable.background = skinStrings.getUiBackground("NewGameScreen/BottomTable", tintColor = skinStrings.skinConfig.clearColor)
-        topTable.background = skinStrings.getUiBackground("NewGameScreen/TopTable", tintColor = skinStrings.skinConfig.clearColor)
+        topTable.polishSetupWidgets()
+        topTable.background = GameUiStyle.background("NewGameScreen/TopTable")
 
-        val horizontalGroup = HorizontalGroup().padBottom(5f).space(10f)
-        rightSideGroup.addActorAt(0, horizontalGroup)
-        horizontalGroup.addActor("Presets".toTextButton().onClick { SetupPresetsPopup(this) })
-
-        if (UncivGame.Current.settings.lastGameSetup != null) {
-            val resetToDefaultsButton = "Reset to defaults".toTextButton()
-            resetToDefaultsButton.onClick {
+        val resetAction: (() -> Unit)? = if (UncivGame.Current.settings.lastGameSetup != null) {
+            {
                 ConfirmPopup(
                     this,
                     "Are you sure you want to reset all game options to defaults?",
@@ -120,16 +125,13 @@ class NewGameScreen(
                     game.replaceCurrentScreen{ NewGameScreen(gameSetupInfo) }
                 }.open(true)
             }
-            horizontalGroup.addActor(resetToDefaultsButton)
-        }
+        } else null
 
-        descriptionLabel.color = Color.SKY
-        descriptionLabel.setText("Starting an agent game begins automated play immediately using the selected provider account.")
-
-        val startGameButton = "Start game!".toTextButton().apply { color = Color.GREEN }        
-        startGameButton.onClick(this::startGameAvoidANRs)
-        horizontalGroup.addActor(startGameButton)
-        pickerPane.rightSideButton.remove()
+        showStartReadiness(startBlockedReason)
+        pickerPane.configureSetupFooter(stage.width, stage.height, { SetupPresetsPopup(this) }, resetAction)
+        showStartReadiness(startBlockedReason)
+        // No Enter shortcut: a key pressed in a seed or size field must never start a paid agent match.
+        rightSideButton.onActivation(this::startGameAvoidANRs)
     }
 
     private fun startGameAvoidANRs(){
@@ -236,7 +238,7 @@ class NewGameScreen(
     private fun startGame() {
 
         Concurrency.runOnGLThread {
-            rightSideButton.disable()
+            setStartEnabled(false)
             rightSideButton.setText(Constants.working.tr())
             setSkin()
             
@@ -248,8 +250,36 @@ class NewGameScreen(
     }
 
     /** Subtables may need an upper limit to their width - they can ask this function. */
-    // In sync with isPortrait in init, here so UI details need not know about 3-column vs 1-column layout
-    internal fun getColumnWidth() = floor(stage.width / (if (isNarrowerThan4to3()) 1 else 3))
+    internal fun getColumnWidth() = floor(
+        if (usesStackedLayout(stage.width, stage.height)) minOf(stage.width, stackedContentWidth(stage.width) + 20f)
+        else stage.width / 3)
+
+    internal fun setStartEnabled(enabled: Boolean) {
+        GameUiStyle.apply(rightSideButton, primary = true)
+        GameUiStyle.setEnabled(rightSideButton, enabled)
+    }
+
+    /** Explains a disabled Start in the footer; `null` restores the agent-start notice. */
+    internal fun showStartReadiness(blockedReason: String?) {
+        startBlockedReason = blockedReason
+        val description = pickerPane.descriptionLabel
+        description.setFontColor(if (blockedReason == null) GameUiStyle.muted else GameUiStyle.warning)
+        description.setText((blockedReason ?: AGENT_START_NOTICE).tr())
+        if (pickerPane.bottomTable.getCell(description) != null)
+            pickerPane.updateSetupFooterSize(stage.height)
+    }
+
+    companion object {
+        private const val AGENT_START_NOTICE =
+            "Starting an agent game begins automated play immediately using the selected provider account."
+        /** Stacked setup keeps a readable measure instead of stretching cards across wide windows. */
+        private const val MAX_STACKED_WIDTH = 720f
+
+        /** Three option columns need readable controls even in a short landscape window. */
+        internal fun usesStackedLayout(width: Float, height: Float) = width < 1080f || width < height * 4f / 3f
+
+        internal fun stackedContentWidth(stageWidth: Float) = minOf(stageWidth - 20f, MAX_STACKED_WIDTH)
+    }
 
     internal fun refreshExampleMap() {
         if (mapOptionsTableInitialized)
@@ -280,24 +310,7 @@ class NewGameScreen(
 
     private fun initPortrait() {
         scrollPane.setScrollingDisabled(false,false)
-
-        topTable.add(ExpanderTab("Game Options") {
-            it.add(newGameOptionsTable).row()
-        }).expandX().fillX().row()
-        topTable.addSeparator(Color.DARK_GRAY, height = 1f)
-
-        topTable.add(newGameOptionsTable.modCheckboxes).expandX().fillX().row()
-        topTable.addSeparator(Color.DARK_GRAY, height = 1f)
-
-        topTable.add(ExpanderTab("Map Options") {
-            it.add(mapOptionsTable).row()
-        }).expandX().fillX().row()
-        topTable.addSeparator(Color.DARK_GRAY, height = 1f)
-
-        (playerPickerTable.playerListTable.parent as ScrollPane).setScrollingDisabled(true,true)
-        topTable.add(ExpanderTab("Civilizations") {
-            it.add(playerPickerTable).row()
-        }).expandX().fillX().row()
+        topTable.configureStackedSetup(newGameOptionsTable, mapOptionsTable, playerPickerTable)
     }
 
     private fun checkConnectionToMultiplayerServer(): Boolean {
@@ -378,7 +391,7 @@ class NewGameScreen(
                     addCloseButton()
                 }
                 Gdx.input.inputProcessor = stage
-                rightSideButton.enable()
+                setStartEnabled(true)
                 rightSideButton.setText("Start game!".tr())
             }
             return@coroutineScope
@@ -392,7 +405,7 @@ class NewGameScreen(
             } catch (ex: FileStorageRateLimitReached) {
                 launchOnGLThread {
                     popup.reuseWith("Server limit reached! Please wait for [${ex.limitRemainingSeconds}] seconds", true)
-                    rightSideButton.enable()
+                    setStartEnabled(true)
                     rightSideButton.setText("Start game!".tr())
                 }
                 Gdx.input.inputProcessor = stage
@@ -401,7 +414,7 @@ class NewGameScreen(
                 Log.error("Error while creating game", ex)
                 launchOnGLThread {
                     popup.reuseWith("Could not upload game!", true)
-                    rightSideButton.enable()
+                    setStartEnabled(true)
                     rightSideButton.setText("Start game!".tr())
                 }
                 Gdx.input.inputProcessor = stage
@@ -477,7 +490,10 @@ class NewGameScreen(
         ImageGetter.setNewRuleset(ruleset)
         game.musicController.setModList(gameSetupInfo.gameParameters.getModsAndBaseRuleset())
 
-        if (updateUI) newGameOptionsTable.updateRuleset(ruleset)
+        if (updateUI) {
+            newGameOptionsTable.updateRuleset(ruleset)
+            topTable.polishSetupWidgets()
+        }
         return success
     }
 
@@ -496,6 +512,7 @@ class NewGameScreen(
         playerPickerTable.update()
         newGameOptionsTable.changeGameParameters(gameSetupInfo.gameParameters)
         newGameOptionsTable.update()
+        topTable.polishSetupWidgets()
     }
 
     internal fun loadPreset(preset: com.unciv.logic.files.SetupPreset) {
@@ -507,4 +524,104 @@ class NewGameScreen(
     }
 
     override fun recreate(): BaseScreen = NewGameScreen(gameSetupInfo, playerPickerTable.snapshotAgentSlots())
+}
+
+internal fun Table.configureStackedSetup(options: GameOptionsTable, map: MapOptionsTable, players: PlayerPickerTable) {
+    // The nation cards already carry the capped stacked measure; every section shares it, centred.
+    val contentWidth = players.civBlocksWidth + 20f
+    add(ExpanderTab("Game Options") { it.add(options).row() }).width(contentWidth).row()
+    addSeparator(GameUiStyle.hover, height = 1f).width(contentWidth)
+    add(options.modCheckboxes).width(contentWidth).row()
+    addSeparator(GameUiStyle.hover, height = 1f).width(contentWidth)
+    add(ExpanderTab("Map Options") { it.add(map).row() }).width(contentWidth).row()
+    addSeparator(GameUiStyle.hover, height = 1f).width(contentWidth)
+    (players.playerListTable.parent as ScrollPane).setScrollingDisabled(true, true)
+    add(ExpanderTab("Civilizations") { it.add(players).row() }).width(contentWidth).row()
+}
+
+/** Presentation-only traversal keeps option-table listeners and mod-specific contents intact. */
+internal fun Actor.polishSetupWidgets() {
+    if (this is PlayerPickerTable) return  // Nation cards already own their hierarchy and semantic colors.
+    when (this) {
+        is CheckBox -> {
+            style = CheckBox.CheckBoxStyle(style).apply {
+                fontColor = GameUiStyle.ink
+                disabledFontColor = GameUiStyle.muted
+            }
+            label.setFontSize(14)
+        }
+        is TextButton -> {
+            GameUiStyle.apply(this)
+            GameUiStyle.setEnabled(this, !isDisabled)
+        }
+        is TextField -> polishSetupField()
+        is SelectBox<*> -> polishSetupSelect()
+        is Label -> if (style.fontColor == Color.WHITE) setFontColor(GameUiStyle.ink)
+        is Table -> if (background != null)
+            background = GameUiStyle.background("NewGameScreen/Options/${javaClass.simpleName}")
+    }
+    if (this is Group) children.forEach { it.polishSetupWidgets() }
+    // A closed expander keeps its content detached until it opens. Attached content
+    // was already visited through children, so only traverse the detached case here.
+    if (this is ExpanderTab && innerTable.parent == null) innerTable.polishSetupWidgets()
+}
+
+/** Reuses the PickerPane action so readiness, working state and keyboard input share one widget. */
+internal fun PickerPane.configureSetupFooter(
+    width: Float,
+    height: Float,
+    onPresets: () -> Unit,
+    onReset: (() -> Unit)? = null
+) {
+    GameUiStyle.apply(closeButton)
+    GameUiStyle.apply(rightSideButton, primary = true)
+    GameUiStyle.setEnabled(rightSideButton, !rightSideButton.isDisabled)
+    rightSideButton.setText("Start game!".tr())
+    rightSideButton.name = "SetupStart"
+    // Back stands apart on the left; Presets separates the destructive Reset from the primary Start.
+    val secondary = ArrayList<TextButton>()
+    if (onReset != null) secondary.add(GameUiStyle.button("Reset to defaults").apply { onClick(onReset) })
+    secondary.add(GameUiStyle.button("Presets").apply { onClick(onPresets) })
+    val buttons = listOf(closeButton) + secondary + rightSideButton
+
+    val gap = 8f
+    val spacer = 16f
+    val available = width - 16f - gap * buttons.size - spacer
+    fun preferred(button: TextButton) =
+        if (button === rightSideButton) maxOf(button.prefWidth, 150f) else button.prefWidth
+    // Wrapped labels report zero preferred width; retain their natural measurements before wrapping.
+    val preferredWidths = buttons.map(::preferred)
+    val preferredTotal = preferredWidths.sum()
+    // Natural widths when they fit; otherwise shrink proportionally so Start stays the widest.
+    val scale = (available / preferredTotal).coerceAtMost(1f)
+
+    val actions = Table().apply { name = "SetupFooterActions" }
+    for ((index, button) in buttons.withIndex()) {
+        button.label.wrap = scale < 1f
+        button.label.setAlignment(Align.center)
+        val cell = actions.add(button).width(preferredWidths[index] * scale).fillY().pad(gap / 2)
+        if (button === closeButton) cell.padRight(gap / 2 + spacer).expandX().left()
+    }
+    bottomTable.clear()
+    bottomTable.background = GameUiStyle.background("NewGameScreen/BottomTable")
+    bottomTable.pad(8f)
+    // Measure the wrapped caption at its real available width. A fixed-height
+    // description scroll pane clips its second line in short desktop windows.
+    descriptionLabel.name = "SetupFooterDescription"
+    descriptionLabel.setFontColor(GameUiStyle.muted)
+    descriptionLabel.setAlignment(Align.left)
+    descriptionLabel.width = width - 16f
+    bottomTable.add(descriptionLabel).width(width - 16f).growX().padBottom(6f).row()
+    bottomTable.add(actions).growX().row()
+    updateSetupFooterSize(height)
+}
+
+/** Readiness captions change height; remeasure the configured footer without replacing its actions. */
+internal fun PickerPane.updateSetupFooterSize(height: Float) {
+    // PickerPane normally reserves only 15% for the footer. A short desktop window
+    // needs the actual fixed action height, with the option area taking the remainder.
+    val footerHeight = bottomTable.prefHeight
+    maxBottomTableHeight = maxOf(150f, footerHeight)
+    splitPane.maxSplitAmount = (1f - footerHeight / height).coerceIn(0.4f, 0.85f)
+    invalidateHierarchy()
 }

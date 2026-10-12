@@ -155,7 +155,7 @@ class WorldScreenHudTest {
     @Test fun `top bar controls remain inside the window through narrow and wide resizes`() {
         val f = Fixture()
         val bar = f.bar()
-        for (width in listOf(960f, 520f, 360f, 960f)) {
+        for (width in listOf(960f, 520f, 420f, 360f, 960f)) {
             f.width = width
             f.update(bar)
             assertEquals(width, bar.width, 0.01f)
@@ -165,6 +165,23 @@ class WorldScreenHudTest {
                 assertTrue("Button left at $width: $left", left.x >= 0f && left.y >= 0f)
                 assertTrue("Button right at $width", left.x + button.width <= bar.width + 0.1f)
                 assertTrue("Button top at $width", left.y + button.height <= bar.height + 0.1f)
+            }
+        }
+    }
+
+    @Test fun `long active civilization identity stays within the top bar at narrow widths`() {
+        val f = Fixture()
+        f.game.addCiv(f.game.ruleset.nations["The Ottomans"]!!)
+        f.active = "The Ottomans"
+        val bar = f.bar()
+        for (width in listOf(960f, 420f, 360f, 960f)) {
+            f.width = width
+            f.update(bar)
+            val identity = bar.descendants().filterIsInstance<Label>().single { it.text.toString() == "The Ottomans" }
+            for (corner in listOf(Vector2(), Vector2(identity.width, identity.height))) {
+                val point = identity.localToAscendantCoordinates(bar, corner)
+                assertTrue("Civilization identity must stay within the HUD at $width: $point", point.x >= 0f && point.x <= bar.width)
+                assertTrue(point.y >= 0f && point.y <= bar.height)
             }
         }
     }

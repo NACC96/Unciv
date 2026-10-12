@@ -6,6 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Cell
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.unciv.logic.civilization.Civilization
 import com.unciv.models.translations.tr
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.extensions.toLabel
 import com.unciv.ui.components.input.KeyboardBinding
 import com.unciv.ui.components.input.onActivation
@@ -31,8 +32,8 @@ class WorldScreenTopBar(internal val worldScreen: WorldScreen) : Table() {
     private val statsTable = WorldScreenTopBarStats(this)
     private val resourceTable = WorldScreenTopBarResources(this)
     private val identity = Table()
-    private val civLabel = "".toLabel(WorldScreenStyle.ink, 16, hideIcons = true).apply { setEllipsis(true) }
-    private val viewingLabel = "".toLabel(WorldScreenStyle.muted, 10)
+    private val civLabel = "".toLabel(WorldScreenStyle.ink, 17, hideIcons = true).apply { setEllipsis(true) }
+    private val viewingLabel = "".toLabel(WorldScreenStyle.muted, GameUiStyle.Type.caption)
     private val portraitCell: Cell<Group>
     private var portraitCiv = ""
     private val overview = Table()
@@ -47,10 +48,10 @@ class WorldScreenTopBar(internal val worldScreen: WorldScreen) : Table() {
         menu.onActivation(binding = KeyboardBinding.Menu) { WorldScreenMenuPopup(worldScreen) }
         menu.onRightClick { WorldScreenMenuPopup(worldScreen, true) }
         identity.add(menu).size(34f).padRight(10f)
-        portraitCell = identity.add(Group()).size(24f).padRight(8f)
+        portraitCell = identity.add(Group()).size(26f).padRight(8f)
         val names = Table()
-        names.add(civLabel).growX().left().row()
-        names.add(viewingLabel).growX().left().padTop(2f)
+        names.add(civLabel).minWidth(0f).growX().left().row()
+        names.add(viewingLabel).minWidth(0f).growX().left().padTop(3f)
         identity.add(names).growX()
         names.onClick { worldScreen.openCivilopedia(displayedCiv.nation.makeLink()) }
 
@@ -76,7 +77,7 @@ class WorldScreenTopBar(internal val worldScreen: WorldScreen) : Table() {
         civLabel.setText(displayedCiv.civID.tr(hideIcons = true))
         viewingLabel.setText(if (worldScreen.viewingCiv.isSpectator()) "Spectator".tr() else "${displayedCiv.tech.era.name}".tr())
         if (portraitCiv != displayedCiv.civID) {
-            portraitCell.setActor(ImageGetter.getNationPortrait(displayedCiv.nation, 24f))
+            portraitCell.setActor(ImageGetter.getNationPortrait(displayedCiv.nation, 26f))
             portraitCiv = displayedCiv.civID
         }
         val deficit = displayedCiv.stats.getUnitSupplyDeficit() > 0
@@ -88,7 +89,7 @@ class WorldScreenTopBar(internal val worldScreen: WorldScreen) : Table() {
 
     private fun updateLayout() {
         val available = (stage.width - 20f).coerceAtLeast(1f)
-        val identityWidth = minOf(190f, available * 0.38f)
+        val identityWidth = minOf(220f, available * 0.44f)
         val controlsWidth = overview.prefWidth
         val middleWidth = available - identityWidth - controlsWidth - 28f
         val stack = middleWidth < max(statsTable.prefWidth, resourceTable.prefWidth)
@@ -99,7 +100,7 @@ class WorldScreenTopBar(internal val worldScreen: WorldScreen) : Table() {
             add(overview).right().row()
             statsTable.scaleTo(available)
             resourceTable.scaleTo(available)
-            add(statsTable).colspan(3).growX().padTop(4f).row()
+            add(statsTable).colspan(3).growX().padTop(6f).row()
             add(resourceTable).colspan(3).growX().row()
         } else {
             statsTable.scaleTo(middleWidth)

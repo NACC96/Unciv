@@ -3,6 +3,7 @@ package com.unciv.ui.screens.newgamescreen
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.Touchable
+import com.badlogic.gdx.scenes.scene2d.ui.Button
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.utils.Align
 import com.unciv.Constants
@@ -22,8 +23,8 @@ import com.unciv.models.ruleset.Ruleset
 import com.unciv.models.ruleset.nation.Nation
 import com.unciv.models.ruleset.unique.UniqueType
 import com.unciv.models.translations.tr
-import com.unciv.ui.components.extensions.darken
-import com.unciv.ui.components.extensions.isEnabled
+import com.unciv.ui.components.GameUiStyle
+import com.unciv.ui.components.UncivTooltip.Companion.addTooltip
 import com.unciv.ui.components.extensions.setFontColor
 import com.unciv.ui.components.extensions.surroundWithCircle
 import com.unciv.ui.components.extensions.toCheckBox
@@ -36,6 +37,7 @@ import com.unciv.ui.components.input.onClick
 import com.unciv.ui.components.widgets.UncivTextField
 import com.unciv.ui.components.widgets.WrappableLabel
 import com.unciv.ui.images.ImageGetter
+import com.unciv.ui.popups.ConfirmPopup
 import com.unciv.ui.popups.Popup
 import com.unciv.ui.screens.basescreen.BaseScreen
 import com.unciv.ui.screens.multiplayerscreens.FriendPickerList
@@ -60,7 +62,9 @@ class PlayerPickerTable(
     blockWidth: Float = 0f
 ): Table() {
     val playerListTable = Table()
-    val civBlocksWidth = if (blockWidth <= 10f) previousScreen.stage.width / 3 - 5f else blockWidth
+    val civBlocksWidth = if (blockWidth > 10f) blockWidth else
+        if (NewGameScreen.usesStackedLayout(previousScreen.stage.width, previousScreen.stage.height))
+            NewGameScreen.stackedContentWidth(previousScreen.stage.width) else previousScreen.stage.width / 3 - 12f
     private var randomNumberLabel: WrappableLabel? = null
 
     /** Locks player table for editing, currently unused, was previously used for scenarios and could be useful in the future. */
@@ -85,14 +89,21 @@ class PlayerPickerTable(
             player.playerId = "" // This is to stop people from getting other users' IDs and cheating with them in multiplayer games
 
         top()
-        val watchAgentsBtn = "Watch agents play (Spectator)".toTextButton().apply { color = Color.SKY }
+        val watchAgentsBtn = GameUiStyle.button("Watch agents play (Spectator)").apply {
+            label.wrap = true
+            label.setAlignment(Align.center)
+        }
         watchAgentsBtn.onClick { setupSpectatorAgentMatch() }
-        add(watchAgentsBtn).padTop(5f).padBottom(5f).row()
+        add(watchAgentsBtn).width(civBlocksWidth - 16f).padTop(8f).padBottom(8f).row()
 
-        add("Shuffle Civ Order at Start".toCheckBox(gameParameters.shufflePlayerOrder) { gameParameters.shufflePlayerOrder = it }).padTop(2f).padBottom(5f).row()
+        val shuffle = "Shuffle Civ Order at Start".toCheckBox(gameParameters.shufflePlayerOrder) { gameParameters.shufflePlayerOrder = it }
+        shuffle.polishSetupWidgets()
+        shuffle.label.wrap = true
+        shuffle.labelCell.growX()
+        add(shuffle).width(civBlocksWidth - 16f).padTop(2f).padBottom(8f).row()
         add(ScrollPane(playerListTable).apply { setOverscroll(false, false) }).width(civBlocksWidth)
         update()
-        background = BaseScreen.skinStrings.getUiBackground("NewGameScreen/PlayerPickerTable", tintColor = BaseScreen.skinStrings.skinConfig.clearColor)
+        background = GameUiStyle.background("NewGameScreen/PlayerPickerTable")
     }
 
     /**
@@ -148,7 +159,15 @@ class PlayerPickerTable(
         // enable start game when at least one human player and they're not alone
         val humanPlayerCount = gameParameters.players.count { it.playerType == PlayerType.Human }
         val isValid = humanPlayerCount >= 1 && (isRandomNumberOfPlayers || gameParameters.players.size >= 2)
-        (previousScreen as? PickerScreen)?.setRightSideButtonEnabled(isValid)
+        if (previousScreen is NewGameScreen) {
+            previousScreen.setStartEnabled(isValid)
+            previousScreen.showStartReadiness(when {
+                isValid -> null
+                humanPlayerCount < 1 -> "Add a human, agent or spectator player to start."
+                else -> "Add at least one more player to start."
+            })
+        }
+        else (previousScreen as? PickerScreen)?.setRightSideButtonEnabled(isValid)
     }
 
     /**
@@ -278,35 +297,42 @@ class PlayerPickerTable(
      */
     private fun getPlayerTable(player: Player): Table {
         val playerTable = Table()
-        playerTable.pad(5f)
-        playerTable.background = BaseScreen.skinStrings.getUiBackground(
-            "NewGameScreen/PlayerPickerTable/PlayerTable",
-            tintColor = BaseScreen.skinStrings.skinConfig.baseColor.darken(0.8f)
-        )
+        playerTable.name = "SetupNation-${player.chosenCiv}"
+        playerTable.pad(12f)
+        // Sits between the picker surface and the raised buttons, so card actions keep visible edges.
+        playerTable.background = GameUiStyle.background("NewGameScreen/PlayerPickerTable/PlayerTable",
+            GameUiStyle.surface.cpy().lerp(GameUiStyle.raised, 0.5f))
+        val contentWidth = (civBlocksWidth - 24f).coerceAtLeast(100f)
 
         val nationTable = getNationTable(player)
-        playerTable.add(nationTable).left()
+        playerTable.add(nationTable).width(contentWidth).left().row()
+        val actions = Table().apply { name = "SetupNationActions" }
+        val actionCount = if (player.chosenCiv == Constants.spectator) 1 else 2
+        val actionWidth = (contentWidth - actionCount * 6f - if (locked) 0f else 36f) / actionCount
 
         val control = AgentSlotLogic.controlOf(player, agentProfiles)
-        val playerTypeTextButton = player.playerType.name.toTextButton()
         // Agent slots stay Human-typed (rule parity); the label carries the distinction.
-        if (control == SlotControl.AGENT)
-            playerTypeTextButton.setText("Agent")
-        playerTable.add(playerTypeTextButton).width(80f).pad(5f).right()
+        // Naming the setting makes clear that the button cycles a choice rather than showing a status.
+        val controlName = if (control == SlotControl.AGENT) "Agent" else player.playerType.name
+        val playerTypeTextButton = GameUiStyle.button("${"Control".tr()}: ${controlName.tr()}").apply {
+            name = "SetupPlayerControl"
+            label.wrap = true
+        }
+        actions.add(playerTypeTextButton).width(actionWidth).padRight(6f)
 
         if (player.chosenCiv != Constants.spectator) {
-            val editAgentButton = "Edit".toTextButton()
+            val editAgentButton = GameUiStyle.button("Edit")
             editAgentButton.onClick {
                 val profile = agentProfiles[player]
                 if (profile != null) {
                     AgentProfilePopup(this@PlayerPickerTable, player, profile, onSave = { update() })
                 } else NationSettingsPopup(this@PlayerPickerTable, player)
             }
-            playerTable.add(editAgentButton).width(60f).pad(5f).right()
+            actions.add(editAgentButton).width(actionWidth).padRight(6f)
         }
         fun updatePlayerTypeButtonEnabled() {
             // This could be written much shorter with logical operators - I think this is readable
-            playerTypeTextButton.isEnabled = when {
+            val enabled = when {
                 // Can always change AI to Human
                 player.playerType == PlayerType.AI -> true
                 // we cannot change Spectator player to AI type, robots not allowed to spectate :(
@@ -315,6 +341,7 @@ class PlayerPickerTable(
                 gameParameters.randomNumberOfPlayers && player.chosenCiv == Constants.random -> false
                 else -> true
             } && AgentSlotLogic.isSlotEditable(player, gameParameters.randomNumberOfPlayers)
+            GameUiStyle.setEnabled(playerTypeTextButton, enabled)
         }
         updatePlayerTypeButtonEnabled()
 
@@ -336,39 +363,54 @@ class PlayerPickerTable(
         }
 
         if (!locked) {
-            playerTable.add("-".toLabel(ImageGetter.CHARCOAL, 30, Align.center)
-                .surroundWithCircle(40f)
-                .onClick {
-                    gameParameters.players.remove(player)
-                    AgentSlotLogic.forgetPlayer(player, agentProfiles)
-                    profileCache.remove(player)
-                    update()
+            fun removePlayer() {
+                gameParameters.players.remove(player)
+                AgentSlotLogic.forgetPlayer(player, agentProfiles)
+                profileCache.remove(player)
+                update()
+            }
+            val remove = Button(BaseScreen.skin).apply {
+                name = "SetupRemovePlayer"
+                GameUiStyle.apply(this, size = GameUiStyle.ButtonSize.Icon)
+                add(ImageGetter.getImage("OtherIcons/Close").apply { color = GameUiStyle.muted }).size(14f)
+                addTooltip("Remove", 22f)
+                onClick {
+                    // Removing an agent slot also forgets its configured profile, so confirm first.
+                    if (agentProfiles[player] == null) removePlayer()
+                    else ConfirmPopup(previousScreen.stage,
+                        "Remove [${player.chosenCiv}] and its agent profile?", "Remove") { removePlayer() }.open()
                 }
-            ).pad(5f).right()
+            }
+            actions.add(remove).size(36f)
         }
+        playerTable.add(actions).width(contentWidth).left().padTop(8f).padBottom(6f).row()
 
         if (control == SlotControl.AGENT) {
             val profile = agentProfiles[player]
             if (profile != null) {
-                playerTable.row()
                 val thinking = profile.reasoning?.let { "Reasoning: $it" } ?: "Reasoning: default"
                 val summaryText = "${profile.displayName} · ${profile.modelId} · $thinking"
-                val summaryLabel = summaryText.toLabel(Color.LIGHT_GRAY, 12).apply {
+                val summaryLabel = summaryText.toLabel(GameUiStyle.muted, 12).apply {
                     wrap = true
+                    name = "SetupAgentSummary"
                 }
-                playerTable.add(summaryLabel).colspan(4).padLeft(10f).padBottom(4f).fillX()
+                playerTable.add(summaryLabel).width(contentWidth).left().padBottom(6f).row()
             }
         }
 
         val bonuses = player.startingBonuses.summary()
         if (bonuses.isNotEmpty()) {
-            playerTable.row()
-            playerTable.add(bonuses.toLabel(Color.GOLD, 12).apply { wrap = true })
-                .colspan(4).padLeft(10f).padBottom(4f).fillX()
+            playerTable.add(bonuses.toLabel(GameUiStyle.info, GameUiStyle.Type.small).apply {
+                wrap = true
+                name = "SetupBonusSummary"
+            }).width(contentWidth).left().padBottom(4f).row()
         }
 
-        if (gameParameters.isOnlineMultiplayer && player.playerType == PlayerType.Human)
-            playerTable.addPlayerTableMultiplayerControls(player)
+        if (gameParameters.isOnlineMultiplayer && player.playerType == PlayerType.Human) {
+            val multiplayer = Table()
+            multiplayer.addPlayerTableMultiplayerControls(player)
+            playerTable.add(multiplayer).width(contentWidth).fillX().row()
+        }
 
         return playerTable
     }
@@ -422,6 +464,8 @@ class PlayerPickerTable(
             }
             add(selectPlayerFromFriendsList).left().colspan(3).fillX().pad(5f)
         }
+        // Nation cards own their styling and are skipped by the screen traversal.
+        if (previousScreen is NewGameScreen) polishSetupWidgets()
     }
 
     /**
@@ -437,7 +481,10 @@ class PlayerPickerTable(
                 ImageGetter.getRandomNationPortrait(40f)
             else ImageGetter.getNationPortrait(nationImageName, 40f)
         nationTable.add(nationImage).pad(5f)
-        nationTable.add(player.chosenCiv.toLabel(hideIcons = true)).pad(5f)
+        nationTable.add(player.chosenCiv.toLabel(GameUiStyle.ink, hideIcons = true).apply {
+            wrap = true
+            name = "SetupNationName"
+        }).width((civBlocksWidth - 84f).coerceAtLeast(40f)).left().pad(5f)
         nationTable.touchable = Touchable.enabled
         return nationTable
     }

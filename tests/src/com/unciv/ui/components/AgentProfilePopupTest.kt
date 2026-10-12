@@ -19,11 +19,11 @@ import com.unciv.models.metadata.GameSetupInfo
 import com.unciv.models.metadata.Player
 import com.unciv.testing.GdxTestRunner
 import com.unciv.testing.TestGame
-import com.unciv.ui.components.fonts.FontRulesetIcons
 import com.unciv.ui.components.fonts.Fonts
 import com.unciv.ui.components.input.ActivationListener
 import com.unciv.ui.images.ImageGetter
 import com.unciv.ui.screens.basescreen.UncivStage
+import com.unciv.ui.screens.basescreen.BaseScreen
 import com.unciv.ui.screens.newgamescreen.AgentProfilePopup
 import com.unciv.ui.screens.newgamescreen.IPreviousScreen
 import com.unciv.ui.screens.newgamescreen.NationSettingsPopup
@@ -43,21 +43,16 @@ import org.mockito.Mockito
 @RunWith(GdxTestRunner::class)
 class AgentProfilePopupTest {
     @get:Rule val temporary = TemporaryFolder()
-    private lateinit var priorIconNames: Map<String, Char>
-    private lateinit var priorIconActors: Map<Char, Actor>
+    private lateinit var priorUiState: SetupUiStateSnapshot
 
     @Before
     fun rememberFontIcons() {
-        priorIconNames = FontRulesetIcons.rulesetObjectNameToChar.toMap()
-        priorIconActors = FontRulesetIcons.charToRulesetImageActor.toMap()
+        priorUiState = SetupUiStateSnapshot()
     }
 
     @After
     fun restoreFontIcons() {
-        FontRulesetIcons.rulesetObjectNameToChar.clear()
-        FontRulesetIcons.rulesetObjectNameToChar.putAll(priorIconNames)
-        FontRulesetIcons.charToRulesetImageActor.clear()
-        FontRulesetIcons.charToRulesetImageActor.putAll(priorIconActors)
+        priorUiState.restore()
     }
 
     private class Fixture(width: Float, height: Float) {
@@ -116,6 +111,7 @@ class AgentProfilePopupTest {
 
     private fun Actor.press(text: String) {
         val button = descendants().filterIsInstance<TextButton>().single { it.text.toString() == text }
+        button.silenceSetupActivationSounds()
         val event = InputEvent().apply { listenerActor = button }
         button.listeners.filterIsInstance<ActivationListener>().single().tap(event, 1f, 1f, 1, 0)
     }
@@ -165,6 +161,57 @@ class AgentProfilePopupTest {
         }
         fixture.popup.press("Save")
         assertEquals(1, fixture.saves)
+    }
+
+    @Test
+    fun `setup fields and model dropdowns use copied styles without changing the skin`() {
+        val fixture = Fixture(800f, 500f)
+        val sharedField = BaseScreen.skin.get(TextField.TextFieldStyle::class.java)
+        val sharedSelect = BaseScreen.skin.get(SelectBox.SelectBoxStyle::class.java)
+        val sharedFieldBackground = sharedField.background
+        val sharedSelectBackground = sharedSelect.background
+        val sharedListBackground = sharedSelect.listStyle.background
+        for (field in fixture.popup.descendants().filterIsInstance<TextField>()) {
+            assertNotSame(sharedField, field.style)
+            assertEquals(GameUiStyle.ink, field.style.fontColor)
+        }
+        for (box in fixture.popup.boxes()) {
+            assertNotSame(sharedSelect, box.style)
+            assertNotSame(sharedSelect.listStyle, box.style.listStyle)
+            assertNotSame(sharedSelect.scrollStyle, box.style.scrollStyle)
+            assertEquals(GameUiStyle.ink, box.style.fontColor)
+        }
+        fixture.reopen().close()
+        assertSame(sharedFieldBackground, sharedField.background)
+        assertSame(sharedSelectBackground, sharedSelect.background)
+        assertSame(sharedListBackground, sharedSelect.listStyle.background)
+        fixture.popup.close()
+    }
+
+    @Test
+    fun `opened model list fits a narrow viewport while preserving the full custom model`() {
+        val fixture = Fixture(520f, 360f)
+        fixture.popup.close()
+        val modelId = "custom-model-" + "very-long-provider-release-name-".repeat(12)
+        fixture.profile.modelId = modelId
+        val popup = fixture.reopen()
+        popup.validate()
+        val model = popup.boxes()[1]
+        val pane = popup.getScrollPane()!!
+        val position = model.localToAscendantCoordinates(pane.actor, Vector2())
+        pane.scrollY = (pane.actor.height - position.y - model.height).coerceIn(0f, pane.maxY)
+        pane.updateVisualScroll()
+        pane.invalidate()
+        pane.validate()
+        model.showList()
+        val menu = model.scrollPane
+        val origin = menu.localToStageCoordinates(Vector2())
+        assertTrue("The opened list must be no wider than the viewport", menu.width <= 504f)
+        assertTrue("The entire list must remain inside the viewport", origin.x >= 8f && origin.x + menu.width <= 512f)
+        assertTrue("Ellipsis must only affect the displayed label", model.selected.toString().contains(modelId))
+        assertEquals(modelId, fixture.profile.modelId)
+        model.hideList()
+        popup.close()
     }
 
     @Test
@@ -282,6 +329,11 @@ class AgentProfilePopupTest {
         Mockito.`when`(screen.gameSetupInfo).thenReturn(setup)
         val popup = SetupPresetsPopup(screen)
         popup.validate()
+        val loadButton = popup.descendants().filterIsInstance<TextButton>().single { it.text.toString() == "Load" }
+        assertTrue("Empty presets must disable the visible Load action", loadButton.isDisabled)
+        popup.press("Load")
+        assertNull(loaded)
+        assertNotNull(popup.parent)
         popup.descendants().filterIsInstance<TextField>().single().text = "Atlas test"
         popup.press("Save preset")
         setup.mapParameters.seed = 99L

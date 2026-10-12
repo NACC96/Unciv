@@ -157,6 +157,8 @@ class GameOptionsTable(
         if (!isPortrait)
             add(modCheckboxes).padTop(0f).row()
 
+        // Internal option callbacks rebuild this table without going through NewGameScreen.updateTables.
+        if (previousScreen is NewGameScreen) polishSetupWidgets()
         pack()
     }
 

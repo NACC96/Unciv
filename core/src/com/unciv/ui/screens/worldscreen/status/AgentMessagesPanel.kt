@@ -21,6 +21,7 @@ import com.badlogic.gdx.utils.Timer
 import com.unciv.logic.agents.AgentMatchSession
 import com.unciv.logic.agents.DiplomaticMessageLimits
 import com.unciv.ui.components.extensions.setFontSize
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.extensions.toLabel
 import com.unciv.ui.components.input.onClick
 import com.unciv.ui.components.widgets.AutoScrollPane
@@ -37,7 +38,6 @@ class AgentMessagesPanel(private val screen: WorldScreen, private val session: A
     private data class Mail(val id: String, val sender: String, val target: String, val text: String,
                             val sent: Int, val delivered: Int?, val origin: String,
                             val acknowledged: Int?, val acknowledgementText: String?)
-    private val glass = AgentActivityGlass(this)
     private val history = Table(skin).apply { top().left() }
     private val scroll = AutoScrollPane(history, skin)
     private val recipient = AgentNationSelectBox<NationOption>().apply { name = "MessageRecipient" }
@@ -56,7 +56,7 @@ class AgentMessagesPanel(private val screen: WorldScreen, private val session: A
     private val send = WorldScreenStyle.button("Send", primary = true).apply { name = "MessageSend" }
     private val status = "".toLabel(WorldScreenStyle.muted, 11).apply { wrap = true }
     private val identity = "".toLabel(WorldScreenStyle.muted, 11).apply { wrap = true }
-    private val count = "".toLabel(WorldScreenStyle.muted, 10)
+    private val count = "".toLabel(WorldScreenStyle.muted, GameUiStyle.Type.caption)
     private val allConversations = NationOption(null, "All conversations")
     private var mail = emptyList<Mail>()
     private var options = emptyList<NationOption>()
@@ -73,7 +73,7 @@ class AgentMessagesPanel(private val screen: WorldScreen, private val session: A
 
     init {
         name = "AgentMessagesPanel"
-        background = glass
+        background = WorldScreenStyle.panelBackground("WorldScreen/Messages")
         touchable = Touchable.enabled
         pad(14f)
         val close = Button(skin).apply {
@@ -82,8 +82,8 @@ class AgentMessagesPanel(private val screen: WorldScreen, private val session: A
             onClick { setShown(false) }
         }
         val header = Table(skin).apply { touchable = Touchable.enabled }
-        header.add("Messages".toLabel(WorldScreenStyle.ink, 19)).expandX().left()
-        header.add("Drag to move".toLabel(WorldScreenStyle.muted, 10)).padRight(8f)
+        header.add("Messages".toLabel(WorldScreenStyle.ink, 17)).expandX().left()
+        header.add(WorldScreenStyle.dragGrip()).padRight(8f)
         header.add(close).size(26f)
         header.addListener(object : InputListener() {
             private val origin = Vector2()
@@ -217,7 +217,10 @@ class AgentMessagesPanel(private val screen: WorldScreen, private val session: A
         recipient.isDisabled = sending || options.isEmpty()
         body.isDisabled = sending || options.isEmpty()
         send.setText(if (sending) "Saving…" else "Send")
-        if (options.isEmpty() && !sending) status.setText("No eligible agent nations to message yet.")
+        if (options.isEmpty() && !sending) {
+            status.color = WorldScreenStyle.muted
+            status.setText("No eligible agent nations to message yet.")
+        }
     }
 
     private fun sendCurrentDraft() {
@@ -225,7 +228,7 @@ class AgentMessagesPanel(private val screen: WorldScreen, private val session: A
         val target = recipient.selected?.id ?: return
         val draft = body.text
         val requestGeneration = generation
-        sending = true; status.setText("Saving your message…"); updateSendState()
+        sending = true; status.color = WorldScreenStyle.muted; status.setText("Saving your message…"); updateSendState()
         session.sendMessage(target, draft) { error ->
             if (disposed || requestGeneration != generation) return@sendMessage
             sending = false
@@ -248,7 +251,7 @@ class AgentMessagesPanel(private val screen: WorldScreen, private val session: A
         history.clearChildren()
         val selected = conversation.selected?.id
         val filtered = mail.filter { selected == null || it.sender == selected || it.target == selected }
-        val contentWidth = (width - 36f).coerceAtLeast(80f)
+        val contentWidth = (width - 40f).coerceAtLeast(80f)
         if (filtered.isEmpty()) history.add("No messages yet. Replies arrive on the recipient’s next turn."
             .toLabel(WorldScreenStyle.muted, 12).apply { wrap = true }).width(contentWidth).left().row()
         if (filtered.size > visibleLimit) {
@@ -259,11 +262,20 @@ class AgentMessagesPanel(private val screen: WorldScreen, private val session: A
         for (message in filtered.takeLast(visibleLimit)) {
             val sender = if (message.origin == "SPECTATOR") "Spectator" else message.sender
             val senderColor = AgentActivityAppearance.color(screen.gameInfo, message.sender)
-            history.add("$sender → ${message.target}".toLabel(senderColor, 12, hideIcons = true)).width(contentWidth).left().row()
+            history.add("$sender → ${message.target}".toLabel(senderColor, 13, hideIcons = true).apply { wrap = true })
+                .width(contentWidth).left().row()
             val state = message.acknowledged?.let { "Acknowledged · turn $it" }
                 ?: message.delivered?.let { "Delivered · turn $it" } ?: "Queued · next turn"
-            val stateColor = if (message.acknowledged != null) WorldScreenStyle.accent else WorldScreenStyle.muted
-            history.add(state.toLabel(stateColor, 10)).width(contentWidth).left().padTop(2f).row()
+            // Receipt colours read as progress; amber stays reserved for real problems.
+            val stateColor = when {
+                message.acknowledged != null -> WorldScreenStyle.positive
+                message.delivered != null -> WorldScreenStyle.ink
+                else -> WorldScreenStyle.muted
+            }
+            val receipt = Table(skin)
+            receipt.add("Sent turn ${message.sent}".toLabel(WorldScreenStyle.muted, GameUiStyle.Type.caption)).left().expandX()
+            receipt.add(state.toLabel(stateColor, 11)).right().padLeft(8f)
+            history.add(receipt).width(contentWidth).left().padTop(3f).row()
             val text = Label(message.text, Label.LabelStyle(BaseScreen.skin.get(Label.LabelStyle::class.java))).apply {
                 setFontSize(13); color = WorldScreenStyle.ink; wrap = true
             }
@@ -271,7 +283,7 @@ class AgentMessagesPanel(private val screen: WorldScreen, private val session: A
                 .padBottom(if (message.acknowledged == null) 16f else 8f).row()
             if (message.acknowledged != null) {
                 history.add("${message.target} acknowledged receipt".toLabel(
-                    AgentActivityAppearance.color(screen.gameInfo, message.target), 11, hideIcons = true))
+                    AgentActivityAppearance.color(screen.gameInfo, message.target), 11, hideIcons = true).apply { wrap = true })
                     .width(contentWidth).left().row()
                 val acknowledgement = Label(message.acknowledgementText.orEmpty(),
                     Label.LabelStyle(BaseScreen.skin.get(Label.LabelStyle::class.java))).apply {
@@ -292,6 +304,6 @@ class AgentMessagesPanel(private val screen: WorldScreen, private val session: A
 
     override fun dispose() {
         disposed = true; task.cancel(); recipient.hideList(); conversation.hideList()
-        glass.dispose(); remove()
+        remove()
     }
 }

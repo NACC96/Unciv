@@ -1,7 +1,5 @@
 package com.unciv.ui.screens.worldscreen.minimap
 
-import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.Actor
@@ -21,7 +19,7 @@ import com.unciv.ui.components.extensions.addInTable
 import com.unciv.ui.components.input.onActivation
 import com.unciv.ui.components.input.onClick
 import com.unciv.ui.images.ImageGetter
-import com.unciv.ui.screens.basescreen.BaseScreen
+import com.unciv.ui.screens.worldscreen.WorldScreenStyle
 import com.unciv.ui.screens.worldscreen.worldmap.WorldMapHolder
 
 class MinimapHolder(val mapHolder: WorldMapHolder) : Table() {
@@ -71,6 +69,16 @@ class MinimapHolder(val mapHolder: WorldMapHolder) : Table() {
         resourceImageButton,
         improvementsImageButton
     )
+
+    init {
+        // Reuse the translated options labels for these otherwise icon-only controls.
+        val labels = listOf("Show unit movement arrows", "Show tile yields", "Show worked tiles",
+            "Show resources and improvements", "Show pixel improvements")
+        for ((button, label) in buttons.zip(labels)) {
+            button.name = label
+            button.setLayerTooltip(label)
+        }
+    }
 
     private fun rebuildIfSizeChanged(civInfo: Civilization) {
         // For Spectator should not restrict minimap
@@ -133,10 +141,18 @@ class MinimapHolder(val mapHolder: WorldMapHolder) : Table() {
 
         val table = Table()
         if (shouldShowMapButtons()) {
-            // table provides larger click area. we want the resize icon to be small to not cover the map
+            // table provides larger click area. we want the resize icon to be small to not cover the map,
+            // so only a compact plate behind the icon is drawn.
             val name = if (maximized) "Reduce" else "Increase"
             val image = ImageGetter.getImage("OtherIcons/$name")
-            table.add(image).expand().size(20f).pad(8f).align(alignment)
+            image.color = WorldScreenStyle.ink
+            val plate = Table().apply {
+                background = WorldScreenStyle.background("WorldScreen/Minimap/ResizePlate",
+                    WorldScreenStyle.raised.cpy().apply { a = 0.9f })
+                touchable = Touchable.disabled
+                add(image).size(16f).pad(5f)
+            }
+            table.add(plate).expand().size(26f).align(alignment).pad(2f)
             table.touchable = Touchable.enabled
             table.onActivation(toggle)
         } else {
@@ -151,6 +167,7 @@ class MinimapHolder(val mapHolder: WorldMapHolder) : Table() {
 
     private fun getCornerHandleIcon(): Image {
         return ImageGetter.getImage("OtherIcons/Corner").apply {
+            color = WorldScreenStyle.muted
             touchable = Touchable.disabled
             isVisible = !maximized && shouldShowMapButtons()
         }
@@ -161,26 +178,26 @@ class MinimapHolder(val mapHolder: WorldMapHolder) : Table() {
 
     private fun getWrappedMinimap(): Table {
         val internalMinimapWrapper = Table()
-        internalMinimapWrapper.add(minimap)
+        internalMinimapWrapper.add(minimap).pad(3f)
 
-        internalMinimapWrapper.background = BaseScreen.skinStrings.getUiBackground(
+        internalMinimapWrapper.background = WorldScreenStyle.background(
             "WorldScreen/Minimap/Background",
-            tintColor = Color.GRAY
+            WorldScreenStyle.surface
         )
         internalMinimapWrapper.pack()
 
         val externalMinimapWrapper = Table()
-        externalMinimapWrapper.add(internalMinimapWrapper).pad(5f)
-        externalMinimapWrapper.background = BaseScreen.skinStrings.getUiBackground(
+        externalMinimapWrapper.add(internalMinimapWrapper).pad(1f)
+        externalMinimapWrapper.background = WorldScreenStyle.background(
             "WorldScreen/Minimap/Border",
-            tintColor = Color.WHITE
+            WorldScreenStyle.hover
         )
         externalMinimapWrapper.pack()
 
         return externalMinimapWrapper
     }
 
-    /** @return Layout table for the little green map overlay toggle buttons, show to the left of the minimap. */
+    /** @return Layout table for the map overlay controls shown to the left of the minimap. */
     private fun getToggleIcons(minimapHeight: Float): Table {
         val toggleIconTable = Table()
 

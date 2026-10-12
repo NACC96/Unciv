@@ -6,6 +6,7 @@ import com.unciv.logic.city.City
 import com.unciv.logic.civilization.Civilization
 import com.unciv.models.TutorialTrigger
 import com.unciv.ui.images.ImageGetter
+import com.unciv.ui.screens.worldscreen.WorldScreenStyle
 
 /**
  *  Bottom-most decoration showing zero or more icons
@@ -50,5 +51,10 @@ internal class StatusTable(
             val wltkdImage = ImageGetter.getImage("OtherIcons/WLTKD")
             add(wltkdImage).size(iconSize)
         }
+
+        // Existing status art stays intact; a quiet backing separates it from busy terrain.
+        if (cells.size > 0)
+            background = WorldScreenStyle.background("WorldScreen/CityButton/StatusTable",
+                WorldScreenStyle.surface.cpy().apply { a = 0.9f })
     }
 }

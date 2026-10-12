@@ -11,12 +11,14 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.ui.TextField
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener
+import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.Timer
 import com.unciv.models.translations.tr
 import com.unciv.logic.agents.AgentRunState
 import com.unciv.ui.components.extensions.toLabel
-import com.unciv.ui.components.extensions.setFontSize
+import com.unciv.ui.components.GameUiStyle
+import com.unciv.ui.components.fonts.Fonts
 import com.unciv.ui.components.input.onClick
 import com.unciv.ui.components.widgets.AutoScrollPane
 import com.unciv.ui.components.widgets.UncivTextField
@@ -26,12 +28,11 @@ import com.unciv.ui.screens.overviewscreen.EmpireOverviewScreen
 import com.unciv.ui.screens.worldscreen.WorldScreen
 import com.unciv.ui.screens.worldscreen.WorldScreenStyle
 import com.unciv.ui.screens.worldscreen.status.AgentActivityAppearance
-import com.unciv.ui.screens.worldscreen.status.AgentActivityGlass
 import com.unciv.view.GameView
 
 /**
  * THESIS: Compare civilizations without leaving the live map.
- * OWN-WORLD: Inherit the world HUD's charcoal glass, off-white type and stable agent accents.
+ * OWN-WORLD: Inherit the world HUD's charcoal surface, off-white type and stable agent accents.
  * STORY: Sort nations, select one, inspect accurate stats; preserve human information limits.
  * FIRST VIEWPORT: Movable right-side panel, compact comparison above selected-nation details.
  * FORM: Local HUD extension, specified floating panel; no new visual identity.
@@ -42,8 +43,7 @@ class CivilizationOverviewPanel(private val screen: WorldScreen) : Table(BaseScr
         SCORE("Score", { it.score }), CITIES("Cities", { it.cities }), POPULATION("Pop.", { it.population }),
         GOLD("Gold", { it.gold }), SCIENCE("Science", { it.science })
     }
-    private val glass = AgentActivityGlass(this)
-    private val status = "".toLabel(WorldScreenStyle.muted, 11)
+    private val status = "".toLabel(WorldScreenStyle.muted, 11).apply { wrap = true }
     private val rows = Table(skin)
     private val details = Table(skin)
     private val rowScroll = AutoScrollPane(rows, skin)
@@ -73,12 +73,12 @@ class CivilizationOverviewPanel(private val screen: WorldScreen) : Table(BaseScr
     }
 
     init {
-        background = glass
+        background = WorldScreenStyle.panelBackground("WorldScreen/Overview")
         touchable = Touchable.enabled
         pad(14f)
         val header = Table(skin).apply { touchable = Touchable.enabled }
-        header.add("Civilizations".toLabel(WorldScreenStyle.ink, 19)).left().expandX()
-        header.add("Drag to move".toLabel(WorldScreenStyle.muted, 10)).padRight(12f)
+        header.add("Civilizations".toLabel(WorldScreenStyle.ink, 17)).left().expandX()
+        header.add(WorldScreenStyle.dragGrip()).padRight(12f)
         val close = Button(skin).apply {
             WorldScreenStyle.apply(this)
             pad(4f)
@@ -203,11 +203,22 @@ class CivilizationOverviewPanel(private val screen: WorldScreen) : Table(BaseScr
         val nameWidth = (width - 44f - columns.size * metricWidth).coerceAtLeast(90f)
         val tableWidth = nameWidth + columns.size * metricWidth
         val headings = Table(skin)
-        headings.add(label("${visible.size} civilizations", WorldScreenStyle.muted, 10)).width(nameWidth).left()
+        headings.add(label("${visible.size} civilizations", WorldScreenStyle.muted, GameUiStyle.Type.caption)).width(nameWidth).left()
         for (column in columns) {
-            val title = column.title + if (sort == column) (if (ascending) " ↑" else " ↓") else ""
-            val heading = WorldScreenStyle.button(title).apply { pad(6f, 2f, 6f, 2f) }
-            heading.label.setFontSize(11)
+            val arrowText = when {
+                sort != column -> ""
+                ascending -> Fonts.sortUpArrow.toString()
+                else -> Fonts.sortDownArrow.toString()
+            }
+            val arrow = label(arrowText, WorldScreenStyle.selection, GameUiStyle.Type.caption)
+            val heading = WorldScreenStyle.button(column.title, size = GameUiStyle.ButtonSize.Compact)
+            heading.isChecked = sort == column
+            // A fixed arrow slot keeps widths stable; titles share the values' right edge.
+            heading.clearChildren()
+            heading.add(arrow).width(SORT_ARROW_WIDTH).right()
+            heading.label.setAlignment(Align.right)
+            heading.add(heading.label).growX().right()
+            heading.pad(6f, 0f, 6f, METRIC_RIGHT_PAD)
             heading.onClick { if (sort == column) ascending = !ascending else { sort = column; ascending = false }; rebuild() }
             headings.add(heading).width(metricWidth).height(26f)
         }
@@ -227,10 +238,19 @@ class CivilizationOverviewPanel(private val screen: WorldScreen) : Table(BaseScr
             val color = AgentActivityAppearance.color(screen.gameInfo, civ.id)
             names.add(label(civ.id, color, 13).apply { setEllipsis(true) }).growX().left().row()
             val subtitle = when { civ.defeated -> "Defeated"; civ.active -> "${stateName()} · ${civ.agentName ?: civ.controller}"; else -> civ.agentName ?: civ.controller }
-            names.add(label(subtitle, WorldScreenStyle.muted, 10).apply { setEllipsis(true) }).growX().left()
+            names.add(label(subtitle, WorldScreenStyle.muted, GameUiStyle.Type.caption).apply { setEllipsis(true) }).growX().left()
             identity.add(names).growX()
             button.add(identity).width(nameWidth).left()
-            for (column in columns) button.add(label(sortValue(civ, column))).width(metricWidth).center()
+            for (column in columns) {
+                val color = when {
+                    column.value(civ) == null -> WorldScreenStyle.muted
+                    column == sort -> WorldScreenStyle.selection
+                    else -> WorldScreenStyle.ink
+                }
+                // The cell sizes the label, so the text itself must be right-aligned to match the headings.
+                button.add(label(sortValue(civ, column), color).apply { setAlignment(Align.right) })
+                    .width(metricWidth - METRIC_RIGHT_PAD).padRight(METRIC_RIGHT_PAD)
+            }
             rows.add(button).width(tableWidth).padTop(3f).row()
         }
         if (visible.isEmpty()) rows.add(label("No civilizations match this filter.", WorldScreenStyle.muted)).width(tableWidth).padTop(18f)
@@ -249,6 +269,8 @@ class CivilizationOverviewPanel(private val screen: WorldScreen) : Table(BaseScr
         details.clearChildren()
         if (civ == null) return
         val w = width - 40f
+        details.add(ImageGetter.getWhiteDot().apply { color = WorldScreenStyle.hover }).width(w).height(1f)
+            .padBottom(12f).row()
         val accent = AgentActivityAppearance.color(screen.gameInfo, civ.id)
         fun line(text: String, color: Color = WorldScreenStyle.muted, size: Int = 12, top: Float = 4f) {
             details.add(label(text, color, size).apply { wrap = true }).width(w).left().padTop(top).row()
@@ -267,7 +289,7 @@ class CivilizationOverviewPanel(private val screen: WorldScreen) : Table(BaseScr
         val count = if (compact) 2 else 3
         for ((index, metric) in values.withIndex()) {
             val cell = Table(skin)
-            cell.add(label(metric.first, WorldScreenStyle.muted, 10)).left().row()
+            cell.add(label(metric.first, WorldScreenStyle.muted, GameUiStyle.Type.caption)).left().row()
             cell.add(label(metric.second, WorldScreenStyle.ink, 13)).left().padTop(2f)
             metrics.add(cell).width(w / count).left().padTop(10f)
             if ((index + 1) % count == 0) metrics.row()
@@ -316,7 +338,11 @@ class CivilizationOverviewPanel(private val screen: WorldScreen) : Table(BaseScr
         if (disposed) return
         disposed = true
         refreshTask.cancel()
-        glass.dispose()
         remove()
+    }
+
+    private companion object {
+        const val SORT_ARROW_WIDTH = 9f
+        const val METRIC_RIGHT_PAD = 8f
     }
 }
