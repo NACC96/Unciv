@@ -46,6 +46,13 @@ internal class DisplayTab(
         addTileSetSelectBox()
         addUnitSetSelectBox()
         addSkinSelectBox()
+        addEnumAsStringSelectBox("Unit animation", settings::unitAnimationMode,
+            com.unciv.ui.screens.worldscreen.presentation.WorldVisualTimeline.Mode.entries) {
+            if (GUI.isWorldLoaded()) GUI.getWorldScreen().resetVisualPlayback()
+        }
+        addCheckbox("Follow visible actions", settings::followVisibleActions) {
+            if (GUI.isWorldLoaded()) GUI.getWorldScreen().resetVisualPlayback()
+        }
 
         addHeader("UI")
 

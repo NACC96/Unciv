@@ -11,6 +11,7 @@ import com.unciv.ui.images.ImageGetter
 class UnitSpriteSlot {
     val spriteGroup = NonTransformGroup()
     var currentImageLocation = ""
+    var unitId: Int? = null
 }
 
 class TileLayerUnitSprite(tileGroup: TileGroup, size: Float) : TileLayer(tileGroup, size) {
@@ -18,12 +19,41 @@ class TileLayerUnitSprite(tileGroup: TileGroup, size: Float) : TileLayer(tileGro
     // Slots are only filled if units exist, and images for those units exist
     private var civilianSlot: UnitSpriteSlot? = null
     private var militarySlot: UnitSpriteSlot? = null
+    private val visualMasks = HashMap<Int, Int>()
+    private var maskGeneration = 0L
+
+    fun visibleUnitIds(): List<Int> = listOfNotNull(civilianSlot?.unitId, militarySlot?.unitId)
+
+    /** Hide only this committed sprite slot. Unit flags, tile hit targets and selection remain authoritative. */
+    fun maskForVisual(unitId: Int): AutoCloseable? {
+        if (civilianSlot?.unitId != unitId && militarySlot?.unitId != unitId) return null
+        val generation = maskGeneration
+        visualMasks[unitId] = (visualMasks[unitId] ?: 0) + 1
+        applyVisualMasks()
+        var released = false
+        return AutoCloseable {
+            if (!released) {
+                released = true
+                if (generation == maskGeneration) {
+                    val remaining = (visualMasks[unitId] ?: 1) - 1
+                    if (remaining <= 0) visualMasks.remove(unitId) else visualMasks[unitId] = remaining
+                    applyVisualMasks()
+                }
+            }
+        }
+    }
+
+    private fun applyVisualMasks() {
+        for (slot in listOfNotNull(civilianSlot, militarySlot))
+            slot.spriteGroup.isVisible = isVisible && (visualMasks[slot.unitId] ?: 0) == 0
+    }
 
 
     fun getSpriteSlot(unit: MapUnit) = if (unit.isCivilian()) civilianSlot else militarySlot
 
     private fun updateSlot(currentSlot: UnitSpriteSlot?, unitView: ForeignMapUnitView?, isShown: Boolean): UnitSpriteSlot? {
 
+        currentSlot?.unitId = unitView?.id
         var location = ""
         var nationName = ""
 
@@ -48,6 +78,7 @@ class TileLayerUnitSprite(tileGroup: TileGroup, size: Float) : TileLayer(tileGro
             spriteGroup.setSize(size, size)
             addOwnedActor(spriteGroup)
         }
+        slot.unitId = unitView!!.id
         slot.currentImageLocation = "$nationName$location"
         slot.spriteGroup.clear()
 
@@ -85,9 +116,12 @@ class TileLayerUnitSprite(tileGroup: TileGroup, size: Float) : TileLayer(tileGro
 
     override fun determineVisibility() {
         isVisible = civilianSlot != null || militarySlot != null
+        applyVisualMasks()
     }
 
     fun reset() {
+        maskGeneration++
+        visualMasks.clear()
         civilianSlot?.spriteGroup?.let { removeOwnedActor(it) }
         militarySlot?.spriteGroup?.let { removeOwnedActor(it) }
         civilianSlot = null

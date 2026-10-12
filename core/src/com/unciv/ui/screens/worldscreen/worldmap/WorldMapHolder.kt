@@ -13,6 +13,9 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.math.Interpolation
+import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.math.Rectangle
+import com.unciv.logic.presentation.VisualPosition
 import com.badlogic.gdx.scenes.scene2d.*
 import com.unciv.UncivGame
 import com.unciv.logic.city.City
@@ -55,6 +58,72 @@ class WorldMapHolder(
 ) : ZoomableScrollPane(20f, 20f) {
     internal var selectedTile: TileView? = null
     val tileGroups = HashMap<TileView, WorldTileGroup>()
+    private val visualTiles = HashMap<VisualPosition, WorldTileGroup>()
+    private val visualUnitTiles = HashMap<Int, WorldTileGroup>()
+    var visualManualInputSerial = 0L
+        private set
+    private val visualViewport = Rectangle()
+
+    private fun manualVisualInput() { visualManualInputSerial++ }
+
+    fun rebuildVisualUnitIndex() {
+        visualUnitTiles.clear()
+        for (tile in tileGroups.values) for (id in tile.layerUnitArt.visibleUnitIds()) visualUnitTiles[id] = tile
+    }
+
+    fun visualUnitTile(unitId: Int): WorldTileGroup? = visualUnitTiles[unitId]?.takeIf {
+        isVisualTileVisible(VisualPosition(it.tileView.position().x, it.tileView.position().y)) &&
+            worldScreen.getGameViewConsideringForOfWar().getTile(it.tileView).getVisibleUnits().any { unit -> unit.id == unitId }
+    }
+
+    fun visualTile(position: VisualPosition): WorldTileGroup? = visualTiles[position]?.takeIf { isVisualTileVisible(position) }
+
+    fun isVisualTileVisible(position: VisualPosition): Boolean {
+        val tile = visualTiles[position] ?: return false
+        val view = worldScreen.getGameViewConsideringForOfWar()
+        val tileView = view.getTile(tile.tileView)
+        return tileView.isForceVisible() || view.civView.isSpectator() || view.civView.canSeeTile(tileView)
+    }
+
+    fun visualPoint(position: VisualPosition, relativeTo: Vector2? = null): Vector2? {
+        val tile = visualTile(position) ?: return null
+        val point = Vector2(tile.x, tile.y)
+        if (continuousScrollingX && tileGroupMap.width > 0f) {
+            val referenceX = relativeTo?.x ?: run { getViewport(visualViewport); visualViewport.x + visualViewport.width / 2f }
+            val width = tileGroupMap.width
+            while (point.x - referenceX > width / 2f) point.x -= width
+            while (referenceX - point.x > width / 2f) point.x += width
+        }
+        return point
+    }
+
+    fun isVisualOnScreen(position: VisualPosition): Boolean {
+        val point = visualPoint(position) ?: return false
+        getViewport(visualViewport)
+        return visualViewport.overlaps(Rectangle(point.x - 25f, point.y - 25f, 104f, 104f))
+    }
+
+    /** Conservative corridor check; projectile feedback never draws a route over an unseen tile. */
+    fun canDrawVisualProjectile(source: VisualPosition, target: VisualPosition): Boolean {
+        val from = visualTile(source)?.tileView?.getTile() ?: return false
+        val to = visualTile(target)?.tileView?.getTile() ?: return false
+        val distance = from.aerialDistanceTo(to)
+        if (distance > 10) return false
+        return from.getTilesInDistance(distance).all { isVisualTileVisible(VisualPosition(it.position.x, it.position.y)) }
+    }
+
+    fun addVisualActor(actor: Actor) { actor.touchable = Touchable.disabled; tileGroupMap.addActor(actor) }
+
+    /** Camera-only movement: never changes selected tile/unit or adds a gameplay highlight. */
+    fun followVisual(position: VisualPosition, delta: Float) {
+        if (isPanning || isZooming()) return
+        val point = visualPoint(position) ?: return
+        val amount = (delta * 8f).coerceIn(0f, 1f)
+        scrollX += (point.x + 27f - scrollX) * amount
+        scrollY += (maxY - point.y - 27f - scrollY) * amount
+        updateVisualScroll(); updateCulling(); onViewportChanged()
+    }
+
 
     /** Holds buttons created by [OverlayButtonData] implementations */
     internal val unitActionOverlays: ArrayList<Actor> = ArrayList()
@@ -71,6 +140,14 @@ class WorldMapHolder(
         if (Gdx.app.type == Application.ApplicationType.Desktop) this.setFlingTime(0f)
         continuousScrollingX = tileMap.mapParameters.worldWrap
         setupZoomPanListeners()
+        addCaptureListener(object : InputListener() {
+            override fun touchDown(event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int): Boolean {
+                manualVisualInput(); return false
+            }
+            override fun scrolled(event: InputEvent?, x: Float, y: Float, amountX: Float, amountY: Float): Boolean {
+                manualVisualInput(); return false
+            }
+        })
     }
 
     /**
@@ -91,9 +168,9 @@ class WorldMapHolder(
             tileGroupMap.shouldHit = isEnabled
         }
 
-        onPanStartListener = { setActHit() }
+        onPanStartListener = { manualVisualInput(); setActHit() }
         onPanStopListener = { setActHit() }
-        onZoomStartListener = { setActHit() }
+        onZoomStartListener = { manualVisualInput(); setActHit() }
         onZoomStopListener = { setActHit() }
     }
 
@@ -106,10 +183,16 @@ class WorldMapHolder(
         // the map holds a NEW object graph, and stale TileView keys would
         // keep orphaned groups alive here.
         tileGroups.clear()
+        visualTiles.clear()
+        visualUnitTiles.clear()
         val tileGroupsNew = tileMap.values.map { WorldTileGroup(tileMapView.getTile(it), tileSetStrings) }
         tileGroupMap = TileGroupMap(this, tileGroupsNew, continuousScrollingX)
 
-        for (tileGroup in tileGroupsNew) tileGroups[tileGroup.tileView] = tileGroup
+        for (tileGroup in tileGroupsNew) {
+            tileGroups[tileGroup.tileView] = tileGroup
+            val position = tileGroup.tileView.position()
+            visualTiles[VisualPosition(position.x, position.y)] = tileGroup
+        }
 
         addClickListener()
 
@@ -128,6 +211,7 @@ class WorldMapHolder(
      * and is preserved.
      */
     internal fun rebindToSnapshot(newTileMap: TileMap) {
+        worldScreen.reconcileVisualActors()
         val oldScrollX = scrollX
         val oldScrollY = scrollY
         val oldZoom = scaleX
@@ -403,7 +487,7 @@ class WorldMapHolder(
 
                     worldScreen.shouldUpdate = true
 
-                    if (pathToTile != null) {
+                    if (pathToTile != null && !worldScreen.usesSharedVisualPlayback()) {
                         val tileToMoveToView = tileMapView.getTile(tileToMoveTo)
                         val pathToTileViews = pathToTile.map { tileMapView.getTile(it) }
                         animateMovement(previousTileView, selectedUnitView, tileToMoveToView, pathToTileViews)
@@ -807,6 +891,7 @@ class WorldMapHolder(
     }
 
     override fun restrictX(deltaX: Float): Float {
+        if (deltaX != 0f) manualVisualInput()
         var result = scrollX - deltaX
         if (worldScreen.selectedGameView.spectatorMode) return result
 
@@ -826,6 +911,7 @@ class WorldMapHolder(
     }
 
     override fun restrictY(deltaY: Float): Float {
+        if (deltaY != 0f) manualVisualInput()
         var result = scrollY + deltaY
         if (worldScreen.selectedGameView.spectatorMode) return result
 

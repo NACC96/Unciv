@@ -148,9 +148,12 @@ object BattleTableHelpers {
         attacker: CombatantView, damageToAttacker: Int,
         defender: CombatantView, damageToDefender: Int
     ){
+        if (usesSharedVisualPlayback()) return
         // This ensures that we schedule the animation to happen AFTER the worldscreen.update(),
         //    where the spriteGroup of the attacker is created on the tile it moves to
-        Concurrency.runOnGLThread { battleAnimation(attacker, damageToAttacker, defender, damageToDefender) }
+        Concurrency.runOnGLThread {
+            if (!usesSharedVisualPlayback()) battleAnimation(attacker, damageToAttacker, defender, damageToDefender)
+        }
     }
 
     private fun WorldScreen.battleAnimation(

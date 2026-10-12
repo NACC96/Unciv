@@ -19,6 +19,7 @@ import com.unciv.logic.agents.AgentSnapshotPublication
 import com.unciv.logic.agents.ResolvedSelection
 import com.unciv.view.GameView
 import com.unciv.view.VisualEventProjector
+import com.unciv.ui.screens.worldscreen.presentation.WorldVisualTimeline
 import com.unciv.logic.presentation.*
 import java.util.concurrent.atomic.AtomicLong
 import java.util.concurrent.atomic.AtomicReference
@@ -197,6 +198,16 @@ class WorldScreen(
     /** Desktop installs one asynchronous callback; never perform host work inline on the GL thread. */
     @Volatile var visualViewChangedListener: (() -> Unit)? = null
 
+    private val visualTimelineDelegate = lazy { WorldVisualTimeline(this) }
+    val visualTimeline: WorldVisualTimeline get() = visualTimelineDelegate.value
+
+    fun usesSharedVisualPlayback(): Boolean = agentSession != null || ordinaryVisualSession != null
+
+    /** GL-only cleanup, without forcing a cache or timeline to initialize on an unused/hidden screen. */
+    fun reconcileVisualActors() {
+        if (visualTimelineDelegate.isInitialized()) visualTimeline.reconcile()
+    }
+
     fun currentVisualViewKey(): VisualViewKey = visualView
     fun isVisualTransportAvailable(): Boolean = !visualDisposed && !visualSuspended
 
@@ -216,6 +227,7 @@ class WorldScreen(
 
     /** Skip/resize clear queued work and start capture from the current committed state. GL thread only. */
     fun resetVisualPlayback() {
+        reconcileVisualActors()
         invalidateVisualAuthority()
         if (agentSession == null) installOrdinaryCapture()
         visualViewChangedListener?.invoke()
@@ -612,12 +624,14 @@ class WorldScreen(
     }
 
     override fun hide() {
+        reconcileVisualActors()
         suspendVisuals()
         visualViewChangedListener?.invoke()
         super.hide()
     }
 
     override fun dispose() {
+        if (visualTimelineDelegate.isInitialized()) visualTimeline.dispose()
         visualDisposed = true
         suspendVisuals()
         visualViewChangedListener = null
@@ -814,6 +828,7 @@ class WorldScreen(
         // it causes a bug when we move a unit to an unexplored tile (for instance a cavalry unit which can move far)
 
         mapHolder.updateTiles(getGameViewConsideringForOfWar().civView)
+        mapHolder.rebuildVisualUnitIndex()
 
         topBar.update(selectedCiv)
         civilizationOverview?.takeIf { it.isVisible }?.refresh()
@@ -1238,6 +1253,7 @@ class WorldScreen(
                 Gdx.input.inputProcessor = stage
         }
 
+        visualTimeline.advance(delta)
         super.render(delta)
     }
 

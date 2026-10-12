@@ -81,6 +81,10 @@ class GameSettings {
     var showResourcesAndImprovements = true
     var showPixelImprovements = true
     var unitIconOpacity = 1f // default corresponds to fully opaque
+    /** Local display preferences only; unknown animation values fall back to Normal. */
+    var unitAnimationMode: String = "Normal"
+    var followVisibleActions: Boolean = false
+    var appearanceVersion: Int = 0
 
     //// Performance
     var continuousRendering = false
