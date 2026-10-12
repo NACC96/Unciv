@@ -1,19 +1,95 @@
 {
-"schemaVersion": 1,
-"unitName": "Dromon",
-"assetId": "dromon",
-"reviewState": "missing",
-"canvasWidth": 128,
-"canvasHeight": 128,
-"anchorX": 64,
-"anchorY": 96,
-"clippingMargin": 2,
-"uniqueUnitIdentity": "Dromon",
-"uniqueTo": "Byzantium",
-"replaces": "Trireme",
-"staticFallbackKey": "TileSets/AtlasUnits/Units/Dromon",
-"framesDirectory": "frames/",
-"applicableStates": [ "IDLE", "MOVE", "ATTACK", "HIT", "DEFEAT" ],
-"facings": [ "E", "NE", "NW", "W", "SW", "SE" ],
-"minimumFrames": { "IDLE": 4, "MOVE": 8, "ATTACK": 8, "HIT": 4, "DEFEAT": 8 }
+  "schemaVersion": 1,
+  "unitName": "Dromon",
+  "assetId": "dromon",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": "Dromon",
+  "uniqueTo": "Byzantium",
+  "replaces": "Trireme",
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Dromon",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/dromon/e-motion-v2.png",
+      "rawHash": "c75db1251d0a64ffa0a68c3598cdf2006e4ebff9168f8136a7e86555d97c54d6",
+      "promptPath": "art/atlas/units/dromon/prompts/e-v2.txt",
+      "promptHash": "f62b6c2aeada4bb71eb5d42020fb503cf74859be252aad4af2e2a31368013a04",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/dromon/ne-motion-v2.png",
+      "rawHash": "c3c6f1a0c5eafcc11985ba2a304cde2d7aee720a7168122c21673de32a9c0c0f",
+      "promptPath": "art/atlas/units/dromon/prompts/ne-v2.txt",
+      "promptHash": "9bc672837a94a11b644df7728e00c8b47b118bfc280bd1e4219f2681a3710207",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/dromon/se-motion-v2.png",
+      "rawHash": "f50bed90fe882bb86ec960b9fcde934f0607da38d8ded76ac2e7c87c5299db74",
+      "promptPath": "art/atlas/units/dromon/prompts/se-v2.txt",
+      "promptHash": "032189b4ca0782110a32eff7880747535d10db954151ebb6575c988a3b6000fc",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
 }
