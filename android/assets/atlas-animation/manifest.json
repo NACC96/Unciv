@@ -1,19 +1,8350 @@
 {
-  "schemaVersion": 1,
-  "packing": {
-    "maxPageSize": 1024,
-    "padding": 2,
-    "duplicateEdges": true,
-    "mipmaps": true,
-    "filterMin": "MipMapLinearLinear",
-    "filterMag": "Linear"
-  },
-  "budgets": {
-    "desktopBytes": 134217728,
-    "otherBytes": 33554432,
-    "pendingUploadBytes": 8388608
-  },
-  "units": [],
-  "pages": [],
-  "clips": []
+"schemaVersion": 1,
+"packing": {
+	"maxPageSize": 1024,
+	"padding": 2,
+	"duplicateEdges": true,
+	"mipmaps": true,
+	"filterMin": "MipMapLinearLinear",
+	"filterMag": "Linear"
+},
+"budgets": { "desktopBytes": 134217728, "otherBytes": 33554432, "pendingUploadBytes": 8388608 },
+"units": [
+	{
+		"unitName": "Warrior",
+		"assetId": "warrior",
+		"canvasWidth": 128,
+		"canvasHeight": 128,
+		"anchorX": 64,
+		"anchorY": 96,
+		"staticLayers": [ "TileSets/AtlasUnits/Units/Warrior" ],
+		"maskKeys": [ "TileSets/AtlasUnits/Units/Warrior-1" ],
+		"shadowKey": null,
+		"clippingMargin": 2,
+		"uniqueUnitIdentity": null,
+		"applicableStates": [ "IDLE", "MOVE", "ATTACK", "HIT", "DEFEAT" ]
+	}
+],
+"pages": [
+	{
+		"name": "warrior-attack-e-000-color",
+		"fileName": "warrior-attack-e-000-color.png",
+		"layerId": "color",
+		"width": 1024,
+		"height": 128,
+		"mipmaps": true,
+		"decodedBytes": 524288,
+		"gpuBytes": 699068
+	},
+	{
+		"name": "warrior-attack-e-000-mask-nation",
+		"fileName": "warrior-attack-e-000-mask-nation.png",
+		"layerId": "mask:nation",
+		"width": 1024,
+		"height": 128,
+		"mipmaps": true,
+		"decodedBytes": 524288,
+		"gpuBytes": 699068
+	},
+	{
+		"name": "warrior-attack-e-000-shadow",
+		"fileName": "warrior-attack-e-000-shadow.png",
+		"layerId": "shadow",
+		"width": 1024,
+		"height": 128,
+		"mipmaps": true,
+		"decodedBytes": 524288,
+		"gpuBytes": 699068
+	},
+	{
+		"name": "warrior-attack-ne-000-color",
+		"fileName": "warrior-attack-ne-000-color.png",
+		"layerId": "color",
+		"width": 1024,
+		"height": 128,
+		"mipmaps": true,
+		"decodedBytes": 524288,
+		"gpuBytes": 699068
+	},
+	{
+		"name": "warrior-attack-ne-000-mask-nation",
+		"fileName": "warrior-attack-ne-000-mask-nation.png",
+		"layerId": "mask:nation",
+		"width": 1024,
+		"height": 128,
+		"mipmaps": true,
+		"decodedBytes": 524288,
+		"gpuBytes": 699068
+	},
+	{
+		"name": "warrior-attack-ne-000-shadow",
+		"fileName": "warrior-attack-ne-000-shadow.png",
+		"layerId": "shadow",
+		"width": 1024,
+		"height": 128,
+		"mipmaps": true,
+		"decodedBytes": 524288,
+		"gpuBytes": 699068
+	},
+	{
+		"name": "warrior-attack-se-000-color",
+		"fileName": "warrior-attack-se-000-color.png",
+		"layerId": "color",
+		"width": 1024,
+		"height": 128,
+		"mipmaps": true,
+		"decodedBytes": 524288,
+		"gpuBytes": 699068
+	},
+	{
+		"name": "warrior-attack-se-000-mask-nation",
+		"fileName": "warrior-attack-se-000-mask-nation.png",
+		"layerId": "mask:nation",
+		"width": 1024,
+		"height": 128,
+		"mipmaps": true,
+		"decodedBytes": 524288,
+		"gpuBytes": 699068
+	},
+	{
+		"name": "warrior-attack-se-000-shadow",
+		"fileName": "warrior-attack-se-000-shadow.png",
+		"layerId": "shadow",
+		"width": 1024,
+		"height": 128,
+		"mipmaps": true,
+		"decodedBytes": 524288,
+		"gpuBytes": 699068
+	},
+	{
+		"name": "warrior-defeat-e-000-color",
+		"fileName": "warrior-defeat-e-000-color.png",
+		"layerId": "color",
+		"width": 1024,
+		"height": 128,
+		"mipmaps": true,
+		"decodedBytes": 524288,
+		"gpuBytes": 699068
+	},
+	{
+		"name": "warrior-defeat-e-000-mask-nation",
+		"fileName": "warrior-defeat-e-000-mask-nation.png",
+		"layerId": "mask:nation",
+		"width": 1024,
+		"height": 128,
+		"mipmaps": true,
+		"decodedBytes": 524288,
+		"gpuBytes": 699068
+	},
+	{
+		"name": "warrior-defeat-e-000-shadow",
+		"fileName": "warrior-defeat-e-000-shadow.png",
+		"layerId": "shadow",
+		"width": 1024,
+		"height": 128,
+		"mipmaps": true,
+		"decodedBytes": 524288,
+		"gpuBytes": 699068
+	},
+	{
+		"name": "warrior-defeat-ne-000-color",
+		"fileName": "warrior-defeat-ne-000-color.png",
+		"layerId": "color",
+		"width": 1024,
+		"height": 128,
+		"mipmaps": true,
+		"decodedBytes": 524288,
+		"gpuBytes": 699068
+	},
+	{
+		"name": "warrior-defeat-ne-000-mask-nation",
+		"fileName": "warrior-defeat-ne-000-mask-nation.png",
+		"layerId": "mask:nation",
+		"width": 1024,
+		"height": 128,
+		"mipmaps": true,
+		"decodedBytes": 524288,
+		"gpuBytes": 699068
+	},
+	{
+		"name": "warrior-defeat-ne-000-shadow",
+		"fileName": "warrior-defeat-ne-000-shadow.png",
+		"layerId": "shadow",
+		"width": 1024,
+		"height": 128,
+		"mipmaps": true,
+		"decodedBytes": 524288,
+		"gpuBytes": 699068
+	},
+	{
+		"name": "warrior-defeat-se-000-color",
+		"fileName": "warrior-defeat-se-000-color.png",
+		"layerId": "color",
+		"width": 1024,
+		"height": 128,
+		"mipmaps": true,
+		"decodedBytes": 524288,
+		"gpuBytes": 699068
+	},
+	{
+		"name": "warrior-defeat-se-000-mask-nation",
+		"fileName": "warrior-defeat-se-000-mask-nation.png",
+		"layerId": "mask:nation",
+		"width": 1024,
+		"height": 128,
+		"mipmaps": true,
+		"decodedBytes": 524288,
+		"gpuBytes": 699068
+	},
+	{
+		"name": "warrior-defeat-se-000-shadow",
+		"fileName": "warrior-defeat-se-000-shadow.png",
+		"layerId": "shadow",
+		"width": 1024,
+		"height": 128,
+		"mipmaps": true,
+		"decodedBytes": 524288,
+		"gpuBytes": 699068
+	},
+	{
+		"name": "warrior-hit-e-000-color",
+		"fileName": "warrior-hit-e-000-color.png",
+		"layerId": "color",
+		"width": 512,
+		"height": 128,
+		"mipmaps": true,
+		"decodedBytes": 262144,
+		"gpuBytes": 349532
+	},
+	{
+		"name": "warrior-hit-e-000-mask-nation",
+		"fileName": "warrior-hit-e-000-mask-nation.png",
+		"layerId": "mask:nation",
+		"width": 512,
+		"height": 128,
+		"mipmaps": true,
+		"decodedBytes": 262144,
+		"gpuBytes": 349532
+	},
+	{
+		"name": "warrior-hit-e-000-shadow",
+		"fileName": "warrior-hit-e-000-shadow.png",
+		"layerId": "shadow",
+		"width": 512,
+		"height": 128,
+		"mipmaps": true,
+		"decodedBytes": 262144,
+		"gpuBytes": 349532
+	},
+	{
+		"name": "warrior-hit-ne-000-color",
+		"fileName": "warrior-hit-ne-000-color.png",
+		"layerId": "color",
+		"width": 512,
+		"height": 128,
+		"mipmaps": true,
+		"decodedBytes": 262144,
+		"gpuBytes": 349532
+	},
+	{
+		"name": "warrior-hit-ne-000-mask-nation",
+		"fileName": "warrior-hit-ne-000-mask-nation.png",
+		"layerId": "mask:nation",
+		"width": 512,
+		"height": 128,
+		"mipmaps": true,
+		"decodedBytes": 262144,
+		"gpuBytes": 349532
+	},
+	{
+		"name": "warrior-hit-ne-000-shadow",
+		"fileName": "warrior-hit-ne-000-shadow.png",
+		"layerId": "shadow",
+		"width": 512,
+		"height": 128,
+		"mipmaps": true,
+		"decodedBytes": 262144,
+		"gpuBytes": 349532
+	},
+	{
+		"name": "warrior-hit-se-000-color",
+		"fileName": "warrior-hit-se-000-color.png",
+		"layerId": "color",
+		"width": 512,
+		"height": 128,
+		"mipmaps": true,
+		"decodedBytes": 262144,
+		"gpuBytes": 349532
+	},
+	{
+		"name": "warrior-hit-se-000-mask-nation",
+		"fileName": "warrior-hit-se-000-mask-nation.png",
+		"layerId": "mask:nation",
+		"width": 512,
+		"height": 128,
+		"mipmaps": true,
+		"decodedBytes": 262144,
+		"gpuBytes": 349532
+	},
+	{
+		"name": "warrior-hit-se-000-shadow",
+		"fileName": "warrior-hit-se-000-shadow.png",
+		"layerId": "shadow",
+		"width": 512,
+		"height": 128,
+		"mipmaps": true,
+		"decodedBytes": 262144,
+		"gpuBytes": 349532
+	},
+	{
+		"name": "warrior-idle-e-000-color",
+		"fileName": "warrior-idle-e-000-color.png",
+		"layerId": "color",
+		"width": 512,
+		"height": 128,
+		"mipmaps": true,
+		"decodedBytes": 262144,
+		"gpuBytes": 349532
+	},
+	{
+		"name": "warrior-idle-e-000-mask-nation",
+		"fileName": "warrior-idle-e-000-mask-nation.png",
+		"layerId": "mask:nation",
+		"width": 512,
+		"height": 128,
+		"mipmaps": true,
+		"decodedBytes": 262144,
+		"gpuBytes": 349532
+	},
+	{
+		"name": "warrior-idle-e-000-shadow",
+		"fileName": "warrior-idle-e-000-shadow.png",
+		"layerId": "shadow",
+		"width": 512,
+		"height": 128,
+		"mipmaps": true,
+		"decodedBytes": 262144,
+		"gpuBytes": 349532
+	},
+	{
+		"name": "warrior-idle-ne-000-color",
+		"fileName": "warrior-idle-ne-000-color.png",
+		"layerId": "color",
+		"width": 512,
+		"height": 128,
+		"mipmaps": true,
+		"decodedBytes": 262144,
+		"gpuBytes": 349532
+	},
+	{
+		"name": "warrior-idle-ne-000-mask-nation",
+		"fileName": "warrior-idle-ne-000-mask-nation.png",
+		"layerId": "mask:nation",
+		"width": 512,
+		"height": 128,
+		"mipmaps": true,
+		"decodedBytes": 262144,
+		"gpuBytes": 349532
+	},
+	{
+		"name": "warrior-idle-ne-000-shadow",
+		"fileName": "warrior-idle-ne-000-shadow.png",
+		"layerId": "shadow",
+		"width": 512,
+		"height": 128,
+		"mipmaps": true,
+		"decodedBytes": 262144,
+		"gpuBytes": 349532
+	},
+	{
+		"name": "warrior-idle-se-000-color",
+		"fileName": "warrior-idle-se-000-color.png",
+		"layerId": "color",
+		"width": 512,
+		"height": 128,
+		"mipmaps": true,
+		"decodedBytes": 262144,
+		"gpuBytes": 349532
+	},
+	{
+		"name": "warrior-idle-se-000-mask-nation",
+		"fileName": "warrior-idle-se-000-mask-nation.png",
+		"layerId": "mask:nation",
+		"width": 512,
+		"height": 128,
+		"mipmaps": true,
+		"decodedBytes": 262144,
+		"gpuBytes": 349532
+	},
+	{
+		"name": "warrior-idle-se-000-shadow",
+		"fileName": "warrior-idle-se-000-shadow.png",
+		"layerId": "shadow",
+		"width": 512,
+		"height": 128,
+		"mipmaps": true,
+		"decodedBytes": 262144,
+		"gpuBytes": 349532
+	},
+	{
+		"name": "warrior-move-e-000-color",
+		"fileName": "warrior-move-e-000-color.png",
+		"layerId": "color",
+		"width": 1024,
+		"height": 128,
+		"mipmaps": true,
+		"decodedBytes": 524288,
+		"gpuBytes": 699068
+	},
+	{
+		"name": "warrior-move-e-000-mask-nation",
+		"fileName": "warrior-move-e-000-mask-nation.png",
+		"layerId": "mask:nation",
+		"width": 1024,
+		"height": 128,
+		"mipmaps": true,
+		"decodedBytes": 524288,
+		"gpuBytes": 699068
+	},
+	{
+		"name": "warrior-move-e-000-shadow",
+		"fileName": "warrior-move-e-000-shadow.png",
+		"layerId": "shadow",
+		"width": 1024,
+		"height": 128,
+		"mipmaps": true,
+		"decodedBytes": 524288,
+		"gpuBytes": 699068
+	},
+	{
+		"name": "warrior-move-ne-000-color",
+		"fileName": "warrior-move-ne-000-color.png",
+		"layerId": "color",
+		"width": 1024,
+		"height": 128,
+		"mipmaps": true,
+		"decodedBytes": 524288,
+		"gpuBytes": 699068
+	},
+	{
+		"name": "warrior-move-ne-000-mask-nation",
+		"fileName": "warrior-move-ne-000-mask-nation.png",
+		"layerId": "mask:nation",
+		"width": 1024,
+		"height": 128,
+		"mipmaps": true,
+		"decodedBytes": 524288,
+		"gpuBytes": 699068
+	},
+	{
+		"name": "warrior-move-ne-000-shadow",
+		"fileName": "warrior-move-ne-000-shadow.png",
+		"layerId": "shadow",
+		"width": 1024,
+		"height": 128,
+		"mipmaps": true,
+		"decodedBytes": 524288,
+		"gpuBytes": 699068
+	},
+	{
+		"name": "warrior-move-se-000-color",
+		"fileName": "warrior-move-se-000-color.png",
+		"layerId": "color",
+		"width": 1024,
+		"height": 128,
+		"mipmaps": true,
+		"decodedBytes": 524288,
+		"gpuBytes": 699068
+	},
+	{
+		"name": "warrior-move-se-000-mask-nation",
+		"fileName": "warrior-move-se-000-mask-nation.png",
+		"layerId": "mask:nation",
+		"width": 1024,
+		"height": 128,
+		"mipmaps": true,
+		"decodedBytes": 524288,
+		"gpuBytes": 699068
+	},
+	{
+		"name": "warrior-move-se-000-shadow",
+		"fileName": "warrior-move-se-000-shadow.png",
+		"layerId": "shadow",
+		"width": 1024,
+		"height": 128,
+		"mipmaps": true,
+		"decodedBytes": 524288,
+		"gpuBytes": 699068
+	}
+],
+"clips": [
+	{
+		"unitName": "Warrior",
+		"state": "ATTACK",
+		"facing": "E",
+		"frames": [
+			{
+				"color": {
+					"pageName": "warrior-attack-e-000-color",
+					"regionName": "warrior-attack-e-0000",
+					"x": 2,
+					"y": 2,
+					"width": 78,
+					"height": 95
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-attack-e-000-mask-nation",
+							"regionName": "warrior-attack-e-0000",
+							"x": 2,
+							"y": 2,
+							"width": 78,
+							"height": 95
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-attack-e-000-shadow",
+					"regionName": "warrior-attack-e-0000",
+					"x": 2,
+					"y": 2,
+					"width": 78,
+					"height": 95
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 24,
+				"trimY": 9,
+				"anchorX": 40,
+				"anchorY": 87
+			},
+			{
+				"color": {
+					"pageName": "warrior-attack-e-000-color",
+					"regionName": "warrior-attack-e-0001",
+					"x": 84,
+					"y": 2,
+					"width": 82,
+					"height": 102
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-attack-e-000-mask-nation",
+							"regionName": "warrior-attack-e-0001",
+							"x": 84,
+							"y": 2,
+							"width": 82,
+							"height": 102
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-attack-e-000-shadow",
+					"regionName": "warrior-attack-e-0001",
+					"x": 84,
+					"y": 2,
+					"width": 82,
+					"height": 102
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 21,
+				"trimY": 2,
+				"anchorX": 43,
+				"anchorY": 94
+			},
+			{
+				"color": {
+					"pageName": "warrior-attack-e-000-color",
+					"regionName": "warrior-attack-e-0002",
+					"x": 170,
+					"y": 2,
+					"width": 81,
+					"height": 102
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-attack-e-000-mask-nation",
+							"regionName": "warrior-attack-e-0002",
+							"x": 170,
+							"y": 2,
+							"width": 81,
+							"height": 102
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-attack-e-000-shadow",
+					"regionName": "warrior-attack-e-0002",
+					"x": 170,
+					"y": 2,
+					"width": 81,
+					"height": 102
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 20,
+				"trimY": 2,
+				"anchorX": 44,
+				"anchorY": 94
+			},
+			{
+				"color": {
+					"pageName": "warrior-attack-e-000-color",
+					"regionName": "warrior-attack-e-0003",
+					"x": 255,
+					"y": 2,
+					"width": 88,
+					"height": 102
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-attack-e-000-mask-nation",
+							"regionName": "warrior-attack-e-0003",
+							"x": 255,
+							"y": 2,
+							"width": 88,
+							"height": 102
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-attack-e-000-shadow",
+					"regionName": "warrior-attack-e-0003",
+					"x": 255,
+					"y": 2,
+					"width": 88,
+					"height": 102
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 19,
+				"trimY": 2,
+				"anchorX": 45,
+				"anchorY": 94
+			},
+			{
+				"color": {
+					"pageName": "warrior-attack-e-000-color",
+					"regionName": "warrior-attack-e-0004",
+					"x": 347,
+					"y": 2,
+					"width": 95,
+					"height": 83
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-attack-e-000-mask-nation",
+							"regionName": "warrior-attack-e-0004",
+							"x": 347,
+							"y": 2,
+							"width": 95,
+							"height": 83
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-attack-e-000-shadow",
+					"regionName": "warrior-attack-e-0004",
+					"x": 347,
+					"y": 2,
+					"width": 95,
+					"height": 83
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 21,
+				"trimY": 21,
+				"anchorX": 43,
+				"anchorY": 75
+			},
+			{
+				"color": {
+					"pageName": "warrior-attack-e-000-color",
+					"regionName": "warrior-attack-e-0005",
+					"x": 446,
+					"y": 2,
+					"width": 102,
+					"height": 74
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-attack-e-000-mask-nation",
+							"regionName": "warrior-attack-e-0005",
+							"x": 446,
+							"y": 2,
+							"width": 102,
+							"height": 74
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-attack-e-000-shadow",
+					"regionName": "warrior-attack-e-0005",
+					"x": 446,
+					"y": 2,
+					"width": 102,
+					"height": 74
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 13,
+				"trimY": 30,
+				"anchorX": 51,
+				"anchorY": 66
+			},
+			{
+				"color": {
+					"pageName": "warrior-attack-e-000-color",
+					"regionName": "warrior-attack-e-0006",
+					"x": 552,
+					"y": 2,
+					"width": 95,
+					"height": 98
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-attack-e-000-mask-nation",
+							"regionName": "warrior-attack-e-0006",
+							"x": 552,
+							"y": 2,
+							"width": 95,
+							"height": 98
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-attack-e-000-shadow",
+					"regionName": "warrior-attack-e-0006",
+					"x": 552,
+					"y": 2,
+					"width": 95,
+					"height": 98
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 13,
+				"trimY": 6,
+				"anchorX": 51,
+				"anchorY": 90
+			},
+			{
+				"color": {
+					"pageName": "warrior-attack-e-000-color",
+					"regionName": "warrior-attack-e-0007",
+					"x": 651,
+					"y": 2,
+					"width": 75,
+					"height": 93
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-attack-e-000-mask-nation",
+							"regionName": "warrior-attack-e-0007",
+							"x": 651,
+							"y": 2,
+							"width": 75,
+							"height": 93
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-attack-e-000-shadow",
+					"regionName": "warrior-attack-e-0007",
+					"x": 651,
+					"y": 2,
+					"width": 75,
+					"height": 93
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 27,
+				"trimY": 11,
+				"anchorX": 37,
+				"anchorY": 85
+			}
+		],
+		"anchorX": 64,
+		"anchorY": 96,
+		"staticFallbackKey": "TileSets/AtlasUnits/Units/Warrior",
+		"pageNames": [ "warrior-attack-e-000-color", "warrior-attack-e-000-mask-nation", "warrior-attack-e-000-shadow" ],
+		"mirroredFacing": null,
+		"looping": false,
+		"maskIds": [ "nation" ],
+		"hasShadow": true,
+		"decodedBytes": 1572864,
+		"decodedStagingBytes": 524288,
+		"gpuBytes": 2097204
+	},
+	{
+		"unitName": "Warrior",
+		"state": "ATTACK",
+		"facing": "NE",
+		"frames": [
+			{
+				"color": {
+					"pageName": "warrior-attack-ne-000-color",
+					"regionName": "warrior-attack-ne-0000",
+					"x": 2,
+					"y": 2,
+					"width": 85,
+					"height": 97
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-attack-ne-000-mask-nation",
+							"regionName": "warrior-attack-ne-0000",
+							"x": 2,
+							"y": 2,
+							"width": 85,
+							"height": 97
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-attack-ne-000-shadow",
+					"regionName": "warrior-attack-ne-0000",
+					"x": 2,
+					"y": 2,
+					"width": 85,
+					"height": 97
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 31,
+				"trimY": 7,
+				"anchorX": 33,
+				"anchorY": 89
+			},
+			{
+				"color": {
+					"pageName": "warrior-attack-ne-000-color",
+					"regionName": "warrior-attack-ne-0001",
+					"x": 91,
+					"y": 2,
+					"width": 81,
+					"height": 100
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-attack-ne-000-mask-nation",
+							"regionName": "warrior-attack-ne-0001",
+							"x": 91,
+							"y": 2,
+							"width": 81,
+							"height": 100
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-attack-ne-000-shadow",
+					"regionName": "warrior-attack-ne-0001",
+					"x": 91,
+					"y": 2,
+					"width": 81,
+					"height": 100
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 23,
+				"trimY": 4,
+				"anchorX": 41,
+				"anchorY": 92
+			},
+			{
+				"color": {
+					"pageName": "warrior-attack-ne-000-color",
+					"regionName": "warrior-attack-ne-0002",
+					"x": 176,
+					"y": 2,
+					"width": 75,
+					"height": 102
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-attack-ne-000-mask-nation",
+							"regionName": "warrior-attack-ne-0002",
+							"x": 176,
+							"y": 2,
+							"width": 75,
+							"height": 102
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-attack-ne-000-shadow",
+					"regionName": "warrior-attack-ne-0002",
+					"x": 176,
+					"y": 2,
+					"width": 75,
+					"height": 102
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 26,
+				"trimY": 2,
+				"anchorX": 38,
+				"anchorY": 94
+			},
+			{
+				"color": {
+					"pageName": "warrior-attack-ne-000-color",
+					"regionName": "warrior-attack-ne-0003",
+					"x": 255,
+					"y": 2,
+					"width": 83,
+					"height": 102
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-attack-ne-000-mask-nation",
+							"regionName": "warrior-attack-ne-0003",
+							"x": 255,
+							"y": 2,
+							"width": 83,
+							"height": 102
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-attack-ne-000-shadow",
+					"regionName": "warrior-attack-ne-0003",
+					"x": 255,
+					"y": 2,
+					"width": 83,
+					"height": 102
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 21,
+				"trimY": 2,
+				"anchorX": 43,
+				"anchorY": 94
+			},
+			{
+				"color": {
+					"pageName": "warrior-attack-ne-000-color",
+					"regionName": "warrior-attack-ne-0004",
+					"x": 342,
+					"y": 2,
+					"width": 94,
+					"height": 88
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-attack-ne-000-mask-nation",
+							"regionName": "warrior-attack-ne-0004",
+							"x": 342,
+							"y": 2,
+							"width": 94,
+							"height": 88
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-attack-ne-000-shadow",
+					"regionName": "warrior-attack-ne-0004",
+					"x": 342,
+					"y": 2,
+					"width": 94,
+					"height": 88
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 22,
+				"trimY": 16,
+				"anchorX": 42,
+				"anchorY": 80
+			},
+			{
+				"color": {
+					"pageName": "warrior-attack-ne-000-color",
+					"regionName": "warrior-attack-ne-0005",
+					"x": 440,
+					"y": 2,
+					"width": 102,
+					"height": 79
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-attack-ne-000-mask-nation",
+							"regionName": "warrior-attack-ne-0005",
+							"x": 440,
+							"y": 2,
+							"width": 102,
+							"height": 79
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-attack-ne-000-shadow",
+					"regionName": "warrior-attack-ne-0005",
+					"x": 440,
+					"y": 2,
+					"width": 102,
+					"height": 79
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 13,
+				"trimY": 25,
+				"anchorX": 51,
+				"anchorY": 71
+			},
+			{
+				"color": {
+					"pageName": "warrior-attack-ne-000-color",
+					"regionName": "warrior-attack-ne-0006",
+					"x": 546,
+					"y": 2,
+					"width": 103,
+					"height": 100
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-attack-ne-000-mask-nation",
+							"regionName": "warrior-attack-ne-0006",
+							"x": 546,
+							"y": 2,
+							"width": 103,
+							"height": 100
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-attack-ne-000-shadow",
+					"regionName": "warrior-attack-ne-0006",
+					"x": 546,
+					"y": 2,
+					"width": 103,
+					"height": 100
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 13,
+				"trimY": 4,
+				"anchorX": 51,
+				"anchorY": 92
+			},
+			{
+				"color": {
+					"pageName": "warrior-attack-ne-000-color",
+					"regionName": "warrior-attack-ne-0007",
+					"x": 653,
+					"y": 2,
+					"width": 98,
+					"height": 97
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-attack-ne-000-mask-nation",
+							"regionName": "warrior-attack-ne-0007",
+							"x": 653,
+							"y": 2,
+							"width": 98,
+							"height": 97
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-attack-ne-000-shadow",
+					"regionName": "warrior-attack-ne-0007",
+					"x": 653,
+					"y": 2,
+					"width": 98,
+					"height": 97
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 13,
+				"trimY": 7,
+				"anchorX": 51,
+				"anchorY": 89
+			}
+		],
+		"anchorX": 64,
+		"anchorY": 96,
+		"staticFallbackKey": "TileSets/AtlasUnits/Units/Warrior",
+		"pageNames": [
+			"warrior-attack-ne-000-color",
+			"warrior-attack-ne-000-mask-nation",
+			"warrior-attack-ne-000-shadow"
+		],
+		"mirroredFacing": null,
+		"looping": false,
+		"maskIds": [ "nation" ],
+		"hasShadow": true,
+		"decodedBytes": 1572864,
+		"decodedStagingBytes": 524288,
+		"gpuBytes": 2097204
+	},
+	{
+		"unitName": "Warrior",
+		"state": "ATTACK",
+		"facing": "NW",
+		"frames": [
+			{
+				"color": {
+					"pageName": "warrior-attack-ne-000-color",
+					"regionName": "warrior-attack-ne-0000",
+					"x": 2,
+					"y": 2,
+					"width": 85,
+					"height": 97
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-attack-ne-000-mask-nation",
+							"regionName": "warrior-attack-ne-0000",
+							"x": 2,
+							"y": 2,
+							"width": 85,
+							"height": 97
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-attack-ne-000-shadow",
+					"regionName": "warrior-attack-ne-0000",
+					"x": 2,
+					"y": 2,
+					"width": 85,
+					"height": 97
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 31,
+				"trimY": 7,
+				"anchorX": 33,
+				"anchorY": 89
+			},
+			{
+				"color": {
+					"pageName": "warrior-attack-ne-000-color",
+					"regionName": "warrior-attack-ne-0001",
+					"x": 91,
+					"y": 2,
+					"width": 81,
+					"height": 100
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-attack-ne-000-mask-nation",
+							"regionName": "warrior-attack-ne-0001",
+							"x": 91,
+							"y": 2,
+							"width": 81,
+							"height": 100
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-attack-ne-000-shadow",
+					"regionName": "warrior-attack-ne-0001",
+					"x": 91,
+					"y": 2,
+					"width": 81,
+					"height": 100
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 23,
+				"trimY": 4,
+				"anchorX": 41,
+				"anchorY": 92
+			},
+			{
+				"color": {
+					"pageName": "warrior-attack-ne-000-color",
+					"regionName": "warrior-attack-ne-0002",
+					"x": 176,
+					"y": 2,
+					"width": 75,
+					"height": 102
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-attack-ne-000-mask-nation",
+							"regionName": "warrior-attack-ne-0002",
+							"x": 176,
+							"y": 2,
+							"width": 75,
+							"height": 102
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-attack-ne-000-shadow",
+					"regionName": "warrior-attack-ne-0002",
+					"x": 176,
+					"y": 2,
+					"width": 75,
+					"height": 102
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 26,
+				"trimY": 2,
+				"anchorX": 38,
+				"anchorY": 94
+			},
+			{
+				"color": {
+					"pageName": "warrior-attack-ne-000-color",
+					"regionName": "warrior-attack-ne-0003",
+					"x": 255,
+					"y": 2,
+					"width": 83,
+					"height": 102
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-attack-ne-000-mask-nation",
+							"regionName": "warrior-attack-ne-0003",
+							"x": 255,
+							"y": 2,
+							"width": 83,
+							"height": 102
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-attack-ne-000-shadow",
+					"regionName": "warrior-attack-ne-0003",
+					"x": 255,
+					"y": 2,
+					"width": 83,
+					"height": 102
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 21,
+				"trimY": 2,
+				"anchorX": 43,
+				"anchorY": 94
+			},
+			{
+				"color": {
+					"pageName": "warrior-attack-ne-000-color",
+					"regionName": "warrior-attack-ne-0004",
+					"x": 342,
+					"y": 2,
+					"width": 94,
+					"height": 88
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-attack-ne-000-mask-nation",
+							"regionName": "warrior-attack-ne-0004",
+							"x": 342,
+							"y": 2,
+							"width": 94,
+							"height": 88
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-attack-ne-000-shadow",
+					"regionName": "warrior-attack-ne-0004",
+					"x": 342,
+					"y": 2,
+					"width": 94,
+					"height": 88
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 22,
+				"trimY": 16,
+				"anchorX": 42,
+				"anchorY": 80
+			},
+			{
+				"color": {
+					"pageName": "warrior-attack-ne-000-color",
+					"regionName": "warrior-attack-ne-0005",
+					"x": 440,
+					"y": 2,
+					"width": 102,
+					"height": 79
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-attack-ne-000-mask-nation",
+							"regionName": "warrior-attack-ne-0005",
+							"x": 440,
+							"y": 2,
+							"width": 102,
+							"height": 79
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-attack-ne-000-shadow",
+					"regionName": "warrior-attack-ne-0005",
+					"x": 440,
+					"y": 2,
+					"width": 102,
+					"height": 79
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 13,
+				"trimY": 25,
+				"anchorX": 51,
+				"anchorY": 71
+			},
+			{
+				"color": {
+					"pageName": "warrior-attack-ne-000-color",
+					"regionName": "warrior-attack-ne-0006",
+					"x": 546,
+					"y": 2,
+					"width": 103,
+					"height": 100
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-attack-ne-000-mask-nation",
+							"regionName": "warrior-attack-ne-0006",
+							"x": 546,
+							"y": 2,
+							"width": 103,
+							"height": 100
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-attack-ne-000-shadow",
+					"regionName": "warrior-attack-ne-0006",
+					"x": 546,
+					"y": 2,
+					"width": 103,
+					"height": 100
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 13,
+				"trimY": 4,
+				"anchorX": 51,
+				"anchorY": 92
+			},
+			{
+				"color": {
+					"pageName": "warrior-attack-ne-000-color",
+					"regionName": "warrior-attack-ne-0007",
+					"x": 653,
+					"y": 2,
+					"width": 98,
+					"height": 97
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-attack-ne-000-mask-nation",
+							"regionName": "warrior-attack-ne-0007",
+							"x": 653,
+							"y": 2,
+							"width": 98,
+							"height": 97
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-attack-ne-000-shadow",
+					"regionName": "warrior-attack-ne-0007",
+					"x": 653,
+					"y": 2,
+					"width": 98,
+					"height": 97
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 13,
+				"trimY": 7,
+				"anchorX": 51,
+				"anchorY": 89
+			}
+		],
+		"anchorX": 64,
+		"anchorY": 96,
+		"staticFallbackKey": "TileSets/AtlasUnits/Units/Warrior",
+		"pageNames": [
+			"warrior-attack-ne-000-color",
+			"warrior-attack-ne-000-mask-nation",
+			"warrior-attack-ne-000-shadow"
+		],
+		"mirroredFacing": "NE",
+		"looping": false,
+		"maskIds": [ "nation" ],
+		"hasShadow": true,
+		"decodedBytes": 1572864,
+		"decodedStagingBytes": 524288,
+		"gpuBytes": 2097204
+	},
+	{
+		"unitName": "Warrior",
+		"state": "ATTACK",
+		"facing": "SE",
+		"frames": [
+			{
+				"color": {
+					"pageName": "warrior-attack-se-000-color",
+					"regionName": "warrior-attack-se-0000",
+					"x": 2,
+					"y": 2,
+					"width": 81,
+					"height": 102
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-attack-se-000-mask-nation",
+							"regionName": "warrior-attack-se-0000",
+							"x": 2,
+							"y": 2,
+							"width": 81,
+							"height": 102
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-attack-se-000-shadow",
+					"regionName": "warrior-attack-se-0000",
+					"x": 2,
+					"y": 2,
+					"width": 81,
+					"height": 102
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 22,
+				"trimY": 2,
+				"anchorX": 42,
+				"anchorY": 94
+			},
+			{
+				"color": {
+					"pageName": "warrior-attack-se-000-color",
+					"regionName": "warrior-attack-se-0001",
+					"x": 87,
+					"y": 2,
+					"width": 86,
+					"height": 101
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-attack-se-000-mask-nation",
+							"regionName": "warrior-attack-se-0001",
+							"x": 87,
+							"y": 2,
+							"width": 86,
+							"height": 101
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-attack-se-000-shadow",
+					"regionName": "warrior-attack-se-0001",
+					"x": 87,
+					"y": 2,
+					"width": 86,
+					"height": 101
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 25,
+				"trimY": 3,
+				"anchorX": 39,
+				"anchorY": 93
+			},
+			{
+				"color": {
+					"pageName": "warrior-attack-se-000-color",
+					"regionName": "warrior-attack-se-0002",
+					"x": 177,
+					"y": 2,
+					"width": 90,
+					"height": 102
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-attack-se-000-mask-nation",
+							"regionName": "warrior-attack-se-0002",
+							"x": 177,
+							"y": 2,
+							"width": 90,
+							"height": 102
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-attack-se-000-shadow",
+					"regionName": "warrior-attack-se-0002",
+					"x": 177,
+					"y": 2,
+					"width": 90,
+					"height": 102
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 16,
+				"trimY": 2,
+				"anchorX": 48,
+				"anchorY": 94
+			},
+			{
+				"color": {
+					"pageName": "warrior-attack-se-000-color",
+					"regionName": "warrior-attack-se-0003",
+					"x": 271,
+					"y": 2,
+					"width": 98,
+					"height": 102
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-attack-se-000-mask-nation",
+							"regionName": "warrior-attack-se-0003",
+							"x": 271,
+							"y": 2,
+							"width": 98,
+							"height": 102
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-attack-se-000-shadow",
+					"regionName": "warrior-attack-se-0003",
+					"x": 271,
+					"y": 2,
+					"width": 98,
+					"height": 102
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 18,
+				"trimY": 2,
+				"anchorX": 46,
+				"anchorY": 94
+			},
+			{
+				"color": {
+					"pageName": "warrior-attack-se-000-color",
+					"regionName": "warrior-attack-se-0004",
+					"x": 373,
+					"y": 2,
+					"width": 103,
+					"height": 75
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-attack-se-000-mask-nation",
+							"regionName": "warrior-attack-se-0004",
+							"x": 373,
+							"y": 2,
+							"width": 103,
+							"height": 75
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-attack-se-000-shadow",
+					"regionName": "warrior-attack-se-0004",
+					"x": 373,
+					"y": 2,
+					"width": 103,
+					"height": 75
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 13,
+				"trimY": 29,
+				"anchorX": 51,
+				"anchorY": 67
+			},
+			{
+				"color": {
+					"pageName": "warrior-attack-se-000-color",
+					"regionName": "warrior-attack-se-0005",
+					"x": 480,
+					"y": 2,
+					"width": 102,
+					"height": 102
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-attack-se-000-mask-nation",
+							"regionName": "warrior-attack-se-0005",
+							"x": 480,
+							"y": 2,
+							"width": 102,
+							"height": 102
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-attack-se-000-shadow",
+					"regionName": "warrior-attack-se-0005",
+					"x": 480,
+					"y": 2,
+					"width": 102,
+					"height": 102
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 13,
+				"trimY": 2,
+				"anchorX": 51,
+				"anchorY": 94
+			},
+			{
+				"color": {
+					"pageName": "warrior-attack-se-000-color",
+					"regionName": "warrior-attack-se-0006",
+					"x": 586,
+					"y": 2,
+					"width": 103,
+					"height": 96
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-attack-se-000-mask-nation",
+							"regionName": "warrior-attack-se-0006",
+							"x": 586,
+							"y": 2,
+							"width": 103,
+							"height": 96
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-attack-se-000-shadow",
+					"regionName": "warrior-attack-se-0006",
+					"x": 586,
+					"y": 2,
+					"width": 103,
+					"height": 96
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 13,
+				"trimY": 8,
+				"anchorX": 51,
+				"anchorY": 88
+			},
+			{
+				"color": {
+					"pageName": "warrior-attack-se-000-color",
+					"regionName": "warrior-attack-se-0007",
+					"x": 693,
+					"y": 2,
+					"width": 76,
+					"height": 97
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-attack-se-000-mask-nation",
+							"regionName": "warrior-attack-se-0007",
+							"x": 693,
+							"y": 2,
+							"width": 76,
+							"height": 97
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-attack-se-000-shadow",
+					"regionName": "warrior-attack-se-0007",
+					"x": 693,
+					"y": 2,
+					"width": 76,
+					"height": 97
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 26,
+				"trimY": 7,
+				"anchorX": 38,
+				"anchorY": 89
+			}
+		],
+		"anchorX": 64,
+		"anchorY": 96,
+		"staticFallbackKey": "TileSets/AtlasUnits/Units/Warrior",
+		"pageNames": [
+			"warrior-attack-se-000-color",
+			"warrior-attack-se-000-mask-nation",
+			"warrior-attack-se-000-shadow"
+		],
+		"mirroredFacing": null,
+		"looping": false,
+		"maskIds": [ "nation" ],
+		"hasShadow": true,
+		"decodedBytes": 1572864,
+		"decodedStagingBytes": 524288,
+		"gpuBytes": 2097204
+	},
+	{
+		"unitName": "Warrior",
+		"state": "ATTACK",
+		"facing": "SW",
+		"frames": [
+			{
+				"color": {
+					"pageName": "warrior-attack-se-000-color",
+					"regionName": "warrior-attack-se-0000",
+					"x": 2,
+					"y": 2,
+					"width": 81,
+					"height": 102
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-attack-se-000-mask-nation",
+							"regionName": "warrior-attack-se-0000",
+							"x": 2,
+							"y": 2,
+							"width": 81,
+							"height": 102
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-attack-se-000-shadow",
+					"regionName": "warrior-attack-se-0000",
+					"x": 2,
+					"y": 2,
+					"width": 81,
+					"height": 102
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 22,
+				"trimY": 2,
+				"anchorX": 42,
+				"anchorY": 94
+			},
+			{
+				"color": {
+					"pageName": "warrior-attack-se-000-color",
+					"regionName": "warrior-attack-se-0001",
+					"x": 87,
+					"y": 2,
+					"width": 86,
+					"height": 101
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-attack-se-000-mask-nation",
+							"regionName": "warrior-attack-se-0001",
+							"x": 87,
+							"y": 2,
+							"width": 86,
+							"height": 101
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-attack-se-000-shadow",
+					"regionName": "warrior-attack-se-0001",
+					"x": 87,
+					"y": 2,
+					"width": 86,
+					"height": 101
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 25,
+				"trimY": 3,
+				"anchorX": 39,
+				"anchorY": 93
+			},
+			{
+				"color": {
+					"pageName": "warrior-attack-se-000-color",
+					"regionName": "warrior-attack-se-0002",
+					"x": 177,
+					"y": 2,
+					"width": 90,
+					"height": 102
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-attack-se-000-mask-nation",
+							"regionName": "warrior-attack-se-0002",
+							"x": 177,
+							"y": 2,
+							"width": 90,
+							"height": 102
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-attack-se-000-shadow",
+					"regionName": "warrior-attack-se-0002",
+					"x": 177,
+					"y": 2,
+					"width": 90,
+					"height": 102
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 16,
+				"trimY": 2,
+				"anchorX": 48,
+				"anchorY": 94
+			},
+			{
+				"color": {
+					"pageName": "warrior-attack-se-000-color",
+					"regionName": "warrior-attack-se-0003",
+					"x": 271,
+					"y": 2,
+					"width": 98,
+					"height": 102
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-attack-se-000-mask-nation",
+							"regionName": "warrior-attack-se-0003",
+							"x": 271,
+							"y": 2,
+							"width": 98,
+							"height": 102
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-attack-se-000-shadow",
+					"regionName": "warrior-attack-se-0003",
+					"x": 271,
+					"y": 2,
+					"width": 98,
+					"height": 102
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 18,
+				"trimY": 2,
+				"anchorX": 46,
+				"anchorY": 94
+			},
+			{
+				"color": {
+					"pageName": "warrior-attack-se-000-color",
+					"regionName": "warrior-attack-se-0004",
+					"x": 373,
+					"y": 2,
+					"width": 103,
+					"height": 75
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-attack-se-000-mask-nation",
+							"regionName": "warrior-attack-se-0004",
+							"x": 373,
+							"y": 2,
+							"width": 103,
+							"height": 75
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-attack-se-000-shadow",
+					"regionName": "warrior-attack-se-0004",
+					"x": 373,
+					"y": 2,
+					"width": 103,
+					"height": 75
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 13,
+				"trimY": 29,
+				"anchorX": 51,
+				"anchorY": 67
+			},
+			{
+				"color": {
+					"pageName": "warrior-attack-se-000-color",
+					"regionName": "warrior-attack-se-0005",
+					"x": 480,
+					"y": 2,
+					"width": 102,
+					"height": 102
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-attack-se-000-mask-nation",
+							"regionName": "warrior-attack-se-0005",
+							"x": 480,
+							"y": 2,
+							"width": 102,
+							"height": 102
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-attack-se-000-shadow",
+					"regionName": "warrior-attack-se-0005",
+					"x": 480,
+					"y": 2,
+					"width": 102,
+					"height": 102
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 13,
+				"trimY": 2,
+				"anchorX": 51,
+				"anchorY": 94
+			},
+			{
+				"color": {
+					"pageName": "warrior-attack-se-000-color",
+					"regionName": "warrior-attack-se-0006",
+					"x": 586,
+					"y": 2,
+					"width": 103,
+					"height": 96
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-attack-se-000-mask-nation",
+							"regionName": "warrior-attack-se-0006",
+							"x": 586,
+							"y": 2,
+							"width": 103,
+							"height": 96
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-attack-se-000-shadow",
+					"regionName": "warrior-attack-se-0006",
+					"x": 586,
+					"y": 2,
+					"width": 103,
+					"height": 96
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 13,
+				"trimY": 8,
+				"anchorX": 51,
+				"anchorY": 88
+			},
+			{
+				"color": {
+					"pageName": "warrior-attack-se-000-color",
+					"regionName": "warrior-attack-se-0007",
+					"x": 693,
+					"y": 2,
+					"width": 76,
+					"height": 97
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-attack-se-000-mask-nation",
+							"regionName": "warrior-attack-se-0007",
+							"x": 693,
+							"y": 2,
+							"width": 76,
+							"height": 97
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-attack-se-000-shadow",
+					"regionName": "warrior-attack-se-0007",
+					"x": 693,
+					"y": 2,
+					"width": 76,
+					"height": 97
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 26,
+				"trimY": 7,
+				"anchorX": 38,
+				"anchorY": 89
+			}
+		],
+		"anchorX": 64,
+		"anchorY": 96,
+		"staticFallbackKey": "TileSets/AtlasUnits/Units/Warrior",
+		"pageNames": [
+			"warrior-attack-se-000-color",
+			"warrior-attack-se-000-mask-nation",
+			"warrior-attack-se-000-shadow"
+		],
+		"mirroredFacing": "SE",
+		"looping": false,
+		"maskIds": [ "nation" ],
+		"hasShadow": true,
+		"decodedBytes": 1572864,
+		"decodedStagingBytes": 524288,
+		"gpuBytes": 2097204
+	},
+	{
+		"unitName": "Warrior",
+		"state": "ATTACK",
+		"facing": "W",
+		"frames": [
+			{
+				"color": {
+					"pageName": "warrior-attack-e-000-color",
+					"regionName": "warrior-attack-e-0000",
+					"x": 2,
+					"y": 2,
+					"width": 78,
+					"height": 95
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-attack-e-000-mask-nation",
+							"regionName": "warrior-attack-e-0000",
+							"x": 2,
+							"y": 2,
+							"width": 78,
+							"height": 95
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-attack-e-000-shadow",
+					"regionName": "warrior-attack-e-0000",
+					"x": 2,
+					"y": 2,
+					"width": 78,
+					"height": 95
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 24,
+				"trimY": 9,
+				"anchorX": 40,
+				"anchorY": 87
+			},
+			{
+				"color": {
+					"pageName": "warrior-attack-e-000-color",
+					"regionName": "warrior-attack-e-0001",
+					"x": 84,
+					"y": 2,
+					"width": 82,
+					"height": 102
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-attack-e-000-mask-nation",
+							"regionName": "warrior-attack-e-0001",
+							"x": 84,
+							"y": 2,
+							"width": 82,
+							"height": 102
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-attack-e-000-shadow",
+					"regionName": "warrior-attack-e-0001",
+					"x": 84,
+					"y": 2,
+					"width": 82,
+					"height": 102
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 21,
+				"trimY": 2,
+				"anchorX": 43,
+				"anchorY": 94
+			},
+			{
+				"color": {
+					"pageName": "warrior-attack-e-000-color",
+					"regionName": "warrior-attack-e-0002",
+					"x": 170,
+					"y": 2,
+					"width": 81,
+					"height": 102
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-attack-e-000-mask-nation",
+							"regionName": "warrior-attack-e-0002",
+							"x": 170,
+							"y": 2,
+							"width": 81,
+							"height": 102
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-attack-e-000-shadow",
+					"regionName": "warrior-attack-e-0002",
+					"x": 170,
+					"y": 2,
+					"width": 81,
+					"height": 102
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 20,
+				"trimY": 2,
+				"anchorX": 44,
+				"anchorY": 94
+			},
+			{
+				"color": {
+					"pageName": "warrior-attack-e-000-color",
+					"regionName": "warrior-attack-e-0003",
+					"x": 255,
+					"y": 2,
+					"width": 88,
+					"height": 102
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-attack-e-000-mask-nation",
+							"regionName": "warrior-attack-e-0003",
+							"x": 255,
+							"y": 2,
+							"width": 88,
+							"height": 102
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-attack-e-000-shadow",
+					"regionName": "warrior-attack-e-0003",
+					"x": 255,
+					"y": 2,
+					"width": 88,
+					"height": 102
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 19,
+				"trimY": 2,
+				"anchorX": 45,
+				"anchorY": 94
+			},
+			{
+				"color": {
+					"pageName": "warrior-attack-e-000-color",
+					"regionName": "warrior-attack-e-0004",
+					"x": 347,
+					"y": 2,
+					"width": 95,
+					"height": 83
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-attack-e-000-mask-nation",
+							"regionName": "warrior-attack-e-0004",
+							"x": 347,
+							"y": 2,
+							"width": 95,
+							"height": 83
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-attack-e-000-shadow",
+					"regionName": "warrior-attack-e-0004",
+					"x": 347,
+					"y": 2,
+					"width": 95,
+					"height": 83
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 21,
+				"trimY": 21,
+				"anchorX": 43,
+				"anchorY": 75
+			},
+			{
+				"color": {
+					"pageName": "warrior-attack-e-000-color",
+					"regionName": "warrior-attack-e-0005",
+					"x": 446,
+					"y": 2,
+					"width": 102,
+					"height": 74
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-attack-e-000-mask-nation",
+							"regionName": "warrior-attack-e-0005",
+							"x": 446,
+							"y": 2,
+							"width": 102,
+							"height": 74
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-attack-e-000-shadow",
+					"regionName": "warrior-attack-e-0005",
+					"x": 446,
+					"y": 2,
+					"width": 102,
+					"height": 74
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 13,
+				"trimY": 30,
+				"anchorX": 51,
+				"anchorY": 66
+			},
+			{
+				"color": {
+					"pageName": "warrior-attack-e-000-color",
+					"regionName": "warrior-attack-e-0006",
+					"x": 552,
+					"y": 2,
+					"width": 95,
+					"height": 98
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-attack-e-000-mask-nation",
+							"regionName": "warrior-attack-e-0006",
+							"x": 552,
+							"y": 2,
+							"width": 95,
+							"height": 98
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-attack-e-000-shadow",
+					"regionName": "warrior-attack-e-0006",
+					"x": 552,
+					"y": 2,
+					"width": 95,
+					"height": 98
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 13,
+				"trimY": 6,
+				"anchorX": 51,
+				"anchorY": 90
+			},
+			{
+				"color": {
+					"pageName": "warrior-attack-e-000-color",
+					"regionName": "warrior-attack-e-0007",
+					"x": 651,
+					"y": 2,
+					"width": 75,
+					"height": 93
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-attack-e-000-mask-nation",
+							"regionName": "warrior-attack-e-0007",
+							"x": 651,
+							"y": 2,
+							"width": 75,
+							"height": 93
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-attack-e-000-shadow",
+					"regionName": "warrior-attack-e-0007",
+					"x": 651,
+					"y": 2,
+					"width": 75,
+					"height": 93
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 27,
+				"trimY": 11,
+				"anchorX": 37,
+				"anchorY": 85
+			}
+		],
+		"anchorX": 64,
+		"anchorY": 96,
+		"staticFallbackKey": "TileSets/AtlasUnits/Units/Warrior",
+		"pageNames": [ "warrior-attack-e-000-color", "warrior-attack-e-000-mask-nation", "warrior-attack-e-000-shadow" ],
+		"mirroredFacing": "E",
+		"looping": false,
+		"maskIds": [ "nation" ],
+		"hasShadow": true,
+		"decodedBytes": 1572864,
+		"decodedStagingBytes": 524288,
+		"gpuBytes": 2097204
+	},
+	{
+		"unitName": "Warrior",
+		"state": "DEFEAT",
+		"facing": "E",
+		"frames": [
+			{
+				"color": {
+					"pageName": "warrior-defeat-e-000-color",
+					"regionName": "warrior-defeat-e-0000",
+					"x": 2,
+					"y": 2,
+					"width": 78,
+					"height": 92
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-defeat-e-000-mask-nation",
+							"regionName": "warrior-defeat-e-0000",
+							"x": 2,
+							"y": 2,
+							"width": 78,
+							"height": 92
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-defeat-e-000-shadow",
+					"regionName": "warrior-defeat-e-0000",
+					"x": 2,
+					"y": 2,
+					"width": 78,
+					"height": 92
+				},
+				"durationMs": 130,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 24,
+				"trimY": 1,
+				"anchorX": 40,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-defeat-e-000-color",
+					"regionName": "warrior-defeat-e-0001",
+					"x": 84,
+					"y": 2,
+					"width": 80,
+					"height": 92
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-defeat-e-000-mask-nation",
+							"regionName": "warrior-defeat-e-0001",
+							"x": 84,
+							"y": 2,
+							"width": 80,
+							"height": 92
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-defeat-e-000-shadow",
+					"regionName": "warrior-defeat-e-0001",
+					"x": 84,
+					"y": 2,
+					"width": 80,
+					"height": 92
+				},
+				"durationMs": 130,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 18,
+				"trimY": 1,
+				"anchorX": 46,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-defeat-e-000-color",
+					"regionName": "warrior-defeat-e-0002",
+					"x": 168,
+					"y": 2,
+					"width": 83,
+					"height": 91
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-defeat-e-000-mask-nation",
+							"regionName": "warrior-defeat-e-0002",
+							"x": 168,
+							"y": 2,
+							"width": 83,
+							"height": 91
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-defeat-e-000-shadow",
+					"regionName": "warrior-defeat-e-0002",
+					"x": 168,
+					"y": 2,
+					"width": 83,
+					"height": 91
+				},
+				"durationMs": 130,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 15,
+				"trimY": 1,
+				"anchorX": 49,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-defeat-e-000-color",
+					"regionName": "warrior-defeat-e-0003",
+					"x": 255,
+					"y": 2,
+					"width": 102,
+					"height": 91
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-defeat-e-000-mask-nation",
+							"regionName": "warrior-defeat-e-0003",
+							"x": 255,
+							"y": 2,
+							"width": 102,
+							"height": 91
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-defeat-e-000-shadow",
+					"regionName": "warrior-defeat-e-0003",
+					"x": 255,
+					"y": 2,
+					"width": 102,
+					"height": 91
+				},
+				"durationMs": 130,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 14,
+				"trimY": 1,
+				"anchorX": 50,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-defeat-e-000-color",
+					"regionName": "warrior-defeat-e-0004",
+					"x": 361,
+					"y": 2,
+					"width": 103,
+					"height": 88
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-defeat-e-000-mask-nation",
+							"regionName": "warrior-defeat-e-0004",
+							"x": 361,
+							"y": 2,
+							"width": 103,
+							"height": 88
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-defeat-e-000-shadow",
+					"regionName": "warrior-defeat-e-0004",
+					"x": 361,
+					"y": 2,
+					"width": 103,
+					"height": 88
+				},
+				"durationMs": 130,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 13,
+				"trimY": 1,
+				"anchorX": 51,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-defeat-e-000-color",
+					"regionName": "warrior-defeat-e-0005",
+					"x": 468,
+					"y": 2,
+					"width": 102,
+					"height": 95
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-defeat-e-000-mask-nation",
+							"regionName": "warrior-defeat-e-0005",
+							"x": 468,
+							"y": 2,
+							"width": 102,
+							"height": 95
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-defeat-e-000-shadow",
+					"regionName": "warrior-defeat-e-0005",
+					"x": 468,
+					"y": 2,
+					"width": 102,
+					"height": 95
+				},
+				"durationMs": 130,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 13,
+				"trimY": 1,
+				"anchorX": 51,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-defeat-e-000-color",
+					"regionName": "warrior-defeat-e-0006",
+					"x": 574,
+					"y": 2,
+					"width": 103,
+					"height": 95
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-defeat-e-000-mask-nation",
+							"regionName": "warrior-defeat-e-0006",
+							"x": 574,
+							"y": 2,
+							"width": 103,
+							"height": 95
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-defeat-e-000-shadow",
+					"regionName": "warrior-defeat-e-0006",
+					"x": 574,
+					"y": 2,
+					"width": 103,
+					"height": 95
+				},
+				"durationMs": 130,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 13,
+				"trimY": 1,
+				"anchorX": 51,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-defeat-e-000-color",
+					"regionName": "warrior-defeat-e-0007",
+					"x": 681,
+					"y": 2,
+					"width": 99,
+					"height": 96
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-defeat-e-000-mask-nation",
+							"regionName": "warrior-defeat-e-0007",
+							"x": 681,
+							"y": 2,
+							"width": 99,
+							"height": 96
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-defeat-e-000-shadow",
+					"regionName": "warrior-defeat-e-0007",
+					"x": 681,
+					"y": 2,
+					"width": 99,
+					"height": 96
+				},
+				"durationMs": 130,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 13,
+				"trimY": 1,
+				"anchorX": 51,
+				"anchorY": 95
+			}
+		],
+		"anchorX": 64,
+		"anchorY": 96,
+		"staticFallbackKey": "TileSets/AtlasUnits/Units/Warrior",
+		"pageNames": [ "warrior-defeat-e-000-color", "warrior-defeat-e-000-mask-nation", "warrior-defeat-e-000-shadow" ],
+		"mirroredFacing": null,
+		"looping": false,
+		"maskIds": [ "nation" ],
+		"hasShadow": true,
+		"decodedBytes": 1572864,
+		"decodedStagingBytes": 524288,
+		"gpuBytes": 2097204
+	},
+	{
+		"unitName": "Warrior",
+		"state": "DEFEAT",
+		"facing": "NE",
+		"frames": [
+			{
+				"color": {
+					"pageName": "warrior-defeat-ne-000-color",
+					"regionName": "warrior-defeat-ne-0000",
+					"x": 2,
+					"y": 2,
+					"width": 87,
+					"height": 94
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-defeat-ne-000-mask-nation",
+							"regionName": "warrior-defeat-ne-0000",
+							"x": 2,
+							"y": 2,
+							"width": 87,
+							"height": 94
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-defeat-ne-000-shadow",
+					"regionName": "warrior-defeat-ne-0000",
+					"x": 2,
+					"y": 2,
+					"width": 87,
+					"height": 94
+				},
+				"durationMs": 130,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 25,
+				"trimY": 1,
+				"anchorX": 39,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-defeat-ne-000-color",
+					"regionName": "warrior-defeat-ne-0001",
+					"x": 93,
+					"y": 2,
+					"width": 72,
+					"height": 94
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-defeat-ne-000-mask-nation",
+							"regionName": "warrior-defeat-ne-0001",
+							"x": 93,
+							"y": 2,
+							"width": 72,
+							"height": 94
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-defeat-ne-000-shadow",
+					"regionName": "warrior-defeat-ne-0001",
+					"x": 93,
+					"y": 2,
+					"width": 72,
+					"height": 94
+				},
+				"durationMs": 130,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 22,
+				"trimY": 1,
+				"anchorX": 42,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-defeat-ne-000-color",
+					"regionName": "warrior-defeat-ne-0002",
+					"x": 169,
+					"y": 2,
+					"width": 93,
+					"height": 92
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-defeat-ne-000-mask-nation",
+							"regionName": "warrior-defeat-ne-0002",
+							"x": 169,
+							"y": 2,
+							"width": 93,
+							"height": 92
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-defeat-ne-000-shadow",
+					"regionName": "warrior-defeat-ne-0002",
+					"x": 169,
+					"y": 2,
+					"width": 93,
+					"height": 92
+				},
+				"durationMs": 130,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 16,
+				"trimY": 1,
+				"anchorX": 48,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-defeat-ne-000-color",
+					"regionName": "warrior-defeat-ne-0003",
+					"x": 266,
+					"y": 2,
+					"width": 100,
+					"height": 93
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-defeat-ne-000-mask-nation",
+							"regionName": "warrior-defeat-ne-0003",
+							"x": 266,
+							"y": 2,
+							"width": 100,
+							"height": 93
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-defeat-ne-000-shadow",
+					"regionName": "warrior-defeat-ne-0003",
+					"x": 266,
+					"y": 2,
+					"width": 100,
+					"height": 93
+				},
+				"durationMs": 130,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 16,
+				"trimY": 1,
+				"anchorX": 48,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-defeat-ne-000-color",
+					"regionName": "warrior-defeat-ne-0004",
+					"x": 370,
+					"y": 2,
+					"width": 103,
+					"height": 91
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-defeat-ne-000-mask-nation",
+							"regionName": "warrior-defeat-ne-0004",
+							"x": 370,
+							"y": 2,
+							"width": 103,
+							"height": 91
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-defeat-ne-000-shadow",
+					"regionName": "warrior-defeat-ne-0004",
+					"x": 370,
+					"y": 2,
+					"width": 103,
+					"height": 91
+				},
+				"durationMs": 130,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 13,
+				"trimY": 1,
+				"anchorX": 51,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-defeat-ne-000-color",
+					"regionName": "warrior-defeat-ne-0005",
+					"x": 477,
+					"y": 2,
+					"width": 101,
+					"height": 93
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-defeat-ne-000-mask-nation",
+							"regionName": "warrior-defeat-ne-0005",
+							"x": 477,
+							"y": 2,
+							"width": 101,
+							"height": 93
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-defeat-ne-000-shadow",
+					"regionName": "warrior-defeat-ne-0005",
+					"x": 477,
+					"y": 2,
+					"width": 101,
+					"height": 93
+				},
+				"durationMs": 130,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 13,
+				"trimY": 1,
+				"anchorX": 51,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-defeat-ne-000-color",
+					"regionName": "warrior-defeat-ne-0006",
+					"x": 582,
+					"y": 2,
+					"width": 103,
+					"height": 98
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-defeat-ne-000-mask-nation",
+							"regionName": "warrior-defeat-ne-0006",
+							"x": 582,
+							"y": 2,
+							"width": 103,
+							"height": 98
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-defeat-ne-000-shadow",
+					"regionName": "warrior-defeat-ne-0006",
+					"x": 582,
+					"y": 2,
+					"width": 103,
+					"height": 98
+				},
+				"durationMs": 130,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 13,
+				"trimY": 1,
+				"anchorX": 51,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-defeat-ne-000-color",
+					"regionName": "warrior-defeat-ne-0007",
+					"x": 689,
+					"y": 2,
+					"width": 99,
+					"height": 98
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-defeat-ne-000-mask-nation",
+							"regionName": "warrior-defeat-ne-0007",
+							"x": 689,
+							"y": 2,
+							"width": 99,
+							"height": 98
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-defeat-ne-000-shadow",
+					"regionName": "warrior-defeat-ne-0007",
+					"x": 689,
+					"y": 2,
+					"width": 99,
+					"height": 98
+				},
+				"durationMs": 130,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 13,
+				"trimY": 1,
+				"anchorX": 51,
+				"anchorY": 95
+			}
+		],
+		"anchorX": 64,
+		"anchorY": 96,
+		"staticFallbackKey": "TileSets/AtlasUnits/Units/Warrior",
+		"pageNames": [
+			"warrior-defeat-ne-000-color",
+			"warrior-defeat-ne-000-mask-nation",
+			"warrior-defeat-ne-000-shadow"
+		],
+		"mirroredFacing": null,
+		"looping": false,
+		"maskIds": [ "nation" ],
+		"hasShadow": true,
+		"decodedBytes": 1572864,
+		"decodedStagingBytes": 524288,
+		"gpuBytes": 2097204
+	},
+	{
+		"unitName": "Warrior",
+		"state": "DEFEAT",
+		"facing": "NW",
+		"frames": [
+			{
+				"color": {
+					"pageName": "warrior-defeat-ne-000-color",
+					"regionName": "warrior-defeat-ne-0000",
+					"x": 2,
+					"y": 2,
+					"width": 87,
+					"height": 94
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-defeat-ne-000-mask-nation",
+							"regionName": "warrior-defeat-ne-0000",
+							"x": 2,
+							"y": 2,
+							"width": 87,
+							"height": 94
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-defeat-ne-000-shadow",
+					"regionName": "warrior-defeat-ne-0000",
+					"x": 2,
+					"y": 2,
+					"width": 87,
+					"height": 94
+				},
+				"durationMs": 130,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 25,
+				"trimY": 1,
+				"anchorX": 39,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-defeat-ne-000-color",
+					"regionName": "warrior-defeat-ne-0001",
+					"x": 93,
+					"y": 2,
+					"width": 72,
+					"height": 94
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-defeat-ne-000-mask-nation",
+							"regionName": "warrior-defeat-ne-0001",
+							"x": 93,
+							"y": 2,
+							"width": 72,
+							"height": 94
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-defeat-ne-000-shadow",
+					"regionName": "warrior-defeat-ne-0001",
+					"x": 93,
+					"y": 2,
+					"width": 72,
+					"height": 94
+				},
+				"durationMs": 130,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 22,
+				"trimY": 1,
+				"anchorX": 42,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-defeat-ne-000-color",
+					"regionName": "warrior-defeat-ne-0002",
+					"x": 169,
+					"y": 2,
+					"width": 93,
+					"height": 92
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-defeat-ne-000-mask-nation",
+							"regionName": "warrior-defeat-ne-0002",
+							"x": 169,
+							"y": 2,
+							"width": 93,
+							"height": 92
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-defeat-ne-000-shadow",
+					"regionName": "warrior-defeat-ne-0002",
+					"x": 169,
+					"y": 2,
+					"width": 93,
+					"height": 92
+				},
+				"durationMs": 130,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 16,
+				"trimY": 1,
+				"anchorX": 48,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-defeat-ne-000-color",
+					"regionName": "warrior-defeat-ne-0003",
+					"x": 266,
+					"y": 2,
+					"width": 100,
+					"height": 93
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-defeat-ne-000-mask-nation",
+							"regionName": "warrior-defeat-ne-0003",
+							"x": 266,
+							"y": 2,
+							"width": 100,
+							"height": 93
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-defeat-ne-000-shadow",
+					"regionName": "warrior-defeat-ne-0003",
+					"x": 266,
+					"y": 2,
+					"width": 100,
+					"height": 93
+				},
+				"durationMs": 130,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 16,
+				"trimY": 1,
+				"anchorX": 48,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-defeat-ne-000-color",
+					"regionName": "warrior-defeat-ne-0004",
+					"x": 370,
+					"y": 2,
+					"width": 103,
+					"height": 91
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-defeat-ne-000-mask-nation",
+							"regionName": "warrior-defeat-ne-0004",
+							"x": 370,
+							"y": 2,
+							"width": 103,
+							"height": 91
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-defeat-ne-000-shadow",
+					"regionName": "warrior-defeat-ne-0004",
+					"x": 370,
+					"y": 2,
+					"width": 103,
+					"height": 91
+				},
+				"durationMs": 130,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 13,
+				"trimY": 1,
+				"anchorX": 51,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-defeat-ne-000-color",
+					"regionName": "warrior-defeat-ne-0005",
+					"x": 477,
+					"y": 2,
+					"width": 101,
+					"height": 93
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-defeat-ne-000-mask-nation",
+							"regionName": "warrior-defeat-ne-0005",
+							"x": 477,
+							"y": 2,
+							"width": 101,
+							"height": 93
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-defeat-ne-000-shadow",
+					"regionName": "warrior-defeat-ne-0005",
+					"x": 477,
+					"y": 2,
+					"width": 101,
+					"height": 93
+				},
+				"durationMs": 130,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 13,
+				"trimY": 1,
+				"anchorX": 51,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-defeat-ne-000-color",
+					"regionName": "warrior-defeat-ne-0006",
+					"x": 582,
+					"y": 2,
+					"width": 103,
+					"height": 98
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-defeat-ne-000-mask-nation",
+							"regionName": "warrior-defeat-ne-0006",
+							"x": 582,
+							"y": 2,
+							"width": 103,
+							"height": 98
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-defeat-ne-000-shadow",
+					"regionName": "warrior-defeat-ne-0006",
+					"x": 582,
+					"y": 2,
+					"width": 103,
+					"height": 98
+				},
+				"durationMs": 130,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 13,
+				"trimY": 1,
+				"anchorX": 51,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-defeat-ne-000-color",
+					"regionName": "warrior-defeat-ne-0007",
+					"x": 689,
+					"y": 2,
+					"width": 99,
+					"height": 98
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-defeat-ne-000-mask-nation",
+							"regionName": "warrior-defeat-ne-0007",
+							"x": 689,
+							"y": 2,
+							"width": 99,
+							"height": 98
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-defeat-ne-000-shadow",
+					"regionName": "warrior-defeat-ne-0007",
+					"x": 689,
+					"y": 2,
+					"width": 99,
+					"height": 98
+				},
+				"durationMs": 130,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 13,
+				"trimY": 1,
+				"anchorX": 51,
+				"anchorY": 95
+			}
+		],
+		"anchorX": 64,
+		"anchorY": 96,
+		"staticFallbackKey": "TileSets/AtlasUnits/Units/Warrior",
+		"pageNames": [
+			"warrior-defeat-ne-000-color",
+			"warrior-defeat-ne-000-mask-nation",
+			"warrior-defeat-ne-000-shadow"
+		],
+		"mirroredFacing": "NE",
+		"looping": false,
+		"maskIds": [ "nation" ],
+		"hasShadow": true,
+		"decodedBytes": 1572864,
+		"decodedStagingBytes": 524288,
+		"gpuBytes": 2097204
+	},
+	{
+		"unitName": "Warrior",
+		"state": "DEFEAT",
+		"facing": "SE",
+		"frames": [
+			{
+				"color": {
+					"pageName": "warrior-defeat-se-000-color",
+					"regionName": "warrior-defeat-se-0000",
+					"x": 2,
+					"y": 2,
+					"width": 86,
+					"height": 99
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-defeat-se-000-mask-nation",
+							"regionName": "warrior-defeat-se-0000",
+							"x": 2,
+							"y": 2,
+							"width": 86,
+							"height": 99
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-defeat-se-000-shadow",
+					"regionName": "warrior-defeat-se-0000",
+					"x": 2,
+					"y": 2,
+					"width": 86,
+					"height": 99
+				},
+				"durationMs": 130,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 17,
+				"trimY": 1,
+				"anchorX": 47,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-defeat-se-000-color",
+					"regionName": "warrior-defeat-se-0001",
+					"x": 92,
+					"y": 2,
+					"width": 85,
+					"height": 98
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-defeat-se-000-mask-nation",
+							"regionName": "warrior-defeat-se-0001",
+							"x": 92,
+							"y": 2,
+							"width": 85,
+							"height": 98
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-defeat-se-000-shadow",
+					"regionName": "warrior-defeat-se-0001",
+					"x": 92,
+					"y": 2,
+					"width": 85,
+					"height": 98
+				},
+				"durationMs": 130,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 23,
+				"trimY": 1,
+				"anchorX": 41,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-defeat-se-000-color",
+					"regionName": "warrior-defeat-se-0002",
+					"x": 181,
+					"y": 2,
+					"width": 84,
+					"height": 99
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-defeat-se-000-mask-nation",
+							"regionName": "warrior-defeat-se-0002",
+							"x": 181,
+							"y": 2,
+							"width": 84,
+							"height": 99
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-defeat-se-000-shadow",
+					"regionName": "warrior-defeat-se-0002",
+					"x": 181,
+					"y": 2,
+					"width": 84,
+					"height": 99
+				},
+				"durationMs": 130,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 18,
+				"trimY": 1,
+				"anchorX": 46,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-defeat-se-000-color",
+					"regionName": "warrior-defeat-se-0003",
+					"x": 269,
+					"y": 2,
+					"width": 103,
+					"height": 99
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-defeat-se-000-mask-nation",
+							"regionName": "warrior-defeat-se-0003",
+							"x": 269,
+							"y": 2,
+							"width": 103,
+							"height": 99
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-defeat-se-000-shadow",
+					"regionName": "warrior-defeat-se-0003",
+					"x": 269,
+					"y": 2,
+					"width": 103,
+					"height": 99
+				},
+				"durationMs": 130,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 13,
+				"trimY": 1,
+				"anchorX": 51,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-defeat-se-000-color",
+					"regionName": "warrior-defeat-se-0004",
+					"x": 376,
+					"y": 2,
+					"width": 103,
+					"height": 97
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-defeat-se-000-mask-nation",
+							"regionName": "warrior-defeat-se-0004",
+							"x": 376,
+							"y": 2,
+							"width": 103,
+							"height": 97
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-defeat-se-000-shadow",
+					"regionName": "warrior-defeat-se-0004",
+					"x": 376,
+					"y": 2,
+					"width": 103,
+					"height": 97
+				},
+				"durationMs": 130,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 13,
+				"trimY": 1,
+				"anchorX": 51,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-defeat-se-000-color",
+					"regionName": "warrior-defeat-se-0005",
+					"x": 483,
+					"y": 2,
+					"width": 102,
+					"height": 102
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-defeat-se-000-mask-nation",
+							"regionName": "warrior-defeat-se-0005",
+							"x": 483,
+							"y": 2,
+							"width": 102,
+							"height": 102
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-defeat-se-000-shadow",
+					"regionName": "warrior-defeat-se-0005",
+					"x": 483,
+					"y": 2,
+					"width": 102,
+					"height": 102
+				},
+				"durationMs": 130,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 13,
+				"trimY": 1,
+				"anchorX": 51,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-defeat-se-000-color",
+					"regionName": "warrior-defeat-se-0006",
+					"x": 589,
+					"y": 2,
+					"width": 103,
+					"height": 101
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-defeat-se-000-mask-nation",
+							"regionName": "warrior-defeat-se-0006",
+							"x": 589,
+							"y": 2,
+							"width": 103,
+							"height": 101
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-defeat-se-000-shadow",
+					"regionName": "warrior-defeat-se-0006",
+					"x": 589,
+					"y": 2,
+					"width": 103,
+					"height": 101
+				},
+				"durationMs": 130,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 13,
+				"trimY": 1,
+				"anchorX": 51,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-defeat-se-000-color",
+					"regionName": "warrior-defeat-se-0007",
+					"x": 696,
+					"y": 2,
+					"width": 103,
+					"height": 101
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-defeat-se-000-mask-nation",
+							"regionName": "warrior-defeat-se-0007",
+							"x": 696,
+							"y": 2,
+							"width": 103,
+							"height": 101
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-defeat-se-000-shadow",
+					"regionName": "warrior-defeat-se-0007",
+					"x": 696,
+					"y": 2,
+					"width": 103,
+					"height": 101
+				},
+				"durationMs": 130,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 13,
+				"trimY": 1,
+				"anchorX": 51,
+				"anchorY": 95
+			}
+		],
+		"anchorX": 64,
+		"anchorY": 96,
+		"staticFallbackKey": "TileSets/AtlasUnits/Units/Warrior",
+		"pageNames": [
+			"warrior-defeat-se-000-color",
+			"warrior-defeat-se-000-mask-nation",
+			"warrior-defeat-se-000-shadow"
+		],
+		"mirroredFacing": null,
+		"looping": false,
+		"maskIds": [ "nation" ],
+		"hasShadow": true,
+		"decodedBytes": 1572864,
+		"decodedStagingBytes": 524288,
+		"gpuBytes": 2097204
+	},
+	{
+		"unitName": "Warrior",
+		"state": "DEFEAT",
+		"facing": "SW",
+		"frames": [
+			{
+				"color": {
+					"pageName": "warrior-defeat-se-000-color",
+					"regionName": "warrior-defeat-se-0000",
+					"x": 2,
+					"y": 2,
+					"width": 86,
+					"height": 99
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-defeat-se-000-mask-nation",
+							"regionName": "warrior-defeat-se-0000",
+							"x": 2,
+							"y": 2,
+							"width": 86,
+							"height": 99
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-defeat-se-000-shadow",
+					"regionName": "warrior-defeat-se-0000",
+					"x": 2,
+					"y": 2,
+					"width": 86,
+					"height": 99
+				},
+				"durationMs": 130,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 17,
+				"trimY": 1,
+				"anchorX": 47,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-defeat-se-000-color",
+					"regionName": "warrior-defeat-se-0001",
+					"x": 92,
+					"y": 2,
+					"width": 85,
+					"height": 98
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-defeat-se-000-mask-nation",
+							"regionName": "warrior-defeat-se-0001",
+							"x": 92,
+							"y": 2,
+							"width": 85,
+							"height": 98
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-defeat-se-000-shadow",
+					"regionName": "warrior-defeat-se-0001",
+					"x": 92,
+					"y": 2,
+					"width": 85,
+					"height": 98
+				},
+				"durationMs": 130,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 23,
+				"trimY": 1,
+				"anchorX": 41,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-defeat-se-000-color",
+					"regionName": "warrior-defeat-se-0002",
+					"x": 181,
+					"y": 2,
+					"width": 84,
+					"height": 99
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-defeat-se-000-mask-nation",
+							"regionName": "warrior-defeat-se-0002",
+							"x": 181,
+							"y": 2,
+							"width": 84,
+							"height": 99
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-defeat-se-000-shadow",
+					"regionName": "warrior-defeat-se-0002",
+					"x": 181,
+					"y": 2,
+					"width": 84,
+					"height": 99
+				},
+				"durationMs": 130,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 18,
+				"trimY": 1,
+				"anchorX": 46,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-defeat-se-000-color",
+					"regionName": "warrior-defeat-se-0003",
+					"x": 269,
+					"y": 2,
+					"width": 103,
+					"height": 99
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-defeat-se-000-mask-nation",
+							"regionName": "warrior-defeat-se-0003",
+							"x": 269,
+							"y": 2,
+							"width": 103,
+							"height": 99
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-defeat-se-000-shadow",
+					"regionName": "warrior-defeat-se-0003",
+					"x": 269,
+					"y": 2,
+					"width": 103,
+					"height": 99
+				},
+				"durationMs": 130,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 13,
+				"trimY": 1,
+				"anchorX": 51,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-defeat-se-000-color",
+					"regionName": "warrior-defeat-se-0004",
+					"x": 376,
+					"y": 2,
+					"width": 103,
+					"height": 97
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-defeat-se-000-mask-nation",
+							"regionName": "warrior-defeat-se-0004",
+							"x": 376,
+							"y": 2,
+							"width": 103,
+							"height": 97
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-defeat-se-000-shadow",
+					"regionName": "warrior-defeat-se-0004",
+					"x": 376,
+					"y": 2,
+					"width": 103,
+					"height": 97
+				},
+				"durationMs": 130,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 13,
+				"trimY": 1,
+				"anchorX": 51,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-defeat-se-000-color",
+					"regionName": "warrior-defeat-se-0005",
+					"x": 483,
+					"y": 2,
+					"width": 102,
+					"height": 102
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-defeat-se-000-mask-nation",
+							"regionName": "warrior-defeat-se-0005",
+							"x": 483,
+							"y": 2,
+							"width": 102,
+							"height": 102
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-defeat-se-000-shadow",
+					"regionName": "warrior-defeat-se-0005",
+					"x": 483,
+					"y": 2,
+					"width": 102,
+					"height": 102
+				},
+				"durationMs": 130,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 13,
+				"trimY": 1,
+				"anchorX": 51,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-defeat-se-000-color",
+					"regionName": "warrior-defeat-se-0006",
+					"x": 589,
+					"y": 2,
+					"width": 103,
+					"height": 101
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-defeat-se-000-mask-nation",
+							"regionName": "warrior-defeat-se-0006",
+							"x": 589,
+							"y": 2,
+							"width": 103,
+							"height": 101
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-defeat-se-000-shadow",
+					"regionName": "warrior-defeat-se-0006",
+					"x": 589,
+					"y": 2,
+					"width": 103,
+					"height": 101
+				},
+				"durationMs": 130,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 13,
+				"trimY": 1,
+				"anchorX": 51,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-defeat-se-000-color",
+					"regionName": "warrior-defeat-se-0007",
+					"x": 696,
+					"y": 2,
+					"width": 103,
+					"height": 101
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-defeat-se-000-mask-nation",
+							"regionName": "warrior-defeat-se-0007",
+							"x": 696,
+							"y": 2,
+							"width": 103,
+							"height": 101
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-defeat-se-000-shadow",
+					"regionName": "warrior-defeat-se-0007",
+					"x": 696,
+					"y": 2,
+					"width": 103,
+					"height": 101
+				},
+				"durationMs": 130,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 13,
+				"trimY": 1,
+				"anchorX": 51,
+				"anchorY": 95
+			}
+		],
+		"anchorX": 64,
+		"anchorY": 96,
+		"staticFallbackKey": "TileSets/AtlasUnits/Units/Warrior",
+		"pageNames": [
+			"warrior-defeat-se-000-color",
+			"warrior-defeat-se-000-mask-nation",
+			"warrior-defeat-se-000-shadow"
+		],
+		"mirroredFacing": "SE",
+		"looping": false,
+		"maskIds": [ "nation" ],
+		"hasShadow": true,
+		"decodedBytes": 1572864,
+		"decodedStagingBytes": 524288,
+		"gpuBytes": 2097204
+	},
+	{
+		"unitName": "Warrior",
+		"state": "DEFEAT",
+		"facing": "W",
+		"frames": [
+			{
+				"color": {
+					"pageName": "warrior-defeat-e-000-color",
+					"regionName": "warrior-defeat-e-0000",
+					"x": 2,
+					"y": 2,
+					"width": 78,
+					"height": 92
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-defeat-e-000-mask-nation",
+							"regionName": "warrior-defeat-e-0000",
+							"x": 2,
+							"y": 2,
+							"width": 78,
+							"height": 92
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-defeat-e-000-shadow",
+					"regionName": "warrior-defeat-e-0000",
+					"x": 2,
+					"y": 2,
+					"width": 78,
+					"height": 92
+				},
+				"durationMs": 130,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 24,
+				"trimY": 1,
+				"anchorX": 40,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-defeat-e-000-color",
+					"regionName": "warrior-defeat-e-0001",
+					"x": 84,
+					"y": 2,
+					"width": 80,
+					"height": 92
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-defeat-e-000-mask-nation",
+							"regionName": "warrior-defeat-e-0001",
+							"x": 84,
+							"y": 2,
+							"width": 80,
+							"height": 92
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-defeat-e-000-shadow",
+					"regionName": "warrior-defeat-e-0001",
+					"x": 84,
+					"y": 2,
+					"width": 80,
+					"height": 92
+				},
+				"durationMs": 130,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 18,
+				"trimY": 1,
+				"anchorX": 46,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-defeat-e-000-color",
+					"regionName": "warrior-defeat-e-0002",
+					"x": 168,
+					"y": 2,
+					"width": 83,
+					"height": 91
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-defeat-e-000-mask-nation",
+							"regionName": "warrior-defeat-e-0002",
+							"x": 168,
+							"y": 2,
+							"width": 83,
+							"height": 91
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-defeat-e-000-shadow",
+					"regionName": "warrior-defeat-e-0002",
+					"x": 168,
+					"y": 2,
+					"width": 83,
+					"height": 91
+				},
+				"durationMs": 130,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 15,
+				"trimY": 1,
+				"anchorX": 49,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-defeat-e-000-color",
+					"regionName": "warrior-defeat-e-0003",
+					"x": 255,
+					"y": 2,
+					"width": 102,
+					"height": 91
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-defeat-e-000-mask-nation",
+							"regionName": "warrior-defeat-e-0003",
+							"x": 255,
+							"y": 2,
+							"width": 102,
+							"height": 91
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-defeat-e-000-shadow",
+					"regionName": "warrior-defeat-e-0003",
+					"x": 255,
+					"y": 2,
+					"width": 102,
+					"height": 91
+				},
+				"durationMs": 130,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 14,
+				"trimY": 1,
+				"anchorX": 50,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-defeat-e-000-color",
+					"regionName": "warrior-defeat-e-0004",
+					"x": 361,
+					"y": 2,
+					"width": 103,
+					"height": 88
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-defeat-e-000-mask-nation",
+							"regionName": "warrior-defeat-e-0004",
+							"x": 361,
+							"y": 2,
+							"width": 103,
+							"height": 88
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-defeat-e-000-shadow",
+					"regionName": "warrior-defeat-e-0004",
+					"x": 361,
+					"y": 2,
+					"width": 103,
+					"height": 88
+				},
+				"durationMs": 130,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 13,
+				"trimY": 1,
+				"anchorX": 51,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-defeat-e-000-color",
+					"regionName": "warrior-defeat-e-0005",
+					"x": 468,
+					"y": 2,
+					"width": 102,
+					"height": 95
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-defeat-e-000-mask-nation",
+							"regionName": "warrior-defeat-e-0005",
+							"x": 468,
+							"y": 2,
+							"width": 102,
+							"height": 95
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-defeat-e-000-shadow",
+					"regionName": "warrior-defeat-e-0005",
+					"x": 468,
+					"y": 2,
+					"width": 102,
+					"height": 95
+				},
+				"durationMs": 130,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 13,
+				"trimY": 1,
+				"anchorX": 51,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-defeat-e-000-color",
+					"regionName": "warrior-defeat-e-0006",
+					"x": 574,
+					"y": 2,
+					"width": 103,
+					"height": 95
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-defeat-e-000-mask-nation",
+							"regionName": "warrior-defeat-e-0006",
+							"x": 574,
+							"y": 2,
+							"width": 103,
+							"height": 95
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-defeat-e-000-shadow",
+					"regionName": "warrior-defeat-e-0006",
+					"x": 574,
+					"y": 2,
+					"width": 103,
+					"height": 95
+				},
+				"durationMs": 130,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 13,
+				"trimY": 1,
+				"anchorX": 51,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-defeat-e-000-color",
+					"regionName": "warrior-defeat-e-0007",
+					"x": 681,
+					"y": 2,
+					"width": 99,
+					"height": 96
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-defeat-e-000-mask-nation",
+							"regionName": "warrior-defeat-e-0007",
+							"x": 681,
+							"y": 2,
+							"width": 99,
+							"height": 96
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-defeat-e-000-shadow",
+					"regionName": "warrior-defeat-e-0007",
+					"x": 681,
+					"y": 2,
+					"width": 99,
+					"height": 96
+				},
+				"durationMs": 130,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 13,
+				"trimY": 1,
+				"anchorX": 51,
+				"anchorY": 95
+			}
+		],
+		"anchorX": 64,
+		"anchorY": 96,
+		"staticFallbackKey": "TileSets/AtlasUnits/Units/Warrior",
+		"pageNames": [ "warrior-defeat-e-000-color", "warrior-defeat-e-000-mask-nation", "warrior-defeat-e-000-shadow" ],
+		"mirroredFacing": "E",
+		"looping": false,
+		"maskIds": [ "nation" ],
+		"hasShadow": true,
+		"decodedBytes": 1572864,
+		"decodedStagingBytes": 524288,
+		"gpuBytes": 2097204
+	},
+	{
+		"unitName": "Warrior",
+		"state": "HIT",
+		"facing": "E",
+		"frames": [
+			{
+				"color": {
+					"pageName": "warrior-hit-e-000-color",
+					"regionName": "warrior-hit-e-0000",
+					"x": 2,
+					"y": 2,
+					"width": 92,
+					"height": 92
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-hit-e-000-mask-nation",
+							"regionName": "warrior-hit-e-0000",
+							"x": 2,
+							"y": 2,
+							"width": 92,
+							"height": 92
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-hit-e-000-shadow",
+					"regionName": "warrior-hit-e-0000",
+					"x": 2,
+					"y": 2,
+					"width": 92,
+					"height": 92
+				},
+				"durationMs": 95,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 16,
+				"trimY": 12,
+				"anchorX": 48,
+				"anchorY": 84
+			},
+			{
+				"color": {
+					"pageName": "warrior-hit-e-000-color",
+					"regionName": "warrior-hit-e-0001",
+					"x": 98,
+					"y": 2,
+					"width": 82,
+					"height": 82
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-hit-e-000-mask-nation",
+							"regionName": "warrior-hit-e-0001",
+							"x": 98,
+							"y": 2,
+							"width": 82,
+							"height": 82
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-hit-e-000-shadow",
+					"regionName": "warrior-hit-e-0001",
+					"x": 98,
+					"y": 2,
+					"width": 82,
+					"height": 82
+				},
+				"durationMs": 95,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 24,
+				"trimY": 22,
+				"anchorX": 40,
+				"anchorY": 74
+			},
+			{
+				"color": {
+					"pageName": "warrior-hit-e-000-color",
+					"regionName": "warrior-hit-e-0002",
+					"x": 184,
+					"y": 2,
+					"width": 81,
+					"height": 91
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-hit-e-000-mask-nation",
+							"regionName": "warrior-hit-e-0002",
+							"x": 184,
+							"y": 2,
+							"width": 81,
+							"height": 91
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-hit-e-000-shadow",
+					"regionName": "warrior-hit-e-0002",
+					"x": 184,
+					"y": 2,
+					"width": 81,
+					"height": 91
+				},
+				"durationMs": 95,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 26,
+				"trimY": 13,
+				"anchorX": 38,
+				"anchorY": 83
+			},
+			{
+				"color": {
+					"pageName": "warrior-hit-e-000-color",
+					"regionName": "warrior-hit-e-0003",
+					"x": 269,
+					"y": 2,
+					"width": 72,
+					"height": 94
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-hit-e-000-mask-nation",
+							"regionName": "warrior-hit-e-0003",
+							"x": 269,
+							"y": 2,
+							"width": 72,
+							"height": 94
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-hit-e-000-shadow",
+					"regionName": "warrior-hit-e-0003",
+					"x": 269,
+					"y": 2,
+					"width": 72,
+					"height": 94
+				},
+				"durationMs": 95,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 30,
+				"trimY": 10,
+				"anchorX": 34,
+				"anchorY": 86
+			}
+		],
+		"anchorX": 64,
+		"anchorY": 96,
+		"staticFallbackKey": "TileSets/AtlasUnits/Units/Warrior",
+		"pageNames": [ "warrior-hit-e-000-color", "warrior-hit-e-000-mask-nation", "warrior-hit-e-000-shadow" ],
+		"mirroredFacing": null,
+		"looping": false,
+		"maskIds": [ "nation" ],
+		"hasShadow": true,
+		"decodedBytes": 786432,
+		"decodedStagingBytes": 262144,
+		"gpuBytes": 1048596
+	},
+	{
+		"unitName": "Warrior",
+		"state": "HIT",
+		"facing": "NE",
+		"frames": [
+			{
+				"color": {
+					"pageName": "warrior-hit-ne-000-color",
+					"regionName": "warrior-hit-ne-0000",
+					"x": 2,
+					"y": 2,
+					"width": 78,
+					"height": 97
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-hit-ne-000-mask-nation",
+							"regionName": "warrior-hit-ne-0000",
+							"x": 2,
+							"y": 2,
+							"width": 78,
+							"height": 97
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-hit-ne-000-shadow",
+					"regionName": "warrior-hit-ne-0000",
+					"x": 2,
+					"y": 2,
+					"width": 78,
+					"height": 97
+				},
+				"durationMs": 95,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 34,
+				"trimY": 7,
+				"anchorX": 30,
+				"anchorY": 89
+			},
+			{
+				"color": {
+					"pageName": "warrior-hit-ne-000-color",
+					"regionName": "warrior-hit-ne-0001",
+					"x": 84,
+					"y": 2,
+					"width": 79,
+					"height": 95
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-hit-ne-000-mask-nation",
+							"regionName": "warrior-hit-ne-0001",
+							"x": 84,
+							"y": 2,
+							"width": 79,
+							"height": 95
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-hit-ne-000-shadow",
+					"regionName": "warrior-hit-ne-0001",
+					"x": 84,
+					"y": 2,
+					"width": 79,
+					"height": 95
+				},
+				"durationMs": 95,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 28,
+				"trimY": 9,
+				"anchorX": 36,
+				"anchorY": 87
+			},
+			{
+				"color": {
+					"pageName": "warrior-hit-ne-000-color",
+					"regionName": "warrior-hit-ne-0002",
+					"x": 167,
+					"y": 2,
+					"width": 84,
+					"height": 86
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-hit-ne-000-mask-nation",
+							"regionName": "warrior-hit-ne-0002",
+							"x": 167,
+							"y": 2,
+							"width": 84,
+							"height": 86
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-hit-ne-000-shadow",
+					"regionName": "warrior-hit-ne-0002",
+					"x": 167,
+					"y": 2,
+					"width": 84,
+					"height": 86
+				},
+				"durationMs": 95,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 32,
+				"trimY": 18,
+				"anchorX": 32,
+				"anchorY": 78
+			},
+			{
+				"color": {
+					"pageName": "warrior-hit-ne-000-color",
+					"regionName": "warrior-hit-ne-0003",
+					"x": 255,
+					"y": 2,
+					"width": 79,
+					"height": 98
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-hit-ne-000-mask-nation",
+							"regionName": "warrior-hit-ne-0003",
+							"x": 255,
+							"y": 2,
+							"width": 79,
+							"height": 98
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-hit-ne-000-shadow",
+					"regionName": "warrior-hit-ne-0003",
+					"x": 255,
+					"y": 2,
+					"width": 79,
+					"height": 98
+				},
+				"durationMs": 95,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 32,
+				"trimY": 6,
+				"anchorX": 32,
+				"anchorY": 90
+			}
+		],
+		"anchorX": 64,
+		"anchorY": 96,
+		"staticFallbackKey": "TileSets/AtlasUnits/Units/Warrior",
+		"pageNames": [ "warrior-hit-ne-000-color", "warrior-hit-ne-000-mask-nation", "warrior-hit-ne-000-shadow" ],
+		"mirroredFacing": null,
+		"looping": false,
+		"maskIds": [ "nation" ],
+		"hasShadow": true,
+		"decodedBytes": 786432,
+		"decodedStagingBytes": 262144,
+		"gpuBytes": 1048596
+	},
+	{
+		"unitName": "Warrior",
+		"state": "HIT",
+		"facing": "NW",
+		"frames": [
+			{
+				"color": {
+					"pageName": "warrior-hit-ne-000-color",
+					"regionName": "warrior-hit-ne-0000",
+					"x": 2,
+					"y": 2,
+					"width": 78,
+					"height": 97
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-hit-ne-000-mask-nation",
+							"regionName": "warrior-hit-ne-0000",
+							"x": 2,
+							"y": 2,
+							"width": 78,
+							"height": 97
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-hit-ne-000-shadow",
+					"regionName": "warrior-hit-ne-0000",
+					"x": 2,
+					"y": 2,
+					"width": 78,
+					"height": 97
+				},
+				"durationMs": 95,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 34,
+				"trimY": 7,
+				"anchorX": 30,
+				"anchorY": 89
+			},
+			{
+				"color": {
+					"pageName": "warrior-hit-ne-000-color",
+					"regionName": "warrior-hit-ne-0001",
+					"x": 84,
+					"y": 2,
+					"width": 79,
+					"height": 95
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-hit-ne-000-mask-nation",
+							"regionName": "warrior-hit-ne-0001",
+							"x": 84,
+							"y": 2,
+							"width": 79,
+							"height": 95
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-hit-ne-000-shadow",
+					"regionName": "warrior-hit-ne-0001",
+					"x": 84,
+					"y": 2,
+					"width": 79,
+					"height": 95
+				},
+				"durationMs": 95,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 28,
+				"trimY": 9,
+				"anchorX": 36,
+				"anchorY": 87
+			},
+			{
+				"color": {
+					"pageName": "warrior-hit-ne-000-color",
+					"regionName": "warrior-hit-ne-0002",
+					"x": 167,
+					"y": 2,
+					"width": 84,
+					"height": 86
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-hit-ne-000-mask-nation",
+							"regionName": "warrior-hit-ne-0002",
+							"x": 167,
+							"y": 2,
+							"width": 84,
+							"height": 86
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-hit-ne-000-shadow",
+					"regionName": "warrior-hit-ne-0002",
+					"x": 167,
+					"y": 2,
+					"width": 84,
+					"height": 86
+				},
+				"durationMs": 95,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 32,
+				"trimY": 18,
+				"anchorX": 32,
+				"anchorY": 78
+			},
+			{
+				"color": {
+					"pageName": "warrior-hit-ne-000-color",
+					"regionName": "warrior-hit-ne-0003",
+					"x": 255,
+					"y": 2,
+					"width": 79,
+					"height": 98
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-hit-ne-000-mask-nation",
+							"regionName": "warrior-hit-ne-0003",
+							"x": 255,
+							"y": 2,
+							"width": 79,
+							"height": 98
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-hit-ne-000-shadow",
+					"regionName": "warrior-hit-ne-0003",
+					"x": 255,
+					"y": 2,
+					"width": 79,
+					"height": 98
+				},
+				"durationMs": 95,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 32,
+				"trimY": 6,
+				"anchorX": 32,
+				"anchorY": 90
+			}
+		],
+		"anchorX": 64,
+		"anchorY": 96,
+		"staticFallbackKey": "TileSets/AtlasUnits/Units/Warrior",
+		"pageNames": [ "warrior-hit-ne-000-color", "warrior-hit-ne-000-mask-nation", "warrior-hit-ne-000-shadow" ],
+		"mirroredFacing": "NE",
+		"looping": false,
+		"maskIds": [ "nation" ],
+		"hasShadow": true,
+		"decodedBytes": 786432,
+		"decodedStagingBytes": 262144,
+		"gpuBytes": 1048596
+	},
+	{
+		"unitName": "Warrior",
+		"state": "HIT",
+		"facing": "SE",
+		"frames": [
+			{
+				"color": {
+					"pageName": "warrior-hit-se-000-color",
+					"regionName": "warrior-hit-se-0000",
+					"x": 2,
+					"y": 2,
+					"width": 82,
+					"height": 97
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-hit-se-000-mask-nation",
+							"regionName": "warrior-hit-se-0000",
+							"x": 2,
+							"y": 2,
+							"width": 82,
+							"height": 97
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-hit-se-000-shadow",
+					"regionName": "warrior-hit-se-0000",
+					"x": 2,
+					"y": 2,
+					"width": 82,
+					"height": 97
+				},
+				"durationMs": 95,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 25,
+				"trimY": 7,
+				"anchorX": 39,
+				"anchorY": 89
+			},
+			{
+				"color": {
+					"pageName": "warrior-hit-se-000-color",
+					"regionName": "warrior-hit-se-0001",
+					"x": 88,
+					"y": 2,
+					"width": 78,
+					"height": 84
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-hit-se-000-mask-nation",
+							"regionName": "warrior-hit-se-0001",
+							"x": 88,
+							"y": 2,
+							"width": 78,
+							"height": 84
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-hit-se-000-shadow",
+					"regionName": "warrior-hit-se-0001",
+					"x": 88,
+					"y": 2,
+					"width": 78,
+					"height": 84
+				},
+				"durationMs": 95,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 36,
+				"trimY": 20,
+				"anchorX": 28,
+				"anchorY": 76
+			},
+			{
+				"color": {
+					"pageName": "warrior-hit-se-000-color",
+					"regionName": "warrior-hit-se-0002",
+					"x": 170,
+					"y": 2,
+					"width": 84,
+					"height": 90
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-hit-se-000-mask-nation",
+							"regionName": "warrior-hit-se-0002",
+							"x": 170,
+							"y": 2,
+							"width": 84,
+							"height": 90
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-hit-se-000-shadow",
+					"regionName": "warrior-hit-se-0002",
+					"x": 170,
+					"y": 2,
+					"width": 84,
+					"height": 90
+				},
+				"durationMs": 95,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 29,
+				"trimY": 14,
+				"anchorX": 35,
+				"anchorY": 82
+			},
+			{
+				"color": {
+					"pageName": "warrior-hit-se-000-color",
+					"regionName": "warrior-hit-se-0003",
+					"x": 258,
+					"y": 2,
+					"width": 75,
+					"height": 99
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-hit-se-000-mask-nation",
+							"regionName": "warrior-hit-se-0003",
+							"x": 258,
+							"y": 2,
+							"width": 75,
+							"height": 99
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-hit-se-000-shadow",
+					"regionName": "warrior-hit-se-0003",
+					"x": 258,
+					"y": 2,
+					"width": 75,
+					"height": 99
+				},
+				"durationMs": 95,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 27,
+				"trimY": 5,
+				"anchorX": 37,
+				"anchorY": 91
+			}
+		],
+		"anchorX": 64,
+		"anchorY": 96,
+		"staticFallbackKey": "TileSets/AtlasUnits/Units/Warrior",
+		"pageNames": [ "warrior-hit-se-000-color", "warrior-hit-se-000-mask-nation", "warrior-hit-se-000-shadow" ],
+		"mirroredFacing": null,
+		"looping": false,
+		"maskIds": [ "nation" ],
+		"hasShadow": true,
+		"decodedBytes": 786432,
+		"decodedStagingBytes": 262144,
+		"gpuBytes": 1048596
+	},
+	{
+		"unitName": "Warrior",
+		"state": "HIT",
+		"facing": "SW",
+		"frames": [
+			{
+				"color": {
+					"pageName": "warrior-hit-se-000-color",
+					"regionName": "warrior-hit-se-0000",
+					"x": 2,
+					"y": 2,
+					"width": 82,
+					"height": 97
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-hit-se-000-mask-nation",
+							"regionName": "warrior-hit-se-0000",
+							"x": 2,
+							"y": 2,
+							"width": 82,
+							"height": 97
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-hit-se-000-shadow",
+					"regionName": "warrior-hit-se-0000",
+					"x": 2,
+					"y": 2,
+					"width": 82,
+					"height": 97
+				},
+				"durationMs": 95,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 25,
+				"trimY": 7,
+				"anchorX": 39,
+				"anchorY": 89
+			},
+			{
+				"color": {
+					"pageName": "warrior-hit-se-000-color",
+					"regionName": "warrior-hit-se-0001",
+					"x": 88,
+					"y": 2,
+					"width": 78,
+					"height": 84
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-hit-se-000-mask-nation",
+							"regionName": "warrior-hit-se-0001",
+							"x": 88,
+							"y": 2,
+							"width": 78,
+							"height": 84
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-hit-se-000-shadow",
+					"regionName": "warrior-hit-se-0001",
+					"x": 88,
+					"y": 2,
+					"width": 78,
+					"height": 84
+				},
+				"durationMs": 95,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 36,
+				"trimY": 20,
+				"anchorX": 28,
+				"anchorY": 76
+			},
+			{
+				"color": {
+					"pageName": "warrior-hit-se-000-color",
+					"regionName": "warrior-hit-se-0002",
+					"x": 170,
+					"y": 2,
+					"width": 84,
+					"height": 90
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-hit-se-000-mask-nation",
+							"regionName": "warrior-hit-se-0002",
+							"x": 170,
+							"y": 2,
+							"width": 84,
+							"height": 90
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-hit-se-000-shadow",
+					"regionName": "warrior-hit-se-0002",
+					"x": 170,
+					"y": 2,
+					"width": 84,
+					"height": 90
+				},
+				"durationMs": 95,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 29,
+				"trimY": 14,
+				"anchorX": 35,
+				"anchorY": 82
+			},
+			{
+				"color": {
+					"pageName": "warrior-hit-se-000-color",
+					"regionName": "warrior-hit-se-0003",
+					"x": 258,
+					"y": 2,
+					"width": 75,
+					"height": 99
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-hit-se-000-mask-nation",
+							"regionName": "warrior-hit-se-0003",
+							"x": 258,
+							"y": 2,
+							"width": 75,
+							"height": 99
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-hit-se-000-shadow",
+					"regionName": "warrior-hit-se-0003",
+					"x": 258,
+					"y": 2,
+					"width": 75,
+					"height": 99
+				},
+				"durationMs": 95,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 27,
+				"trimY": 5,
+				"anchorX": 37,
+				"anchorY": 91
+			}
+		],
+		"anchorX": 64,
+		"anchorY": 96,
+		"staticFallbackKey": "TileSets/AtlasUnits/Units/Warrior",
+		"pageNames": [ "warrior-hit-se-000-color", "warrior-hit-se-000-mask-nation", "warrior-hit-se-000-shadow" ],
+		"mirroredFacing": "SE",
+		"looping": false,
+		"maskIds": [ "nation" ],
+		"hasShadow": true,
+		"decodedBytes": 786432,
+		"decodedStagingBytes": 262144,
+		"gpuBytes": 1048596
+	},
+	{
+		"unitName": "Warrior",
+		"state": "HIT",
+		"facing": "W",
+		"frames": [
+			{
+				"color": {
+					"pageName": "warrior-hit-e-000-color",
+					"regionName": "warrior-hit-e-0000",
+					"x": 2,
+					"y": 2,
+					"width": 92,
+					"height": 92
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-hit-e-000-mask-nation",
+							"regionName": "warrior-hit-e-0000",
+							"x": 2,
+							"y": 2,
+							"width": 92,
+							"height": 92
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-hit-e-000-shadow",
+					"regionName": "warrior-hit-e-0000",
+					"x": 2,
+					"y": 2,
+					"width": 92,
+					"height": 92
+				},
+				"durationMs": 95,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 16,
+				"trimY": 12,
+				"anchorX": 48,
+				"anchorY": 84
+			},
+			{
+				"color": {
+					"pageName": "warrior-hit-e-000-color",
+					"regionName": "warrior-hit-e-0001",
+					"x": 98,
+					"y": 2,
+					"width": 82,
+					"height": 82
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-hit-e-000-mask-nation",
+							"regionName": "warrior-hit-e-0001",
+							"x": 98,
+							"y": 2,
+							"width": 82,
+							"height": 82
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-hit-e-000-shadow",
+					"regionName": "warrior-hit-e-0001",
+					"x": 98,
+					"y": 2,
+					"width": 82,
+					"height": 82
+				},
+				"durationMs": 95,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 24,
+				"trimY": 22,
+				"anchorX": 40,
+				"anchorY": 74
+			},
+			{
+				"color": {
+					"pageName": "warrior-hit-e-000-color",
+					"regionName": "warrior-hit-e-0002",
+					"x": 184,
+					"y": 2,
+					"width": 81,
+					"height": 91
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-hit-e-000-mask-nation",
+							"regionName": "warrior-hit-e-0002",
+							"x": 184,
+							"y": 2,
+							"width": 81,
+							"height": 91
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-hit-e-000-shadow",
+					"regionName": "warrior-hit-e-0002",
+					"x": 184,
+					"y": 2,
+					"width": 81,
+					"height": 91
+				},
+				"durationMs": 95,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 26,
+				"trimY": 13,
+				"anchorX": 38,
+				"anchorY": 83
+			},
+			{
+				"color": {
+					"pageName": "warrior-hit-e-000-color",
+					"regionName": "warrior-hit-e-0003",
+					"x": 269,
+					"y": 2,
+					"width": 72,
+					"height": 94
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-hit-e-000-mask-nation",
+							"regionName": "warrior-hit-e-0003",
+							"x": 269,
+							"y": 2,
+							"width": 72,
+							"height": 94
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-hit-e-000-shadow",
+					"regionName": "warrior-hit-e-0003",
+					"x": 269,
+					"y": 2,
+					"width": 72,
+					"height": 94
+				},
+				"durationMs": 95,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 30,
+				"trimY": 10,
+				"anchorX": 34,
+				"anchorY": 86
+			}
+		],
+		"anchorX": 64,
+		"anchorY": 96,
+		"staticFallbackKey": "TileSets/AtlasUnits/Units/Warrior",
+		"pageNames": [ "warrior-hit-e-000-color", "warrior-hit-e-000-mask-nation", "warrior-hit-e-000-shadow" ],
+		"mirroredFacing": "E",
+		"looping": false,
+		"maskIds": [ "nation" ],
+		"hasShadow": true,
+		"decodedBytes": 786432,
+		"decodedStagingBytes": 262144,
+		"gpuBytes": 1048596
+	},
+	{
+		"unitName": "Warrior",
+		"state": "IDLE",
+		"facing": "E",
+		"frames": [
+			{
+				"color": {
+					"pageName": "warrior-idle-e-000-color",
+					"regionName": "warrior-idle-e-0000",
+					"x": 2,
+					"y": 2,
+					"width": 73,
+					"height": 97
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-idle-e-000-mask-nation",
+							"regionName": "warrior-idle-e-0000",
+							"x": 2,
+							"y": 2,
+							"width": 73,
+							"height": 97
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-idle-e-000-shadow",
+					"regionName": "warrior-idle-e-0000",
+					"x": 2,
+					"y": 2,
+					"width": 73,
+					"height": 97
+				},
+				"durationMs": 160,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 28,
+				"trimY": 7,
+				"anchorX": 36,
+				"anchorY": 89
+			},
+			{
+				"color": {
+					"pageName": "warrior-idle-e-000-color",
+					"regionName": "warrior-idle-e-0001",
+					"x": 79,
+					"y": 2,
+					"width": 74,
+					"height": 97
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-idle-e-000-mask-nation",
+							"regionName": "warrior-idle-e-0001",
+							"x": 79,
+							"y": 2,
+							"width": 74,
+							"height": 97
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-idle-e-000-shadow",
+					"regionName": "warrior-idle-e-0001",
+					"x": 79,
+					"y": 2,
+					"width": 74,
+					"height": 97
+				},
+				"durationMs": 160,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 26,
+				"trimY": 7,
+				"anchorX": 38,
+				"anchorY": 89
+			},
+			{
+				"color": {
+					"pageName": "warrior-idle-e-000-color",
+					"regionName": "warrior-idle-e-0002",
+					"x": 157,
+					"y": 2,
+					"width": 69,
+					"height": 97
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-idle-e-000-mask-nation",
+							"regionName": "warrior-idle-e-0002",
+							"x": 157,
+							"y": 2,
+							"width": 69,
+							"height": 97
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-idle-e-000-shadow",
+					"regionName": "warrior-idle-e-0002",
+					"x": 157,
+					"y": 2,
+					"width": 69,
+					"height": 97
+				},
+				"durationMs": 160,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 31,
+				"trimY": 7,
+				"anchorX": 33,
+				"anchorY": 89
+			},
+			{
+				"color": {
+					"pageName": "warrior-idle-e-000-color",
+					"regionName": "warrior-idle-e-0003",
+					"x": 230,
+					"y": 2,
+					"width": 73,
+					"height": 97
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-idle-e-000-mask-nation",
+							"regionName": "warrior-idle-e-0003",
+							"x": 230,
+							"y": 2,
+							"width": 73,
+							"height": 97
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-idle-e-000-shadow",
+					"regionName": "warrior-idle-e-0003",
+					"x": 230,
+					"y": 2,
+					"width": 73,
+					"height": 97
+				},
+				"durationMs": 160,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 28,
+				"trimY": 7,
+				"anchorX": 36,
+				"anchorY": 89
+			}
+		],
+		"anchorX": 64,
+		"anchorY": 96,
+		"staticFallbackKey": "TileSets/AtlasUnits/Units/Warrior",
+		"pageNames": [ "warrior-idle-e-000-color", "warrior-idle-e-000-mask-nation", "warrior-idle-e-000-shadow" ],
+		"mirroredFacing": null,
+		"looping": true,
+		"maskIds": [ "nation" ],
+		"hasShadow": true,
+		"decodedBytes": 786432,
+		"decodedStagingBytes": 262144,
+		"gpuBytes": 1048596
+	},
+	{
+		"unitName": "Warrior",
+		"state": "IDLE",
+		"facing": "NE",
+		"frames": [
+			{
+				"color": {
+					"pageName": "warrior-idle-ne-000-color",
+					"regionName": "warrior-idle-ne-0000",
+					"x": 2,
+					"y": 2,
+					"width": 82,
+					"height": 98
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-idle-ne-000-mask-nation",
+							"regionName": "warrior-idle-ne-0000",
+							"x": 2,
+							"y": 2,
+							"width": 82,
+							"height": 98
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-idle-ne-000-shadow",
+					"regionName": "warrior-idle-ne-0000",
+					"x": 2,
+					"y": 2,
+					"width": 82,
+					"height": 98
+				},
+				"durationMs": 160,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 31,
+				"trimY": 6,
+				"anchorX": 33,
+				"anchorY": 90
+			},
+			{
+				"color": {
+					"pageName": "warrior-idle-ne-000-color",
+					"regionName": "warrior-idle-ne-0001",
+					"x": 88,
+					"y": 2,
+					"width": 77,
+					"height": 99
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-idle-ne-000-mask-nation",
+							"regionName": "warrior-idle-ne-0001",
+							"x": 88,
+							"y": 2,
+							"width": 77,
+							"height": 99
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-idle-ne-000-shadow",
+					"regionName": "warrior-idle-ne-0001",
+					"x": 88,
+					"y": 2,
+					"width": 77,
+					"height": 99
+				},
+				"durationMs": 160,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 30,
+				"trimY": 5,
+				"anchorX": 34,
+				"anchorY": 91
+			},
+			{
+				"color": {
+					"pageName": "warrior-idle-ne-000-color",
+					"regionName": "warrior-idle-ne-0002",
+					"x": 169,
+					"y": 2,
+					"width": 81,
+					"height": 99
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-idle-ne-000-mask-nation",
+							"regionName": "warrior-idle-ne-0002",
+							"x": 169,
+							"y": 2,
+							"width": 81,
+							"height": 99
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-idle-ne-000-shadow",
+					"regionName": "warrior-idle-ne-0002",
+					"x": 169,
+					"y": 2,
+					"width": 81,
+					"height": 99
+				},
+				"durationMs": 160,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 30,
+				"trimY": 5,
+				"anchorX": 34,
+				"anchorY": 91
+			},
+			{
+				"color": {
+					"pageName": "warrior-idle-ne-000-color",
+					"regionName": "warrior-idle-ne-0003",
+					"x": 254,
+					"y": 2,
+					"width": 80,
+					"height": 99
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-idle-ne-000-mask-nation",
+							"regionName": "warrior-idle-ne-0003",
+							"x": 254,
+							"y": 2,
+							"width": 80,
+							"height": 99
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-idle-ne-000-shadow",
+					"regionName": "warrior-idle-ne-0003",
+					"x": 254,
+					"y": 2,
+					"width": 80,
+					"height": 99
+				},
+				"durationMs": 160,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 28,
+				"trimY": 5,
+				"anchorX": 36,
+				"anchorY": 91
+			}
+		],
+		"anchorX": 64,
+		"anchorY": 96,
+		"staticFallbackKey": "TileSets/AtlasUnits/Units/Warrior",
+		"pageNames": [ "warrior-idle-ne-000-color", "warrior-idle-ne-000-mask-nation", "warrior-idle-ne-000-shadow" ],
+		"mirroredFacing": null,
+		"looping": true,
+		"maskIds": [ "nation" ],
+		"hasShadow": true,
+		"decodedBytes": 786432,
+		"decodedStagingBytes": 262144,
+		"gpuBytes": 1048596
+	},
+	{
+		"unitName": "Warrior",
+		"state": "IDLE",
+		"facing": "NW",
+		"frames": [
+			{
+				"color": {
+					"pageName": "warrior-idle-ne-000-color",
+					"regionName": "warrior-idle-ne-0000",
+					"x": 2,
+					"y": 2,
+					"width": 82,
+					"height": 98
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-idle-ne-000-mask-nation",
+							"regionName": "warrior-idle-ne-0000",
+							"x": 2,
+							"y": 2,
+							"width": 82,
+							"height": 98
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-idle-ne-000-shadow",
+					"regionName": "warrior-idle-ne-0000",
+					"x": 2,
+					"y": 2,
+					"width": 82,
+					"height": 98
+				},
+				"durationMs": 160,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 31,
+				"trimY": 6,
+				"anchorX": 33,
+				"anchorY": 90
+			},
+			{
+				"color": {
+					"pageName": "warrior-idle-ne-000-color",
+					"regionName": "warrior-idle-ne-0001",
+					"x": 88,
+					"y": 2,
+					"width": 77,
+					"height": 99
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-idle-ne-000-mask-nation",
+							"regionName": "warrior-idle-ne-0001",
+							"x": 88,
+							"y": 2,
+							"width": 77,
+							"height": 99
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-idle-ne-000-shadow",
+					"regionName": "warrior-idle-ne-0001",
+					"x": 88,
+					"y": 2,
+					"width": 77,
+					"height": 99
+				},
+				"durationMs": 160,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 30,
+				"trimY": 5,
+				"anchorX": 34,
+				"anchorY": 91
+			},
+			{
+				"color": {
+					"pageName": "warrior-idle-ne-000-color",
+					"regionName": "warrior-idle-ne-0002",
+					"x": 169,
+					"y": 2,
+					"width": 81,
+					"height": 99
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-idle-ne-000-mask-nation",
+							"regionName": "warrior-idle-ne-0002",
+							"x": 169,
+							"y": 2,
+							"width": 81,
+							"height": 99
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-idle-ne-000-shadow",
+					"regionName": "warrior-idle-ne-0002",
+					"x": 169,
+					"y": 2,
+					"width": 81,
+					"height": 99
+				},
+				"durationMs": 160,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 30,
+				"trimY": 5,
+				"anchorX": 34,
+				"anchorY": 91
+			},
+			{
+				"color": {
+					"pageName": "warrior-idle-ne-000-color",
+					"regionName": "warrior-idle-ne-0003",
+					"x": 254,
+					"y": 2,
+					"width": 80,
+					"height": 99
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-idle-ne-000-mask-nation",
+							"regionName": "warrior-idle-ne-0003",
+							"x": 254,
+							"y": 2,
+							"width": 80,
+							"height": 99
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-idle-ne-000-shadow",
+					"regionName": "warrior-idle-ne-0003",
+					"x": 254,
+					"y": 2,
+					"width": 80,
+					"height": 99
+				},
+				"durationMs": 160,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 28,
+				"trimY": 5,
+				"anchorX": 36,
+				"anchorY": 91
+			}
+		],
+		"anchorX": 64,
+		"anchorY": 96,
+		"staticFallbackKey": "TileSets/AtlasUnits/Units/Warrior",
+		"pageNames": [ "warrior-idle-ne-000-color", "warrior-idle-ne-000-mask-nation", "warrior-idle-ne-000-shadow" ],
+		"mirroredFacing": "NE",
+		"looping": true,
+		"maskIds": [ "nation" ],
+		"hasShadow": true,
+		"decodedBytes": 786432,
+		"decodedStagingBytes": 262144,
+		"gpuBytes": 1048596
+	},
+	{
+		"unitName": "Warrior",
+		"state": "IDLE",
+		"facing": "SE",
+		"frames": [
+			{
+				"color": {
+					"pageName": "warrior-idle-se-000-color",
+					"regionName": "warrior-idle-se-0000",
+					"x": 2,
+					"y": 2,
+					"width": 77,
+					"height": 100
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-idle-se-000-mask-nation",
+							"regionName": "warrior-idle-se-0000",
+							"x": 2,
+							"y": 2,
+							"width": 77,
+							"height": 100
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-idle-se-000-shadow",
+					"regionName": "warrior-idle-se-0000",
+					"x": 2,
+					"y": 2,
+					"width": 77,
+					"height": 100
+				},
+				"durationMs": 160,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 25,
+				"trimY": 4,
+				"anchorX": 39,
+				"anchorY": 92
+			},
+			{
+				"color": {
+					"pageName": "warrior-idle-se-000-color",
+					"regionName": "warrior-idle-se-0001",
+					"x": 83,
+					"y": 2,
+					"width": 81,
+					"height": 99
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-idle-se-000-mask-nation",
+							"regionName": "warrior-idle-se-0001",
+							"x": 83,
+							"y": 2,
+							"width": 81,
+							"height": 99
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-idle-se-000-shadow",
+					"regionName": "warrior-idle-se-0001",
+					"x": 83,
+					"y": 2,
+					"width": 81,
+					"height": 99
+				},
+				"durationMs": 160,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 26,
+				"trimY": 5,
+				"anchorX": 38,
+				"anchorY": 91
+			},
+			{
+				"color": {
+					"pageName": "warrior-idle-se-000-color",
+					"regionName": "warrior-idle-se-0002",
+					"x": 168,
+					"y": 2,
+					"width": 73,
+					"height": 100
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-idle-se-000-mask-nation",
+							"regionName": "warrior-idle-se-0002",
+							"x": 168,
+							"y": 2,
+							"width": 73,
+							"height": 100
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-idle-se-000-shadow",
+					"regionName": "warrior-idle-se-0002",
+					"x": 168,
+					"y": 2,
+					"width": 73,
+					"height": 100
+				},
+				"durationMs": 160,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 28,
+				"trimY": 4,
+				"anchorX": 36,
+				"anchorY": 92
+			},
+			{
+				"color": {
+					"pageName": "warrior-idle-se-000-color",
+					"regionName": "warrior-idle-se-0003",
+					"x": 245,
+					"y": 2,
+					"width": 78,
+					"height": 99
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-idle-se-000-mask-nation",
+							"regionName": "warrior-idle-se-0003",
+							"x": 245,
+							"y": 2,
+							"width": 78,
+							"height": 99
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-idle-se-000-shadow",
+					"regionName": "warrior-idle-se-0003",
+					"x": 245,
+					"y": 2,
+					"width": 78,
+					"height": 99
+				},
+				"durationMs": 160,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 23,
+				"trimY": 5,
+				"anchorX": 41,
+				"anchorY": 91
+			}
+		],
+		"anchorX": 64,
+		"anchorY": 96,
+		"staticFallbackKey": "TileSets/AtlasUnits/Units/Warrior",
+		"pageNames": [ "warrior-idle-se-000-color", "warrior-idle-se-000-mask-nation", "warrior-idle-se-000-shadow" ],
+		"mirroredFacing": null,
+		"looping": true,
+		"maskIds": [ "nation" ],
+		"hasShadow": true,
+		"decodedBytes": 786432,
+		"decodedStagingBytes": 262144,
+		"gpuBytes": 1048596
+	},
+	{
+		"unitName": "Warrior",
+		"state": "IDLE",
+		"facing": "SW",
+		"frames": [
+			{
+				"color": {
+					"pageName": "warrior-idle-se-000-color",
+					"regionName": "warrior-idle-se-0000",
+					"x": 2,
+					"y": 2,
+					"width": 77,
+					"height": 100
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-idle-se-000-mask-nation",
+							"regionName": "warrior-idle-se-0000",
+							"x": 2,
+							"y": 2,
+							"width": 77,
+							"height": 100
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-idle-se-000-shadow",
+					"regionName": "warrior-idle-se-0000",
+					"x": 2,
+					"y": 2,
+					"width": 77,
+					"height": 100
+				},
+				"durationMs": 160,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 25,
+				"trimY": 4,
+				"anchorX": 39,
+				"anchorY": 92
+			},
+			{
+				"color": {
+					"pageName": "warrior-idle-se-000-color",
+					"regionName": "warrior-idle-se-0001",
+					"x": 83,
+					"y": 2,
+					"width": 81,
+					"height": 99
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-idle-se-000-mask-nation",
+							"regionName": "warrior-idle-se-0001",
+							"x": 83,
+							"y": 2,
+							"width": 81,
+							"height": 99
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-idle-se-000-shadow",
+					"regionName": "warrior-idle-se-0001",
+					"x": 83,
+					"y": 2,
+					"width": 81,
+					"height": 99
+				},
+				"durationMs": 160,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 26,
+				"trimY": 5,
+				"anchorX": 38,
+				"anchorY": 91
+			},
+			{
+				"color": {
+					"pageName": "warrior-idle-se-000-color",
+					"regionName": "warrior-idle-se-0002",
+					"x": 168,
+					"y": 2,
+					"width": 73,
+					"height": 100
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-idle-se-000-mask-nation",
+							"regionName": "warrior-idle-se-0002",
+							"x": 168,
+							"y": 2,
+							"width": 73,
+							"height": 100
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-idle-se-000-shadow",
+					"regionName": "warrior-idle-se-0002",
+					"x": 168,
+					"y": 2,
+					"width": 73,
+					"height": 100
+				},
+				"durationMs": 160,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 28,
+				"trimY": 4,
+				"anchorX": 36,
+				"anchorY": 92
+			},
+			{
+				"color": {
+					"pageName": "warrior-idle-se-000-color",
+					"regionName": "warrior-idle-se-0003",
+					"x": 245,
+					"y": 2,
+					"width": 78,
+					"height": 99
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-idle-se-000-mask-nation",
+							"regionName": "warrior-idle-se-0003",
+							"x": 245,
+							"y": 2,
+							"width": 78,
+							"height": 99
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-idle-se-000-shadow",
+					"regionName": "warrior-idle-se-0003",
+					"x": 245,
+					"y": 2,
+					"width": 78,
+					"height": 99
+				},
+				"durationMs": 160,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 23,
+				"trimY": 5,
+				"anchorX": 41,
+				"anchorY": 91
+			}
+		],
+		"anchorX": 64,
+		"anchorY": 96,
+		"staticFallbackKey": "TileSets/AtlasUnits/Units/Warrior",
+		"pageNames": [ "warrior-idle-se-000-color", "warrior-idle-se-000-mask-nation", "warrior-idle-se-000-shadow" ],
+		"mirroredFacing": "SE",
+		"looping": true,
+		"maskIds": [ "nation" ],
+		"hasShadow": true,
+		"decodedBytes": 786432,
+		"decodedStagingBytes": 262144,
+		"gpuBytes": 1048596
+	},
+	{
+		"unitName": "Warrior",
+		"state": "IDLE",
+		"facing": "W",
+		"frames": [
+			{
+				"color": {
+					"pageName": "warrior-idle-e-000-color",
+					"regionName": "warrior-idle-e-0000",
+					"x": 2,
+					"y": 2,
+					"width": 73,
+					"height": 97
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-idle-e-000-mask-nation",
+							"regionName": "warrior-idle-e-0000",
+							"x": 2,
+							"y": 2,
+							"width": 73,
+							"height": 97
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-idle-e-000-shadow",
+					"regionName": "warrior-idle-e-0000",
+					"x": 2,
+					"y": 2,
+					"width": 73,
+					"height": 97
+				},
+				"durationMs": 160,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 28,
+				"trimY": 7,
+				"anchorX": 36,
+				"anchorY": 89
+			},
+			{
+				"color": {
+					"pageName": "warrior-idle-e-000-color",
+					"regionName": "warrior-idle-e-0001",
+					"x": 79,
+					"y": 2,
+					"width": 74,
+					"height": 97
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-idle-e-000-mask-nation",
+							"regionName": "warrior-idle-e-0001",
+							"x": 79,
+							"y": 2,
+							"width": 74,
+							"height": 97
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-idle-e-000-shadow",
+					"regionName": "warrior-idle-e-0001",
+					"x": 79,
+					"y": 2,
+					"width": 74,
+					"height": 97
+				},
+				"durationMs": 160,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 26,
+				"trimY": 7,
+				"anchorX": 38,
+				"anchorY": 89
+			},
+			{
+				"color": {
+					"pageName": "warrior-idle-e-000-color",
+					"regionName": "warrior-idle-e-0002",
+					"x": 157,
+					"y": 2,
+					"width": 69,
+					"height": 97
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-idle-e-000-mask-nation",
+							"regionName": "warrior-idle-e-0002",
+							"x": 157,
+							"y": 2,
+							"width": 69,
+							"height": 97
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-idle-e-000-shadow",
+					"regionName": "warrior-idle-e-0002",
+					"x": 157,
+					"y": 2,
+					"width": 69,
+					"height": 97
+				},
+				"durationMs": 160,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 31,
+				"trimY": 7,
+				"anchorX": 33,
+				"anchorY": 89
+			},
+			{
+				"color": {
+					"pageName": "warrior-idle-e-000-color",
+					"regionName": "warrior-idle-e-0003",
+					"x": 230,
+					"y": 2,
+					"width": 73,
+					"height": 97
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-idle-e-000-mask-nation",
+							"regionName": "warrior-idle-e-0003",
+							"x": 230,
+							"y": 2,
+							"width": 73,
+							"height": 97
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-idle-e-000-shadow",
+					"regionName": "warrior-idle-e-0003",
+					"x": 230,
+					"y": 2,
+					"width": 73,
+					"height": 97
+				},
+				"durationMs": 160,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 28,
+				"trimY": 7,
+				"anchorX": 36,
+				"anchorY": 89
+			}
+		],
+		"anchorX": 64,
+		"anchorY": 96,
+		"staticFallbackKey": "TileSets/AtlasUnits/Units/Warrior",
+		"pageNames": [ "warrior-idle-e-000-color", "warrior-idle-e-000-mask-nation", "warrior-idle-e-000-shadow" ],
+		"mirroredFacing": "E",
+		"looping": true,
+		"maskIds": [ "nation" ],
+		"hasShadow": true,
+		"decodedBytes": 786432,
+		"decodedStagingBytes": 262144,
+		"gpuBytes": 1048596
+	},
+	{
+		"unitName": "Warrior",
+		"state": "MOVE",
+		"facing": "E",
+		"frames": [
+			{
+				"color": {
+					"pageName": "warrior-move-e-000-color",
+					"regionName": "warrior-move-e-0000",
+					"x": 2,
+					"y": 2,
+					"width": 70,
+					"height": 96
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-move-e-000-mask-nation",
+							"regionName": "warrior-move-e-0000",
+							"x": 2,
+							"y": 2,
+							"width": 70,
+							"height": 96
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-move-e-000-shadow",
+					"regionName": "warrior-move-e-0000",
+					"x": 2,
+					"y": 2,
+					"width": 70,
+					"height": 96
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 30,
+				"trimY": 6,
+				"anchorX": 34,
+				"anchorY": 90
+			},
+			{
+				"color": {
+					"pageName": "warrior-move-e-000-color",
+					"regionName": "warrior-move-e-0001",
+					"x": 76,
+					"y": 2,
+					"width": 74,
+					"height": 97
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-move-e-000-mask-nation",
+							"regionName": "warrior-move-e-0001",
+							"x": 76,
+							"y": 2,
+							"width": 74,
+							"height": 97
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-move-e-000-shadow",
+					"regionName": "warrior-move-e-0001",
+					"x": 76,
+					"y": 2,
+					"width": 74,
+					"height": 97
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 22,
+				"trimY": 5,
+				"anchorX": 42,
+				"anchorY": 91
+			},
+			{
+				"color": {
+					"pageName": "warrior-move-e-000-color",
+					"regionName": "warrior-move-e-0002",
+					"x": 154,
+					"y": 2,
+					"width": 74,
+					"height": 98
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-move-e-000-mask-nation",
+							"regionName": "warrior-move-e-0002",
+							"x": 154,
+							"y": 2,
+							"width": 74,
+							"height": 98
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-move-e-000-shadow",
+					"regionName": "warrior-move-e-0002",
+					"x": 154,
+					"y": 2,
+					"width": 74,
+					"height": 98
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 21,
+				"trimY": 6,
+				"anchorX": 43,
+				"anchorY": 90
+			},
+			{
+				"color": {
+					"pageName": "warrior-move-e-000-color",
+					"regionName": "warrior-move-e-0003",
+					"x": 232,
+					"y": 2,
+					"width": 90,
+					"height": 100
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-move-e-000-mask-nation",
+							"regionName": "warrior-move-e-0003",
+							"x": 232,
+							"y": 2,
+							"width": 90,
+							"height": 100
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-move-e-000-shadow",
+					"regionName": "warrior-move-e-0003",
+					"x": 232,
+					"y": 2,
+					"width": 90,
+					"height": 100
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 21,
+				"trimY": 4,
+				"anchorX": 43,
+				"anchorY": 92
+			},
+			{
+				"color": {
+					"pageName": "warrior-move-e-000-color",
+					"regionName": "warrior-move-e-0004",
+					"x": 326,
+					"y": 2,
+					"width": 81,
+					"height": 99
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-move-e-000-mask-nation",
+							"regionName": "warrior-move-e-0004",
+							"x": 326,
+							"y": 2,
+							"width": 81,
+							"height": 99
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-move-e-000-shadow",
+					"regionName": "warrior-move-e-0004",
+					"x": 326,
+					"y": 2,
+					"width": 81,
+					"height": 99
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 24,
+				"trimY": 3,
+				"anchorX": 40,
+				"anchorY": 93
+			},
+			{
+				"color": {
+					"pageName": "warrior-move-e-000-color",
+					"regionName": "warrior-move-e-0005",
+					"x": 411,
+					"y": 2,
+					"width": 79,
+					"height": 99
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-move-e-000-mask-nation",
+							"regionName": "warrior-move-e-0005",
+							"x": 411,
+							"y": 2,
+							"width": 79,
+							"height": 99
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-move-e-000-shadow",
+					"regionName": "warrior-move-e-0005",
+					"x": 411,
+					"y": 2,
+					"width": 79,
+					"height": 99
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 26,
+				"trimY": 3,
+				"anchorX": 38,
+				"anchorY": 93
+			},
+			{
+				"color": {
+					"pageName": "warrior-move-e-000-color",
+					"regionName": "warrior-move-e-0006",
+					"x": 494,
+					"y": 2,
+					"width": 84,
+					"height": 96
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-move-e-000-mask-nation",
+							"regionName": "warrior-move-e-0006",
+							"x": 494,
+							"y": 2,
+							"width": 84,
+							"height": 96
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-move-e-000-shadow",
+					"regionName": "warrior-move-e-0006",
+					"x": 494,
+					"y": 2,
+					"width": 84,
+					"height": 96
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 28,
+				"trimY": 6,
+				"anchorX": 36,
+				"anchorY": 90
+			},
+			{
+				"color": {
+					"pageName": "warrior-move-e-000-color",
+					"regionName": "warrior-move-e-0007",
+					"x": 582,
+					"y": 2,
+					"width": 73,
+					"height": 98
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-move-e-000-mask-nation",
+							"regionName": "warrior-move-e-0007",
+							"x": 582,
+							"y": 2,
+							"width": 73,
+							"height": 98
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-move-e-000-shadow",
+					"regionName": "warrior-move-e-0007",
+					"x": 582,
+					"y": 2,
+					"width": 73,
+					"height": 98
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 27,
+				"trimY": 4,
+				"anchorX": 37,
+				"anchorY": 92
+			}
+		],
+		"anchorX": 64,
+		"anchorY": 96,
+		"staticFallbackKey": "TileSets/AtlasUnits/Units/Warrior",
+		"pageNames": [ "warrior-move-e-000-color", "warrior-move-e-000-mask-nation", "warrior-move-e-000-shadow" ],
+		"mirroredFacing": null,
+		"looping": true,
+		"maskIds": [ "nation" ],
+		"hasShadow": true,
+		"decodedBytes": 1572864,
+		"decodedStagingBytes": 524288,
+		"gpuBytes": 2097204
+	},
+	{
+		"unitName": "Warrior",
+		"state": "MOVE",
+		"facing": "NE",
+		"frames": [
+			{
+				"color": {
+					"pageName": "warrior-move-ne-000-color",
+					"regionName": "warrior-move-ne-0000",
+					"x": 2,
+					"y": 2,
+					"width": 85,
+					"height": 103
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-move-ne-000-mask-nation",
+							"regionName": "warrior-move-ne-0000",
+							"x": 2,
+							"y": 2,
+							"width": 85,
+							"height": 103
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-move-ne-000-shadow",
+					"regionName": "warrior-move-ne-0000",
+					"x": 2,
+					"y": 2,
+					"width": 85,
+					"height": 103
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 31,
+				"trimY": 1,
+				"anchorX": 33,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-move-ne-000-color",
+					"regionName": "warrior-move-ne-0001",
+					"x": 91,
+					"y": 2,
+					"width": 85,
+					"height": 103
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-move-ne-000-mask-nation",
+							"regionName": "warrior-move-ne-0001",
+							"x": 91,
+							"y": 2,
+							"width": 85,
+							"height": 103
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-move-ne-000-shadow",
+					"regionName": "warrior-move-ne-0001",
+					"x": 91,
+					"y": 2,
+					"width": 85,
+					"height": 103
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 31,
+				"trimY": 1,
+				"anchorX": 33,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-move-ne-000-color",
+					"regionName": "warrior-move-ne-0002",
+					"x": 180,
+					"y": 2,
+					"width": 80,
+					"height": 103
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-move-ne-000-mask-nation",
+							"regionName": "warrior-move-ne-0002",
+							"x": 180,
+							"y": 2,
+							"width": 80,
+							"height": 103
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-move-ne-000-shadow",
+					"regionName": "warrior-move-ne-0002",
+					"x": 180,
+					"y": 2,
+					"width": 80,
+					"height": 103
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 31,
+				"trimY": 1,
+				"anchorX": 33,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-move-ne-000-color",
+					"regionName": "warrior-move-ne-0003",
+					"x": 264,
+					"y": 2,
+					"width": 79,
+					"height": 103
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-move-ne-000-mask-nation",
+							"regionName": "warrior-move-ne-0003",
+							"x": 264,
+							"y": 2,
+							"width": 79,
+							"height": 103
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-move-ne-000-shadow",
+					"regionName": "warrior-move-ne-0003",
+					"x": 264,
+					"y": 2,
+					"width": 79,
+					"height": 103
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 32,
+				"trimY": 1,
+				"anchorX": 32,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-move-ne-000-color",
+					"regionName": "warrior-move-ne-0004",
+					"x": 347,
+					"y": 2,
+					"width": 82,
+					"height": 103
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-move-ne-000-mask-nation",
+							"regionName": "warrior-move-ne-0004",
+							"x": 347,
+							"y": 2,
+							"width": 82,
+							"height": 103
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-move-ne-000-shadow",
+					"regionName": "warrior-move-ne-0004",
+					"x": 347,
+					"y": 2,
+					"width": 82,
+					"height": 103
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 31,
+				"trimY": 1,
+				"anchorX": 33,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-move-ne-000-color",
+					"regionName": "warrior-move-ne-0005",
+					"x": 433,
+					"y": 2,
+					"width": 84,
+					"height": 103
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-move-ne-000-mask-nation",
+							"regionName": "warrior-move-ne-0005",
+							"x": 433,
+							"y": 2,
+							"width": 84,
+							"height": 103
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-move-ne-000-shadow",
+					"regionName": "warrior-move-ne-0005",
+					"x": 433,
+					"y": 2,
+					"width": 84,
+					"height": 103
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 31,
+				"trimY": 1,
+				"anchorX": 33,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-move-ne-000-color",
+					"regionName": "warrior-move-ne-0006",
+					"x": 521,
+					"y": 2,
+					"width": 83,
+					"height": 103
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-move-ne-000-mask-nation",
+							"regionName": "warrior-move-ne-0006",
+							"x": 521,
+							"y": 2,
+							"width": 83,
+							"height": 103
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-move-ne-000-shadow",
+					"regionName": "warrior-move-ne-0006",
+					"x": 521,
+					"y": 2,
+					"width": 83,
+					"height": 103
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 33,
+				"trimY": 1,
+				"anchorX": 31,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-move-ne-000-color",
+					"regionName": "warrior-move-ne-0007",
+					"x": 608,
+					"y": 2,
+					"width": 79,
+					"height": 103
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-move-ne-000-mask-nation",
+							"regionName": "warrior-move-ne-0007",
+							"x": 608,
+							"y": 2,
+							"width": 79,
+							"height": 103
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-move-ne-000-shadow",
+					"regionName": "warrior-move-ne-0007",
+					"x": 608,
+					"y": 2,
+					"width": 79,
+					"height": 103
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 32,
+				"trimY": 1,
+				"anchorX": 32,
+				"anchorY": 95
+			}
+		],
+		"anchorX": 64,
+		"anchorY": 96,
+		"staticFallbackKey": "TileSets/AtlasUnits/Units/Warrior",
+		"pageNames": [ "warrior-move-ne-000-color", "warrior-move-ne-000-mask-nation", "warrior-move-ne-000-shadow" ],
+		"mirroredFacing": null,
+		"looping": true,
+		"maskIds": [ "nation" ],
+		"hasShadow": true,
+		"decodedBytes": 1572864,
+		"decodedStagingBytes": 524288,
+		"gpuBytes": 2097204
+	},
+	{
+		"unitName": "Warrior",
+		"state": "MOVE",
+		"facing": "NW",
+		"frames": [
+			{
+				"color": {
+					"pageName": "warrior-move-ne-000-color",
+					"regionName": "warrior-move-ne-0000",
+					"x": 2,
+					"y": 2,
+					"width": 85,
+					"height": 103
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-move-ne-000-mask-nation",
+							"regionName": "warrior-move-ne-0000",
+							"x": 2,
+							"y": 2,
+							"width": 85,
+							"height": 103
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-move-ne-000-shadow",
+					"regionName": "warrior-move-ne-0000",
+					"x": 2,
+					"y": 2,
+					"width": 85,
+					"height": 103
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 31,
+				"trimY": 1,
+				"anchorX": 33,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-move-ne-000-color",
+					"regionName": "warrior-move-ne-0001",
+					"x": 91,
+					"y": 2,
+					"width": 85,
+					"height": 103
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-move-ne-000-mask-nation",
+							"regionName": "warrior-move-ne-0001",
+							"x": 91,
+							"y": 2,
+							"width": 85,
+							"height": 103
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-move-ne-000-shadow",
+					"regionName": "warrior-move-ne-0001",
+					"x": 91,
+					"y": 2,
+					"width": 85,
+					"height": 103
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 31,
+				"trimY": 1,
+				"anchorX": 33,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-move-ne-000-color",
+					"regionName": "warrior-move-ne-0002",
+					"x": 180,
+					"y": 2,
+					"width": 80,
+					"height": 103
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-move-ne-000-mask-nation",
+							"regionName": "warrior-move-ne-0002",
+							"x": 180,
+							"y": 2,
+							"width": 80,
+							"height": 103
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-move-ne-000-shadow",
+					"regionName": "warrior-move-ne-0002",
+					"x": 180,
+					"y": 2,
+					"width": 80,
+					"height": 103
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 31,
+				"trimY": 1,
+				"anchorX": 33,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-move-ne-000-color",
+					"regionName": "warrior-move-ne-0003",
+					"x": 264,
+					"y": 2,
+					"width": 79,
+					"height": 103
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-move-ne-000-mask-nation",
+							"regionName": "warrior-move-ne-0003",
+							"x": 264,
+							"y": 2,
+							"width": 79,
+							"height": 103
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-move-ne-000-shadow",
+					"regionName": "warrior-move-ne-0003",
+					"x": 264,
+					"y": 2,
+					"width": 79,
+					"height": 103
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 32,
+				"trimY": 1,
+				"anchorX": 32,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-move-ne-000-color",
+					"regionName": "warrior-move-ne-0004",
+					"x": 347,
+					"y": 2,
+					"width": 82,
+					"height": 103
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-move-ne-000-mask-nation",
+							"regionName": "warrior-move-ne-0004",
+							"x": 347,
+							"y": 2,
+							"width": 82,
+							"height": 103
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-move-ne-000-shadow",
+					"regionName": "warrior-move-ne-0004",
+					"x": 347,
+					"y": 2,
+					"width": 82,
+					"height": 103
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 31,
+				"trimY": 1,
+				"anchorX": 33,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-move-ne-000-color",
+					"regionName": "warrior-move-ne-0005",
+					"x": 433,
+					"y": 2,
+					"width": 84,
+					"height": 103
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-move-ne-000-mask-nation",
+							"regionName": "warrior-move-ne-0005",
+							"x": 433,
+							"y": 2,
+							"width": 84,
+							"height": 103
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-move-ne-000-shadow",
+					"regionName": "warrior-move-ne-0005",
+					"x": 433,
+					"y": 2,
+					"width": 84,
+					"height": 103
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 31,
+				"trimY": 1,
+				"anchorX": 33,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-move-ne-000-color",
+					"regionName": "warrior-move-ne-0006",
+					"x": 521,
+					"y": 2,
+					"width": 83,
+					"height": 103
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-move-ne-000-mask-nation",
+							"regionName": "warrior-move-ne-0006",
+							"x": 521,
+							"y": 2,
+							"width": 83,
+							"height": 103
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-move-ne-000-shadow",
+					"regionName": "warrior-move-ne-0006",
+					"x": 521,
+					"y": 2,
+					"width": 83,
+					"height": 103
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 33,
+				"trimY": 1,
+				"anchorX": 31,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-move-ne-000-color",
+					"regionName": "warrior-move-ne-0007",
+					"x": 608,
+					"y": 2,
+					"width": 79,
+					"height": 103
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-move-ne-000-mask-nation",
+							"regionName": "warrior-move-ne-0007",
+							"x": 608,
+							"y": 2,
+							"width": 79,
+							"height": 103
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-move-ne-000-shadow",
+					"regionName": "warrior-move-ne-0007",
+					"x": 608,
+					"y": 2,
+					"width": 79,
+					"height": 103
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 32,
+				"trimY": 1,
+				"anchorX": 32,
+				"anchorY": 95
+			}
+		],
+		"anchorX": 64,
+		"anchorY": 96,
+		"staticFallbackKey": "TileSets/AtlasUnits/Units/Warrior",
+		"pageNames": [ "warrior-move-ne-000-color", "warrior-move-ne-000-mask-nation", "warrior-move-ne-000-shadow" ],
+		"mirroredFacing": "NE",
+		"looping": true,
+		"maskIds": [ "nation" ],
+		"hasShadow": true,
+		"decodedBytes": 1572864,
+		"decodedStagingBytes": 524288,
+		"gpuBytes": 2097204
+	},
+	{
+		"unitName": "Warrior",
+		"state": "MOVE",
+		"facing": "SE",
+		"frames": [
+			{
+				"color": {
+					"pageName": "warrior-move-se-000-color",
+					"regionName": "warrior-move-se-0000",
+					"x": 2,
+					"y": 2,
+					"width": 79,
+					"height": 103
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-move-se-000-mask-nation",
+							"regionName": "warrior-move-se-0000",
+							"x": 2,
+							"y": 2,
+							"width": 79,
+							"height": 103
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-move-se-000-shadow",
+					"regionName": "warrior-move-se-0000",
+					"x": 2,
+					"y": 2,
+					"width": 79,
+					"height": 103
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 25,
+				"trimY": 1,
+				"anchorX": 39,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-move-se-000-color",
+					"regionName": "warrior-move-se-0001",
+					"x": 85,
+					"y": 2,
+					"width": 77,
+					"height": 103
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-move-se-000-mask-nation",
+							"regionName": "warrior-move-se-0001",
+							"x": 85,
+							"y": 2,
+							"width": 77,
+							"height": 103
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-move-se-000-shadow",
+					"regionName": "warrior-move-se-0001",
+					"x": 85,
+					"y": 2,
+					"width": 77,
+					"height": 103
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 23,
+				"trimY": 1,
+				"anchorX": 41,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-move-se-000-color",
+					"regionName": "warrior-move-se-0002",
+					"x": 166,
+					"y": 2,
+					"width": 72,
+					"height": 103
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-move-se-000-mask-nation",
+							"regionName": "warrior-move-se-0002",
+							"x": 166,
+							"y": 2,
+							"width": 72,
+							"height": 103
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-move-se-000-shadow",
+					"regionName": "warrior-move-se-0002",
+					"x": 166,
+					"y": 2,
+					"width": 72,
+					"height": 103
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 27,
+				"trimY": 1,
+				"anchorX": 37,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-move-se-000-color",
+					"regionName": "warrior-move-se-0003",
+					"x": 242,
+					"y": 2,
+					"width": 83,
+					"height": 103
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-move-se-000-mask-nation",
+							"regionName": "warrior-move-se-0003",
+							"x": 242,
+							"y": 2,
+							"width": 83,
+							"height": 103
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-move-se-000-shadow",
+					"regionName": "warrior-move-se-0003",
+					"x": 242,
+					"y": 2,
+					"width": 83,
+					"height": 103
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 20,
+				"trimY": 1,
+				"anchorX": 44,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-move-se-000-color",
+					"regionName": "warrior-move-se-0004",
+					"x": 329,
+					"y": 2,
+					"width": 72,
+					"height": 103
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-move-se-000-mask-nation",
+							"regionName": "warrior-move-se-0004",
+							"x": 329,
+							"y": 2,
+							"width": 72,
+							"height": 103
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-move-se-000-shadow",
+					"regionName": "warrior-move-se-0004",
+					"x": 329,
+					"y": 2,
+					"width": 72,
+					"height": 103
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 30,
+				"trimY": 1,
+				"anchorX": 34,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-move-se-000-color",
+					"regionName": "warrior-move-se-0005",
+					"x": 405,
+					"y": 2,
+					"width": 71,
+					"height": 103
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-move-se-000-mask-nation",
+							"regionName": "warrior-move-se-0005",
+							"x": 405,
+							"y": 2,
+							"width": 71,
+							"height": 103
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-move-se-000-shadow",
+					"regionName": "warrior-move-se-0005",
+					"x": 405,
+					"y": 2,
+					"width": 71,
+					"height": 103
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 28,
+				"trimY": 1,
+				"anchorX": 36,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-move-se-000-color",
+					"regionName": "warrior-move-se-0006",
+					"x": 480,
+					"y": 2,
+					"width": 79,
+					"height": 103
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-move-se-000-mask-nation",
+							"regionName": "warrior-move-se-0006",
+							"x": 480,
+							"y": 2,
+							"width": 79,
+							"height": 103
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-move-se-000-shadow",
+					"regionName": "warrior-move-se-0006",
+					"x": 480,
+					"y": 2,
+					"width": 79,
+					"height": 103
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 29,
+				"trimY": 1,
+				"anchorX": 35,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-move-se-000-color",
+					"regionName": "warrior-move-se-0007",
+					"x": 563,
+					"y": 2,
+					"width": 69,
+					"height": 103
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-move-se-000-mask-nation",
+							"regionName": "warrior-move-se-0007",
+							"x": 563,
+							"y": 2,
+							"width": 69,
+							"height": 103
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-move-se-000-shadow",
+					"regionName": "warrior-move-se-0007",
+					"x": 563,
+					"y": 2,
+					"width": 69,
+					"height": 103
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 32,
+				"trimY": 1,
+				"anchorX": 32,
+				"anchorY": 95
+			}
+		],
+		"anchorX": 64,
+		"anchorY": 96,
+		"staticFallbackKey": "TileSets/AtlasUnits/Units/Warrior",
+		"pageNames": [ "warrior-move-se-000-color", "warrior-move-se-000-mask-nation", "warrior-move-se-000-shadow" ],
+		"mirroredFacing": null,
+		"looping": true,
+		"maskIds": [ "nation" ],
+		"hasShadow": true,
+		"decodedBytes": 1572864,
+		"decodedStagingBytes": 524288,
+		"gpuBytes": 2097204
+	},
+	{
+		"unitName": "Warrior",
+		"state": "MOVE",
+		"facing": "SW",
+		"frames": [
+			{
+				"color": {
+					"pageName": "warrior-move-se-000-color",
+					"regionName": "warrior-move-se-0000",
+					"x": 2,
+					"y": 2,
+					"width": 79,
+					"height": 103
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-move-se-000-mask-nation",
+							"regionName": "warrior-move-se-0000",
+							"x": 2,
+							"y": 2,
+							"width": 79,
+							"height": 103
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-move-se-000-shadow",
+					"regionName": "warrior-move-se-0000",
+					"x": 2,
+					"y": 2,
+					"width": 79,
+					"height": 103
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 25,
+				"trimY": 1,
+				"anchorX": 39,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-move-se-000-color",
+					"regionName": "warrior-move-se-0001",
+					"x": 85,
+					"y": 2,
+					"width": 77,
+					"height": 103
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-move-se-000-mask-nation",
+							"regionName": "warrior-move-se-0001",
+							"x": 85,
+							"y": 2,
+							"width": 77,
+							"height": 103
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-move-se-000-shadow",
+					"regionName": "warrior-move-se-0001",
+					"x": 85,
+					"y": 2,
+					"width": 77,
+					"height": 103
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 23,
+				"trimY": 1,
+				"anchorX": 41,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-move-se-000-color",
+					"regionName": "warrior-move-se-0002",
+					"x": 166,
+					"y": 2,
+					"width": 72,
+					"height": 103
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-move-se-000-mask-nation",
+							"regionName": "warrior-move-se-0002",
+							"x": 166,
+							"y": 2,
+							"width": 72,
+							"height": 103
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-move-se-000-shadow",
+					"regionName": "warrior-move-se-0002",
+					"x": 166,
+					"y": 2,
+					"width": 72,
+					"height": 103
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 27,
+				"trimY": 1,
+				"anchorX": 37,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-move-se-000-color",
+					"regionName": "warrior-move-se-0003",
+					"x": 242,
+					"y": 2,
+					"width": 83,
+					"height": 103
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-move-se-000-mask-nation",
+							"regionName": "warrior-move-se-0003",
+							"x": 242,
+							"y": 2,
+							"width": 83,
+							"height": 103
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-move-se-000-shadow",
+					"regionName": "warrior-move-se-0003",
+					"x": 242,
+					"y": 2,
+					"width": 83,
+					"height": 103
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 20,
+				"trimY": 1,
+				"anchorX": 44,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-move-se-000-color",
+					"regionName": "warrior-move-se-0004",
+					"x": 329,
+					"y": 2,
+					"width": 72,
+					"height": 103
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-move-se-000-mask-nation",
+							"regionName": "warrior-move-se-0004",
+							"x": 329,
+							"y": 2,
+							"width": 72,
+							"height": 103
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-move-se-000-shadow",
+					"regionName": "warrior-move-se-0004",
+					"x": 329,
+					"y": 2,
+					"width": 72,
+					"height": 103
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 30,
+				"trimY": 1,
+				"anchorX": 34,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-move-se-000-color",
+					"regionName": "warrior-move-se-0005",
+					"x": 405,
+					"y": 2,
+					"width": 71,
+					"height": 103
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-move-se-000-mask-nation",
+							"regionName": "warrior-move-se-0005",
+							"x": 405,
+							"y": 2,
+							"width": 71,
+							"height": 103
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-move-se-000-shadow",
+					"regionName": "warrior-move-se-0005",
+					"x": 405,
+					"y": 2,
+					"width": 71,
+					"height": 103
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 28,
+				"trimY": 1,
+				"anchorX": 36,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-move-se-000-color",
+					"regionName": "warrior-move-se-0006",
+					"x": 480,
+					"y": 2,
+					"width": 79,
+					"height": 103
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-move-se-000-mask-nation",
+							"regionName": "warrior-move-se-0006",
+							"x": 480,
+							"y": 2,
+							"width": 79,
+							"height": 103
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-move-se-000-shadow",
+					"regionName": "warrior-move-se-0006",
+					"x": 480,
+					"y": 2,
+					"width": 79,
+					"height": 103
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 29,
+				"trimY": 1,
+				"anchorX": 35,
+				"anchorY": 95
+			},
+			{
+				"color": {
+					"pageName": "warrior-move-se-000-color",
+					"regionName": "warrior-move-se-0007",
+					"x": 563,
+					"y": 2,
+					"width": 69,
+					"height": 103
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-move-se-000-mask-nation",
+							"regionName": "warrior-move-se-0007",
+							"x": 563,
+							"y": 2,
+							"width": 69,
+							"height": 103
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-move-se-000-shadow",
+					"regionName": "warrior-move-se-0007",
+					"x": 563,
+					"y": 2,
+					"width": 69,
+					"height": 103
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 32,
+				"trimY": 1,
+				"anchorX": 32,
+				"anchorY": 95
+			}
+		],
+		"anchorX": 64,
+		"anchorY": 96,
+		"staticFallbackKey": "TileSets/AtlasUnits/Units/Warrior",
+		"pageNames": [ "warrior-move-se-000-color", "warrior-move-se-000-mask-nation", "warrior-move-se-000-shadow" ],
+		"mirroredFacing": "SE",
+		"looping": true,
+		"maskIds": [ "nation" ],
+		"hasShadow": true,
+		"decodedBytes": 1572864,
+		"decodedStagingBytes": 524288,
+		"gpuBytes": 2097204
+	},
+	{
+		"unitName": "Warrior",
+		"state": "MOVE",
+		"facing": "W",
+		"frames": [
+			{
+				"color": {
+					"pageName": "warrior-move-e-000-color",
+					"regionName": "warrior-move-e-0000",
+					"x": 2,
+					"y": 2,
+					"width": 70,
+					"height": 96
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-move-e-000-mask-nation",
+							"regionName": "warrior-move-e-0000",
+							"x": 2,
+							"y": 2,
+							"width": 70,
+							"height": 96
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-move-e-000-shadow",
+					"regionName": "warrior-move-e-0000",
+					"x": 2,
+					"y": 2,
+					"width": 70,
+					"height": 96
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 30,
+				"trimY": 6,
+				"anchorX": 34,
+				"anchorY": 90
+			},
+			{
+				"color": {
+					"pageName": "warrior-move-e-000-color",
+					"regionName": "warrior-move-e-0001",
+					"x": 76,
+					"y": 2,
+					"width": 74,
+					"height": 97
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-move-e-000-mask-nation",
+							"regionName": "warrior-move-e-0001",
+							"x": 76,
+							"y": 2,
+							"width": 74,
+							"height": 97
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-move-e-000-shadow",
+					"regionName": "warrior-move-e-0001",
+					"x": 76,
+					"y": 2,
+					"width": 74,
+					"height": 97
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 22,
+				"trimY": 5,
+				"anchorX": 42,
+				"anchorY": 91
+			},
+			{
+				"color": {
+					"pageName": "warrior-move-e-000-color",
+					"regionName": "warrior-move-e-0002",
+					"x": 154,
+					"y": 2,
+					"width": 74,
+					"height": 98
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-move-e-000-mask-nation",
+							"regionName": "warrior-move-e-0002",
+							"x": 154,
+							"y": 2,
+							"width": 74,
+							"height": 98
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-move-e-000-shadow",
+					"regionName": "warrior-move-e-0002",
+					"x": 154,
+					"y": 2,
+					"width": 74,
+					"height": 98
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 21,
+				"trimY": 6,
+				"anchorX": 43,
+				"anchorY": 90
+			},
+			{
+				"color": {
+					"pageName": "warrior-move-e-000-color",
+					"regionName": "warrior-move-e-0003",
+					"x": 232,
+					"y": 2,
+					"width": 90,
+					"height": 100
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-move-e-000-mask-nation",
+							"regionName": "warrior-move-e-0003",
+							"x": 232,
+							"y": 2,
+							"width": 90,
+							"height": 100
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-move-e-000-shadow",
+					"regionName": "warrior-move-e-0003",
+					"x": 232,
+					"y": 2,
+					"width": 90,
+					"height": 100
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 21,
+				"trimY": 4,
+				"anchorX": 43,
+				"anchorY": 92
+			},
+			{
+				"color": {
+					"pageName": "warrior-move-e-000-color",
+					"regionName": "warrior-move-e-0004",
+					"x": 326,
+					"y": 2,
+					"width": 81,
+					"height": 99
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-move-e-000-mask-nation",
+							"regionName": "warrior-move-e-0004",
+							"x": 326,
+							"y": 2,
+							"width": 81,
+							"height": 99
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-move-e-000-shadow",
+					"regionName": "warrior-move-e-0004",
+					"x": 326,
+					"y": 2,
+					"width": 81,
+					"height": 99
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 24,
+				"trimY": 3,
+				"anchorX": 40,
+				"anchorY": 93
+			},
+			{
+				"color": {
+					"pageName": "warrior-move-e-000-color",
+					"regionName": "warrior-move-e-0005",
+					"x": 411,
+					"y": 2,
+					"width": 79,
+					"height": 99
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-move-e-000-mask-nation",
+							"regionName": "warrior-move-e-0005",
+							"x": 411,
+							"y": 2,
+							"width": 79,
+							"height": 99
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-move-e-000-shadow",
+					"regionName": "warrior-move-e-0005",
+					"x": 411,
+					"y": 2,
+					"width": 79,
+					"height": 99
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 26,
+				"trimY": 3,
+				"anchorX": 38,
+				"anchorY": 93
+			},
+			{
+				"color": {
+					"pageName": "warrior-move-e-000-color",
+					"regionName": "warrior-move-e-0006",
+					"x": 494,
+					"y": 2,
+					"width": 84,
+					"height": 96
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-move-e-000-mask-nation",
+							"regionName": "warrior-move-e-0006",
+							"x": 494,
+							"y": 2,
+							"width": 84,
+							"height": 96
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-move-e-000-shadow",
+					"regionName": "warrior-move-e-0006",
+					"x": 494,
+					"y": 2,
+					"width": 84,
+					"height": 96
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 28,
+				"trimY": 6,
+				"anchorX": 36,
+				"anchorY": 90
+			},
+			{
+				"color": {
+					"pageName": "warrior-move-e-000-color",
+					"regionName": "warrior-move-e-0007",
+					"x": 582,
+					"y": 2,
+					"width": 73,
+					"height": 98
+				},
+				"masks": [
+					{
+						"id": "nation",
+						"region": {
+							"pageName": "warrior-move-e-000-mask-nation",
+							"regionName": "warrior-move-e-0007",
+							"x": 582,
+							"y": 2,
+							"width": 73,
+							"height": 98
+						}
+					}
+				],
+				"shadow": {
+					"pageName": "warrior-move-e-000-shadow",
+					"regionName": "warrior-move-e-0007",
+					"x": 582,
+					"y": 2,
+					"width": 73,
+					"height": 98
+				},
+				"durationMs": 90,
+				"originalWidth": 128,
+				"originalHeight": 128,
+				"trimX": 27,
+				"trimY": 4,
+				"anchorX": 37,
+				"anchorY": 92
+			}
+		],
+		"anchorX": 64,
+		"anchorY": 96,
+		"staticFallbackKey": "TileSets/AtlasUnits/Units/Warrior",
+		"pageNames": [ "warrior-move-e-000-color", "warrior-move-e-000-mask-nation", "warrior-move-e-000-shadow" ],
+		"mirroredFacing": "E",
+		"looping": true,
+		"maskIds": [ "nation" ],
+		"hasShadow": true,
+		"decodedBytes": 1572864,
+		"decodedStagingBytes": 524288,
+		"gpuBytes": 2097204
+	}
+]
 }

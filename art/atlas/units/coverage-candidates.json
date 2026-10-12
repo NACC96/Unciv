@@ -1,0 +1,1327 @@
+{
+  "schemaVersion": 1,
+  "rows": [
+    {
+      "id": "unit-clip|Warrior|ATTACK|E",
+      "rulesetKey": "Warrior",
+      "category": "unit-clip",
+      "assetKey": "Warrior|ATTACK|E",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/warrior/frames/attack-e.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/e-color.png",
+          "sha256": "138f95d69506e7f7c0295ef8d9dccb0861649a84fada6fbebc9c94f8a2f00f05",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/e-nation.png",
+          "sha256": "1381337b6b8e77e309861ac52cb8c91e7cae5e4fe49b345f18afd09852e31fd9",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/e-shadow.png",
+          "sha256": "beba6a37c6a15ff512db33c3b245d2b4f5a0e977d27598ce971c9d056b488521",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Warrior",
+      "state": "ATTACK",
+      "facing": "E",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Warrior|ATTACK|NE",
+      "rulesetKey": "Warrior",
+      "category": "unit-clip",
+      "assetKey": "Warrior|ATTACK|NE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/warrior/frames/attack-ne.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/ne-color.png",
+          "sha256": "db0509950f67233d717aa0b03d109d90a1c5bf02d2bb45b7aab9d200ed863265",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/ne-nation.png",
+          "sha256": "fe5de8a6d9142965fb60647f382f6f1699114a1886dd664d5bef19ecee1fa23b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/ne-shadow.png",
+          "sha256": "5bcc3ec2f60e8b0800872e9849f97dc3254b506f7687cb34a6f402757f03ea5c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Warrior",
+      "state": "ATTACK",
+      "facing": "NE",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Warrior|ATTACK|NW",
+      "rulesetKey": "Warrior",
+      "category": "unit-clip",
+      "assetKey": "Warrior|ATTACK|NW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/warrior/frames/attack-nw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/ne-color.png",
+          "sha256": "db0509950f67233d717aa0b03d109d90a1c5bf02d2bb45b7aab9d200ed863265",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/ne-nation.png",
+          "sha256": "fe5de8a6d9142965fb60647f382f6f1699114a1886dd664d5bef19ecee1fa23b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/ne-shadow.png",
+          "sha256": "5bcc3ec2f60e8b0800872e9849f97dc3254b506f7687cb34a6f402757f03ea5c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Warrior",
+      "state": "ATTACK",
+      "facing": "NW",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Warrior|ATTACK|SE",
+      "rulesetKey": "Warrior",
+      "category": "unit-clip",
+      "assetKey": "Warrior|ATTACK|SE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/warrior/frames/attack-se.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/se-color.png",
+          "sha256": "d3b6b501b008531fd56a7095e28b9c788b682c5db47ec6b45535a06ea6ab46b0",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/se-nation.png",
+          "sha256": "db1ccff337f9e000bea0b2c434f9f70cd71b5263cbaf6178aa9923b2eee7e13a",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/se-shadow.png",
+          "sha256": "7567bcda9a881c10e8dd93c9cb23105359eb1ede9833a1f1d535ee78bb47b5bf",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Warrior",
+      "state": "ATTACK",
+      "facing": "SE",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Warrior|ATTACK|SW",
+      "rulesetKey": "Warrior",
+      "category": "unit-clip",
+      "assetKey": "Warrior|ATTACK|SW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/warrior/frames/attack-sw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/se-color.png",
+          "sha256": "d3b6b501b008531fd56a7095e28b9c788b682c5db47ec6b45535a06ea6ab46b0",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/se-nation.png",
+          "sha256": "db1ccff337f9e000bea0b2c434f9f70cd71b5263cbaf6178aa9923b2eee7e13a",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/se-shadow.png",
+          "sha256": "7567bcda9a881c10e8dd93c9cb23105359eb1ede9833a1f1d535ee78bb47b5bf",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Warrior",
+      "state": "ATTACK",
+      "facing": "SW",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Warrior|ATTACK|W",
+      "rulesetKey": "Warrior",
+      "category": "unit-clip",
+      "assetKey": "Warrior|ATTACK|W",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/warrior/frames/attack-w.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/e-color.png",
+          "sha256": "138f95d69506e7f7c0295ef8d9dccb0861649a84fada6fbebc9c94f8a2f00f05",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/e-nation.png",
+          "sha256": "1381337b6b8e77e309861ac52cb8c91e7cae5e4fe49b345f18afd09852e31fd9",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/e-shadow.png",
+          "sha256": "beba6a37c6a15ff512db33c3b245d2b4f5a0e977d27598ce971c9d056b488521",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Warrior",
+      "state": "ATTACK",
+      "facing": "W",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Warrior|DEFEAT|E",
+      "rulesetKey": "Warrior",
+      "category": "unit-clip",
+      "assetKey": "Warrior|DEFEAT|E",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/warrior/frames/defeat-e.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/e-color.png",
+          "sha256": "138f95d69506e7f7c0295ef8d9dccb0861649a84fada6fbebc9c94f8a2f00f05",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/e-nation.png",
+          "sha256": "1381337b6b8e77e309861ac52cb8c91e7cae5e4fe49b345f18afd09852e31fd9",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/e-shadow.png",
+          "sha256": "beba6a37c6a15ff512db33c3b245d2b4f5a0e977d27598ce971c9d056b488521",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Warrior",
+      "state": "DEFEAT",
+      "facing": "E",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Warrior|DEFEAT|NE",
+      "rulesetKey": "Warrior",
+      "category": "unit-clip",
+      "assetKey": "Warrior|DEFEAT|NE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/warrior/frames/defeat-ne.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/ne-color.png",
+          "sha256": "db0509950f67233d717aa0b03d109d90a1c5bf02d2bb45b7aab9d200ed863265",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/ne-nation.png",
+          "sha256": "fe5de8a6d9142965fb60647f382f6f1699114a1886dd664d5bef19ecee1fa23b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/ne-shadow.png",
+          "sha256": "5bcc3ec2f60e8b0800872e9849f97dc3254b506f7687cb34a6f402757f03ea5c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Warrior",
+      "state": "DEFEAT",
+      "facing": "NE",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Warrior|DEFEAT|NW",
+      "rulesetKey": "Warrior",
+      "category": "unit-clip",
+      "assetKey": "Warrior|DEFEAT|NW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/warrior/frames/defeat-nw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/ne-color.png",
+          "sha256": "db0509950f67233d717aa0b03d109d90a1c5bf02d2bb45b7aab9d200ed863265",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/ne-nation.png",
+          "sha256": "fe5de8a6d9142965fb60647f382f6f1699114a1886dd664d5bef19ecee1fa23b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/ne-shadow.png",
+          "sha256": "5bcc3ec2f60e8b0800872e9849f97dc3254b506f7687cb34a6f402757f03ea5c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Warrior",
+      "state": "DEFEAT",
+      "facing": "NW",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Warrior|DEFEAT|SE",
+      "rulesetKey": "Warrior",
+      "category": "unit-clip",
+      "assetKey": "Warrior|DEFEAT|SE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/warrior/frames/defeat-se.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/se-color.png",
+          "sha256": "d3b6b501b008531fd56a7095e28b9c788b682c5db47ec6b45535a06ea6ab46b0",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/se-nation.png",
+          "sha256": "db1ccff337f9e000bea0b2c434f9f70cd71b5263cbaf6178aa9923b2eee7e13a",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/se-shadow.png",
+          "sha256": "7567bcda9a881c10e8dd93c9cb23105359eb1ede9833a1f1d535ee78bb47b5bf",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Warrior",
+      "state": "DEFEAT",
+      "facing": "SE",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Warrior|DEFEAT|SW",
+      "rulesetKey": "Warrior",
+      "category": "unit-clip",
+      "assetKey": "Warrior|DEFEAT|SW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/warrior/frames/defeat-sw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/se-color.png",
+          "sha256": "d3b6b501b008531fd56a7095e28b9c788b682c5db47ec6b45535a06ea6ab46b0",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/se-nation.png",
+          "sha256": "db1ccff337f9e000bea0b2c434f9f70cd71b5263cbaf6178aa9923b2eee7e13a",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/se-shadow.png",
+          "sha256": "7567bcda9a881c10e8dd93c9cb23105359eb1ede9833a1f1d535ee78bb47b5bf",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Warrior",
+      "state": "DEFEAT",
+      "facing": "SW",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Warrior|DEFEAT|W",
+      "rulesetKey": "Warrior",
+      "category": "unit-clip",
+      "assetKey": "Warrior|DEFEAT|W",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/warrior/frames/defeat-w.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/e-color.png",
+          "sha256": "138f95d69506e7f7c0295ef8d9dccb0861649a84fada6fbebc9c94f8a2f00f05",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/e-nation.png",
+          "sha256": "1381337b6b8e77e309861ac52cb8c91e7cae5e4fe49b345f18afd09852e31fd9",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/e-shadow.png",
+          "sha256": "beba6a37c6a15ff512db33c3b245d2b4f5a0e977d27598ce971c9d056b488521",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Warrior",
+      "state": "DEFEAT",
+      "facing": "W",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Warrior|HIT|E",
+      "rulesetKey": "Warrior",
+      "category": "unit-clip",
+      "assetKey": "Warrior|HIT|E",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/warrior/frames/hit-e.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/e-color.png",
+          "sha256": "138f95d69506e7f7c0295ef8d9dccb0861649a84fada6fbebc9c94f8a2f00f05",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/e-nation.png",
+          "sha256": "1381337b6b8e77e309861ac52cb8c91e7cae5e4fe49b345f18afd09852e31fd9",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/e-shadow.png",
+          "sha256": "beba6a37c6a15ff512db33c3b245d2b4f5a0e977d27598ce971c9d056b488521",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Warrior",
+      "state": "HIT",
+      "facing": "E",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Warrior|HIT|NE",
+      "rulesetKey": "Warrior",
+      "category": "unit-clip",
+      "assetKey": "Warrior|HIT|NE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/warrior/frames/hit-ne.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/ne-color.png",
+          "sha256": "db0509950f67233d717aa0b03d109d90a1c5bf02d2bb45b7aab9d200ed863265",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/ne-nation.png",
+          "sha256": "fe5de8a6d9142965fb60647f382f6f1699114a1886dd664d5bef19ecee1fa23b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/ne-shadow.png",
+          "sha256": "5bcc3ec2f60e8b0800872e9849f97dc3254b506f7687cb34a6f402757f03ea5c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Warrior",
+      "state": "HIT",
+      "facing": "NE",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Warrior|HIT|NW",
+      "rulesetKey": "Warrior",
+      "category": "unit-clip",
+      "assetKey": "Warrior|HIT|NW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/warrior/frames/hit-nw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/ne-color.png",
+          "sha256": "db0509950f67233d717aa0b03d109d90a1c5bf02d2bb45b7aab9d200ed863265",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/ne-nation.png",
+          "sha256": "fe5de8a6d9142965fb60647f382f6f1699114a1886dd664d5bef19ecee1fa23b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/ne-shadow.png",
+          "sha256": "5bcc3ec2f60e8b0800872e9849f97dc3254b506f7687cb34a6f402757f03ea5c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Warrior",
+      "state": "HIT",
+      "facing": "NW",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Warrior|HIT|SE",
+      "rulesetKey": "Warrior",
+      "category": "unit-clip",
+      "assetKey": "Warrior|HIT|SE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/warrior/frames/hit-se.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/se-color.png",
+          "sha256": "d3b6b501b008531fd56a7095e28b9c788b682c5db47ec6b45535a06ea6ab46b0",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/se-nation.png",
+          "sha256": "db1ccff337f9e000bea0b2c434f9f70cd71b5263cbaf6178aa9923b2eee7e13a",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/se-shadow.png",
+          "sha256": "7567bcda9a881c10e8dd93c9cb23105359eb1ede9833a1f1d535ee78bb47b5bf",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Warrior",
+      "state": "HIT",
+      "facing": "SE",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Warrior|HIT|SW",
+      "rulesetKey": "Warrior",
+      "category": "unit-clip",
+      "assetKey": "Warrior|HIT|SW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/warrior/frames/hit-sw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/se-color.png",
+          "sha256": "d3b6b501b008531fd56a7095e28b9c788b682c5db47ec6b45535a06ea6ab46b0",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/se-nation.png",
+          "sha256": "db1ccff337f9e000bea0b2c434f9f70cd71b5263cbaf6178aa9923b2eee7e13a",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/se-shadow.png",
+          "sha256": "7567bcda9a881c10e8dd93c9cb23105359eb1ede9833a1f1d535ee78bb47b5bf",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Warrior",
+      "state": "HIT",
+      "facing": "SW",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Warrior|HIT|W",
+      "rulesetKey": "Warrior",
+      "category": "unit-clip",
+      "assetKey": "Warrior|HIT|W",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/warrior/frames/hit-w.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/e-color.png",
+          "sha256": "138f95d69506e7f7c0295ef8d9dccb0861649a84fada6fbebc9c94f8a2f00f05",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/e-nation.png",
+          "sha256": "1381337b6b8e77e309861ac52cb8c91e7cae5e4fe49b345f18afd09852e31fd9",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/e-shadow.png",
+          "sha256": "beba6a37c6a15ff512db33c3b245d2b4f5a0e977d27598ce971c9d056b488521",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Warrior",
+      "state": "HIT",
+      "facing": "W",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Warrior|IDLE|E",
+      "rulesetKey": "Warrior",
+      "category": "unit-clip",
+      "assetKey": "Warrior|IDLE|E",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/warrior/frames/idle-e.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/e-color.png",
+          "sha256": "138f95d69506e7f7c0295ef8d9dccb0861649a84fada6fbebc9c94f8a2f00f05",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/e-nation.png",
+          "sha256": "1381337b6b8e77e309861ac52cb8c91e7cae5e4fe49b345f18afd09852e31fd9",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/e-shadow.png",
+          "sha256": "beba6a37c6a15ff512db33c3b245d2b4f5a0e977d27598ce971c9d056b488521",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Warrior",
+      "state": "IDLE",
+      "facing": "E",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Warrior|IDLE|NE",
+      "rulesetKey": "Warrior",
+      "category": "unit-clip",
+      "assetKey": "Warrior|IDLE|NE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/warrior/frames/idle-ne.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/ne-color.png",
+          "sha256": "db0509950f67233d717aa0b03d109d90a1c5bf02d2bb45b7aab9d200ed863265",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/ne-nation.png",
+          "sha256": "fe5de8a6d9142965fb60647f382f6f1699114a1886dd664d5bef19ecee1fa23b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/ne-shadow.png",
+          "sha256": "5bcc3ec2f60e8b0800872e9849f97dc3254b506f7687cb34a6f402757f03ea5c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Warrior",
+      "state": "IDLE",
+      "facing": "NE",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Warrior|IDLE|NW",
+      "rulesetKey": "Warrior",
+      "category": "unit-clip",
+      "assetKey": "Warrior|IDLE|NW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/warrior/frames/idle-nw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/ne-color.png",
+          "sha256": "db0509950f67233d717aa0b03d109d90a1c5bf02d2bb45b7aab9d200ed863265",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/ne-nation.png",
+          "sha256": "fe5de8a6d9142965fb60647f382f6f1699114a1886dd664d5bef19ecee1fa23b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/ne-shadow.png",
+          "sha256": "5bcc3ec2f60e8b0800872e9849f97dc3254b506f7687cb34a6f402757f03ea5c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Warrior",
+      "state": "IDLE",
+      "facing": "NW",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Warrior|IDLE|SE",
+      "rulesetKey": "Warrior",
+      "category": "unit-clip",
+      "assetKey": "Warrior|IDLE|SE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/warrior/frames/idle-se.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/se-color.png",
+          "sha256": "d3b6b501b008531fd56a7095e28b9c788b682c5db47ec6b45535a06ea6ab46b0",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/se-nation.png",
+          "sha256": "db1ccff337f9e000bea0b2c434f9f70cd71b5263cbaf6178aa9923b2eee7e13a",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/se-shadow.png",
+          "sha256": "7567bcda9a881c10e8dd93c9cb23105359eb1ede9833a1f1d535ee78bb47b5bf",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Warrior",
+      "state": "IDLE",
+      "facing": "SE",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Warrior|IDLE|SW",
+      "rulesetKey": "Warrior",
+      "category": "unit-clip",
+      "assetKey": "Warrior|IDLE|SW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/warrior/frames/idle-sw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/se-color.png",
+          "sha256": "d3b6b501b008531fd56a7095e28b9c788b682c5db47ec6b45535a06ea6ab46b0",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/se-nation.png",
+          "sha256": "db1ccff337f9e000bea0b2c434f9f70cd71b5263cbaf6178aa9923b2eee7e13a",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/se-shadow.png",
+          "sha256": "7567bcda9a881c10e8dd93c9cb23105359eb1ede9833a1f1d535ee78bb47b5bf",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Warrior",
+      "state": "IDLE",
+      "facing": "SW",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Warrior|IDLE|W",
+      "rulesetKey": "Warrior",
+      "category": "unit-clip",
+      "assetKey": "Warrior|IDLE|W",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/warrior/frames/idle-w.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/e-color.png",
+          "sha256": "138f95d69506e7f7c0295ef8d9dccb0861649a84fada6fbebc9c94f8a2f00f05",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/e-nation.png",
+          "sha256": "1381337b6b8e77e309861ac52cb8c91e7cae5e4fe49b345f18afd09852e31fd9",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/e-shadow.png",
+          "sha256": "beba6a37c6a15ff512db33c3b245d2b4f5a0e977d27598ce971c9d056b488521",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Warrior",
+      "state": "IDLE",
+      "facing": "W",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Warrior|MOVE|E",
+      "rulesetKey": "Warrior",
+      "category": "unit-clip",
+      "assetKey": "Warrior|MOVE|E",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/warrior/frames/move-e.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/e-color.png",
+          "sha256": "138f95d69506e7f7c0295ef8d9dccb0861649a84fada6fbebc9c94f8a2f00f05",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/e-nation.png",
+          "sha256": "1381337b6b8e77e309861ac52cb8c91e7cae5e4fe49b345f18afd09852e31fd9",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/e-shadow.png",
+          "sha256": "beba6a37c6a15ff512db33c3b245d2b4f5a0e977d27598ce971c9d056b488521",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Warrior",
+      "state": "MOVE",
+      "facing": "E",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Warrior|MOVE|NE",
+      "rulesetKey": "Warrior",
+      "category": "unit-clip",
+      "assetKey": "Warrior|MOVE|NE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/warrior/frames/move-ne.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/ne-color.png",
+          "sha256": "db0509950f67233d717aa0b03d109d90a1c5bf02d2bb45b7aab9d200ed863265",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/ne-nation.png",
+          "sha256": "fe5de8a6d9142965fb60647f382f6f1699114a1886dd664d5bef19ecee1fa23b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/ne-shadow.png",
+          "sha256": "5bcc3ec2f60e8b0800872e9849f97dc3254b506f7687cb34a6f402757f03ea5c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Warrior",
+      "state": "MOVE",
+      "facing": "NE",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Warrior|MOVE|NW",
+      "rulesetKey": "Warrior",
+      "category": "unit-clip",
+      "assetKey": "Warrior|MOVE|NW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/warrior/frames/move-nw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/ne-color.png",
+          "sha256": "db0509950f67233d717aa0b03d109d90a1c5bf02d2bb45b7aab9d200ed863265",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/ne-nation.png",
+          "sha256": "fe5de8a6d9142965fb60647f382f6f1699114a1886dd664d5bef19ecee1fa23b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/ne-shadow.png",
+          "sha256": "5bcc3ec2f60e8b0800872e9849f97dc3254b506f7687cb34a6f402757f03ea5c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Warrior",
+      "state": "MOVE",
+      "facing": "NW",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Warrior|MOVE|SE",
+      "rulesetKey": "Warrior",
+      "category": "unit-clip",
+      "assetKey": "Warrior|MOVE|SE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/warrior/frames/move-se.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/se-color.png",
+          "sha256": "d3b6b501b008531fd56a7095e28b9c788b682c5db47ec6b45535a06ea6ab46b0",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/se-nation.png",
+          "sha256": "db1ccff337f9e000bea0b2c434f9f70cd71b5263cbaf6178aa9923b2eee7e13a",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/se-shadow.png",
+          "sha256": "7567bcda9a881c10e8dd93c9cb23105359eb1ede9833a1f1d535ee78bb47b5bf",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Warrior",
+      "state": "MOVE",
+      "facing": "SE",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Warrior|MOVE|SW",
+      "rulesetKey": "Warrior",
+      "category": "unit-clip",
+      "assetKey": "Warrior|MOVE|SW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/warrior/frames/move-sw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/se-color.png",
+          "sha256": "d3b6b501b008531fd56a7095e28b9c788b682c5db47ec6b45535a06ea6ab46b0",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/se-nation.png",
+          "sha256": "db1ccff337f9e000bea0b2c434f9f70cd71b5263cbaf6178aa9923b2eee7e13a",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/se-shadow.png",
+          "sha256": "7567bcda9a881c10e8dd93c9cb23105359eb1ede9833a1f1d535ee78bb47b5bf",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Warrior",
+      "state": "MOVE",
+      "facing": "SW",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Warrior|MOVE|W",
+      "rulesetKey": "Warrior",
+      "category": "unit-clip",
+      "assetKey": "Warrior|MOVE|W",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/warrior/frames/move-w.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/e-color.png",
+          "sha256": "138f95d69506e7f7c0295ef8d9dccb0861649a84fada6fbebc9c94f8a2f00f05",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/e-nation.png",
+          "sha256": "1381337b6b8e77e309861ac52cb8c91e7cae5e4fe49b345f18afd09852e31fd9",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/e-shadow.png",
+          "sha256": "beba6a37c6a15ff512db33c3b245d2b4f5a0e977d27598ce971c9d056b488521",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Warrior",
+      "state": "MOVE",
+      "facing": "W",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-static|TileSets/AtlasUnits/Units/Warrior",
+      "rulesetKey": "Warrior",
+      "category": "unit-static",
+      "assetKey": "TileSets/AtlasUnits/Units/Warrior",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Warrior.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Warrior.png",
+          "sha256": "761aa9fc783ddc7934e0b94e8354cceb3522df41774111d8a5f026ac98d4749e",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Warrior-1.png",
+          "sha256": "410c487110423ff7d3cad58a077c781b550d0c87033788118bfea2ec2e834077",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null
+    }
+  ]
+}

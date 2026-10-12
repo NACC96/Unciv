@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "status": "Original Atlas map candidates authored; all acceptance and unit coverage remain separate and deferred",
+  "status": "Original Atlas map and unit candidates authored; full unit library and acceptance remain in progress",
   "requiredUnitNames": [
     "African Forest Elephant",
     "Anti-Aircraft Gun",
@@ -154822,8 +154822,30 @@
       ],
       "intendedSource": "art/atlas/units/warrior/frames/attack-e.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/e-color.png",
+          "sha256": "138f95d69506e7f7c0295ef8d9dccb0861649a84fada6fbebc9c94f8a2f00f05",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/e-nation.png",
+          "sha256": "1381337b6b8e77e309861ac52cb8c91e7cae5e4fe49b345f18afd09852e31fd9",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/e-shadow.png",
+          "sha256": "beba6a37c6a15ff512db33c3b245d2b4f5a0e977d27598ce971c9d056b488521",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -154843,8 +154865,30 @@
       ],
       "intendedSource": "art/atlas/units/warrior/frames/attack-ne.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/ne-color.png",
+          "sha256": "db0509950f67233d717aa0b03d109d90a1c5bf02d2bb45b7aab9d200ed863265",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/ne-nation.png",
+          "sha256": "fe5de8a6d9142965fb60647f382f6f1699114a1886dd664d5bef19ecee1fa23b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/ne-shadow.png",
+          "sha256": "5bcc3ec2f60e8b0800872e9849f97dc3254b506f7687cb34a6f402757f03ea5c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -154864,8 +154908,30 @@
       ],
       "intendedSource": "art/atlas/units/warrior/frames/attack-nw.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/ne-color.png",
+          "sha256": "db0509950f67233d717aa0b03d109d90a1c5bf02d2bb45b7aab9d200ed863265",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/ne-nation.png",
+          "sha256": "fe5de8a6d9142965fb60647f382f6f1699114a1886dd664d5bef19ecee1fa23b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/ne-shadow.png",
+          "sha256": "5bcc3ec2f60e8b0800872e9849f97dc3254b506f7687cb34a6f402757f03ea5c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -154885,8 +154951,30 @@
       ],
       "intendedSource": "art/atlas/units/warrior/frames/attack-se.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/se-color.png",
+          "sha256": "d3b6b501b008531fd56a7095e28b9c788b682c5db47ec6b45535a06ea6ab46b0",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/se-nation.png",
+          "sha256": "db1ccff337f9e000bea0b2c434f9f70cd71b5263cbaf6178aa9923b2eee7e13a",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/se-shadow.png",
+          "sha256": "7567bcda9a881c10e8dd93c9cb23105359eb1ede9833a1f1d535ee78bb47b5bf",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -154906,8 +154994,30 @@
       ],
       "intendedSource": "art/atlas/units/warrior/frames/attack-sw.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/se-color.png",
+          "sha256": "d3b6b501b008531fd56a7095e28b9c788b682c5db47ec6b45535a06ea6ab46b0",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/se-nation.png",
+          "sha256": "db1ccff337f9e000bea0b2c434f9f70cd71b5263cbaf6178aa9923b2eee7e13a",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/se-shadow.png",
+          "sha256": "7567bcda9a881c10e8dd93c9cb23105359eb1ede9833a1f1d535ee78bb47b5bf",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -154927,8 +155037,30 @@
       ],
       "intendedSource": "art/atlas/units/warrior/frames/attack-w.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/e-color.png",
+          "sha256": "138f95d69506e7f7c0295ef8d9dccb0861649a84fada6fbebc9c94f8a2f00f05",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/e-nation.png",
+          "sha256": "1381337b6b8e77e309861ac52cb8c91e7cae5e4fe49b345f18afd09852e31fd9",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/e-shadow.png",
+          "sha256": "beba6a37c6a15ff512db33c3b245d2b4f5a0e977d27598ce971c9d056b488521",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -154948,8 +155080,30 @@
       ],
       "intendedSource": "art/atlas/units/warrior/frames/defeat-e.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/e-color.png",
+          "sha256": "138f95d69506e7f7c0295ef8d9dccb0861649a84fada6fbebc9c94f8a2f00f05",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/e-nation.png",
+          "sha256": "1381337b6b8e77e309861ac52cb8c91e7cae5e4fe49b345f18afd09852e31fd9",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/e-shadow.png",
+          "sha256": "beba6a37c6a15ff512db33c3b245d2b4f5a0e977d27598ce971c9d056b488521",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -154969,8 +155123,30 @@
       ],
       "intendedSource": "art/atlas/units/warrior/frames/defeat-ne.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/ne-color.png",
+          "sha256": "db0509950f67233d717aa0b03d109d90a1c5bf02d2bb45b7aab9d200ed863265",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/ne-nation.png",
+          "sha256": "fe5de8a6d9142965fb60647f382f6f1699114a1886dd664d5bef19ecee1fa23b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/ne-shadow.png",
+          "sha256": "5bcc3ec2f60e8b0800872e9849f97dc3254b506f7687cb34a6f402757f03ea5c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -154990,8 +155166,30 @@
       ],
       "intendedSource": "art/atlas/units/warrior/frames/defeat-nw.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/ne-color.png",
+          "sha256": "db0509950f67233d717aa0b03d109d90a1c5bf02d2bb45b7aab9d200ed863265",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/ne-nation.png",
+          "sha256": "fe5de8a6d9142965fb60647f382f6f1699114a1886dd664d5bef19ecee1fa23b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/ne-shadow.png",
+          "sha256": "5bcc3ec2f60e8b0800872e9849f97dc3254b506f7687cb34a6f402757f03ea5c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -155011,8 +155209,30 @@
       ],
       "intendedSource": "art/atlas/units/warrior/frames/defeat-se.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/se-color.png",
+          "sha256": "d3b6b501b008531fd56a7095e28b9c788b682c5db47ec6b45535a06ea6ab46b0",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/se-nation.png",
+          "sha256": "db1ccff337f9e000bea0b2c434f9f70cd71b5263cbaf6178aa9923b2eee7e13a",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/se-shadow.png",
+          "sha256": "7567bcda9a881c10e8dd93c9cb23105359eb1ede9833a1f1d535ee78bb47b5bf",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -155032,8 +155252,30 @@
       ],
       "intendedSource": "art/atlas/units/warrior/frames/defeat-sw.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/se-color.png",
+          "sha256": "d3b6b501b008531fd56a7095e28b9c788b682c5db47ec6b45535a06ea6ab46b0",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/se-nation.png",
+          "sha256": "db1ccff337f9e000bea0b2c434f9f70cd71b5263cbaf6178aa9923b2eee7e13a",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/se-shadow.png",
+          "sha256": "7567bcda9a881c10e8dd93c9cb23105359eb1ede9833a1f1d535ee78bb47b5bf",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -155053,8 +155295,30 @@
       ],
       "intendedSource": "art/atlas/units/warrior/frames/defeat-w.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/e-color.png",
+          "sha256": "138f95d69506e7f7c0295ef8d9dccb0861649a84fada6fbebc9c94f8a2f00f05",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/e-nation.png",
+          "sha256": "1381337b6b8e77e309861ac52cb8c91e7cae5e4fe49b345f18afd09852e31fd9",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/e-shadow.png",
+          "sha256": "beba6a37c6a15ff512db33c3b245d2b4f5a0e977d27598ce971c9d056b488521",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -155074,8 +155338,30 @@
       ],
       "intendedSource": "art/atlas/units/warrior/frames/hit-e.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/e-color.png",
+          "sha256": "138f95d69506e7f7c0295ef8d9dccb0861649a84fada6fbebc9c94f8a2f00f05",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/e-nation.png",
+          "sha256": "1381337b6b8e77e309861ac52cb8c91e7cae5e4fe49b345f18afd09852e31fd9",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/e-shadow.png",
+          "sha256": "beba6a37c6a15ff512db33c3b245d2b4f5a0e977d27598ce971c9d056b488521",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -155095,8 +155381,30 @@
       ],
       "intendedSource": "art/atlas/units/warrior/frames/hit-ne.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/ne-color.png",
+          "sha256": "db0509950f67233d717aa0b03d109d90a1c5bf02d2bb45b7aab9d200ed863265",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/ne-nation.png",
+          "sha256": "fe5de8a6d9142965fb60647f382f6f1699114a1886dd664d5bef19ecee1fa23b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/ne-shadow.png",
+          "sha256": "5bcc3ec2f60e8b0800872e9849f97dc3254b506f7687cb34a6f402757f03ea5c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -155116,8 +155424,30 @@
       ],
       "intendedSource": "art/atlas/units/warrior/frames/hit-nw.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/ne-color.png",
+          "sha256": "db0509950f67233d717aa0b03d109d90a1c5bf02d2bb45b7aab9d200ed863265",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/ne-nation.png",
+          "sha256": "fe5de8a6d9142965fb60647f382f6f1699114a1886dd664d5bef19ecee1fa23b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/ne-shadow.png",
+          "sha256": "5bcc3ec2f60e8b0800872e9849f97dc3254b506f7687cb34a6f402757f03ea5c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -155137,8 +155467,30 @@
       ],
       "intendedSource": "art/atlas/units/warrior/frames/hit-se.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/se-color.png",
+          "sha256": "d3b6b501b008531fd56a7095e28b9c788b682c5db47ec6b45535a06ea6ab46b0",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/se-nation.png",
+          "sha256": "db1ccff337f9e000bea0b2c434f9f70cd71b5263cbaf6178aa9923b2eee7e13a",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/se-shadow.png",
+          "sha256": "7567bcda9a881c10e8dd93c9cb23105359eb1ede9833a1f1d535ee78bb47b5bf",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -155158,8 +155510,30 @@
       ],
       "intendedSource": "art/atlas/units/warrior/frames/hit-sw.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/se-color.png",
+          "sha256": "d3b6b501b008531fd56a7095e28b9c788b682c5db47ec6b45535a06ea6ab46b0",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/se-nation.png",
+          "sha256": "db1ccff337f9e000bea0b2c434f9f70cd71b5263cbaf6178aa9923b2eee7e13a",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/se-shadow.png",
+          "sha256": "7567bcda9a881c10e8dd93c9cb23105359eb1ede9833a1f1d535ee78bb47b5bf",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -155179,8 +155553,30 @@
       ],
       "intendedSource": "art/atlas/units/warrior/frames/hit-w.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/e-color.png",
+          "sha256": "138f95d69506e7f7c0295ef8d9dccb0861649a84fada6fbebc9c94f8a2f00f05",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/e-nation.png",
+          "sha256": "1381337b6b8e77e309861ac52cb8c91e7cae5e4fe49b345f18afd09852e31fd9",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/e-shadow.png",
+          "sha256": "beba6a37c6a15ff512db33c3b245d2b4f5a0e977d27598ce971c9d056b488521",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -155200,8 +155596,30 @@
       ],
       "intendedSource": "art/atlas/units/warrior/frames/idle-e.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/e-color.png",
+          "sha256": "138f95d69506e7f7c0295ef8d9dccb0861649a84fada6fbebc9c94f8a2f00f05",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/e-nation.png",
+          "sha256": "1381337b6b8e77e309861ac52cb8c91e7cae5e4fe49b345f18afd09852e31fd9",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/e-shadow.png",
+          "sha256": "beba6a37c6a15ff512db33c3b245d2b4f5a0e977d27598ce971c9d056b488521",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -155221,8 +155639,30 @@
       ],
       "intendedSource": "art/atlas/units/warrior/frames/idle-ne.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/ne-color.png",
+          "sha256": "db0509950f67233d717aa0b03d109d90a1c5bf02d2bb45b7aab9d200ed863265",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/ne-nation.png",
+          "sha256": "fe5de8a6d9142965fb60647f382f6f1699114a1886dd664d5bef19ecee1fa23b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/ne-shadow.png",
+          "sha256": "5bcc3ec2f60e8b0800872e9849f97dc3254b506f7687cb34a6f402757f03ea5c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -155242,8 +155682,30 @@
       ],
       "intendedSource": "art/atlas/units/warrior/frames/idle-nw.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/ne-color.png",
+          "sha256": "db0509950f67233d717aa0b03d109d90a1c5bf02d2bb45b7aab9d200ed863265",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/ne-nation.png",
+          "sha256": "fe5de8a6d9142965fb60647f382f6f1699114a1886dd664d5bef19ecee1fa23b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/ne-shadow.png",
+          "sha256": "5bcc3ec2f60e8b0800872e9849f97dc3254b506f7687cb34a6f402757f03ea5c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -155263,8 +155725,30 @@
       ],
       "intendedSource": "art/atlas/units/warrior/frames/idle-se.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/se-color.png",
+          "sha256": "d3b6b501b008531fd56a7095e28b9c788b682c5db47ec6b45535a06ea6ab46b0",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/se-nation.png",
+          "sha256": "db1ccff337f9e000bea0b2c434f9f70cd71b5263cbaf6178aa9923b2eee7e13a",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/se-shadow.png",
+          "sha256": "7567bcda9a881c10e8dd93c9cb23105359eb1ede9833a1f1d535ee78bb47b5bf",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -155284,8 +155768,30 @@
       ],
       "intendedSource": "art/atlas/units/warrior/frames/idle-sw.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/se-color.png",
+          "sha256": "d3b6b501b008531fd56a7095e28b9c788b682c5db47ec6b45535a06ea6ab46b0",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/se-nation.png",
+          "sha256": "db1ccff337f9e000bea0b2c434f9f70cd71b5263cbaf6178aa9923b2eee7e13a",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/se-shadow.png",
+          "sha256": "7567bcda9a881c10e8dd93c9cb23105359eb1ede9833a1f1d535ee78bb47b5bf",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -155305,8 +155811,30 @@
       ],
       "intendedSource": "art/atlas/units/warrior/frames/idle-w.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/e-color.png",
+          "sha256": "138f95d69506e7f7c0295ef8d9dccb0861649a84fada6fbebc9c94f8a2f00f05",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/e-nation.png",
+          "sha256": "1381337b6b8e77e309861ac52cb8c91e7cae5e4fe49b345f18afd09852e31fd9",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/e-shadow.png",
+          "sha256": "beba6a37c6a15ff512db33c3b245d2b4f5a0e977d27598ce971c9d056b488521",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -155326,8 +155854,30 @@
       ],
       "intendedSource": "art/atlas/units/warrior/frames/move-e.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/e-color.png",
+          "sha256": "138f95d69506e7f7c0295ef8d9dccb0861649a84fada6fbebc9c94f8a2f00f05",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/e-nation.png",
+          "sha256": "1381337b6b8e77e309861ac52cb8c91e7cae5e4fe49b345f18afd09852e31fd9",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/e-shadow.png",
+          "sha256": "beba6a37c6a15ff512db33c3b245d2b4f5a0e977d27598ce971c9d056b488521",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -155347,8 +155897,30 @@
       ],
       "intendedSource": "art/atlas/units/warrior/frames/move-ne.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/ne-color.png",
+          "sha256": "db0509950f67233d717aa0b03d109d90a1c5bf02d2bb45b7aab9d200ed863265",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/ne-nation.png",
+          "sha256": "fe5de8a6d9142965fb60647f382f6f1699114a1886dd664d5bef19ecee1fa23b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/ne-shadow.png",
+          "sha256": "5bcc3ec2f60e8b0800872e9849f97dc3254b506f7687cb34a6f402757f03ea5c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -155368,8 +155940,30 @@
       ],
       "intendedSource": "art/atlas/units/warrior/frames/move-nw.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/ne-color.png",
+          "sha256": "db0509950f67233d717aa0b03d109d90a1c5bf02d2bb45b7aab9d200ed863265",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/ne-nation.png",
+          "sha256": "fe5de8a6d9142965fb60647f382f6f1699114a1886dd664d5bef19ecee1fa23b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/ne-shadow.png",
+          "sha256": "5bcc3ec2f60e8b0800872e9849f97dc3254b506f7687cb34a6f402757f03ea5c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -155389,8 +155983,30 @@
       ],
       "intendedSource": "art/atlas/units/warrior/frames/move-se.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/se-color.png",
+          "sha256": "d3b6b501b008531fd56a7095e28b9c788b682c5db47ec6b45535a06ea6ab46b0",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/se-nation.png",
+          "sha256": "db1ccff337f9e000bea0b2c434f9f70cd71b5263cbaf6178aa9923b2eee7e13a",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/se-shadow.png",
+          "sha256": "7567bcda9a881c10e8dd93c9cb23105359eb1ede9833a1f1d535ee78bb47b5bf",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -155410,8 +156026,30 @@
       ],
       "intendedSource": "art/atlas/units/warrior/frames/move-sw.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/se-color.png",
+          "sha256": "d3b6b501b008531fd56a7095e28b9c788b682c5db47ec6b45535a06ea6ab46b0",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/se-nation.png",
+          "sha256": "db1ccff337f9e000bea0b2c434f9f70cd71b5263cbaf6178aa9923b2eee7e13a",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/se-shadow.png",
+          "sha256": "7567bcda9a881c10e8dd93c9cb23105359eb1ede9833a1f1d535ee78bb47b5bf",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -155431,8 +156069,30 @@
       ],
       "intendedSource": "art/atlas/units/warrior/frames/move-w.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/e-color.png",
+          "sha256": "138f95d69506e7f7c0295ef8d9dccb0861649a84fada6fbebc9c94f8a2f00f05",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/e-nation.png",
+          "sha256": "1381337b6b8e77e309861ac52cb8c91e7cae5e4fe49b345f18afd09852e31fd9",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/warrior/frames/e-shadow.png",
+          "sha256": "beba6a37c6a15ff512db33c3b245d2b4f5a0e977d27598ce971c9d056b488521",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null,
@@ -159280,8 +159940,23 @@
       ],
       "intendedSource": "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Warrior.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Warrior.png",
+          "sha256": "761aa9fc783ddc7934e0b94e8354cceb3522df41774111d8a5f026ac98d4749e",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Warrior-1.png",
+          "sha256": "410c487110423ff7d3cad58a077c781b550d0c87033788118bfea2ec2e834077",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": null,
       "replaces": null,
       "uniqueUnitIdentity": null

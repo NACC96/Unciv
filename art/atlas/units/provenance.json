@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "entries": [
+    {
+      "assetId": "warrior",
+      "creator": "OpenAI image generation",
+      "source": "art/atlas/units/warrior/creation-record.json",
+      "promptPath": "art/atlas/units/warrior/prompts/e-v2.txt",
+      "rights": "original-generated",
+      "sourceHash": "2c17129d8eaaebadae0f534eeeecf8901195c018996ec58f73fdcb9a1444d992",
+      "outputHashes": {
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Warrior-1.png": "410c487110423ff7d3cad58a077c781b550d0c87033788118bfea2ec2e834077",
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Warrior.png": "761aa9fc783ddc7934e0b94e8354cceb3522df41774111d8a5f026ac98d4749e",
+        "art/atlas/units/warrior/frames/e-color.png": "138f95d69506e7f7c0295ef8d9dccb0861649a84fada6fbebc9c94f8a2f00f05",
+        "art/atlas/units/warrior/frames/e-nation.png": "1381337b6b8e77e309861ac52cb8c91e7cae5e4fe49b345f18afd09852e31fd9",
+        "art/atlas/units/warrior/frames/e-shadow.png": "beba6a37c6a15ff512db33c3b245d2b4f5a0e977d27598ce971c9d056b488521",
+        "art/atlas/units/warrior/frames/ne-color.png": "db0509950f67233d717aa0b03d109d90a1c5bf02d2bb45b7aab9d200ed863265",
+        "art/atlas/units/warrior/frames/ne-nation.png": "fe5de8a6d9142965fb60647f382f6f1699114a1886dd664d5bef19ecee1fa23b",
+        "art/atlas/units/warrior/frames/ne-shadow.png": "5bcc3ec2f60e8b0800872e9849f97dc3254b506f7687cb34a6f402757f03ea5c",
+        "art/atlas/units/warrior/frames/se-color.png": "d3b6b501b008531fd56a7095e28b9c788b682c5db47ec6b45535a06ea6ab46b0",
+        "art/atlas/units/warrior/frames/se-nation.png": "db1ccff337f9e000bea0b2c434f9f70cd71b5263cbaf6178aa9923b2eee7e13a",
+        "art/atlas/units/warrior/frames/se-shadow.png": "7567bcda9a881c10e8dd93c9cb23105359eb1ede9833a1f1d535ee78bb47b5bf"
+      }
+    }
+  ]
+}

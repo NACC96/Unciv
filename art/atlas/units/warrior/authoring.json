@@ -1,19 +1,95 @@
 {
-"schemaVersion": 1,
-"unitName": "Warrior",
-"assetId": "warrior",
-"reviewState": "missing",
-"canvasWidth": 128,
-"canvasHeight": 128,
-"anchorX": 64,
-"anchorY": 96,
-"clippingMargin": 2,
-"uniqueUnitIdentity": null,
-"uniqueTo": null,
-"replaces": null,
-"staticFallbackKey": "TileSets/AtlasUnits/Units/Warrior",
-"framesDirectory": "frames/",
-"applicableStates": [ "IDLE", "MOVE", "ATTACK", "HIT", "DEFEAT" ],
-"facings": [ "E", "NE", "NW", "W", "SW", "SE" ],
-"minimumFrames": { "IDLE": 4, "MOVE": 8, "ATTACK": 8, "HIT": 4, "DEFEAT": 8 }
+  "schemaVersion": 1,
+  "unitName": "Warrior",
+  "assetId": "warrior",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": null,
+  "uniqueTo": null,
+  "replaces": null,
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Warrior",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/warrior/e-motion-v2.png",
+      "rawHash": "b5436897f64d78aaaa197bec9dcb449a781cd08f6cda538bc88430adaf2e7c39",
+      "promptPath": "art/atlas/units/warrior/prompts/e-v2.txt",
+      "promptHash": "a79504c1ee3f500261a30b2504994bef6f914edab68bf4b94cef4d5f98f75b5c",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/warrior/ne-motion-v2.png",
+      "rawHash": "4c9f1bc045653bf6b268931b351971393f390348d5797e9364020e95c2874287",
+      "promptPath": "art/atlas/units/warrior/prompts/ne-v2.txt",
+      "promptHash": "812b9f072640142307f40a29f09a221011d3df197fca60b5384bee159435c463",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/warrior/se-motion-v2.png",
+      "rawHash": "910fe110dc68b1d850d6cb870b9960d999ef5cad2bd213ef50e4b9368c5a717a",
+      "promptPath": "art/atlas/units/warrior/prompts/se-v2.txt",
+      "promptHash": "2f9ae20115238c64b704a49be9b0cb67af52bde9e3d7163d15313e740bd701f3",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
 }

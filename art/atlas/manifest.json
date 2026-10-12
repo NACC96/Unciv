@@ -13,6 +13,3221 @@
     "otherBytes": 33554432,
     "pendingUploadBytes": 8388608
   },
-  "units": [],
-  "clips": []
+  "units": [
+    {
+      "unitName": "Warrior",
+      "assetId": "warrior",
+      "canvasWidth": 128,
+      "canvasHeight": 128,
+      "anchorX": 64,
+      "anchorY": 96,
+      "staticLayers": [
+        "TileSets/AtlasUnits/Units/Warrior"
+      ],
+      "maskKeys": [
+        "TileSets/AtlasUnits/Units/Warrior-1"
+      ],
+      "shadowKey": null,
+      "clippingMargin": 2,
+      "uniqueUnitIdentity": null,
+      "applicableStates": [
+        "IDLE",
+        "MOVE",
+        "ATTACK",
+        "HIT",
+        "DEFEAT"
+      ]
+    }
+  ],
+  "clips": [
+    {
+      "unitName": "Warrior",
+      "state": "ATTACK",
+      "facing": "E",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Warrior",
+      "looping": false,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/e-color.png",
+            "x": 0,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/e-nation.png",
+                "x": 0,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/e-shadow.png",
+            "x": 0,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/e-color.png",
+            "x": 128,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/e-nation.png",
+                "x": 128,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/e-shadow.png",
+            "x": 128,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/e-color.png",
+            "x": 256,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/e-nation.png",
+                "x": 256,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/e-shadow.png",
+            "x": 256,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/e-color.png",
+            "x": 384,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/e-nation.png",
+                "x": 384,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/e-shadow.png",
+            "x": 384,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/e-color.png",
+            "x": 512,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/e-nation.png",
+                "x": 512,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/e-shadow.png",
+            "x": 512,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/e-color.png",
+            "x": 640,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/e-nation.png",
+                "x": 640,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/e-shadow.png",
+            "x": 640,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/e-color.png",
+            "x": 768,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/e-nation.png",
+                "x": 768,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/e-shadow.png",
+            "x": 768,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/e-color.png",
+            "x": 896,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/e-nation.png",
+                "x": 896,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/e-shadow.png",
+            "x": 896,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Warrior",
+      "state": "ATTACK",
+      "facing": "NE",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Warrior",
+      "looping": false,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/ne-color.png",
+            "x": 0,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/ne-nation.png",
+                "x": 0,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/ne-shadow.png",
+            "x": 0,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/ne-color.png",
+            "x": 128,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/ne-nation.png",
+                "x": 128,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/ne-shadow.png",
+            "x": 128,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/ne-color.png",
+            "x": 256,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/ne-nation.png",
+                "x": 256,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/ne-shadow.png",
+            "x": 256,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/ne-color.png",
+            "x": 384,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/ne-nation.png",
+                "x": 384,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/ne-shadow.png",
+            "x": 384,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/ne-color.png",
+            "x": 512,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/ne-nation.png",
+                "x": 512,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/ne-shadow.png",
+            "x": 512,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/ne-color.png",
+            "x": 640,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/ne-nation.png",
+                "x": 640,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/ne-shadow.png",
+            "x": 640,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/ne-color.png",
+            "x": 768,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/ne-nation.png",
+                "x": 768,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/ne-shadow.png",
+            "x": 768,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/ne-color.png",
+            "x": 896,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/ne-nation.png",
+                "x": 896,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/ne-shadow.png",
+            "x": 896,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Warrior",
+      "state": "ATTACK",
+      "facing": "NW",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Warrior",
+      "looping": false,
+      "mirroredFacing": "NE",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Warrior",
+      "state": "ATTACK",
+      "facing": "SE",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Warrior",
+      "looping": false,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/se-color.png",
+            "x": 0,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/se-nation.png",
+                "x": 0,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/se-shadow.png",
+            "x": 0,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/se-color.png",
+            "x": 128,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/se-nation.png",
+                "x": 128,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/se-shadow.png",
+            "x": 128,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/se-color.png",
+            "x": 256,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/se-nation.png",
+                "x": 256,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/se-shadow.png",
+            "x": 256,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/se-color.png",
+            "x": 384,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/se-nation.png",
+                "x": 384,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/se-shadow.png",
+            "x": 384,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/se-color.png",
+            "x": 512,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/se-nation.png",
+                "x": 512,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/se-shadow.png",
+            "x": 512,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/se-color.png",
+            "x": 640,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/se-nation.png",
+                "x": 640,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/se-shadow.png",
+            "x": 640,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/se-color.png",
+            "x": 768,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/se-nation.png",
+                "x": 768,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/se-shadow.png",
+            "x": 768,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/se-color.png",
+            "x": 896,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/se-nation.png",
+                "x": 896,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/se-shadow.png",
+            "x": 896,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Warrior",
+      "state": "ATTACK",
+      "facing": "SW",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Warrior",
+      "looping": false,
+      "mirroredFacing": "SE",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Warrior",
+      "state": "ATTACK",
+      "facing": "W",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Warrior",
+      "looping": false,
+      "mirroredFacing": "E",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Warrior",
+      "state": "DEFEAT",
+      "facing": "E",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Warrior",
+      "looping": false,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/e-color.png",
+            "x": 0,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/e-nation.png",
+                "x": 0,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/e-shadow.png",
+            "x": 0,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/e-color.png",
+            "x": 128,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/e-nation.png",
+                "x": 128,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/e-shadow.png",
+            "x": 128,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/e-color.png",
+            "x": 256,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/e-nation.png",
+                "x": 256,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/e-shadow.png",
+            "x": 256,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/e-color.png",
+            "x": 384,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/e-nation.png",
+                "x": 384,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/e-shadow.png",
+            "x": 384,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/e-color.png",
+            "x": 512,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/e-nation.png",
+                "x": 512,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/e-shadow.png",
+            "x": 512,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/e-color.png",
+            "x": 640,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/e-nation.png",
+                "x": 640,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/e-shadow.png",
+            "x": 640,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/e-color.png",
+            "x": 768,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/e-nation.png",
+                "x": 768,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/e-shadow.png",
+            "x": 768,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/e-color.png",
+            "x": 896,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/e-nation.png",
+                "x": 896,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/e-shadow.png",
+            "x": 896,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Warrior",
+      "state": "DEFEAT",
+      "facing": "NE",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Warrior",
+      "looping": false,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/ne-color.png",
+            "x": 0,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/ne-nation.png",
+                "x": 0,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/ne-shadow.png",
+            "x": 0,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/ne-color.png",
+            "x": 128,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/ne-nation.png",
+                "x": 128,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/ne-shadow.png",
+            "x": 128,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/ne-color.png",
+            "x": 256,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/ne-nation.png",
+                "x": 256,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/ne-shadow.png",
+            "x": 256,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/ne-color.png",
+            "x": 384,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/ne-nation.png",
+                "x": 384,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/ne-shadow.png",
+            "x": 384,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/ne-color.png",
+            "x": 512,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/ne-nation.png",
+                "x": 512,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/ne-shadow.png",
+            "x": 512,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/ne-color.png",
+            "x": 640,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/ne-nation.png",
+                "x": 640,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/ne-shadow.png",
+            "x": 640,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/ne-color.png",
+            "x": 768,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/ne-nation.png",
+                "x": 768,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/ne-shadow.png",
+            "x": 768,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/ne-color.png",
+            "x": 896,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/ne-nation.png",
+                "x": 896,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/ne-shadow.png",
+            "x": 896,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Warrior",
+      "state": "DEFEAT",
+      "facing": "NW",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Warrior",
+      "looping": false,
+      "mirroredFacing": "NE",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Warrior",
+      "state": "DEFEAT",
+      "facing": "SE",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Warrior",
+      "looping": false,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/se-color.png",
+            "x": 0,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/se-nation.png",
+                "x": 0,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/se-shadow.png",
+            "x": 0,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/se-color.png",
+            "x": 128,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/se-nation.png",
+                "x": 128,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/se-shadow.png",
+            "x": 128,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/se-color.png",
+            "x": 256,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/se-nation.png",
+                "x": 256,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/se-shadow.png",
+            "x": 256,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/se-color.png",
+            "x": 384,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/se-nation.png",
+                "x": 384,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/se-shadow.png",
+            "x": 384,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/se-color.png",
+            "x": 512,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/se-nation.png",
+                "x": 512,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/se-shadow.png",
+            "x": 512,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/se-color.png",
+            "x": 640,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/se-nation.png",
+                "x": 640,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/se-shadow.png",
+            "x": 640,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/se-color.png",
+            "x": 768,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/se-nation.png",
+                "x": 768,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/se-shadow.png",
+            "x": 768,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/se-color.png",
+            "x": 896,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/se-nation.png",
+                "x": 896,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/se-shadow.png",
+            "x": 896,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Warrior",
+      "state": "DEFEAT",
+      "facing": "SW",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Warrior",
+      "looping": false,
+      "mirroredFacing": "SE",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Warrior",
+      "state": "DEFEAT",
+      "facing": "W",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Warrior",
+      "looping": false,
+      "mirroredFacing": "E",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Warrior",
+      "state": "HIT",
+      "facing": "E",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Warrior",
+      "looping": false,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 95,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/e-color.png",
+            "x": 512,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/e-nation.png",
+                "x": 512,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/e-shadow.png",
+            "x": 512,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 95,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/e-color.png",
+            "x": 640,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/e-nation.png",
+                "x": 640,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/e-shadow.png",
+            "x": 640,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 95,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/e-color.png",
+            "x": 768,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/e-nation.png",
+                "x": 768,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/e-shadow.png",
+            "x": 768,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 95,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/e-color.png",
+            "x": 896,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/e-nation.png",
+                "x": 896,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/e-shadow.png",
+            "x": 896,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Warrior",
+      "state": "HIT",
+      "facing": "NE",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Warrior",
+      "looping": false,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 95,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/ne-color.png",
+            "x": 512,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/ne-nation.png",
+                "x": 512,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/ne-shadow.png",
+            "x": 512,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 95,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/ne-color.png",
+            "x": 640,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/ne-nation.png",
+                "x": 640,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/ne-shadow.png",
+            "x": 640,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 95,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/ne-color.png",
+            "x": 768,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/ne-nation.png",
+                "x": 768,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/ne-shadow.png",
+            "x": 768,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 95,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/ne-color.png",
+            "x": 896,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/ne-nation.png",
+                "x": 896,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/ne-shadow.png",
+            "x": 896,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Warrior",
+      "state": "HIT",
+      "facing": "NW",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Warrior",
+      "looping": false,
+      "mirroredFacing": "NE",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Warrior",
+      "state": "HIT",
+      "facing": "SE",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Warrior",
+      "looping": false,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 95,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/se-color.png",
+            "x": 512,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/se-nation.png",
+                "x": 512,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/se-shadow.png",
+            "x": 512,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 95,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/se-color.png",
+            "x": 640,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/se-nation.png",
+                "x": 640,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/se-shadow.png",
+            "x": 640,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 95,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/se-color.png",
+            "x": 768,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/se-nation.png",
+                "x": 768,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/se-shadow.png",
+            "x": 768,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 95,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/se-color.png",
+            "x": 896,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/se-nation.png",
+                "x": 896,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/se-shadow.png",
+            "x": 896,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Warrior",
+      "state": "HIT",
+      "facing": "SW",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Warrior",
+      "looping": false,
+      "mirroredFacing": "SE",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Warrior",
+      "state": "HIT",
+      "facing": "W",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Warrior",
+      "looping": false,
+      "mirroredFacing": "E",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Warrior",
+      "state": "IDLE",
+      "facing": "E",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Warrior",
+      "looping": true,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 160,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/e-color.png",
+            "x": 0,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/e-nation.png",
+                "x": 0,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/e-shadow.png",
+            "x": 0,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 160,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/e-color.png",
+            "x": 128,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/e-nation.png",
+                "x": 128,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/e-shadow.png",
+            "x": 128,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 160,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/e-color.png",
+            "x": 256,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/e-nation.png",
+                "x": 256,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/e-shadow.png",
+            "x": 256,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 160,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/e-color.png",
+            "x": 384,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/e-nation.png",
+                "x": 384,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/e-shadow.png",
+            "x": 384,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Warrior",
+      "state": "IDLE",
+      "facing": "NE",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Warrior",
+      "looping": true,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 160,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/ne-color.png",
+            "x": 0,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/ne-nation.png",
+                "x": 0,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/ne-shadow.png",
+            "x": 0,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 160,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/ne-color.png",
+            "x": 128,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/ne-nation.png",
+                "x": 128,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/ne-shadow.png",
+            "x": 128,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 160,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/ne-color.png",
+            "x": 256,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/ne-nation.png",
+                "x": 256,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/ne-shadow.png",
+            "x": 256,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 160,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/ne-color.png",
+            "x": 384,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/ne-nation.png",
+                "x": 384,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/ne-shadow.png",
+            "x": 384,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Warrior",
+      "state": "IDLE",
+      "facing": "NW",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Warrior",
+      "looping": true,
+      "mirroredFacing": "NE",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Warrior",
+      "state": "IDLE",
+      "facing": "SE",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Warrior",
+      "looping": true,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 160,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/se-color.png",
+            "x": 0,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/se-nation.png",
+                "x": 0,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/se-shadow.png",
+            "x": 0,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 160,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/se-color.png",
+            "x": 128,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/se-nation.png",
+                "x": 128,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/se-shadow.png",
+            "x": 128,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 160,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/se-color.png",
+            "x": 256,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/se-nation.png",
+                "x": 256,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/se-shadow.png",
+            "x": 256,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 160,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/se-color.png",
+            "x": 384,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/se-nation.png",
+                "x": 384,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/se-shadow.png",
+            "x": 384,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Warrior",
+      "state": "IDLE",
+      "facing": "SW",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Warrior",
+      "looping": true,
+      "mirroredFacing": "SE",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Warrior",
+      "state": "IDLE",
+      "facing": "W",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Warrior",
+      "looping": true,
+      "mirroredFacing": "E",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Warrior",
+      "state": "MOVE",
+      "facing": "E",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Warrior",
+      "looping": true,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/e-color.png",
+            "x": 0,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/e-nation.png",
+                "x": 0,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/e-shadow.png",
+            "x": 0,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/e-color.png",
+            "x": 128,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/e-nation.png",
+                "x": 128,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/e-shadow.png",
+            "x": 128,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/e-color.png",
+            "x": 256,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/e-nation.png",
+                "x": 256,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/e-shadow.png",
+            "x": 256,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/e-color.png",
+            "x": 384,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/e-nation.png",
+                "x": 384,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/e-shadow.png",
+            "x": 384,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/e-color.png",
+            "x": 512,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/e-nation.png",
+                "x": 512,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/e-shadow.png",
+            "x": 512,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/e-color.png",
+            "x": 640,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/e-nation.png",
+                "x": 640,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/e-shadow.png",
+            "x": 640,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/e-color.png",
+            "x": 768,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/e-nation.png",
+                "x": 768,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/e-shadow.png",
+            "x": 768,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/e-color.png",
+            "x": 896,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/e-nation.png",
+                "x": 896,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/e-shadow.png",
+            "x": 896,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Warrior",
+      "state": "MOVE",
+      "facing": "NE",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Warrior",
+      "looping": true,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/ne-color.png",
+            "x": 0,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/ne-nation.png",
+                "x": 0,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/ne-shadow.png",
+            "x": 0,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/ne-color.png",
+            "x": 128,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/ne-nation.png",
+                "x": 128,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/ne-shadow.png",
+            "x": 128,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/ne-color.png",
+            "x": 256,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/ne-nation.png",
+                "x": 256,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/ne-shadow.png",
+            "x": 256,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/ne-color.png",
+            "x": 384,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/ne-nation.png",
+                "x": 384,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/ne-shadow.png",
+            "x": 384,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/ne-color.png",
+            "x": 512,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/ne-nation.png",
+                "x": 512,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/ne-shadow.png",
+            "x": 512,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/ne-color.png",
+            "x": 640,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/ne-nation.png",
+                "x": 640,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/ne-shadow.png",
+            "x": 640,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/ne-color.png",
+            "x": 768,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/ne-nation.png",
+                "x": 768,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/ne-shadow.png",
+            "x": 768,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/ne-color.png",
+            "x": 896,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/ne-nation.png",
+                "x": 896,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/ne-shadow.png",
+            "x": 896,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Warrior",
+      "state": "MOVE",
+      "facing": "NW",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Warrior",
+      "looping": true,
+      "mirroredFacing": "NE",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Warrior",
+      "state": "MOVE",
+      "facing": "SE",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Warrior",
+      "looping": true,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/se-color.png",
+            "x": 0,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/se-nation.png",
+                "x": 0,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/se-shadow.png",
+            "x": 0,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/se-color.png",
+            "x": 128,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/se-nation.png",
+                "x": 128,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/se-shadow.png",
+            "x": 128,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/se-color.png",
+            "x": 256,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/se-nation.png",
+                "x": 256,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/se-shadow.png",
+            "x": 256,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/se-color.png",
+            "x": 384,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/se-nation.png",
+                "x": 384,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/se-shadow.png",
+            "x": 384,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/se-color.png",
+            "x": 512,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/se-nation.png",
+                "x": 512,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/se-shadow.png",
+            "x": 512,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/se-color.png",
+            "x": 640,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/se-nation.png",
+                "x": 640,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/se-shadow.png",
+            "x": 640,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/se-color.png",
+            "x": 768,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/se-nation.png",
+                "x": 768,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/se-shadow.png",
+            "x": 768,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/warrior/frames/se-color.png",
+            "x": 896,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/warrior/frames/se-nation.png",
+                "x": 896,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/warrior/frames/se-shadow.png",
+            "x": 896,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Warrior",
+      "state": "MOVE",
+      "facing": "SW",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Warrior",
+      "looping": true,
+      "mirroredFacing": "SE",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Warrior",
+      "state": "MOVE",
+      "facing": "W",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Warrior",
+      "looping": true,
+      "mirroredFacing": "E",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    }
+  ]
 }
