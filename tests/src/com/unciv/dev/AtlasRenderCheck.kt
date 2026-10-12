@@ -132,7 +132,7 @@ object AtlasRenderCheck {
                 val scrollParents = generateSequence(button.parent) { it.parent }.filterIsInstance<com.badlogic.gdx.scenes.scene2d.ui.ScrollPane>()
                 if (scrollParents.any { parent ->
                     val p = parent.localToStageCoordinates(Vector2())
-                    position.x < p.x || position.y < p.y || position.x + button.width > p.x + parent.width || position.y + button.height > p.y + parent.height
+                    position.x < p.x - .5f || position.y < p.y - .5f || position.x + button.width > p.x + parent.width + .5f || position.y + button.height > p.y + parent.height + .5f
                 }) return@mapNotNull null
                 val foreground = button.label.style.fontColor.cpy().mul(button.label.color)
                 val points = listOf(Vector2(position.x + 8f, position.y + 8f), Vector2(position.x + button.width - 8f, position.y + 8f))
