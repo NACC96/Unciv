@@ -9,6 +9,32 @@ import org.junit.runner.RunWith
 class AgentModelCatalogTest {
 
     @Test
+    fun `documented image models carry known capability across providers`() {
+        val models = listOf("codex" to "gpt-4o", "claude" to "claude-3-7-sonnet",
+            "claude" to "claude-3-5-sonnet", "claude" to "claude-3-5-haiku",
+            "opencode" to "anthropic/claude-3-7-sonnet", "opencode" to "google/gemini-2.5-pro",
+            "opencode" to "google/gemini-2.5-flash", "opencode" to "openai/gpt-5.6-luna")
+        for ((provider, id) in models)
+            Assert.assertEquals("Image capability for $provider/$id", true,
+                AgentModelCatalog.findModel(provider, id).supportsImages)
+    }
+
+    @Test
+    fun `discovery fills missing known images while preserving explicit unsupported and unknown models`() {
+        val known = AgentModelCatalog.CLAUDE_MODELS.first()
+        val unknown = AgentModelCatalog.customModel("private-text-model", "claude").copy(isDiscovered = true)
+        try {
+            AgentModelCatalog.setDiscoveredModels("claude", listOf(known.copy(supportsImages = null), unknown))
+            Assert.assertEquals(true, AgentModelCatalog.findModel("claude", known.id).supportsImages)
+            Assert.assertNull(AgentModelCatalog.findModel("claude", unknown.id).supportsImages)
+            AgentModelCatalog.setDiscoveredModels("claude", listOf(known.copy(supportsImages = false)))
+            Assert.assertEquals(false, AgentModelCatalog.findModel("claude", known.id).supportsImages)
+        } finally {
+            AgentModelCatalog.setDiscoveredModels("claude", emptyList())
+        }
+    }
+
+    @Test
     fun `codex default respects a discovered catalog without luna`() {
         val discovered = AgentModelCatalog.CODEX_MODELS.first { it.id == "gpt-6.1-sol" }
             .copy(defaultThinkingLevel = ThinkingLevel.MEDIUM, isDiscovered = true)

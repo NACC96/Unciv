@@ -7,6 +7,7 @@ import com.unciv.logic.Version
 import com.unciv.logic.agents.AgentMatchSessionFactory
 import com.unciv.logic.agents.AgentMatchSetup
 import com.unciv.logic.agents.AgentMatchState
+import com.unciv.logic.agents.NationControl
 import com.unciv.logic.agents.AgentOrdinarySave
 import com.unciv.logic.agents.ControllerKind
 import com.unciv.logic.automation.Timers
@@ -237,7 +238,14 @@ open class UncivGame(val isConsoleMode: Boolean = false) : Game(), PlatformSpeci
 
         return@toplevel withGLContext {
             disposeScreens()
-            val newWorldScreen = WorldScreen(newGameInfo, autoPlay, newGameInfo.getPlayerToViewAs(), worldScreenRestoreState)
+            val savedViewer = savedAgentMatch?.let { NationControl.savedViewerCivId(newGameInfo, it) }
+                ?.let { id -> newGameInfo.civilizations.firstOrNull { it.civID == id } }
+            val defaultViewer = newGameInfo.getPlayerToViewAs()
+            val nativeViewer = if (agentSetup != null && savedAgentMatch == null &&
+                newGameInfo.civilizations.none { it.isSpectator() } && agentSetup.slots.containsKey(defaultViewer.civName))
+                newGameInfo.civilizations.firstOrNull { it.isMajorCiv() && it.playerType == PlayerType.Human && !agentSetup.slots.containsKey(it.civName) }
+            else null
+            val newWorldScreen = WorldScreen(newGameInfo, autoPlay, savedViewer ?: nativeViewer ?: defaultViewer, worldScreenRestoreState)
             if (savedAgentMatch != null) {
                 // No new-game setup/automatic play: exact saved controllers, work and receipts, PAUSED.
                 try {
@@ -275,7 +283,11 @@ open class UncivGame(val isConsoleMode: Boolean = false) : Game(), PlatformSpeci
             }
             val moreThanOnePlayer = humanCount > 1
             val isSingleplayer = !newGameInfo.gameParameters.isOnlineMultiplayer
-            val screenToShow = if (moreThanOnePlayer && isSingleplayer) {
+            val spectatorManaged = (savedAgentMatch != null || agentSetup != null) &&
+                (newWorldScreen.viewingCiv.isSpectator() || savedAgentMatch?.localControlCivId?.let { id ->
+                    newGameInfo.civilizations.firstOrNull { it.civID == id }?.isSpectator()
+                } == true)
+            val screenToShow = if (moreThanOnePlayer && isSingleplayer && !spectatorManaged) {
                 PlayerReadyScreen(newWorldScreen)
             } else {
                 newWorldScreen

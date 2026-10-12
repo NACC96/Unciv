@@ -30,6 +30,12 @@ enum class NextTurnAction(protected val text: String, val color: Color) {
             worldScreen.agentSession?.onNextTurnPressed()
         }
     },
+    AgentUnsupportedChoice("Unsupported choice", Color.ORANGE) {
+        override fun isChoice(worldScreen: WorldScreen) = false
+        override fun action(worldScreen: WorldScreen) {
+            com.unciv.ui.popups.ToastPopup("Religion and espionage choices are unsupported in this agent match.", worldScreen).open(force = true)
+        }
+    },
     Default("", ImageGetter.CHARCOAL) {
         override val icon get() = null
         override fun isChoice(worldScreen: WorldScreen) = false

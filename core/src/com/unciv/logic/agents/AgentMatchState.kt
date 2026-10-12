@@ -3,7 +3,7 @@ package com.unciv.logic.agents
 import com.unciv.logic.IsPartOfGameInfoSerialization
 
 /** Fork save-format version for agent-match metadata. Reject others explicitly. */
-const val AGENT_MATCH_FORMAT_VERSION = 2
+const val AGENT_MATCH_FORMAT_VERSION = 3
 
 /** Mandatory choices block end-turn; optional ones are deferrable reminders; informational ones log only. */
 enum class DecisionClassification : IsPartOfGameInfoSerialization {
@@ -134,7 +134,13 @@ class AgentMatchState(
     /** Mail-send and acknowledgement receipts outlive turn-scoped gameplay receipts; private to the host. */
     var diplomaticMessageReceipts: HashMap<String, ActionReceipt> = HashMap(),
     /** Sanitized last sightings and geometry-only discovery, isolated per controller. */
-    var mapKnowledge: AgentMapKnowledge = AgentMapKnowledge()
+    var mapKnowledge: AgentMapKnowledge = AgentMapKnowledge(),
+    /** Immutable local management origin; absent historical identities are initialized without choosing an agent. */
+    var localControlCivId: String? = null,
+    /** Actual saved presentation identity, independent of management origin and active turn. */
+    var localViewingCivId: String? = null,
+    /** Last external personality/configuration survives explicit Human assignment. */
+    var retainedAgentProfiles: HashMap<String, AgentProfile> = HashMap()
 ) : IsPartOfGameInfoSerialization {
     @Suppress("unused") // used by json serialization
     constructor() : this(
@@ -164,6 +170,9 @@ class AgentMatchState(
         endTurnsCommitted,
         ArrayList(diplomaticMessages.map { it.copy() }),
         HashMap(diplomaticMessageReceipts.mapValues { it.value.copy() }),
-        mapKnowledge.deepCopy()
+        mapKnowledge.deepCopy(),
+        localControlCivId,
+        localViewingCivId,
+        HashMap(retainedAgentProfiles.mapValues { it.value.copy() })
     )
 }

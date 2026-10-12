@@ -9,6 +9,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import com.badlogic.gdx.utils.Align
 import com.unciv.Constants
 import com.unciv.GUI
+import com.unciv.ui.screens.worldscreen.AgentSnapshotScreen
+import com.unciv.ui.screens.worldscreen.WorldScreen
+import com.unciv.ui.screens.worldscreen.refreshAgentSnapshot
+import com.unciv.view.GameView
 import com.unciv.UncivGame
 import com.unciv.logic.civilization.Civilization
 import com.unciv.logic.civilization.NotificationIcon
@@ -55,7 +59,32 @@ class DiplomacyScreen(
     private val selectCivView: ForeignCivView? = null,
     private val selectTrade: Trade? = null,
     private val showTrade: Boolean = selectTrade != null
-): BaseScreen(), RecreateOnResize {
+): BaseScreen(), RecreateOnResize, AgentSnapshotScreen {
+    override val snapshotGameInfo = viewingCivView.getCiv().gameInfo
+    override val snapshotViewerCivId = game.worldScreen?.takeIf { it.gameInfo.gameId == snapshotGameInfo.gameId }?.currentViewerCivId() ?: viewingCivView.gameView.civView.civID
+    private var selectedOtherCivId: String? = selectCivView?.civID
+    private var activeTrade: TradeTable? = null
+
+    override fun show() = refreshAgentSnapshot()
+
+    override fun recreateForSnapshot(worldScreen: WorldScreen): BaseScreen? {
+        val civ = worldScreen.gameInfo.civilizations.firstOrNull { it.civID == viewingCiv.civID } ?: return null
+        if (!worldScreen.viewingCiv.isSpectator() && civ !== worldScreen.viewingCiv) return null
+        val view = GameView(worldScreen.gameInfo, civ, worldScreen.viewingCiv.isSpectator())
+        val other = worldScreen.gameInfo.civilizations.firstOrNull { it.civID == selectedOtherCivId && civ.knows(it) }
+        val draft = activeTrade?.tradeView?.let { trade ->
+            Trade().apply { ourOffers.addAll(trade.ourStagedOffers()); theirOffers.addAll(trade.theirStagedOffers()) }
+        }
+        // A newly committed proposal is loaded by TradeTable itself. Do not overwrite it
+        // with the pre-dispatch draft (which may already have been cleared by its caller).
+        val hasPendingOffer = other?.tradeRequests?.any { it.requestingCiv == civ.civID } == true
+        return DiplomacyScreen(view.civView, other?.let { view.getForeignCivView(it) },
+            draft.takeIf { other != null && !hasPendingOffer }, activeTrade != null && other != null).also {
+            it.leftSideScroll.scrollY = leftSideScroll.scrollY
+            it.leftSideScroll.updateVisualScroll()
+        }
+    }
+
     companion object {
         private const val nationIconSize = 100f
         private const val nationIconPad = 10f
@@ -219,6 +248,8 @@ class DiplomacyScreen(
     }
 
     internal fun updateRightSide(otherCiv: Civilization) {
+        selectedOtherCivId = otherCiv.civID
+        activeTrade = null
         rightSideTable.clear()
         UncivGame.Current.musicController.chooseTrack(otherCiv.civName,
             MusicMood.peaceOrWar(viewingCiv.isAtWarWith(otherCiv)),MusicTrackChooserFlags.setSelectNation)
@@ -231,8 +262,10 @@ class DiplomacyScreen(
     //region Major Civ Diplomacy
 
     internal fun setTrade(otherCiv: Civilization): TradeTable {
+        selectedOtherCivId = otherCiv.civID
         rightSideTable.clear()
         val tradeTable = TradeTable(viewingCivView, viewingCivView.gameView.getForeignCivView(otherCiv), this)
+        activeTrade = tradeTable
         rightSideTable.add(tradeTable)
         return tradeTable
     }
@@ -326,13 +359,14 @@ class DiplomacyScreen(
             declareWarButton.setText(declareWarButton.text.toString() + " (${turnsToPeaceTreaty.tr()}${Fonts.turn})")
         }
         declareWarButton.onClick {
-            // Agent matches route war declaration through the coordinator (§3.2).
-            if (UncivGame.Current.worldScreen?.routeThroughAgentSession {
-                    listOf({ r: Int ->
-                        DeclareWarCommand(viewingCiv.civID, "ui-${System.nanoTime()}", r, otherCiv.civID)
-                    })
-                } == true) return@onClick
             ConfirmPopup(this, getDeclareWarButtonText(otherCiv), "Declare war") {
+                // Agent matches route war declaration through the coordinator (§3.2).
+                if (UncivGame.Current.worldScreen?.routeThroughAgentSession {
+                        listOf({ r: Int ->
+                            DeclareWarCommand(viewingCiv.civID, "ui-${System.nanoTime()}", r, otherCiv.civID)
+                        })
+                    } == true) return@ConfirmPopup
+
                 diplomacyManager.declareWar()
                 setRightSideFlavorText(otherCiv, otherCiv.nation.attacked, "Very well.")
                 updateLeftSideTable(otherCiv)

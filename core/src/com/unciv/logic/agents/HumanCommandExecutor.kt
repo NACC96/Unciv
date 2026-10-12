@@ -24,8 +24,9 @@ class HumanCommandExecutor(private val coordinator: MatchCoordinator) {
     fun isHumanTurn(): Boolean = currentHumanCivId() != null
 
     /**
-     * Executes one human gameplay command. The expected revision is stamped
-     * here — UI callers never track coordinator revisions themselves.
+     * Executes a supplied human command; the coordinator validates its expected revision.
+     * WorldScreen batch routes first reject a stale displayed revision, then
+     * executeAll invokes each factory with the current coordinator revision.
      * Returns null on success, or a human-readable error.
      */
     fun execute(actorCivId: String?, command: AgentCommand): String? =

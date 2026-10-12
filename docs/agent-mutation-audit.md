@@ -21,17 +21,22 @@ check inherits the gate for free.
 | Movement stop (button) | `UnitActionsTable.activateAction` | `UnitActionType.StopMovement` → `UnitOrder.WAKE` |
 | Unit movement (right-click, move-here button, single-tap, multi-unit) | `WorldMapHolder.moveUnitToTargetTile`, single-tap branch | `MoveUnitCommand` per unit, batch factories with fresh revisions |
 | Unit attacks incl. nukes (right-click path) | `WorldMapHolder.onTileRightClicked` | `AttackCommand` |
-| City production queue add/remove/raise/lower | `CityView.tryAddToQueue/tryRemoveFromQueue/tryRaisePriority/tryLowerPriority` | `CityProductionCommand` (ADD_BOTTOM/REMOVE/RAISE/LOWER) |
-| City purchase (gold) | `BuyButtonFactory.purchaseConstruction` | `CityProductionCommand` PURCHASE |
+| City production queue add/remove/reorder, construction context menu and target-tile addition | `CityView` queue helpers | `CityProductionCommand` (ADD_TOP/ADD_BOTTOM/REMOVE/REMOVE_ALL/RAISE/LOWER/MOVE_TOP/MOVE_END), stable city ID and target tile |
+| Construction disable/enable in one or all cities | `CityView.tryDisableConstruction/tryEnableConstruction`, `CivView.tryDisableCivConstruction/tryEnableCivConstruction` | `CityConstructionSettingsCommand`; civ-wide command includes the persistent new-city setting |
+| City purchase | `BuyButtonFactory.purchaseConstruction` | `CityProductionCommand` PURCHASE captures the displayed queue index, construction, currency and target tile; the coordinator revalidates them |
 | Citizen work/stop/lock/unlock, tile purchase, rename | `CityView.tryWorkTile/tryStopWorkingTile/tryLockTile/tryUnlockTile/tryBuyTile/tryRenameCity` | `CityCitizensCommand`, `BuyTileCommand`, `RenameCityCommand` |
-| Research selection (pick/queue/free tech) | `TechPickerScreen.tryExit` | `SelectResearchCommand` |
+| Citizen focus, avoid-growth, manual-specialist/assignment and Reset Citizens | `CityView` citizen helpers | `CityCitizensCommand`; Reset Citizens preserves `resetLocked=true` |
+| Found City after the existing promise confirmation | `UnitActionsFromUniques.getFoundCityAction` | `FoundCityCommand` in the confirmed callback; cancelling routes nothing |
+| Research selection (pick/queue/free tech) | `TechPickerScreen.tryExit` | Copies the complete staged queue; first `SelectResearchCommand` replaces, later entries append; free tech remains one explicit choice |
 | Policy adoption (branch + member) | `PolicyPickerScreen` (branch onClick, confirmAction) | `AdoptPolicyCommand` |
 | Declare war | `DiplomacyScreen.getDeclareWarButton` | `DeclareWarCommand` |
 | Denounce | `MajorCivDiplomacyTable.getDenounceButton` | `DenounceCommand` |
 | Declaration of friendship | `MajorCivDiplomacyTable.getDeclareFriendshipButton` | `FriendshipCommand` |
 | Incoming trade accept/decline | `TradePopup` buttons | `RespondTradeCommand` |
 | Demand answers (agree/refuse) | `AlertPopup.addDemand` buttons | `RespondDemandCommand` |
-| Human-command execution core | `logic/agents/HumanCommandExecutor.kt` | single coordinator entry: revision stamping per command, HUMAN-controller verification, batch all-or-nothing — headless-tested |
+| Human-command execution core | `WorldScreen.routeThroughAgentSession`, `logic/agents/HumanCommandExecutor.kt` | Captures displayed intent and rejects a stale displayed revision before the batch; factories use the current revision for each command with HUMAN-controller verification; first failure stops later commands |
+| Saved unit promotion defaults and city preference | `PromotionPickerScreen`, `CityView.trySetUnitShouldUseSavedPromotion` | `SaveUnitPromotionDefaultsCommand` copies candidate unit promotions; `SetCityUnitSavedPromotionCommand` updates the existing preference |
+| City-state resource improvement gift | `CityStateDiplomacyTable` Gift Improvement callback | `GiftImprovementToCityStateCommand`, validates ownership/resource/buildability, influence and gold before one atomic cost/improvement commit |
 | Promotion adoption (whole path) | `PromotionPickerScreen.acceptPromotion` | one `PromoteUnitCommand` per path step |
 | Unit upgrades (button + menu + upgrade-all) | `UnitActionsTable.activateAction`, `UnitUpgradeMenu.doUpgrade/doAllUpgrade` | `UpgradeUnitCommand` (coordinator revalidates gold/movement/requirements) |
 | Unit disband (confirm popup) | `UnitActions.addDisbandAction` | `UnitOrderCommand` DISBAND; popup cancel routes nothing |
@@ -43,6 +48,7 @@ check inherits the gate for free.
 | Raze / stop razing | `CityView.trySetRazing` | `SetRazingCommand` |
 | Queue move-to-top | `CityView.tryMoveEntryToTop` | `CityProductionCommand` MOVE_TOP |
 | City-state gold gifts (250/500/1000) | `CityStateDiplomacyTable.getGoldGiftTable` | `GiftGoldToCityStateCommand` |
+| City-state Negotiate Peace | `CityStateDiplomacyTable.getNegotiatePeaceCityStateButton` confirmation callback | Human-only `NegotiateCityStatePeaceCommand` revalidates contact, war, declared-war and ally-war gates, then accepts reciprocal native Peace Treaty offers on the candidate, retaining native treaty cooldown |
 | City-state tribute (gold/worker) | `CityStateDiplomacyTable` tribute buttons | `TributeCommand` (willingness gates mirror the disabled buttons) |
 | City-state protection pledge/revoke | `CityStateDiplomacyTable` confirm popups | `ProtectionCommand` (pledge/withdraw gates mirror the disabled buttons) |
 | City-state diplomatic marriage | `CityStateDiplomacyTable` marriage button | `DiplomaticMarriageCommand` (unique + canBeMarriedBy gates; cities auto-puppet, annex via routed conquest options) |
@@ -52,6 +58,10 @@ check inherits the gate for free.
 | Denouncement retaliation ("THIS MEANS WAR!") | `AlertPopup.addDenouncement` | `DeclareWarCommand` |
 | Protected-minor alert (war / side-with / break pledge) | `AlertPopup.addBulliedOrAttackedProtectedOrAlliedMinor` | `RespondProtectorAlertCommand` (war type follows allied-vs-protected; break-pledge forces withdrawal with notification, mirroring legacy) |
 | Diplomatic vote (picker) | `DiplomaticVotePickerScreen.voteAndClose` | `CastVoteCommand` (incl. abstain) |
+| Free great person selection | `GreatPersonPickerScreen.confirmAction` | `ChooseFreeGreatPersonCommand` commits the selected legal unit and consumes the free choice; the picker closes only after success |
+| Informational alert dismissal | `AlertPopup.close` | `DismissAlertCommand` removes the matching informational alert durably; decision-bearing alerts retain their typed answer routes |
+| Diplomatic vote result dismissal | `DiplomaticVoteResultScreen` | `DismissDiplomaticVoteResultsCommand` clears the saved result prompt |
+| Optional policy picker opening | `CivView.tryDismissPolicyPicker` | `MarkPolicyPickerOpenedCommand` clears only the saved reminder; it spends no culture or free policies |
 
 ## Gated (blocked while an agent turn is live; normal on human turns)
 
@@ -81,6 +91,7 @@ check inherits the gate for free.
 | Entry point | File | Mechanism |
 | --- | --- | --- |
 | Developer console | `WorldScreen.openDeveloperConsole` | returns immediately when `agentSession != null` (engine-level mutation bypasses the coordinator) |
+| Undo | `UndoHandler` | recording and restoring snapshot-only undo checkpoints is disabled whenever an agent session exists |
 | Simulation (`Simulate until turn`) | `logic/simulation`, `DebugTab` | controls not added when a session exists; the button itself routes through the gated NextTurn path |
 
 ## Read-only by construction
@@ -92,10 +103,13 @@ check inherits the gate for free.
 
 ## Human Mutation Routing Closure (CP-033)
 
-All applicable human mutation routes in the Vanilla scope have now been routed
-through the authoritative `MatchCoordinator` via `WorldScreen.routeThroughAgentSession`,
-publishing fresh snapshots to the GL thread upon completion. In ordinary (non-agent)
-matches, each interceptor safely yields false and executes legacy callbacks untouched.
+The routed entries listed above use the authoritative `MatchCoordinator` via
+`WorldScreen.routeThroughAgentSession`. The October 2026 takeover audit found
+legacy snapshot-only dependencies in citizen controls, founding, construction
+menus and city-state gifts, plus incomplete research intent. The listed routes
+now cover those confirmed controls. This is a bounded Vanilla audit, not proof
+that every legacy or mod mutation has been exercised. In ordinary (non-agent)
+matches, interceptors yield false and execute the legacy callbacks.
 
 ### 1. Unit Orders & Actions (`UnitActionsTable.kt`)
 - **Unit orders**: `EXPLORE`, `STOP_EXPLORATION`, `AUTOMATE`, `STOP_AUTOMATION`,
@@ -132,7 +146,7 @@ matches, each interceptor safely yields false and executes legacy callbacks unto
   in-match mutations on the current game or civilization state.
 - **Spectator Mode (`CivView.isSpectator()`)**: Presentation-only observation mode.
   When viewing as a spectator, `canChangeState` returns `false`, and all mutation
-  action buttons are hidden. Spectators cannot issue commands.
+  action buttons are hidden. Spectators cannot issue gameplay commands while viewing as a spectator.
 - **`UnitActionType.Transform`**: Mod-only unique (`UniqueType.CanTransform`).
   Excluded from Vanilla Civ 5 scope as no transformable units exist in the Vanilla ruleset.
 
@@ -170,12 +184,34 @@ none of them can change match state in an agent-enabled match:
 | Espionage screens and spy actions (`EspionageOverviewScreen`) | Vanilla has no espionage; `AgentMatchSetup.validate` locks espionage/mods for agent matches, so these screens are unreachable |
 | Religion screens/pickers/founding | Vanilla has no religion; ruleset-gated, unreachable |
 | `UnitActionType.Transform` | mod-only unique (`UniqueType.CanTransform`); no transformable unit exists in the Vanilla ruleset |
-| Unit gifts to major civilizations | no such control exists: the engine has no major-civ unit-gift function and `TradeOfferType` has no unit type (unit gifts exist only toward city-states, which are routed) |
 | Dev console, debug cheats, god-mode toggle, simulation controls | forbidden outright while a session exists (see above), not merely gated |
 | Multiplayer status popup (`MultiplayerStatusButton`) | presentation-only: loads file previews of remote multiplayer matches, never writes to the current game |
 | Spectator perspective controls | presentation-only observation; `canChangeState` is false for spectators so no mutation control is reachable |
 | Minimap, tile info, overlay toggles, save/load, options, civilopedia | read-only or out of match scope |
 
-There is no residual list of gameplay controls bypassing the coordinator:
-every entry point that can mutate match state in a Vanilla agent match is
-either ROUTED above or FORBIDDEN above.
+Unlisted controls require source and executable verification before claiming
+complete mutation coverage. Secondary-screen rebinding and mandatory-choice
+reachability are separate integration requirements from durable route handling.
+
+## Review-fix boundaries (2026-10-12)
+
+Presentation acknowledgements are saved state even when they do not change the
+economy or map. The human-only commands above commit through the same candidate,
+checkpoint and receipt path as gameplay commands, so a publication cannot restore
+a dismissed alert or reminder. Free-person selection is distinct from an existing
+great person's `unit.great` action. Neither path silently chooses for the human.
+Unsupported religion or espionage decisions in a legacy save block the agent
+Next Turn path and reject end-turn rather than opening a snapshot-mutating picker
+or falling through to a turn commit; the supported setup remains Vanilla.
+
+Offline matches without a spectator retain native local hotseat handoff: the next
+HUMAN turn commits that human as both the local management identity and viewer.
+Reloading on a human turn selects that human. A match with a spectator keeps its
+explicit Play as/Spectate view and management model; turn rotation does not
+silently change the spectator's selected nation. These are separate authority
+policies, not permissions to act for an inactive nation.
+
+This audit describes source routes. Automated component and coordinator checks
+do not establish installed native-app behavior, live provider operation, or
+complete mutation coverage for mods. The PR4 review-fix wave is source-only and
+has not rebuilt, installed or restarted the user's native app.

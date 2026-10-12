@@ -5,6 +5,11 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.utils.Align
+import com.badlogic.gdx.utils.JsonReader
+import com.unciv.logic.agents.AgentCommandException
+import com.unciv.logic.agents.AgentCommandError
+import com.unciv.logic.agents.ControllerKind
+import com.unciv.logic.agents.migrateAgentMatchStateJson
 import com.unciv.Constants
 import com.unciv.UncivGame
 import com.unciv.logic.GameInfo
@@ -59,6 +64,8 @@ import com.unciv.ui.screens.worldscreen.chat.ChatButton
 import com.unciv.ui.screens.worldscreen.mainmenu.WorldScreenMusicPopup
 import com.unciv.ui.screens.worldscreen.minimap.MinimapHolder
 import com.unciv.ui.screens.worldscreen.status.AutoPlayStatusButton
+import com.unciv.ui.screens.worldscreen.status.AgentActivityFeed
+import com.unciv.ui.screens.worldscreen.status.AgentNationSettingsPanel
 import com.unciv.ui.screens.worldscreen.status.AgentMessagesPanel
 import com.unciv.ui.screens.worldscreen.status.MultiplayerStatusButton
 import com.unciv.ui.screens.worldscreen.status.NextTurnButton
@@ -147,9 +154,9 @@ class WorldScreen(
 
     /**
      * Active agent match session, if this screen shows an agent-enabled
-     * match. Routes the end-turn button and gates human input; all other
-     * mutation paths are enumerated in docs/agent-mutation-audit.md (most
-     * still route legacy — full interception is tracked there, not here).
+     * match. Routes human gameplay through committed coordinator actions and
+     * gates input by the active controller. The bounded Vanilla route audit and
+     * remaining unsupported paths are documented in docs/agent-mutation-audit.md.
      */
     var agentSession: AgentMatchSession? = null
 
@@ -167,6 +174,7 @@ class WorldScreen(
         if (panel == null || !panel.isVisible) {
             // These floating detail panels share the right side of the map; Activity remains independent.
             stage.root.children.filterIsInstance<AgentMessagesPanel>().forEach { it.hide() }
+            stage.root.children.filterIsInstance<AgentNationSettingsPanel>().forEach { it.hide() }
         }
         if (panel == null) civilizationOverview = com.unciv.ui.screens.worldscreen.overview.CivilizationOverviewPanel(this)
         else panel.toggle()
@@ -193,15 +201,36 @@ class WorldScreen(
      */
     fun routeThroughAgentSession(
         buildCommands: (expectedRevision: Int) -> List<(Int) -> AgentCommand>
+    ): Boolean = routeThroughAgentSession({}, buildCommands)
+
+    fun routeThroughAgentSession(
+        onComplete: (String?) -> Unit,
+        buildCommands: (expectedRevision: Int) -> List<(Int) -> AgentCommand>
     ): Boolean {
         val session = agentSession ?: return false
+        val clickedViewerId = currentViewerCivId()
+        // Bind UI indices and choices to the frame on which the user clicked.
+        val displayedRevision = gameInfo.agentMatchStateJson?.let { JsonReader().parse(it).getInt("stateRevision", 0) }
+        val commands = try { buildCommands(displayedRevision ?: 0) } catch (ex: Exception) {
+            val error = ex.message ?: "This action could not be prepared."
+            ToastPopup(error, this).open(force = true)
+            onComplete(error)
+            return true
+        }
         // Never run coordinator mutations on the GL thread (serialization +
         // checkpoint I/O): dispatch to a worker, report back on the GL thread.
         Concurrency.runOnNonDaemonThreadPool("HumanAction") {
-            val error = session.executeHumanAction(buildCommands)
+            val error = session.executeHumanAction { revision ->
+                if (displayedRevision != null && displayedRevision != revision)
+                    listOf({ _: Int -> throw AgentCommandException(AgentCommandError.STALE_STATE,
+                        "The displayed game has changed. Please try this action again.", revision) })
+                else commands
+            }
             Concurrency.runOnGLThread {
+                if (game.worldScreen !== this@WorldScreen || agentSession !== session || currentViewerCivId() != clickedViewerId) return@runOnGLThread
                 if (error != null) ToastPopup(error, this@WorldScreen).open(force = true)
                 shouldUpdate = true
+                onComplete(error)
             }
         }
         return true
@@ -224,39 +253,73 @@ class WorldScreen(
      */
     private val agentPublicationFence = com.unciv.logic.agents.AgentPublicationFence()
 
-    fun installAgentSnapshot(snapshot: GameInfo, selection: ResolvedSelection, publicationGeneration: Long = 0) {
+    fun installAgentSnapshot(snapshot: GameInfo, selection: ResolvedSelection, publicationGeneration: Long = 0, viewerCivId: String? = null) {
         // A queued frame from an old host must not replace the currently opened game or its autosave.
         if (game.worldScreen !== this || game.gameInfo !== gameInfo || agentSession == null || gameInfo.gameId != snapshot.gameId) return
         if (gameInfo === snapshot) return
         val oldViewerId = viewingCiv.civID
-        val newViewer = snapshot.civilizations.firstOrNull { it.civID == oldViewerId }
+        val newViewer = snapshot.civilizations.firstOrNull { it.civID == (viewerCivId ?: oldViewerId) }
             ?: return // snapshot without the viewer is a host bug; keep current render
         if (!agentPublicationFence.accept(publicationGeneration)) return
         gameInfo = snapshot
         game.gameInfo = snapshot
+        val viewerChanged = newViewer.civID != oldViewerId
+        // A spectator's unrestricted view must never survive a committed takeover.
+        if (!newViewer.isSpectator()) fogOfWar = true
         viewingCiv = newViewer
-        selectedCiv = snapshot.civilizations.firstOrNull { it.civID == selectedCiv.civID } ?: newViewer
+        selectedCiv = if (viewerChanged || !newViewer.isSpectator()) newViewer else
+            snapshot.civilizations.firstOrNull { it.civID == selectedCiv.civID } ?: newViewer
         selectedGameView = GameView(snapshot, selectedCiv, spectatorMode = viewingCiv.isSpectator())
         cachedSpectatorGameView = null
         isPlayersTurn = viewingCiv.isCurrentPlayer()
+
+        if (viewerChanged) {
+            hideCivilizationOverview()
+            stage.root.children.filterIsInstance<AgentMessagesPanel>().forEach { it.hide(); it.refresh() }
+            stage.root.children.filterIsInstance<AgentActivityFeed>().forEach { it.hide() }
+            stage.root.children.filterIsInstance<AgentNationSettingsPanel>().forEach { it.hide() }
+            stage.root.children.filterIsInstance<Popup>().toList().forEach { it.close() }
+            stage.keyboardFocus = null
+            stage.scrollFocus = null
+            bottomUnitTable.selectSpy(null)
+            bottomUnitTable.selectUnit()
+            undoHandler.clearCheckpoints()
+            deferFreeGreatPersonPicker = false
+        }
 
         // Rebind the map layer to the new object graph.
         mapHolder.rebindToSnapshot(snapshot.tileMap)
 
         // Re-resolve selections by stable ID; drop removed entities.
-        val unit = selection.unitId?.let { id ->
+        val unit = selection.unitId?.takeUnless { viewerChanged }?.let { id ->
             snapshot.civilizations.asSequence().flatMap { it.units.getCivUnits() }
                 .firstOrNull { it.id == id }
         }
         val unitView = unit?.let { selectedGameView.getMapUnitView(it) }
-        val cityView = selection.cityId?.let { id ->
+        val cityView = selection.cityId?.takeUnless { viewerChanged }?.let { id ->
             snapshot.getCities().firstOrNull { it.id == id }?.let { selectedGameView.getForeignCityView(it) }
         }
         bottomUnitTable.reselectAfterSnapshot(unitView, cityView)
-        mapHolder.selectedTile = selection.tile?.let { pos ->
+        mapHolder.selectedTile = selection.tile?.takeUnless { viewerChanged }?.let { pos ->
             val tile = snapshot.tileMap.values.firstOrNull { it.position == pos }
             tile?.let { selectedGameView.getTile(it) }
         }
+        val nativeHumanHandoff = if (viewerChanged && !newViewer.isSpectator()) snapshot.agentMatchStateJson?.let { encoded ->
+            val state = migrateAgentMatchStateJson(encoded)
+            val principal = snapshot.civilizations.firstOrNull { it.civID == state.localControlCivId }
+            principal?.isSpectator() == false && state.controllers[newViewer.civID]?.kind == ControllerKind.HUMAN &&
+                snapshot.civilizations.count { !it.isSpectator() && state.controllers[it.civID]?.kind == ControllerKind.HUMAN } > 1
+        } == true else false
+        if (nativeHumanHandoff) {
+            // Retain the world in the stack; the privacy cover must also replace any old private screen.
+            val readyScreen = game.screen as? PlayerReadyScreen
+            if (readyScreen != null && !readyScreen.retainedWorldInStack)
+                game.replaceCurrentScreen { PlayerReadyScreen(this) }
+            else {
+                game.resetToWorldScreen()
+                game.pushScreen { PlayerReadyScreen(this, retainedWorldInStack = true) }
+            }
+        } else game.screen?.refreshAgentSnapshot()
         shouldUpdate = true
         Gdx.graphics.requestRendering()
     }
@@ -427,7 +490,8 @@ class WorldScreen(
         globalShortcuts.add(KeyboardBinding.QuickSave) { QuickSave.save(gameInfo, this) }
         globalShortcuts.add(KeyboardBinding.QuickLoad) { QuickSave.load(this) }
         globalShortcuts.add(KeyboardBinding.ViewCapitalCity) {
-            val capital = gameInfo.getCurrentPlayerCivilization().getCapital()
+            // A private inactive viewer must never open the active foreign nation's full CityView.
+            val capital = (if (viewingCiv.isSpectator()) gameInfo.getCurrentPlayerCivilization() else viewingCiv).getCapital()
             if (capital != null && !mapHolder.setCenterPosition(capital.location.toHexCoord()))
                 game.pushScreen{ CityScreen(selectedGameView.getCityView(capital)) }
         }
@@ -702,8 +766,8 @@ class WorldScreen(
     }
 
     fun setSelectedCiv(civ: Civilization) {
-        selectedCiv = civ
-        selectedGameView = GameView(gameInfo, civ, viewingCiv.isSpectator())
+        selectedCiv = if (viewingCiv.isSpectator()) civ else viewingCiv
+        selectedGameView = GameView(gameInfo, selectedCiv, viewingCiv.isSpectator())
     }
 
     private fun updateSelectedCiv() {
@@ -732,23 +796,23 @@ class WorldScreen(
 
     private fun restore(restoreState: RestoreState) {
 
-        // This is not the case if you have a multiplayer game where you play as 2 civs
-        if (viewingCiv.civID == restoreState.viewingCivName) {
-            mapHolder.zoom(restoreState.zoom)
-            mapHolder.scrollX = restoreState.scrollX
-            mapHolder.scrollY = restoreState.scrollY
-            mapHolder.updateVisualScroll()
-        }
+        // A restored host viewer wins over the previous screen's spectator selection and fog.
+        if (viewingCiv.civID != restoreState.viewingCivName) return
+        mapHolder.zoom(restoreState.zoom)
+        mapHolder.scrollX = restoreState.scrollX
+        mapHolder.scrollY = restoreState.scrollY
+        mapHolder.updateVisualScroll()
 
-        setSelectedCiv(gameInfo.getCivilization(restoreState.selectedCivName))
-        fogOfWar = restoreState.fogOfWar
+        val selected = gameInfo.civilizations.firstOrNull { it.civID == restoreState.selectedCivName }
+        setSelectedCiv(if (viewingCiv.isSpectator()) selected ?: viewingCiv else viewingCiv)
+        fogOfWar = !viewingCiv.isSpectator() || restoreState.fogOfWar
     }
 
     fun nextTurn() {
         // Agent-enabled matches never take the legacy clone/nextTurn path:
         // the session routes the current civ's end-turn through the match
         // coordinator (or consumes the press when nothing may act).
-        if (agentSession?.onNextTurnPressed() == true) return
+        agentSession?.let { it.onNextTurnPressed(); return }
         isPlayersTurn = false
         shouldUpdate = true
         val progressBar = NextTurnProgress(nextTurnButton)

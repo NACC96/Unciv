@@ -110,14 +110,27 @@ fun migrateAgentMatchStateJson(matchJson: String, expectedVersion: Int? = null):
     state.formatVersion = version
     if (version == 1) {
         // v1 exploration survives in the world; complete historical sightings cannot be invented.
-        state.formatVersion = AGENT_MATCH_FORMAT_VERSION
         state.mapKnowledge = AgentMapKnowledge()
     }
+    if (version < 3) {
+        val receipts = state.diplomaticMessageReceipts.values + state.currentTurnReceipts
+        val serializer = json()
+        for (message in state.diplomaticMessages) {
+            if (message.acknowledgedTurnSerial == null) continue
+            val fingerprint = "diplomacy.acknowledgeMessage|" + serializer.toJson(arrayListOf(
+                message.targetCivId, message.messageId, message.acknowledgementText))
+            message.acknowledgedRevision = receipts.filter {
+                it.outcome == "applied" && it.actorCivId == message.targetCivId &&
+                    it.resultJson == message.messageId && it.requestFingerprint == fingerprint
+            }.minOfOrNull { it.afterRevision }
+        }
+    }
+    state.formatVersion = AGENT_MATCH_FORMAT_VERSION
     state.validateFormat()
     return state
 }
 
-/** Explicit matching v1->v2 migration, before strict current-version validation. */
+/** Explicit matching v1/v2->v3 migration, before strict current-version validation. */
 fun migrateAgentBundle(bundle: AgentBundle): AgentBundle {
     require(bundle.bundleVersion in 1..AGENT_MATCH_FORMAT_VERSION) {
         "Unsupported agent bundle version ${bundle.bundleVersion}"

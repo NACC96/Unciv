@@ -1,6 +1,7 @@
 package com.unciv.ui.screens.worldscreen.unit.actions
 
 import com.unciv.logic.agents.RepairCommand
+import com.unciv.logic.agents.FoundCityCommand
 
 import com.unciv.Constants
 import com.unciv.GUI
@@ -63,7 +64,12 @@ object UnitActionsFromUniques {
         val hasActionModifiers = unique.modifiers.any { it.type?.targetTypes?.contains(
             UniqueTarget.UnitActionModifier
         ) == true }
-        val foundAction = {
+        val foundAction = fun() {
+            // This callback also belongs to the promise confirmation below. Route only after
+            // that confirmation, and leave headless built-in AI / ordinary games on the engine path.
+            if (unit.civ.playerType != PlayerType.AI && UncivGame.Current.worldScreen?.routeThroughAgentSession {
+                    listOf({ r: Int -> FoundCityCommand(unit.civ.civID, "ui-${System.nanoTime()}", r, unit.id) })
+                } == true) return
             if (unit.civ.playerType != PlayerType.AI)
                 UncivGame.Current.settings.addCompletedTutorialTask("Found city")
             // Get the city to be able to change it into puppet, for modding.

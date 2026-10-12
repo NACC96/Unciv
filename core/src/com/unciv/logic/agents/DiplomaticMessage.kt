@@ -15,16 +15,29 @@ class DiplomaticMessage(
     var origin: String = "NATION",
     /** A durable, explicit response by the recipient; delivery alone does not acknowledge mail. */
     var acknowledgedTurnSerial: Int? = null,
-    var acknowledgementText: String? = null
+    var acknowledgementText: String? = null,
+    var attachments: ArrayList<DiplomaticImageAttachment> = ArrayList(),
+    var acknowledgedRevision: Int? = null
 ) : IsPartOfGameInfoSerialization {
     @Suppress("unused")
     constructor() : this("", "", "", "", 0, null, "NATION")
 
     fun copy(): DiplomaticMessage = DiplomaticMessage(
         messageId, senderCivId, targetCivId, text, sentTurnSerial, deliveredTurnSerial, origin,
-        acknowledgedTurnSerial, acknowledgementText
+        acknowledgedTurnSerial, acknowledgementText, ArrayList(attachments.map { it.copy() }),
+        acknowledgedRevision
     )
 }
+
+/** A migrated acknowledgement group with missing revisions retains its complete saved order. */
+fun orderedDiplomaticMessages(messages: List<DiplomaticMessage>): List<DiplomaticMessage> =
+    messages.groupBy { it.acknowledgedTurnSerial }.entries
+        .sortedWith(compareBy<Map.Entry<Int?, List<DiplomaticMessage>>> { it.key == null }
+            .thenBy { it.key ?: Int.MAX_VALUE })
+        .flatMap { (_, group) ->
+            if (group.any { it.acknowledgedRevision == null }) group
+            else group.sortedBy { it.acknowledgedRevision }
+        }
 
 /** Delivered incoming mail is readable only by its target, never by guessed IDs. */
 internal fun DiplomaticMessage.isDeliveredTo(actorCivId: String, turnSerial: Int): Boolean =

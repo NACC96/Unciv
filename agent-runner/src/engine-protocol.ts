@@ -16,6 +16,7 @@ export const ENGINE_PROTOCOL_VERSION = 1;
 
 export type EngineMethod =
   | "observe"
+  | "message_image"
   | "inspect"
   | "inspect_tile"
   | "map"

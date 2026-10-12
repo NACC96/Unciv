@@ -170,14 +170,16 @@ class BuyButtonFactory(val cityScreen: CityScreen) {
         tile: TileView? = null
     ) {
         val cityView = cityScreen.cityView
+        val queueIndex = cityScreen.selectedQueueEntry
+        val tilePosition = tile?.position()
         // Agent matches route purchases through the coordinator (§3.2).
         if (UncivGame.Current.worldScreen?.routeThroughAgentSession {
                 listOf({ r: Int ->
                     CityProductionCommand(
                         cityView.city.civ.civID, "ui-${System.nanoTime()}", r, cityView.city.id,
                         ProductionOp.PURCHASE, name = construction.name,
-                        index = cityScreen.selectedQueueEntry,
-                        tilePos = tile?.position()
+                        index = queueIndex,
+                        tilePos = tilePosition, purchaseStat = stat
                     )
                 })
             } == true) {

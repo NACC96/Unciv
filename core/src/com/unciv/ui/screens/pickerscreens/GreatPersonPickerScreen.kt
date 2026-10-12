@@ -1,6 +1,7 @@
 package com.unciv.ui.screens.pickerscreens
 
 import com.unciv.UncivGame
+import com.unciv.logic.agents.ChooseFreeGreatPersonCommand
 import com.unciv.logic.civilization.Civilization
 import com.unciv.models.UncivSound
 import com.unciv.models.ruleset.unit.BaseUnit
@@ -72,6 +73,13 @@ class GreatPersonPickerScreen(val worldScreen: WorldScreen, val civInfo: Civiliz
             }
             return
         }
+        val unitName = chosenUnit.name
+        if (worldScreen.routeThroughAgentSession(onComplete = { error ->
+                if (error == null) {
+                    worldScreen.deferFreeGreatPersonPicker = false
+                    if (game.screen === this) game.popScreen()
+                }
+            }) { listOf({ r: Int -> ChooseFreeGreatPersonCommand(civInfo.civID, "ui-${System.nanoTime()}", r, unitName) }) }) return
         if (civInfo.greatPeople.chooseFreeGreatPerson(chosenUnit.name) == null) {
             descriptionLabel.setText("No space to place this unit".tr())
             allowClose()

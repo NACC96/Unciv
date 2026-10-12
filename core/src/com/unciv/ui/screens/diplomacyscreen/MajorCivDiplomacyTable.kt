@@ -133,13 +133,14 @@ class MajorCivDiplomacyTable(private val diplomacyScreen: DiplomacyScreen) {
     ): TextButton {
         val denounceButton = "Denounce ([30] turns)".toTextButton()
         denounceButton.onClick {
-            // Agent matches route denouncement through the coordinator (§3.2).
-            if (UncivGame.Current.worldScreen?.routeThroughAgentSession {
-                    listOf({ r: Int ->
-                        DenounceCommand(viewingCiv.civID, "ui-${System.nanoTime()}", r, otherCiv.civID)
-                    })
-                } == true) return@onClick
             ConfirmPopup(diplomacyScreen, "Denounce [${otherCiv.civName}]?", "Denounce ([30] turns)") {
+                // Agent matches route denouncement through the coordinator (§3.2).
+                if (UncivGame.Current.worldScreen?.routeThroughAgentSession {
+                        listOf({ r: Int ->
+                            DenounceCommand(viewingCiv.civID, "ui-${System.nanoTime()}", r, otherCiv.civID)
+                        })
+                    } == true) return@ConfirmPopup
+
                 diplomacyManager.denounce()
                 diplomacyScreen.updateLeftSideTable(otherCiv)
                 diplomacyScreen.setRightSideFlavorText(

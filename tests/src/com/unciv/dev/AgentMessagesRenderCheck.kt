@@ -26,6 +26,9 @@ import com.unciv.logic.agents.AgentActivityEntry
 import com.unciv.logic.agents.AgentMatchSession
 import com.unciv.logic.agents.AgentProfile
 import com.unciv.logic.agents.AgentRunState
+import com.unciv.logic.agents.MessageImageDraft
+import com.unciv.logic.agents.MessageImageClipboard
+import com.unciv.logic.agents.DiplomaticImageAttachment
 import com.unciv.logic.agents.DiplomaticMessage
 import com.unciv.logic.agents.MessageContact
 import com.unciv.testing.TestGame
@@ -67,6 +70,7 @@ object AgentMessagesRenderCheck {
             var captureFilter = false
             var captureRecipient = false
             val nations = listOf("America", "Arabia", "Germany", "China", "Russia", "The Ottomans", "Persia", "England", "France")
+            val historyCallbacks = ArrayList<() -> Unit>()
             val profiles = nations.associateWith { AgentProfile.defaultFor(it) }.also {
                 it["The Ottomans"]!!.displayName += " · A patient ruler of coastlines, trade routes and a very long imperial title"
             }
@@ -124,7 +128,9 @@ object AgentMessagesRenderCheck {
                             "Consider training another Scout.\nThis is spectator guidance, not a change to the game rules.",
                             32, null, "SPECTATOR"),
                         DiplomaticMessage("nation-queued", "America", "Arabia",
-                            "Could we exchange spare luxuries next turn?", 32)
+                            "Could we exchange spare luxuries next turn?", 32).apply {
+                            attachments.add(DiplomaticImageAttachment("a".repeat(64), "image/png", 320, 180, 1000))
+                        }
                     ))
                     val activity = listOf(
                         AgentActivityEntry("old-rome", "America", 30, "message", "", "", "2026-10-11T00:00:00Z"),
@@ -150,9 +156,35 @@ object AgentMessagesRenderCheck {
                     Mockito.`when`(session.getActivityDetails(Mockito.anyString())).thenAnswer {
                         details[it.getArgument<String>(0)].orEmpty()
                     }
+                    // Synthetic in-memory source avoids the real clipboard and any external images.
+                    val source = java.awt.image.BufferedImage(320, 180, java.awt.image.BufferedImage.TYPE_INT_ARGB)
+                    val painter = source.createGraphics()
+                    try {
+                        painter.color = java.awt.Color(49, 105, 151); painter.fillRect(0, 0, 320, 180)
+                        painter.color = java.awt.Color(126, 173, 102); painter.fillOval(15, 15, 200, 150)
+                        painter.color = java.awt.Color.WHITE; painter.drawString("Proposed coastal border", 90, 100)
+                    } finally { painter.dispose() }
+                    val draft = com.unciv.app.desktop.MessageImageNormalizer.normalize(source)
+                    Mockito.doAnswer {
+                        val complete = it.getArgument<(MessageImageDraft?, String?) -> Unit>(2)
+                        historyCallbacks.add { complete(draft.copy(), null) }
+                        null
+                    }.`when`(session).readMessageImage(Mockito.anyString(), Mockito.anyString(),
+                        Mockito.any<(MessageImageDraft?, String?) -> Unit>() ?: { _, _ -> })
+                    // Unknown metadata exercises a persistent, warning-only recipient capability state.
+                    profiles["The Ottomans"]!!.modelId = "render-fixture-unknown-vision"
+                    val clipboard = object : MessageImageClipboard {
+                        override fun hasImageContents() = true
+                        override fun readImage(onComplete: (MessageImageDraft?, String?) -> Unit) { onComplete(draft.copy(), null) }
+                    }
                     feed = AgentActivityFeed(screen, session)
-                    panel = AgentMessagesPanel(screen, session)
+                    panel = AgentMessagesPanel(screen, session, clipboard)
                     panel.toggle()
+                    historyCallbacks.forEach { it() }; historyCallbacks.clear()
+                    panel.descendants().single { it.name == "MessagePasteImage" }.let { button ->
+                        button.listeners.filterIsInstance<ActivationListener>().single().tap(
+                            InputEvent().apply { listenerActor = button }, 1f, 1f, 1, 0)
+                    }
                     panel.descendants().filterIsInstance<TextArea>().single().apply {
                         text = "Please consider a coastal city.\nKeep a defensive unit near the capital."
                         fire(ChangeListener.ChangeEvent())
@@ -213,6 +245,7 @@ object AgentMessagesRenderCheck {
                 Gdx.gl.glClearColor(0.1f, 0.16f, 0.17f, 1f)
                 Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
                 stage.root.act(1 / 60f)
+                historyCallbacks.toList().forEach { it() }; historyCallbacks.clear()
                 stage.camera.update()
                 stage.batch.projectionMatrix = stage.camera.combined
                 stage.batch.begin()
@@ -248,12 +281,18 @@ object AgentMessagesRenderCheck {
                     }
                 }
                 panel.validate()
-                for (name in listOf("MessageBody", "MessageRecipient", "MessageConversation", "MessageSend")) {
+                for (name in (if (panel.isVisible) listOf("MessageBody", "MessageRecipient", "MessageConversation", "MessageSend", "MessagePasteImage", "MessageImagePreview", "MessageRemoveImage", "MessageVisionWarning") else emptyList())) {
                     val control = panel.descendants().single { it.name == name }
                     val point = control.localToStageCoordinates(Vector2())
                     check(point.x >= panel.x - 0.5f && point.x + control.width <= panel.x + panel.width + 0.5f &&
                         point.y >= panel.y - 0.5f && point.y + control.height <= panel.y + panel.height + 0.5f) {
                         "$name falls outside the panel at ${width}x$height"
+                    }
+                }
+                if (panel.isVisible) {
+                    check(panel.descendants().any { it.name == "MessageHistoryImage" }) { "History attachment must render through a session preview" }
+                    check(panel.descendants().filterIsInstance<Label>().any { it.text.toString().contains("Image support is unknown") }) {
+                        "Unknown vision warning must remain visible with the attached draft"
                     }
                 }
                 val pixels = Pixmap.createFromFrameBuffer(0, 0,
@@ -278,7 +317,7 @@ object AgentMessagesRenderCheck {
                     picker.hideList()
                     captureFilter = false
                     if (++sizeIndex == sizes.size) {
-                        println("MESSAGES_RENDER_CHECK_PASSED: real GPU, mail provenance, queued/delivered/acknowledged, draft, nine default agent identities and a long selected name, filters, resize, glass content, activity and recipient dropdown bounds")
+                        println("MESSAGES_RENDER_CHECK_PASSED: real GPU, mail provenance, queued/delivered/acknowledged, image draft/history previews, paste/remove controls, persistent warning, nine default agent identities and a long selected name, filters, resize, glass content, activity and recipient dropdown bounds")
                         completed = true
                         if (!synchronous) Gdx.app.exit()
                     } else {

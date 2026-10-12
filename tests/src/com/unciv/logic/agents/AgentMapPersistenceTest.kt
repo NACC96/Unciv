@@ -27,7 +27,7 @@ class AgentMapPersistenceTest {
             assertEquals("original", state.timelineId)
             assertTrue(state.mapKnowledge.tilesByCiv.isEmpty())
             assertEquals("{\"old\":true}", bundle.gameJson)
-            assertTrue(recovered.bundleJson.contains("\"bundleVersion\":2"))
+            assertTrue(recovered.bundleJson.contains("\"bundleVersion\":3"))
             // Checksum continues to describe the historical bytes, never rewritten by recovery.
             assertEquals(legacy, dir.resolve("legacy-gen-000001.unciv-agent").readText())
         } finally { dir.deleteRecursively() }
@@ -42,7 +42,7 @@ class AgentMapPersistenceTest {
                 resource = ObservedResource("Iron", 2, 3, 4, ResourceKnowledgeSource.TECHNOLOGY)))
             val store = FileCheckpointStore(dir, "m")
             store.write("{}", serializer.toJson(state))
-            store.writeBundle(serializer.toJson(AgentBundle("{}", "{\"formatVersion\":3}", 3)))
+            store.writeBundle(serializer.toJson(AgentBundle("{}", "{\"formatVersion\":999}", 999)))
             val recovery = store.recover()!!
             assertTrue(recovery.fellBack)
             assertEquals(listOf(2), recovery.discardedGenerations)
@@ -52,8 +52,8 @@ class AgentMapPersistenceTest {
             assertEquals("Grassland", tile.terrain)
             assertEquals(ResourceKnowledgeSource.TECHNOLOGY, tile.resource!!.source)
             assertEquals(4, tile.resource!!.updatedRevision)
-            assertTrue(recovery.bundleJson.contains("\"bundleVersion\":2"))
-            assertTrue(bundle.matchJson.contains("\"formatVersion\":2"))
+            assertTrue(recovery.bundleJson.contains("\"bundleVersion\":3"))
+            assertTrue(bundle.matchJson.contains("\"formatVersion\":3"))
         } finally { dir.deleteRecursively() }
     }
     @Test fun compressed_retention_preserves_map_memory_and_current_turn_receipt_window() {
@@ -94,7 +94,7 @@ class AgentMapPersistenceTest {
                 "{\"matchId\":\"legacy\",\"stateRevision\":17}"))
             store.writeBundle(legacy)
             val serializer = json().apply { setUsePrototypes(false) }
-            store.writeBundle(serializer.toJson(AgentBundle("{}", "{\"formatVersion\":3}", 3)))
+            store.writeBundle(serializer.toJson(AgentBundle("{}", "{\"formatVersion\":999}", 999)))
             val recovery = store.recover()!!
             assertEquals(1, recovery.generation)
             assertEquals(listOf(2), recovery.discardedGenerations)

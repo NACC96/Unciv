@@ -16,6 +16,9 @@ import com.unciv.logic.agents.AgentActivityEntry
 import com.unciv.logic.agents.AgentMatchSession
 import com.unciv.logic.agents.AgentProfile
 import com.unciv.logic.agents.AgentRunState
+import com.unciv.logic.agents.AgentRunTiming
+import com.unciv.ui.screens.worldscreen.status.AgentMatchControlTable
+import com.badlogic.gdx.utils.Timer
 import com.unciv.models.translations.tr
 import com.unciv.testing.GdxTestRunner
 import com.unciv.testing.TestGame
@@ -47,6 +50,7 @@ class WorldScreenHudTest {
     private lateinit var priorNames: Map<String, Char>
     private lateinit var priorActors: Map<Char, Actor>
     private val feeds = ArrayList<AgentActivityFeed>()
+    private val controls = ArrayList<AgentMatchControlTable>()
     private val overviews = ArrayList<CivilizationOverviewPanel>()
 
     @Before fun setup() {
@@ -54,6 +58,7 @@ class WorldScreenHudTest {
         priorActors = FontRulesetIcons.charToRulesetImageActor.toMap()
     }
     @After fun cleanup() {
+        controls.forEach { it.dispose() }
         feeds.forEach { it.dispose() }
         overviews.forEach { it.dispose() }
         FontRulesetIcons.rulesetObjectNameToChar.clear()
@@ -74,6 +79,7 @@ class WorldScreenHudTest {
         val screen = Mockito.mock(WorldScreen::class.java)
         var active: String? = "Rome"
         var activity = emptyList<AgentActivityEntry>()
+        var timing: AgentRunTiming? = null
 
         init {
             Fonts.fontImplementation = FontDesktop()
@@ -97,6 +103,11 @@ class WorldScreenHudTest {
             }
             Mockito.`when`(session.getRunState()).thenReturn(AgentRunState.AGENT_DECIDING)
             Mockito.`when`(session.getActivity()).thenAnswer { activity }
+            Mockito.`when`(session.getActiveRunTiming()).thenAnswer { timing }
+            Mockito.`when`(session.getActiveAgentProfile()).thenReturn(AgentProfile.defaultFor("Rome").apply {
+                displayName = "A patient ruler of coastlines, trade routes and a very long imperial title"
+                modelId = "saved-provider/custom-model-with-a-long-identity"
+            })
             Mockito.`when`(session.getActivityDetails(Mockito.anyString())).thenAnswer {
                 val id = it.getArgument<String>(0)
                 if (id == "tool") "RAW TOOL DETAILS" else "Message $id. The Warrior will explore the nearby coast while the city builds a Scout."
@@ -124,13 +135,162 @@ class WorldScreenHudTest {
     private fun AgentActivityFeed.selectNation(label: String) {
         @Suppress("UNCHECKED_CAST")
         val picker = descendants().filterIsInstance<SelectBox<*>>().single() as SelectBox<Any>
-        picker.selected = picker.items.first { it.toString() == label }
+        picker.selected = picker.items.first { it.toString() == label || it.toString().endsWith(" · $label") }
     }
     private fun AgentActivityFeed.messageIds() = descendants().filterIsInstance<Label>()
         .map { it.text.toString() }.filter { it.startsWith("Message ") }.toList()
     private fun Fixture.feed() = AgentActivityFeed(screen, session).also { feeds.add(it) }
     private fun Fixture.overview() = CivilizationOverviewPanel(screen).also { overviews.add(it) }
     private fun entry(id: String, kind: String = "message") = AgentActivityEntry(id, "Rome", 1, kind, "Move Warrior", "Moved to (1, 2)", id, "succeeded")
+
+    private fun Fixture.controls() = AgentMatchControlTable(session, screen).also { controls.add(it) }
+    private fun AgentMatchControlTable.tickTimer() = javaClass.getDeclaredField("timingRefreshTask")
+        .apply { isAccessible = true }.get(this).let { (it as Timer.Task).run() }
+    private fun AgentMatchControlTable.timerScheduled() = javaClass.getDeclaredField("timingRefreshTask")
+        .apply { isAccessible = true }.get(this).let { (it as Timer.Task).isScheduled }
+    private fun AgentMatchControlTable.timerLabel() = descendants().filterIsInstance<Label>().single { it.name == "AgentRunElapsed" }
+
+    @Test fun `elapsed updates while activity is hidden without polling activity or rebuilding status`() {
+        val f = Fixture()
+        f.timing = AgentRunTiming("run-1", "Rome", 65_000)
+        val controls = f.controls()
+        assertTrue(controls.timerScheduled())
+        val feed = f.root.children.filterIsInstance<AgentActivityFeed>().single()
+        feed.hide()
+        val statusLabels = controls.descendants().filterIsInstance<Label>().toList()
+        Mockito.clearInvocations(f.session, f.screen)
+        f.timing = AgentRunTiming("run-1", "Rome", 66_000)
+        controls.tickTimer()
+        assertEquals("Elapsed 01:06 · Rome", controls.timerLabel().text.toString())
+        assertEquals(statusLabels, controls.descendants().filterIsInstance<Label>().toList())
+        Mockito.verify(f.session, Mockito.never()).getActivity()
+        Mockito.verify(f.session, Mockito.never()).getRunState()
+        Mockito.verify(f.screen).viewingCiv
+        Mockito.verifyNoMoreInteractions(f.screen)
+    }
+
+    @Test fun `timer stays visible during pause drains resets on retry and disappears at completion`() {
+        val f = Fixture()
+        f.timing = AgentRunTiming("run-1", "Rome", 3_600_000)
+        val controls = f.controls()
+        Mockito.`when`(f.session.getRunState()).thenReturn(AgentRunState.PAUSING)
+        controls.update()
+        f.timing = AgentRunTiming("run-1", "Rome", 3_601_000)
+        controls.tickTimer()
+        assertEquals("Elapsed 1:00:01 · Rome", controls.timerLabel().text.toString())
+        f.timing = null
+        controls.tickTimer()
+        assertFalse(controls.timerLabel().isVisible)
+        assertFalse(controls.timerScheduled())
+        f.timing = AgentRunTiming("retry-1", "Rome", 0)
+        controls.tickTimer()
+        assertTrue(controls.timerLabel().isVisible)
+        assertTrue(controls.timerScheduled())
+        assertEquals("Elapsed 00:00 · Rome", controls.timerLabel().text.toString())
+        controls.dispose()
+        assertFalse(controls.timerScheduled())
+        Mockito.clearInvocations(f.session)
+        controls.tickTimer()
+        Mockito.verifyNoInteractions(f.session)
+    }
+
+    @Test fun `idle or unchanged timer never requests a redraw`() {
+        val f = Fixture()
+        val controls = f.controls()
+        assertFalse(controls.timerScheduled())
+        val previous = com.badlogic.gdx.Gdx.graphics
+        val graphics = Mockito.mock(com.badlogic.gdx.Graphics::class.java)
+        com.badlogic.gdx.Gdx.graphics = graphics
+        try {
+            controls.tickTimer()
+            Mockito.verifyNoInteractions(graphics)
+            f.timing = AgentRunTiming("run", "Rome", 1_000)
+            controls.tickTimer()
+            Mockito.verify(graphics).requestRendering()
+            Mockito.clearInvocations(graphics)
+            controls.tickTimer()
+            Mockito.verifyNoInteractions(graphics)
+            f.timing = null
+            controls.tickTimer()
+            Mockito.verify(graphics).requestRendering()
+            Mockito.clearInvocations(graphics)
+            controls.tickTimer()
+            Mockito.verifyNoInteractions(graphics)
+        } finally { com.badlogic.gdx.Gdx.graphics = previous }
+    }
+
+    @Test fun `ordinary viewer sees only their own timer and spectator sees every active timer`() {
+        val f = Fixture(spectator = false)
+        f.timing = AgentRunTiming("foreign", "Korea", 65_000)
+        val controls = f.controls()
+        assertFalse(controls.timerLabel().isVisible)
+        f.timing = AgentRunTiming("own", "Rome", 65_000)
+        controls.tickTimer()
+        assertTrue(controls.timerLabel().isVisible)
+        Mockito.`when`(f.screen.viewingCiv).thenReturn(f.spectatorCiv)
+        f.timing = AgentRunTiming("foreign", "Korea", 65_000)
+        controls.tickTimer()
+        assertTrue(controls.timerLabel().isVisible)
+    }
+
+    @Test fun `long agent identity model and hour timer retain their own rows within narrow controls`() {
+        val f = Fixture(width = 420f)
+        f.active = "The Ottomans"
+        f.game.addCiv(f.game.ruleset.nations["The Ottomans"]!!)
+        f.timing = AgentRunTiming("run", "The Ottomans", 45_296_000)
+        val controls = f.controls()
+        controls.validate()
+        val elapsed = controls.timerLabel()
+        assertEquals("Elapsed 12:34:56 · The Ottomans", elapsed.text.toString())
+        assertTrue(elapsed.width >= com.badlogic.gdx.graphics.g2d.GlyphLayout(elapsed.style.font, "Elapsed 12:34:56").width * elapsed.fontScaleX)
+        assertTrue(controls.width <= f.width - 20f)
+        for (label in controls.descendants().filterIsInstance<Label>()) {
+            val point = label.localToAscendantCoordinates(controls, Vector2())
+            assertTrue("Label outside compact controls: ${label.text}", point.x >= -0.1f && point.x + label.width <= controls.width + 0.1f)
+        }
+    }
+
+    @Test fun `activity fits below elapsed controls when narrow but retains left top on wide screens`() {
+        val f = Fixture(width = 420f)
+        f.timing = AgentRunTiming("run", "Rome", 45_296_000)
+        val controls = f.controls()
+        f.stage.addActor(controls)
+        val feed = f.root.children.filterIsInstance<AgentActivityFeed>().single()
+        for (width in listOf(420f, 960f, 420f)) {
+            f.width = width
+            controls.update()
+            controls.setPosition(width - controls.width - 8f, f.height - controls.height - 8f)
+            feed.refreshNow()
+            if (width == 420f) assertTrue("Activity header must remain below controls", feed.y + feed.height <= controls.y - 8f + 0.1f)
+            else assertEquals("Wide left activity retains its original top", f.height - 108f, feed.y + feed.height, 0.1f)
+            assertTrue(feed.y >= 8f && feed.height >= 160f)
+        }
+    }
+
+    @Test fun `run durations remain named visible distinct from collapsed tools and obey nation filters`() {
+        val f = Fixture()
+        f.activity = listOf(entry("tool-1", "tool"), entry("tool-2", "tool"),
+            entry("run-1", "run").copy(title = "**Provider** completed in 01:05", summary = "**Duration** 01:05", status = "completed"),
+            entry("tool-3", "tool"),
+            entry("run-2", "run").copy(civId = "Korea", title = "Provider failed in 1:00:01", summary = "Duration 1:00:01", status = "failed"))
+        val feed = f.feed()
+        fun labels() = feed.descendants().filterIsInstance<Label>().map { it.text.toString() }.toList()
+        assertTrue("Completed run identity missing from ${labels()}", labels().contains("Atlas · Run completed"))
+        assertTrue("Completed title must retain padded duration: ${labels()}", labels().contains("Provider completed in 01:05"))
+        assertTrue("Completed duration missing from ${labels()}", labels().contains("Duration 01:05"))
+        assertFalse(labels().any { it.contains("1:00:01") })
+        feed.selectNation("All nations")
+        assertTrue("Failed run identity missing from ${labels()}", labels().contains("Nova · Run failed"))
+        assertTrue("Failed title must retain padded duration: ${labels()}", labels().contains("Provider failed in 1:00:01"))
+        assertTrue("Failed duration missing from ${labels()}", labels().contains("Duration 1:00:01"))
+        val failure = feed.descendants().filterIsInstance<Label>().single { it.text.toString() == "Duration 1:00:01" }
+        assertEquals(WorldScreenStyle.error, failure.style.fontColor)
+        feed.selectNation("Rome · Atlas")
+        assertFalse(labels().any { it.contains("1:00:01") })
+        Mockito.`when`(f.screen.viewingCiv).thenReturn(f.rome)
+        feed.selectNation("All nations")
+        assertFalse(labels().any { it.contains("1:00:01") })
+    }
 
     @Test fun `spectator economy and inspection view follow the active agent without switching the map view`() {
         val f = Fixture()
@@ -228,7 +388,9 @@ class WorldScreenHudTest {
                     val picker = feed.descendants().filterIsInstance<SelectBox<*>>().single()
                     assertEquals(11, picker.items.size)
                     assertEquals("Every real nation should retain its full identity in the choices", nations.toSet(),
-                        picker.items.toList().drop(2).map { it.toString().substringBefore(" · ") }.toSet())
+                        picker.items.toList().drop(2).map { it.toString().substringAfter(". ")
+                            .removePrefix("Current · ").removePrefix("Eliminated · ")
+                            .removePrefix("Previous in order · ").substringBefore(" · ") }.toSet())
                     for (actor in feed.descendants().filter { it !== feed }) {
                         val point = actor.localToAscendantCoordinates(feed, Vector2())
                         val label = when (actor) {
@@ -425,12 +587,63 @@ class WorldScreenHudTest {
         assertTrue(feed.messageIds().all { it.startsWith("Message rome") })
         val picker = feed.descendants().filterIsInstance<SelectBox<*>>().single()
         assertEquals("Follow active nation", picker.selected.toString())
-        assertEquals(setOf("Follow active nation", "All nations", "Korea · Nova", "Rome · Atlas"), picker.items.map { it.toString() }.toSet())
+        assertEquals(listOf("Follow active nation", "All nations", "1. Current · Rome · Atlas", "2. Eliminated · Korea · Nova"),
+            picker.items.map { it.toString() })
         f.active = "Korea"
         feed.refreshNow()
         assertTrue(feed.messageIds().all { it.startsWith("Message korea") })
         val scroll = feed.descendants().filterIsInstance<AutoScrollPane>().single()
         assertEquals(scroll.maxY, scroll.scrollY, 0.1f)
+    }
+
+    @Test fun `nation picker uses numbered engine order rather than alphabetical agent names`() {
+        val f = Fixture()
+        val china = f.game.addCiv(f.game.ruleset.nations["China"]!!)
+        for (civ in listOf(f.rome, f.korea, china)) f.game.addUnit("Settler", civ, null)
+        f.active = "Korea"
+        val feed = f.feed()
+        val picker = feed.descendants().filterIsInstance<SelectBox<*>>().single()
+        assertEquals(listOf("Follow active nation", "All nations",
+            "1. Previous in order · Rome · Atlas", "2. Current · Korea · Nova", "3. China · Nova"),
+            picker.items.map { it.toString() })
+    }
+
+    @Test fun `previous nation wraps and skips eliminated nations without losing historical filters`() {
+        val f = Fixture()
+        val china = f.game.addCiv(f.game.ruleset.nations["China"]!!)
+        for (civ in listOf(f.rome, f.korea, china)) f.game.addUnit("Settler", civ, null)
+        f.korea.hasEverOwnedOriginalCapital = true // No remaining cities: excluded from rotation.
+        Mockito.`when`(f.session.getAgentProfile("China")).thenReturn(null)
+        f.activity = listOf(entry("old-china").copy(civId = "China"), entry("unknown").copy(civId = "Unknown"))
+        val feed = f.feed()
+        val picker = feed.descendants().filterIsInstance<SelectBox<*>>().single()
+        assertEquals(listOf("Follow active nation", "All nations",
+            "1. Current · Rome · Atlas", "2. Eliminated · Korea · Nova", "3. Previous in order · China"),
+            picker.items.map { it.toString() })
+        f.active = "China"
+        feed.refreshNow()
+        assertEquals(listOf("Follow active nation", "All nations",
+            "1. Previous in order · Rome · Atlas", "2. Eliminated · Korea · Nova", "3. Current · China"),
+            picker.items.map { it.toString() })
+    }
+
+    @Test fun `turn order label changes preserve fixed nation selection and reading position`() {
+        val f = Fixture()
+        for (civ in listOf(f.rome, f.korea)) f.game.addUnit("Settler", civ, null)
+        f.activity = (1..40).map { entry("rome$it") }
+        val feed = f.feed()
+        @Suppress("UNCHECKED_CAST")
+        val picker = feed.descendants().filterIsInstance<SelectBox<*>>().single() as SelectBox<Any>
+        picker.selected = picker.items.first { it.toString() == "1. Current · Rome · Atlas" }
+        val scroll = feed.descendants().filterIsInstance<AutoScrollPane>().single()
+        scroll.captureListeners.filterIsInstance<InputListener>().forEach { it.scrolled(InputEvent(), 0f, 0f, 0f, -1f) }
+        scroll.scrollY = 20f
+        f.active = "Korea"
+        feed.refreshNow()
+        assertEquals("1. Previous in order · Rome · Atlas", picker.selected.toString())
+        assertEquals(20f, scroll.scrollY, 0.1f)
+        assertTrue(feed.messageIds().all { it.startsWith("Message rome") })
+        assertFalse(feed.descendants().filterIsInstance<TextButton>().single { it.text.toString() == "Live" }.isChecked)
     }
 
     @Test fun `reading holds the auto nation across turns and hidden activity leaves scroll and unread alone`() {
@@ -485,7 +698,7 @@ class WorldScreenHudTest {
         feed.toggle()
         feed.toggle()
         feed.refreshNow()
-        assertEquals("Rome · Atlas", feed.descendants().filterIsInstance<SelectBox<*>>().single().selected.toString())
+        assertTrue(feed.descendants().filterIsInstance<SelectBox<*>>().single().selected.toString().endsWith(" · Rome · Atlas"))
         assertTrue(feed.messageIds().single().startsWith("Message rome."))
         assertTrue("A fixed feed must identify its selected nation while a different agent thinks", feed.descendants().filterIsInstance<Label>().any { it.text.toString().contains("Rome") && it.text.toString().contains("activity", ignoreCase = true) })
     }
@@ -527,7 +740,7 @@ class WorldScreenHudTest {
         f.activity = listOf(entry("own")) // Host supplies only the viewer's private activity.
         val feed = f.feed()
         val picker = feed.descendants().filterIsInstance<SelectBox<*>>().single()
-        assertEquals(setOf("Follow active nation", "All nations", "Rome · Atlas"), picker.items.map { it.toString() }.toSet())
+        assertEquals(listOf("Follow active nation", "All nations", "1. Eliminated · Rome · Atlas"), picker.items.map { it.toString() })
         assertTrue(feed.messageIds().single().startsWith("Message own."))
         feed.selectNation("All nations")
         assertTrue(feed.messageIds().single().startsWith("Message own."))

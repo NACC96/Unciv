@@ -1,6 +1,9 @@
 package com.unciv.view
 
 import com.unciv.Constants
+import com.unciv.UncivGame
+import com.unciv.logic.agents.CityConstructionSettingsCommand
+import com.unciv.logic.agents.MarkPolicyPickerOpenedCommand
 import com.unciv.logic.city.City
 import com.unciv.logic.civilization.Civilization
 import com.unciv.logic.civilization.managers.ReligionState
@@ -115,11 +118,20 @@ class CivView(civ: Civilization,
     @Readonly fun calculateScoreBreakdown(): HashMap<String, Double> = civ.calculateScoreBreakdown()
 
     // Actions
+    private fun routeConstructionSetting(name: String, disabled: Boolean): Boolean =
+        UncivGame.Current.worldScreen?.routeThroughAgentSession { listOf({ r: Int ->
+            CityConstructionSettingsCommand(civ.civID, "ui-${System.nanoTime()}", r, name, disabled)
+        }) } == true
+
     fun tryDisableCivConstruction(name: String) {
+        if (civ !== viewer || !viewer.isCurrentPlayer()) return
+        if (routeConstructionSetting(name, true)) return
         civ.cities.forEach { it.disabledConstructions.add(name) }
         civ.disabledCityConstructions.add(name)
     }
     fun tryEnableCivConstruction(name: String) {
+        if (civ !== viewer || !viewer.isCurrentPlayer()) return
+        if (routeConstructionSetting(name, false)) return
         civ.cities.forEach { it.disabledConstructions.remove(name) }
         civ.disabledCityConstructions.remove(name)
     }
@@ -131,7 +143,13 @@ class CivView(civ: Civilization,
         civ.cities.forEach { it.cityStats.update() }
         return true
     }
-    fun tryDismissPolicyPicker(): Boolean { civ.policies.shouldOpenPolicyPicker = false; return true }
+    fun tryDismissPolicyPicker(): Boolean {
+        if (UncivGame.Current.worldScreen?.routeThroughAgentSession {
+                listOf({ r: Int -> MarkPolicyPickerOpenedCommand(civ.civID, "ui-${System.nanoTime()}", r) })
+            } == true) return true
+        civ.policies.shouldOpenPolicyPicker = false
+        return true
+    }
     fun tryDismissMoveSpies(): Boolean { civ.espionageManager.dismissedShouldMoveSpies = true; return true }
     fun tryMarkMovedAutomatedUnits(): Boolean { civ.hasMovedAutomatedUnits = true; return true }
     fun tryAutomateAllUnits(): Boolean { civ.units.getCivUnits().forEach { it.doAction() }; return true }

@@ -9,6 +9,23 @@ import type { HexPosition, MapQuery, MapPage, MapSummary, ObservedTile, RulesQue
  * act, end_turn, notes) behind the same interface over private stdio.
  * Transports must program to this interface, never to the fake.
  */
+export interface DiplomaticImageAttachment {
+  attachmentId: string;
+  mimeType: string;
+  width: number;
+  height: number;
+  byteLength: number;
+}
+
+/** Encoded bytes exist only on the dedicated authorized image-read seam. */
+export interface MessageImageResult {
+  attachmentId: string;
+  mimeType: string;
+  width: number;
+  height: number;
+  data: string;
+}
+
 export interface DiplomaticMessage {
   messageId: string;
   senderCivId: string;
@@ -20,6 +37,32 @@ export interface DiplomaticMessage {
   /** Absent legacy fields are equivalent to null (not acknowledged). */
   acknowledgedTurnSerial?: number | null;
   acknowledgementText?: string | null;
+  acknowledgedRevision?: number | null;
+  attachments?: DiplomaticImageAttachment[];
+}
+
+/** Project the wire contract, never arbitrary fields or encoded bytes. */
+export function messageMetadata(message: DiplomaticMessage): DiplomaticMessage {
+  return {
+    messageId: message.messageId, senderCivId: message.senderCivId, targetCivId: message.targetCivId,
+    text: message.text, sentTurnSerial: message.sentTurnSerial, deliveredTurnSerial: message.deliveredTurnSerial,
+    origin: message.origin, acknowledgedTurnSerial: message.acknowledgedTurnSerial,
+    acknowledgementText: message.acknowledgementText, acknowledgedRevision: message.acknowledgedRevision,
+    ...(message.attachments ? { attachments: message.attachments.map(a => ({
+      attachmentId: a.attachmentId, mimeType: a.mimeType, width: a.width, height: a.height, byteLength: a.byteLength,
+    })) } : {}),
+  };
+}
+
+/** Own sent mail and delivered incoming mail only, newest response/message first. */
+export function privateCorrespondence(messages: DiplomaticMessage[], civId: string, turnSerial: number): DiplomaticMessage[] {
+  return messages.filter(m => m.sentTurnSerial <= turnSerial && (m.senderCivId === civId ||
+    (m.targetCivId === civId && m.deliveredTurnSerial != null && m.deliveredTurnSerial <= turnSerial)))
+    .map((message, index) => ({ message, index }))
+    .sort((a, b) => Math.max(b.message.sentTurnSerial, b.message.deliveredTurnSerial ?? -1, b.message.acknowledgedTurnSerial ?? -1) -
+      Math.max(a.message.sentTurnSerial, a.message.deliveredTurnSerial ?? -1, a.message.acknowledgedTurnSerial ?? -1) ||
+      (b.message.acknowledgedRevision ?? -1) - (a.message.acknowledgedRevision ?? -1) || a.index - b.index)
+    .slice(0, 12).map(({ message }) => messageMetadata(message));
 }
 
 export interface MessageContact {
@@ -45,10 +88,13 @@ export interface GameObserveResult {
   inbox?: DiplomaticMessage[];
   /** Met, living human/agent nations eligible for diplomatic mail. */
   messageContacts?: MessageContact[];
+  /** Bounded private correspondence, including replies stored on own sent mail. */
+  diplomaticHistory?: DiplomaticMessage[];
 }
 
 export interface IGameService {
   observe(): Promise<GameObserveResult>;
+  messageImage(messageId: string, attachmentId: string): Promise<MessageImageResult | FakeError>;
   inspect(unitId: number): Promise<FakeUnit | ObservedUnit | FakeError | null>;
   inspectTile(position: HexPosition): Promise<ObservedTile | FakeError | null>;
   map(query?: MapQuery): Promise<MapPage | FakeError>;
@@ -139,6 +185,7 @@ export class FakeGameService implements IGameService {
   civId = "Rome";
   turnSerial = 3;
   messages: DiplomaticMessage[] = [];
+  messageImages = new Map<string, MessageImageResult>();
 
   async observe(): Promise<GameObserveResult> {
     return {
@@ -151,10 +198,19 @@ export class FakeGameService implements IGameService {
       endTurnsCommitted: this.endTurnsCommitted,
       requiredDecisions: [...this.decisionsPending],
       recentEvents: [`rev-${this.revision}-committed`],
-      inbox: this.turnEnded ? [] : structuredClone(this.messages.filter(message =>
+      diplomaticHistory: privateCorrespondence(this.messages, this.civId, this.turnSerial),
+      inbox: this.turnEnded ? [] : this.messages.filter(message =>
         message.targetCivId === this.civId && message.deliveredTurnSerial != null && message.deliveredTurnSerial <= this.turnSerial &&
-        (message.deliveredTurnSerial === this.turnSerial || message.acknowledgedTurnSerial == null))),
+        (message.deliveredTurnSerial === this.turnSerial || message.acknowledgedTurnSerial == null)).map(messageMetadata),
     };
+  }
+
+  async messageImage(messageId: string, attachmentId: string): Promise<MessageImageResult | FakeError> {
+    const message = this.messages.find(m => m.messageId === messageId && m.targetCivId === this.civId &&
+      m.deliveredTurnSerial != null && m.deliveredTurnSerial <= this.turnSerial &&
+      m.attachments?.some(a => a.attachmentId === attachmentId));
+    const image = message ? this.messageImages.get(attachmentId) : undefined;
+    return image ? { ...image } : { protocolVersion: 1, status: "rejected", code: "ILLEGAL_ACTION", message: "no such delivered attachment" };
   }
 
   async readNotes(): Promise<{ notes: string; notesRevision: number }> {
@@ -290,6 +346,7 @@ export class FakeGameService implements IGameService {
         message.acknowledgedTurnSerial = this.turnSerial;
         message.acknowledgementText = text.trim();
         this.revision += 1;
+        message.acknowledgedRevision = this.revision;
         const receipt: FakeReceipt = { protocolVersion: 1, actionId: envelope.actionId, status: "applied", revision: this.revision,
           result: structuredClone(message) as unknown as Record<string, unknown>, pendingDecisions: [...this.decisionsPending] };
         this.receipts.set(envelope.actionId, { fingerprint, receipt });

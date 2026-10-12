@@ -70,6 +70,7 @@ class CityConstructionsTable(private val cityScreen: CityScreen) {
     var selectedQueueEntry = -1 // None
 
     private val cityView get() = cityScreen.cityView
+    private val usesAgentSession get() = cityScreen.game.worldScreen?.agentSession != null
 
     private val upperTable = Table(BaseScreen.skin)
     private val constructionsQueueScrollPane: ScrollPane
@@ -452,8 +453,7 @@ class CityConstructionsTable(private val cityScreen: CityScreen) {
             table.addContextMenu {
                 selectQueueEntry(constructionQueueIndex) {
                     CityScreenConstructionMenu(cityScreen.stage, table, cityView, construction) {
-                        cityView.tryReassignPopulation()
-                        cityScreen.updateAsync()
+                        updateAfterConstructionMenu()
                     }
                 }
             }
@@ -578,6 +578,7 @@ class CityConstructionsTable(private val cityScreen: CityScreen) {
         pickConstructionButton.onClick {
             if (cityScreen.selectedConstruction == construction) {
                 addConstructionToQueue(construction)
+                if (usesAgentSession) return@onClick
             } else {
                 cityScreen.selectConstruction(construction)
                 highlightConstructionButton(pickConstructionButton, true, true)  // without, will highlight but with visible delay
@@ -596,11 +597,18 @@ class CityConstructionsTable(private val cityScreen: CityScreen) {
                 cityScreen.updateWithoutConstructionAndMap()
             }
             CityScreenConstructionMenu(cityScreen.stage, pickConstructionButton, cityView, construction) {
-                cityView.tryReassignPopulation()
-                cityScreen.updateAsync()
+                updateAfterConstructionMenu()
             }
         }
         return pickConstructionButton
+    }
+
+    private fun updateAfterConstructionMenu() {
+        // Session commands reassign population on the committed candidate and publish
+        // a fresh screen. The displayed queue is still the preceding snapshot here.
+        if (usesAgentSession) return
+        cityView.tryReassignPopulation()
+        cityScreen.updateAsync()
     }
 
     private fun highlightConstructionButton(
@@ -668,12 +676,13 @@ class CityConstructionsTable(private val cityScreen: CityScreen) {
 
         SoundPlayer.play(getConstructionSound(construction))
 
-        cityView.tryAddToQueue(construction.name)
+        if (!cityView.tryAddToQueue(construction.name)) return
+        cityScreen.game.settings.addCompletedTutorialTask("Pick construction")
+        if (usesAgentSession) return
         if (!cityView.constructions.shouldBeDisplayed(construction)) // For buildings - unlike units which can be queued multiple times
             cityScreen.clearSelection()
         if (cityView.constructions.constructionQueue.first() == construction.name)
             cityView.tryReassignPopulation()
-        cityScreen.game.settings.addCompletedTutorialTask("Pick construction")
     }
 
     private fun getConstructionSound(construction: IConstruction): UncivSound {
@@ -700,8 +709,12 @@ class CityConstructionsTable(private val cityScreen: CityScreen) {
         button.touchable = Touchable.enabled
         // Don't bind the queue reordering keys here - those should affect only the selected entry, not all of them
         button.onActivation {
-            button.touchable = Touchable.disabled
-            selectedQueueEntry = movePriority(constructionQueueIndex) ?: return@onActivation
+            // Rejected session commands leave this screen in place, so retain an
+            // active control and its current selection until a commit is published.
+            if (!usesAgentSession) button.touchable = Touchable.disabled
+            val newQueueEntry = movePriority(constructionQueueIndex) ?: return@onActivation
+            if (usesAgentSession) return@onActivation
+            selectedQueueEntry = newQueueEntry
             // Selection display may need to update as I can click the button of a non-selected entry.
             cityScreen.selectConstruction(name)
             cityView.tryReassignPopulation()
@@ -728,6 +741,10 @@ class CityConstructionsTable(private val cityScreen: CityScreen) {
         tab.add(ImageGetter.getImage("OtherIcons/Stop").surroundWithCircle(40f))
         tab.touchable = Touchable.enabled
         tab.onClick {
+            if (usesAgentSession) {
+                cityView.tryRemoveFromQueue(constructionQueueIndex, false)
+                return@onClick
+            }
             tab.touchable = Touchable.disabled
             Concurrency.run {
                 val success = cityView.tryRemoveFromQueue(constructionQueueIndex, false)

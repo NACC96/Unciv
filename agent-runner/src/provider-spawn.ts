@@ -14,6 +14,7 @@ import { delimiter, isAbsolute, join, resolve } from "node:path";
 
 export const GAME_TOOL_ALLOWLIST = [
   "game.observe",
+  "game.message_image",
   "game.inspect",
   "game.tile",
   "game.map",
