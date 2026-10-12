@@ -47,3 +47,65 @@ it("does not label default city or combat DTO fields as worker capabilities", ()
   expect(summarizeTool("game.legal_actions", { unitId: 49 }, { ...defaults, workInProgress: { name: "Farm", turnsRemaining: 3 } }).title).toBe("Checked worker options");
   expect(summarizeTool("game.legal_actions", { unitId: 49 }, { ...defaults, repair: { turnsToRepair: 2 } }).title).toBe("Checked worker options");
 });
+
+it("presents a reciprocal peace treaty as a pending proposal without claiming peace", () => {
+  const input = { type: "diplomacy.proposeTrade", args: {
+    targetCivId: "Korea",
+    ourOffers: [{ name: "Peace Treaty", type: "Treaty", amount: 1 }, { name: "Gold", type: "Gold", amount: 50 }],
+    theirOffers: [{ name: "Peace Treaty", type: "Treaty", amount: 1 }],
+  } };
+  const p = new ActivityNormalizer();
+  const item = { id: "peace", type: "mcp_tool_call", tool: "game.act", arguments: input, status: "in_progress" };
+  expect(p.fromLine(JSON.stringify({ type: "item.started", item }))[0])
+    .toMatchObject({ title: "Proposing peace with Korea", status: "running" });
+  expect(p.fromLine(JSON.stringify({ type: "item.completed", item: { ...item, status: "completed", result: {
+    content: [{ type: "text", text: JSON.stringify({ status: "applied", revision: 43, result: { pendingRequestsWithTarget: 1 } }) }],
+  } } }))[0]).toMatchObject({
+    title: "Proposed peace with Korea", status: "completed",
+    summary: "Offer queued for their next turn; war continues until they accept.",
+  });
+  expect(summarizeTool("game.act", input, undefined)).toMatchObject({
+    title: "Peace proposal call with Korea", summary: "Check action_result to confirm the proposal.",
+  });
+  expect(summarizeTool("game.act", input, { status: "rejected", message: "Offer is not valid" }))
+    .toMatchObject({ title: "Action rejected", status: "failed", summary: "Offer is not valid" });
+});
+
+it("keeps ordinary, one-sided and third-party trade proposals distinct from bilateral peace", () => {
+  for (const [ourOffers, theirOffers] of [
+    [[{ name: "Gold", type: "Gold", amount: 50 }], []],
+    [[{ name: "Peace Treaty", type: "Treaty", amount: 1 }], []],
+    [[{ name: "Peace Treaty", type: "PeaceProposal", amount: 1 }], [{ name: "Peace Treaty", type: "PeaceProposal", amount: 1 }]],
+    [[{ name: "Geneva", type: "PeaceProposal", amount: 1 }], []],
+    [[{ name: "Peace Treaty", type: "Treaty", amount: 2 }], [{ name: "Peace Treaty", type: "Treaty", amount: 1 }]],
+  ]) {
+    expect(summarizeTool("game.act", { type: "diplomacy.proposeTrade", args: { targetCivId: "Korea", ourOffers, theirOffers } }, { status: "applied" }))
+      .toMatchObject({ title: "Proposed trade with Korea", summary: "" });
+  }
+  expect(summarizeTool("game.act", { type: "diplomacy.makePeace", args: { targetCivId: "Geneva" } }, { status: "applied" }))
+    .toMatchObject({ title: "Made peace with Geneva" });
+});
+
+it.each([
+  { accept: false, accepted: true, title: "Accepted trade", summary: "Accepted the pending offer from Japan." },
+  { accept: true, accepted: false, title: "Declined trade", summary: "Declined the pending offer from Japan." },
+])("reports the committed trade response rather than requested accept=$accept", ({ accept, accepted, title, summary }) => {
+  const input = { type: "diplomacy.respondTrade", args: { requestingCivId: "Japan", accept } };
+  expect(summarizeTool("game.act", input, { status: "applied", result: { accepted } }))
+    .toMatchObject({ title, summary, status: "completed" });
+});
+
+it("does not claim a trade response was accepted or declined until its applied result confirms it", () => {
+  for (const accept of [true, false]) {
+    const input = { type: "diplomacy.respondTrade", args: { requestingCivId: "Japan", accept } };
+    expect(summarizeTool("game.act", input, undefined, "in_progress"))
+      .toMatchObject({ title: accept ? "Accepting trade" : "Declining trade", status: "running" });
+    for (const result of [undefined, { status: "applied" }, { status: "pending", result: { accepted: accept } }]) {
+      expect(summarizeTool("game.act", input, result)).toMatchObject({
+        title: "Trade response call", summary: "Check action_result to confirm acceptance or decline.", status: "completed",
+      });
+    }
+    expect(summarizeTool("game.act", input, { status: "rejected", message: "Not your turn" }))
+      .toMatchObject({ title: "Action rejected", summary: "Not your turn", status: "failed" });
+  }
+});

@@ -74,10 +74,10 @@ unit.order -> {unitId:integer,order:UnitOrder}
 unit.attack -> {attackerUnitId?:integer,attackerCityId?:string,target:Hex}; supply exactly one attacker.
 conquest.resolve -> {decisionId:string,disposition:ANNEX|PUPPET|RAZE|LIBERATE}
 diplomacy.declareWar -> {targetCivId:string}
-diplomacy.makePeace -> {targetCivId:string}
+diplomacy.makePeace -> {targetCivId:string}; city-state-only. Major-nation peace requires a reciprocal Peace Treaty proposal and recipient acceptance.
 diplomacy.friendship -> {targetCivId:string}
-diplomacy.proposeTrade -> {targetCivId:string,ourOffers:TradeOffer[],theirOffers:TradeOffer[]}
-diplomacy.respondTrade -> {requestingCivId:string,accept:boolean}
+diplomacy.proposeTrade -> {targetCivId:string,ourOffers:TradeOffer[],theirOffers:TradeOffer[]}; queues a pending offer and does not end war. Major-nation peace requires {name:"Peace Treaty",type:"Treaty",amount:1} in BOTH arrays.
+diplomacy.respondTrade -> {requestingCivId:string,accept:boolean}; only the recipient on its own turn may accept or decline a pending offer. Only an applied acceptance ends war under the reciprocal peace treaty; declining keeps war.
 civics.adopt -> {policyName:string}
 city.citizens -> {cityId:string,op:CitizenOp,tilePos?:Hex,specialist?:string,focus?:string,flag?:boolean=false}; tilePos for tile ops, specialist for specialist ops, focus for SET_FOCUS, flag for SET_MANUAL_SPECIALISTS/SET_AVOID_GROWTH.
 city.buyTile -> {cityId:string,tilePos:Hex}
@@ -109,6 +109,9 @@ unit.gift -> {unitId:integer}; recipient is derived from the tile owner.
 diplomacy.message -> {targetCivId:string,text:string}
 diplomacy.acknowledgeMessage -> {messageId:string,text:string}; acknowledge delivered incoming mail explicitly, never automatically.
 Hex={x:integer,y:integer}. TradeOffer={name:string,type:Embassy|Gold|Gold_Per_Turn|Treaty|Agreement|Luxury_Resource|Strategic_Resource|Stockpiled_Resource|Technology|Introduction|WarDeclaration|PeaceProposal|City,amount:integer}.
+Major-nation peace example: {"targetCivId":"Greece","ourOffers":[{"name":"Peace Treaty","type":"Treaty","amount":1}],"theirOffers":[{"name":"Peace Treaty","type":"Treaty","amount":1}]}
+The recipient must decide on its own turn using diplomacy.respondTrade; an applied proposal only queues the offer, and war continues until acceptance. Messages and acknowledgements do not accept offers.
+PeaceProposal is a third-party commitment whose name must be an exact civilization ID, not "Peace Treaty". PeaceProposal cannot impose peace on a major nation; use reciprocal Treaty offers for major-nation peace.
 ProductionOp=ADD_TOP|ADD_BOTTOM|REMOVE|RAISE|LOWER|MOVE_TOP|PURCHASE|SELL.
 UnitOrder=FORTIFY|FORTIFY_UNTIL_HEALED|SLEEP|SLEEP_UNTIL_HEALED|WAKE|DISBAND|PARADROP|EXPLORE|STOP_EXPLORATION|AUTOMATE|STOP_AUTOMATION|GUARD|SET_UP|AIR_SWEEP|ESCORT_FORMATION|STOP_ESCORT_FORMATION.
 CitizenOp=WORK_TILE|STOP_TILE|LOCK_TILE|UNLOCK_TILE|ASSIGN_SPECIALIST|UNASSIGN_SPECIALIST|SET_FOCUS|SET_MANUAL_SPECIALISTS|SET_AVOID_GROWTH|REASSIGN.

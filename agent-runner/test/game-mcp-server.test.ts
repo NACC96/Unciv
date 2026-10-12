@@ -308,3 +308,19 @@ it("publishes actionable names, arguments and enum choices in model-visible game
   expect(act.description).toContain("actor identity");
   expect(act.description).not.toContain("controller.set");
 });
+
+it("exposes the major-nation peace consent contract in the model-visible tool catalog", async () => {
+  server = await startGameMcpServer(new FakeGameService(), { matchId: "m", timelineId: "t", civId: "Rome", runId: "r", authorityEpoch: 1 });
+  const response = await rpc(server.url, server.bearer, call("tools/list"));
+  const tools = (response.json?.["result"] as { tools: { name: string; description: string }[] }).tools;
+  const description = tools.find(tool => tool.name === "game.act")!.description;
+  expect(description).toMatch(/diplomacy\.makePeace -> \{targetCivId:string\}[^\n]*city-state-only/);
+  expect(description).toMatch(/diplomacy\.proposeTrade[^\n]*queues[^\n]*does not end war/);
+  const offer = { name: "Peace Treaty", type: "Treaty", amount: 1 };
+  const example = description.match(/Major-nation peace example: (\{[^\n]+\})/);
+  expect(example).not.toBeNull();
+  expect(JSON.parse(example![1])).toEqual({ targetCivId: "Greece", ourOffers: [offer], theirOffers: [offer] });
+  expect(description).toMatch(/recipient[^\n]*own turn[^\n]*diplomacy\.respondTrade/);
+  expect(description).toMatch(/PeaceProposal[^\n]*third-party[^\n]*civilization ID/);
+  expect(description).toMatch(/PeaceProposal[^\n]*cannot[^\n]*major/);
+});
