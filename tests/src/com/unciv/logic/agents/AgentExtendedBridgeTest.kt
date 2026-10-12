@@ -56,6 +56,37 @@ class AgentExtendedBridgeTest {
         }
     }
 
+    @Test fun `wire peace proposal reports a queue and only recipient acceptance reports peace`() {
+        val f = Fixture()
+        f.act("diplomacy.declareWar", mapOf("targetCivId" to f.greeceId))
+        val before = f.coordinator.saveToJson()
+        val error = f.failure {
+            f.act("diplomacy.makePeace", mapOf("targetCivId" to f.greeceId))
+        }
+        assertEquals("ILLEGAL_ACTION", error.code)
+        assertTrue(error.message!!.contains("diplomacy.proposeTrade"))
+        assertEquals(before, f.coordinator.saveToJson())
+        val treaty = mapOf("name" to "Peace Treaty", "type" to "Treaty", "amount" to 1)
+        val proposed = f.act("diplomacy.proposeTrade", mapOf(
+            "targetCivId" to f.greeceId, "ourOffers" to listOf(treaty), "theirOffers" to listOf(treaty)))
+        assertEquals("applied", proposed["status"])
+        assertEquals(mapOf("pendingRequestsWithTarget" to 1), proposed["result"])
+        assertEquals("War", f.coordinator.getDiplomaticStatus(f.romeId, f.greeceId))
+        assertEquals(listOf(f.romeId), f.coordinator.getIncomingTradeRequests(f.greeceId))
+        val responseArgs = mapOf("requestingCivId" to f.romeId, "accept" to true)
+        assertEquals("NOT_YOUR_TURN", f.failure {
+            f.act("diplomacy.respondTrade", responseArgs, actor = f.greeceId, id = "early-response")
+        }.code)
+        f.bridge.endTurn(f.romeId, "end-rome", f.coordinator.getStateRevision())
+        assertEquals(f.greeceId, f.coordinator.getCurrentCivId())
+        val accepted = f.act("diplomacy.respondTrade", responseArgs)
+        assertEquals("applied", accepted["status"])
+        assertEquals(mapOf("accepted" to true), accepted["result"])
+        assertEquals("Peace", f.coordinator.getDiplomaticStatus(f.romeId, f.greeceId))
+        assertEquals("Peace", f.coordinator.getDiplomaticStatus(f.greeceId, f.romeId))
+        assertTrue(f.coordinator.getIncomingTradeRequests(f.greeceId).isEmpty())
+    }
+
     @Test fun `wire demand response clears mandatory decision and permits the next turn`() {
         val f = Fixture()
         val issued = f.act("diplomacy.demand", mapOf("targetCivId" to f.greeceId, "demandName" to "DoNotSettleNearUs"))

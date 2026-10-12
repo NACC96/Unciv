@@ -1,7 +1,7 @@
 package com.unciv.logic.agents
 
-import com.unciv.json.json
 import com.unciv.Constants
+import com.unciv.json.json
 import com.unciv.logic.GameInfo
 import com.unciv.logic.battle.AttackableTile
 import com.unciv.logic.battle.Battle
@@ -28,8 +28,8 @@ import com.unciv.logic.trade.Trade
 import com.unciv.logic.trade.TradeEvaluation
 import com.unciv.logic.trade.TradeLogic
 import com.unciv.logic.trade.TradeOffer
-import com.unciv.logic.trade.TradeRequest
 import com.unciv.logic.trade.TradeOfferType
+import com.unciv.logic.trade.TradeRequest
 import com.unciv.models.UnitActionType
 import com.unciv.models.ruleset.Building
 import com.unciv.models.ruleset.INonPerpetualConstruction
@@ -1496,18 +1496,67 @@ class MatchCoordinator(
         ) { candidateGame, _ ->
             val civ = candidateGame.getCivilizationOrNull(command.actorCivId)
                 ?: throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Unknown civilization")
-            candidateGame.getCivilizationOrNull(command.targetCivId)
+            val target = candidateGame.getCivilizationOrNull(command.targetCivId)
                 ?: throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Unknown civilization")
+            if (target.isMajorCiv())
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION,
+                    "A major civilization must consent to peace on its own turn. $bilateralPeaceGuidance")
             val diplomacy = civ.getDiplomacyManager(command.targetCivId)
                 ?: throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "No diplomatic contact")
             if (diplomacy.diplomaticStatus != DiplomaticStatus.War)
                 throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Not at war")
-            // Direct peace without a treaty cooldown (plan §6 diplomacy row):
-            // timed treaties arrive through accepted trade, as in human play.
+            // City-state peace retains its native direct behavior. Major peace
+            // reaches this native implementation only through an accepted treaty.
             diplomacy.makePeace()
             diplomacy.diplomaticStatus.name
         }
         return DiplomacyResult(command.actorCivId, receipt, receipt.resultJson)
+    }
+
+    private val bilateralPeaceGuidance =
+        "Use diplomacy.proposeTrade with {name: \"Peace Treaty\", type: \"Treaty\", amount: 1} " +
+            "in BOTH ourOffers and theirOffers, then the recipient must accept with diplomacy.respondTrade on its own turn."
+
+    /** Native PeaceProposal names a third civilization, whose consent it does not obtain. */
+    private fun peaceOfferViolation(
+        game: GameInfo,
+        ourOffers: List<TradeOffer>,
+        theirOffers: List<TradeOffer>
+    ): AgentCommandException? {
+        val allOffers = ourOffers + theirOffers
+        if (allOffers.any { it.name == Constants.peaceTreaty }) {
+            fun hasOnePeaceTreaty(offers: List<TradeOffer>): Boolean {
+                val peaceOffers = offers.filter { it.name == Constants.peaceTreaty }
+                return peaceOffers.size == 1 && peaceOffers.single().type == TradeOfferType.Treaty
+                    && peaceOffers.single().amount == 1
+            }
+            if (!hasOnePeaceTreaty(ourOffers) || !hasOnePeaceTreaty(theirOffers))
+                return AgentCommandException(AgentCommandError.INVALID_ARGUMENT,
+                    "Bilateral peace requires one Peace Treaty of type Treaty and amount 1 on each side. $bilateralPeaceGuidance")
+        }
+        var majorConsentViolation: AgentCommandException? = null
+        for (offer in allOffers.filter { it.type == TradeOfferType.PeaceProposal }) {
+            if (offer.amount != 1)
+                return AgentCommandException(AgentCommandError.INVALID_ARGUMENT,
+                    "PeaceProposal requires a third civilization ID as name and amount 1. $bilateralPeaceGuidance")
+            val thirdCiv = game.getCivilizationOrNull(offer.name)
+                ?: return AgentCommandException(AgentCommandError.INVALID_ARGUMENT,
+                    "PeaceProposal name must be a known third civilization ID. $bilateralPeaceGuidance")
+            // Malformed entries on either side take priority over major-consent policy.
+            if (thirdCiv.isMajorCiv() && majorConsentViolation == null)
+                majorConsentViolation = AgentCommandException(AgentCommandError.ILLEGAL_ACTION,
+                    "PeaceProposal cannot obtain a third major civilization's consent. Propose peace to that civilization directly. " +
+                        bilateralPeaceGuidance)
+        }
+        return majorConsentViolation
+    }
+
+    /** Runs only on unpublished turn candidates, before native request validation/automation. */
+    private fun discardUnsafePeaceRequests(game: GameInfo, civ: Civilization, includeMajorProposals: Boolean) {
+        civ.tradeRequests.removeAll { request ->
+            val violation = peaceOfferViolation(game, request.trade.ourOffers, request.trade.theirOffers)
+            violation != null && (includeMajorProposals || violation.code == AgentCommandError.INVALID_ARGUMENT)
+        }
     }
 
     private fun executeNegotiateCityStatePeace(command: NegotiateCityStatePeaceCommand): DiplomacyResult {
@@ -1538,14 +1587,17 @@ class MatchCoordinator(
 
     private fun buildTrade(
         candidateGame: GameInfo,
-        actor: Civilization,
         command: ProposeTradeCommand
     ): Trade {
+        val ourOffers = command.ourOffers.map { TradeOffer(it.name, it.type, it.amount, candidateGame.speed) }
+        val theirOffers = command.theirOffers.map { TradeOffer(it.name, it.type, it.amount, candidateGame.speed) }
+        // Inspect the input before TradeOffersList merges duplicate amounts.
+        peaceOfferViolation(candidateGame, ourOffers, theirOffers)?.let { throw it }
         val trade = Trade()
-        for (offer in command.ourOffers)
-            trade.ourOffers.add(TradeOffer(offer.name, offer.type, offer.amount, candidateGame.speed))
-        for (offer in command.theirOffers)
-            trade.theirOffers.add(TradeOffer(offer.name, offer.type, offer.amount, candidateGame.speed))
+        for (offer in ourOffers) trade.ourOffers.add(offer)
+        for (offer in theirOffers) trade.theirOffers.add(offer)
+        // Duplicate city-state commitments can become malformed only after merging.
+        peaceOfferViolation(candidateGame, trade.ourOffers, trade.theirOffers)?.let { throw it }
         return trade
     }
 
@@ -1562,7 +1614,7 @@ class MatchCoordinator(
                 ?: throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Unknown civilization")
             if (civ.getDiplomacyManager(command.targetCivId) == null)
                 throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "No diplomatic contact")
-            val trade = buildTrade(candidateGame, civ, command)
+            val trade = buildTrade(candidateGame, command)
             // Engine NPEs on unmet-civ lookups surface as a plain rejection.
             val valid = try {
                 TradeEvaluation().isTradeValid(trade, civ, target)
@@ -1580,7 +1632,8 @@ class MatchCoordinator(
         return TradeProposedResult(command.actorCivId, receipt, receipt.resultJson.toInt())
     }
 
-    private fun executeRespondTrade(command: RespondTradeCommand): TradeRespondedResult {        val receipt = runGameplayMutation(
+    private fun executeRespondTrade(command: RespondTradeCommand): TradeRespondedResult {
+        val receipt = runGameplayMutation(
             command.actorCivId, command.actionId, command.expectedRevision,
             "diplomacy.respondTrade|${command.requestingCivId}|${command.accept}"
         ) { candidateGame, _ ->
@@ -1597,6 +1650,7 @@ class MatchCoordinator(
             }
             // Revalidate immediately before applying: offers expire as the
             // game moves (plan §6.1); never apply a stale proposal.
+            peaceOfferViolation(candidateGame, request.trade.ourOffers, request.trade.theirOffers)?.let { throw it }
             if (!TradeEvaluation().isTradeValid(request.trade, civ, requester))
                 throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Offer is no longer valid")
             val logic = TradeLogic(civ, requester)
@@ -2825,6 +2879,7 @@ class MatchCoordinator(
             if (kind == ControllerKind.BUILTIN_AI) {
                 // One indivisible automated turn (plan §9): existing automation
                 // runs internally, never through provider invocations.
+                discardUnsafePeaceRequests(candidateGame, civ, includeMajorProposals = true)
                 TurnManager(civ).startTurn(null, suppressAutomation = false)
                 TurnManager(civ).automateTurn()
                 TurnManager(civ).endTurn(null, suppressAutomation = false)
@@ -2843,6 +2898,10 @@ class MatchCoordinator(
         civId: String
     ) {
         val civ = candidateGame.getCivilization(civId)
+        // Malformed legacy peace must not crash native start-turn validation.
+        // Well-formed major mediation remains visible for an explicit decline;
+        // accepting it still passes through the consent guard above.
+        discardUnsafePeaceRequests(candidateGame, civ, includeMajorProposals = false)
         TurnManager(civ).startTurn(null, suppressAutomation = true)
         candidateGame.currentPlayer = civ.civID
         candidateGame.currentPlayerCiv = civ

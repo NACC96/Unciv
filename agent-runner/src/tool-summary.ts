@@ -67,7 +67,17 @@ export function summarizeTool(rawName: string, input: any = {}, result?: any, st
         case "diplomacy.declareWar": title = `${active ? "Declaring" : "Declared"} war on ${args.targetCivId ?? "civilization"}`; break;
         case "diplomacy.makePeace": title = `${active ? "Making" : "Made"} peace with ${args.targetCivId ?? "civilization"}`; break;
         case "diplomacy.friendship": title = `${active ? "Proposing" : "Proposed"} friendship to ${args.targetCivId ?? "civilization"}`; break;
-        case "diplomacy.proposeTrade": title = `${active ? "Proposing" : "Proposed"} trade with ${args.targetCivId ?? "civilization"}`; break;
+        case "diplomacy.proposeTrade": {
+          const hasPeaceTreaty = (offers: any) => Array.isArray(offers) && offers.some(offer =>
+            offer?.name === "Peace Treaty" && offer?.type === "Treaty" && offer?.amount === 1);
+          if (hasPeaceTreaty(args.ourOffers) && hasPeaceTreaty(args.theirOffers)) {
+            title = `${active ? "Proposing peace" : result?.status === "applied" ? "Proposed peace" : "Peace proposal call"} with ${args.targetCivId ?? "civilization"}`;
+            if (!active) summary = result?.status === "applied"
+              ? "Offer queued for their next turn; war continues until they accept."
+              : "Check action_result to confirm the proposal.";
+          } else title = `${active ? "Proposing" : "Proposed"} trade with ${args.targetCivId ?? "civilization"}`;
+          break;
+        }
         case "diplomacy.message":
           title = `${active ? "Sending message" : result?.status === "applied" ? "Sent message" : "Message call"} to ${args.targetCivId ?? "civilization"}`;
           if (!active) summary = result?.status === "applied" ? "Queued for their next turn." : "Check action_result to confirm the send.";
@@ -76,7 +86,17 @@ export function summarizeTool(rawName: string, input: any = {}, result?: any, st
           title = active ? "Acknowledging message" : result?.status === "applied" ? "Message acknowledged" : "Acknowledgement call";
           if (!active) summary = result?.status === "applied" ? (result?.result?.acknowledgementText ?? "Receipt acknowledged; no agreement implied.") : "Check action_result to confirm acknowledgement.";
           break;
-        case "diplomacy.respondTrade": title = `${args.accept ? (active ? "Accepting" : "Accepted") : (active ? "Declining" : "Declined")} trade`; break;
+        case "diplomacy.respondTrade":
+          if (active) title = `${args.accept ? "Accepting" : "Declining"} trade`;
+          else if (result?.status === "applied" && typeof result?.result?.accepted === "boolean") {
+            const response = result.result.accepted ? "Accepted" : "Declined";
+            title = `${response} trade`;
+            summary = `${response} the pending offer from ${args.requestingCivId ?? "civilization"}.`;
+          } else {
+            title = "Trade response call";
+            summary = "Check action_result to confirm acceptance or decline.";
+          }
+          break;
         case "citystate.giftGold": title = `${active ? "Giving" : "Gave"} ${args.amount ?? ""} gold to ${args.cityStateId ?? "city-state"}`; break;
         case "city.buyTile": title = `${active ? "Buying" : "Bought"} tile ${point(args.tilePos)}`; break;
         case "conquest.resolve": title = `${active ? "Choosing" : "Chose"} conquered city disposition: ${String(args.disposition ?? "").toLowerCase()}`; break;
