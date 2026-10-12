@@ -91,17 +91,20 @@ class MatchCoordinator(
         if (session != null) {
             require(session.journal.gameId == committedGame.gameId)
             require(session.journal.timelineId == committedMatch.timelineId)
-            require(session.view.viewerCivId == committedMatch.localViewingCivId)
-            require(session.view.spectatorMode == isSpectatorViewer(session.view.viewerCivId))
+            require(isVisualViewPermitted(session.view))
         }
         visualCaptureSession = session
     }
 
+    private fun isVisualViewPermitted(view: com.unciv.logic.presentation.VisualViewKey): Boolean {
+        val local = committedMatch.localViewingCivId ?: return false
+        if (committedGame.civilizations.none { it.civID == view.viewerCivId }) return false
+        return if (isSpectatorViewer(local)) view.spectatorMode
+            else !view.spectatorMode && view.viewerCivId == local
+    }
+
     private fun beginVisualCapture(game: GameInfo, actionId: String): CaptureScope {
-        val session = visualCaptureSession?.takeIf {
-            it.view.viewerCivId == committedMatch.localViewingCivId &&
-                it.view.spectatorMode == isSpectatorViewer(it.view.viewerCivId)
-        }
+        val session = visualCaptureSession?.takeIf { isVisualViewPermitted(it.view) }
         return VisualCapture.begin(game, session, VisualProvenance(actionId = actionId))
     }
 

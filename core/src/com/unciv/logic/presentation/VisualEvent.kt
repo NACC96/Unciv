@@ -144,3 +144,13 @@ internal fun VisualEvent.withProvenance(provenance: VisualProvenance): VisualEve
     is VisualEvent.ChangeImprovement -> copy(provenance = provenance)
     is VisualEvent.CaptureCity -> copy(provenance = provenance)
 }
+
+/** Only the ordinary committed-turn handoff may rebind already-permitted facts to a new screen epoch. */
+internal fun VisualEvent.withView(view: VisualViewKey): VisualEvent = when (this) {
+    is VisualEvent.Move -> VisualEvent.Move(id, view, provenance, unit, path, kind, displacementOrigin)
+    is VisualEvent.Attack -> copy(view = view)
+    is VisualEvent.RemoveUnit -> copy(view = view)
+    is VisualEvent.FoundCity -> copy(view = view)
+    is VisualEvent.ChangeImprovement -> copy(view = view)
+    is VisualEvent.CaptureCity -> copy(view = view)
+}

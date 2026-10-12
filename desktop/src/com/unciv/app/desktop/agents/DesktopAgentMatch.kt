@@ -34,6 +34,11 @@ import com.unciv.logic.agents.NationControl
 import com.unciv.logic.agents.NationControlChange
 import com.unciv.logic.agents.NationSetting
 import com.unciv.logic.agents.TurnPhase
+import com.unciv.logic.presentation.VisualBatch
+import com.unciv.logic.presentation.VisualCapture
+import com.unciv.logic.presentation.VisualJournal
+import com.unciv.logic.presentation.VisualViewKey
+import com.unciv.view.VisualEventProjector
 import com.unciv.ui.screens.worldscreen.WorldScreen
 import com.unciv.utils.Concurrency
 import com.unciv.utils.Log
@@ -233,6 +238,58 @@ class DesktopAgentMatch(
     private var viewInstallInFlight = false
     /** Render attempts advance independently so a failed accepted frame can be retried. */
     private var publicationSequence = 0L
+
+    private val visualJournal = VisualJournal(game.gameId, coordinator.getTimelineId())
+    private var visualSession: VisualCapture.Session? = null
+    private var installedVisualSequence = 0L
+    private var visualAuthority: List<Any?>? = null
+    private val visualViewListener: () -> Unit = {
+        Concurrency.runOnNonDaemonThreadPool("Refresh visual view") {
+            synchronized(lock) {
+                if (!closed.get() && worldScreen?.agentSession === this) publishSnapshotLocked()
+            }
+        }
+    }
+
+    init { worldScreen?.visualViewChangedListener = visualViewListener }
+
+    /** Host lock binds the projected journal to exactly the authority of the serialized snapshot. */
+    private fun configureVisualCaptureLocked() {
+        val screen = worldScreen
+        if (screen == null || closed.get() || !matchOpen || !screen.isVisualTransportAvailable()) {
+            visualSession?.invalidate()
+            visualSession = null
+            coordinator.configureVisualCapture(null)
+            return
+        }
+        val authority = listOf(coordinator.getLocalControlCivId(), coordinator.getLocalViewingCivId(),
+            coordinator.getControllers().mapValues { it.value.kind }, authorityEpoch)
+        if (visualAuthority != null && visualAuthority != authority) {
+            visualSession?.invalidate()
+            visualSession = null
+            screen.invalidateVisualAuthority()
+        }
+        visualAuthority = authority
+        val local = coordinator.getLocalViewingCivId() ?: screen.currentViewerCivId()
+        val requested = screen.currentVisualViewKey()
+        val desired = if (screen.currentViewerCivId() == local && coordinator.isSpectatorViewer(local)) requested
+            else VisualViewKey(local, coordinator.isSpectatorViewer(local), requested.epoch)
+        if (visualSession?.view == desired) return
+        visualSession?.invalidate()
+        visualJournal.reset(desired)
+        installedVisualSequence = 0L
+        visualSession = VisualCapture.Session(desired, VisualEventProjector, visualJournal) {
+            screen.isVisualTransportAvailable() && screen.currentVisualViewKey().epoch == desired.epoch
+        }
+        try {
+            coordinator.configureVisualCapture(visualSession)
+        } catch (_: Exception) {
+            // Optional presentation must never send a successful provider action down a retry path.
+            visualSession?.invalidate()
+            visualSession = null
+            coordinator.configureVisualCapture(null)
+        }
+    }
 
     /** Production requires the actual rendered viewer; explicit injected fixtures can be headless. */
     private fun actualViewerLocked(): String? {
@@ -553,6 +610,7 @@ class DesktopAgentMatch(
 
     /** All coordinator mutations publish their committed pair, including failure-only metadata. */
     private inline fun <T> publishCommittedChangesLocked(action: () -> T): T {
+        configureVisualCaptureLocked()
         val beforeGeneration = coordinator.getPublicationGeneration()
         try {
             return action()
@@ -577,12 +635,20 @@ class DesktopAgentMatch(
             onInstalled?.invoke(null)
             return
         }
+        configureVisualCaptureLocked()
+        val localViewer = coordinator.getLocalViewingCivId() ?: screen.currentViewerCivId()
+        val captureView = visualSession?.view ?: screen.currentVisualViewKey().let {
+            if (localViewer == screen.currentViewerCivId() && coordinator.isSpectatorViewer(localViewer)) it
+            else VisualViewKey(localViewer, coordinator.isSpectatorViewer(localViewer), it.epoch)
+        }
         val payload = AgentSnapshotPublication.buildPayload(
             coordinator,
             viewerCivId = coordinator.getLocalViewingCivId() ?: screen.currentViewerCivId(),
             selectedUnitId = screen.currentSelectedUnitId(),
             selectedCityId = screen.currentSelectedCityId(),
-            selectedTile = screen.currentSelectedTilePos()
+            selectedTile = screen.currentSelectedTilePos(),
+            visualBatch = if (visualSession != null) visualJournal.readAfter(installedVisualSequence, captureView)
+                else VisualBatch(captureView, emptyList(), 0L, 0L)
         )
         publicationSequence = maxOf(publicationSequence + 1, payload.generation)
         payload.generation = publicationSequence
@@ -590,14 +656,18 @@ class DesktopAgentMatch(
         val selection = AgentSnapshotPublication.resolveSelection(snapshot, payload)
         Concurrency.runOnGLThread {
             synchronized(lock) {
-                if (closed.get() || onInstalled != null && !matchOpen) {
-                    onInstalled?.invoke("The match was closed or left")
+                if (closed.get() || !matchOpen || screen.agentSession !== this ||
+                    payload.visualBatch?.view?.epoch?.let { it != screen.currentVisualViewKey().epoch } == true) {
+                    onInstalled?.invoke("The match view changed before installation")
                     return@synchronized
                 }
                 val error = try {
-                    screen.installAgentSnapshot(snapshot, selection, payload.generation, payload.viewerCivId)
-                    Gdx.graphics.requestRendering()
-                    null
+                    val installed = screen.installAgentSnapshot(snapshot, selection, payload.generation, payload.viewerCivId, payload.visualBatch)
+                    if (installed && captureView == visualSession?.view) {
+                        payload.visualBatch?.let { installedVisualSequence = maxOf(installedVisualSequence, it.throughSequence) }
+                    }
+                    if (installed) Gdx.graphics.requestRendering()
+                    if (installed) null else "A newer match view is already installed"
                 } catch (ex: Exception) {
                     markViewRefreshFailedLocked(ex.message ?: "Could not install the committed view")
                 }
@@ -610,12 +680,17 @@ class DesktopAgentMatch(
         val idleSupervisor = synchronized(lock) {
             if (!closed.compareAndSet(false, true)) return
             matchOpen = false
+            visualSession?.invalidate()
+            visualSession = null
+            coordinator.configureVisualCapture(null)
+            worldScreen?.invalidateVisualAuthority()
             viewInstallInFlight = false
             cancelPendingNationChangeLocked("The match closed before the nation change was saved")
             // Keep engine RPCs alive for an admitted turn. Its existing worker owns shutdown.
             runState = if (isLoopRunning.get()) AgentRunState.PAUSING else AgentRunState.PAUSED
             if (isLoopRunning.get()) null else detachSupervisorLocked()
         }
+        if (worldScreen?.visualViewChangedListener === visualViewListener) worldScreen.visualViewChangedListener = null
         if (worldScreen?.agentSession === this) worldScreen.agentSession = null
         if (idleSupervisor != null) Concurrency.runOnNonDaemonThreadPool("Close agent supervisor") {
             shutdownSupervisor(idleSupervisor)
@@ -625,6 +700,10 @@ class DesktopAgentMatch(
     override fun onMatchLeft() {
         synchronized(lock) {
             matchOpen = false
+            visualSession?.invalidate()
+            visualSession = null
+            coordinator.configureVisualCapture(null)
+            worldScreen?.invalidateVisualAuthority()
             viewInstallInFlight = false
             cancelPendingNationChangeLocked("The match was left before the nation change was saved")
         }

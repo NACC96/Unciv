@@ -23,12 +23,23 @@ interface VisualProjection {
     fun position(game: GameInfo, view: VisualViewKey, tile: Tile): VisualPosition?
 }
 
-/** No default projector or global registration: ordinary/headless games remain completely disabled. */
+/** No global registration: only hosts that explicitly install a privacy projector enable capture. */
 object VisualCapture {
-    class Session(val view: VisualViewKey, val projector: VisualProjection, val journal: VisualJournal) {
+    class Session(val view: VisualViewKey, val projector: VisualProjection, val journal: VisualJournal,
+                  private val authorityIsCurrent: () -> Boolean = { true }) {
+        @Volatile internal var active = true
+            private set
         private var claimed = false
+        internal fun isActive(): Boolean = active && try { authorityIsCurrent() } catch (_: Throwable) { false }
+        @Synchronized internal fun publish(events: List<VisualEvent>) {
+            if (isActive()) journal.appendCommitted(events)
+        }
+        @Synchronized fun invalidate() {
+            active = false
+            journal.reset(view)
+        }
         @Synchronized internal fun claim(): Boolean {
-            if (claimed) return false
+            if (!isActive() || claimed) return false
             claimed = true
             return true
         }
@@ -102,6 +113,11 @@ class CaptureScope internal constructor(
 
     private fun <T> safely(block: () -> T): T? {
         if (session == null || closed || failed || finished != null) return null
+        if (!session.isActive()) {
+            failed = true
+            events.clear()
+            return null
+        }
         if (Thread.currentThread() !== thread) {
             VisualCapture.diagnostic()
             return null
@@ -289,7 +305,7 @@ class CaptureScope internal constructor(
 
     /** Projection is already frozen at hooks; finish occurs before durable serialization/commit. */
     fun finish(committedRevision: Int? = null): List<VisualEvent> {
-        if (closed || failed || session == null || Thread.currentThread() !== thread) return emptyList()
+        if (closed || failed || session == null || !session.isActive() || Thread.currentThread() !== thread) return emptyList()
         finished?.let { return it }
         return try {
             val finalProvenance = if (committedRevision == null) provenance
@@ -306,10 +322,10 @@ class CaptureScope internal constructor(
 
     /** Called only after the engine return or durable commit, with failures isolated from gameplay. */
     fun publishCommitted() {
-        if (published || closed || session == null || Thread.currentThread() !== thread) return
+        if (published || closed || session == null || !session.isActive() || Thread.currentThread() !== thread) return
         try {
             val result = finish()
-            session.journal.appendCommitted(result)
+            session.publish(result)
             published = true
         } catch (_: Throwable) { VisualCapture.diagnostic() }
     }

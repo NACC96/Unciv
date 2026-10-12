@@ -18,6 +18,10 @@ import com.unciv.logic.agents.AgentCommand
 import com.unciv.logic.agents.AgentSnapshotPublication
 import com.unciv.logic.agents.ResolvedSelection
 import com.unciv.view.GameView
+import com.unciv.view.VisualEventProjector
+import com.unciv.logic.presentation.*
+import java.util.concurrent.atomic.AtomicLong
+import java.util.concurrent.atomic.AtomicReference
 import com.unciv.logic.UncivShowableException
 import com.unciv.logic.civilization.Civilization
 import com.unciv.logic.civilization.PlayerType
@@ -151,6 +155,12 @@ class WorldScreen(
     /** UI toggle only (spectator mode): whether the map/tile panel should show [selectedGameView]'s
      *  (fogged) vision or [spectatorGameView]'s (the spectator's own, unrestricted) vision. */
     var fogOfWar = true
+        set(value) {
+            val next = value || !viewingCiv.isSpectator()
+            if (field == next) return
+            field = next
+            refreshVisualView(force = true)
+        }
 
     /**
      * Active agent match session, if this screen shows an agent-enabled
@@ -159,6 +169,144 @@ class WorldScreen(
      * remaining unsupported paths are documented in docs/agent-mutation-audit.md.
      */
     var agentSession: AgentMatchSession? = null
+        set(value) {
+            if (field === value) return
+            field = value
+            invalidateVisualAuthority()
+            if (value == null && !visualDisposed) installOrdinaryCapture()
+            visualViewChangedListener?.invoke()
+        }
+
+    companion object { private val visualEpochs = AtomicLong() }
+    private val visualLock = Any()
+    private val visualAuthoritySerial = AtomicLong()
+    private val visualViewState = AtomicReference(VisualViewKey(viewingCiv.civID, viewingCiv.isSpectator(), visualEpochs.incrementAndGet()))
+    private var visualView: VisualViewKey
+        get() = visualViewState.get()
+        set(value) { visualViewState.set(value) }
+    @Volatile private var visualDisposed = false
+    @Volatile private var visualSuspended = false
+    @Volatile private var pendingVisualBatch: VisualBatch? = null
+    private var ordinaryVisualSession: VisualCapture.Session? = null
+    private var ordinaryVisualCursor = 0L
+    private var installedVisualSequence = 0L
+    private var installedVisualTimeline: String? = null
+    /** V3 must compare this before rendering effects and reconcile whenever it changes. */
+    @Volatile var visualResetGeneration = 0L
+        private set
+    /** Desktop installs one asynchronous callback; never perform host work inline on the GL thread. */
+    @Volatile var visualViewChangedListener: (() -> Unit)? = null
+
+    fun currentVisualViewKey(): VisualViewKey = visualView
+    fun isVisualTransportAvailable(): Boolean = !visualDisposed && !visualSuspended
+
+    /** May be called under the host lock. Does not touch actors or perform GL work. */
+    fun invalidateVisualAuthority(): VisualViewKey = synchronized(visualLock) {
+        ordinaryVisualSession?.invalidate()
+        ordinaryVisualSession = null
+        VisualCapture.install(gameInfo, null)
+        pendingVisualBatch = null
+        ordinaryVisualCursor = 0L
+        installedVisualSequence = 0L
+        installedVisualTimeline = null
+        visualResetGeneration++
+        visualAuthoritySerial.incrementAndGet()
+        visualView.copy(epoch = visualEpochs.incrementAndGet()).also { visualView = it }
+    }
+
+    /** Skip/resize clear queued work and start capture from the current committed state. GL thread only. */
+    fun resetVisualPlayback() {
+        invalidateVisualAuthority()
+        if (agentSession == null) installOrdinaryCapture()
+        visualViewChangedListener?.invoke()
+    }
+
+    private fun refreshVisualView(force: Boolean = false) {
+        val effective = if (fogOfWar) selectedCiv else viewingCiv
+        val previous = currentVisualViewKey()
+        if (!force && previous.viewerCivId == effective.civID && previous.spectatorMode == viewingCiv.isSpectator()) return
+        synchronized(visualLock) {
+            invalidateVisualAuthority()
+            visualView = VisualViewKey(effective.civID, viewingCiv.isSpectator(), visualView.epoch)
+        }
+        if (agentSession == null) installOrdinaryCapture()
+        visualViewChangedListener?.invoke()
+    }
+
+    private fun installOrdinaryCapture() = synchronized(visualLock) {
+        if (visualDisposed || visualSuspended || agentSession != null || gameInfo.agentMatchStateJson != null) return@synchronized
+        if (ordinaryVisualSession != null) return@synchronized
+        val journal = VisualJournal(gameInfo.gameId)
+        journal.reset(visualView)
+        val authority = visualViewState
+        val view = visualView
+        ordinaryVisualSession = VisualCapture.Session(view, VisualEventProjector, journal) { authority.get() == view }.also {
+            VisualCapture.install(gameInfo, it)
+        }
+        ordinaryVisualCursor = 0L
+    }
+
+    /** Bounded handoff to playback. Hidden/skipped screens and obsolete view epochs return nothing. */
+    fun takeVisualBatch(): VisualBatch? = synchronized(visualLock) {
+        val batch = pendingVisualBatch
+        pendingVisualBatch = null
+        batch?.takeIf { isVisualTransportAvailable() && it.view == visualView }
+    }
+
+    private fun installVisualBatch(batch: VisualBatch) = synchronized(visualLock) {
+        if (!isVisualTransportAvailable() || batch.view != visualView) return@synchronized
+        if (batch.events.any { it.view != visualView || it.id.gameId != gameInfo.gameId }) return@synchronized
+        val timeline = batch.events.firstOrNull()?.id?.timelineId ?: installedVisualTimeline
+        if (batch.events.any { it.id.timelineId != timeline }) return@synchronized
+        if (installedVisualTimeline != null && installedVisualTimeline != timeline) {
+            pendingVisualBatch = null
+            installedVisualSequence = 0L
+            visualResetGeneration++
+        }
+        installedVisualTimeline = timeline
+        // Multiple snapshots may have been built before any GL acknowledgment. Do not replay their overlap,
+        // including events the playback consumer already drained from the pending batch.
+        val fresh = batch.events.filter { it.id.sequence > installedVisualSequence }
+        val previous = pendingVisualBatch?.takeIf { it.view == batch.view }
+        val all = previous?.events.orEmpty() + fresh
+        val dropped = maxOf(previous?.droppedThroughSequence ?: 0L, batch.droppedThroughSequence,
+            all.dropLast(VisualJournal.MAX_EVENTS).lastOrNull()?.id?.sequence ?: 0L)
+        installedVisualSequence = maxOf(installedVisualSequence, batch.throughSequence)
+        pendingVisualBatch = VisualBatch(batch.view, all.takeLast(VisualJournal.MAX_EVENTS), installedVisualSequence, dropped)
+    }
+
+    internal fun installOrdinaryTurnVisuals(batch: VisualBatch) = synchronized(visualLock) {
+        val current = visualView
+        if (agentSession != null || !isVisualTransportAvailable() || current.viewerCivId != batch.view.viewerCivId ||
+            current.spectatorMode != batch.view.spectatorMode || batch.events.isEmpty()) return@synchronized
+        // Never replace actions already committed on the new screen with the preceding turn's handoff.
+        if (ordinaryVisualSession?.journal?.readAfter(0L, current)?.throughSequence != 0L) return@synchronized
+        val timeline = batch.events.first().id.timelineId
+        if (batch.events.any { it.id.gameId != gameInfo.gameId || it.id.timelineId != timeline }) return@synchronized
+        val rebound = batch.events.map { it.withView(current) }
+        ordinaryVisualSession?.invalidate()
+        val journal = VisualJournal(gameInfo.gameId, timeline)
+        journal.reset(current)
+        journal.appendCommitted(rebound)
+        val authority = visualViewState
+        ordinaryVisualSession = VisualCapture.Session(current, VisualEventProjector, journal) { authority.get() == current }.also {
+            VisualCapture.install(gameInfo, it)
+        }
+        installVisualBatch(VisualBatch(current, rebound, batch.throughSequence, batch.droppedThroughSequence))
+        ordinaryVisualCursor = batch.throughSequence
+    }
+
+    private fun suspendVisuals() = synchronized(visualLock) {
+        visualSuspended = true
+        ordinaryVisualSession?.invalidate()
+        ordinaryVisualSession = null
+        VisualCapture.install(gameInfo, null)
+        pendingVisualBatch = null
+        installedVisualSequence = 0L
+        installedVisualTimeline = null
+        visualView = visualView.copy(epoch = visualEpochs.incrementAndGet())
+        visualResetGeneration++
+    }
 
     /** The session owns asynchronous work, so detach it before releasing this screen's resources. */
     fun closeAgentSession() {
@@ -253,23 +401,37 @@ class WorldScreen(
      */
     private val agentPublicationFence = com.unciv.logic.agents.AgentPublicationFence()
 
-    fun installAgentSnapshot(snapshot: GameInfo, selection: ResolvedSelection, publicationGeneration: Long = 0, viewerCivId: String? = null) {
+    fun installAgentSnapshot(snapshot: GameInfo, selection: ResolvedSelection, publicationGeneration: Long = 0, viewerCivId: String? = null, visualBatch: VisualBatch? = null): Boolean {
         // A queued frame from an old host must not replace the currently opened game or its autosave.
-        if (game.worldScreen !== this || game.gameInfo !== gameInfo || agentSession == null || gameInfo.gameId != snapshot.gameId) return
-        if (gameInfo === snapshot) return
+        if (game.worldScreen !== this || game.gameInfo !== gameInfo || agentSession == null || gameInfo.gameId != snapshot.gameId) return false
+        if (gameInfo === snapshot) return false
+        if (visualDisposed || visualBatch != null && visualBatch.view.epoch != visualView.epoch) return false
         val oldViewerId = viewingCiv.civID
         val newViewer = snapshot.civilizations.firstOrNull { it.civID == (viewerCivId ?: oldViewerId) }
-            ?: return // snapshot without the viewer is a host bug; keep current render
-        if (!agentPublicationFence.accept(publicationGeneration)) return
+            ?: return false // snapshot without the viewer is a host bug; keep current render
+        val expectedSelected = if (newViewer.civID != oldViewerId || !newViewer.isSpectator()) newViewer.civID else selectedCiv.civID
+        val expectedVisualView = VisualViewKey(if (newViewer.isSpectator() && !fogOfWar) newViewer.civID else expectedSelected,
+            newViewer.isSpectator(), visualView.epoch)
+        if (visualBatch != null && (visualBatch.view != expectedVisualView ||
+                visualBatch.events.any { it.view != expectedVisualView || it.id.gameId != snapshot.gameId })) return false
+        if (!agentPublicationFence.accept(publicationGeneration)) return false
         gameInfo = snapshot
         game.gameInfo = snapshot
         val viewerChanged = newViewer.civID != oldViewerId
-        // A spectator's unrestricted view must never survive a committed takeover.
-        if (!newViewer.isSpectator()) fogOfWar = true
+        // Revoke pending effects before rebinding anything that could render a new authority.
+        if (viewerChanged) synchronized(visualLock) {
+            pendingVisualBatch = null
+            visualResetGeneration++
+        }
         viewingCiv = newViewer
         selectedCiv = if (viewerChanged || !newViewer.isSpectator()) newViewer else
             snapshot.civilizations.firstOrNull { it.civID == selectedCiv.civID } ?: newViewer
         selectedGameView = GameView(snapshot, selectedCiv, spectatorMode = viewingCiv.isSpectator())
+        synchronized(visualLock) {
+            val effectiveId = if (newViewer.isSpectator() && !fogOfWar) newViewer.civID else selectedCiv.civID
+            visualView = VisualViewKey(effectiveId, newViewer.isSpectator(), visualView.epoch)
+        }
+        if (!newViewer.isSpectator()) fogOfWar = true
         cachedSpectatorGameView = null
         isPlayersTurn = viewingCiv.isCurrentPlayer()
 
@@ -320,8 +482,10 @@ class WorldScreen(
                 game.pushScreen { PlayerReadyScreen(this, retainedWorldInStack = true) }
             }
         } else game.screen?.refreshAgentSnapshot()
+        if (visualBatch != null) installVisualBatch(visualBatch)
         shouldUpdate = true
         Gdx.graphics.requestRendering()
+        return true
     }
 
     //endregion
@@ -432,13 +596,31 @@ class WorldScreen(
         }
 
         if (restoreState != null) restore(restoreState)
+        refreshVisualView()
+        installOrdinaryCapture()
 
         // don't run update() directly, because the UncivGame.worldScreen should be set so that the city buttons and tile groups
         //  know what the viewing civ is.
         shouldUpdate = true
     }
 
+    override fun show() {
+        super.show()
+        visualSuspended = false
+        installOrdinaryCapture()
+        visualViewChangedListener?.invoke()
+    }
+
+    override fun hide() {
+        suspendVisuals()
+        visualViewChangedListener?.invoke()
+        super.hide()
+    }
+
     override fun dispose() {
+        visualDisposed = true
+        suspendVisuals()
+        visualViewChangedListener = null
         closeAgentSession()
         resizeDeferTimer?.cancel()
         events.stopReceiving()
@@ -787,6 +969,7 @@ class WorldScreen(
     fun setSelectedCiv(civ: Civilization) {
         selectedCiv = if (viewingCiv.isSpectator()) civ else viewingCiv
         selectedGameView = GameView(gameInfo, selectedCiv, viewingCiv.isSpectator())
+        refreshVisualView()
     }
 
     private fun updateSelectedCiv() {
@@ -851,7 +1034,15 @@ class WorldScreen(
 
             progressBar.increment()
 
-            gameInfoClone.nextTurn(progressBar, true)
+            val turnView = currentVisualViewKey()
+            val turnJournal = VisualJournal(gameInfoClone.gameId)
+            turnJournal.reset(turnView)
+            val turnAuthority = visualViewState
+            val turnSession = VisualCapture.Session(turnView, VisualEventProjector, turnJournal) { turnAuthority.get() == turnView }
+            val committedTurnVisuals = VisualCapture.begin(gameInfoClone, turnSession).use { capture ->
+                gameInfoClone.nextTurn(progressBar, true)
+                capture.finish()
+            }
 
             if (originalGameInfo.gameParameters.isOnlineMultiplayer) {
                 // outer try-catch for non-auth exceptions
@@ -924,7 +1115,11 @@ class WorldScreen(
 
             progressBar.increment()
 
-            startNewScreenJob(gameInfoClone, autoPlay)
+            val visualHandoff = if (currentVisualViewKey() == turnView) runCatching {
+                turnJournal.appendCommitted(committedTurnVisuals)
+                OrdinaryVisualHandoff(visualAuthoritySerial, visualAuthoritySerial.get(), turnJournal.readAfter(0L, turnView))
+            }.getOrNull() else null
+            startNewScreenJob(gameInfoClone, autoPlay, visualHandoff = visualHandoff)
         }
     }
 
@@ -998,6 +1193,7 @@ class WorldScreen(
     private var resizeDeferTimer: Timer? = null
 
     override fun resize(width: Int, height: Int) {
+        resetVisualPlayback()
         if (agentSession != null) {
             // Keep the live host and feed attached; reconstructing this screen
             // discards the agent session. ExtendViewport scales down with the window.
@@ -1020,6 +1216,15 @@ class WorldScreen(
     }
 
     override fun render(delta: Float) {
+        if (agentSession == null && isVisualTransportAvailable()) {
+            ordinaryVisualSession?.let { session ->
+                val batch = session.journal.readAfter(ordinaryVisualCursor, currentVisualViewKey())
+                if (batch.throughSequence > ordinaryVisualCursor) {
+                    installVisualBatch(batch)
+                    ordinaryVisualCursor = batch.throughSequence
+                }
+            }
+        }
         //  This is so that updates happen in the MAIN THREAD, where there is a GL Context,
         //    otherwise images will not load properly!
         if (shouldUpdate && resizeDeferTimer == null) {
@@ -1096,9 +1301,17 @@ class WorldScreen(
     }
 }
 
-/** This exists so that no reference to the current world screen remains, so the old world screen can get garbage collected during [UncivGame.loadGame]. */
-private fun startNewScreenJob(gameInfo: GameInfo, autoPlay: AutoPlay, autosaveDisabled: Boolean = false) {
+/** A revocable value token, deliberately without a reference to the old screen or its game graph. */
+private class OrdinaryVisualHandoff(val authority: AtomicLong, val serial: Long, val batch: VisualBatch)
+
+/** Keep the old screen collectible while [UncivGame.loadGame] constructs the replacement. */
+private fun startNewScreenJob(gameInfo: GameInfo, autoPlay: AutoPlay, autosaveDisabled: Boolean = false,
+                              visualHandoff: OrdinaryVisualHandoff? = null) {
     Concurrency.run {
+        // Only a successful ordinary next-turn publication can transfer values across screen creation.
+        val handoff = visualHandoff?.takeIf {
+            UncivGame.Current.worldScreen?.currentVisualViewKey() == it.batch.view && it.authority.get() == it.serial
+        }
         val newWorldScreen = try {
             UncivGame.Current.loadGame(gameInfo, autoPlay)
         } catch (notAPlayer: UncivShowableException) {
@@ -1114,6 +1327,11 @@ private fun startNewScreenJob(gameInfo: GameInfo, autoPlay: AutoPlay, autosaveDi
                 ToastPopup("Not enough memory on phone to load game!", mainMenu)
             }
             return@run
+        }
+
+        if (handoff != null) withGLContext {
+            if (UncivGame.Current.worldScreen === newWorldScreen && handoff.authority.get() == handoff.serial)
+                newWorldScreen.installOrdinaryTurnVisuals(handoff.batch)
         }
 
         val shouldAutoSave = !autosaveDisabled
