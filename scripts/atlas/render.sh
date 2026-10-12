@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 repo=$(cd "$(dirname "$0")/../.." && pwd)
+source "$repo/scripts/atlas/paths.sh"
 id=${1:-}; shift || true
 output=; matrix=false
 while [[ $# -gt 0 ]]; do
@@ -11,6 +12,21 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 [[ -n $id && $output == /* ]] || { echo 'Usage: render.sh <id|performance> --output <absolute path> [--matrix]' >&2; exit 2; }
+output=$(atlas_evidence_path "$output")
+# HEAD identifies production/build inputs. Only the complete, separately hashed
+# Atlas harness may be dirty; reused test fixtures must also match HEAD.
+dirty_inputs=$(git -C "$repo" status --porcelain=v1 --untracked-files=all -- \
+    core desktop android server buildSrc gradle tests agent-protocol agent-runner extraImages \
+    ':(top)build.gradle*' ':(top)settings.gradle*' gradle.properties ':(top)gradlew*' \
+    ':(exclude)tests/src/com/unciv/dev/AtlasFixtureCatalog.kt' \
+    ':(exclude)tests/src/com/unciv/dev/AtlasRenderCheck.kt' \
+    ':(exclude)tests/src/com/unciv/dev/AtlasPerformanceCheck.kt' \
+    ':(exclude)tests/src/com/unciv/ui/components/AtlasCoverageTest.kt')
+if [[ -n $dirty_inputs ]]; then
+    printf 'Atlas rendering requires committed production/build inputs. Dirty paths:\n%s\n' "$dirty_inputs" >&2
+    echo 'Commit the listed changes with git add <paths> and git commit, then rerun render.sh.' >&2
+    exit 2
+fi
 mkdir -p "$output"
 worktree_id=$(printf '%s' "$repo" | shasum -a 256 | cut -c1-12)
 export JAVA_HOME=${JAVA_HOME:-/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home}

@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 repo=$(cd "$(dirname "$0")/../.." && pwd)
+source "$repo/scripts/atlas/paths.sh"
 worktree_id=$(printf '%s' "$repo" | shasum -a 256 | cut -c1-12)
 export JAVA_HOME=${JAVA_HOME:-/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home}
 export GRADLE_USER_HOME=${GRADLE_USER_HOME:-/Users/noahkenny/.gradle-unciv}
 export UNCIV_ATLAS_BUILD_ROOT=${UNCIV_ATLAS_BUILD_ROOT:-/Users/noahkenny/.unciv-atlas-build/$worktree_id}
-evidence=${UNCIV_ATLAS_OUTPUT:-$repo/.superpowers/civ6-atlas/checks}
-mkdir -p "$evidence"
+evidence=$(atlas_evidence_path "${UNCIV_ATLAS_OUTPUT:-$ATLAS_EVIDENCE_ROOT/checks}")
 args=()
 if [[ ${1:-} == --gradle ]]; then
     shift
@@ -22,5 +22,6 @@ else
     args=(:tests:test)
     for pattern in "$@"; do args+=(--tests "$pattern"); done
 fi
+mkdir -p "$evidence"
 cd "$repo"
-./gradlew -I "$repo/scripts/atlas/build.gradle" --console=plain "${args[@]}" 2>&1 | tee "$evidence/gradle-$(date -u +%Y%m%dT%H%M%SZ).log"
+./gradlew -I "$repo/scripts/atlas/build.gradle" --console=plain "${args[@]}" 2>&1 | tee "$evidence/gradle-$(date -u +%Y%m%dT%H%M%SZ)-$$.log"
