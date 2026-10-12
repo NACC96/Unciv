@@ -200,7 +200,7 @@ object AtlasFixtureCatalog {
                     }
                     if (id.startsWith("world") && id != "world-legacy") {
                         // World review camera is interior; the immutable F1 performance camera is unchanged.
-                        holder.setCenterPosition(fixture.tileMap[0, 0].position, immediately = true, selectUnit = false)
+                        holder.setCenterPosition(if (viewer.isSpectator()) fixture.tileMap[0, 0].position else civ.units.getCivUnits().first().getTile().position, immediately = true, selectUnit = false)
                         Mockito.`when`(scope.session.statusText()).thenReturn("Paused · America")
                         if (id == "world-selection") {
                             Mockito.`when`(scope.session.isHumanInputAllowed()).thenReturn(true)
@@ -390,6 +390,7 @@ object AtlasFixtureCatalog {
         Mockito.`when`(screen.selectedGameView).thenReturn(GameView(fixture.gameInfo, selected, viewer.isSpectator()))
         Mockito.`when`(screen.currentViewerCivId()).thenReturn(viewer.civID)
         Mockito.`when`(screen.agentSession).thenReturn(scope.session)
+        Mockito.`when`(screen.autoPlay).thenReturn(Mockito.mock(com.unciv.ui.screens.worldscreen.unit.AutoPlay::class.java))
         getter(screen, "getBottomUnitTable", Mockito.mock(UnitTable::class.java))
         getter(screen, "getUndoHandler", Mockito.mock(UndoHandler::class.java))
         UncivGame::class.java.getDeclaredField("worldScreen").apply { isAccessible = true }.set(UncivGame.Current, screen)

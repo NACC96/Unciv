@@ -7,6 +7,7 @@ import com.unciv.models.translations.tr
 import com.unciv.ui.components.UncivTooltip.Companion.addTooltip
 import com.unciv.ui.components.UncivTooltip.Companion.removeTooltips
 import com.unciv.ui.components.extensions.setSize
+import com.unciv.ui.components.extensions.setFontColor
 import com.unciv.ui.components.input.KeyboardBinding
 import com.unciv.ui.components.input.keyShortcuts
 import com.unciv.ui.components.input.onActivation
@@ -86,7 +87,23 @@ class NextTurnButton(
             unitsDueCell.setActor(unitsDueLabel)
         } ?: unitsDueCell.clearActor()
 
+        updateAtlasForeground()
         pack()
+    }
+
+    override fun setDisabled(disabled: Boolean) {
+        super.setDisabled(disabled)
+        updateAtlasForeground()
+    }
+
+    // IconTextButton owns plain Labels, so ButtonStyle.fontColor cannot color its children.
+    // Update on state publication, never in draw/act.
+    private fun updateAtlasForeground() {
+        if (!com.unciv.ui.components.GameUiStyle.isAtlas) return
+        val foreground = if (isDisabled) WorldScreenStyle.muted else WorldScreenStyle.surface
+        label?.let { it.color = com.badlogic.gdx.graphics.Color.WHITE; if (it.style.fontColor != foreground) it.setFontColor(foreground) }
+        unitsDueLabel?.let { it.color = com.badlogic.gdx.graphics.Color.WHITE; if (it.style.fontColor != foreground) it.setFontColor(foreground) }
+        iconCell?.actor?.color = foreground
     }
 
     private fun getNextTurnAction(worldScreen: WorldScreen): NextTurnAction {

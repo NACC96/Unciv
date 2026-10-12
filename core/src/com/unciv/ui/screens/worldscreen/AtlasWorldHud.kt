@@ -11,7 +11,7 @@ import com.unciv.ui.screens.worldscreen.status.AgentActivityFeed
 /** Bounded, scrollable hosts retain the actual gameplay actors, listeners and selection state. */
 class AtlasWorldHud(
     private val screen: WorldScreen,
-    tracker: Actor, unit: Actor, actions: Actor, private val minimap: com.unciv.ui.screens.worldscreen.minimap.MinimapHolder, turn: Actor, tileInfo: Actor
+    tracker: Actor, private val unit: Actor, private val unitActions: Actor, private val minimap: com.unciv.ui.screens.worldscreen.minimap.MinimapHolder, turn: Actor, tileInfo: Actor
 ) {
     private fun pane(name: String, content: Actor) = AutoScrollPane(content).apply {
         this.name = name
@@ -25,10 +25,12 @@ class AtlasWorldHud(
         screen.chatButton?.let { if (it.isVisible) add(it).left().padTop(6f) }
     }
     private val trackerPane = pane("AtlasTracker", trackerContent)
+    private var dockCompact = screen.stage.width < 960f
     private val unitContent = Table().apply {
         background = GameUiStyle.panelBackground("Atlas/World/Selection")
         add(unit).top().pad(8f)
-        add(actions).top().pad(8f)
+        if (screen.stage.width < 960f) row()
+        add(unitActions).top().pad(8f)
     }
     private val unitPane = pane("AtlasUnitDock", unitContent)
     private val mapContent = Table().apply {
@@ -39,8 +41,7 @@ class AtlasWorldHud(
     private val turnPane = pane("AtlasTurnAction", turn)
     private var selectedTab = 0
     private val tabButtons: Table = AtlasWidgets.tabs(listOf("World", "Activity", "Research", "Selection", "Map"), 0) {
-        selectedTab = it
-        layout()
+        selectTab(it)
     }.apply {
         children.filterIsInstance<com.badlogic.gdx.scenes.scene2d.ui.TextButton>().forEach {
             it.label.wrap = false
@@ -51,9 +52,25 @@ class AtlasWorldHud(
     var regions = WorldHudLayout.calculate(screen.stage.width, screen.stage.height, screen.game.settings.fontSizeMultiplier, true)
         private set
 
+    private fun selectTab(index: Int) {
+        selectedTab = index
+        layout()
+        tabs.validate()
+        val button = tabButtons.children[index]
+        tabs.scrollTo(button.x, button.y, button.width, button.height, true, false)
+        tabs.updateVisualScroll()
+    }
+
     fun layout() {
         val feed = screen.stage.root.children.filterIsInstance<AgentActivityFeed>().firstOrNull()
         regions = WorldHudLayout.calculate(screen.stage.width, screen.stage.height, screen.game.settings.fontSizeMultiplier, feed?.isVisible == true)
+        if (dockCompact != regions.compact) {
+            dockCompact = regions.compact
+            unitContent.clearChildren()
+            unitContent.add(unit).top().pad(8f)
+            if (dockCompact) unitContent.row()
+            unitContent.add(unitActions).top().pad(8f)
+        }
         fun Actor.place(r: Rectangle) { setBounds(r.x, r.y, r.width, r.height) }
         trackerPane.place(regions.tracker)
         unitPane.place(regions.unitDock)

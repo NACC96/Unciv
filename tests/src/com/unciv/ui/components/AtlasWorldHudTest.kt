@@ -110,6 +110,20 @@ class AtlasWorldHudTest {
         assertEquals(1, invoked)
     }
 
+    @Test fun primaryTurnActionUsesContrastingTextForEnabledAndDisabledStates() {
+        com.unciv.models.skins.SkinCache.loadSkinConfigs()
+        com.unciv.UncivGame.Current.settings.skin = "Atlas"
+        com.unciv.ui.screens.basescreen.BaseScreen.setSkin()
+        val screen = org.mockito.Mockito.mock(com.unciv.ui.screens.worldscreen.WorldScreen::class.java)
+        val button = com.unciv.ui.screens.worldscreen.status.NextTurnButton(screen)
+        button.isDisabled = false
+        assertEquals(GameUiStyle.surface, button.label.style.fontColor)
+        button.isDisabled = true
+        assertEquals(GameUiStyle.muted, button.label.style.fontColor)
+        button.isDisabled = false
+        assertEquals(GameUiStyle.surface, button.label.style.fontColor)
+    }
+
     @Test fun defaultHudLeavesMapVisible() {
         val layout = WorldHudLayout.calculate(1440f, 900f, 1f, true)
         assertTrue(layout.unobstructedMapFraction >= .45f)

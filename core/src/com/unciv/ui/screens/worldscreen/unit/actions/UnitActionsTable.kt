@@ -195,7 +195,7 @@ class UnitActionsTable(val worldScreen: WorldScreen) : Table() {
 
         if (com.unciv.ui.components.GameUiStyle.isAtlas) {
             com.unciv.ui.components.GameUiStyle.apply(actionButton, primary = unitAction.isCurrentAction)
-            actionButton.label.color = com.unciv.ui.components.GameUiStyle.ink
+            actionButton.label.color = if (unitAction.isCurrentAction) com.unciv.ui.components.GameUiStyle.surface else com.unciv.ui.components.GameUiStyle.ink
         }
         actionButton.pack()
 
