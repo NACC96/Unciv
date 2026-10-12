@@ -181,6 +181,9 @@ object AgentNationSettingsRenderCheck {
                     val feed = stage.root.children.filterIsInstance<AgentActivityFeed>().single()
                     check(feed.isVisible && !panel.isVisible)
                     check(feed.x >= 0f && feed.y >= 0f && feed.x + feed.width <= stage.width && feed.y + feed.height <= stage.height)
+                    val horizontalOverlap = feed.x < controls.x + controls.width && controls.x < feed.x + feed.width
+                    val verticalOverlap = feed.y < controls.y + controls.height && controls.y < feed.y + feed.height
+                    check(!horizontalOverlap || !verticalOverlap) { "Activity header and close control are covered at $width" }
                     val labels = feed.descendants().filterIsInstance<Label>().map { it.text.toString() }.toList()
                     check(labels.any { it.contains("Run completed") } && "Duration 01:05" in labels)
                     check(labels.any { it.contains("Run failed") } && "Duration 12:34:56" in labels)
@@ -226,6 +229,9 @@ object AgentNationSettingsRenderCheck {
             }
             private fun placeControls() {
                 controls.update(); controls.setPosition(stage.width - controls.width - 8f, stage.height - controls.height - 8f)
+                // Synchronous captures must explicitly perform floating widgets' periodic refresh.
+                val feed = stage.root.children.filterIsInstance<AgentActivityFeed>().single()
+                feed.javaClass.getDeclaredMethod("refresh").apply { isAccessible = true }.invoke(feed)
             }
             private fun resizeLogical(width: Int, height: Int) {
                 stage.viewport.update(width, height, true)
@@ -233,8 +239,6 @@ object AgentNationSettingsRenderCheck {
                 // The synchronous loop does not pump Timer's posted GL refreshes. Settle anchors
                 // in production order: WorldScreen places controls before the floating panel refresh.
                 panel.refresh()
-                val feed = stage.root.children.filterIsInstance<AgentActivityFeed>().single()
-                feed.javaClass.getDeclaredMethod("refresh").apply { isAccessible = true }.invoke(feed)
             }
             override fun resize(width: Int, height: Int) { if (!synchronous && ::panel.isInitialized) resizeLogical(width, height) }
             override fun dispose() { target?.dispose(); if (::controls.isInitialized) controls.dispose() else if (::panel.isInitialized) panel.dispose(); if (::stage.isInitialized) stage.dispose() }

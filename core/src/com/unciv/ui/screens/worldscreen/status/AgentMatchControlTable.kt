@@ -31,7 +31,7 @@ class AgentMatchControlTable(
     }
     private val actionButton = WorldScreenStyle.button("", primary = true)
     private val activityButton = WorldScreenStyle.button("Activity")
-    private val activityFeed = AgentActivityFeed(screen, session)
+    private val activityFeed = AgentActivityFeed(screen, session, this)
     private val messagesButton = WorldScreenStyle.button("Messages")
     private val messagesPanel = AgentMessagesPanel(screen, session)
 

@@ -250,6 +250,23 @@ class WorldScreenHudTest {
         }
     }
 
+    @Test fun `activity fits below elapsed controls when narrow but retains left top on wide screens`() {
+        val f = Fixture(width = 420f)
+        f.timing = AgentRunTiming("run", "Rome", 45_296_000)
+        val controls = f.controls()
+        f.stage.addActor(controls)
+        val feed = f.root.children.filterIsInstance<AgentActivityFeed>().single()
+        for (width in listOf(420f, 960f, 420f)) {
+            f.width = width
+            controls.update()
+            controls.setPosition(width - controls.width - 8f, f.height - controls.height - 8f)
+            feed.refreshNow()
+            if (width == 420f) assertTrue("Activity header must remain below controls", feed.y + feed.height <= controls.y - 8f + 0.1f)
+            else assertEquals("Wide left activity retains its original top", f.height - 108f, feed.y + feed.height, 0.1f)
+            assertTrue(feed.y >= 8f && feed.height >= 160f)
+        }
+    }
+
     @Test fun `run durations remain named visible distinct from collapsed tools and obey nation filters`() {
         val f = Fixture()
         f.activity = listOf(entry("tool-1", "tool"), entry("tool-2", "tool"),

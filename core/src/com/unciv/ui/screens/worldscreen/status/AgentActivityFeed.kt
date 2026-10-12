@@ -33,7 +33,8 @@ import com.unciv.ui.screens.worldscreen.WorldScreenStyle
 import java.io.File
 
 /** Floating transcript: compact tools, readable agent identity, and live following. */
-class AgentActivityFeed(private val screen: WorldScreen, private val session: AgentMatchSession) : Table(BaseScreen.skin), Disposable {
+class AgentActivityFeed(private val screen: WorldScreen, private val session: AgentMatchSession,
+                        private val controlsAnchor: Actor? = null) : Table(BaseScreen.skin), Disposable {
     private val muted = WorldScreenStyle.muted
     private val ink = WorldScreenStyle.ink
     private val entriesTable = Table(skin)
@@ -194,7 +195,11 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
 
     private fun refresh() {
         val width = minOf(300f, maxOf(230f, screen.stage.width * 0.26f), screen.stage.width - 20f)
-        val top = screen.techPolicyAndDiplomacy.y - 8f
+        val controls = controlsAnchor?.takeIf { it.stage != null && it.height > 0f }
+        val controlsBottom = controls?.localToStageCoordinates(Vector2())
+        val overlapsControls = controls != null && controlsBottom != null && controlsBottom.x < 10f + width && controlsBottom.x + controls.width > 10f
+        val top = minOf(screen.techPolicyAndDiplomacy.y - 8f,
+            if (overlapsControls) controlsBottom!!.y - 8f else Float.MAX_VALUE)
         val height = (top - 16f).coerceAtLeast(160f).coerceAtMost(screen.stage.height - 32f)
         val resized = width != panelWidth || height != panelHeight
         if (resized) { panelWidth = width; panelHeight = height; setSize(width, height) }
