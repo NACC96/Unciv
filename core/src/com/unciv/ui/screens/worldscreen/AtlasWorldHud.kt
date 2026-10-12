@@ -54,6 +54,7 @@ class AtlasWorldHud(
 
     private fun selectTab(index: Int) {
         selectedTab = index
+        if (index == 1) screen.stage.root.children.filterIsInstance<AgentActivityFeed>().firstOrNull()?.show()
         layout()
         tabs.validate()
         val button = tabButtons.children[index]

@@ -93,7 +93,7 @@ object AtlasFixtureCatalog {
             val fixture = scope.seedGame(large)
             val game = UncivGame.Current
             game.settings.apply {
-                skin = if ((id.startsWith("world") && id != "world-legacy") || id.startsWith("supporting-atlas")) "Atlas" else "Minimal"
+                skin = if ((id.startsWith("world") && id != "world-legacy") || id.startsWith("supporting-atlas") || id in setOf("activity", "messages", "overview", "nation-control")) "Atlas" else "Minimal"
                 fontSizeMultiplier = fontScale
                 showTutorials = false
                 enableEasterEggs = false
@@ -109,7 +109,7 @@ object AtlasFixtureCatalog {
             // A new JVM per matrix cell owns Fonts, atlases and this sole GL context.
             Fonts.fontImplementation = DesktopFont()
             ImageGetter.setNewRuleset(fixture.ruleset)
-            if ((id.startsWith("world") && id != "world-legacy") || id.startsWith("supporting-atlas")) {
+            if ((id.startsWith("world") && id != "world-legacy") || id.startsWith("supporting-atlas") || id in setOf("activity", "messages", "overview", "nation-control")) {
                 SkinCache.loadSkinConfigs()
                 BaseScreen.setSkin()
                 FontRulesetIcons.addRulesetImages(fixture.ruleset)
@@ -287,11 +287,30 @@ object AtlasFixtureCatalog {
                                 com.badlogic.gdx.scenes.scene2d.InputEvent().apply { listenerActor = tab }, 1f, 1f, 1, 0)
                         }
                     }
+                    if (id in setOf("activity", "messages", "overview", "nation-control")) preparePanelFixture(scope)
                     val panel: Disposable? = when (id) {
                         "activity" -> AgentActivityFeed(facade, scope.session)
-                        "messages" -> AgentMessagesPanel(facade, scope.session).also { it.toggle() }
+                        "messages" -> AgentMessagesPanel(facade, scope.session, object : MessageImageClipboard {
+                            override fun hasImageContents() = true
+                            override fun readImage(onComplete: (MessageImageDraft?, String?) -> Unit) {
+                                onComplete(MessageImageDraft(java.util.Base64.getDecoder().decode(
+                                    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVR4nGP4DwQACfsD/fteaysAAAAASUVORK5CYII="), "image/png", 1, 1), null)
+                            }
+                        }).also {
+                            it.toggle()
+                            val editor = it.atlasDescendants().filterIsInstance<com.badlogic.gdx.scenes.scene2d.ui.TextArea>().single()
+                            editor.text = "Let us keep the river peaceful while our cities grow."
+                            val paste = it.atlasDescendants().filterIsInstance<TextButton>().single { actor -> actor.name == "MessagePasteImage" }
+                            paste.listeners.filterIsInstance<com.unciv.ui.components.input.ActivationListener>().single().tap(
+                                com.badlogic.gdx.scenes.scene2d.InputEvent().apply { listenerActor = paste }, 1f, 1f, 1, 0)
+                            it.refresh()
+                        }
                         "overview" -> CivilizationOverviewPanel(facade)
-                        "nation-control" -> AgentNationSettingsPanel(facade, scope.session).also { it.toggle() }
+                        "nation-control" -> AgentNationSettingsPanel(facade, scope.session).also {
+                            it.toggle()
+                            Mockito.`when`(scope.session.getPendingNationChange()).thenReturn("Handing America to its agent after the admitted turn finishes")
+                            it.refresh()
+                        }
                         else -> null
                     }
                     panel?.let { screen.cleanup += { it.dispose() } }
@@ -303,6 +322,22 @@ object AtlasFixtureCatalog {
             scope.close()
             throw failure
         }
+    }
+
+    /** Rich W2 data is separate from the immutable F1 seed/workload. No provider or send runs. */
+    private fun preparePanelFixture(scope: AtlasDataScope) {
+        Mockito.`when`(scope.session.getActiveRunTiming()).thenReturn(AgentRunTiming("panel-run", "America", 83_000))
+        Mockito.`when`(scope.session.getActivity()).thenReturn(listOf(
+            AgentActivityEntry("panel-speech", "America", 32, "message", "", "", "2026-10-12T00:00:00Z")) +
+            (1..10).map { AgentActivityEntry("panel-tool-$it", "America", 32, "tool", "Inspect border city $it", "", "time-$it", if (it == 10) "running" else "succeeded") } +
+            AgentActivityEntry("panel-error", "Arabia", 33, "error", "The proposed route was unavailable", "Choose a legal destination before retrying", "later", "failed"))
+        Mockito.`when`(scope.session.getActivityDetails(Mockito.anyString())).thenReturn(
+            "We will explore the coastline and consider the trade proposal before expanding inland. Our cities can prepare infrastructure while the scout follows the river. A peaceful border gives both nations room to grow.")
+        Mockito.`when`(scope.session.getMessages()).thenReturn(listOf(
+            DiplomaticMessage("panel-ack", "America", "Arabia", "Let us discuss peaceful trade across the river.", 30, 31,
+                acknowledgedTurnSerial = 31, acknowledgementText = "Received. I will consider the proposal."),
+            DiplomaticMessage("panel-unread", "Arabia", "America", "Our caravan is ready. We can exchange resources on the next turn and preserve the road along our border. Please confirm whether the northern crossing remains open.", 31, 32),
+            DiplomaticMessage("panel-queued", "Spectator", "America", "Explore the coast before choosing the next city.", 32, null, "SPECTATOR")))
     }
 
     /** Fixed native state selectors exercise actual ImageTextButton drawing, without replacing

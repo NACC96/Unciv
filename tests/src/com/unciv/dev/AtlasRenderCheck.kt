@@ -92,7 +92,7 @@ object AtlasRenderCheck {
                         "worldActionEvidence" to worldActions,
                         "worldLayerBounds" to if (id.startsWith("world") && id != "world-legacy") worldLayerBounds(screen) else null,
                         "worldHud" to if (id.startsWith("world") && id != "world-legacy") worldHudEvidence(screen, id == "world") else null,
-                        "status" to if (id.startsWith("world") && id != "world-legacy") "synthetic Atlas world migration evidence; native input and installation pending" else if (id == "world-legacy") "synthetic Minimal compatibility evidence; native input and installation pending" else "baseline capture; migration and interactions remain pending"))
+                        "status" to if (id.startsWith("world") && id != "world-legacy") "synthetic Atlas world migration evidence; native input and installation pending" else if (id == "world-legacy") "synthetic Minimal compatibility evidence; native input and installation pending" else if (id in setOf("activity", "messages", "overview", "nation-control")) "synthetic Atlas panel migration evidence; final matrix and native input pending" else "baseline capture; migration and interactions remain pending"))
                     println("ATLAS_CAPTURE_OK $id ${width}x$height ${args[4]} actors=${actors.size} providerCalls=0")
                     code = 0
                 } catch (failure: Throwable) { failure.printStackTrace() }

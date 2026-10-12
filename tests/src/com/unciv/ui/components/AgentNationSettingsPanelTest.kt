@@ -104,6 +104,25 @@ class AgentNationSettingsPanelTest {
         box.selected = box.items.first { it.toString().startsWith(prefix) }
     }
 
+    @Test fun selectedNationImmediatelyReportsItsController() {
+        val f = Fixture(); val panel = AgentNationSettingsPanel(f.screen, f.session)
+        try {
+            panel.toggle(); panel.select("NationPicker", "Greece")
+            assertTrue((panel.named("NationController") as Label).text.toString().contains("Controller: Agent · Greece"))
+        } finally { panel.dispose() }
+    }
+
+    @Test fun pendingControlClearsWhenAuthoritySettles() {
+        val f = Fixture(); val panel = AgentNationSettingsPanel(f.screen, f.session)
+        try {
+            panel.toggle(); f.pending = "Pending takeover of Rome"; panel.refresh()
+            assertTrue((panel.named("NationStatus") as Label).text.toString().contains("Pending takeover"))
+            f.pending = null; panel.refresh()
+            assertFalse("An old pending change must not remain after settlement", (panel.named("NationStatus") as Label).text.toString().contains("Pending takeover"))
+            assertTrue(panel.descendants().filterIsInstance<Label>().any { it.text.toString().contains("Controller: Human") })
+        } finally { panel.dispose() }
+    }
+
     @Test fun `saved custom model row is visible and directly editable on opening`() {
         val f = Fixture(); val panel = AgentNationSettingsPanel(f.screen, f.session)
         try {

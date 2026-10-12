@@ -169,6 +169,26 @@ class AgentMessagesPanelTest {
         }
     }
 
+    @Test fun refreshRetainsComposerAndSelection() {
+        val f = Fixture(); f.contacts += MessageContact("Rome", "Caesar", true)
+        val panel = AgentMessagesPanel(f.screen, f.session)
+        try {
+            panel.toggle()
+            val composer = panel.descendants().filterIsInstance<TextArea>().single()
+            val recipient = panel.descendants().single { it.name == "MessageRecipient" } as com.badlogic.gdx.scenes.scene2d.ui.SelectBox<*>
+            @Suppress("UNCHECKED_CAST") val choices = recipient as com.badlogic.gdx.scenes.scene2d.ui.SelectBox<Any>
+            choices.selected = choices.items.last()
+            composer.text = "A persistent draft for our neighbour"; composer.setSelection(2, 9)
+            val draftBefore = composer.text; val caretBefore = composer.cursorPosition; val selectionBefore = composer.selection
+            val recipientBefore = choices.selected
+            f.width = 420f; f.height = 600f
+            f.messages = listOf(DiplomaticMessage("new", "Greece", Constants.spectator, "A new dispatch", 4, null))
+            panel.refresh(); panel.validate()
+            assertEquals(draftBefore, composer.text); assertEquals(caretBefore, composer.cursorPosition)
+            assertEquals(selectionBefore, composer.selection); assertEquals(recipientBefore, choices.selected)
+        } finally { panel.dispose() }
+    }
+
     @Test fun `composer typing does not activate world or actor shortcuts`() = withComposer { stage, _, editor ->
         var globalOpens = 0
         var actorOpens = 0

@@ -12,6 +12,9 @@ internal class AgentNationSelectBox<T> : SelectBox<T>(BaseScreen.skin) {
             val margin = minOf(8f, stage.width / 2f)
             width = minOf(width, (stage.width - margin * 2f).coerceAtLeast(1f))
             x = x.coerceIn(margin, maxOf(margin, stage.width - width - margin))
+            val verticalMargin = minOf(8f, stage.height / 2f)
+            height = minOf(height, (stage.height - verticalMargin * 2f).coerceAtLeast(1f))
+            y = y.coerceIn(verticalMargin, maxOf(verticalMargin, stage.height - height - verticalMargin))
             // With horizontal scrolling disabled, List draws long names with an ellipsis.
             validate()
         }

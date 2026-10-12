@@ -17,6 +17,8 @@ import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.Timer
 import com.unciv.logic.agents.*
 import com.unciv.ui.components.extensions.toLabel
+import com.unciv.ui.components.GameUiStyle
+import com.unciv.UncivGame
 import com.unciv.ui.components.input.onChange
 import com.unciv.ui.components.input.onClick
 import com.unciv.ui.components.widgets.AutoScrollPane
@@ -39,6 +41,9 @@ class AgentNationSettingsPanel(private val screen: WorldScreen, private val sess
     private val displayName = TextField("", skin).apply { name = "NationDisplayName"; maxLength = 256 }
     private val customModel = TextField("", skin).apply { name = "NationCustomModel"; maxLength = 256 }
     private val personality = TextArea("", skin).apply { name = "NationPersonality"; maxLength = 16 * 1024 }
+    private val controller = "".toLabel(WorldScreenStyle.ink, GameUiStyle.Type.body).apply { name = "NationController"; wrap = true }
+    private var previousPending: String? = null
+    private val actionFooter = Table(skin).apply { name = "NationActionFooter" }
     private val identity = "".toLabel(WorldScreenStyle.muted, 11).apply { wrap = true }
     private val status = "".toLabel(WorldScreenStyle.muted, 12).apply { name = "NationStatus"; wrap = true }
     private val form = Table(skin).apply { top().left(); defaults().growX().minWidth(0f) }
@@ -86,6 +91,7 @@ class AgentNationSettingsPanel(private val screen: WorldScreen, private val sess
         add(header).growX().row()
         add(identity).growX().left().padTop(6f).padBottom(8f).row()
         add(nation).minWidth(0f).growX().height(32f).row()
+        add(controller).minWidth(0f).growX().left().padTop(6f).row()
         add(status).minWidth(0f).growX().left().padTop(6f).padBottom(6f).row()
         scroll.setScrollingDisabled(true, false); scroll.setFadeScrollBars(false); scroll.setOverscroll(false, false)
         add(scroll).grow().row()
@@ -100,7 +106,10 @@ class AgentNationSettingsPanel(private val screen: WorldScreen, private val sess
         form.add(customModel).height(32f).row()
         field("Thinking level / reasoning effort", reasoning)
         field("Personality instructions", personality, 86f)
-        form.add(save).height(34f).padTop(16f).row()
+        if (GameUiStyle.isAtlas) {
+            actionFooter.add(save).minWidth(0f).growX().minHeight(GameUiStyle.standardControlHeight)
+            add(actionFooter).growX().padTop(8f).row()
+        } else form.add(save).height(34f).padTop(16f).row()
         form.add(play).height(34f).padTop(6f).row()
         form.add(handback).height(34f).padTop(6f).row()
         form.add(spectate).height(34f).padTop(6f).row()
@@ -180,7 +189,7 @@ class AgentNationSettingsPanel(private val screen: WorldScreen, private val sess
                 populateModels(draft)
             } else { displayName.text = ""; personality.text = "" }
         } finally { updating = false }
-        scroll.scrollY = 0f; scroll.updateVisualScroll(); updateEnabled()
+        scroll.scrollY = 0f; scroll.updateVisualScroll(); updateController(); updateEnabled()
     }
     private fun populateModels(draft: AgentProfile) {
         val wasUpdating = updating; updating = true
@@ -222,7 +231,7 @@ class AgentNationSettingsPanel(private val screen: WorldScreen, private val sess
     } }
     fun hide() {
         isVisible = false
-        for (picker in listOf(nation, provider, model, reasoning)) picker.hideList()
+        for (picker in listOf(nation, provider, model, reasoning)) picker.hideScrollPane()
         if (screen.stage.scrollFocus?.isDescendantOf(this) == true) screen.stage.scrollFocus = null
         if (screen.stage.keyboardFocus?.isDescendantOf(this) == true) screen.stage.keyboardFocus = null
         Gdx.graphics.requestRendering()
@@ -240,11 +249,15 @@ class AgentNationSettingsPanel(private val screen: WorldScreen, private val sess
             updating = false
             if (nation.selected?.id != selectedId) loadDraft(nation.selected?.id)
         }
-        identity.setText("Viewing ${screen.viewingCiv.civID} · changes apply after the current agent finishes")
-        session.getPendingNationChange()?.let { status.setText(it); status.color = WorldScreenStyle.warning }
+        identity.setText("Viewing: ${screen.viewingCiv.civID} · view and control are separate")
+        updateController()
+        val pending = session.getPendingNationChange()
+        if (pending != null) { status.setText("Pending: $pending"); status.color = WorldScreenStyle.warning }
+        else if (previousPending != null) { status.setText(""); status.color = WorldScreenStyle.muted }
+        previousPending = pending
         val w = minOf(480f, screen.stage.width - 16f).coerceAtLeast(1f)
         val anchorTop = if (isVisible) controlsAnchor?.localToStageCoordinates(Vector2())?.y?.minus(8f) else null
-        val h = minOf(650f, screen.stage.height - 130f, anchorTop?.minus(8f) ?: Float.MAX_VALUE).coerceAtLeast(1f)
+        val h = minOf(650f, screen.stage.height - if (GameUiStyle.isAtlas) 24f else 130f, anchorTop?.minus(8f) ?: Float.MAX_VALUE).coerceAtLeast(1f)
         setSize(w, h)
         // Controls are not mounted/laid out during hidden construction. Follow their real stage
         // bottom only after showing; an explicit drag preserves the user's placement on resize.
@@ -255,7 +268,17 @@ class AgentNationSettingsPanel(private val screen: WorldScreen, private val sess
         // Bound wrapped labels to the scroll pane; long identities must never drive its preferred width.
         val contentWidth = (w - 46f).coerceAtLeast(1f)
         form.cells.forEach { it.width(contentWidth) }
+        if (GameUiStyle.isAtlas) {
+            // The form scrolls independently; the save action remains reachable at every size.
+            getCell(actionFooter).height(48f * UncivGame.Current.settings.fontSizeMultiplier)
+        }
         clampPosition(); updateEnabled(); invalidateHierarchy(); Gdx.graphics.requestRendering()
+    }
+    private fun updateController() {
+        val selected = settings.firstOrNull { it.civId == selectedId }
+        controller.setText(selected?.let {
+            "Controller: ${if (it.kind == ControllerKind.HUMAN) "Human" else "Agent"} · ${it.nationName}${if (it.isActive) " · Current turn" else ""}"
+        } ?: "No nation selected")
     }
     private fun clampPosition() {
         setPosition(x.coerceIn(0f, maxOf(0f, screen.stage.width - width)), y.coerceIn(0f, maxOf(0f, screen.stage.height - height)))
@@ -282,7 +305,7 @@ class AgentNationSettingsPanel(private val screen: WorldScreen, private val sess
         requesting = true; status.setText("Waiting for the current agent turn…"); status.color = WorldScreenStyle.warning; updateEnabled()
         session.requestNationChange(id, change, profile) { error ->
             if (!disposed) {
-                requesting = false
+                requesting = false; previousPending = null
                 status.setText(error ?: "Applied. The match is paused.")
                 status.color = if (error == null) WorldScreenStyle.accent else WorldScreenStyle.error
                 refresh()
