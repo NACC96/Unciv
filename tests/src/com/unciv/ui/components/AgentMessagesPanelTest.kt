@@ -380,7 +380,7 @@ class AgentMessagesPanelTest {
         try {
             val panel = controls.openPanel(f)
             panel.validate()
-            assertEquals(2, f.root.children.size) // feed and mailbox; no modal input blocker
+            assertEquals(3, f.root.children.size) // feed, mailbox and settings; no modal input blocker
             assertTrue(panel.x >= 0f && panel.x + panel.width <= f.width)
             assertTrue(panel.y >= 0f && panel.y + panel.height <= f.height)
             val send = panel.descendants().single { it.name == "MessageSend" }

@@ -24,13 +24,17 @@ class AgentMatchControlTable(
     private val messagesButton = WorldScreenStyle.button("Messages")
     private val messagesPanel = AgentMessagesPanel(screen, session)
 
-    fun dispose() { activityFeed.dispose(); messagesPanel.dispose() }
+    private val settingsButton = WorldScreenStyle.button("Settings")
+    private val settingsPanel = AgentNationSettingsPanel(screen, session)
+
+    fun dispose() { activityFeed.dispose(); messagesPanel.dispose(); settingsPanel.dispose() }
 
     init {
         pad(8f)
         background = WorldScreenStyle.background("WorldScreen/AgentControls")
         activityButton.onClick { activityFeed.toggle(); update() }
         messagesButton.onClick { messagesPanel.toggle(); update() }
+        settingsButton.onClick { settingsPanel.toggle(); update() }
         actionButton.onClick {
             when {
                 session.canPause() -> session.pause()
@@ -79,6 +83,7 @@ class AgentMatchControlTable(
         WorldScreenStyle.setEnabled(actionButton, action != null && state != AgentRunState.PAUSING)
         activityButton.isChecked = activityFeed.isVisible
         messagesButton.isChecked = messagesPanel.isVisible
+        settingsButton.isChecked = settingsPanel.isVisible
         val width = minOf(390f, screen.stage.width - 20f)
         clearChildren()
         val text = Table()
@@ -87,7 +92,16 @@ class AgentMatchControlTable(
         val buttons = Table()
         if (action != null) buttons.add(actionButton).padRight(6f)
         buttons.add(activityButton).padRight(6f)
-        buttons.add(messagesButton)
+        buttons.add(messagesButton).padRight(6f)
+        buttons.add(settingsButton)
+        if (buttons.prefWidth > width - 16f) {
+            buttons.clearChildren()
+            val visibleButtons = listOfNotNull(actionButton.takeIf { action != null }, activityButton, messagesButton, settingsButton)
+            for ((index, button) in visibleButtons.withIndex()) {
+                if (index > 0 && index % 2 == 0) buttons.row()
+                buttons.add(button).padRight(6f).padTop(if (index >= 2) 6f else 0f)
+            }
+        }
         val narrow = width - buttons.prefWidth - 26f < 120f
         if (narrow) {
             add(text).width(width - 16f).row()

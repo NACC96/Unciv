@@ -177,6 +177,7 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
     }
 
     fun toggle() = setShown(!isVisible)
+    fun hide() { setShown(false); nationPicker.hideList() }
 
     private fun setShown(shown: Boolean) {
         isVisible = shown

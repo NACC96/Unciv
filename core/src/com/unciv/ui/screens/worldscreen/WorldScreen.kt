@@ -59,6 +59,8 @@ import com.unciv.ui.screens.worldscreen.chat.ChatButton
 import com.unciv.ui.screens.worldscreen.mainmenu.WorldScreenMusicPopup
 import com.unciv.ui.screens.worldscreen.minimap.MinimapHolder
 import com.unciv.ui.screens.worldscreen.status.AutoPlayStatusButton
+import com.unciv.ui.screens.worldscreen.status.AgentActivityFeed
+import com.unciv.ui.screens.worldscreen.status.AgentNationSettingsPanel
 import com.unciv.ui.screens.worldscreen.status.AgentMessagesPanel
 import com.unciv.ui.screens.worldscreen.status.MultiplayerStatusButton
 import com.unciv.ui.screens.worldscreen.status.NextTurnButton
@@ -167,6 +169,7 @@ class WorldScreen(
         if (panel == null || !panel.isVisible) {
             // These floating detail panels share the right side of the map; Activity remains independent.
             stage.root.children.filterIsInstance<AgentMessagesPanel>().forEach { it.hide() }
+            stage.root.children.filterIsInstance<AgentNationSettingsPanel>().forEach { it.hide() }
         }
         if (panel == null) civilizationOverview = com.unciv.ui.screens.worldscreen.overview.CivilizationOverviewPanel(this)
         else panel.toggle()
@@ -224,36 +227,53 @@ class WorldScreen(
      */
     private val agentPublicationFence = com.unciv.logic.agents.AgentPublicationFence()
 
-    fun installAgentSnapshot(snapshot: GameInfo, selection: ResolvedSelection, publicationGeneration: Long = 0) {
+    fun installAgentSnapshot(snapshot: GameInfo, selection: ResolvedSelection, publicationGeneration: Long = 0, viewerCivId: String? = null) {
         // A queued frame from an old host must not replace the currently opened game or its autosave.
         if (game.worldScreen !== this || game.gameInfo !== gameInfo || agentSession == null || gameInfo.gameId != snapshot.gameId) return
         if (gameInfo === snapshot) return
         val oldViewerId = viewingCiv.civID
-        val newViewer = snapshot.civilizations.firstOrNull { it.civID == oldViewerId }
+        val newViewer = snapshot.civilizations.firstOrNull { it.civID == (viewerCivId ?: oldViewerId) }
             ?: return // snapshot without the viewer is a host bug; keep current render
         if (!agentPublicationFence.accept(publicationGeneration)) return
         gameInfo = snapshot
         game.gameInfo = snapshot
+        val viewerChanged = newViewer.civID != oldViewerId
+        // A spectator's unrestricted view must never survive a committed takeover.
+        if (!newViewer.isSpectator()) fogOfWar = true
         viewingCiv = newViewer
-        selectedCiv = snapshot.civilizations.firstOrNull { it.civID == selectedCiv.civID } ?: newViewer
+        selectedCiv = if (viewerChanged || !newViewer.isSpectator()) newViewer else
+            snapshot.civilizations.firstOrNull { it.civID == selectedCiv.civID } ?: newViewer
         selectedGameView = GameView(snapshot, selectedCiv, spectatorMode = viewingCiv.isSpectator())
         cachedSpectatorGameView = null
         isPlayersTurn = viewingCiv.isCurrentPlayer()
+
+        if (viewerChanged) {
+            hideCivilizationOverview()
+            stage.root.children.filterIsInstance<AgentMessagesPanel>().forEach { it.hide(); it.refresh() }
+            stage.root.children.filterIsInstance<AgentActivityFeed>().forEach { it.hide() }
+            stage.root.children.filterIsInstance<Popup>().toList().forEach { it.close() }
+            stage.keyboardFocus = null
+            stage.scrollFocus = null
+            bottomUnitTable.selectSpy(null)
+            bottomUnitTable.selectUnit()
+            undoHandler.clearCheckpoints()
+            deferFreeGreatPersonPicker = false
+        }
 
         // Rebind the map layer to the new object graph.
         mapHolder.rebindToSnapshot(snapshot.tileMap)
 
         // Re-resolve selections by stable ID; drop removed entities.
-        val unit = selection.unitId?.let { id ->
+        val unit = selection.unitId?.takeUnless { viewerChanged }?.let { id ->
             snapshot.civilizations.asSequence().flatMap { it.units.getCivUnits() }
                 .firstOrNull { it.id == id }
         }
         val unitView = unit?.let { selectedGameView.getMapUnitView(it) }
-        val cityView = selection.cityId?.let { id ->
+        val cityView = selection.cityId?.takeUnless { viewerChanged }?.let { id ->
             snapshot.getCities().firstOrNull { it.id == id }?.let { selectedGameView.getForeignCityView(it) }
         }
         bottomUnitTable.reselectAfterSnapshot(unitView, cityView)
-        mapHolder.selectedTile = selection.tile?.let { pos ->
+        mapHolder.selectedTile = selection.tile?.takeUnless { viewerChanged }?.let { pos ->
             val tile = snapshot.tileMap.values.firstOrNull { it.position == pos }
             tile?.let { selectedGameView.getTile(it) }
         }
@@ -702,8 +722,8 @@ class WorldScreen(
     }
 
     fun setSelectedCiv(civ: Civilization) {
-        selectedCiv = civ
-        selectedGameView = GameView(gameInfo, civ, viewingCiv.isSpectator())
+        selectedCiv = if (viewingCiv.isSpectator()) civ else viewingCiv
+        selectedGameView = GameView(gameInfo, selectedCiv, viewingCiv.isSpectator())
     }
 
     private fun updateSelectedCiv() {
@@ -732,23 +752,23 @@ class WorldScreen(
 
     private fun restore(restoreState: RestoreState) {
 
-        // This is not the case if you have a multiplayer game where you play as 2 civs
-        if (viewingCiv.civID == restoreState.viewingCivName) {
-            mapHolder.zoom(restoreState.zoom)
-            mapHolder.scrollX = restoreState.scrollX
-            mapHolder.scrollY = restoreState.scrollY
-            mapHolder.updateVisualScroll()
-        }
+        // A restored host viewer wins over the previous screen's spectator selection and fog.
+        if (viewingCiv.civID != restoreState.viewingCivName) return
+        mapHolder.zoom(restoreState.zoom)
+        mapHolder.scrollX = restoreState.scrollX
+        mapHolder.scrollY = restoreState.scrollY
+        mapHolder.updateVisualScroll()
 
-        setSelectedCiv(gameInfo.getCivilization(restoreState.selectedCivName))
-        fogOfWar = restoreState.fogOfWar
+        val selected = gameInfo.civilizations.firstOrNull { it.civID == restoreState.selectedCivName }
+        setSelectedCiv(if (viewingCiv.isSpectator()) selected ?: viewingCiv else viewingCiv)
+        fogOfWar = !viewingCiv.isSpectator() || restoreState.fogOfWar
     }
 
     fun nextTurn() {
         // Agent-enabled matches never take the legacy clone/nextTurn path:
         // the session routes the current civ's end-turn through the match
         // coordinator (or consumes the press when nothing may act).
-        if (agentSession?.onNextTurnPressed() == true) return
+        agentSession?.let { it.onNextTurnPressed(); return }
         isPlayersTurn = false
         shouldUpdate = true
         val progressBar = NextTurnProgress(nextTurnButton)

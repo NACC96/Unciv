@@ -214,7 +214,9 @@ class AgentMessagesPanel(
         isVisible = shown
         if (shown) {
             imagesHidden = false
-            screen.hideCivilizationOverview(); toFront()
+            screen.hideCivilizationOverview()
+            screen.stage.root.children.filterIsInstance<AgentNationSettingsPanel>().forEach { it.hide() }
+            toFront()
             val priorHistory = historyGeneration
             refresh(); rebuildDraftPreview()
             if (historyGeneration == priorHistory) rebuildHistory()

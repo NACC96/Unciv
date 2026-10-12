@@ -44,7 +44,7 @@ class TechPolicyDiplomacyButtons(val worldScreen: WorldScreen) : Table(BaseScree
     private val espionageButtonHolder = Container<Button?>()
     private val espionageButton = Button(skin)
 
-    private val viewingCiv = worldScreen.selectedGameView.civView
+    private val viewingCiv get() = worldScreen.selectedGameView.civView
     private val game = worldScreen.game
 
     init {
@@ -61,6 +61,7 @@ class TechPolicyDiplomacyButtons(val worldScreen: WorldScreen) : Table(BaseScree
         fogOfWarButton.labelCell.pad(0f)
         fogOfWarButton.pack()
         fogOfWarButtonHolder.onActivation(UncivSound.Paper, KeyboardBinding.TechnologyTree) {
+            if (!viewingCiv.isSpectator()) return@onActivation
             worldScreen.fogOfWar = !worldScreen.fogOfWar
             worldScreen.shouldUpdate = true
         }
@@ -118,6 +119,8 @@ class TechPolicyDiplomacyButtons(val worldScreen: WorldScreen) : Table(BaseScree
     }
 
     private fun updateFogOfWarButton() {
+        // Actor shortcuts ignore Touchable.disabled. Hide the holder to leave T for technology.
+        fogOfWarButtonHolder.isVisible = viewingCiv.isSpectator()
         if (viewingCiv.isSpectator()) {
             fogOfWarButton.isChecked = worldScreen.fogOfWar
             fogOfWarButtonHolder.actor = fogOfWarButton
