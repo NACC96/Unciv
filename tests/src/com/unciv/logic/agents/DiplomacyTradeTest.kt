@@ -1,6 +1,13 @@
 package com.unciv.logic.agents
 
+import com.unciv.logic.GameInfo
+import com.unciv.logic.civilization.diplomacy.DeclareWarReason
+import com.unciv.logic.civilization.diplomacy.WarType
+import com.unciv.logic.trade.Trade
+import com.unciv.logic.trade.TradeEvaluation
+import com.unciv.logic.trade.TradeOffer
 import com.unciv.logic.trade.TradeOfferType
+import com.unciv.logic.trade.TradeRequest
 import com.unciv.models.metadata.BaseRuleset
 import com.unciv.testing.BaseTestRunner
 import com.unciv.testing.TestGame
@@ -41,6 +48,8 @@ class DiplomacyTradeTest {
             testGame.addUnit("Warrior", rome, testGame.getTile(0, 0))
             testGame.addUnit("Warrior", greece, testGame.getTile(1, 0))
             rome.diplomacyFunctions.makeCivilizationsMeet(greece)
+            testGame.gameInfo.currentPlayer = romeId
+            testGame.gameInfo.currentPlayerCiv = rome
 
             val match = AgentMatchState(
                 matchId = "m1", timelineId = "t1", turnPhase = TurnPhase.AWAITING_DECISIONS
@@ -74,6 +83,51 @@ class DiplomacyTradeTest {
 
         fun rev() = coordinator.getStateRevision()
         fun goldGift(amount: Int) = TradeOfferDto("Gold", TradeOfferType.Gold, amount)
+        fun peaceTreaty() = TradeOfferDto("Peace Treaty", TradeOfferType.Treaty, 1)
+        fun snapshot() = coordinator.deserializeForPublication(coordinator.serializeCommittedGameForPublication())
+
+        /** Models an older saved request without routing it through today's proposal validation. */
+        fun editSavedBundle(edit: (GameInfo, AgentMatchState) -> Unit) {
+            val serializer = com.unciv.json.json().apply { setUsePrototypes(false) }
+            val bundle = serializer.fromJson(AgentBundle::class.java, coordinator.saveToJson())
+            val game = snapshot()
+            val match = serializer.fromJson(AgentMatchState::class.java, bundle.matchJson)
+            edit(game, match)
+            bundle.gameJson = serializer.toJson(game)
+            bundle.matchJson = serializer.toJson(match)
+            coordinator = MatchCoordinator.loadFromJson(serializer.toJson(bundle), writer)
+        }
+
+        fun prepareThirdPartyWar(warringCivId: String) {
+            val aztecs = testGame.gameInfo.getCivilization(aztecId)
+            testGame.addUnit("Warrior", aztecs, testGame.getTile(-2, 0))
+            for (civId in listOf(romeId, greeceId))
+                testGame.gameInfo.getCivilization(civId).diplomacyFunctions.makeCivilizationsMeet(aztecs)
+            testGame.gameInfo.getCivilization(warringCivId).getDiplomacyManager(aztecs)!!
+                .declareWar(DeclareWarReason(WarType.DirectWar))
+            rebuild()
+        }
+
+        fun addLegacyThirdPartyPeaceRequest(name: String = aztecId) {
+            editSavedBundle { game, _ ->
+                val trade = Trade()
+                trade.ourOffers.add(TradeOffer(name, TradeOfferType.PeaceProposal, 1, game.speed))
+                trade.theirOffers.add(TradeOffer("Gold", TradeOfferType.Gold, 100, game.speed))
+                game.getCivilization(greeceId).tradeRequests.add(TradeRequest(romeId, trade))
+            }
+        }
+
+        fun addCityState(): String {
+            val cityState = testGame.addCiv(testGame.ruleset.nations["Geneva"]!!)
+            testGame.addUnit("Warrior", cityState, testGame.getTile(2, 0))
+            for (civId in listOf(romeId, greeceId))
+                testGame.gameInfo.getCivilization(civId).diplomacyFunctions.makeCivilizationsMeet(cityState)
+            rebuild()
+            editSavedBundle { _, match ->
+                match.controllers[cityState.civID] = CivilizationController(cityState.civID, ControllerKind.BUILTIN_AI)
+            }
+            return cityState.civID
+        }
 
         /** Rebuilds the coordinator after source-game edits so the committed
          *  snapshot picks them up (candidates are serialized clones). */
@@ -92,30 +146,412 @@ class DiplomacyTradeTest {
         }
     }
 
+    private fun rejectedWithoutMutation(
+        f: Fixture, command: AgentCommand, code: AgentCommandError
+    ): AgentCommandException {
+        val before = f.coordinator.saveToJson()
+        val writes = f.writer.writeCount
+        try {
+            f.coordinator.execute(command)
+            Assert.fail("expected $code")
+        } catch (ex: AgentCommandException) {
+            Assert.assertEquals(code, ex.code)
+            Assert.assertEquals(before, f.coordinator.saveToJson())
+            Assert.assertEquals(writes, f.writer.writeCount)
+            Assert.assertFalse(f.coordinator.isPaused())
+            return ex
+        }
+        throw AssertionError("unreachable")
+    }
+
     @Test
-    fun `declare war and make peace cycle statuses`() {
+    fun `fresh direct major peace rejects without ending either side of the war`() {
         val f = Fixture()
-        val war = f.executeOnActorsTurn(
+        f.coordinator.execute(DeclareWarCommand(f.romeId, "war", f.rev(), f.greeceId))
+        val error = rejectedWithoutMutation(f,
+            MakePeaceCommand(f.romeId, "direct-peace", f.rev(), f.greeceId), AgentCommandError.ILLEGAL_ACTION)
+        Assert.assertTrue(error.message!!.contains("diplomacy.proposeTrade"))
+        Assert.assertTrue(error.message!!.contains("diplomacy.respondTrade"))
+        Assert.assertEquals("War", f.coordinator.getDiplomaticStatus(f.romeId, f.greeceId))
+        Assert.assertEquals("War", f.coordinator.getDiplomaticStatus(f.greeceId, f.romeId))
+        Assert.assertNull(f.coordinator.getReceipt("direct-peace"))
+    }
+
+    @Test
+    fun `malformed bilateral peace proposal returns treaty schema guidance`() {
+        val f = Fixture()
+        f.coordinator.execute(DeclareWarCommand(f.romeId, "war", f.rev(), f.greeceId))
+        val error = rejectedWithoutMutation(f, ProposeTradeCommand(f.romeId, "bad-peace", f.rev(), f.greeceId,
+            listOf(TradeOfferDto("Peace Treaty", TradeOfferType.PeaceProposal, 1)), emptyList()),
+            AgentCommandError.INVALID_ARGUMENT)
+        Assert.assertTrue(error.message!!.contains("Treaty"))
+        Assert.assertTrue(error.message!!.contains("ourOffers"))
+        Assert.assertTrue(error.message!!.contains("theirOffers"))
+        Assert.assertTrue(f.coordinator.getIncomingTradeRequests(f.greeceId).isEmpty())
+        Assert.assertEquals("War", f.coordinator.getDiplomaticStatus(f.romeId, f.greeceId))
+    }
+
+    @Test
+    fun `third party peace offers cannot impose peace on an unconsenting major`() {
+        for (onOurSide in listOf(true, false)) {
+            val f = Fixture()
+            f.prepareThirdPartyWar(if (onOurSide) f.romeId else f.greeceId)
+            val peace = listOf(TradeOfferDto(f.aztecId, TradeOfferType.PeaceProposal, 1))
+            val error = rejectedWithoutMutation(f, ProposeTradeCommand(f.romeId, "mediated-peace", f.rev(), f.greeceId,
+                if (onOurSide) peace else emptyList(), if (onOurSide) emptyList() else peace),
+                AgentCommandError.ILLEGAL_ACTION)
+            Assert.assertTrue(error.message!!.contains("consent"))
+            Assert.assertTrue(f.coordinator.getIncomingTradeRequests(f.greeceId).isEmpty())
+            Assert.assertEquals("War", f.coordinator.getDiplomaticStatus(
+                if (onOurSide) f.romeId else f.greeceId, f.aztecId))
+        }
+    }
+
+    @Test
+    fun `unknown third party peace name is a schema rejection without a native lookup failure`() {
+        val f = Fixture()
+        val error = rejectedWithoutMutation(f, ProposeTradeCommand(f.romeId, "unknown-peace", f.rev(), f.greeceId,
+            listOf(TradeOfferDto("unknown-civ", TradeOfferType.PeaceProposal, 1)), emptyList()),
+            AgentCommandError.INVALID_ARGUMENT)
+        Assert.assertTrue(error.message!!.contains("civilization"))
+        Assert.assertTrue(error.message!!.contains("PeaceProposal"))
+        Assert.assertTrue(error.message!!.contains("Treaty"))
+    }
+
+    @Test
+    fun `legacy third party major peace cannot be accepted by a different recipient`() {
+        val f = Fixture()
+        f.prepareThirdPartyWar(f.greeceId)
+        f.addLegacyThirdPartyPeaceRequest()
+        f.selectActor(f.greeceId)
+        val error = rejectedWithoutMutation(f,
+            RespondTradeCommand(f.greeceId, "unsafe-accept", f.rev(), f.romeId, true),
+            AgentCommandError.ILLEGAL_ACTION)
+        Assert.assertTrue(error.message!!.contains("consent"))
+        Assert.assertEquals("War", f.coordinator.getDiplomaticStatus(f.greeceId, f.aztecId))
+        Assert.assertEquals(listOf(f.romeId), f.coordinator.getIncomingTradeRequests(f.greeceId))
+        Assert.assertEquals(200, f.coordinator.getGold(f.romeId))
+    }
+
+    @Test
+    fun `built in turn discards unsafe legacy peace before native trade automation`() {
+        val f = Fixture()
+        f.prepareThirdPartyWar(f.greeceId)
+        f.addLegacyThirdPartyPeaceRequest()
+        f.editSavedBundle { _, match ->
+            match.controllers[f.greeceId] = CivilizationController(f.greeceId, ControllerKind.BUILTIN_AI)
+            match.controllers[f.aztecId] = CivilizationController(f.aztecId, ControllerKind.HUMAN)
+        }
+        val initial = f.snapshot()
+        val greece = initial.getCivilization(f.greeceId)
+        val rome = initial.getCivilization(f.romeId)
+        val legacy = greece.tradeRequests.single()
+        // Establish that the old native path would accept this real offer.
+        Assert.assertTrue(TradeEvaluation().isTradeValid(legacy.trade, greece, rome))
+        Assert.assertTrue(TradeEvaluation().isTradeAcceptable(legacy.trade, greece, rome))
+        f.coordinator.execute(EndTurnCommand(f.romeId, "end-rome", f.rev()))
+        Assert.assertEquals(f.aztecId, f.coordinator.getCurrentCivId())
+        Assert.assertEquals("War", f.coordinator.getDiplomaticStatus(f.greeceId, f.aztecId))
+        Assert.assertEquals("War", f.coordinator.getDiplomaticStatus(f.aztecId, f.greeceId))
+        Assert.assertTrue(f.coordinator.getIncomingTradeRequests(f.greeceId).isEmpty())
+        Assert.assertEquals(200, f.coordinator.getGold(f.romeId))
+    }
+
+    @Test
+    fun `bilateral peace stays queued until recipient accepts on its real turn`() {
+        val f = Fixture()
+        val war = f.coordinator.execute(
             DeclareWarCommand(f.romeId, "w1", f.rev(), f.greeceId)) as DiplomacyResult
         Assert.assertEquals("War", war.status)
         Assert.assertEquals("War", f.coordinator.getDiplomaticStatus(f.romeId, f.greeceId))
 
-        // A second declaration is illegal, and peace without war is illegal.
-        try {
-            f.executeOnActorsTurn(DeclareWarCommand(f.romeId, "w2", f.rev(), f.greeceId))
-            Assert.fail("expected ILLEGAL_ACTION")
-        } catch (ex: AgentCommandException) {
-            Assert.assertEquals(AgentCommandError.ILLEGAL_ACTION, ex.code)
-        }
+        rejectedWithoutMutation(f, DeclareWarCommand(f.romeId, "w2", f.rev(), f.greeceId),
+            AgentCommandError.ILLEGAL_ACTION)
+        val proposalRevision = f.rev()
+        val proposal = ProposeTradeCommand(f.romeId, "offer-peace", proposalRevision, f.greeceId,
+            listOf(f.peaceTreaty(), f.goldGift(25)), listOf(f.peaceTreaty()))
+        val proposed = f.coordinator.execute(proposal) as TradeProposedResult
+        Assert.assertEquals(1, proposed.pendingRequestsWithTarget)
+        Assert.assertEquals("War", f.coordinator.getDiplomaticStatus(f.romeId, f.greeceId))
+        Assert.assertEquals("War", f.coordinator.getDiplomaticStatus(f.greeceId, f.romeId))
+        Assert.assertEquals(200, f.coordinator.getGold(f.romeId))
+        val stored = f.snapshot().getCivilization(f.greeceId).tradeRequests.single().trade
+        Assert.assertEquals(listOf("Peace Treaty"), stored.ourOffers.map { it.name })
+        Assert.assertEquals(listOf("Peace Treaty", "Gold"), stored.theirOffers.map { it.name })
+        Assert.assertEquals(25, stored.theirOffers.single { it.type == TradeOfferType.Gold }.amount)
+        val writesAfterProposal = f.writer.writeCount
+        Assert.assertEquals(proposed.receipt.afterRevision,
+            (f.coordinator.execute(proposal) as TradeProposedResult).receipt.afterRevision)
+        Assert.assertEquals(writesAfterProposal, f.writer.writeCount)
 
-        val peace = f.executeOnActorsTurn(
-            MakePeaceCommand(f.romeId, "p1", f.rev(), f.greeceId)) as DiplomacyResult
-        Assert.assertEquals("Peace", peace.status)
+        rejectedWithoutMutation(f, RespondTradeCommand(f.greeceId, "early-accept", f.rev(), f.romeId, true),
+            AgentCommandError.NOT_YOUR_TURN)
+        rejectedWithoutMutation(f, RespondTradeCommand(f.romeId, "self-accept", f.rev(), f.greeceId, true),
+            AgentCommandError.INVALID_ARGUMENT)
+        rejectedWithoutMutation(f, MakePeaceCommand(f.romeId, "bypass-offer", f.rev(), f.greeceId),
+            AgentCommandError.ILLEGAL_ACTION)
+        Assert.assertEquals(listOf(f.romeId), f.coordinator.getIncomingTradeRequests(f.greeceId))
+
+        f.coordinator.execute(EndTurnCommand(f.romeId, "end-rome", f.rev()))
+        Assert.assertEquals(f.greeceId, f.coordinator.getCurrentCivId())
+        Assert.assertEquals(listOf(f.romeId), f.coordinator.getIncomingTradeRequests(f.greeceId))
+        val romeGold = f.coordinator.getGold(f.romeId)
+        val greeceGold = f.coordinator.getGold(f.greeceId)
+        val acceptRevision = f.rev()
+        val accepted = f.coordinator.execute(
+            RespondTradeCommand(f.greeceId, "accept-peace", acceptRevision, f.romeId, true)) as TradeRespondedResult
+        Assert.assertTrue(accepted.accepted)
+        Assert.assertEquals("Peace", f.coordinator.getDiplomaticStatus(f.romeId, f.greeceId))
+        Assert.assertEquals("Peace", f.coordinator.getDiplomaticStatus(f.greeceId, f.romeId))
+        Assert.assertEquals(romeGold - 25, f.coordinator.getGold(f.romeId))
+        Assert.assertEquals(greeceGold + 25, f.coordinator.getGold(f.greeceId))
+        Assert.assertTrue(f.coordinator.getIncomingTradeRequests(f.greeceId).isEmpty())
+        val state = f.snapshot()
+        Assert.assertEquals(state.speed.peaceDealDuration,
+            state.getCivilization(f.romeId).getDiplomacyManager(f.greeceId)!!.turnsToPeaceTreaty())
+        Assert.assertEquals(state.speed.peaceDealDuration,
+            state.getCivilization(f.greeceId).getDiplomacyManager(f.romeId)!!.turnsToPeaceTreaty())
+        rejectedWithoutMutation(f, DeclareWarCommand(f.greeceId, "break-treaty", f.rev(), f.romeId),
+            AgentCommandError.ILLEGAL_ACTION)
+        val restoredWriter = InMemoryCheckpointWriter()
+        val restored = MatchCoordinator.loadFromJson(f.coordinator.saveToJson(), restoredWriter)
+        val replay = restored.execute(
+            RespondTradeCommand(f.greeceId, "accept-peace", acceptRevision, f.romeId, true)) as TradeRespondedResult
+        Assert.assertTrue(replay.accepted)
+        Assert.assertEquals(accepted.receipt.afterRevision, replay.receipt.afterRevision)
+        Assert.assertEquals(f.rev(), restored.getStateRevision())
+        Assert.assertEquals(greeceGold + 25, restored.getGold(f.greeceId))
+        Assert.assertEquals(0, restoredWriter.writeCount)
+    }
+
+    @Test
+    fun `declining peace on recipient turn preserves war and the offered gold`() {
+        val f = Fixture()
+        f.coordinator.execute(DeclareWarCommand(f.romeId, "war", f.rev(), f.greeceId))
+        f.coordinator.execute(ProposeTradeCommand(f.romeId, "peace", f.rev(), f.greeceId,
+            listOf(f.peaceTreaty(), f.goldGift(25)), listOf(f.peaceTreaty())))
+        f.coordinator.execute(EndTurnCommand(f.romeId, "end-rome", f.rev()))
+        val romeGold = f.coordinator.getGold(f.romeId)
+        val greeceGold = f.coordinator.getGold(f.greeceId)
+        val result = f.coordinator.execute(
+            RespondTradeCommand(f.greeceId, "decline-peace", f.rev(), f.romeId, false)) as TradeRespondedResult
+        Assert.assertFalse(result.accepted)
+        Assert.assertEquals("War", f.coordinator.getDiplomaticStatus(f.romeId, f.greeceId))
+        Assert.assertEquals("War", f.coordinator.getDiplomaticStatus(f.greeceId, f.romeId))
+        Assert.assertEquals(romeGold, f.coordinator.getGold(f.romeId))
+        Assert.assertEquals(greeceGold, f.coordinator.getGold(f.greeceId))
+        Assert.assertTrue(f.coordinator.getIncomingTradeRequests(f.greeceId).isEmpty())
+    }
+
+    @Test
+    fun `peace acceptance checks revision and checkpoints before exposing effects`() {
+        val f = Fixture()
+        f.coordinator.execute(DeclareWarCommand(f.romeId, "war", f.rev(), f.greeceId))
+        f.coordinator.execute(ProposeTradeCommand(f.romeId, "peace", f.rev(), f.greeceId,
+            listOf(f.peaceTreaty(), f.goldGift(25)), listOf(f.peaceTreaty())))
+        f.coordinator.execute(EndTurnCommand(f.romeId, "end-rome", f.rev()))
+        rejectedWithoutMutation(f, RespondTradeCommand(f.greeceId, "stale-accept", f.rev() - 1, f.romeId, true),
+            AgentCommandError.STALE_STATE)
+        val revision = f.rev()
+        val writes = f.writer.writeCount
+        val romeGold = f.coordinator.getGold(f.romeId)
+        val greeceGold = f.coordinator.getGold(f.greeceId)
+        f.writer.failNextWrite = true
         try {
-            f.executeOnActorsTurn(MakePeaceCommand(f.romeId, "p2", f.rev(), f.greeceId))
-            Assert.fail("expected ILLEGAL_ACTION")
+            f.coordinator.execute(RespondTradeCommand(f.greeceId, "failed-accept", revision, f.romeId, true))
+            Assert.fail("expected checkpoint failure")
         } catch (ex: AgentCommandException) {
-            Assert.assertEquals(AgentCommandError.ILLEGAL_ACTION, ex.code)
+            Assert.assertEquals(AgentCommandError.INTERNAL_ERROR, ex.code)
+        }
+        Assert.assertTrue(f.coordinator.isPaused())
+        Assert.assertEquals(revision, f.rev())
+        Assert.assertEquals(writes, f.writer.writeCount)
+        Assert.assertEquals("War", f.coordinator.getDiplomaticStatus(f.romeId, f.greeceId))
+        Assert.assertEquals("War", f.coordinator.getDiplomaticStatus(f.greeceId, f.romeId))
+        Assert.assertEquals(listOf(f.romeId), f.coordinator.getIncomingTradeRequests(f.greeceId))
+        Assert.assertEquals(romeGold, f.coordinator.getGold(f.romeId))
+        Assert.assertEquals(greeceGold, f.coordinator.getGold(f.greeceId))
+        Assert.assertNull(f.coordinator.getReceipt("failed-accept"))
+    }
+
+    @Test
+    fun `bilateral peace validates both raw offer sides before duplicate amounts merge`() {
+        val cases = listOf(
+            listOf(TradeOfferDto("Peace Treaty", TradeOfferType.Treaty, 1)) to emptyList(),
+            emptyList<TradeOfferDto>() to listOf(TradeOfferDto("Peace Treaty", TradeOfferType.Treaty, 1)),
+            listOf(TradeOfferDto("Peace Treaty", TradeOfferType.Agreement, 1)) to listOf(TradeOfferDto("Peace Treaty", TradeOfferType.Treaty, 1)),
+            listOf(TradeOfferDto("Peace Treaty", TradeOfferType.Treaty, 0)) to listOf(TradeOfferDto("Peace Treaty", TradeOfferType.Treaty, 1)),
+            listOf(TradeOfferDto("Peace Treaty", TradeOfferType.Treaty, 1), TradeOfferDto("Peace Treaty", TradeOfferType.Treaty, -1)) to emptyList(),
+            listOf(TradeOfferDto("Peace Treaty", TradeOfferType.Treaty, 1), TradeOfferDto("Peace Treaty", TradeOfferType.Treaty, 1)) to listOf(TradeOfferDto("Peace Treaty", TradeOfferType.Treaty, 1))
+        )
+        for ((ourOffers, theirOffers) in cases) {
+            val f = Fixture()
+            f.coordinator.execute(DeclareWarCommand(f.romeId, "war", f.rev(), f.greeceId))
+            rejectedWithoutMutation(f, ProposeTradeCommand(f.romeId, "bad-shape", f.rev(), f.greeceId,
+                ourOffers, theirOffers), AgentCommandError.INVALID_ARGUMENT)
+            Assert.assertEquals("War", f.coordinator.getDiplomaticStatus(f.romeId, f.greeceId))
+            Assert.assertTrue(f.coordinator.getIncomingTradeRequests(f.greeceId).isEmpty())
+        }
+    }
+
+    @Test
+    fun `malformed legacy peace rejects acceptance but permits an explicit decline`() {
+        for (name in listOf("unknown-civ", "Peace Treaty")) {
+            val f = Fixture()
+            f.prepareThirdPartyWar(f.greeceId)
+            f.addLegacyThirdPartyPeaceRequest(name)
+            f.selectActor(f.greeceId)
+            rejectedWithoutMutation(f, RespondTradeCommand(f.greeceId, "accept", f.rev(), f.romeId, true),
+                AgentCommandError.INVALID_ARGUMENT)
+            val declined = f.coordinator.execute(
+                RespondTradeCommand(f.greeceId, "decline", f.rev(), f.romeId, false)) as TradeRespondedResult
+            Assert.assertFalse(declined.accepted)
+            Assert.assertTrue(f.coordinator.getIncomingTradeRequests(f.greeceId).isEmpty())
+            Assert.assertEquals("War", f.coordinator.getDiplomaticStatus(f.greeceId, f.aztecId))
+        }
+    }
+
+    @Test
+    fun `commandable start turn removes malformed peace and preserves ordinary and declinable requests`() {
+        for (malformedName in listOf("unknown-civ", "Peace Treaty")) {
+            val f = Fixture()
+            f.prepareThirdPartyWar(f.greeceId)
+            f.addLegacyThirdPartyPeaceRequest(malformedName)
+            f.addLegacyThirdPartyPeaceRequest()
+            f.editSavedBundle { game, _ ->
+                val gift = Trade()
+                gift.theirOffers.add(TradeOffer("Gold", TradeOfferType.Gold, 25, game.speed))
+                game.getCivilization(f.greeceId).tradeRequests.add(TradeRequest(f.romeId, gift))
+            }
+            f.coordinator.execute(EndTurnCommand(f.romeId, "end-rome", f.rev()))
+            Assert.assertEquals(f.greeceId, f.coordinator.getCurrentCivId())
+            Assert.assertFalse(f.coordinator.isPaused())
+            Assert.assertEquals(listOf(f.romeId, f.romeId), f.coordinator.getIncomingTradeRequests(f.greeceId))
+            rejectedWithoutMutation(f, RespondTradeCommand(f.greeceId, "unsafe", f.rev(), f.romeId, true),
+                AgentCommandError.ILLEGAL_ACTION)
+            f.coordinator.execute(RespondTradeCommand(f.greeceId, "decline-unsafe", f.rev(), f.romeId, false))
+            val romeGold = f.coordinator.getGold(f.romeId)
+            val accepted = f.coordinator.execute(
+                RespondTradeCommand(f.greeceId, "ordinary-gift", f.rev(), f.romeId, true)) as TradeRespondedResult
+            Assert.assertTrue(accepted.accepted)
+            Assert.assertEquals(romeGold - 25, f.coordinator.getGold(f.romeId))
+            Assert.assertEquals("War", f.coordinator.getDiplomaticStatus(f.greeceId, f.aztecId))
+            Assert.assertTrue(f.coordinator.getIncomingTradeRequests(f.greeceId).isEmpty())
+        }
+    }
+
+    @Test
+    fun `turn sanitation rolls back with a failed checkpoint`() {
+        val f = Fixture()
+        f.prepareThirdPartyWar(f.greeceId)
+        f.addLegacyThirdPartyPeaceRequest("unknown-civ")
+        val revision = f.rev()
+        val writes = f.writer.writeCount
+        f.writer.failNextWrite = true
+        try {
+            f.coordinator.execute(EndTurnCommand(f.romeId, "failed-turn", revision))
+            Assert.fail("expected checkpoint failure")
+        } catch (ex: AgentCommandException) {
+            Assert.assertEquals(AgentCommandError.INTERNAL_ERROR, ex.code)
+        }
+        Assert.assertTrue(f.coordinator.isPaused())
+        Assert.assertEquals(revision, f.rev())
+        Assert.assertEquals(writes, f.writer.writeCount)
+        Assert.assertEquals(f.romeId, f.coordinator.getCurrentCivId())
+        Assert.assertEquals(listOf(f.romeId), f.coordinator.getIncomingTradeRequests(f.greeceId))
+        Assert.assertEquals("unknown-civ", f.snapshot().getCivilization(f.greeceId).tradeRequests.single().trade.ourOffers.single().name)
+        Assert.assertEquals("War", f.coordinator.getDiplomaticStatus(f.greeceId, f.aztecId))
+        Assert.assertNull(f.coordinator.getReceipt("failed-turn"))
+    }
+
+    @Test
+    fun `historical committed direct major peace receipt replays without applying fresh peace`() {
+        val f = Fixture()
+        f.coordinator.execute(DeclareWarCommand(f.romeId, "war", f.rev(), f.greeceId))
+        f.editSavedBundle { game, match ->
+            game.getCivilization(f.romeId).getDiplomacyManager(f.greeceId)!!.makePeace()
+            match.stateRevision = 2
+            match.currentTurnReceipts.add(ActionReceipt("legacy-peace", f.romeId, "t1",
+                "diplomacy.makePeace|${f.greeceId}", 1, 2, "applied", ArrayList(), "Peace"))
+        }
+        val before = f.coordinator.saveToJson()
+        val writes = f.writer.writeCount
+        val replay = f.coordinator.execute(MakePeaceCommand(f.romeId, "legacy-peace", 1, f.greeceId)) as DiplomacyResult
+        Assert.assertEquals("Peace", replay.status)
+        Assert.assertEquals(2, replay.receipt.afterRevision)
+        Assert.assertEquals(before, f.coordinator.saveToJson())
+        Assert.assertEquals(writes, f.writer.writeCount)
+        rejectedWithoutMutation(f, MakePeaceCommand(f.romeId, "fresh-peace", f.rev(), f.greeceId),
+            AgentCommandError.ILLEGAL_ACTION)
+        rejectedWithoutMutation(f, MakePeaceCommand(f.romeId, "legacy-peace", f.rev(), f.aztecId),
+            AgentCommandError.ACTION_ID_CONFLICT)
+    }
+
+    @Test
+    fun `city state direct peace retains native status and absence of treaty cooldown`() {
+        val f = Fixture()
+        val cityStateId = f.addCityState()
+        f.coordinator.execute(DeclareWarCommand(f.romeId, "war", f.rev(), cityStateId))
+        val peace = f.coordinator.execute(MakePeaceCommand(f.romeId, "peace", f.rev(), cityStateId)) as DiplomacyResult
+        Assert.assertEquals("Peace", peace.status)
+        Assert.assertEquals("Peace", f.coordinator.getDiplomaticStatus(f.romeId, cityStateId))
+        Assert.assertEquals("Peace", f.coordinator.getDiplomaticStatus(cityStateId, f.romeId))
+        val state = f.snapshot()
+        Assert.assertEquals(0, state.getCivilization(f.romeId).getDiplomacyManager(cityStateId)!!.turnsToPeaceTreaty())
+        Assert.assertTrue(state.getCivilization(cityStateId).getDiplomacyManager(f.romeId)!!.canDeclareWar())
+        rejectedWithoutMutation(f, MakePeaceCommand(f.romeId, "second-peace", f.rev(), cityStateId),
+            AgentCommandError.ILLEGAL_ACTION)
+    }
+
+    @Test
+    fun `city state actor cannot end war with a major target using direct peace`() {
+        val f = Fixture()
+        val cityStateId = f.addCityState()
+        f.coordinator.execute(DeclareWarCommand(f.romeId, "war", f.rev(), cityStateId))
+        f.editSavedBundle { game, match ->
+            game.currentPlayer = cityStateId
+            match.controllers[cityStateId] = CivilizationController(cityStateId, ControllerKind.HUMAN)
+        }
+        rejectedWithoutMutation(f, MakePeaceCommand(cityStateId, "force-major-peace", f.rev(), f.romeId),
+            AgentCommandError.ILLEGAL_ACTION)
+        Assert.assertEquals("War", f.coordinator.getDiplomaticStatus(f.romeId, cityStateId))
+        Assert.assertEquals("War", f.coordinator.getDiplomaticStatus(cityStateId, f.romeId))
+    }
+
+    @Test
+    fun `changed gold invalidates queued peace before recipient acceptance`() {
+        val f = Fixture()
+        f.coordinator.execute(DeclareWarCommand(f.romeId, "war", f.rev(), f.greeceId))
+        f.coordinator.execute(ProposeTradeCommand(f.romeId, "peace", f.rev(), f.greeceId,
+            listOf(f.peaceTreaty(), f.goldGift(150)), listOf(f.peaceTreaty())))
+        f.coordinator.execute(EndTurnCommand(f.romeId, "end-rome", f.rev()))
+        f.editSavedBundle { game, _ -> game.getCivilization(f.romeId).addGold(-180) }
+        rejectedWithoutMutation(f, RespondTradeCommand(f.greeceId, "expired-accept", f.rev(), f.romeId, true),
+            AgentCommandError.ILLEGAL_ACTION)
+        Assert.assertEquals(listOf(f.romeId), f.coordinator.getIncomingTradeRequests(f.greeceId))
+        Assert.assertEquals("War", f.coordinator.getDiplomaticStatus(f.romeId, f.greeceId))
+        Assert.assertEquals("War", f.coordinator.getDiplomaticStatus(f.greeceId, f.romeId))
+    }
+
+    @Test
+    fun `built in legacy sanitation removes malformed peace without consuming ordinary gift`() {
+        for (name in listOf("unknown-civ", "Peace Treaty")) {
+            val f = Fixture()
+            f.prepareThirdPartyWar(f.greeceId)
+            f.addLegacyThirdPartyPeaceRequest(name)
+            f.editSavedBundle { game, match ->
+                val gift = Trade()
+                gift.theirOffers.add(TradeOffer("Gold", TradeOfferType.Gold, 25, game.speed))
+                game.getCivilization(f.greeceId).tradeRequests.add(TradeRequest(f.romeId, gift))
+                match.controllers[f.greeceId] = CivilizationController(f.greeceId, ControllerKind.BUILTIN_AI)
+                match.controllers[f.aztecId] = CivilizationController(f.aztecId, ControllerKind.HUMAN)
+            }
+            f.coordinator.execute(EndTurnCommand(f.romeId, "end-rome", f.rev()))
+            Assert.assertEquals(f.aztecId, f.coordinator.getCurrentCivId())
+            Assert.assertFalse(f.coordinator.isPaused())
+            Assert.assertEquals("War", f.coordinator.getDiplomaticStatus(f.greeceId, f.aztecId))
+            Assert.assertEquals(175, f.coordinator.getGold(f.romeId))
+            Assert.assertTrue(f.coordinator.getIncomingTradeRequests(f.greeceId).isEmpty())
         }
     }
 

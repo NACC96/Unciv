@@ -247,7 +247,10 @@ class DeclareWarCommand(
     val targetCivId: String
 ) : AgentCommand
 
-/** Peace (game.act type `diplomacy.makePeace`). No treaty cooldown in v1; treaties ride trade. */
+/**
+ * Direct city-state peace (game.act type `diplomacy.makePeace`). Major nations
+ * must accept a queued bilateral Peace Treaty through [RespondTradeCommand].
+ */
 class MakePeaceCommand(
     override val actorCivId: String,
     val actionId: String,
@@ -268,8 +271,9 @@ data class TradeOfferDto(val name: String, val type: TradeOfferType, val amount:
 /**
  * Bilateral proposal (game.act type `diplomacy.proposeTrade`). Validated and
  * queued as a TradeRequest on the target; acceptance happens on the
- * responder's turn (async, like human play) or immediately by coordinator
- * command. Counteroffers compose from a decline plus a reversed proposal.
+ * responder's own turn through [RespondTradeCommand]. Bilateral peace uses
+ * Peace Treaty, type Treaty, amount 1 in both offer lists. Counteroffers
+ * compose from a decline plus a reversed proposal.
  */
 class ProposeTradeCommand(
     override val actorCivId: String,
