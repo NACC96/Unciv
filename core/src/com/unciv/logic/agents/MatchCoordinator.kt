@@ -80,6 +80,7 @@ class MatchCoordinator(
         // Deep-copy inputs so the caller retains no alias into committed state.
         committedGame = deserializeGame(json.toJson(game))
         committedMatch = match.deepCopy()
+        NationControl.initialize(committedGame, committedMatch)
         // Initial/load knowledge is populated once, never by a read tool.
         AgentMapSightings().apply {
             captureAll(committedGame, committedMatch)
@@ -87,6 +88,83 @@ class MatchCoordinator(
         }
         committedMatchJson = AgentOrdinarySave.encode(committedMatch)
         rebuildHotIndex()
+    }
+
+    fun getLocalControlCivId(): String? = committedMatch.localControlCivId
+    fun getLocalViewingCivId(): String? = committedMatch.localViewingCivId
+
+    @Synchronized
+    fun getNationSettings(): List<NationSetting> {
+        if (committedGame.gameParameters.isOnlineMultiplayer) return emptyList()
+        val origin = committedMatch.localControlCivId ?: return emptyList()
+        val principal = committedGame.getCivilizationOrNull(origin) ?: return emptyList()
+        return committedGame.civilizations.filter { NationControl.isEligible(it, committedMatch) &&
+            (principal.isSpectator() || it.civID == origin) }.map { civ ->
+            val controller = committedMatch.controllers[civ.civID]!!
+            NationSetting(civ.civID, civ.civName, controller.kind,
+                (controller.agentProfile ?: committedMatch.retainedAgentProfiles[civ.civID])?.copy(),
+                committedGame.currentPlayer == civ.civID)
+        }
+    }
+
+    fun canSpectate(): Boolean = !committedGame.gameParameters.isOnlineMultiplayer &&
+        committedMatch.localControlCivId?.let { committedGame.getCivilizationOrNull(it)?.isSpectator() } == true
+
+    /** The host supplies no gameplay actor: authority comes only from the saved local principal. */
+    @Synchronized
+    fun validateNationChange(civId: String?, change: NationControlChange, profile: AgentProfile?) {
+        require(!committedGame.gameParameters.isOnlineMultiplayer) { "Online agent matches are unsupported" }
+        check(committedMatch.turnPhase != TurnPhase.COMPLETED) { "This match has finished" }
+        if (change == NationControlChange.SPECTATE) {
+            require(canSpectate()) { "Only the local spectator may return to spectating" }
+            return
+        }
+        require(getNationSettings().any { it.civId == civId }) { "This nation is unavailable to the local player" }
+        if (change == NationControlChange.SAVE_AGENT_SETTINGS) require(profile != null) { "Choose an agent profile" }
+        val desired = profile ?: committedMatch.retainedAgentProfiles[civId]
+            ?: committedMatch.controllers[civId]?.agentProfile
+        if (change in setOf(NationControlChange.SAVE_AGENT_SETTINGS, NationControlChange.HAND_TO_AGENT)) {
+            require(desired != null) { "Choose an agent profile before handing this nation to an agent" }
+            NationControl.validateProfile(desired)
+        }
+    }
+
+    /** Called only at a host-owned idle boundary, never exposed in the provider engine protocol. */
+    @Synchronized
+    fun applyNationChange(civId: String?, change: NationControlChange, profile: AgentProfile?) {
+        check(!committedMatch.matchPaused) { "Resolve the checkpoint failure before changing nation settings" }
+        validateNationChange(civId, change, profile)
+        val candidate = committedMatch.deepCopy()
+        if (change == NationControlChange.SPECTATE) {
+            candidate.localViewingCivId = candidate.localControlCivId
+        } else {
+            val controller = candidate.controllers[civId]!!
+            if (controller.agentProfile != null) candidate.retainedAgentProfiles[civId!!] = controller.agentProfile!!.copy()
+            if (profile != null && change != NationControlChange.PLAY_AS) {
+                val previousRevision = candidate.retainedAgentProfiles[civId]?.profileRevision ?: 0
+                require(previousRevision < Int.MAX_VALUE) { "Agent profile revision is exhausted" }
+                candidate.retainedAgentProfiles[civId!!] = profile.copy().apply {
+                    profileRevision = maxOf(profileRevision, previousRevision + 1)
+                }
+            }
+            when (change) {
+                NationControlChange.PLAY_AS -> {
+                    controller.kind = ControllerKind.HUMAN
+                    controller.agentProfile = null
+                    candidate.localViewingCivId = civId
+                }
+                NationControlChange.HAND_TO_AGENT -> {
+                    controller.kind = ControllerKind.EXTERNAL_AGENT
+                    controller.agentProfile = candidate.retainedAgentProfiles[civId]!!.copy()
+                }
+                NationControlChange.SAVE_AGENT_SETTINGS -> if (controller.kind == ControllerKind.EXTERNAL_AGENT)
+                    controller.agentProfile = candidate.retainedAgentProfiles[civId]!!.copy()
+                else -> {}
+            }
+        }
+        check(candidate.stateRevision < Int.MAX_VALUE) { "Match revision is exhausted" }
+        candidate.stateRevision++
+        commit(null, candidate)
     }
 
     //region Reads (no mutation)

@@ -90,6 +90,16 @@ interface AgentMatchSession {
                          onComplete: (MessageImageDraft?, String?) -> Unit) {
         onComplete(null, "Message images are unavailable for this match")
     }
+    /** Copied settings available to the saved local management origin, not the active provider. */
+    fun getNationSettings(): List<NationSetting> = emptyList()
+    /** Transient intent only: leaving/closing cancels a change before it is durably applied. */
+    fun getPendingNationChange(): String? = null
+    fun canSpectate(): Boolean = false
+    /** Completion means durable application or a terminal error; live providers drain naturally. */
+    fun requestNationChange(civId: String?, change: NationControlChange, profile: AgentProfile?,
+                            onComplete: (String?) -> Unit) {
+        onComplete("Nation settings are unavailable for this match")
+    }
     fun startAutomaticPlay()
 }
 

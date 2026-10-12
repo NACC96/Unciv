@@ -26,6 +26,9 @@ import com.unciv.logic.agents.FileCheckpointStore
 import com.unciv.logic.agents.HumanCommandExecutor
 import com.unciv.logic.agents.MatchCoordinator
 import com.unciv.logic.agents.SetControllerCommand
+import com.unciv.logic.agents.NationControl
+import com.unciv.logic.agents.NationControlChange
+import com.unciv.logic.agents.NationSetting
 import com.unciv.logic.agents.TurnPhase
 import com.unciv.ui.screens.worldscreen.WorldScreen
 import com.unciv.utils.Concurrency
@@ -169,7 +172,9 @@ class DesktopAgentMatch(
     private val lock = Any()
     val recoveryDirectory: File = recoveryLineage?.let { File(checkpointDir(dataDir, match.matchId), "restores/$it") }
         ?: checkpointDir(dataDir, match.matchId)
-    val coordinator = MatchCoordinator(game, match, fileStore(dataDir, recoveryDirectory, match.matchId))
+    val coordinator = MatchCoordinator(game, match.deepCopy().also {
+        NationControl.initialize(game, it, if (recoveryLineage == null) worldScreen?.currentViewerCivId() else null)
+    }, fileStore(dataDir, recoveryDirectory, match.matchId))
     private val imageStore = FileMessageImageStore(dataDir)
     private val bridge = AgentEngineBridge(coordinator)
     private val humanExecutor = HumanCommandExecutor(coordinator)
@@ -188,6 +193,124 @@ class DesktopAgentMatch(
     private val closed = AtomicBoolean(false)
     /** Navigation may hide a retained match; reopening grants access, never automatic play. */
     private var matchOpen = true // protected by lock
+    private data class PendingNationChange(
+        val civId: String?, val change: NationControlChange, val profile: AgentProfile?,
+        val origin: String?, val viewer: String?, val onComplete: (String?) -> Unit
+    )
+    private var pendingNationChange: PendingNationChange? = null
+    private var pendingNationReason: String? = null
+    /** A committed assignment can outlive a failed render payload; Retry republishes without dispatch. */
+    private var pendingViewRefresh = false
+
+    /** Production requires the actual rendered viewer; explicit injected fixtures can be headless. */
+    private fun actualViewerLocked(): String? {
+        if (worldScreen != null)
+            return if (worldScreen.agentSession === this) worldScreen.currentViewerCivId() else null
+        return if (supervisorFactory != null) coordinator.getLocalViewingCivId()
+            ?: humanExecutor.currentHumanCivId() else null
+    }
+
+    override fun getNationSettings(): List<NationSetting> = synchronized(lock) {
+        if (closed.get() || !matchOpen || actualViewerLocked() == null) emptyList()
+        else coordinator.getNationSettings()
+    }
+    override fun canSpectate(): Boolean = synchronized(lock) {
+        !closed.get() && matchOpen && actualViewerLocked() != null && coordinator.canSpectate()
+    }
+    override fun getPendingNationChange(): String? = synchronized(lock) {
+        pendingNationChange?.let {
+            pendingNationReason ?: "Pending nation change — waiting for the agent to finish. Leaving cancels this change."
+        }
+    }
+
+    override fun requestNationChange(civId: String?, change: NationControlChange, profile: AgentProfile?,
+                                     onComplete: (String?) -> Unit) {
+        val copiedProfile = profile?.copy()
+        val request: PendingNationChange
+        try {
+            synchronized(lock) {
+                check(!closed.get() && matchOpen) { "This match is not open" }
+                check(pendingNationChange == null) { "Another nation change is pending" }
+                val viewer = actualViewerLocked()
+                require(viewer != null) { "Nation settings require an attached player or spectator" }
+                coordinator.validateNationChange(civId, change, copiedProfile)
+                request = PendingNationChange(civId, change, copiedProfile,
+                    coordinator.getLocalControlCivId(), viewer, onComplete)
+                pendingNationChange = request
+                pendingNationReason = null
+                runState = AgentRunState.PAUSING
+            }
+        } catch (ex: Exception) {
+            completeNationChange(onComplete, ex.message ?: "Could not change nation settings")
+            return
+        }
+        refreshUi()
+        Concurrency.runOnNonDaemonThreadPool("Save nation settings") {
+            synchronized(lock) {
+                if (pendingNationChange !== request) return@synchronized
+                // An admitted or selected loop owns its final bookkeeping and drains in finally.
+                if (!isLoopRunning.get() && providerRunCivId == null) applyPendingNationChangeLocked()
+            }
+        }
+    }
+
+    private fun completeNationChange(callback: (String?) -> Unit, error: String?) {
+        if (worldScreen == null) callback(error)
+        else Concurrency.runOnGLThread {
+            val completion = synchronized(lock) {
+                error ?: if (closed.get() || !matchOpen) "The match was closed or left" else null
+            }
+            callback(completion)
+            Gdx.graphics.requestRendering()
+        }
+    }
+
+    private fun cancelPendingNationChangeLocked(reason: String) {
+        val pending = pendingNationChange ?: return
+        pendingNationChange = null
+        pendingNationReason = null
+        completeNationChange(pending.onComplete, reason)
+    }
+
+    /** Always holds the same lock as Resume, and runs only after loop ownership is released. */
+    private fun applyPendingNationChangeLocked() {
+        val pending = pendingNationChange ?: return
+        check(!isLoopRunning.get() && providerRunCivId == null)
+        var committed = false
+        val error = try {
+            check(!closed.get() && matchOpen) { "This match is not open" }
+            check(coordinator.getLocalControlCivId() == pending.origin) { "The local player has changed" }
+            check(actualViewerLocked() == pending.viewer) { "The viewing nation has changed" }
+            publishCommittedChangesLocked {
+                coordinator.applyNationChange(pending.civId, pending.change, pending.profile)
+                committed = true
+                if (pending.change != NationControlChange.SPECTATE) {
+                    // Revoke only after durable success, before render delivery can fail in finally.
+                    authorityEpoch = AgentRunControls.nextEpoch(authorityEpoch)
+                    pending.civId?.let { sessions.remove(it) }
+                }
+            }
+            pendingViewRefresh = false
+            failureReason = null
+            runState = AgentRunState.PAUSED
+            null
+        } catch (ex: Exception) {
+            if (committed) {
+                pendingViewRefresh = true
+                failureReason = "The nation change was saved, but the view refresh failed: ${ex.message}. Retry to refresh the view."
+                runState = AgentRunState.NEEDS_ATTENTION
+                failureReason
+            } else {
+                failureReason = coordinator.getPausedReason() ?: ex.message
+                runState = if (coordinator.isPaused()) AgentRunState.NEEDS_ATTENTION else AgentRunState.PAUSED
+                ex.message ?: "Could not save nation settings"
+            }
+        }
+        pendingNationChange = null
+        pendingNationReason = null
+        refreshUi()
+        completeNationChange(pending.onComplete, error)
+    }
 
     companion object {
         fun checkpointDir(dataDir: File, matchId: String): File =
@@ -299,27 +422,27 @@ class DesktopAgentMatch(
         }
     }
 
-    override fun isHumanInputAllowed(): Boolean {
-        synchronized(lock) {
-            if (closed.get() || !matchOpen) return false
-            if (runState != AgentRunState.PAUSED && runState != AgentRunState.WAITING_HUMAN) return false
-            if (coordinator.getTurnPhase() != TurnPhase.AWAITING_DECISIONS) return false
-            return coordinator.getController(coordinator.getCurrentCivId())?.kind == ControllerKind.HUMAN
-        }
+    private fun humanInputAllowedLocked(): Boolean {
+        if (closed.get() || !matchOpen || isLoopRunning.get() || providerRunCivId != null || pendingNationChange != null) return false
+        if (runState != AgentRunState.PAUSED && runState != AgentRunState.WAITING_HUMAN) return false
+        if (coordinator.isPaused() || coordinator.getTurnPhase() != TurnPhase.AWAITING_DECISIONS) return false
+        val viewer = actualViewerLocked() ?: return false
+        val savedViewer = coordinator.getLocalViewingCivId()
+        if (savedViewer != null && savedViewer != viewer) return false
+        return viewer == coordinator.getCurrentCivId() && coordinator.getController(viewer)?.kind == ControllerKind.HUMAN
     }
+
+    override fun isHumanInputAllowed(): Boolean = synchronized(lock) { humanInputAllowedLocked() }
 
     override fun onNextTurnPressed(): Boolean {
         val civId = synchronized(lock) {
-            if (closed.get() || !matchOpen) return false
-            if (coordinator.getTurnPhase() != TurnPhase.AWAITING_DECISIONS) return false
-            val current = coordinator.getCurrentCivId()
-            if (coordinator.getController(current)?.kind != ControllerKind.HUMAN) return false
-            current
+            if (!humanInputAllowedLocked()) return false
+            coordinator.getCurrentCivId()
         }
         Concurrency.runOnNonDaemonThreadPool("AgentMatch") {
             try {
                 synchronized(lock) {
-                    if (closed.get() || !matchOpen) return@runOnNonDaemonThreadPool
+                    if (!humanInputAllowedLocked() || coordinator.getCurrentCivId() != civId) return@runOnNonDaemonThreadPool
                     publishCommittedChangesLocked {
                         coordinator.execute(EndTurnCommand(civId, "ui-end-${UUID.randomUUID()}",
                             coordinator.getStateRevision()))
@@ -346,9 +469,19 @@ class DesktopAgentMatch(
     override fun executeHumanAction(
         buildCommands: (expectedRevision: Int) -> List<(Int) -> AgentCommand>
     ): String? = synchronized(lock) {
-        if (closed.get() || !matchOpen) return@synchronized "This match is not open"
+        if (!humanInputAllowedLocked()) return@synchronized "Human input requires the active nation's own view"
+        val actor = actualViewerLocked()!!
         publishCommittedChangesLocked {
-            humanExecutor.executeAll(null, buildCommands)
+            humanExecutor.executeAll(actor) { revision ->
+                buildCommands(revision).map { factory ->
+                    { currentRevision: Int ->
+                        factory(currentRevision).also { command ->
+                            require(command.actorCivId == actor) { "Command belongs to another nation" }
+                            require(command !is SetControllerCommand) { "Use Nation settings to change controllers" }
+                        }
+                    }
+                }
+            }
         }
     }.also {
         if (it == null) refreshUi()
@@ -375,7 +508,7 @@ class DesktopAgentMatch(
         val screen = worldScreen ?: return
         val payload = AgentSnapshotPublication.buildPayload(
             coordinator,
-            viewerCivId = screen.currentViewerCivId(),
+            viewerCivId = coordinator.getLocalViewingCivId() ?: screen.currentViewerCivId(),
             selectedUnitId = screen.currentSelectedUnitId(),
             selectedCityId = screen.currentSelectedCityId(),
             selectedTile = screen.currentSelectedTilePos()
@@ -384,7 +517,7 @@ class DesktopAgentMatch(
         val selection = AgentSnapshotPublication.resolveSelection(snapshot, payload)
         Concurrency.runOnGLThread {
             if (closed.get()) return@runOnGLThread
-            screen.installAgentSnapshot(snapshot, selection, payload.generation)
+            screen.installAgentSnapshot(snapshot, selection, payload.generation, payload.viewerCivId)
             Gdx.graphics.requestRendering()
         }
     }
@@ -393,6 +526,7 @@ class DesktopAgentMatch(
         val idleSupervisor = synchronized(lock) {
             if (!closed.compareAndSet(false, true)) return
             matchOpen = false
+            cancelPendingNationChangeLocked("The match closed before the nation change was saved")
             // Keep engine RPCs alive for an admitted turn. Its existing worker owns shutdown.
             runState = if (isLoopRunning.get()) AgentRunState.PAUSING else AgentRunState.PAUSED
             if (isLoopRunning.get()) null else detachSupervisorLocked()
@@ -404,7 +538,10 @@ class DesktopAgentMatch(
     }
 
     override fun onMatchLeft() {
-        synchronized(lock) { matchOpen = false }
+        synchronized(lock) {
+            matchOpen = false
+            cancelPendingNationChangeLocked("The match was left before the nation change was saved")
+        }
         pause()
     }
 
@@ -432,7 +569,7 @@ class DesktopAgentMatch(
     }
 
     override fun canResume(): Boolean = synchronized(lock) {
-        !closed.get() && matchOpen && runState == AgentRunState.PAUSED && !coordinator.isPaused() && coordinator.getTurnPhase() != TurnPhase.COMPLETED
+        !closed.get() && matchOpen && pendingNationChange == null && runState == AgentRunState.PAUSED && !coordinator.isPaused() && coordinator.getTurnPhase() != TurnPhase.COMPLETED
     }
 
     override fun canRetry(): Boolean = synchronized(lock) {
@@ -462,6 +599,19 @@ class DesktopAgentMatch(
         synchronized(lock) {
             if (closed.get() || !matchOpen || isLoopRunning.get()) return
             if (runState != AgentRunState.NEEDS_ATTENTION) return
+            if (pendingViewRefresh) {
+                try { publishSnapshotLocked() }
+                catch (ex: Exception) {
+                    failureReason = "The nation change was saved, but the view refresh failed: ${ex.message}. Retry to refresh the view."
+                    refreshUi()
+                    return
+                }
+                pendingViewRefresh = false
+                failureReason = coordinator.getPausedReason()
+                runState = if (coordinator.isPaused()) AgentRunState.NEEDS_ATTENTION else AgentRunState.PAUSED
+                refreshUi()
+                return
+            }
             try {
                 publishCommittedChangesLocked { coordinator.retryPausedMatch() }
             } catch (ex: Exception) {
@@ -470,7 +620,8 @@ class DesktopAgentMatch(
                 return
             }
             failureReason = null
-            runState = AgentRunState.STARTING
+            if (pendingNationChange != null) applyPendingNationChangeLocked()
+            else runState = AgentRunState.STARTING
         }
         refreshUi()
         triggerRunLoop()
@@ -494,12 +645,13 @@ class DesktopAgentMatch(
     override fun getFailureReason(): String? = synchronized(lock) { failureReason }
 
     override fun isSpectatorMode(): Boolean = synchronized(lock) {
-        coordinator.getControllers().values.none { it.kind == ControllerKind.HUMAN }
+        actualViewerLocked()?.let { coordinator.isSpectatorViewer(it) }
+            ?: coordinator.getControllers().values.none { it.kind == ControllerKind.HUMAN }
     }
 
     override fun startAutomaticPlay() {
         synchronized(lock) {
-            if (closed.get() || !matchOpen) return
+            if (closed.get() || !matchOpen || pendingNationChange != null || pendingViewRefresh) return
             if (coordinator.getTurnPhase() == TurnPhase.READY_TO_START) {
                 publishCommittedChangesLocked { coordinator.beginAwaitingTurn() }
             }
@@ -519,7 +671,7 @@ class DesktopAgentMatch(
     /** Continuous agent play, advancing across civs and pausing at human turns or failures. */
     fun run() {
         synchronized(lock) {
-            if (closed.get() || !matchOpen || runState == AgentRunState.PAUSING) return
+            if (closed.get() || !matchOpen || pendingNationChange != null || pendingViewRefresh || runState == AgentRunState.PAUSING) return
             if (coordinator.isPaused()) return
             if (runState == AgentRunState.FINISHED) return
             if (coordinator.getTurnPhase() == TurnPhase.COMPLETED) {
@@ -546,7 +698,7 @@ class DesktopAgentMatch(
 
     private fun triggerRunLoop() {
         synchronized(lock) {
-            if (closed.get() || !matchOpen || runState != AgentRunState.STARTING) return
+            if (closed.get() || !matchOpen || pendingNationChange != null || pendingViewRefresh || runState != AgentRunState.STARTING) return
             if (!isLoopRunning.compareAndSet(false, true)) return
             Concurrency.runOnNonDaemonThreadPool("AgentMatch") {
                 try {
@@ -563,6 +715,12 @@ class DesktopAgentMatch(
                             if (coordinator.isPaused()) {
                                 failureReason = coordinator.getPausedReason()
                                 runState = AgentRunState.NEEDS_ATTENTION
+                            }
+                            if (pendingNationChange != null) {
+                                if (coordinator.isPaused() || runState == AgentRunState.NEEDS_ATTENTION) {
+                                    pendingNationReason = "Blocked: ${failureReason ?: "the provider failed"}. Retry before applying; leaving cancels this change."
+                                    runState = AgentRunState.NEEDS_ATTENTION
+                                } else applyPendingNationChangeLocked()
                             }
                             // Resume/retry may arrive after the loop publishes its boundary,
                             // but before this worker releases ownership. Hand off that request.
@@ -601,13 +759,15 @@ class DesktopAgentMatch(
 
     fun takeOverHuman() {
         val civId = synchronized(lock) { currentCommandable() } ?: return
-        if (!transition(AgentControl.TAKEOVER)) return
-        reassign(civId, ControllerKind.HUMAN, null)
+        requestNationChange(civId, NationControlChange.PLAY_AS, null) { error ->
+            if (error != null) Log.debug("Nation takeover rejected: %s", error)
+        }
     }
 
     fun returnToAgent(civId: String, profile: AgentProfile) {
-        if (!transition(AgentControl.RETURN_TO_AGENT)) return
-        reassign(civId, ControllerKind.EXTERNAL_AGENT, profile)
+        requestNationChange(civId, NationControlChange.HAND_TO_AGENT, profile) { error ->
+            if (error != null) Log.debug("Agent handback rejected: %s", error)
+        }
     }
 
     fun queueGuidance(civId: String, text: String) {
@@ -805,21 +965,6 @@ class DesktopAgentMatch(
                 fail(outcome.detail)
                 return
             }
-        }
-        refreshUi()
-    }
-
-    private fun reassign(civId: String, kind: ControllerKind, profile: AgentProfile?) {
-        synchronized(lock) {
-            if (closed.get() || !matchOpen || isLoopRunning.get()) return
-            authorityEpoch = AgentRunControls.nextEpoch(authorityEpoch)
-            sessions.remove(civId)
-            publishCommittedChangesLocked {
-                coordinator.execute(SetControllerCommand(
-                    civId, "reassign-${UUID.randomUUID()}",
-                    coordinator.getStateRevision(), civId, kind, profile))
-            }
-            runState = AgentRunState.PAUSED
         }
         refreshUi()
     }
