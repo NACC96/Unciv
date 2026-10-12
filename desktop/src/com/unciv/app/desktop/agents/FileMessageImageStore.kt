@@ -10,6 +10,8 @@ import java.io.File
 import java.io.FileOutputStream
 import java.nio.channels.FileChannel
 import java.nio.file.AtomicMoveNotSupportedException
+import java.nio.file.FileStore
+import java.nio.file.LinkOption
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 import java.nio.file.StandardOpenOption
@@ -27,7 +29,7 @@ class FileMessageImageStore(
 
     @Synchronized
     fun store(image: MessageImageDraft): DiplomaticImageAttachment {
-        DesktopDataDirectory.requireAvailableVolume(dataDir.absoluteFile)
+        requireStorageAvailable()
         val draft = image.copy()
         validatePng(draft)
         val metadata = DiplomaticImageAttachment(sha256(draft.bytes), draft.mimeType,
@@ -37,16 +39,19 @@ class FileMessageImageStore(
         if (final.exists()) {
             read(metadata) // A corrupt pre-existing blob is an error, never silently overwritten.
             directorySync(directory)
+            requireStorageAvailable(final)
             return metadata
         }
+        requireStorageAvailable(final)
         val temporary = Files.createTempFile(directory.toPath(), ".message-image-", ".tmp").toFile()
         try {
+            requireStorageAvailable(temporary, final)
             FileOutputStream(temporary).use {
                 it.write(draft.bytes)
                 it.flush()
                 it.fd.sync()
             }
-            DesktopDataDirectory.requireAvailableVolume(dataDir.absoluteFile)
+            requireStorageAvailable(temporary, final)
             try { Files.move(temporary.toPath(), final.toPath(), StandardCopyOption.ATOMIC_MOVE) }
             catch (_: AtomicMoveNotSupportedException) { Files.move(temporary.toPath(), final.toPath()) }
             // Required, including on ExFAT. An orphan is safe; a premature metadata reference is not.
@@ -58,11 +63,12 @@ class FileMessageImageStore(
 
     @Synchronized
     fun read(metadata: DiplomaticImageAttachment): MessageImageDraft {
-        DesktopDataDirectory.requireAvailableVolume(dataDir.absoluteFile)
+        requireStorageAvailable()
         metadata.validate()
         require(!Files.isSymbolicLink(directory.toPath()) &&
             !Files.isSymbolicLink(directory.parentFile.toPath())) { "Message image directory must not be a symbolic link" }
         val file = File(directory, "${metadata.attachmentId}.png")
+        requireStorageAvailable(file)
         check(file.isFile && !Files.isSymbolicLink(file.toPath())) { "Message image is missing: ${metadata.attachmentId}" }
         check(file.length() == metadata.byteLength.toLong()) { "Message image byte length is corrupt" }
         val bytes = file.inputStream().use { input ->
@@ -71,11 +77,13 @@ class FileMessageImageStore(
             check(result.size == metadata.byteLength) { "Message image byte length is corrupt" }
             result
         }
+        requireStorageAvailable(file)
         check(sha256(bytes) == metadata.attachmentId) { "Message image SHA-256 is corrupt" }
         return MessageImageDraft(bytes, metadata.mimeType, metadata.width, metadata.height).also { validatePng(it) }
     }
 
     private fun ensureDirectory() {
+        requireStorageAvailable()
         val missing = ArrayList<File>()
         var ancestor = directory
         while (!ancestor.exists()) {
@@ -85,11 +93,29 @@ class FileMessageImageStore(
         require(!Files.isSymbolicLink(directory.toPath()) &&
             !Files.isSymbolicLink(directory.parentFile.toPath())) { "Message image directory must not be a symbolic link" }
         check(directory.isDirectory || directory.mkdirs()) { "Cannot create message image directory" }
+        requireStorageAvailable()
         // Persist each newly-created entry in its parent before promising durable blob metadata.
         for (created in missing.asReversed()) directorySync(created.parentFile)
         // A prior failed publication may have left these directories present but unsynced.
         directorySync(dataDir)
         directorySync(directory.parentFile)
+    }
+
+    /** Required external-volume checks apply to the resolved path, never just its lexical prefix. */
+    private fun requireStorageAvailable(vararg targets: File) {
+        DesktopDataDirectory.requireAvailableVolume(dataDir.absoluteFile)
+        val volumes = File("/Volumes").toPath().toAbsolutePath().normalize()
+        val configured = dataDir.toPath().toAbsolutePath().normalize()
+        if (!configured.startsWith(volumes)) return
+        val relative = volumes.relativize(configured)
+        check(relative.nameCount > 0 && relative.getName(0).toString().isNotEmpty()) {
+            "Select a mounted volume for message image storage"
+        }
+        val volume = volumes.resolve(relative.getName(0)).toFile()
+        requireMountedMessageImageVolume(volume, volumes.toFile())
+        requireMessageImageVolumeContainment(dataDir, volume)
+        requireMessageImageVolumeContainment(directory, volume)
+        for (target in targets) requireMessageImageVolumeContainment(target, volume)
     }
 
     private fun validatePng(draft: MessageImageDraft) {
@@ -121,3 +147,34 @@ class FileMessageImageStore(
     private fun sha256(bytes: ByteArray): String = MessageDigest.getInstance("SHA-256")
         .digest(bytes).joinToString("") { "%02x".format(it) }
 }
+
+/** Plain fallback folders must not be mistaken for an available external storage volume. */
+internal fun requireMountedMessageImageVolume(volume: File, volumesDirectory: File) {
+    val volumeStore = Files.getFileStore(volume.toPath().toRealPath())
+    val parentStore = Files.getFileStore(volumesDirectory.toPath().toRealPath())
+    check(!sameMessageImageFileStore(volumeStore, parentStore)) {
+        "Message image configured volume is not mounted: $volume"
+    }
+}
+
+/** Resolve existing ancestry without creating anything; retain OS symlink and '..' semantics. */
+internal fun requireMessageImageVolumeContainment(path: File, volume: File) {
+    val root = volume.toPath().toRealPath()
+    var existing = path.toPath().toAbsolutePath()
+    val missing = java.util.ArrayDeque<java.nio.file.Path>()
+    while (!Files.exists(existing, LinkOption.NOFOLLOW_LINKS)) {
+        missing.addFirst(existing.fileName)
+        existing = existing.parent ?: error("Cannot resolve message image configured volume ancestry")
+    }
+    val resolvedParent = existing.toRealPath()
+    var resolved = resolvedParent
+    for (component in missing) resolved = resolved.resolve(component)
+    check(resolved.normalize().startsWith(root) &&
+        sameMessageImageFileStore(Files.getFileStore(resolvedParent), Files.getFileStore(root))) {
+        "Message image storage path escapes its configured volume: $path"
+    }
+}
+
+// FileStore objects are not guaranteed to implement meaningful object equality on every provider.
+private fun sameMessageImageFileStore(first: FileStore, second: FileStore): Boolean =
+    first.name() == second.name() && first.type() == second.type()
