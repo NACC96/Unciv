@@ -380,10 +380,14 @@ internal enum class AtlasButtonState(val caption: String, val over: Boolean = fa
 
 /** Fixture-only preview; the native widget still selects and draws every foreground/background. */
 internal class AtlasStateButton(val preview: AtlasButtonState, style: ImageTextButtonStyle) : ImageTextButton(preview.caption, style) {
+    // Button's constructor calls state selectors before Kotlin fields are initialized.
+    private var previewOver = preview.over
+    private var previewPressed = preview.pressed
+    private var previewFocused = preview.focused
     init { isChecked = preview.checked; isDisabled = preview.disabled }
-    override fun isOver() = preview.over
-    override fun isPressed() = preview.pressed
-    override fun hasKeyboardFocus() = preview.focused
+    override fun isOver() = previewOver
+    override fun isPressed() = previewPressed
+    override fun hasKeyboardFocus() = previewFocused
     fun resolvedFontColor(): Color = super.getFontColor().cpy()
 }
 

@@ -413,6 +413,20 @@ class AtlasThemeTest {
         assertEquals(1f, incoming.checkedDownFontColor.a, 0f)
     }
 
+    @Test fun nativeTypedSelectorsUseTheAccessiblePaletteForEveryState() {
+        selectSkin("Atlas")
+        for (state in com.unciv.dev.AtlasButtonState.entries) {
+            val button = com.unciv.dev.AtlasStateButton(state, ImageTextButton.ImageTextButtonStyle().apply {
+                font = Fonts.font; fontColor = GameUiStyle.ink; overFontColor = GameUiStyle.ink
+                downFontColor = GameUiStyle.ink; focusedFontColor = GameUiStyle.ink
+                checkedFontColor = GameUiStyle.ink; checkedOverFontColor = GameUiStyle.ink
+                checkedDownFontColor = GameUiStyle.ink
+            })
+            GameUiStyle.apply(button, primary = true)
+            assertEquals(state.name, if (state.disabled) GameUiStyle.muted else GameUiStyle.surface, button.resolvedFontColor())
+        }
+    }
+
     private fun backgrounds(style: Button.ButtonStyle) = listOf(style.up, style.over, style.down,
         style.checked, style.focused, style.disabled, style.checkedOver, style.checkedDown)
     private fun foregrounds(style: TextButton.TextButtonStyle) = listOf(style.fontColor, style.overFontColor,
