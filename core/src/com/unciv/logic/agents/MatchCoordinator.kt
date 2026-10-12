@@ -1298,6 +1298,7 @@ class MatchCoordinator(
                 return AgentCommandException(AgentCommandError.INVALID_ARGUMENT,
                     "Bilateral peace requires one Peace Treaty of type Treaty and amount 1 on each side. $bilateralPeaceGuidance")
         }
+        var majorConsentViolation: AgentCommandException? = null
         for (offer in allOffers.filter { it.type == TradeOfferType.PeaceProposal }) {
             if (offer.amount != 1)
                 return AgentCommandException(AgentCommandError.INVALID_ARGUMENT,
@@ -1305,12 +1306,13 @@ class MatchCoordinator(
             val thirdCiv = game.getCivilizationOrNull(offer.name)
                 ?: return AgentCommandException(AgentCommandError.INVALID_ARGUMENT,
                     "PeaceProposal name must be a known third civilization ID. $bilateralPeaceGuidance")
-            if (thirdCiv.isMajorCiv())
-                return AgentCommandException(AgentCommandError.ILLEGAL_ACTION,
+            // Malformed entries on either side take priority over major-consent policy.
+            if (thirdCiv.isMajorCiv() && majorConsentViolation == null)
+                majorConsentViolation = AgentCommandException(AgentCommandError.ILLEGAL_ACTION,
                     "PeaceProposal cannot obtain a third major civilization's consent. Propose peace to that civilization directly. " +
                         bilateralPeaceGuidance)
         }
-        return null
+        return majorConsentViolation
     }
 
     /** Runs only on unpublished turn candidates, before native request validation/automation. */
@@ -1332,6 +1334,8 @@ class MatchCoordinator(
         val trade = Trade()
         for (offer in ourOffers) trade.ourOffers.add(offer)
         for (offer in theirOffers) trade.theirOffers.add(offer)
+        // Duplicate city-state commitments can become malformed only after merging.
+        peaceOfferViolation(candidateGame, trade.ourOffers, trade.theirOffers)?.let { throw it }
         return trade
     }
 

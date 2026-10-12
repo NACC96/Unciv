@@ -440,6 +440,111 @@ class DiplomacyTradeTest {
         }
     }
 
+    private fun rotateWithMixedLegacyPeace(majorFirst: Boolean, malformedOnTheirSide: Boolean = false) {
+        val f = Fixture()
+        f.prepareThirdPartyWar(f.greeceId)
+        f.editSavedBundle { game, _ ->
+            val mixed = Trade()
+            val majorPeace = TradeOffer(f.aztecId, TradeOfferType.PeaceProposal, 1, game.speed)
+            val unknownPeace = TradeOffer("unknown-civ", TradeOfferType.PeaceProposal, 1, game.speed)
+            if (malformedOnTheirSide) {
+                mixed.ourOffers.add(majorPeace)
+                mixed.theirOffers.add(unknownPeace)
+            } else {
+                mixed.ourOffers.add(if (majorFirst) majorPeace else unknownPeace)
+                mixed.ourOffers.add(if (majorFirst) unknownPeace else majorPeace)
+            }
+            val gift = Trade()
+            gift.theirOffers.add(TradeOffer("Gold", TradeOfferType.Gold, 25, game.speed))
+            val recipient = game.getCivilization(f.greeceId)
+            recipient.tradeRequests.add(TradeRequest(f.romeId, mixed))
+            recipient.tradeRequests.add(TradeRequest(f.romeId, gift))
+        }
+        f.coordinator.execute(EndTurnCommand(f.romeId, "end-rome", f.rev()))
+        Assert.assertEquals(f.greeceId, f.coordinator.getCurrentCivId())
+        Assert.assertFalse(f.coordinator.isPaused())
+        Assert.assertEquals("War", f.coordinator.getDiplomaticStatus(f.greeceId, f.aztecId))
+        Assert.assertEquals(listOf(f.romeId), f.coordinator.getIncomingTradeRequests(f.greeceId))
+        val remaining = f.snapshot().getCivilization(f.greeceId).tradeRequests.single().trade
+        Assert.assertTrue(remaining.ourOffers.isEmpty())
+        Assert.assertEquals(listOf("Gold"), remaining.theirOffers.map { it.name })
+        val romeGold = f.coordinator.getGold(f.romeId)
+        val accepted = f.coordinator.execute(
+            RespondTradeCommand(f.greeceId, "accept-gift", f.rev(), f.romeId, true)) as TradeRespondedResult
+        Assert.assertTrue(accepted.accepted)
+        Assert.assertEquals(romeGold - 25, f.coordinator.getGold(f.romeId))
+        Assert.assertEquals("War", f.coordinator.getDiplomaticStatus(f.greeceId, f.aztecId))
+    }
+
+    @Test
+    fun `major then unknown peace in one legacy request cannot block the recipient turn`() {
+        rotateWithMixedLegacyPeace(majorFirst = true)
+    }
+
+    @Test
+    fun `unknown then major peace in one legacy request is sanitized before the recipient turn`() {
+        rotateWithMixedLegacyPeace(majorFirst = false)
+    }
+
+    @Test
+    fun `unknown peace on the opposite side of a legacy major proposal cannot block the recipient turn`() {
+        rotateWithMixedLegacyPeace(majorFirst = true, malformedOnTheirSide = true)
+    }
+
+    @Test
+    fun `major followed by malformed city state peace is removed before the recipient turn`() {
+        val f = Fixture()
+        f.prepareThirdPartyWar(f.greeceId)
+        val cityStateId = f.addCityState()
+        f.editSavedBundle { game, _ ->
+            val recipient = game.getCivilization(f.greeceId)
+            recipient.getDiplomacyManager(cityStateId)!!.declareWar(DeclareWarReason(WarType.DirectWar))
+            val mixed = Trade()
+            mixed.ourOffers.add(TradeOffer(f.aztecId, TradeOfferType.PeaceProposal, 1, game.speed))
+            mixed.ourOffers.add(TradeOffer(cityStateId, TradeOfferType.PeaceProposal, 2, game.speed))
+            recipient.tradeRequests.add(TradeRequest(f.romeId, mixed))
+        }
+        val initial = f.snapshot()
+        val recipient = initial.getCivilization(f.greeceId)
+        Assert.assertTrue(TradeEvaluation().isTradeValid(recipient.tradeRequests.single().trade,
+            recipient, initial.getCivilization(f.romeId)))
+        f.coordinator.execute(EndTurnCommand(f.romeId, "end-rome", f.rev()))
+        Assert.assertEquals(f.greeceId, f.coordinator.getCurrentCivId())
+        Assert.assertFalse(f.coordinator.isPaused())
+        Assert.assertTrue(f.coordinator.getIncomingTradeRequests(f.greeceId).isEmpty())
+        Assert.assertEquals("War", f.coordinator.getDiplomaticStatus(f.greeceId, f.aztecId))
+        Assert.assertEquals("War", f.coordinator.getDiplomaticStatus(f.greeceId, cityStateId))
+    }
+
+    @Test
+    fun `duplicate city state peace on proposer side rejects before queueing a merged invalid offer`() {
+        val f = Fixture()
+        val cityStateId = f.addCityState()
+        f.coordinator.execute(DeclareWarCommand(f.romeId, "war", f.rev(), cityStateId))
+        val peace = TradeOfferDto(cityStateId, TradeOfferType.PeaceProposal, 1)
+        rejectedWithoutMutation(f, ProposeTradeCommand(f.romeId, "duplicate-peace", f.rev(), f.greeceId,
+            listOf(peace, peace, f.goldGift(25)), emptyList()), AgentCommandError.INVALID_ARGUMENT)
+        Assert.assertTrue(f.coordinator.getIncomingTradeRequests(f.greeceId).isEmpty())
+        Assert.assertNull(f.coordinator.getReceipt("duplicate-peace"))
+        Assert.assertEquals("War", f.coordinator.getDiplomaticStatus(f.romeId, cityStateId))
+    }
+
+    @Test
+    fun `duplicate city state peace on recipient side rejects before queueing a merged invalid offer`() {
+        val f = Fixture()
+        val cityStateId = f.addCityState()
+        f.editSavedBundle { game, _ ->
+            game.getCivilization(f.greeceId).getDiplomacyManager(cityStateId)!!
+                .declareWar(DeclareWarReason(WarType.DirectWar))
+        }
+        val peace = TradeOfferDto(cityStateId, TradeOfferType.PeaceProposal, 1)
+        rejectedWithoutMutation(f, ProposeTradeCommand(f.romeId, "duplicate-peace", f.rev(), f.greeceId,
+            listOf(f.goldGift(25)), listOf(peace, peace)), AgentCommandError.INVALID_ARGUMENT)
+        Assert.assertTrue(f.coordinator.getIncomingTradeRequests(f.greeceId).isEmpty())
+        Assert.assertNull(f.coordinator.getReceipt("duplicate-peace"))
+        Assert.assertEquals("War", f.coordinator.getDiplomaticStatus(f.greeceId, cityStateId))
+    }
+
     @Test
     fun `turn sanitation rolls back with a failed checkpoint`() {
         val f = Fixture()
