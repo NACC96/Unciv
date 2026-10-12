@@ -1,5 +1,8 @@
 package com.unciv.ui.components
 
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.Group
 import com.badlogic.gdx.scenes.scene2d.InputEvent
@@ -7,6 +10,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.TextArea
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.utils.viewport.ScreenViewport
+import com.badlogic.gdx.utils.Clipboard
+import com.badlogic.gdx.scenes.scene2d.utils.UIUtils
 import com.unciv.Constants
 import com.unciv.dev.FontDesktop
 import com.unciv.logic.agents.AgentMatchSession
@@ -19,7 +25,15 @@ import com.unciv.testing.TestGame
 import com.unciv.ui.components.fonts.Fonts
 import com.unciv.ui.components.fonts.FontRulesetIcons
 import com.unciv.ui.components.input.ActivationListener
+import com.unciv.ui.components.input.KeyCharAndCode
+import com.unciv.ui.components.input.KeyShortcutDispatcher
+import com.unciv.ui.components.input.KeyboardBinding
+import com.unciv.ui.components.input.KeyboardBindings
+import com.unciv.ui.components.input.KeyboardPanningListener
+import com.unciv.ui.components.input.installShortcutDispatcher
+import com.unciv.ui.components.input.keyShortcuts
 import com.unciv.ui.components.widgets.AutoScrollPane
+import com.unciv.ui.components.widgets.ZoomableScrollPane
 import com.unciv.ui.images.ImageGetter
 import com.unciv.ui.screens.basescreen.UncivStage
 import com.unciv.ui.screens.worldscreen.TechPolicyDiplomacyButtons
@@ -103,6 +117,123 @@ class AgentMessagesPanelTest {
         return f.root.children.filterIsInstance<AgentMessagesPanel>().single()
     }
     private fun Actor.labels() = descendants().filterIsInstance<Label>().map { it.text.toString() }.toList()
+
+    /** Exercise real Scene2D focus and event bubbling; fixture mocks only game/session state. */
+    private fun withComposer(block: (UncivStage, AgentMessagesPanel, TextArea) -> Unit) {
+        val f = Fixture()
+        // Keyboard routing needs no draw calls; headless GL cannot compile SpriteBatch's shader.
+        Mockito.mockConstruction(SpriteBatch::class.java).use {
+            val stage = UncivStage(ScreenViewport())
+            stage.viewport.update(960, 600, true)
+            Mockito.`when`(f.screen.stage).thenReturn(stage)
+            val panel = AgentMessagesPanel(f.screen, f.session)
+            try {
+                panel.toggle()
+                panel.validate()
+                val editor = panel.descendants().filterIsInstance<TextArea>().single()
+                stage.keyboardFocus = editor
+                block(stage, panel, editor)
+            } finally {
+                panel.dispose()
+                stage.dispose()
+                stage.batch.dispose()
+            }
+        }
+    }
+
+    @Test fun `composer typing does not activate world or actor shortcuts`() = withComposer { stage, _, editor ->
+        var globalOpens = 0
+        var actorOpens = 0
+        val shortcuts = KeyShortcutDispatcher().apply {
+            add('t') { globalOpens++ }
+            add(KeyCharAndCode.SPACE) { globalOpens++ }
+            add(KeyCharAndCode.RETURN) { globalOpens++ }
+            add(KeyCharAndCode(Input.Keys.LEFT)) { globalOpens++ }
+        }
+        stage.addActor(Actor().apply { keyShortcuts.add('h') { actorOpens++ } })
+        stage.installShortcutDispatcher(shortcuts) { null }
+        for ((key, char) in listOf(Input.Keys.T to 'T', Input.Keys.H to 'h', Input.Keys.E to 'e', Input.Keys.SPACE to ' ')) {
+            stage.keyDown(key)
+            stage.keyTyped(char)
+            stage.keyUp(key)
+        }
+        stage.keyDown(Input.Keys.ENTER)
+        stage.keyTyped('\r')
+        stage.keyUp(Input.Keys.ENTER)
+        val cursorBeforeLeft = editor.cursorPosition
+        stage.keyDown(Input.Keys.LEFT)
+        stage.keyUp(Input.Keys.LEFT)
+        assertEquals("The editor must still move its caret", cursorBeforeLeft - 1, editor.cursorPosition)
+        assertEquals("The \n", editor.text)
+        assertEquals("Typing must not open a screen through global bindings", 0, globalOpens)
+        assertEquals("Typing must not trigger another actor's binding", 0, actorOpens)
+    }
+
+    @Test fun `composer select all copy and paste stay in the text editor`() = withComposer { stage, _, editor ->
+        val priorInput = Gdx.input
+        try {
+            // Platform input state is external to Stage.keyDown; keep native editing listeners real.
+            Gdx.input = Mockito.mock(Input::class.java)
+            val controlKey = if (UIUtils.isMac) Input.Keys.SYM else Input.Keys.CONTROL_LEFT
+            Mockito.`when`(Gdx.input.isKeyPressed(controlKey)).thenReturn(true)
+            editor.setClipboard(object : Clipboard {
+                private var value = ""
+                override fun hasContents() = value.isNotEmpty()
+                override fun getContents() = value
+                override fun setContents(content: String) { value = content }
+            })
+            var shortcutOpens = 0
+            val shortcuts = KeyShortcutDispatcher().apply {
+                for (letter in listOf('A', 'C', 'V')) {
+                    add(letter) { shortcutOpens++ }
+                    add(KeyCharAndCode.ctrl(letter)) { shortcutOpens++ }
+                }
+            }
+            stage.installShortcutDispatcher(shortcuts) { null }
+            editor.text = "Peaceful borders"
+            stage.keyDown(Input.Keys.A)
+            stage.keyUp(Input.Keys.A)
+            assertEquals("Peaceful borders", editor.selection)
+            stage.keyDown(Input.Keys.C)
+            stage.keyUp(Input.Keys.C)
+            editor.text = ""
+            stage.keyDown(Input.Keys.V)
+            stage.keyUp(Input.Keys.V)
+            assertEquals("Peaceful borders", editor.text)
+            assertEquals("Text editing chords must not activate world shortcuts", 0, shortcutOpens)
+        } finally { Gdx.input = priorInput }
+    }
+
+    @Test fun `hiding composer clears focus and restores world shortcuts`() = withComposer { stage, panel, _ ->
+        var globalOpens = 0
+        var actorOpens = 0
+        val shortcuts = KeyShortcutDispatcher().apply { add('t') { globalOpens++ } }
+        stage.addActor(Actor().apply { keyShortcuts.add('h') { actorOpens++ } })
+        stage.installShortcutDispatcher(shortcuts) { null }
+        panel.hide()
+        assertNull(stage.keyboardFocus)
+        stage.keyDown(Input.Keys.T)
+        stage.keyDown(Input.Keys.H)
+        assertEquals(1, globalOpens)
+        assertEquals(1, actorOpens)
+    }
+
+    @Test fun `composer focus still allows an earlier map pan key to be released`() = withComposer { stage, _, editor ->
+        val map = ZoomableScrollPane()
+        val panning = KeyboardPanningListener(map, allowWASD = true)
+        stage.addActor(map)
+        stage.addListener(panning)
+        try {
+            stage.keyboardFocus = null
+            val panKey = KeyboardBindings[KeyboardBinding.PanLeft].code
+            stage.keyDown(panKey)
+            assertEquals(1, map.actions.size)
+            stage.keyboardFocus = editor
+            stage.keyUp(panKey)
+            assertEquals("Release must end the map's repeat action even after composer focus", 0, map.actions.size)
+        } finally { panning.dispose() }
+    }
+
     @Test fun `match controls provide a Messages button beside Activity`() {
         val f = Fixture()
         val controls = AgentMatchControlTable(f.session, f.screen)

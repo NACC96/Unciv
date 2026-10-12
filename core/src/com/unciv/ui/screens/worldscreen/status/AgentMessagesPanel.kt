@@ -46,6 +46,14 @@ class AgentMessagesPanel(private val screen: WorldScreen, private val session: A
         name = "MessageBody"
         messageText = "Write a message for their next turn…"
         maxLength = DiplomaticMessageLimits.MAX_BODY_CHARS
+        addListener(object : InputListener() {
+            override fun keyDown(event: InputEvent, keycode: Int): Boolean {
+                // Let this editor handle typing, but keep its keys out of world shortcuts.
+                // Key-up still bubbles so a map pan started before focus can stop normally.
+                event.stop()
+                return false
+            }
+        })
         style = TextField.TextFieldStyle(style).apply {
             background = WorldScreenStyle.background("WorldScreen/Messages/Composer", WorldScreenStyle.raised)
             focusedBackground = WorldScreenStyle.background("WorldScreen/Messages/ComposerFocused", WorldScreenStyle.pressed)
