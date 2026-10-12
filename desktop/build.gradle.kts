@@ -118,8 +118,11 @@ tasks.register("macApp") {
         val dest = destination.get().asFile.apply { mkdirs() }
         val staging = NioFiles.createTempDirectory(dest.toPath(), ".unciv-native-app-").toFile()
         val dataOptions = System.getProperty("unciv.data.dir")?.let {
-            listOf("--java-options", "-Dunciv.data.dir=$it")
+            listOf("--java-options", "-Dunciv.data.dir=$it", "--java-options", "-XX:ErrorFile=$it/hs_err_pid%p.log")
         } ?: emptyList()
+        // HotSpot's crash reporter can itself crash while printing compiled code, leaving no report at all.
+        val crashReportOptions = listOf("--java-options", "-XX:+UnlockDiagnosticVMOptions",
+            "--java-options", "-XX:ErrorLogPrintCodeLimit=0")
         val result = ProcessBuilder(listOf(
             jpackage.absolutePath, "--type", "app-image", "--name", "Unciv",
             "--app-version", BuildConfig.appVersion,
@@ -128,7 +131,7 @@ tasks.register("macApp") {
             "--main-class", mainClassName, "--dest", staging.absolutePath,
             "--java-options", "-Xmx4G",
             "--icon", rootDir.resolve("extraImages/Icons/Unciv.icns").absolutePath
-        ) + dataOptions).inheritIO().start().waitFor()
+        ) + dataOptions + crashReportOptions).inheritIO().start().waitFor()
         check(result == 0) { "jpackage failed ($result); staging retained at $staging" }
         val app = dest.resolve("Unciv.app")
         if (app.exists()) {
