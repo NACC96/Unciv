@@ -4,6 +4,8 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.CheckBox
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton
+import com.badlogic.gdx.scenes.scene2d.ui.ImageTextButton
 import com.badlogic.gdx.scenes.scene2d.ui.SelectBox
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton
@@ -226,6 +228,72 @@ class AtlasThemeTest {
             for (child in row.children) {
                 assertTrue("${child.javaClass.simpleName} starts outside narrow row: ${child.x}", child.x >= -0.1f)
                 assertTrue("${child.javaClass.simpleName} exceeds narrow row: ${child.x + child.width}", child.x + child.width <= width + 0.1f)
+            }
+        }
+    }
+
+    @Test fun imageControlsRetainTypedStylesImagesAndCallbacks() {
+        selectSkin("Atlas")
+        val image = ImageGetter.getDrawable("OtherIcons/Close")
+        val semanticImage = ImageGetter.getDrawable("OtherIcons/Checkmark")
+        val icon = ImageButton(ImageButton.ImageButtonStyle().apply {
+            imageUp = image; imageOver = semanticImage; imageChecked = semanticImage; imageDisabled = semanticImage
+        })
+        val captioned = ImageTextButton("Shortcut", ImageTextButton.ImageTextButtonStyle().apply {
+            font = com.unciv.ui.components.fonts.Fonts.font
+            fontColor = GameUiStyle.ink
+            imageUp = image; imageOver = semanticImage; imageChecked = semanticImage; imageDisabled = semanticImage
+        })
+        val checkbox = "Keep choice".toCheckBox(true).apply { isDisabled = true }
+        checkbox.style = CheckBox.CheckBoxStyle(checkbox.style).apply {
+            checkboxOn = ImageGetter.getWhiteDot().drawable // small explicit artwork must retain a full target
+        }
+        val checkboxImage = checkbox.style.checkboxOn
+        for (button in listOf(icon, captioned, checkbox)) {
+            button.isChecked = true
+            button.isDisabled = true
+            button.onActivation {}
+            button.keyShortcuts.add('x')
+            val listeners = button.listeners.toList()
+            GameUiStyle.applyWidget(button)
+            assertTrue(button.isChecked)
+            assertTrue(button.isDisabled)
+            assertEquals(listeners, button.listeners.toList())
+            assertTrue(KeyCharAndCode('x') in button.keyShortcuts)
+            when (button) {
+                is ImageButton -> {
+                    assertSame(image, button.style.imageUp)
+                    assertSame(semanticImage, button.style.imageChecked)
+                    assertSame(semanticImage, button.style.imageOver)
+                    assertSame(semanticImage, button.style.imageDisabled)
+                }
+                is ImageTextButton -> {
+                    assertSame(image, button.style.imageUp)
+                    assertSame(semanticImage, button.style.imageChecked)
+                    assertSame(semanticImage, button.style.imageOver)
+                    assertSame(semanticImage, button.style.imageDisabled)
+                }
+                is CheckBox -> assertSame(checkboxImage, button.style.checkboxOn)
+            }
+            GameUiStyle.apply(button)
+            assertTrue(button.height >= 40f)
+            assertTrue(button.isChecked)
+            assertTrue(button.isDisabled)
+            assertEquals(listeners, button.listeners.toList())
+            when (button) {
+                is ImageButton -> {
+                    assertSame(image, button.style.imageUp)
+                    assertSame(semanticImage, button.style.imageChecked)
+                    assertSame(semanticImage, button.style.imageOver)
+                    assertSame(semanticImage, button.style.imageDisabled)
+                }
+                is ImageTextButton -> {
+                    assertSame(image, button.style.imageUp)
+                    assertSame(semanticImage, button.style.imageChecked)
+                    assertSame(semanticImage, button.style.imageOver)
+                    assertSame(semanticImage, button.style.imageDisabled)
+                }
+                is CheckBox -> assertSame(checkboxImage, button.style.checkboxOn)
             }
         }
     }

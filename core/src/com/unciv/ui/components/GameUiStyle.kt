@@ -8,6 +8,8 @@ import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.ui.Button
 import com.badlogic.gdx.scenes.scene2d.ui.CheckBox
 import com.badlogic.gdx.scenes.scene2d.ui.Label
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton
+import com.badlogic.gdx.scenes.scene2d.ui.ImageTextButton
 import com.badlogic.gdx.scenes.scene2d.ui.List
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane
 import com.badlogic.gdx.scenes.scene2d.ui.SelectBox
@@ -118,8 +120,11 @@ object GameUiStyle {
     fun apply(button: Button, primary: Boolean = false, size: ButtonSize = ButtonSize.Regular) {
         val style = buttonStyle(BaseScreen.skin.get(TextButton.TextButtonStyle::class.java), primary,
             if (size == ButtonSize.Regular) standardControlHeight else compactControlHeight)
-        button.style = if (button is TextButton) style else Button.ButtonStyle(style)
+        button.style = typedButtonStyle(button, style)
         if (button is TextButton) button.label.setFontSize(size.fontSize)
+        if (button is ImageTextButton) button.label.setFontSize(size.fontSize)
+        if (button is CheckBox) button.imageCell.minHeight(
+            (if (size == ButtonSize.Regular) standardControlHeight else compactControlHeight) - 2 * size.padVertical)
         button.pad(size.padVertical, size.padHorizontal, size.padVertical, size.padHorizontal)
         button.pack()
     }
@@ -158,6 +163,27 @@ object GameUiStyle {
             }
         }
 
+    /** Scene2D subclasses require their own style type. Preserve semantic image states and fonts. */
+    private fun typedButtonStyle(button: Button, common: TextButton.TextButtonStyle): Button.ButtonStyle {
+        fun Button.ButtonStyle.withStates() = apply {
+            up = common.up; over = common.over; down = common.down; checked = common.checked
+            focused = common.focused; disabled = common.disabled
+        }
+        return when (button) {
+            is CheckBox -> if (isAtlas) checkBoxStyle(button.style, preserveImages = true) else CheckBox.CheckBoxStyle(button.style)
+            is ImageButton -> ImageButton.ImageButtonStyle(button.style).withStates()
+            is ImageTextButton -> ImageTextButton.ImageTextButtonStyle(button.style).apply {
+                withStates()
+                val original = button.style.fontColor
+                // Conflict/nation colors belong to the control, just like its image tints.
+                fontColor = if (original == Color.WHITE || original == ink) common.fontColor else original?.cpy()
+                disabledFontColor = muted
+            }
+            is TextButton -> common
+            else -> Button.ButtonStyle(common)
+        }
+    }
+
     /** Called once after native fonts are rebound, while constructing a fresh selected skin.
      * Only Atlas default styles are replaced. Named semantic/mod styles and other skins are untouched. */
     fun initializeSkin(skin: Skin) {
@@ -172,14 +198,17 @@ object GameUiStyle {
         skin.add("default", scrollStyle(skin.get(ScrollPane.ScrollPaneStyle::class.java)), ScrollPane.ScrollPaneStyle::class.java)
     }
 
-    private fun checkBoxStyle(source: CheckBox.CheckBoxStyle) = CheckBox.CheckBoxStyle(source).apply {
-        fontColor = ink; disabledFontColor = muted; overFontColor = ink; downFontColor = ink; checkedFontColor = ink
-        checkboxOff = checkboxTarget(BaseScreen.skinStrings.getUiBackground("Atlas/Checkbox/Off", "checkbox", muted))
-        checkboxOn = checkboxTarget(BaseScreen.skinStrings.getUiBackground("Atlas/Checkbox/On", "checkbox-pressed", accent))
-        checkboxOver = checkboxTarget(BaseScreen.skinStrings.getUiBackground("Atlas/Checkbox/Over", "checkbox", ink))
-        checkboxOnOver = checkboxTarget(BaseScreen.skinStrings.getUiBackground("Atlas/Checkbox/OnOver", "checkbox-pressed", ink))
-        checkboxOffDisabled = checkboxTarget(BaseScreen.skinStrings.getUiBackground("Atlas/Checkbox/Disabled", "checkbox", muted))
-        checkboxOnDisabled = checkboxTarget(BaseScreen.skinStrings.getUiBackground("Atlas/Checkbox/OnDisabled", "checkbox-pressed", muted))
+    private fun checkBoxStyle(source: CheckBox.CheckBoxStyle, preserveImages: Boolean = false) = CheckBox.CheckBoxStyle(source).apply {
+        fontColor = if (source.fontColor == Color.WHITE || source.fontColor == ink) ink else source.fontColor?.cpy()
+        disabledFontColor = muted; overFontColor = fontColor?.cpy(); downFontColor = fontColor?.cpy(); checkedFontColor = fontColor?.cpy()
+        if (!preserveImages) {
+            checkboxOff = checkboxTarget(BaseScreen.skinStrings.getUiBackground("Atlas/Checkbox/Off", "checkbox", muted))
+            checkboxOn = checkboxTarget(BaseScreen.skinStrings.getUiBackground("Atlas/Checkbox/On", "checkbox-pressed", accent))
+            checkboxOver = checkboxTarget(BaseScreen.skinStrings.getUiBackground("Atlas/Checkbox/Over", "checkbox", ink))
+            checkboxOnOver = checkboxTarget(BaseScreen.skinStrings.getUiBackground("Atlas/Checkbox/OnOver", "checkbox-pressed", ink))
+            checkboxOffDisabled = checkboxTarget(BaseScreen.skinStrings.getUiBackground("Atlas/Checkbox/Disabled", "checkbox", muted))
+            checkboxOnDisabled = checkboxTarget(BaseScreen.skinStrings.getUiBackground("Atlas/Checkbox/OnDisabled", "checkbox-pressed", muted))
+        }
         focused = outlinedBackground("Atlas/Checkbox/Focus", inset, accent)
     }
 
@@ -241,7 +270,7 @@ object GameUiStyle {
         when (actor) {
             is CheckBox -> {
                 val original = actor.label.style.fontColor
-                actor.style = checkBoxStyle(actor.style)
+                actor.style = checkBoxStyle(actor.style, preserveImages = true)
                 if (original != Color.WHITE && original != ink && original != Color.valueOf("eef2f4"))
                     actor.label.style = Label.LabelStyle(actor.label.style).apply { fontColor = original?.cpy() }
                 // Preserve natural preferred width, but permit long translated labels to wrap.
@@ -260,6 +289,11 @@ object GameUiStyle {
                     fontColor = fontColor?.cpy(); overFontColor = overFontColor?.cpy(); downFontColor = downFontColor?.cpy()
                 } else buttonStyle(actor.style, primary = actor.style.fontColor == surface)
                 actor.pad(Space.m, Space.l, Space.m, Space.l)
+            }
+            is ImageButton, is ImageTextButton -> {
+                val source = if (actor is ImageTextButton) actor.style else BaseScreen.skin.get(TextButton.TextButtonStyle::class.java)
+                actor.style = typedButtonStyle(actor, buttonStyle(source,
+                    primary = actor is ImageTextButton && actor.style.fontColor == surface))
             }
             is Button -> actor.style = Button.ButtonStyle(buttonStyle(BaseScreen.skin.get(TextButton.TextButtonStyle::class.java)))
             is TextField -> actor.style = fieldStyle(actor.style)

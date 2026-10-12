@@ -8,6 +8,8 @@ import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.Group
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton
+import com.badlogic.gdx.scenes.scene2d.ui.ImageTextButton
 import com.badlogic.gdx.scenes.scene2d.ui.SelectBox
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane
 import com.badlogic.gdx.utils.Align
@@ -255,6 +257,19 @@ object AtlasFixtureCatalog {
             if (width < 500 && index == 1) states.row()
         }
         content.add(states).row()
+        val icon = ImageButton(ImageButton.ImageButtonStyle().apply {
+            imageUp = ImageGetter.getDrawable("OtherIcons/Close")
+            imageChecked = ImageGetter.getDrawable("OtherIcons/Checkmark")
+        }).apply { imageCell.size(20f); isChecked = true; GameUiStyle.apply(this) }
+        val imageCaption = ImageTextButton("Keys", ImageTextButton.ImageTextButtonStyle().apply {
+            font = Fonts.font; fontColor = GameUiStyle.ink
+            imageUp = ImageGetter.getDrawable("OtherIcons/Keyboard")
+        }).apply { imageCell.size(20f); GameUiStyle.apply(this) }
+        val imageControls = Table().apply {
+            add(icon).minHeight(40f).padRight(8f)
+            add(imageCaption).minHeight(40f).growX()
+        }
+        content.add(AtlasWidgets.field("Image controls — semantic glyphs", imageControls)).row()
         content.add(AtlasWidgets.footer(GameUiStyle.button("Confirm ✓"), listOf(GameUiStyle.button("Cancel")))).row()
         val scroll = ScrollPane(content).apply { setScrollingDisabled(true, false); setFadeScrollBars(false) }
         scroll.setSize(columnWidth + 24f, height - 24f)
