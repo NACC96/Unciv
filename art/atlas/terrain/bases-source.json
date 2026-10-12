@@ -1,0 +1,179 @@
+{
+  "schemaVersion": 1,
+  "batchId": "bases",
+  "tool": "built-in image_gen",
+  "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/terrain-authoring/raw/bases.png",
+  "rawSha256": "9098de4a06251afc6502506abbdbb85528935cc8d066a81d4c3d54733ae3c133",
+  "rawDimensions": [
+    1246,
+    1263
+  ],
+  "promptPath": "art/atlas/terrain/bases-prompt.txt",
+  "promptSha256": "927418f36d61da4eb2dd65081c09836dbaff7ea0bb3909bf43719d99ed37e8ed",
+  "reviewState": "candidate",
+  "formalAcceptance": "deferred by user",
+  "cells": [
+    {
+      "item": "Coast",
+      "cell": 0,
+      "cropBox": [
+        0,
+        0,
+        415,
+        421
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Coast.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "terrain",
+      "sha256": "dbe5f69fa9d37ee46c014b7a4d53ba151076bff964d0460825c48dfe5205b22a",
+      "clippingMargin": 0
+    },
+    {
+      "item": "Desert",
+      "cell": 1,
+      "cropBox": [
+        415,
+        0,
+        831,
+        421
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Desert.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "terrain",
+      "sha256": "00fd5c954f8a42476d6faa0193306f9d74a40de0bbe8554608b2eaff3e62f162",
+      "clippingMargin": 0
+    },
+    {
+      "item": "Grassland",
+      "cell": 2,
+      "cropBox": [
+        831,
+        0,
+        1246,
+        421
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Grassland.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "terrain",
+      "sha256": "b56ca8e8438670657c6848772445aae79eb58fe4922094d3ffb25cf7003f95e2",
+      "clippingMargin": 0
+    },
+    {
+      "item": "Lakes",
+      "cell": 3,
+      "cropBox": [
+        0,
+        421,
+        415,
+        842
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Lakes.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "terrain",
+      "sha256": "5ef319a8875f8b80d304b5f2667e2dd58137f0dbab9e9f10323c7847e4b50f3d",
+      "clippingMargin": 0
+    },
+    {
+      "item": "Mountain",
+      "cell": 4,
+      "cropBox": [
+        415,
+        421,
+        831,
+        842
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Mountain.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "terrain",
+      "sha256": "d2794e3e4593ad197cce6ec085f7e2de40a2606c54a32f1cec536ebf1cec85ce",
+      "clippingMargin": 0
+    },
+    {
+      "item": "Ocean",
+      "cell": 5,
+      "cropBox": [
+        831,
+        421,
+        1246,
+        842
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Ocean.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "terrain",
+      "sha256": "9f04b7022158938b42ace37dedd55a414bff9b2fa44ac6f9502fdc5bcfb61624",
+      "clippingMargin": 0
+    },
+    {
+      "item": "Plains",
+      "cell": 6,
+      "cropBox": [
+        0,
+        842,
+        415,
+        1263
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Plains.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "terrain",
+      "sha256": "8f2bd505df37497845714f029ed71443f22fa64d303ccc1d6a7526ff7934a955",
+      "clippingMargin": 0
+    },
+    {
+      "item": "Snow",
+      "cell": 7,
+      "cropBox": [
+        415,
+        842,
+        831,
+        1263
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Snow.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "terrain",
+      "sha256": "b0e7feef705e7129c7f926ec60e60bc123d91c46e51bc788761095c9574ab472",
+      "clippingMargin": 0
+    },
+    {
+      "item": "Tundra",
+      "cell": 8,
+      "cropBox": [
+        831,
+        842,
+        1246,
+        1263
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Tundra.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "terrain",
+      "sha256": "ddddd18acaaa2892bb875a83427dc385b13bd0b44546986e4770886e5a5a8f29",
+      "clippingMargin": 0
+    }
+  ]
+}

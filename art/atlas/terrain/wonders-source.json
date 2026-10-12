@@ -1,0 +1,305 @@
+{
+  "schemaVersion": 1,
+  "batchId": "wonders",
+  "tool": "built-in image_gen",
+  "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/terrain-authoring/raw/wonders.png",
+  "rawSha256": "9472ca51c7dd9c01003f9d307a8c9cbc85578814b44fad27ee2769f9b5b3a97a",
+  "rawDimensions": [
+    1295,
+    1214
+  ],
+  "promptPath": "art/atlas/terrain/wonders-prompt.txt",
+  "promptSha256": "75dfbcc9ae1da3094a650e74828c8876f0c02e40c9599f73ee5d655d44e38b69",
+  "reviewState": "candidate",
+  "formalAcceptance": "deferred by user",
+  "cells": [
+    {
+      "item": "Barringer Crater",
+      "cell": 0,
+      "cropBox": [
+        0,
+        0,
+        324,
+        304
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Barringer Crater.png",
+      "canvas": [
+        128,
+        144
+      ],
+      "normalization": "natural-wonder",
+      "sha256": "9de65b968a72404f3e94b60d17be97f09f79352c5c99ec5559b28dc7ddfeb0d7",
+      "clippingMargin": 16
+    },
+    {
+      "item": "Cerro de Potosi",
+      "cell": 1,
+      "cropBox": [
+        324,
+        0,
+        648,
+        304
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Cerro de Potosi.png",
+      "canvas": [
+        128,
+        144
+      ],
+      "normalization": "natural-wonder",
+      "sha256": "2e916263a6093ad64a498ceb43dea3bb1a31056b233be2b99ed6643c6e36905f",
+      "clippingMargin": 16
+    },
+    {
+      "item": "El Dorado",
+      "cell": 2,
+      "cropBox": [
+        648,
+        0,
+        971,
+        304
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/El Dorado.png",
+      "canvas": [
+        128,
+        144
+      ],
+      "normalization": "natural-wonder",
+      "sha256": "49458f2fe8731930750c50e79171cf8eb541565a517efab2cff5e59187463ccb",
+      "clippingMargin": 16
+    },
+    {
+      "item": "Fountain of Youth",
+      "cell": 3,
+      "cropBox": [
+        971,
+        0,
+        1295,
+        304
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Fountain of Youth.png",
+      "canvas": [
+        128,
+        144
+      ],
+      "normalization": "natural-wonder",
+      "sha256": "64e00b9b6d66cdc215942bddc0e88f3ab499db40f9a4e2aaf6be750d77de02dd",
+      "clippingMargin": 16
+    },
+    {
+      "item": "Grand Mesa",
+      "cell": 4,
+      "cropBox": [
+        0,
+        304,
+        324,
+        607
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Grand Mesa.png",
+      "canvas": [
+        128,
+        144
+      ],
+      "normalization": "natural-wonder",
+      "sha256": "0696e803208bdd798452c936386f8ceb9019034b421cc1e2d8f7f0c3231c3a1f",
+      "clippingMargin": 16
+    },
+    {
+      "item": "Great Barrier Reef",
+      "cell": 5,
+      "cropBox": [
+        324,
+        304,
+        648,
+        607
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Great Barrier Reef.png",
+      "canvas": [
+        128,
+        144
+      ],
+      "normalization": "natural-wonder",
+      "sha256": "3f8a40753b17a852cb5653a7fc42a936e3c7fe3044e429cbcb1a33a3a92f0589",
+      "clippingMargin": 16
+    },
+    {
+      "item": "Krakatoa",
+      "cell": 6,
+      "cropBox": [
+        648,
+        304,
+        971,
+        607
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Krakatoa.png",
+      "canvas": [
+        128,
+        144
+      ],
+      "normalization": "natural-wonder",
+      "sha256": "0696b56a672ff3ea6978801d9e1b9212cb219d8b4639f886219616e30b43164b",
+      "clippingMargin": 16
+    },
+    {
+      "item": "Mount Fuji",
+      "cell": 7,
+      "cropBox": [
+        971,
+        304,
+        1295,
+        607
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Mount Fuji.png",
+      "canvas": [
+        128,
+        144
+      ],
+      "normalization": "natural-wonder",
+      "sha256": "f04535209641f421da4098fd89b0fa8819fd848c9d7b78851479de6c3bd690b9",
+      "clippingMargin": 16
+    },
+    {
+      "item": "Mount Kailash",
+      "cell": 8,
+      "cropBox": [
+        0,
+        607,
+        324,
+        910
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Mount Kailash.png",
+      "canvas": [
+        128,
+        144
+      ],
+      "normalization": "natural-wonder",
+      "sha256": "8d42ae7fe7badffe6bce15b45c06a757b621de137a7e87484429f466e6c117a4",
+      "clippingMargin": 16
+    },
+    {
+      "item": "Mount Sinai",
+      "cell": 9,
+      "cropBox": [
+        324,
+        607,
+        648,
+        910
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Mount Sinai.png",
+      "canvas": [
+        128,
+        144
+      ],
+      "normalization": "natural-wonder",
+      "sha256": "327edae3524a45da5799b7938164c997b8af94ba72ea6ea5b87d74324ec31590",
+      "clippingMargin": 16
+    },
+    {
+      "item": "Old Faithful",
+      "cell": 10,
+      "cropBox": [
+        648,
+        607,
+        971,
+        910
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Old Faithful.png",
+      "canvas": [
+        128,
+        144
+      ],
+      "normalization": "natural-wonder",
+      "sha256": "1e467a8e289499118a37dee0e50daa0567b7ba0163b687dd75fec3727d79ede4",
+      "clippingMargin": 16
+    },
+    {
+      "item": "Rock of Gibraltar",
+      "cell": 11,
+      "cropBox": [
+        971,
+        607,
+        1295,
+        910
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Rock of Gibraltar.png",
+      "canvas": [
+        128,
+        144
+      ],
+      "normalization": "natural-wonder",
+      "sha256": "5f181587423a82edb45f8a3a7ed9c568f5f8b405901f646a38b50e9b9331c981",
+      "clippingMargin": 16
+    },
+    {
+      "item": "Sri Pada",
+      "cell": 12,
+      "cropBox": [
+        0,
+        910,
+        324,
+        1214
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Sri Pada.png",
+      "canvas": [
+        128,
+        144
+      ],
+      "normalization": "natural-wonder",
+      "sha256": "4233fa54422cedd3aa43325da3d506db5cdc896b46c8646e5f809afe3773f4d2",
+      "clippingMargin": 16
+    },
+    {
+      "item": "Uluru",
+      "cell": 13,
+      "cropBox": [
+        324,
+        910,
+        648,
+        1214
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Uluru.png",
+      "canvas": [
+        128,
+        144
+      ],
+      "normalization": "natural-wonder",
+      "sha256": "f1887c02fa99de702056aaec6b2e2a771033d6ade972655c28f806341116bb2e",
+      "clippingMargin": 16
+    },
+    {
+      "item": "NaturalWonder",
+      "cell": 14,
+      "cropBox": [
+        648,
+        910,
+        971,
+        1214
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/NaturalWonder.png",
+      "canvas": [
+        128,
+        144
+      ],
+      "normalization": "natural-wonder",
+      "sha256": "79b316cc7622f02e325febed705775ce21ab6bff0f0bfb182badd910c37dc276",
+      "clippingMargin": 16
+    },
+    {
+      "item": "City damage",
+      "cell": 15,
+      "cropBox": [
+        971,
+        910,
+        1295,
+        1214
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/City damage.png",
+      "canvas": [
+        128,
+        144
+      ],
+      "normalization": "natural-wonder",
+      "sha256": "033b2d95a975a7f04f80cc8b71d496bf418fff5b94246638eb19cd9647a2a8a9",
+      "clippingMargin": 16
+    }
+  ]
+}
