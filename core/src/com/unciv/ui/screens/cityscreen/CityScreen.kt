@@ -37,6 +37,9 @@ import com.unciv.ui.popups.ToastPopup
 import com.unciv.ui.popups.closeAllPopups
 import com.unciv.ui.screens.basescreen.BaseScreen
 import com.unciv.ui.screens.basescreen.RecreateOnResize
+import com.unciv.ui.screens.worldscreen.AgentSnapshotScreen
+import com.unciv.ui.screens.worldscreen.refreshAgentSnapshot
+import com.unciv.view.GameView
 import com.unciv.ui.screens.worldscreen.WorldScreen
 import com.unciv.utils.Concurrency
 import com.unciv.view.CityView
@@ -52,7 +55,36 @@ class CityScreen(
      *  to avoid premature stops or rewinds. Only the fresh CityScreen from WorldScreen or Overview
      *  will instantiate a new CityAmbiencePlayer and start playing. */
     ambiencePlayer: CityAmbiencePlayer? = null
-): BaseScreen(), RecreateOnResize {
+): BaseScreen(), RecreateOnResize, AgentSnapshotScreen {
+    override val snapshotGameInfo = cityView.getCity().civ.gameInfo
+    override val snapshotViewerCivId = game.worldScreen?.takeIf { it.gameInfo.gameId == snapshotGameInfo.gameId }?.currentViewerCivId() ?: cityView.gameView.civView.civID
+
+    override fun show() = refreshAgentSnapshot()
+
+    override fun recreateForSnapshot(worldScreen: WorldScreen): BaseScreen? {
+        val city = worldScreen.gameInfo.getCities().firstOrNull { it.id == cityView.getCity().id } ?: return null
+        val view = GameView(worldScreen.gameInfo, worldScreen.viewingCiv, worldScreen.viewingCiv.isSpectator())
+            .getForeignCityView(city).tryGetCityView() ?: return null
+        val tile = selectedTile?.position()?.let { pos ->
+            worldScreen.gameInfo.tileMap.values.firstOrNull { it.position == pos }?.let { view.tileView(it) }
+        }
+        val construction = selectedConstruction?.name?.let { name ->
+            view.constructions.getConstruction(name)
+        }
+        return CityScreen(view, construction, tile).also { fresh ->
+            val queuedName = cityView.constructions.constructionQueue.getOrNull(selectedQueueEntry)
+            val queue = view.constructions.constructionQueue
+            fresh.selectedQueueEntry = when {
+                queuedName == null -> -1
+                queue.getOrNull(selectedQueueEntry) == queuedName -> selectedQueueEntry
+                queue.count { it == queuedName } == 1 -> queue.indexOf(queuedName)
+                else -> -1
+            }
+            fresh.pickTileData = pickTileData
+            fresh.updateSync()
+        }
+    }
+
     companion object {
         /** Distance from stage edges to floating widgets */
         const val posFromEdge = 5f
@@ -184,7 +216,11 @@ class CityScreen(
         Concurrency.run {
             // Recalculate Stats
             cityView.updateCityStats()
-            Concurrency.runOnGLThread { updateSync() }
+            Concurrency.runOnGLThread {
+                if (game.screen !== this@CityScreen) return@runOnGLThread
+                if (game.worldScreen?.agentSession != null && game.gameInfo !== snapshotGameInfo) return@runOnGLThread
+                updateSync()
+            }
         }
     }
     
@@ -448,7 +484,9 @@ class CityScreen(
                     updateAsync()
                     return@run
                 }
+                if (game.worldScreen?.agentSession != null) return@run
                 Concurrency.runOnGLThread {
+                    if (game.screen !== this@CityScreen) return@runOnGLThread
                     SoundPlayer.play(UncivSound.Coin)
                     // preselect the next tile on city screen rebuild so bulk buying can go faster
                     game.replaceCurrentScreen { CityScreen(cityView, initSelectedTile = cityView.chooseNewTileToOwn()) }

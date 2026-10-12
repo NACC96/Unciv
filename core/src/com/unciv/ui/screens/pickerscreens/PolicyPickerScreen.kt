@@ -1,5 +1,8 @@
 package com.unciv.ui.screens.pickerscreens
 
+import com.unciv.ui.screens.worldscreen.AgentSnapshotScreen
+import com.unciv.ui.screens.worldscreen.WorldScreen
+import com.unciv.ui.screens.worldscreen.refreshAgentSnapshot
 import com.unciv.UncivGame
 import com.unciv.logic.agents.AdoptPolicyCommand
 
@@ -153,7 +156,22 @@ class PolicyPickerScreen(
     val viewingCiv: Civilization,
     val canChangeState: Boolean,
     select: String? = null
-) : PickerScreen(), RecreateOnResize {
+) : PickerScreen(), RecreateOnResize, AgentSnapshotScreen {
+
+    override val snapshotGameInfo = viewingCiv.gameInfo
+    override val snapshotViewerCivId = game.worldScreen?.takeIf { it.gameInfo.gameId == snapshotGameInfo.gameId }?.currentViewerCivId() ?: viewingCiv.civID
+
+    override fun show() = refreshAgentSnapshot()
+
+    override fun recreateForSnapshot(worldScreen: WorldScreen): BaseScreen? {
+        val civ = worldScreen.gameInfo.civilizations.firstOrNull { it.civID == viewingCiv.civID } ?: return null
+        if (!worldScreen.viewingCiv.isSpectator() && civ !== worldScreen.viewingCiv) return null
+        return PolicyPickerScreen(civ, worldScreen.canChangeState && civ === worldScreen.viewingCiv, selectedPolicyButton?.policy?.name).also {
+            it.scrollPane.scrollPercentX = scrollPane.scrollPercentX
+            it.scrollPane.scrollPercentY = scrollPane.scrollPercentY
+            it.scrollPane.updateVisualScroll()
+        }
+    }
 
     object Sizes {
         const val paddingVertical = 10f
@@ -650,7 +668,6 @@ class PolicyPickerScreen(
                             AdoptPolicyCommand(viewingCiv.civID, "ui-${System.nanoTime()}", r, branch.name)
                         })
                     } == true) {
-                    game.replaceCurrentScreen{ recreate() }
                     return@onClick
                 }
                 ConfirmPopup(
@@ -688,10 +705,6 @@ class PolicyPickerScreen(
                         AdoptPolicyCommand(viewingCiv.civID, "ui-${System.nanoTime()}", r, policy.name)
                     })
                 } == true) {
-                Concurrency.runOnGLThread {
-                    if (game.screen !is PolicyPickerScreen) game.popScreen()
-                    else game.replaceCurrentScreen{ recreate() }
-                }
                 return@run
             }
             InputDisabling.withInputDisabled {

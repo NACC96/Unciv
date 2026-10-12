@@ -149,9 +149,9 @@ class WorldScreen(
 
     /**
      * Active agent match session, if this screen shows an agent-enabled
-     * match. Routes the end-turn button and gates human input; all other
-     * mutation paths are enumerated in docs/agent-mutation-audit.md (most
-     * still route legacy — full interception is tracked there, not here).
+     * match. Routes human gameplay through committed coordinator actions and
+     * gates input by the active controller. The bounded Vanilla route audit and
+     * remaining unsupported paths are documented in docs/agent-mutation-audit.md.
      */
     var agentSession: AgentMatchSession? = null
 
@@ -277,6 +277,7 @@ class WorldScreen(
             val tile = snapshot.tileMap.values.firstOrNull { it.position == pos }
             tile?.let { selectedGameView.getTile(it) }
         }
+        game.screen?.refreshAgentSnapshot()
         shouldUpdate = true
         Gdx.graphics.requestRendering()
     }
