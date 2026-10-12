@@ -71,7 +71,7 @@ object AtlasFixtureCatalog {
         "Persia", "England", "France", "Rome", "Korea", "Babylon", "Polynesia", "Mongolia", "Egypt")
     private val registered = linkedSetOf("world", "activity", "messages", "overview", "nation-control",
         "terrain", "units", "city", "research", "policies", "religion", "promotions", "diplomacy",
-        "setup", "menu", "supporting", "supporting-atlas", "supporting-atlas-end")
+        "setup", "menu", "supporting", "supporting-atlas", "supporting-atlas-end", "supporting-atlas-states")
     private val scopes = IdentityHashMap<BaseScreen, AtlasDataScope>()
 
     fun ids(): Set<String> = registered.toSet()
@@ -173,7 +173,8 @@ object AtlasFixtureCatalog {
                     holder.setCenterPosition(civ.cities.first().location, immediately = true, selectUnit = false)
                     holder.clearActions()
                     if (id.startsWith("supporting-atlas")) {
-                        addControlGallery(screen, width, height, scrolled = id.endsWith("-end"))
+                        if (id == "supporting-atlas-states") addButtonStateGallery(screen, width, height)
+                        else addControlGallery(screen, width, height, scrolled = id.endsWith("-end"))
                         scopes[screen] = scope
                         return screen
                     }
@@ -213,6 +214,52 @@ object AtlasFixtureCatalog {
             scope.close()
             throw failure
         }
+    }
+
+    /** Fixed native state selectors exercise actual ImageTextButton drawing, without replacing
+     * backgrounds/font colors with an up-state preview. No gameplay input or provider is invoked. */
+    private fun addButtonStateGallery(screen: BaseScreen, width: Int, height: Int) {
+        val panels = if (width >= 960) 2 else 1
+        val panelWidth = if (panels == 2) (width - 36f) / 2f else width - 24f
+        val galleries = Table().apply { name = "AtlasPrimaryStateGalleries" }
+        for (panel in 0 until panels) {
+            val content = Table().apply {
+                name = "AtlasPrimaryStatePanel-$panel"
+                background = GameUiStyle.panelBackground("Atlas/StateGallery/$panel", 0.94f)
+                pad(12f); top()
+                defaults().growX().minWidth(0f).padBottom(8f)
+            }
+            content.add(AtlasWidgets.header("Typed primary states", "Native selectors • repeat/reload\nAperçu — 東京 / 中文 / Crème brûlée"))
+                .width(panelWidth - 24f).row()
+            val grid = Table()
+            for ((index, state) in AtlasButtonState.entries.withIndex()) {
+                val button = AtlasStateButton(state, ImageTextButton.ImageTextButtonStyle().apply {
+                    font = Fonts.font
+                    imageUp = ImageGetter.getDrawable("OtherIcons/Keyboard")
+                    // Non-null incoming colors reproduce the review's concrete failure.
+                    fontColor = GameUiStyle.ink; overFontColor = GameUiStyle.ink
+                    downFontColor = GameUiStyle.ink; checkedFontColor = GameUiStyle.ink
+                    focusedFontColor = GameUiStyle.ink; disabledFontColor = GameUiStyle.ink
+                    checkedOverFontColor = GameUiStyle.ink; checkedDownFontColor = GameUiStyle.ink
+                }).apply {
+                    name = "AtlasPrimaryState/$panel/${state.name}"
+                    imageCell.size(20f)
+                    label.wrap = true
+                }
+                grid.add(AtlasWidgets.footer(button, emptyList())).minWidth(0f).uniformX().growX().minHeight(48f).pad(3f)
+                if (index % 2 == 1) grid.row()
+            }
+            content.add(grid).row()
+            content.add("Filled action • all text states retain their role".toLabel(GameUiStyle.muted, 13).apply { wrap = true })
+                .width(panelWidth - 24f).row()
+            content.setWidth(panelWidth); content.pack()
+            content.setPosition(12f + panel * (panelWidth + 12f), height - content.height - 12f)
+            galleries.addActor(content)
+        }
+        screen.stage.addActor(galleries)
+        repeat(2) { GameUiStyle.applyWidget(galleries) }
+        BaseScreen.setSkin()
+        GameUiStyle.applyWidget(galleries)
     }
 
     /** Explicit Atlas variant over the same real mixed-biome map; supporting retains MapEditorScreen. */
@@ -319,6 +366,25 @@ object AtlasFixtureCatalog {
         val method = screen.javaClass.methods.single { it.name.substringBefore('$') == name }
         Mockito.`when`(method.invoke(screen)).thenReturn(value)
     }
+}
+
+internal enum class AtlasButtonState(val caption: String, val over: Boolean = false,
+    val pressed: Boolean = false, val focused: Boolean = false, val checked: Boolean = false,
+    val disabled: Boolean = false) {
+    Hover("Hover", over = true), Pressed("Pressed", pressed = true),
+    Focused("Focus", focused = true), Checked("Checked", checked = true),
+    CheckedOver("Ck-hover", over = true, checked = true),
+    CheckedPressed("Ck-press", pressed = true, checked = true),
+    Normal("Normal"), Disabled("Disabled", disabled = true)
+}
+
+/** Fixture-only preview; the native widget still selects and draws every foreground/background. */
+internal class AtlasStateButton(val preview: AtlasButtonState, style: ImageTextButtonStyle) : ImageTextButton(preview.caption, style) {
+    init { isChecked = preview.checked; isDisabled = preview.disabled }
+    override fun isOver() = preview.over
+    override fun isPressed() = preview.pressed
+    override fun hasKeyboardFocus() = preview.focused
+    fun resolvedFontColor(): Color = super.getFontColor().cpy()
 }
 
 private class AtlasActorScreen(scope: AtlasDataScope) : BaseScreen() {

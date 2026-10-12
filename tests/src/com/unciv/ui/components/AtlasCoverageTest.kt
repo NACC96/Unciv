@@ -44,7 +44,7 @@ class AtlasCoverageTest {
             "units", "city", "research", "policies", "religion", "promotions", "diplomacy",
             "setup", "menu", "supporting")
         assertTrue(ids.containsAll(baselineIds))
-        assertTrue(ids.containsAll(setOf("supporting-atlas", "supporting-atlas-end")))
+        assertTrue(ids.containsAll(setOf("supporting-atlas", "supporting-atlas-end", "supporting-atlas-states")))
         for (entry in entries) {
             assertTrue(entry.getString("status").isNotBlank())
             assertTrue(entry.get("sourcePaths").size > 0)

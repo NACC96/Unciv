@@ -5,11 +5,13 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration
 import com.badlogic.gdx.graphics.GL20
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.PixmapIO
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.HdpiMode
 import com.badlogic.gdx.graphics.glutils.HdpiUtils
+import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.utils.JsonWriter
 import com.unciv.ui.screens.basescreen.BaseScreen
@@ -44,6 +46,7 @@ object AtlasRenderCheck {
                     check(scope.dataRoot.startsWith(scope.fixtureRoot))
                     check(screen.stage.root.children.size > 0) { "$id has no production actors" }
                     frame = FrameBuffer(Pixmap.Format.RGBA8888, width, height, false)
+                    var buttonStates: List<Map<String, Any?>> = emptyList()
                     // Only drain setup errors. Errors from layout, drawing or readback fail the run.
                     while (Gdx.gl.glGetError() != GL20.GL_NO_ERROR) { }
                     repeat(30) { screen.stage.root.act(1f / 60f) }
@@ -54,6 +57,7 @@ object AtlasRenderCheck {
                         try {
                             check(pixels.width == width && pixels.height == height)
                             check(Gdx.gl.glGetError() == GL20.GL_NO_ERROR) { "Capture readback GL error" }
+                            buttonStates = buttonStateEvidence(screen, pixels)
                             PixmapIO.writePNG(Gdx.files.absolute(output.resolve("$id-${width}x$height-${args[4]}.png").toString()), pixels, -1, true)
                         } finally { pixels.dispose() }
                     } finally { frame.end() }
@@ -82,6 +86,7 @@ object AtlasRenderCheck {
                         "providerCalls" to scope.providerCalls, "dataRoot" to scope.dataRoot.toString(),
                         "resolvedRoots" to scope.resolvedRoots(),
                         "fixtureSeed" to AtlasFixtureCatalog.SEED,
+                        "buttonStateEvidence" to buttonStates,
                         "status" to "baseline capture; migration and interactions remain pending"))
                     println("ATLAS_CAPTURE_OK $id ${width}x$height ${args[4]} actors=${actors.size} providerCalls=0")
                     code = 0
@@ -97,6 +102,34 @@ object AtlasRenderCheck {
             }
         }, config)
     }
+
+    /** Controlled native-state evidence, separate from keyboard/mouse interaction tests.
+     * Sample empty interior padding, including its actual framebuffer compositing, before PNG flip. */
+    private fun buttonStateEvidence(screen: BaseScreen, pixels: Pixmap): List<Map<String, Any?>> =
+        screen.stage.root.atlasDescendants().filterIsInstance<AtlasStateButton>().map { button ->
+            val position = button.localToStageCoordinates(Vector2())
+            val labelPosition = button.label.localToStageCoordinates(Vector2())
+            val color = button.resolvedFontColor()
+            val points = listOf(Vector2(position.x + 6f, position.y + button.height / 2f),
+                Vector2(position.x + button.width - 6f, position.y + button.height / 2f),
+                Vector2(position.x + button.width - 6f, position.y + button.height / 2f + 4f))
+            linkedMapOf("name" to button.name, "state" to button.preview.name,
+                "evidenceKind" to "controlled native state selectors; no keyboard/mouse interaction",
+                "bounds" to listOf(position.x, position.y, button.width, button.height),
+                "labelBounds" to listOf(labelPosition.x, labelPosition.y, button.label.width, button.label.height),
+                "resolvedNativeForeground" to listOf(color.r, color.g, color.b, color.a),
+                "backgroundCompositeSamples" to points.map { point ->
+                    check(point.x >= 0 && point.x < pixels.width && point.y >= 0 && point.y < pixels.height) {
+                        "State control ${button.name} is outside the capture"
+                    }
+                    val sample = Color(pixels.getPixel(point.x.toInt(), point.y.toInt()))
+                    mapOf("stagePixel" to listOf(point.x.toInt(), point.y.toInt()),
+                        "rgba" to listOf(sample.r, sample.g, sample.b, sample.a))
+                },
+                "over" to button.isOver, "pressed" to button.isPressed,
+                "focused" to button.hasKeyboardFocus(), "checked" to button.isChecked,
+                "disabled" to button.isDisabled)
+        }.toList()
 
     internal fun draw(screen: BaseScreen, delta: Float) {
         val stage = screen.stage

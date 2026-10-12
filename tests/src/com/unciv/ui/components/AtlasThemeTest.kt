@@ -3,6 +3,9 @@ package com.unciv.ui.components
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.ui.Label
+import com.badlogic.gdx.scenes.scene2d.ui.Button
+import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable
+import com.unciv.ui.components.fonts.Fonts
 import com.badlogic.gdx.scenes.scene2d.ui.CheckBox
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton
 import com.badlogic.gdx.scenes.scene2d.ui.ImageTextButton
@@ -297,6 +300,124 @@ class AtlasThemeTest {
             }
         }
     }
+
+    @Test fun semanticButtonRolesSurviveRepeatPassesAndSkinRecreation() {
+        selectSkin("Atlas")
+        for (name in listOf("positive", "negative")) {
+            for (reloadBeforeFirstPass in listOf(false, true)) {
+                val button = TextButton(name, BaseScreen.skin, name)
+                val backgrounds = backgrounds(button.style)
+                val colors = foregrounds(button.style).map { it?.cpy() }
+                button.onActivation {}
+                button.keyShortcuts.add('z')
+                val owner = button.userObject
+                button.isChecked = true; button.isDisabled = true
+                val listeners = button.listeners.toList()
+                if (reloadBeforeFirstPass) BaseScreen.setSkin()
+                repeat(2) {
+                    GameUiStyle.applyWidget(button)
+                    backgrounds.zip(backgrounds(button.style)).forEach { (before, after) -> assertSame(before, after) }
+                    assertEquals(colors, foregrounds(button.style))
+                    assertSame(Fonts.font, button.style.font)
+                }
+                BaseScreen.setSkin()
+                GameUiStyle.applyWidget(button)
+                backgrounds.zip(backgrounds(button.style)).forEach { (before, after) -> assertSame(before, after) }
+                assertEquals(colors, foregrounds(button.style))
+                assertSame(Fonts.font, button.style.font)
+                assertSame(owner, button.userObject)
+                assertEquals(listeners, button.listeners.toList())
+                assertTrue(button.isChecked && button.isDisabled)
+                assertTrue(KeyCharAndCode('z') in button.keyShortcuts)
+            }
+        }
+    }
+
+    @Test fun everyPrimaryButtonSubclassKeepsItsRoleAfterRootPassAndReload() {
+        selectSkin("Atlas")
+        val image = ImageGetter.getDrawable("OtherIcons/Checkmark")
+        val icon = ImageButton(ImageButton.ImageButtonStyle().apply { imageUp = image })
+        val plain = Button(BaseScreen.skin)
+        val text = GameUiStyle.button("Confirm", primary = true)
+        for (button in listOf(plain, icon, text)) {
+            val owner = Any(); button.userObject = owner
+            val footer = AtlasWidgets.footer(button, emptyList())
+            repeat(2) {
+                GameUiStyle.applyWidget(footer)
+                assertTrue("Primary fill replaced by secondary states", button.style.up is NinePatchDrawable)
+                assertEquals(GameUiStyle.accent, (button.style.up as NinePatchDrawable).patch.color)
+            }
+            BaseScreen.setSkin()
+            GameUiStyle.applyWidget(footer)
+            assertEquals(GameUiStyle.accent, (button.style.up as NinePatchDrawable).patch.color)
+            assertSame(owner, button.userObject)
+            if (button is ImageButton) assertSame(image, button.style.imageUp)
+        }
+    }
+
+    @Test fun typedPrimaryTransfersEveryForegroundStateAndCopiesColors() {
+        selectSkin("Atlas")
+        val image = ImageGetter.getDrawable("OtherIcons/Keyboard")
+        val incoming = ImageTextButton.ImageTextButtonStyle().apply {
+            font = Fonts.font; imageUp = image; fontColor = GameUiStyle.ink
+            overFontColor = GameUiStyle.ink; downFontColor = GameUiStyle.ink
+            checkedFontColor = GameUiStyle.ink; focusedFontColor = GameUiStyle.ink
+            checkedOverFontColor = GameUiStyle.ink; checkedDownFontColor = GameUiStyle.ink
+        }
+        val button = ImageTextButton("Confirm", incoming)
+        button.onActivation {}; button.keyShortcuts.add('y')
+        val owner = button.userObject
+        val listeners = button.listeners.toList()
+        val footer = AtlasWidgets.footer(button, emptyList())
+        fun verify() {
+            val reference = GameUiStyle.button("Reference", primary = true).style
+            assertEquals(foregrounds(reference), foregrounds(button.style))
+            assertSame(Fonts.font, button.style.font)
+            assertSame(image, button.style.imageUp)
+            assertSame(owner, button.userObject)
+            assertEquals(listeners, button.listeners.toList())
+        }
+        verify()
+        repeat(2) { GameUiStyle.applyWidget(footer); verify() }
+        BaseScreen.setSkin(); GameUiStyle.applyWidget(footer); verify()
+        button.style.overFontColor.a = 0.2f
+        assertEquals(1f, incoming.overFontColor.a, 0f)
+    }
+
+    @Test fun explicitTypedSemanticForegroundSurvivesRepeatPassesAndReload() {
+        selectSkin("Atlas")
+        val image = ImageGetter.getDrawable("OtherIcons/Checkmark")
+        val incoming = ImageTextButton.ImageTextButtonStyle().apply {
+            font = Fonts.font; imageUp = image
+            fontColor = GameUiStyle.positive; overFontColor = GameUiStyle.warning
+            downFontColor = GameUiStyle.error; checkedFontColor = GameUiStyle.info
+            focusedFontColor = GameUiStyle.ownership; disabledFontColor = GameUiStyle.muted
+            checkedOverFontColor = GameUiStyle.warning; checkedDownFontColor = GameUiStyle.error
+        }
+        val colors = foregrounds(incoming).map { it?.cpy() }
+        val button = ImageTextButton("Semantic status", incoming)
+        button.onActivation {}; button.keyShortcuts.add('s')
+        val owner = button.userObject
+        val listeners = button.listeners.toList()
+        button.isChecked = true; button.isDisabled = true
+        repeat(2) { GameUiStyle.applyWidget(button); assertEquals(colors, foregrounds(button.style)) }
+        BaseScreen.setSkin(); GameUiStyle.applyWidget(button)
+        assertEquals(colors, foregrounds(button.style))
+        assertSame(Fonts.font, button.style.font)
+        assertSame(image, button.style.imageUp)
+        assertSame(owner, button.userObject)
+        assertEquals(listeners, button.listeners.toList())
+        assertTrue(button.isChecked && button.isDisabled)
+        assertTrue(KeyCharAndCode('s') in button.keyShortcuts)
+        button.style.checkedDownFontColor.a = 0.2f
+        assertEquals(1f, incoming.checkedDownFontColor.a, 0f)
+    }
+
+    private fun backgrounds(style: Button.ButtonStyle) = listOf(style.up, style.over, style.down,
+        style.checked, style.focused, style.disabled, style.checkedOver, style.checkedDown)
+    private fun foregrounds(style: TextButton.TextButtonStyle) = listOf(style.fontColor, style.overFontColor,
+        style.downFontColor, style.checkedFontColor, style.focusedFontColor, style.disabledFontColor,
+        style.checkedOverFontColor, style.checkedDownFontColor)
 
     companion object {
         fun composite(foreground: Color, background: Color) = Color(

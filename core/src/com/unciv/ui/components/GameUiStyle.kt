@@ -22,9 +22,11 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable
 import com.unciv.ui.components.UncivTooltip.Companion.addTooltip
 import com.unciv.ui.components.extensions.setFontSize
 import com.unciv.ui.components.extensions.toTextButton
+import com.unciv.ui.components.fonts.Fonts
 import com.unciv.ui.components.widgets.ExpanderTab
 import com.unciv.ui.images.ImageGetter
 import com.unciv.ui.screens.basescreen.BaseScreen
+import java.util.WeakHashMap
 
 /** Shared controls. Atlas is opt-in; the existing scoped treatment remains available to other skins. */
 object GameUiStyle {
@@ -66,6 +68,58 @@ object GameUiStyle {
         const val m = 8f
         const val l = 12f
         const val xl = 16f
+    }
+
+    /** UI-thread presentation metadata never occupies Actor.userObject (owned by input/callers).
+     * Weak keys and templates containing only copied colors/drawables retain neither actor nor style keys.
+     * Templates omit fonts; each pass binds the current selected platform font. */
+    private data class ButtonRole(val primary: Boolean = false,
+        val semanticStyle: TextButton.TextButtonStyle? = null,
+        val semanticForeground: TextButton.TextButtonStyle? = null)
+    private val buttonRoles = WeakHashMap<Button, ButtonRole>()
+    private val namedSemanticStyles = WeakHashMap<Button.ButtonStyle, String>()
+
+    private fun copyForeground(source: TextButton.TextButtonStyle, target: TextButton.TextButtonStyle) {
+        target.fontColor = source.fontColor?.cpy()
+        target.overFontColor = source.overFontColor?.cpy()
+        target.downFontColor = source.downFontColor?.cpy()
+        target.checkedFontColor = source.checkedFontColor?.cpy()
+        target.focusedFontColor = source.focusedFontColor?.cpy()
+        target.disabledFontColor = source.disabledFontColor?.cpy()
+        target.checkedOverFontColor = source.checkedOverFontColor?.cpy()
+        target.checkedDownFontColor = source.checkedDownFontColor?.cpy()
+    }
+
+    private fun template(source: TextButton.TextButtonStyle) = TextButton.TextButtonStyle(source).also {
+        copyForeground(source, it)
+        it.font = null
+    }
+
+    private fun role(button: Button): ButtonRole = buttonRoles.getOrPut(button) {
+        val source = when (button) {
+            is TextButton -> button.style
+            is ImageTextButton -> button.style
+            else -> null
+        }
+        when {
+            source != null && namedSemanticStyles.containsKey(source) -> ButtonRole(semanticStyle = template(source))
+            source?.fontColor == surface -> ButtonRole(primary = true)
+            button is ImageTextButton && source?.fontColor != null && source.fontColor != Color.WHITE &&
+                source.fontColor != ink && source.fontColor != Color.valueOf("eef2f4") ->
+                ButtonRole(semanticForeground = TextButton.TextButtonStyle().also { copyForeground(source, it) })
+            else -> ButtonRole()
+        }
+    }
+
+    private fun controlStyle(button: Button, source: TextButton.TextButtonStyle,
+        minHeight: Float = standardControlHeight): TextButton.TextButtonStyle {
+        val role = role(button)
+        return if (role.semanticStyle != null) TextButton.TextButtonStyle(role.semanticStyle).also {
+            copyForeground(role.semanticStyle, it)
+            it.font = Fonts.font
+        } else buttonStyle(source, role.primary, minHeight).also {
+            role.semanticForeground?.let { colors -> copyForeground(colors, it) }
+        }
     }
 
     enum class ButtonSize(val fontSize: Int, val padVertical: Float, val padHorizontal: Float) {
@@ -118,7 +172,10 @@ object GameUiStyle {
         text.toTextButton().also { apply(it, primary, size) }
 
     fun apply(button: Button, primary: Boolean = false, size: ButtonSize = ButtonSize.Regular) {
-        val style = buttonStyle(BaseScreen.skin.get(TextButton.TextButtonStyle::class.java), primary,
+        val previous = role(button)
+        buttonRoles[button] = if (primary) ButtonRole(primary = true)
+            else if (previous.primary) ButtonRole() else previous
+        val style = controlStyle(button, BaseScreen.skin.get(TextButton.TextButtonStyle::class.java),
             if (size == ButtonSize.Regular) standardControlHeight else compactControlHeight)
         button.style = typedButtonStyle(button, style)
         if (button is TextButton) button.label.setFontSize(size.fontSize)
@@ -131,6 +188,7 @@ object GameUiStyle {
 
     private fun buttonStyle(source: TextButton.TextButtonStyle, primary: Boolean = false, minHeight: Float = standardControlHeight): TextButton.TextButtonStyle =
         TextButton.TextButtonStyle(source).apply {
+            font = Fonts.font
             disabled = outlinedBackground("WorldScreen/Controls/Disabled", surface, if (isAtlas) muted else hover)
             disabledFontColor = muted
             if (primary) {
@@ -156,9 +214,15 @@ object GameUiStyle {
                 downFontColor = accent
                 checkedFontColor = selection
             }
+            // Clear inherited combined/focus overrides: these states must use this role's palette.
+            focusedFontColor = fontColor?.cpy()
+            checkedOverFontColor = checkedFontColor?.cpy()
+            checkedDownFontColor = checkedFontColor?.cpy()
+            checkedOver = if (primary) over else checked
+            checkedDown = down
             if (isAtlas) {
                 // The fill's geometry can be small; its actual hit/layout target remains accessible.
-                for (drawable in listOf(up, over, down, checked, focused, disabled))
+                for (drawable in listOf(up, over, down, checked, focused, disabled, checkedOver, checkedDown))
                     if (drawable is BaseDrawable) drawable.minHeight = minHeight
             }
         }
@@ -168,16 +232,15 @@ object GameUiStyle {
         fun Button.ButtonStyle.withStates() = apply {
             up = common.up; over = common.over; down = common.down; checked = common.checked
             focused = common.focused; disabled = common.disabled
+            checkedOver = common.checkedOver; checkedDown = common.checkedDown
         }
         return when (button) {
             is CheckBox -> if (isAtlas) checkBoxStyle(button.style, preserveImages = true) else CheckBox.CheckBoxStyle(button.style)
             is ImageButton -> ImageButton.ImageButtonStyle(button.style).withStates()
             is ImageTextButton -> ImageTextButton.ImageTextButtonStyle(button.style).apply {
                 withStates()
-                val original = button.style.fontColor
-                // Conflict/nation colors belong to the control, just like its image tints.
-                fontColor = if (original == Color.WHITE || original == ink) common.fontColor else original?.cpy()
-                disabledFontColor = muted
+                font = Fonts.font
+                copyForeground(common, this)
             }
             is TextButton -> common
             else -> Button.ButtonStyle(common)
@@ -187,6 +250,11 @@ object GameUiStyle {
     /** Called once after native fonts are rebound, while constructing a fresh selected skin.
      * Only Atlas default styles are replaced. Named semantic/mod styles and other skins are untouched. */
     fun initializeSkin(skin: Skin) {
+        // Record every skin's named styles before replacing/copying any defaults. Old style keys
+        // remain discoverable only while an existing actor still owns them across skin recreation.
+        for (name in listOf("positive", "negative"))
+            if (skin.has(name, TextButton.TextButtonStyle::class.java))
+                namedSemanticStyles[skin.get(name, TextButton.TextButtonStyle::class.java)] = name
         if (!isAtlas) return
         skin.add("default", buttonStyle(skin.get(TextButton.TextButtonStyle::class.java)), TextButton.TextButtonStyle::class.java)
         skin.add("default", Button.ButtonStyle(skin.get(TextButton.TextButtonStyle::class.java)), Button.ButtonStyle::class.java)
@@ -281,21 +349,14 @@ object GameUiStyle {
                 actor.cells.firstOrNull()?.minHeight(standardControlHeight - 2 * Space.m)
             }
             is TextButton -> {
-                val semanticStyle = listOf("positive", "negative").any {
-                    BaseScreen.skin.has(it, TextButton.TextButtonStyle::class.java) &&
-                        actor.style === BaseScreen.skin.get(it, TextButton.TextButtonStyle::class.java)
-                }
-                actor.style = if (semanticStyle) TextButton.TextButtonStyle(actor.style).apply {
-                    fontColor = fontColor?.cpy(); overFontColor = overFontColor?.cpy(); downFontColor = downFontColor?.cpy()
-                } else buttonStyle(actor.style, primary = actor.style.fontColor == surface)
+                actor.style = controlStyle(actor, actor.style)
                 actor.pad(Space.m, Space.l, Space.m, Space.l)
             }
             is ImageButton, is ImageTextButton -> {
                 val source = if (actor is ImageTextButton) actor.style else BaseScreen.skin.get(TextButton.TextButtonStyle::class.java)
-                actor.style = typedButtonStyle(actor, buttonStyle(source,
-                    primary = actor is ImageTextButton && actor.style.fontColor == surface))
+                actor.style = typedButtonStyle(actor, controlStyle(actor, source))
             }
-            is Button -> actor.style = Button.ButtonStyle(buttonStyle(BaseScreen.skin.get(TextButton.TextButtonStyle::class.java)))
+            is Button -> actor.style = Button.ButtonStyle(controlStyle(actor, BaseScreen.skin.get(TextButton.TextButtonStyle::class.java)))
             is TextField -> actor.style = fieldStyle(actor.style)
             is SelectBox<*> -> actor.style = selectStyle(actor.style)
             is Label -> {
