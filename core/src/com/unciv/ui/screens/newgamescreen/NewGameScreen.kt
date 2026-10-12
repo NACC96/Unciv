@@ -265,6 +265,8 @@ class NewGameScreen(
         val description = pickerPane.descriptionLabel
         description.setFontColor(if (blockedReason == null) GameUiStyle.muted else GameUiStyle.warning)
         description.setText((blockedReason ?: AGENT_START_NOTICE).tr())
+        if (pickerPane.bottomTable.getCell(description) != null)
+            pickerPane.updateSetupFooterSize(stage.height)
     }
 
     companion object {
@@ -559,6 +561,9 @@ internal fun Actor.polishSetupWidgets() {
             background = GameUiStyle.background("NewGameScreen/Options/${javaClass.simpleName}")
     }
     if (this is Group) children.forEach { it.polishSetupWidgets() }
+    // A closed expander keeps its content detached until it opens. Attached content
+    // was already visited through children, so only traverse the detached case here.
+    if (this is ExpanderTab && innerTable.parent == null) innerTable.polishSetupWidgets()
 }
 
 /** Reuses the PickerPane action so readiness, working state and keyboard input share one widget. */
@@ -584,15 +589,17 @@ internal fun PickerPane.configureSetupFooter(
     val available = width - 16f - gap * buttons.size - spacer
     fun preferred(button: TextButton) =
         if (button === rightSideButton) maxOf(button.prefWidth, 150f) else button.prefWidth
-    val preferredTotal = buttons.sumOf { preferred(it).toDouble() }.toFloat()
+    // Wrapped labels report zero preferred width; retain their natural measurements before wrapping.
+    val preferredWidths = buttons.map(::preferred)
+    val preferredTotal = preferredWidths.sum()
     // Natural widths when they fit; otherwise shrink proportionally so Start stays the widest.
     val scale = (available / preferredTotal).coerceAtMost(1f)
 
     val actions = Table().apply { name = "SetupFooterActions" }
-    for (button in buttons) {
+    for ((index, button) in buttons.withIndex()) {
         button.label.wrap = scale < 1f
         button.label.setAlignment(Align.center)
-        val cell = actions.add(button).width(preferred(button) * scale).fillY().pad(gap / 2)
+        val cell = actions.add(button).width(preferredWidths[index] * scale).fillY().pad(gap / 2)
         if (button === closeButton) cell.padRight(gap / 2 + spacer).expandX().left()
     }
     bottomTable.clear()
@@ -606,8 +613,15 @@ internal fun PickerPane.configureSetupFooter(
     descriptionLabel.width = width - 16f
     bottomTable.add(descriptionLabel).width(width - 16f).growX().padBottom(6f).row()
     bottomTable.add(actions).growX().row()
+    updateSetupFooterSize(height)
+}
+
+/** Readiness captions change height; remeasure the configured footer without replacing its actions. */
+internal fun PickerPane.updateSetupFooterSize(height: Float) {
     // PickerPane normally reserves only 15% for the footer. A short desktop window
     // needs the actual fixed action height, with the option area taking the remainder.
-    splitPane.maxSplitAmount = (1f - bottomTable.prefHeight / height).coerceIn(0.4f, 0.85f)
+    val footerHeight = bottomTable.prefHeight
+    maxBottomTableHeight = maxOf(150f, footerHeight)
+    splitPane.maxSplitAmount = (1f - footerHeight / height).coerceIn(0.4f, 0.85f)
     invalidateHierarchy()
 }

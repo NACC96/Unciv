@@ -25,11 +25,11 @@ import com.unciv.ui.screens.newgamescreen.SetupPresetsPopup
 /** Production setup widgets on a real GPU, with isolated synthetic data and no provider or game run. */
 object SetupPolishRenderCheck {
     @JvmStatic fun main(args: Array<String>) {
-        require(args.isNotEmpty()) { "Provide an isolated output directory" }
+        require(args.size >= 3) { "Provide an isolated output directory, width and height; run each size in a separate JVM" }
         val synchronous = java.lang.Boolean.getBoolean("unciv.renderCheck.synchronous")
-        require(!synchronous || args.size >= 3) { "Synchronous setup capture requires explicit width and height" }
-        val sizes = if (args.size >= 3) listOf(args[1].toInt() to args[2].toInt())
-            else listOf(800 to 500, 520 to 360)
+        val fontSizeMultiplier = args.getOrNull(3)?.toFloat() ?: 1f
+        // ImageGetter's global atlas cache belongs to this JVM's sole GL context.
+        val sizes = listOf(args[1].toInt() to args[2].toInt())
         var failure: Throwable? = null
         for ((width, height) in sizes) {
             if (failure != null) break
@@ -47,7 +47,7 @@ object SetupPolishRenderCheck {
                     try {
                         stage = UncivStage(ScreenViewport())
                         stage.viewport.update(width, height, true)
-                        fixture = SetupLayoutFixture(width.toFloat(), height.toFloat(), stage)
+                        fixture = SetupLayoutFixture(width.toFloat(), height.toFloat(), stage, fontSizeMultiplier)
                         val output = Gdx.files.absolute(args[0])
                         output.mkdirs()
                         fixture.includeOptions(output.child("synthetic-$width-$height").path())

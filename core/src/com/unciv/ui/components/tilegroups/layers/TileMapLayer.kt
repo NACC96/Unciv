@@ -1,9 +1,12 @@
 package com.unciv.ui.components.tilegroups.layers
 
 import com.badlogic.gdx.graphics.g2d.Batch
+import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.Group
 import com.badlogic.gdx.scenes.scene2d.Touchable
+import kotlin.math.max
+import kotlin.math.min
 
 /** Container holding all [TileLayer] instances of one subtype across the whole map,
  *  forming a single rendering/interaction layer in [com.unciv.ui.components.tilegroups.TileGroupMap].
@@ -102,6 +105,47 @@ class UnitFlagMapLayer(initialCapacity: Int, actable: Boolean = false, touchable
 
 class CityButtonMapLayer(initialCapacity: Int, actable: Boolean = false, touchable: Boolean = false):
     TileMapLayer<TileLayerCityButton>(initialCapacity, actable, touchable) {
+    private val cityCullingArea = Rectangle()
+
     override fun act(delta: Float) = super.act(delta)
-    override fun draw(batch: Batch, parentAlpha: Float) = super.draw(batch, parentAlpha)
+
+    override fun draw(batch: Batch, parentAlpha: Float) {
+        val parentArea = cullingArea ?: return super.draw(batch, parentAlpha)
+        var expandLeft = 0f
+        var expandRight = 0f
+        var expandBottom = 0f
+        var expandTop = 0f
+        // City wrappers deliberately have no size. Group's culling tests their origins,
+        // so include the annotation stack's overhang without changing movement or hit bounds.
+        for (wrapperIndex in 0 until children.size) {
+            val wrapper = children[wrapperIndex] as? Group ?: continue
+            if (!wrapper.isVisible) continue
+            val scaleX = if (wrapper.isTransform) wrapper.scaleX else 1f
+            val scaleY = if (wrapper.isTransform) wrapper.scaleY else 1f
+            val originX = wrapper.originX
+            val originY = wrapper.originY
+            for (childIndex in 0 until wrapper.children.size) {
+                val child = wrapper.children[childIndex]
+                if (!child.isVisible) continue
+                val x1 = originX + (child.x - originX) * scaleX
+                val x2 = originX + (child.x + child.width - originX) * scaleX
+                val y1 = originY + (child.y - originY) * scaleY
+                val y2 = originY + (child.y + child.height - originY) * scaleY
+                // Expand the opposite viewport edge: a child reaching right can be
+                // visible while its wrapper origin sits to the left of the viewport.
+                expandLeft = max(expandLeft, max(x1, x2) - wrapper.width)
+                expandRight = max(expandRight, -min(x1, x2))
+                expandBottom = max(expandBottom, max(y1, y2) - wrapper.height)
+                expandTop = max(expandTop, -min(y1, y2))
+            }
+        }
+        cityCullingArea.set(parentArea.x - expandLeft, parentArea.y - expandBottom,
+            parentArea.width + expandLeft + expandRight, parentArea.height + expandBottom + expandTop)
+        cullingArea = cityCullingArea
+        try {
+            super.draw(batch, parentAlpha)
+        } finally {
+            cullingArea = parentArea
+        }
+    }
 }

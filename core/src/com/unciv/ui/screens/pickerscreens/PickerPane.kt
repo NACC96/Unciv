@@ -32,7 +32,7 @@ class PickerPane(
     val rightSideButton = "".toTextButton()
 
     private val screenSplit = 0.85f
-    private val maxBottomTableHeight = 150f     // about 7 lines of normal text
+    internal var maxBottomTableHeight = 150f   // about 7 lines of normal text; setup can reserve larger captions
 
     /**
      * The table displaying the choices from which to pick (usually).

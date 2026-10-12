@@ -99,6 +99,7 @@ class PlayerPickerTable(
         val shuffle = "Shuffle Civ Order at Start".toCheckBox(gameParameters.shufflePlayerOrder) { gameParameters.shufflePlayerOrder = it }
         shuffle.polishSetupWidgets()
         shuffle.label.wrap = true
+        shuffle.labelCell.growX()
         add(shuffle).width(civBlocksWidth - 16f).padTop(2f).padBottom(8f).row()
         add(ScrollPane(playerListTable).apply { setOverscroll(false, false) }).width(civBlocksWidth)
         update()
@@ -463,6 +464,8 @@ class PlayerPickerTable(
             }
             add(selectPlayerFromFriendsList).left().colspan(3).fillX().pad(5f)
         }
+        // Nation cards own their styling and are skipped by the screen traversal.
+        if (previousScreen is NewGameScreen) polishSetupWidgets()
     }
 
     /**

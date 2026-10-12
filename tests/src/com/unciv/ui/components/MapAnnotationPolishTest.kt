@@ -1,6 +1,8 @@
 package com.unciv.ui.components
 
 import com.badlogic.gdx.scenes.scene2d.Actor
+import com.badlogic.gdx.graphics.g2d.Batch
+import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.scenes.scene2d.Group
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.Stage
@@ -10,15 +12,22 @@ import com.unciv.Constants
 import com.unciv.UncivGame
 import com.unciv.dev.FontDesktop
 import com.unciv.logic.city.City
+import com.unciv.logic.city.CityFlags
 import com.unciv.logic.civilization.Civilization
+import com.unciv.models.tilesets.TileSetCache
 import com.unciv.testing.GdxTestRunner
 import com.unciv.testing.TestGame
 import com.unciv.ui.components.fonts.FontRulesetIcons
 import com.unciv.ui.components.fonts.Fonts
 import com.unciv.ui.components.widgets.BorderedTable
+import com.unciv.ui.components.tilegroups.TileSetStrings
+import com.unciv.ui.components.tilegroups.WorldTileGroup
+import com.unciv.ui.components.tilegroups.citybutton.CityButton
+import com.unciv.ui.components.tilegroups.layers.CityButtonMapLayer
 import com.unciv.ui.images.ImageGetter
 import com.unciv.ui.screens.worldscreen.WorldScreen
 import com.unciv.ui.screens.worldscreen.minimap.MapOverlayToggleButton
+import com.unciv.ui.screens.worldscreen.unit.UnitTable
 import com.unciv.view.CityView
 import com.unciv.view.GameView
 import org.junit.After
@@ -125,6 +134,55 @@ class MapAnnotationPolishTest {
         val plaque = f.plaque(f.romanCity, f.rome)
         plaque.pack()
         assertTrue(plaque.descendants().filterIsInstance<Label>().any { it.text.toString() == f.romanCity.name })
+    }
+
+    @Test fun `a two-line city with aircraft and status stays visible at the bottom viewport edge`() {
+        val f = Fixture()
+        f.romanCity.name = "Rome beside the northern mountains and coastal trade routes"
+        f.romanCity.setFlag(CityFlags.WeLoveTheKing, 10)
+        // Unit placement explores tiles. Keep that fixture mutation independent of
+        // the mocked screen's undo handler, as in ordinary game setup.
+        val screenField = UncivGame::class.java.getDeclaredField("worldScreen").apply { isAccessible = true }
+        screenField.set(UncivGame.Current, null)
+        try {
+            f.game.addUnit("Fighter", f.rome, f.romanCity.getCenterTile())
+            f.rome.cache.updateViewableTiles()
+        } finally {
+            screenField.set(UncivGame.Current, f.screen)
+        }
+        Mockito.`when`(f.screen.selectedCiv).thenReturn(f.rome)
+        val unitTableGetter = f.screen.javaClass.methods.single {
+            it.name.substringBefore('$') == "getBottomUnitTable"
+        }
+        Mockito.`when`(unitTableGetter.invoke(f.screen) as UnitTable?)
+            .thenReturn(Mockito.mock(UnitTable::class.java))
+        TileSetCache.loadTileSetConfigs()
+        val view = GameView(f.game.gameInfo, f.rome)
+        val tile = WorldTileGroup(view.getTile(f.romanCity.getCenterTile()), TileSetStrings())
+        val button = Mockito.spy(CityButton(view.getForeignCityView(f.romanCity), tile))
+        Mockito.doNothing().`when`(button).draw(Mockito.any(Batch::class.java), Mockito.anyFloat())
+        val wrapper = Group().apply {
+            isTransform = false
+            setPosition(400f, -96f)
+            addActor(button)
+        }
+        button.update(true)
+        assertTrue("Full city stack must extend into the visible viewport", wrapper.y + button.height > 0f)
+        assertTrue(button.descendants().any { it.javaClass.simpleName == "AirUnitTable" })
+        assertTrue(button.descendants().any { it.javaClass.simpleName == "StatusTable" && (it as com.badlogic.gdx.scenes.scene2d.ui.Table).cells.size > 0 })
+        val area = Rectangle(-75f, -75f, 1150f, 790f)
+        val layer = CityButtonMapLayer(1).apply {
+            cullingArea = area
+            addActor(wrapper)
+        }
+        val batch = Mockito.mock(Batch::class.java)
+
+        layer.draw(batch, 1f)
+
+        Mockito.verify(button).draw(batch, 1f)
+        assertSame(area, layer.cullingArea)
+        assertEquals(-96f, wrapper.y, 0f)
+        assertEquals(0f, wrapper.height, 0f)
     }
 
     @Test fun `own cities keep a heavy rim and foreign identity uses the nation's own colour pair`() {

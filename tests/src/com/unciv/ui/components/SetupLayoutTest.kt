@@ -8,11 +8,13 @@ import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.Group
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.Touchable
+import com.badlogic.gdx.scenes.scene2d.ui.CheckBox
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import com.unciv.Constants
 import com.unciv.UncivGame
+import com.unciv.app.desktop.DesktopFont
 import com.unciv.dev.FontDesktop
 import com.unciv.logic.agents.AgentProfile
 import com.unciv.logic.civilization.PlayerType
@@ -48,7 +50,13 @@ import org.junit.runner.RunWith
 import org.mockito.Mockito
 
 /** Synthetic data and production widgets; no game settings, save directory or provider is opened. */
-internal class SetupLayoutFixture(val width: Float, val height: Float, realStage: UncivStage? = null) {
+internal class SetupLayoutFixture(
+    val width: Float,
+    val height: Float,
+    realStage: UncivStage? = null,
+    fontSizeMultiplier: Float = 1f,
+    includeOpponent: Boolean = true
+) {
     val game = TestGame()
     val root = realStage?.root ?: Group().apply { setSize(width, height) }
     val stage = realStage ?: Mockito.mock(UncivStage::class.java)
@@ -70,7 +78,9 @@ internal class SetupLayoutFixture(val width: Float, val height: Float, realStage
     var mapOptions: MapOptionsTable? = null
 
     init {
-        Fonts.fontImplementation = FontDesktop()
+        UncivGame.Current.settings.fontSizeMultiplier = fontSizeMultiplier
+        // FontDesktop has a fixed font size; exercise accessibility scaling with the production font.
+        Fonts.fontImplementation = if (fontSizeMultiplier == 1f) FontDesktop() else DesktopFont()
         ImageGetter.setNewRuleset(game.ruleset)
         if (realStage == null) {
             Mockito.`when`(stage.width).thenReturn(width)
@@ -85,7 +95,8 @@ internal class SetupLayoutFixture(val width: Float, val height: Float, realStage
         }
         setup.gameParameters.players.clear()
         setup.gameParameters.players.add(player)
-        setup.gameParameters.players.add(Player("Korea", PlayerType.AI).apply { setNationTransient(game.ruleset) })
+        if (includeOpponent)
+            setup.gameParameters.players.add(Player("Korea", PlayerType.AI).apply { setNationTransient(game.ruleset) })
         pane = PickerPane()
         Mockito.`when`(screen.stage).thenReturn(stage)
         Mockito.`when`(screen.gameSetupInfo).thenReturn(setup)
@@ -98,7 +109,6 @@ internal class SetupLayoutFixture(val width: Float, val height: Float, realStage
         picker.profileCache[player] = profile
         picker.update()
         pane.topTable.add(picker).width(width - 40f).top().row()
-        pane.descriptionLabel.setText("Starting an agent game begins automated play immediately using the selected provider account.")
         setupFunction("configureSetupFooter", pane, width, height, {}, {})
         stage.addActor(pane)
         pane.setSize(width, height)
@@ -328,6 +338,106 @@ class SetupLayoutTest {
         assertEquals(720f, width, 0.01f)
         val narrow = setupMember(NewGameScreen.Companion, NewGameScreen.Companion::class.java, "stackedContentWidth", 520f) as Float
         assertEquals(500f, narrow, 0.01f)
+    }
+
+    @Test fun `wrapped footer captions keep readable widths in narrow windows and large fonts`() {
+        for ((width, height) in listOf(420f to 600f, 520f to 360f)) {
+            for (multiplier in listOf(1f, 1.5f)) {
+                val fixture = SetupLayoutFixture(width, height, fontSizeMultiplier = multiplier)
+                for (button in fixture.pane.bottomTable.setupDescendants().filterIsInstance<TextButton>()) {
+                    val context = "${button.text} at $width x $height with font scale $multiplier"
+                    val position = button.localToStageCoordinates(Vector2())
+                    assertTrue("$context needs positive caption width", button.label.width > 0f)
+                    assertTrue("$context must display its whole caption", button.label.height + 0.5f >= button.label.prefHeight)
+                    assertTrue("$context must stay inside the footer",
+                        button.localToAscendantCoordinates(fixture.pane.bottomTable, Vector2()).y + button.height <= fixture.pane.bottomTable.height + 0.5f)
+                    assertTrue("$context must stay in the viewport",
+                        position.x >= 0f && position.y >= 0f && position.x + button.width <= width + 0.5f && position.y + button.height <= height + 0.5f)
+                }
+                val description = fixture.pane.descriptionLabel
+                val actions = fixture.pane.bottomTable.setupDescendants().filterIsInstance<Table>().single { it.name == "SetupFooterActions" }
+                val descriptionPosition = description.localToStageCoordinates(Vector2())
+                val footerPosition = fixture.pane.bottomTable.localToStageCoordinates(Vector2())
+                assertTrue("The description must fit above the actions at font scale $multiplier",
+                    descriptionPosition.y >= actions.localToStageCoordinates(Vector2()).y + actions.height)
+                assertTrue("The whole description must remain visible at font scale $multiplier", description.height + 0.5f >= description.prefHeight)
+                assertTrue("The description must stay inside the footer at font scale $multiplier",
+                    descriptionPosition.y + description.height <= footerPosition.y + fixture.pane.bottomTable.height + 0.5f)
+                assertTrue("The description must stay below the options at font scale $multiplier",
+                    descriptionPosition.y + description.height <= fixture.pane.scrollPane.localToStageCoordinates(Vector2()).y + 0.5f)
+            }
+        }
+    }
+
+    @Test fun `shuffle caption fills its checkbox and preserves the game option callback`() {
+        for ((width, height) in listOf(420f to 600f, 520f to 360f)) {
+            for (multiplier in listOf(1f, 1.5f)) {
+                val fixture = SetupLayoutFixture(width, height, fontSizeMultiplier = multiplier)
+                val shuffle = fixture.picker.children.filterIsInstance<CheckBox>().single()
+                val label = shuffle.label
+                assertTrue("The Shuffle caption needs usable width", label.width > 100f)
+                assertTrue("The Shuffle caption must fit its allocated height", label.height + 0.5f >= label.prefHeight)
+                assertTrue("The Shuffle caption must contain rendered text", label.glyphLayout.runs.size > 0)
+                assertTrue("The Shuffle caption should need at most two lines",
+                    label.glyphLayout.runs.map { it.y }.distinct().size <= 2)
+                shuffle.isChecked = true
+                assertTrue(fixture.setup.gameParameters.shufflePlayerOrder)
+                shuffle.isChecked = false
+                assertFalse(fixture.setup.gameParameters.shufflePlayerOrder)
+            }
+        }
+    }
+
+    @Test fun `readiness transitions resize the large font footer without replacing Start`() {
+        val fixture = SetupLayoutFixture(520f, 360f, fontSizeMultiplier = 1.5f, includeOpponent = false)
+        val start = fixture.pane.rightSideButton
+        val actions = fixture.pane.bottomTable.setupDescendants().filterIsInstance<Table>().single { it.name == "SetupFooterActions" }
+        val buttons = actions.children.toList()
+        var starts = 0
+        start.onActivation(sound = UncivSound.Silent) { starts++ }
+        val activationListener = start.listeners.filterIsInstance<ActivationListener>().single()
+
+        fun checkCaptionBounds() {
+            repeat(4) { fixture.pane.validate() }
+            val description = fixture.pane.descriptionLabel
+            val descriptionPosition = description.localToStageCoordinates(Vector2())
+            val footerPosition = fixture.pane.bottomTable.localToStageCoordinates(Vector2())
+            assertTrue("The whole readiness caption must remain visible", description.height + 0.5f >= description.prefHeight)
+            assertTrue("The readiness caption must stay above the actions",
+                descriptionPosition.y >= actions.localToStageCoordinates(Vector2()).y + actions.height)
+            assertTrue("The readiness caption must fit inside the footer",
+                descriptionPosition.y + description.height <= footerPosition.y + fixture.pane.bottomTable.height + 0.5f)
+            assertTrue("The readiness caption must stay below the options",
+                descriptionPosition.y + description.height <= fixture.pane.scrollPane.localToStageCoordinates(Vector2()).y + 0.5f)
+            assertEquals("Readiness updates must preserve the action buttons", buttons, actions.children.toList())
+            assertSame(start, fixture.pane.rightSideButton)
+            assertSame(activationListener, start.listeners.filterIsInstance<ActivationListener>().single())
+        }
+
+        fun activateStart() = activationListener.tap(InputEvent().apply { listenerActor = start }, 1f, 1f, 1, 0)
+
+        assertTrue(start.isDisabled)
+        assertEquals("Add at least one more player to start.", fixture.pane.descriptionLabel.text.toString())
+        checkCaptionBounds()
+        activateStart()
+        assertEquals(0, starts)
+
+        val opponent = Player("Korea", PlayerType.AI).apply { setNationTransient(fixture.game.ruleset) }
+        fixture.setup.gameParameters.players.add(opponent)
+        fixture.picker.update()
+        assertFalse(start.isDisabled)
+        assertTrue(fixture.pane.descriptionLabel.text.toString().startsWith("Starting an agent game"))
+        checkCaptionBounds()
+        activateStart()
+        assertEquals(1, starts)
+
+        fixture.setup.gameParameters.players.remove(opponent)
+        fixture.picker.update()
+        assertTrue(start.isDisabled)
+        assertEquals("Add at least one more player to start.", fixture.pane.descriptionLabel.text.toString())
+        checkCaptionBounds()
+        activateStart()
+        assertEquals(1, starts)
     }
 
     @Test fun `footer separates Back and keeps Reset away from the primary Start`() {
