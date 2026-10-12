@@ -5,6 +5,10 @@ import com.badlogic.gdx.Graphics
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.Group
+import com.badlogic.gdx.scenes.scene2d.InputEvent
+import com.badlogic.gdx.scenes.scene2d.Touchable
+import com.badlogic.gdx.scenes.scene2d.ui.Label
+import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import com.unciv.Constants
 import com.unciv.UncivGame
@@ -17,10 +21,12 @@ import com.unciv.testing.GdxTestRunner
 import com.unciv.testing.TestGame
 import com.unciv.ui.audio.MusicController
 import com.unciv.ui.components.fonts.Fonts
+import com.unciv.ui.components.input.ActivationListener
 import com.unciv.ui.images.ImageGetter
 import com.unciv.ui.screens.basescreen.BaseScreen
 import com.unciv.ui.screens.basescreen.UncivStage
 import com.unciv.ui.screens.cityscreen.CityScreen
+import com.unciv.ui.screens.cityscreen.CityConstructionsTable
 import com.unciv.ui.screens.diplomacyscreen.DiplomacyScreen
 import com.unciv.ui.screens.pickerscreens.PolicyPickerScreen
 import com.unciv.ui.screens.pickerscreens.PromotionPickerScreen
@@ -36,6 +42,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Answers
 import org.mockito.Mockito
+import java.util.concurrent.LinkedBlockingQueue
+import java.util.concurrent.TimeUnit
 
 /** Real secondary screens and screen stack, real coordinator commits; only native rendering is mocked. */
 @RunWith(GdxTestRunner::class)
@@ -81,6 +89,7 @@ class AgentSecondarySnapshotTest {
             coordinator = MatchCoordinator(test.gameInfo, state, writer)
             app.settings.showTutorials = false
             app.settings.tutorialTasksCompleted.add("Enter city screen")
+            app.settings.tutorialTasksCompleted.add("Pick construction")
             app.musicController = Mockito.mock(MusicController::class.java)
             Fonts.fontImplementation = FontDesktop()
             ImageGetter.setNewRuleset(test.ruleset)
@@ -287,6 +296,102 @@ class AgentSecondarySnapshotTest {
             .apply { isAccessible = true }.get(trade) as com.unciv.view.TradeView
         assertEquals(10, view.ourStagedOffers().first { it.name == "Gold" }.amount)
     }
+
+    @Test fun `empty construction queue add callback waits for publication before indexed removal`() = withFixture { f ->
+        // Capture actual UI-dispatched factories on its worker. Running them below avoids
+        // waiting for a GL callback while this test owns the headless render thread.
+        val pending = LinkedBlockingQueue<(Int) -> List<(Int) -> AgentCommand>>()
+        Mockito.doAnswer { call ->
+            pending.put(call.getArgument(0))
+            null
+        }.`when`(f.session).executeHumanAction(
+            Mockito.any<(Int) -> List<(Int) -> AgentCommand>>() ?: { emptyList() }
+        )
+        fun commitDispatchedAction() {
+            val factories = pending.poll(5, TimeUnit.SECONDS)
+            assertNotNull("The UI callback must dispatch a human action", factories)
+            assertNull(HumanCommandExecutor(f.coordinator).executeAll(f.rome.civID, factories!!))
+            f.publish()
+        }
+
+        val old = f.openCity()
+        assertTrue(old.cityView.constructions.constructionQueue.isEmpty())
+        val table = cityConstructions(old)
+        // Construct the real available-construction widget synchronously; its normal
+        // background DTO gather would otherwise need this blocked GL test thread.
+        val dtos = CityConstructionsTable::class.java.getDeclaredMethod("getConstructionButtonDTOs")
+            .apply { isAccessible = true }.invoke(table) as List<*>
+        val dto = dtos.first { item ->
+            val construction = item!!.javaClass.getDeclaredField("construction").apply { isAccessible = true }
+                .get(item) as com.unciv.models.ruleset.IConstruction
+            construction.name == "Monument"
+        }!!
+        val button = CityConstructionsTable::class.java.getDeclaredMethod("getConstructionButton", dto.javaClass)
+            .apply { isAccessible = true }.invoke(table, dto) as Table
+        old.stage.addActor(button)
+        button.press() // First tap selects; second tap is the normal add/double-tap path.
+        button.press()
+        assertSame(old, f.app.screen)
+        assertTrue("Dispatch must not mutate the presentation snapshot", old.cityView.constructions.constructionQueue.isEmpty())
+        commitDispatchedAction()
+
+        val fresh = f.app.screen as CityScreen
+        assertNotSame(old, fresh)
+        assertEquals(listOf("Monument"), fresh.cityView.constructions.constructionQueue)
+        val queue = CityConstructionsTable::class.java.getDeclaredField("constructionsQueueTable")
+            .apply { isAccessible = true }.get(cityConstructions(fresh)) as Table
+        val row = queue.children.filterIsInstance<Table>().first { candidate ->
+            candidate.descendants().filterIsInstance<Label>().any { it.text.toString().contains("Monument") }
+        }
+        // Click the real remove control from the freshly rendered queue, index zero.
+        val removeButton = row.children.last()
+        removeButton.press()
+        assertEquals(Touchable.enabled, removeButton.touchable)
+        assertEquals(listOf("Monument"), fresh.cityView.constructions.constructionQueue)
+        commitDispatchedAction()
+        val removed = f.app.screen as CityScreen
+        assertEquals(listOf(com.unciv.models.ruleset.PerpetualConstruction.Idle.name), removed.cityView.constructions.constructionQueue)
+        assertEquals(-1, removed.selectedQueueEntry)
+    }
+
+    @Test fun `queue priority callback preserves selection until committed publication`() = withFixture { f ->
+        f.command { CityProductionCommand(f.rome.civID, "first", it, f.cityId, ProductionOp.ADD_BOTTOM, name = "Monument") }
+        f.command { CityProductionCommand(f.rome.civID, "second", it, f.cityId, ProductionOp.ADD_BOTTOM, name = "Warrior") }
+        f.publish()
+        val pending = LinkedBlockingQueue<(Int) -> List<(Int) -> AgentCommand>>()
+        Mockito.doAnswer { call ->
+            pending.put(call.getArgument(0))
+            null
+        }.`when`(f.session).executeHumanAction(
+            Mockito.any<(Int) -> List<(Int) -> AgentCommand>>() ?: { emptyList() }
+        )
+        val old = f.openCity()
+        old.selectConstructionFromQueue(0)
+        old.selectedQueueEntry = 0
+        val button = CityConstructionsTable::class.java
+            .getDeclaredMethod("getLowerPriorityButton", Int::class.javaPrimitiveType, String::class.java)
+            .apply { isAccessible = true }.invoke(cityConstructions(old), 0, "Monument") as Table
+        old.stage.addActor(button)
+        button.press()
+        assertEquals(0, old.selectedQueueEntry)
+        assertEquals(Touchable.enabled, button.touchable)
+        assertEquals(listOf("Monument", "Warrior"), old.cityView.constructions.constructionQueue)
+        val factories = pending.poll(5, TimeUnit.SECONDS)
+        assertNotNull("The priority button must dispatch its production action", factories)
+        assertNull(HumanCommandExecutor(f.coordinator).executeAll(f.rome.civID, factories!!))
+        f.publish()
+        val fresh = f.app.screen as CityScreen
+        assertNotSame(old, fresh)
+        assertEquals(listOf("Warrior", "Monument"), fresh.cityView.constructions.constructionQueue)
+        assertEquals(1, fresh.selectedQueueEntry)
+        assertEquals("Monument", fresh.selectedConstruction?.name)
+    }
+
+    private fun cityConstructions(screen: CityScreen) = CityScreen::class.java.getDeclaredField("constructionsTable")
+        .apply { isAccessible = true }.get(screen) as CityConstructionsTable
+
+    private fun Actor.press() = listeners.filterIsInstance<ActivationListener>().single()
+        .tap(InputEvent().apply { listenerActor = this@press }, 1f, 1f, 1, 0)
 
     private fun Actor.descendants(): Sequence<Actor> = sequence {
         yield(this@descendants)
