@@ -959,6 +959,7 @@ class MatchCoordinator(
         ) { candidateGame, _ ->
             val city = requireOwnCity(candidateGame, command.actorCivId, command.cityId)
             val constructions = city.cityConstructions
+            val previousConstruction = constructions.currentConstructionName()
             when (command.op) {
                 ProductionOp.ADD_TOP, ProductionOp.ADD_BOTTOM -> {
                     val construction = try {
@@ -1067,6 +1068,9 @@ class MatchCoordinator(
                     city.sellBuilding(building)
                 }
             }
+            // Allocate against the committed queue, rather than an old UI snapshot.
+            if (constructions.currentConstructionName() != previousConstruction)
+                city.reassignPopulation()
             constructions.constructionQueue.joinToString("")
         }
         return CityProductionResult(command.actorCivId, receipt, receipt.resultJson.split(""))
