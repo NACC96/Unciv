@@ -407,6 +407,19 @@ class NotificationsScroll(
             }
 
             notification.addNotificationIconsTo(listItem, worldScreen.gameInfo.ruleset, itemIconSize)
+            if (com.unciv.ui.components.GameUiStyle.isAtlas) {
+                // Notification icons are authored for a light background (including black
+                // unit silhouettes). Retain that local backing within the dark Atlas card.
+                for (icon in listItem.children.filter { it !== label }) {
+                    val cell = listItem.getCell(icon)
+                    val plate = Table().apply {
+                        name = "AtlasNotificationIcon"
+                        background = ImageGetter.getWhiteDotDrawable().tint(WorldScreenStyle.ink)
+                        add(icon).size(itemIconSize)
+                    }
+                    cell.setActor(plate)
+                }
+            }
 
             itemWidth = listItem.prefWidth  // includes the background NinePatch's leftWidth+rightWidth
 
