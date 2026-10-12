@@ -110,12 +110,16 @@ class AgentEngineBridge(val coordinator: MatchCoordinator) {
     }
 
     private fun receiptMap(receipt: ActionReceipt, result: Any?, decisions: List<PendingDecision>): Map<String, Any?> {
+        // A replay must describe the original committed revision, even if the unit has since moved or died.
+        val snapshot = receipt.unitSnapshot
+        val resultWithSnapshot = if (snapshot != null && result is Map<*, *>)
+            result + ("unit" to unitState(snapshot)) else result
         return mapOf(
             "protocolVersion" to 1,
             "actionId" to receipt.actionId,
             "status" to receipt.status(),
             "revision" to receipt.afterRevision,
-            "result" to (result ?: mapOf<String, Any?>()),
+            "result" to (resultWithSnapshot ?: mapOf<String, Any?>()),
             "pendingDecisions" to decisions.map { toJsonMap(it) }
         )
     }
@@ -124,11 +128,11 @@ class AgentEngineBridge(val coordinator: MatchCoordinator) {
         coordinator.getPendingDecisions(actorCivId)
 
     /**
-     * Committed state of the commanded unit, so the caller can chain its next
-     * order without re-observing. Null once the unit was consumed or destroyed.
+     * State captured with the receipt, so replay never substitutes a later position or order.
+     * Null means the command consumed or destroyed the unit; legacy receipts omit the unit field.
      */
-    private fun unitState(actorCivId: String, unitId: Int?): Map<String, Any?>? {
-        val unit = unitId?.let { coordinator.ownUnitState(actorCivId, it) } ?: return null
+    private fun unitState(unit: ActionUnitSnapshot): Map<String, Any?>? {
+        if (!unit.present) return null
         return mapOf("unitId" to unit.unitId, "x" to unit.x, "y" to unit.y,
             // Fractional movement (road thirds) would otherwise serialize as 0.3333333432674408.
             "movementLeft" to Math.round(unit.movementLeft * 100) / 100.0, "health" to unit.health, "action" to unit.action)
@@ -169,8 +173,7 @@ class AgentEngineBridge(val coordinator: MatchCoordinator) {
                         requireInt(args, "unitId"), requireHex(args, "destination"))) as UnitMovedResult
                     receiptMap(result.receipt,
                         mapOf("unitId" to result.unitId,
-                            "position" to mapOf("x" to result.finalPosition.x, "y" to result.finalPosition.y),
-                            "unit" to unitState(actorCivId, result.unitId)),
+                            "position" to mapOf("x" to result.finalPosition.x, "y" to result.finalPosition.y)),
                         decisionsFor(actorCivId))
                 }
                 "research.select" -> {
@@ -205,8 +208,7 @@ class AgentEngineBridge(val coordinator: MatchCoordinator) {
                         unitId,
                         requireEnum<UnitOrder>(args, "order"))) as UnitOrderResult
                     receiptMap(result.receipt,
-                        mapOf("action" to result.action, "disbanded" to result.disbanded,
-                            "unit" to unitState(actorCivId, unitId)),
+                        mapOf("action" to result.action, "disbanded" to result.disbanded),
                         decisionsFor(actorCivId))
                 }
                 "unit.attack" -> {
@@ -220,8 +222,7 @@ class AgentEngineBridge(val coordinator: MatchCoordinator) {
                         "attackerAlive" to result.attackerAlive,
                         "defenderAlive" to result.defenderAlive,
                         "attackerDamageDealt" to result.attackerDamageDealt,
-                        "defenderDamageDealt" to result.defenderDamageDealt,
-                        "unit" to unitState(actorCivId, attackerUnitId)), decisionsFor(actorCivId))
+                        "defenderDamageDealt" to result.defenderDamageDealt), decisionsFor(actorCivId))
                 }
                 "conquest.resolve" -> {
                     val result = coordinator.execute(ResolveConquestCommand(
@@ -300,8 +301,7 @@ class AgentEngineBridge(val coordinator: MatchCoordinator) {
                         actorCivId, actionId, expectedRevision,
                         unitId,
                         requireString(args, "improvementName"))) as ImprovementStartedResult
-                    receiptMap(result.receipt, mapOf("turnsToBuild" to result.turnsToBuild,
-                        "unit" to unitState(actorCivId, unitId)),
+                    receiptMap(result.receipt, mapOf("turnsToBuild" to result.turnsToBuild),
                         decisionsFor(actorCivId))
                 }
                 "unit.promote" -> {
@@ -310,8 +310,7 @@ class AgentEngineBridge(val coordinator: MatchCoordinator) {
                         actorCivId, actionId, expectedRevision,
                         unitId,
                         requireString(args, "promotionName"))) as UnitPromotedResult
-                    receiptMap(result.receipt, mapOf("promotionName" to result.promotionName,
-                        "unit" to unitState(actorCivId, unitId)),
+                    receiptMap(result.receipt, mapOf("promotionName" to result.promotionName),
                         decisionsFor(actorCivId))
                 }
                 "unit.upgrade" -> {
@@ -342,8 +341,7 @@ class AgentEngineBridge(val coordinator: MatchCoordinator) {
                     val result = coordinator.execute(PillageCommand(
                         actorCivId, actionId, expectedRevision,
                         unitId)) as PillagedResult
-                    receiptMap(result.receipt, mapOf("pillaged" to result.pillaged,
-                        "unit" to unitState(actorCivId, unitId)),
+                    receiptMap(result.receipt, mapOf("pillaged" to result.pillaged),
                         decisionsFor(actorCivId))
                 }
                 "unit.repair" -> {
@@ -351,8 +349,7 @@ class AgentEngineBridge(val coordinator: MatchCoordinator) {
                     val result = coordinator.execute(RepairCommand(
                         actorCivId, actionId, expectedRevision,
                         unitId)) as RepairStartedResult
-                    receiptMap(result.receipt, mapOf("turnsToRepair" to result.turnsToRepair,
-                        "unit" to unitState(actorCivId, unitId)),
+                    receiptMap(result.receipt, mapOf("turnsToRepair" to result.turnsToRepair),
                         decisionsFor(actorCivId))
                 }
                 "diplomacy.denounce" -> {
@@ -403,7 +400,7 @@ class AgentEngineBridge(val coordinator: MatchCoordinator) {
                     val result = coordinator.execute(StopImprovementCommand(
                         actorCivId, actionId, expectedRevision,
                         unitId)) as ImprovementStoppedResult
-                    receiptMap(result.receipt, mapOf("stopped" to true, "unit" to unitState(actorCivId, unitId)),
+                    receiptMap(result.receipt, mapOf("stopped" to true),
                         decisionsFor(actorCivId))
                 }
                 "unit.swap" -> {
@@ -411,8 +408,7 @@ class AgentEngineBridge(val coordinator: MatchCoordinator) {
                     val result = coordinator.execute(SwapUnitsCommand(
                         actorCivId, actionId, expectedRevision,
                         unitId, requireHex(args, "destination"))) as UnitsSwappedResult
-                    receiptMap(result.receipt, mapOf("position" to mapOf("x" to result.finalPosition.x, "y" to result.finalPosition.y),
-                        "unit" to unitState(actorCivId, unitId)), decisionsFor(actorCivId))
+                    receiptMap(result.receipt, mapOf("position" to mapOf("x" to result.finalPosition.x, "y" to result.finalPosition.y)), decisionsFor(actorCivId))
                 }
                 "unit.rename" -> {
                     val result = coordinator.execute(RenameUnitCommand(
@@ -425,7 +421,7 @@ class AgentEngineBridge(val coordinator: MatchCoordinator) {
                     val result = coordinator.execute(ConnectRoadCommand(
                         actorCivId, actionId, expectedRevision,
                         unitId, requireHex(args, "destination"))) as RoadConnectionStartedResult
-                    receiptMap(result.receipt, mapOf("connecting" to true, "unit" to unitState(actorCivId, unitId)),
+                    receiptMap(result.receipt, mapOf("connecting" to true),
                         decisionsFor(actorCivId))
                 }
                 "citystate.tribute" -> {

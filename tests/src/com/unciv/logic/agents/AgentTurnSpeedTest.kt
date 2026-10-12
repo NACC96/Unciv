@@ -1,5 +1,6 @@
 package com.unciv.logic.agents
 
+import com.unciv.json.json
 import com.unciv.models.metadata.BaseRuleset
 import com.unciv.testing.BaseTestRunner
 import com.unciv.testing.TestGame
@@ -17,6 +18,7 @@ class AgentTurnSpeedTest {
 
     private class Fixture(culture: Int = 0) {
         val testGame = TestGame(baseRuleset = BaseRuleset.Civ_V_Vanilla)
+        val writer = InMemoryCheckpointWriter()
         val coordinator: MatchCoordinator
         val bridge: AgentEngineBridge
         val romeId: String
@@ -41,9 +43,17 @@ class AgentTurnSpeedTest {
             val match = AgentMatchState(matchId = "m1", timelineId = "t1", turnPhase = TurnPhase.AWAITING_DECISIONS)
             match.controllers[romeId] = CivilizationController(romeId, ControllerKind.EXTERNAL_AGENT,
                 AgentProfile("p1", "Ada", "codex", "m", null, "", 1))
-            coordinator = MatchCoordinator(testGame.gameInfo, match, InMemoryCheckpointWriter())
+            coordinator = MatchCoordinator(testGame.gameInfo, match, writer)
             bridge = AgentEngineBridge(coordinator)
         }
+
+        fun envelope(actionId: String, type: String, args: Map<String, Any?>) = mapOf(
+            "protocolVersion" to 1, "actionId" to actionId,
+            "expectedRevision" to coordinator.getStateRevision(), "type" to type,
+            "actorCivId" to romeId, "args" to args)
+
+        fun move(actionId: String, x: Int, y: Int) = envelope(actionId, "unit.move",
+            mapOf("unitId" to scoutId, "destination" to mapOf("x" to x, "y" to y)))
 
         fun legal(unitId: Int) = coordinator.legalActions(romeId, unitId = unitId)
 
@@ -105,6 +115,83 @@ class AgentTurnSpeedTest {
         @Suppress("UNCHECKED_CAST")
         Assert.assertNotNull((order["unit"] as Map<String, Any?>)["action"])
         Assert.assertNull("Units must belong to the actor", f.coordinator.ownUnitState(f.romeId, 999_999))
+    }
+
+    @Test
+    fun `replayed movement returns the original unit snapshot after later movement and reload`() {
+        val f = Fixture()
+        val originalCommand = f.move("first", -2, 0)
+        val original = f.bridge.act(originalCommand)
+        f.bridge.act(f.move("second", -2, 1))
+        Assert.assertEquals(1, f.coordinator.ownUnitState(f.romeId, f.scoutId)!!.y)
+
+        val reloaded = MatchCoordinator.loadFromJson(f.coordinator.saveToJson())
+        for (bridge in listOf(f.bridge, AgentEngineBridge(reloaded))) {
+            val replay = bridge.act(originalCommand)
+            Assert.assertEquals(original["result"], replay["result"])
+            Assert.assertEquals(original["revision"], replay["revision"])
+            Assert.assertEquals(2, bridge.coordinator.getStateRevision())
+        }
+        // Receipt snapshots must be detached along with the rest of a copied receipt.
+        f.coordinator.getReceipt("first")!!.unitSnapshot!!.y = 99
+        Assert.assertEquals(0, f.coordinator.getReceipt("first")!!.unitSnapshot!!.y)
+    }
+
+    @Test
+    fun `replayed orders preserve alive and consumed snapshots after reload`() {
+        val f = Fixture()
+        val fortify = f.envelope("fortify", "unit.order", mapOf("unitId" to f.warriorId, "order" to "FORTIFY"))
+        val fortified = f.bridge.act(fortify)
+        val disband = f.envelope("disband", "unit.order", mapOf("unitId" to f.warriorId, "order" to "DISBAND"))
+        val disbanded = f.bridge.act(disband)
+        val consumedResult = disbanded["result"] as Map<*, *>
+        Assert.assertTrue("A captured absence is explicit", consumedResult.containsKey("unit"))
+        Assert.assertNull(consumedResult["unit"])
+        Assert.assertNull(f.coordinator.ownUnitState(f.romeId, f.warriorId))
+
+        val restored = AgentEngineBridge(MatchCoordinator.loadFromJson(f.coordinator.saveToJson()))
+        Assert.assertEquals(fortified["result"], restored.act(fortify)["result"])
+        Assert.assertEquals(disbanded["result"], restored.act(disband)["result"])
+        Assert.assertNotNull((restored.act(fortify)["result"] as Map<*, *>)["unit"])
+    }
+
+    @Test
+    fun `legacy receipts without snapshots omit unit state instead of reading live units`() {
+        val f = Fixture()
+        val firstCommand = f.move("legacy", -2, 0)
+        f.bridge.act(firstCommand)
+        f.bridge.act(f.move("later", -2, 1))
+        val match = json().fromJson(AgentMatchState::class.java, f.coordinator.serializeCommittedMatchForPublication())
+        match.currentTurnReceipts.forEach { it.unitSnapshot = null }
+        val compactLegacyMatch = json().toJson(match)
+        Assert.assertFalse("Old payloads have no snapshot field", compactLegacyMatch.contains("unitSnapshot"))
+        val saved = json().toJson(AgentBundle(f.coordinator.serializeCommittedGameForPublication(), compactLegacyMatch))
+        val legacy = AgentEngineBridge(MatchCoordinator.loadFromJson(saved))
+
+        val replay = legacy.act(firstCommand)["result"] as Map<*, *>
+        Assert.assertEquals(mapOf("x" to -2, "y" to 0), replay["position"])
+        Assert.assertFalse("Missing historical data must not look like current state or a consumed unit", replay.containsKey("unit"))
+        Assert.assertEquals(1, legacy.coordinator.ownUnitState(f.romeId, f.scoutId)!!.y)
+    }
+
+    @Test
+    fun `failed checkpoint does not publish a new unit snapshot or mutate prior receipts`() {
+        val f = Fixture()
+        f.bridge.act(f.move("committed", -2, 0))
+        f.writer.failNextWrite = true
+        try {
+            f.bridge.act(f.move("failed", -2, 1))
+            Assert.fail("Expected checkpoint failure")
+        } catch (ex: EngineCallException) {
+            Assert.assertEquals("INTERNAL_ERROR", ex.code)
+        }
+        Assert.assertEquals(1, f.coordinator.getStateRevision())
+        Assert.assertNull(f.coordinator.getReceipt("failed"))
+        Assert.assertEquals(0, f.coordinator.getReceipt("committed")!!.unitSnapshot!!.y)
+        val restored = MatchCoordinator.loadFromJson(f.coordinator.saveToJson())
+        Assert.assertNull(restored.getReceipt("failed"))
+        Assert.assertEquals(0, restored.getReceipt("committed")!!.unitSnapshot!!.y)
+        Assert.assertEquals(0, restored.ownUnitState(f.romeId, f.scoutId)!!.y)
     }
 
     @Test

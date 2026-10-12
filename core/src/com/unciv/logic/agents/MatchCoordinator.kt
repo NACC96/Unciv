@@ -818,6 +818,7 @@ class MatchCoordinator(
         rememberReceipt: ((AgentMatchState, ActionReceipt) -> Unit)? = null,
         collectSightings: Boolean = true,
         requiresActiveActor: Boolean = true,
+        snapshotUnitId: Int? = null,
         apply: (candidateGame: GameInfo, candidateMatch: AgentMatchState) -> String
     ): ActionReceipt {
         (actionReceipts[actionId] ?: committedMatch.diplomaticMessageReceipts[actionId])?.let { prior ->
@@ -850,7 +851,14 @@ class MatchCoordinator(
                 afterRevision = before + 1,
                 outcome = "applied",
                 committedEventIds = ArrayList(),
-                resultJson = resultJson
+                resultJson = resultJson,
+                unitSnapshot = snapshotUnitId?.let { unitId ->
+                    val unit = candidateGame.getCivilization(actorCivId).units.getCivUnits()
+                        .firstOrNull { it.id == unitId && it.owner == actorCivId && !it.isDestroyed }
+                    if (unit == null) ActionUnitSnapshot(unitId = unitId)
+                    else ActionUnitSnapshot(unitId, true, unit.getTile().position.x, unit.getTile().position.y,
+                        unit.currentMovement, unit.health, unit.action)
+                }
             )
             candidateMatch.currentTurnReceipts.add(receipt)
             rememberReceipt?.invoke(candidateMatch, receipt)
@@ -891,7 +899,8 @@ class MatchCoordinator(
     private fun executeMove(command: MoveUnitCommand): UnitMovedResult {
         val receipt = runGameplayMutation(
             command.actorCivId, command.actionId, command.expectedRevision,
-            "unit.move|${command.unitId}|${command.destination.x},${command.destination.y}"
+            "unit.move|${command.unitId}|${command.destination.x},${command.destination.y}",
+            snapshotUnitId = command.unitId
         ) { candidateGame, _ ->
             val unit = requireOwnUnit(candidateGame, command.actorCivId, command.unitId)
             val tile = resolveTile(candidateGame, command.destination)
@@ -1213,7 +1222,8 @@ class MatchCoordinator(
     private fun executeOrder(command: UnitOrderCommand): UnitOrderResult {
         val receipt = runGameplayMutation(
             command.actorCivId, command.actionId, command.expectedRevision,
-            "unit.order|${command.unitId}|${command.order}"
+            "unit.order|${command.unitId}|${command.order}",
+            snapshotUnitId = command.unitId
         ) { candidateGame, _ ->
             val unit = requireOwnUnit(candidateGame, command.actorCivId, command.unitId)
             var disbanded = false
@@ -1318,7 +1328,8 @@ class MatchCoordinator(
             )
         val receipt = runGameplayMutation(
             command.actorCivId, command.actionId, command.expectedRevision,
-            "unit.attack|${command.attackerUnitId}|${command.attackerCityId}|${command.target.x},${command.target.y}"
+            "unit.attack|${command.attackerUnitId}|${command.attackerCityId}|${command.target.x},${command.target.y}",
+            snapshotUnitId = command.attackerUnitId
         ) { candidateGame, candidateMatch ->
             val civ = candidateGame.getCivilizationOrNull(command.actorCivId)
                 ?: throw AgentCommandException(AgentCommandError.INVALID_ARGUMENT, "Unknown civilization")
@@ -1859,7 +1870,8 @@ class MatchCoordinator(
     private fun executeBuildImprovement(command: BuildImprovementCommand): ImprovementStartedResult {
         val receipt = runGameplayMutation(
             command.actorCivId, command.actionId, command.expectedRevision,
-            "unit.build|${command.unitId}|${command.improvementName}"
+            "unit.build|${command.unitId}|${command.improvementName}",
+            snapshotUnitId = command.unitId
         ) { candidateGame, _ ->
             val unit = requireOwnUnit(candidateGame, command.actorCivId, command.unitId)
             val improvement = candidateGame.ruleset.tileImprovements[command.improvementName]
@@ -1889,7 +1901,8 @@ class MatchCoordinator(
     private fun executePromote(command: PromoteUnitCommand): UnitPromotedResult {
         val receipt = runGameplayMutation(
             command.actorCivId, command.actionId, command.expectedRevision,
-            "unit.promote|${command.unitId}|${command.promotionName}"
+            "unit.promote|${command.unitId}|${command.promotionName}",
+            snapshotUnitId = command.unitId
         ) { candidateGame, _ ->
             val unit = requireOwnUnit(candidateGame, command.actorCivId, command.unitId)
             if (!unit.promotions.canBePromoted())
@@ -2086,7 +2099,8 @@ class MatchCoordinator(
     private fun executePillage(command: PillageCommand): PillagedResult {
         val receipt = runGameplayMutation(
             command.actorCivId, command.actionId, command.expectedRevision,
-            "unit.pillage|${command.unitId}"
+            "unit.pillage|${command.unitId}",
+            snapshotUnitId = command.unitId
         ) { candidateGame, _ ->
             val unit = requireOwnUnit(candidateGame, command.actorCivId, command.unitId)
             val tile = unit.getTile()
@@ -2140,7 +2154,8 @@ class MatchCoordinator(
     private fun executeRepair(command: RepairCommand): RepairStartedResult {
         val receipt = runGameplayMutation(
             command.actorCivId, command.actionId, command.expectedRevision,
-            "unit.repair|${command.unitId}"
+            "unit.repair|${command.unitId}",
+            snapshotUnitId = command.unitId
         ) { candidateGame, _ ->
             val unit = requireOwnUnit(candidateGame, command.actorCivId, command.unitId)
             val tile = unit.getTile()
@@ -2329,7 +2344,8 @@ class MatchCoordinator(
     private fun executeStopImprovement(command: StopImprovementCommand): ImprovementStoppedResult {
         val receipt = runGameplayMutation(
             command.actorCivId, command.actionId, command.expectedRevision,
-            "unit.stopImprovement|${command.unitId}"
+            "unit.stopImprovement|${command.unitId}",
+            snapshotUnitId = command.unitId
         ) { candidateGame, _ ->
             val unit = requireOwnUnit(candidateGame, command.actorCivId, command.unitId)
             val tile = unit.getTile()
@@ -2343,7 +2359,8 @@ class MatchCoordinator(
     private fun executeSwapUnits(command: SwapUnitsCommand): UnitsSwappedResult {
         val receipt = runGameplayMutation(
             command.actorCivId, command.actionId, command.expectedRevision,
-            "unit.swap|${command.unitId}|${command.destination.x},${command.destination.y}"
+            "unit.swap|${command.unitId}|${command.destination.x},${command.destination.y}",
+            snapshotUnitId = command.unitId
         ) { candidateGame, _ ->
             val unit = requireOwnUnit(candidateGame, command.actorCivId, command.unitId)
             val tile = resolveTile(candidateGame, command.destination)
@@ -2376,7 +2393,8 @@ class MatchCoordinator(
     private fun executeConnectRoad(command: ConnectRoadCommand): RoadConnectionStartedResult {
         val receipt = runGameplayMutation(
             command.actorCivId, command.actionId, command.expectedRevision,
-            "unit.connectRoad|${command.unitId}|${command.destination.x},${command.destination.y}"
+            "unit.connectRoad|${command.unitId}|${command.destination.x},${command.destination.y}",
+            snapshotUnitId = command.unitId
         ) { candidateGame, _ ->
             val unit = requireOwnUnit(candidateGame, command.actorCivId, command.unitId)
             val tile = resolveTile(candidateGame, command.destination)

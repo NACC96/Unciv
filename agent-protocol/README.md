@@ -16,6 +16,8 @@ no arbitrary function/shell/path/save-edit payloads).
 Kotlin and TypeScript representations must be generated or validated from these
 schemas in tests (plan §13.1); no hand-diverged copies.
 
+Unit-state receipts for move, order, attack, build, promote, pillage, repair, stopImprovement, swap and connectRoad include `result.unit` captured at the receipt's committed revision. Replaying the action returns that same snapshot after later mutations or save/load. A captured consumed/destroyed unit is `null`; legacy receipts without a snapshot omit the field, so clients must observe again when historical unit state is unavailable.
+
 ## Additive observation version 2
 
 Structured read tools use `observationVersion:2`; mutation envelopes, receipts and engine frames remain protocol 1. `game.observe` adds `mapSummary`, own-unit inspection adds its permitted tile, and the game tool allowlist includes `game.tile({x,y})` and `game.map({mode?,center?,radius?,limit?,cursor?})`. `game.rules` optionally accepts section, exact name, limit and cursor for static catalogs.
