@@ -12,6 +12,7 @@ import com.unciv.ui.components.extensions.toStringSigned
 import com.unciv.ui.images.IconCircleGroup
 import com.unciv.ui.images.ImageGetter
 import com.unciv.ui.screens.basescreen.BaseScreen
+import com.unciv.ui.components.GameUiStyle
 
 /** Simple class for showing a prompt for a positive integer to the user
  * @param screen The previous screen the user was on
@@ -39,8 +40,9 @@ class AskNumberPopup(
     init {
         val wrapper = Table()
         wrapper.add(icon).padRight(10f)
-        wrapper.add(label.toLabel())
-        add(wrapper).colspan(2).row()
+        wrapper.add(label.toLabel().apply { wrap = GameUiStyle.isAtlas }).growX().minWidth(0f)
+        if (GameUiStyle.isAtlas) innerTable.background = GameUiStyle.panelBackground("AskNumberPopup/Panel", 1f)
+        add(wrapper).colspan(2).apply { if (GameUiStyle.isAtlas) width((maxPopupWidth - 64f).coerceAtMost(540f)) }.row()
 
         val nameField = UncivTextField.Integer(label, defaultValue)
 
@@ -61,6 +63,7 @@ class AskNumberPopup(
         }
 
         val centerTable = Table(skin)
+        var amountColumn = 0
 
         fun addValueButton(delta: Int) {
             centerTable.add(
@@ -73,14 +76,19 @@ class AskNumberPopup(
                         nameField.intValue = clampInBounds(value + delta)
                     }
                 }
-            ).pad(5f)
+            ).pad(5f).apply { if (GameUiStyle.isAtlas) growX().minWidth(0f).minHeight(40f) }
+            if (GameUiStyle.isAtlas && ++amountColumn % 3 == 0) centerTable.row()
         }
 
         for (value in amountButtons.reversed()) {
             addValueButton(-value)
         }
 
-        centerTable.add(nameField).growX().pad(10f)
+        if (GameUiStyle.isAtlas) centerTable.row()
+        centerTable.add(nameField).growX().minWidth(0f).minHeight(40f).pad(10f).apply {
+            if (GameUiStyle.isAtlas) colspan(3)
+        }
+        if (GameUiStyle.isAtlas) { centerTable.row(); amountColumn = 0 }
 
         add(centerTable).colspan(2).row()
 
@@ -89,19 +97,27 @@ class AskNumberPopup(
         }
 
         val errorLabel = errorText.toLabel()
-        errorLabel.color = Color.RED
+        errorLabel.color = if (GameUiStyle.isAtlas) GameUiStyle.error else Color.RED
+        errorLabel.wrap = true
+        errorLabel.isVisible = false
+        add(errorLabel).colspan(2).width((maxPopupWidth - 64f).coerceAtMost(540f)).row()
+        nameField.onChange { errorLabel.isVisible = false }
 
         addCloseButton()
         addOKButton(
             validate = {
                 val errorFound = nameField.intValue?.let { validate(it) } != true
-                if (errorFound) add(errorLabel).colspan(2).center()
+                errorLabel.isVisible = errorFound
                 !errorFound
             }
         ) {
             actionOnOk(nameField.intValue!!)
         }
         equalizeLastTwoButtonWidths()
+        if (GameUiStyle.isAtlas) for (cell in bottomTable.cells) {
+            (cell.actor as? com.badlogic.gdx.scenes.scene2d.ui.TextButton)?.label?.wrap = true
+            cell.minWidth(0f).growX().width(((maxPopupWidth - 64f) / 2).coerceAtMost(270f)).minHeight(44f)
+        }
 
         keyboardFocus = nameField
     }

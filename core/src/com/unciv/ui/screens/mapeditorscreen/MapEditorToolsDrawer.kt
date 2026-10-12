@@ -11,20 +11,23 @@ import com.badlogic.gdx.scenes.scene2d.ui.Container
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.utils.Align
 import com.unciv.ui.images.ImageGetter
+import com.unciv.ui.components.AtlasWidgets
+import com.unciv.ui.components.GameUiStyle
+import com.unciv.ui.components.input.onClick
 import com.unciv.ui.screens.basescreen.BaseScreen
 import kotlin.math.abs
 
 class MapEditorToolsDrawer(
     tabs: MapEditorMainTabs,
     initStage: Stage,
-    private val mapHolder: com.unciv.ui.screens.mapeditorscreen.EditorMapHolder
+    private val editor: MapEditorScreen
 ): Table(BaseScreen.skin) {
     private companion object {
         const val arrowImage = "OtherIcons/BackArrow"
         const val animationDuration = 0.333f
         const val clickEpsilon = 0.001f
     }
-    private val handleWidth = if (Gdx.app.type == Application.ApplicationType.Desktop) 10f else 25f
+    private val handleWidth = if (GameUiStyle.isAtlas) 32f else if (Gdx.app.type == Application.ApplicationType.Desktop) 10f else 25f
     private val arrowSize = if (Gdx.app.type == Application.ApplicationType.Desktop) 10f else 20f  //todo tweak on actual phone
 
     var splitAmount = 1f
@@ -48,11 +51,22 @@ class MapEditorToolsDrawer(
         add(arrowWrapper).align(Align.center).width(handleWidth).fillY().apply {  // the "handle"
             background = BaseScreen.skinStrings.getUiBackground(
                 "MapEditor/MapEditorToolsDrawer/Handle",
-                tintColor = BaseScreen.skin.getColor("color")
+                tintColor = if (GameUiStyle.isAtlas) GameUiStyle.raised else BaseScreen.skin.getColor("color")
             )
         }
 
-        add(tabs)
+        val content = if (GameUiStyle.isAtlas) Table().apply {
+            background = GameUiStyle.panelBackground("MapEditor/Tools", 1f)
+            add(AtlasWidgets.header("Map editor")).growX().height(56f).row()
+            add(tabs).width(editor.getToolsWidth()).height(editor.getToolsHeight()).growY().row()
+            val view = GameUiStyle.button("View").apply { onClick { splitAmount = 0f } }
+            val exit = GameUiStyle.button("Exit map editor").apply {
+                label.wrap = true
+                onClick(editor::closeEditor)
+            }
+            add(AtlasWidgets.footer(view, listOf(exit))).growX().height(60f).row()
+        } else tabs
+        add(content)
             .height(initStage.height)
             .fill().top()
         pack()
@@ -82,7 +96,7 @@ class MapEditorToolsDrawer(
             if (draggingPointer != -1) return false
             if (pointer == 0 && button != 0) return false
             if (x !in drawer.x..(drawer.x + handleWidth)) return false
-            mapHolder.killListeners()
+            editor.mapHolder.killListeners()
             draggingPointer = pointer
             lastX = x
             handleX = drawer.x
@@ -91,7 +105,7 @@ class MapEditorToolsDrawer(
         }
         override fun touchUp(event: InputEvent, x: Float, y: Float, pointer: Int, button: Int) {
             if (pointer != draggingPointer) return
-            mapHolder.resurrectListeners()
+            editor.mapHolder.resurrectListeners()
             draggingPointer = -1
             if (oldSplitAmount < 0f) return
             addAction(SplitAmountAction(drawer, if (splitAmount > 0.5f) 0f else 1f))

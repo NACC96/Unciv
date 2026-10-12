@@ -2,6 +2,7 @@ package com.unciv.ui.popups
 
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.Align
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.extensions.addRoundCloseButton
 import com.unciv.ui.components.input.ActivationTypes
 import com.unciv.ui.components.input.clearActivationActions
@@ -31,11 +32,12 @@ class ToastPopup (message: String, stageToShowOn: Stage, val time: Long = 2000) 
         //Make this popup unobtrusive
         setFillParent(false)
         onClick(::stayVisible) // or `touchable = Touchable.disabled` so you can operate what's behind
+        if (GameUiStyle.isAtlas) innerTable.background = GameUiStyle.panelBackground("ToastPopup/Panel", 1f)
 
         add(ColorMarkupLabel(message).apply {
             wrap = true
             setAlignment(Align.center)
-        }).width(stageToShowOn.width / 2)
+        }).width(if (GameUiStyle.isAtlas) (stageToShowOn.width - 80f).coerceAtMost(580f) else stageToShowOn.width / 2)
 
         open(force = stageToShowOn.actors.none { it is ToastPopup })
 

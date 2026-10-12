@@ -3,6 +3,7 @@ package com.unciv.ui.screens.mapeditorscreen
 import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.ui.Table
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.logic.files.MapSaver
 import com.unciv.models.ruleset.RulesetCache
 import com.unciv.ui.components.extensions.pad
@@ -55,9 +56,9 @@ class MapEditorFilesScroll(
                     // One header per Mod
                     existingSavesTable.add(Table().apply {
                         add(ImageGetter.getDot(Color.LIGHT_GRAY)).minHeight(2f).minWidth(15f)
-                        add(mod.toLabel(Color.LIGHT_GRAY)).left().pad(0f,2f)
+                        add(mod.toLabel(if (GameUiStyle.isAtlas) GameUiStyle.accent else Color.LIGHT_GRAY).apply { wrap = true }).left().pad(0f,2f)
                         add(ImageGetter.getDot(Color.LIGHT_GRAY)).minHeight(2f).growX().row()
-                    }).growX().row()
+                    }).growX().minWidth(0f).row()
                     lastMod = mod
                 }
             }
