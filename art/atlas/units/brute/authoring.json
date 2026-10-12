@@ -1,0 +1,19 @@
+{
+"schemaVersion": 1,
+"unitName": "Brute",
+"assetId": "brute",
+"reviewState": "missing",
+"canvasWidth": 128,
+"canvasHeight": 128,
+"anchorX": 64,
+"anchorY": 96,
+"clippingMargin": 2,
+"uniqueUnitIdentity": "Brute",
+"uniqueTo": "Barbarians",
+"replaces": "Warrior",
+"staticFallbackKey": "TileSets/AtlasUnits/Units/Brute",
+"framesDirectory": "frames/",
+"applicableStates": [ "IDLE", "MOVE", "ATTACK", "HIT", "DEFEAT" ],
+"facings": [ "E", "NE", "NW", "W", "SW", "SE" ],
+"minimumFrames": { "IDLE": 4, "MOVE": 8, "ATTACK": 8, "HIT": 4, "DEFEAT": 8 }
+}

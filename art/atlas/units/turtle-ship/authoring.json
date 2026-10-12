@@ -1,0 +1,19 @@
+{
+"schemaVersion": 1,
+"unitName": "Turtle Ship",
+"assetId": "turtle-ship",
+"reviewState": "missing",
+"canvasWidth": 128,
+"canvasHeight": 128,
+"anchorX": 64,
+"anchorY": 96,
+"clippingMargin": 2,
+"uniqueUnitIdentity": "Turtle Ship",
+"uniqueTo": "Korea",
+"replaces": "Caravel",
+"staticFallbackKey": "TileSets/AtlasUnits/Units/Turtle Ship",
+"framesDirectory": "frames/",
+"applicableStates": [ "IDLE", "MOVE", "ATTACK", "HIT", "DEFEAT" ],
+"facings": [ "E", "NE", "NW", "W", "SW", "SE" ],
+"minimumFrames": { "IDLE": 4, "MOVE": 8, "ATTACK": 8, "HIT": 4, "DEFEAT": 8 }
+}

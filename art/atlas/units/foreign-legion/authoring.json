@@ -1,0 +1,19 @@
+{
+"schemaVersion": 1,
+"unitName": "Foreign Legion",
+"assetId": "foreign-legion",
+"reviewState": "missing",
+"canvasWidth": 128,
+"canvasHeight": 128,
+"anchorX": 64,
+"anchorY": 96,
+"clippingMargin": 2,
+"uniqueUnitIdentity": "Foreign Legion",
+"uniqueTo": "France",
+"replaces": "Great War Infantry",
+"staticFallbackKey": "TileSets/AtlasUnits/Units/Foreign Legion",
+"framesDirectory": "frames/",
+"applicableStates": [ "IDLE", "MOVE", "ATTACK", "HIT", "DEFEAT" ],
+"facings": [ "E", "NE", "NW", "W", "SW", "SE" ],
+"minimumFrames": { "IDLE": 4, "MOVE": 8, "ATTACK": 8, "HIT": 4, "DEFEAT": 8 }
+}

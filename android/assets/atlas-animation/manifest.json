@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "packing": {
+    "maxPageSize": 1024,
+    "padding": 2,
+    "duplicateEdges": true,
+    "mipmaps": true,
+    "filterMin": "MipMapLinearLinear",
+    "filterMag": "Linear"
+  },
+  "budgets": {
+    "desktopBytes": 134217728,
+    "otherBytes": 33554432,
+    "pendingUploadBytes": 8388608
+  },
+  "units": [],
+  "pages": [],
+  "clips": []
+}

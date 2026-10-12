@@ -1,0 +1,6 @@
+{
+  "useColorAsBaseTerrain": false,
+  "useSummaryImages": false,
+  "fallbackTileSet": "FantasyHex",
+  "tileScale": 1.0
+}

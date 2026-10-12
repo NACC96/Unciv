@@ -1,0 +1,19 @@
+{
+"schemaVersion": 1,
+"unitName": "Settler",
+"assetId": "settler",
+"reviewState": "missing",
+"canvasWidth": 128,
+"canvasHeight": 128,
+"anchorX": 64,
+"anchorY": 96,
+"clippingMargin": 2,
+"uniqueUnitIdentity": null,
+"uniqueTo": null,
+"replaces": null,
+"staticFallbackKey": "TileSets/AtlasUnits/Units/Settler",
+"framesDirectory": "frames/",
+"applicableStates": [ "IDLE", "MOVE", "HIT", "DEFEAT" ],
+"facings": [ "E", "NE", "NW", "W", "SW", "SE" ],
+"minimumFrames": { "IDLE": 4, "MOVE": 8, "HIT": 4, "DEFEAT": 8 }
+}

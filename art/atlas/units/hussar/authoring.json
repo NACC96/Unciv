@@ -1,0 +1,19 @@
+{
+"schemaVersion": 1,
+"unitName": "Hussar",
+"assetId": "hussar",
+"reviewState": "missing",
+"canvasWidth": 128,
+"canvasHeight": 128,
+"anchorX": 64,
+"anchorY": 96,
+"clippingMargin": 2,
+"uniqueUnitIdentity": "Hussar",
+"uniqueTo": "Austria",
+"replaces": "Cavalry",
+"staticFallbackKey": "TileSets/AtlasUnits/Units/Hussar",
+"framesDirectory": "frames/",
+"applicableStates": [ "IDLE", "MOVE", "ATTACK", "HIT", "DEFEAT" ],
+"facings": [ "E", "NE", "NW", "W", "SW", "SE" ],
+"minimumFrames": { "IDLE": 4, "MOVE": 8, "ATTACK": 8, "HIT": 4, "DEFEAT": 8 }
+}

@@ -17,6 +17,15 @@ gradle.taskGraph.whenReady { graph ->
 // Pack only the built-in skin sources, without a launcher, Android SDK or mod scan.
 // Uses the same libGDX TexturePacker/settings as the existing AndroidImagePacker.
 gradle.projectsEvaluated {
+    rootProject.tasks.register('atlasAssets') {
+        doLast {
+            def command = System.getenv('UNCIV_ATLAS_ASSET_COMMAND') ?: 'validate'
+            def complete = System.getenv('UNCIV_ATLAS_REQUIRE_COMPLETE') == 'true'
+            def type = rootProject.buildscript.classLoader.loadClass('com.unciv.build.AtlasAssetPacker')
+            type.getMethod('execute', String, String, Boolean.TYPE).invoke(null,
+                rootProject.rootDir.path, command, complete)
+        }
+    }
     rootProject.tasks.register('packAtlasSkin') {
         doLast {
             def loader = rootProject.buildscript.classLoader

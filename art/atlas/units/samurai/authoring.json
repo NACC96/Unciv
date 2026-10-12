@@ -1,0 +1,19 @@
+{
+"schemaVersion": 1,
+"unitName": "Samurai",
+"assetId": "samurai",
+"reviewState": "missing",
+"canvasWidth": 128,
+"canvasHeight": 128,
+"anchorX": 64,
+"anchorY": 96,
+"clippingMargin": 2,
+"uniqueUnitIdentity": "Samurai",
+"uniqueTo": "Japan",
+"replaces": "Longswordsman",
+"staticFallbackKey": "TileSets/AtlasUnits/Units/Samurai",
+"framesDirectory": "frames/",
+"applicableStates": [ "IDLE", "MOVE", "ATTACK", "HIT", "DEFEAT", "WORK" ],
+"facings": [ "E", "NE", "NW", "W", "SW", "SE" ],
+"minimumFrames": { "IDLE": 4, "MOVE": 8, "ATTACK": 8, "HIT": 4, "DEFEAT": 8, "WORK": 8 }
+}
