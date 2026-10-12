@@ -340,6 +340,31 @@ class MatchCoordinator(
         return message.copy()
     }
 
+    /**
+     * The player or spectator who sent mail may delete it until the recipient's turn delivers it.
+     * Undelivered mail was never visible to the recipient, so removal leaves no trace there.
+     */
+    @Synchronized
+    fun deletePlayerMessage(senderCivId: String, messageId: String) {
+        val sender = requireMessageViewer(senderCivId)
+        if (!sender.isSpectator() && committedMatch.controllers[senderCivId]?.kind != ControllerKind.HUMAN)
+            throw AgentCommandException(AgentCommandError.AUTHORITY_REVOKED,
+                "Only the human player or spectator may delete their messages")
+        if (committedMatch.matchPaused)
+            throw AgentCommandException(AgentCommandError.MATCH_PAUSED, "Match requires recovery before changing mail")
+        if (committedMatch.turnPhase == TurnPhase.COMPLETED)
+            throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Cannot change mail after play has ended")
+        val message = committedMatch.diplomaticMessages.firstOrNull {
+            it.messageId == messageId && it.senderCivId == senderCivId
+        } ?: throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "No such message of yours")
+        if (message.deliveredTurnSerial != null)
+            throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION,
+                "This message was already delivered and can no longer be deleted")
+        val candidate = committedMatch.deepCopy()
+        candidate.diplomaticMessages.removeAll { it.messageId == messageId }
+        commit(candidateGame = null, candidateMatch = candidate)
+    }
+
     /** Cheap read-only preflight before a host writes image bytes. Queueing repeats every check. */
     @Synchronized
     fun validatePlayerMessage(senderCivId: String, messageId: String, targetCivId: String,
