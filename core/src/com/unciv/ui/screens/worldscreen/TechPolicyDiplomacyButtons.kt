@@ -14,6 +14,7 @@ import com.unciv.ui.components.extensions.setFontSize
 import com.unciv.ui.components.extensions.toLabel
 import com.unciv.ui.components.fonts.Fonts
 import com.unciv.ui.components.input.KeyboardBinding
+import com.unciv.ui.components.input.keyShortcuts
 import com.unciv.ui.components.input.onActivation
 import com.unciv.ui.images.ImageGetter
 import com.unciv.ui.screens.basescreen.BaseScreen
@@ -60,11 +61,13 @@ class TechPolicyDiplomacyButtons(val worldScreen: WorldScreen) : Table(BaseScree
         fogOfWarButton.label.setFontSize(14)
         fogOfWarButton.labelCell.pad(0f)
         fogOfWarButton.pack()
-        fogOfWarButtonHolder.onActivation(UncivSound.Paper, KeyboardBinding.TechnologyTree) {
-            if (!viewingCiv.isSpectator()) return@onActivation
+        fogOfWarButtonHolder.onActivation(UncivSound.Paper) {
+            if (!worldScreen.viewingCiv.isSpectator()) return@onActivation
             worldScreen.fogOfWar = !worldScreen.fogOfWar
             worldScreen.shouldUpdate = true
         }
+        // Spectators can select a nation's tech view; T still belongs to their fog toggle.
+        fogOfWarButtonHolder.keyShortcuts.add(KeyboardBinding.TechnologyTree, priority = 2)
 
         pickTechButton.background = WorldScreenStyle.background("WorldScreen/PickTechButton")
         pickTechButton.defaults().pad(10f)
@@ -120,8 +123,8 @@ class TechPolicyDiplomacyButtons(val worldScreen: WorldScreen) : Table(BaseScree
 
     private fun updateFogOfWarButton() {
         // Actor shortcuts ignore Touchable.disabled. Hide the holder to leave T for technology.
-        fogOfWarButtonHolder.isVisible = viewingCiv.isSpectator()
-        if (viewingCiv.isSpectator()) {
+        fogOfWarButtonHolder.isVisible = worldScreen.viewingCiv.isSpectator()
+        if (worldScreen.viewingCiv.isSpectator()) {
             fogOfWarButton.isChecked = worldScreen.fogOfWar
             fogOfWarButtonHolder.actor = fogOfWarButton
             fogOfWarButtonHolder.touchable = Touchable.enabled

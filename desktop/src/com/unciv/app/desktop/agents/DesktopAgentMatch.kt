@@ -58,9 +58,9 @@ import java.util.concurrent.atomic.AtomicBoolean
  *
  * Committed actions publish isolated render snapshots to the attached
  * world screen, rebinding cities/units/selections by stable IDs.
- * Human secondary controls (city screens, diplomacy popups, shortcuts)
- * are enumerated in docs/agent-mutation-audit.md — most still route
- * legacy; the end-turn button and [canChangeState] gate route here.
+ * Human secondary controls enter the validated coordinator routes listed
+ * in docs/agent-mutation-audit.md. [canChangeState] gates the actual viewer;
+ * ordinary games keep their session-less engine callbacks.
  */
 class DesktopAgentMatch(
     game: GameInfo,

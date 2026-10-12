@@ -135,6 +135,32 @@ class AgentNationViewTest {
         assertEquals(1, Mockito.mockingDetails(game).invocations.count { it.method.name == "pushScreen" })
     }
 
+    @Test fun `spectator selection keeps fog visible and its shortcut exclusive`() {
+        val f = Fixture()
+        f.game.addCity(f.rome, f.game.tileMap[0, 0])
+        UncivGame.Current.settings.tutorialTasksCompleted.add("Meet another civilization")
+        com.unciv.ui.components.fonts.Fonts.fontImplementation = com.unciv.dev.FontDesktop()
+        com.unciv.ui.images.ImageGetter.setNewRuleset(f.game.ruleset)
+        f.screen.setSelectedCiv(f.rome)
+        val game = Mockito.mock(UncivGame::class.java)
+        Mockito.`when`(game.gameInfo).thenReturn(f.game.gameInfo)
+        field(BaseScreen::class.java, "game").set(f.screen, game)
+        val controls = com.unciv.ui.screens.worldscreen.TechPolicyDiplomacyButtons(f.screen)
+        for (name in listOf("updateFogOfWarButton", "updateTechButton"))
+            controls.javaClass.getDeclaredMethod(name).apply { isAccessible = true }.invoke(controls)
+        val fog = field(controls.javaClass, "fogOfWarButtonHolder").get(controls) as com.badlogic.gdx.scenes.scene2d.Actor
+        val tech = field(controls.javaClass, "techButtonHolder").get(controls) as com.badlogic.gdx.scenes.scene2d.Actor
+        assertTrue("Selecting a nation must preserve the actual spectator's fog control", fog.isVisible)
+        val resolver = com.unciv.ui.components.input.KeyShortcutDispatcher.Resolver(
+            com.unciv.ui.components.input.KeyboardBindings[com.unciv.ui.components.input.KeyboardBinding.TechnologyTree])
+        resolver.updateFor(fog.keyShortcuts)
+        resolver.updateFor(tech.keyShortcuts)
+        resolver.triggeredActions.forEach { it() }
+        assertTrue(f.screen.fogOfWar)
+        assertEquals("Spectator T must only toggle fog", 0,
+            Mockito.mockingDetails(game).invocations.count { it.method.name == "pushScreen" })
+    }
+
     private fun pressCapitalShortcut(f: Fixture, renderedGame: com.unciv.logic.GameInfo): List<com.unciv.view.CityView> {
         val game = Mockito.mock(UncivGame::class.java)
         Mockito.`when`(game.gameInfo).thenReturn(renderedGame)
