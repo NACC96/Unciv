@@ -107,6 +107,48 @@
       }
     },
     {
+      "assetId": "cavalry",
+      "creator": "OpenAI image generation",
+      "source": "art/atlas/units/cavalry/creation-record.json",
+      "promptPath": "art/atlas/units/cavalry/prompts/e-v1.txt",
+      "rights": "original-generated",
+      "sourceHash": "5bb5a8d72acde62305e83cf879aa21a2cbaacf542a9ff0e194e4557c8cbde144",
+      "outputHashes": {
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Cavalry-1.png": "11c8f7022dcb0f2b137e72515f59298343d33b48e16558cfa82dfd70c683437b",
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Cavalry.png": "c81b9afe58885eae2a4b36a7d5405777865e7fa8f9e62dd34ef854e5e64c8a5c",
+        "art/atlas/units/cavalry/frames/e-color.png": "c0ef34083e31f66909158ce87cc00010f2110629baefc635ab4b57ff922b774a",
+        "art/atlas/units/cavalry/frames/e-nation.png": "6c44da5604b43c108f92370e8a5d4b6f2a9887eb331f82fc409330c6e7b9bfa2",
+        "art/atlas/units/cavalry/frames/e-shadow.png": "afcfc5273e7b6f40e7d74e571f673917619903050adbc46969fc08e6fda3e110",
+        "art/atlas/units/cavalry/frames/ne-color.png": "3c0ddf278b65e4b4c4d90e48e5722369d2d900ec442ec371f28df2cf7047e051",
+        "art/atlas/units/cavalry/frames/ne-nation.png": "bae5af51ce19269fe08cf95c777f055eb967758c383981dab52fb50a962aeeb6",
+        "art/atlas/units/cavalry/frames/ne-shadow.png": "f4e132aee8e9ef995b1fe11bc8a2e2cab83f09128b9cca36c1442c8cd0e5b5e2",
+        "art/atlas/units/cavalry/frames/se-color.png": "f303a78b4bd9dc8255fcb6f254125b33cd414e7dc5b31adb043c296647df8142",
+        "art/atlas/units/cavalry/frames/se-nation.png": "f4538305fb92511955cede13257fb0c42464d0f6056b285d724869a1564a8c9f",
+        "art/atlas/units/cavalry/frames/se-shadow.png": "c8499beb2e42a2b50e88afedb8a5e0dd451005042421fd49c00dc3ebb8c009ab"
+      }
+    },
+    {
+      "assetId": "cossack",
+      "creator": "OpenAI image generation",
+      "source": "art/atlas/units/cossack/creation-record.json",
+      "promptPath": "art/atlas/units/cossack/prompts/e-v1.txt",
+      "rights": "original-generated",
+      "sourceHash": "d0e796ebc6b67335eff2754d71d2779cc969de20d0ea95ac2174196ef741baa2",
+      "outputHashes": {
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Cossack-1.png": "6121ae0e821b4da949db868a1a8e89399ac259dce5d2fa99a0375956ac5e77eb",
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Cossack.png": "fe5d2c9718cdbd698f40e4f3c0e08f4b2294f8e50daaf58efafdd1ef10b02dbb",
+        "art/atlas/units/cossack/frames/e-color.png": "e241b26ccfd3ed6557cdd43a3d8bcb269cb9b3b2a38595891aad674e5298c955",
+        "art/atlas/units/cossack/frames/e-nation.png": "6cb4aad6f73be902377fc271a78a49166329a0d63e8218e66172e53da9ec9392",
+        "art/atlas/units/cossack/frames/e-shadow.png": "7e826da9b932ac83fe4d5010fe1ae73ef47a3a3f7d8f994a5fb8fc57fcf51f12",
+        "art/atlas/units/cossack/frames/ne-color.png": "ea9efec7fd4e14b2559f919d3cb77465958846f87388f3e6be863b9412130843",
+        "art/atlas/units/cossack/frames/ne-nation.png": "8f554b970252d6582fb44c7ef31f0fba5ef0b329fe07b450f4a16f751e41b164",
+        "art/atlas/units/cossack/frames/ne-shadow.png": "094c83af4cd83f8379033e3d053870fb205aa2afe2f1915422eb4bb48623de80",
+        "art/atlas/units/cossack/frames/se-color.png": "c0603493e8f40650918d686828245aae68190e59f64a74c64b09d9232a36e7bb",
+        "art/atlas/units/cossack/frames/se-nation.png": "ff226095b3c11d4030d628ea99739051adcc7031cf8c855d49feaadf3452ca74",
+        "art/atlas/units/cossack/frames/se-shadow.png": "ac83b49d1f462f14b277a317dafa62b87ecac46425e7a3fd8e7a482dae4ebe7b"
+      }
+    },
+    {
       "assetId": "foreign-legion",
       "creator": "OpenAI image generation",
       "source": "art/atlas/units/foreign-legion/creation-record.json",
@@ -191,6 +233,48 @@
       }
     },
     {
+      "assetId": "hakkapeliitta",
+      "creator": "OpenAI image generation",
+      "source": "art/atlas/units/hakkapeliitta/creation-record.json",
+      "promptPath": "art/atlas/units/hakkapeliitta/prompts/e-v1.txt",
+      "rights": "original-generated",
+      "sourceHash": "4cad6638b93e3c3b65e038779d1dd0f8300541d940df1790d4c77fb45fdb71e7",
+      "outputHashes": {
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Hakkapeliitta-1.png": "9bb916c0ee57bb9f477236e7ab412268cec9ad5fb3d054f7715837bfe90a9e7f",
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Hakkapeliitta.png": "949a11d36ad05fc70f5cc62f273583013f53177d099dbacbf9908492b9e3cf30",
+        "art/atlas/units/hakkapeliitta/frames/e-color.png": "6771760a8b84624208171834c3d10f3791f13985a071bbe5e3b2c93f3f988064",
+        "art/atlas/units/hakkapeliitta/frames/e-nation.png": "133c682c888bdc5e1254fe206f38df41b452ac990a3c5726ed531d289bd9671a",
+        "art/atlas/units/hakkapeliitta/frames/e-shadow.png": "a00ac69c6c610bbd1ab45563f1b01240942376e4cbc5bd0954561ca74f33da00",
+        "art/atlas/units/hakkapeliitta/frames/ne-color.png": "8b705e0f5707032faa35e3dd911ee914103c2f49d0adcd799383805db324e1af",
+        "art/atlas/units/hakkapeliitta/frames/ne-nation.png": "690b3e45fa4f8862dbe258270fd111ab3293d82faf8caf0d8a3960f96511f724",
+        "art/atlas/units/hakkapeliitta/frames/ne-shadow.png": "e77b1f7387d56c462ab220bb2cdba69ceb496f9a1f5312af45da414e7f5ff018",
+        "art/atlas/units/hakkapeliitta/frames/se-color.png": "53e448b29ec946deffe077342ea110b429473fffe91019e05b752c0091fca062",
+        "art/atlas/units/hakkapeliitta/frames/se-nation.png": "34249c4e38ce5700ce4b902cf07440e2e0be7d90457ba5751d8607c25ff6d092",
+        "art/atlas/units/hakkapeliitta/frames/se-shadow.png": "bf7c568f8e173720bed949ce2db07549b52608fcd11b31a299b24c4cf07c9e11"
+      }
+    },
+    {
+      "assetId": "hussar",
+      "creator": "OpenAI image generation",
+      "source": "art/atlas/units/hussar/creation-record.json",
+      "promptPath": "art/atlas/units/hussar/prompts/e-v1.txt",
+      "rights": "original-generated",
+      "sourceHash": "4729782d29955bdb64f6e049cc27d8a6f0211d1416ced71fcb1943a950ff59a4",
+      "outputHashes": {
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Hussar-1.png": "c7607b1dc6290f54db4bd288cca8bd9024cdc7a97f796caadad1a7421b41b98e",
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Hussar.png": "d2ba2c9dff6f57dd2da0f3b3314f50792749f0788c5e8ff5273c63c8bf9a9420",
+        "art/atlas/units/hussar/frames/e-color.png": "5a452bf465d2cea933ae70bf8f02b4981ae2c3ee7b9dad21acc3c46e4d86f89e",
+        "art/atlas/units/hussar/frames/e-nation.png": "606e274c55bf8c4d97dc6657cccaf492c0b03bcdcfa9e74ff87d44299c0aed7c",
+        "art/atlas/units/hussar/frames/e-shadow.png": "139283f456c16d638fb5c571ff763717cf58599d35fbb04093c413e6bac0ca18",
+        "art/atlas/units/hussar/frames/ne-color.png": "e357e035f5ec5d4d238ff31a39835514d9f02f251c098be7fb199f5068aeac93",
+        "art/atlas/units/hussar/frames/ne-nation.png": "01b6ac435652977abea781c9cd67d81d41b3bf44686b8776d6c15ea9cc4b0ef2",
+        "art/atlas/units/hussar/frames/ne-shadow.png": "9050b17ecf8e0cb85c3479bb738433ef7da681c013e080c6e8f4505ca4ebf289",
+        "art/atlas/units/hussar/frames/se-color.png": "b10611d23b6677faa1e1fd700663d7c5b4705c5f34421bbb0b4c44aaec4240ff",
+        "art/atlas/units/hussar/frames/se-nation.png": "ea50be671e8d4b6e9ddb6b827af56ba659a6bfc92be1a8104fd45d69de4691ee",
+        "art/atlas/units/hussar/frames/se-shadow.png": "fd0af76732e8d58fbd6482f73fad0e46de72c38a31983356b1d52da4925cbc92"
+      }
+    },
+    {
       "assetId": "infantry",
       "creator": "OpenAI image generation",
       "source": "art/atlas/units/infantry/creation-record.json",
@@ -230,6 +314,27 @@
         "art/atlas/units/janissary/frames/se-color.png": "db9616ab5b5ede980f0c14ceb108b0bd5487566c8b13891a7c1fcbeb4d0fee87",
         "art/atlas/units/janissary/frames/se-nation.png": "0eddd79700ac91abfb1e2c6ce03bfda61c82e6d0d91e7480f65bf835cec5d8cd",
         "art/atlas/units/janissary/frames/se-shadow.png": "72752c0eaa8c5bb4c99fac49cdd4b0158acf9677fd790cce76f85f36cb8aa964"
+      }
+    },
+    {
+      "assetId": "lancer",
+      "creator": "OpenAI image generation",
+      "source": "art/atlas/units/lancer/creation-record.json",
+      "promptPath": "art/atlas/units/lancer/prompts/e-v1.txt",
+      "rights": "original-generated",
+      "sourceHash": "59571793cf0f03cc62afb1079397cf1cd2594ef99efb2fa0839bb473d520b09e",
+      "outputHashes": {
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Lancer-1.png": "045ab5eb5759e793188989a186199812809b993356289e02eeec21f8b600ef6a",
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Lancer.png": "fe9fe52e1414856b12eb6b41d7b4022d7e9f90994ec31bde7cfec82e8815b50b",
+        "art/atlas/units/lancer/frames/e-color.png": "d9ecc259842b9135d573714a7d7ba1b035d3a866437c0606d982ce338b2a3eaf",
+        "art/atlas/units/lancer/frames/e-nation.png": "99acd04b563a50781830eaf25ee6eb39e33bd96b1e42615eb7b8b70291c39499",
+        "art/atlas/units/lancer/frames/e-shadow.png": "5f843a3cc3708412012ba474cf8e6b772025165005576289ca6b0c37ce2c2142",
+        "art/atlas/units/lancer/frames/ne-color.png": "aa06eca7deb45eabe296b51d863b0f39d732f04d421b3327415dd06551dca710",
+        "art/atlas/units/lancer/frames/ne-nation.png": "8a3dd7c39da36bea32268a6048cd3a2cacdbbb3e0209351b17d06811f63bb298",
+        "art/atlas/units/lancer/frames/ne-shadow.png": "d19a738c7ea2aa7da0916307257501cb772a4d24761356982636fecfc099488f",
+        "art/atlas/units/lancer/frames/se-color.png": "2deda965e013cfab78478209ec869228f83a6f34a9a049e114927071a6ea70af",
+        "art/atlas/units/lancer/frames/se-nation.png": "8a77573e109e05fe4c39b70b3ba345a0de4f11cf0cf36d5b61180d32a28fedd4",
+        "art/atlas/units/lancer/frames/se-shadow.png": "ccee7f316f285af93ee26d20550280fd4b32599e70d741476fe87a9974106c74"
       }
     },
     {
@@ -524,6 +629,27 @@
         "art/atlas/units/rocket-artillery/frames/se-color.png": "ddce6b6ec747979884b7f9b71cdb39e61dd470f398027633f586825affff9c31",
         "art/atlas/units/rocket-artillery/frames/se-nation.png": "922d5e17397df1c48cc9d1fdef78c954aaa3f1ad84e2588602a3c81ae4284695",
         "art/atlas/units/rocket-artillery/frames/se-shadow.png": "a0a639c899ed18c1f36918a14a4c8127709c3e6a089b8344f2000a89204e80cf"
+      }
+    },
+    {
+      "assetId": "sipahi",
+      "creator": "OpenAI image generation",
+      "source": "art/atlas/units/sipahi/creation-record.json",
+      "promptPath": "art/atlas/units/sipahi/prompts/e-v1.txt",
+      "rights": "original-generated",
+      "sourceHash": "a8ab909598a99d4fde63c3f922a7fb0df7e02255696160786c0d02b416e93e53",
+      "outputHashes": {
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Sipahi-1.png": "ace763a7a7833d45bc916b9f2c56184e71dc4a7a7ad89e809434694339da1695",
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Sipahi.png": "a9ce4bf3134d9ea94f3408cf53db306175dba50774172091b373028b9d2fa7fd",
+        "art/atlas/units/sipahi/frames/e-color.png": "02a5f4003823d05eaa9122f64e706f3757fde1af0dea308902986af3100ae679",
+        "art/atlas/units/sipahi/frames/e-nation.png": "ce978b927f2c22af8db4adef051b91157fd53e029f6249efa37ef8eb5778b902",
+        "art/atlas/units/sipahi/frames/e-shadow.png": "0c76a63612b0d91835f4812737e381cc89e708455f1abc65e195596393c0c321",
+        "art/atlas/units/sipahi/frames/ne-color.png": "9252dc61a34f06ae380abb99d32b9243420fdfb64bc7d544d56de73a509a4883",
+        "art/atlas/units/sipahi/frames/ne-nation.png": "059675bdca5fe152539ce01496b3727c6b48f51aabe1e6f18b57b657fad650bb",
+        "art/atlas/units/sipahi/frames/ne-shadow.png": "c61169813c8d3b18bf0e8145b5a33f91f48fb6e30acbe2c4a5edd80c6ef925a3",
+        "art/atlas/units/sipahi/frames/se-color.png": "41441f3eebd3dd6059ab5812ea6b903e4782cc1a349b0c4ee670ffde6a8a559a",
+        "art/atlas/units/sipahi/frames/se-nation.png": "16e6b2de3ad1addc6be0f2b08f4de3f3d265e1c547c6b9fa766635b9f043aa0a",
+        "art/atlas/units/sipahi/frames/se-shadow.png": "c3dcbf318a8896b942486436a591067fb4149e02999de5385ccf12a5e4f11056"
       }
     }
   ]

@@ -1,19 +1,95 @@
 {
-"schemaVersion": 1,
-"unitName": "Lancer",
-"assetId": "lancer",
-"reviewState": "missing",
-"canvasWidth": 128,
-"canvasHeight": 128,
-"anchorX": 64,
-"anchorY": 96,
-"clippingMargin": 2,
-"uniqueUnitIdentity": null,
-"uniqueTo": null,
-"replaces": null,
-"staticFallbackKey": "TileSets/AtlasUnits/Units/Lancer",
-"framesDirectory": "frames/",
-"applicableStates": [ "IDLE", "MOVE", "ATTACK", "HIT", "DEFEAT" ],
-"facings": [ "E", "NE", "NW", "W", "SW", "SE" ],
-"minimumFrames": { "IDLE": 4, "MOVE": 8, "ATTACK": 8, "HIT": 4, "DEFEAT": 8 }
+  "schemaVersion": 1,
+  "unitName": "Lancer",
+  "assetId": "lancer",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": null,
+  "uniqueTo": null,
+  "replaces": null,
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Lancer",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/lancer/e-motion-v1.png",
+      "rawHash": "818416033dbb092b68026a1acbb844d5cb16bee9f1bad5ca319777fd2f863966",
+      "promptPath": "art/atlas/units/lancer/prompts/e-v1.txt",
+      "promptHash": "ebc16a86841ed46bbb0e983c9a065cc4e7c619e5018dd570bf2f51a7e41e923f",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/lancer/ne-motion-v1.png",
+      "rawHash": "a5f78a9032de136384231a24b7b4aba44d1379a1451fae0409910da9266c033c",
+      "promptPath": "art/atlas/units/lancer/prompts/ne-v1.txt",
+      "promptHash": "784fa7e3c26750199130069081a267c28ba97b74ddb1df6de641c76f9deb606f",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/lancer/se-motion-v1.png",
+      "rawHash": "a98dcd3855ef38d0c8a2ae47d0e59ed09b63ec0f99706e4516b144f71fcf19c2",
+      "promptPath": "art/atlas/units/lancer/prompts/se-v1.txt",
+      "promptHash": "1bbaf66a6c1f043e6716f7f8e19106da52ea3d80f29fc2fa91d8498a90282f8a",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
 }

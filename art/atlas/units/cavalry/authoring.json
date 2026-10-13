@@ -1,19 +1,95 @@
 {
-"schemaVersion": 1,
-"unitName": "Cavalry",
-"assetId": "cavalry",
-"reviewState": "missing",
-"canvasWidth": 128,
-"canvasHeight": 128,
-"anchorX": 64,
-"anchorY": 96,
-"clippingMargin": 2,
-"uniqueUnitIdentity": null,
-"uniqueTo": null,
-"replaces": null,
-"staticFallbackKey": "TileSets/AtlasUnits/Units/Cavalry",
-"framesDirectory": "frames/",
-"applicableStates": [ "IDLE", "MOVE", "ATTACK", "HIT", "DEFEAT" ],
-"facings": [ "E", "NE", "NW", "W", "SW", "SE" ],
-"minimumFrames": { "IDLE": 4, "MOVE": 8, "ATTACK": 8, "HIT": 4, "DEFEAT": 8 }
+  "schemaVersion": 1,
+  "unitName": "Cavalry",
+  "assetId": "cavalry",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": null,
+  "uniqueTo": null,
+  "replaces": null,
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Cavalry",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/cavalry/e-motion-v1.png",
+      "rawHash": "8016ead2453efcc6097e0f86340ce874d6a1d2a0ca82e86036446e28c9158810",
+      "promptPath": "art/atlas/units/cavalry/prompts/e-v1.txt",
+      "promptHash": "b7fe41ee0c1a3b33d74e7acd20292367575d9e33758999ab28a922d9f4fb75ca",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/cavalry/ne-motion-v1.png",
+      "rawHash": "8e74ec6386d73e272ebc3e1f79dbaef333b927f6f8a14d9d702ede3b7c823fac",
+      "promptPath": "art/atlas/units/cavalry/prompts/ne-v1.txt",
+      "promptHash": "a710e1d84f5ff1b9cec5e98f772bc166b3333aee4df766a71e1771b36a763321",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/cavalry/se-motion-v1.png",
+      "rawHash": "9b4b7bb77618b6bae80598e9501f48d6e47b2d1a52dfeef9b40cfefee7ffd16d",
+      "promptPath": "art/atlas/units/cavalry/prompts/se-v1.txt",
+      "promptHash": "f3e121b3c27b5c2e66d2969d41377c9582ab16a3a05db2c197e454918797979d",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
 }
