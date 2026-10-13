@@ -238,7 +238,7 @@ class MainMenuScreen: BaseScreen(), RecreateOnResize {
             add(scrollPane).minWidth(0f).grow().row()
             scrollPane.setScrollingDisabled(true, false)
             GameUiStyle.applyWidget(scrollPane)
-            stage.addActor(this)
+            this@MainMenuScreen.stage.addActor(this)
         } else null
         if (atlasShell == null) {
             scrollPane.setFillParent(true)
