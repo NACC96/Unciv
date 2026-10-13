@@ -2,6 +2,48 @@
   "schemaVersion": 1,
   "entries": [
     {
+      "assetId": "atomic-bomb",
+      "creator": "OpenAI image generation",
+      "source": "art/atlas/units/atomic-bomb/creation-record.json",
+      "promptPath": "art/atlas/units/atomic-bomb/prompts/e-v2.txt",
+      "rights": "original-generated",
+      "sourceHash": "d5b70d63323e90cb96c1389ec82a64a5f04110eb0b3282e6372eaff1dcb0aae4",
+      "outputHashes": {
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Atomic Bomb-1.png": "fa4c6f23b0ca3bf670c56d2137a32cf5ed1bebf27b1d7cf5146c694293e2d446",
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Atomic Bomb.png": "55fef17944be0a197454a4b69d7c724eb17cd5bdb02b67a19037a693b2aec5ab",
+        "art/atlas/units/atomic-bomb/frames/e-color.png": "7666a6efed5340fa20edc558e6493aabb982e4d7a3fd28ea1bae7622386ed25c",
+        "art/atlas/units/atomic-bomb/frames/e-nation.png": "0b0d5443a6381308c23635b7928ffe342c7b063e5cb5257b9f641ae95e50325c",
+        "art/atlas/units/atomic-bomb/frames/e-shadow.png": "6a5a3524d9c611007c92b38f1300dd4c75657ff2589c98f2753b033b80876195",
+        "art/atlas/units/atomic-bomb/frames/ne-color.png": "11cf1cf466080a356b62fb681f76b1aa2f21c9f2c90fb88b9b96e62b72e2ceaa",
+        "art/atlas/units/atomic-bomb/frames/ne-nation.png": "da18edc17c4ab8fc86e536b0265ffe7207b1d93ef4178506cfac6e94c0b68803",
+        "art/atlas/units/atomic-bomb/frames/ne-shadow.png": "d759368ffc545cb0be8c51ba45c5fdb71f54119656cbf428598f8d6d4812a600",
+        "art/atlas/units/atomic-bomb/frames/se-color.png": "2e835261fe63a14974c64ab747c3927cdddff98048f4a3d30e99b1dc2241be72",
+        "art/atlas/units/atomic-bomb/frames/se-nation.png": "51b47fa9dc3f97583a1f2dc51740dda6543565154a9df339d3d9e5a23b2281f4",
+        "art/atlas/units/atomic-bomb/frames/se-shadow.png": "6e4b2cb9dbbb61c2fd670802b095e37a3b097af60b6289520f242165f549b610"
+      }
+    },
+    {
+      "assetId": "b17",
+      "creator": "OpenAI image generation",
+      "source": "art/atlas/units/b17/creation-record.json",
+      "promptPath": "art/atlas/units/b17/prompts/e-v2.txt",
+      "rights": "original-generated",
+      "sourceHash": "5389c89d78c173afb57a2b038845681179112f2646795c30fa836d3b891d0b96",
+      "outputHashes": {
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/B17-1.png": "47ad36055d92fa7798286a8e7b4e47c86bfc1f546381bd1a8fb6de2316979314",
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/B17.png": "eb61227a3c301bc70d36b89763f0e4735eb73ad9ad6f3f5ebef096dd0b5948df",
+        "art/atlas/units/b17/frames/e-color.png": "402ee402e0165e359075cf2c05f1e8bf1ea3ed6c5ea66891ca737ccd5d45c539",
+        "art/atlas/units/b17/frames/e-nation.png": "cbfcb9eb8bdd104e6bd7d87a9d59c42906b1b90773074e99b088aa8f5ddeeb37",
+        "art/atlas/units/b17/frames/e-shadow.png": "162cebc70c65a972b98ef1e2069f110b46e3affaa7d2173af66c494e2dd1c5b9",
+        "art/atlas/units/b17/frames/ne-color.png": "b0cb2bf4592d658b87ace4d5add8fb849fe57933bab44646153cebb5ad412064",
+        "art/atlas/units/b17/frames/ne-nation.png": "7d1cc4798adbe356e6691c7ad9bba8b2f937cb53ba9046bec8c5344642798337",
+        "art/atlas/units/b17/frames/ne-shadow.png": "290a24ca721fad7e0b9088a6d2c64fc8e34bce09258e66b03078297bc7f43a38",
+        "art/atlas/units/b17/frames/se-color.png": "11eb1055e364496aeabcbe481dea4bac3d5acac60008407147fdd8b353066970",
+        "art/atlas/units/b17/frames/se-nation.png": "7c5a2ba81d32b54a433581052dda4e4d15a4ec4083ecb5dd55e01add859e0d23",
+        "art/atlas/units/b17/frames/se-shadow.png": "8f9202cbe7c13ae72787a36fab847ee2024a5e81622746257aa8882825d7ecf7"
+      }
+    },
+    {
       "assetId": "battleship",
       "creator": "OpenAI image generation",
       "source": "art/atlas/units/battleship/creation-record.json",
@@ -20,6 +62,27 @@
         "art/atlas/units/battleship/frames/se-color.png": "bdb43a0c1bc41af0b207fe8499be6540c27ebebbf2d54c9c999afab7c8b0878f",
         "art/atlas/units/battleship/frames/se-nation.png": "677d9af9ced32afb4702fc1615853d5fbc6340427d49105e4bf18b5f0c0b93c4",
         "art/atlas/units/battleship/frames/se-shadow.png": "1d8d62c905933e7c4dcaf1093e1e5a83dda9a05e2ca5dcd75c6d09fac8f23f15"
+      }
+    },
+    {
+      "assetId": "bomber",
+      "creator": "OpenAI image generation",
+      "source": "art/atlas/units/bomber/creation-record.json",
+      "promptPath": "art/atlas/units/bomber/prompts/e-v4.txt",
+      "rights": "original-generated",
+      "sourceHash": "6bbeafd03a1d6d8a46ede395791b102d204aaa90295c38cc934ca8f2b6d257ce",
+      "outputHashes": {
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Bomber-1.png": "f5aed50397390d6f1425390d87da275adbdb7800c7a99c9ff85777bef5c9a157",
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Bomber.png": "d70ccbbaba68e7169cd2da859772756602a11d598ed0f054252f8321e98fc390",
+        "art/atlas/units/bomber/frames/e-color.png": "0e736661a6858986aa9751f0c94945b12830521f26254d9eba619e0b0b49e0d1",
+        "art/atlas/units/bomber/frames/e-nation.png": "9a390cdf69eeb27f9c054d7b1f480d8051eabfe8fe9fb82e5166d1dbdac7fd87",
+        "art/atlas/units/bomber/frames/e-shadow.png": "eec283194de4cabe9a385416004917fa0aa8d79121c54f5d30ee1f7743d6adb6",
+        "art/atlas/units/bomber/frames/ne-color.png": "5362433081a7fbffbdb4bedf6becccaeb1edd3a7390849646d16291b2aa6b347",
+        "art/atlas/units/bomber/frames/ne-nation.png": "461be8ee167989cd97d12209e66aca15b19349e327e7f28de2b69f8eeab9510d",
+        "art/atlas/units/bomber/frames/ne-shadow.png": "95dd89b97c8500bf011a655cc2618ee134eae7530315c91fec2ae0a0f386d7ed",
+        "art/atlas/units/bomber/frames/se-color.png": "5d9d3bdde093543c3956e792d56b1ab5b448f90ea5bad4dfb0e082e3e35a4d80",
+        "art/atlas/units/bomber/frames/se-nation.png": "3e98b657d7ab2c03b62ea265840c4f83b2f70fd803d6539f73209a1979e3d8e3",
+        "art/atlas/units/bomber/frames/se-shadow.png": "3075350a42b3db6728be17b6a0e731ab0bcd06c0071620fc06224c9ee2d4a70c"
       }
     },
     {
@@ -233,6 +296,48 @@
       }
     },
     {
+      "assetId": "guided-missile",
+      "creator": "OpenAI image generation",
+      "source": "art/atlas/units/guided-missile/creation-record.json",
+      "promptPath": "art/atlas/units/guided-missile/prompts/e-v2.txt",
+      "rights": "original-generated",
+      "sourceHash": "97c048d0910f8047397608a9c055ef68431e8e188c593ad05f8f435f2c024d70",
+      "outputHashes": {
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Guided Missile-1.png": "97b78eadb7db13adc3df5f036c906195b9f944719e9ef05861f98ad0cb037544",
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Guided Missile.png": "e2741a4cb9524cb7150c1cecb1afa00d6bd43e5653eb8d2da1423b99e1e6a1ba",
+        "art/atlas/units/guided-missile/frames/e-color.png": "b6042707dfa4da50f860ceeb428441bd0aa020d70caf4862d475f4d5a091361d",
+        "art/atlas/units/guided-missile/frames/e-nation.png": "58fd896f261da014514ada953527876b6aa27526b7e5f2a1e855c72cfcfdf3b4",
+        "art/atlas/units/guided-missile/frames/e-shadow.png": "f6d5933ff5f960463f3b8449eed011253955e29a8aad58219890ed5ff4d72869",
+        "art/atlas/units/guided-missile/frames/ne-color.png": "ce0f388765030cd424da4f42f1ff657bd18ca688eb40e1b520e015ea808cb9df",
+        "art/atlas/units/guided-missile/frames/ne-nation.png": "91a464c2c309539e32ca7a47b36d6fed9a03a59ea28172e8cdeccef6e21a7b88",
+        "art/atlas/units/guided-missile/frames/ne-shadow.png": "127e3ac151311a796b58b8cd10542878b6d5c829f466bc468a0da451634c56dc",
+        "art/atlas/units/guided-missile/frames/se-color.png": "e6a567f47a15b22c10cac258305b5a2ada3e73ab2a544a47e65e5dc1089f4bdd",
+        "art/atlas/units/guided-missile/frames/se-nation.png": "3f3364e4488bbac827bc2a1cb339647d81b7cd42982de695a2365c264d966e2c",
+        "art/atlas/units/guided-missile/frames/se-shadow.png": "d709fcad0ff25aa7be571c30cc740ec219e6409eb6b349a0499c621e0a77385c"
+      }
+    },
+    {
+      "assetId": "helicopter-gunship",
+      "creator": "OpenAI image generation",
+      "source": "art/atlas/units/helicopter-gunship/creation-record.json",
+      "promptPath": "art/atlas/units/helicopter-gunship/prompts/e-v2.txt",
+      "rights": "original-generated",
+      "sourceHash": "e88c513708acfcf519f75b878c3d3a7ff394a1cbda6ec4c79fdc50f268266e5b",
+      "outputHashes": {
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Helicopter Gunship-1.png": "e95127df21cffb7f5dc6cc1de9071ea10b4eaf7ab6f92f7fdd667983a4367537",
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Helicopter Gunship.png": "13ae827ae4b2ef4aebccdf0446c7011ff030a469612edf9c744ace80b3a711e9",
+        "art/atlas/units/helicopter-gunship/frames/e-color.png": "db7e6bc5259e996e4ec0f1083c530bc3303c450dc6fcb8ab44ddca6f1c8abbf7",
+        "art/atlas/units/helicopter-gunship/frames/e-nation.png": "f0accdfbd7988f9ca67e83a7c9b6d509337de21334a68969416579eb74ac52b0",
+        "art/atlas/units/helicopter-gunship/frames/e-shadow.png": "27b987335fec67969141d516051564a25a025a6e696cfbf4c61a990c7ff80710",
+        "art/atlas/units/helicopter-gunship/frames/ne-color.png": "d3531adc18888e2afccc123b8e3cc13286f4bcc2922ca8f62e2f8cdab827a44a",
+        "art/atlas/units/helicopter-gunship/frames/ne-nation.png": "9d903fc77f5535c3645f9230a9d042921654ee891ed5a2aefdad575d6bccc4e0",
+        "art/atlas/units/helicopter-gunship/frames/ne-shadow.png": "07c0f1dcb1845743e06dd28fc58ad3f1251b901fb264e935be70ad53c97d1094",
+        "art/atlas/units/helicopter-gunship/frames/se-color.png": "fbc9a53f9fce17872d0284f9304aa230aef76d16fd32e5383cf7dd28cf5e9da2",
+        "art/atlas/units/helicopter-gunship/frames/se-nation.png": "acf7f7b0f51d1563969f3e44063905f8cd94efdbf8ce81170fa2b3094f7a3143",
+        "art/atlas/units/helicopter-gunship/frames/se-shadow.png": "e3cc6250d91f5d24a1b3bb029fc9eda6639fe17803d6b2cda1754ec4dc524fdf"
+      }
+    },
+    {
       "assetId": "ironclad",
       "creator": "OpenAI image generation",
       "source": "art/atlas/units/ironclad/creation-record.json",
@@ -251,6 +356,27 @@
         "art/atlas/units/ironclad/frames/se-color.png": "6c51060a57a0d90a8ea583aa9c63e95953085f3068f610d424c51f14765fb051",
         "art/atlas/units/ironclad/frames/se-nation.png": "0b2977813cebc45de4e67bfe8d127776632928eaa1362a1812f4fa248c1ccb0e",
         "art/atlas/units/ironclad/frames/se-shadow.png": "2fdec5ef081dfa9f17e98b16aaa1be3a3c0e9f60feacd8917ab9a9dce1fd11fb"
+      }
+    },
+    {
+      "assetId": "jet-fighter",
+      "creator": "OpenAI image generation",
+      "source": "art/atlas/units/jet-fighter/creation-record.json",
+      "promptPath": "art/atlas/units/jet-fighter/prompts/e-v2.txt",
+      "rights": "original-generated",
+      "sourceHash": "0aec9289d7e7accc8f282154890f89f631897aebf53a3daf4dddaa8e6d487944",
+      "outputHashes": {
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Jet Fighter-1.png": "6f11c8ebfbe1e7de24446b7ddd3c1a9c35e3a8f7b22cd94da315676184c5bf9d",
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Jet Fighter.png": "5c2ecc1ebc831b4ccae2e31b0414f6ba366c3973eb24e4b9653b448e09faa5da",
+        "art/atlas/units/jet-fighter/frames/e-color.png": "97c909323c280125b83abd3f475b156dc8d9c32b9ea5a2f2b88d9483a47135aa",
+        "art/atlas/units/jet-fighter/frames/e-nation.png": "3fd9f83fbc05717ae881953f146ad426dec9ed6b13e24bdce246cf103b63cc90",
+        "art/atlas/units/jet-fighter/frames/e-shadow.png": "ad198a6ab16364a7163b7d038466e970d874de3cbfd845b207db053594d6f7ae",
+        "art/atlas/units/jet-fighter/frames/ne-color.png": "fb955ee02b0974a9809009dab9c10de290de6743cbfa77028e671605a5888838",
+        "art/atlas/units/jet-fighter/frames/ne-nation.png": "5ba299c0155d199edff25ec7b707103296ff82799db20d5253c85f729e31fec8",
+        "art/atlas/units/jet-fighter/frames/ne-shadow.png": "a5d6b47b92d2efd105e6853742d17f4ca1138619ca6498f614ea93969e90fe36",
+        "art/atlas/units/jet-fighter/frames/se-color.png": "b41161d72adb4672136316ee40d494687c0e64ec38dfec9f648b53b78ab87cd8",
+        "art/atlas/units/jet-fighter/frames/se-nation.png": "108711718f5ba77e1479ddf5b6ac6d8947d4c8d8e2f07cdcb2630225643a155e",
+        "art/atlas/units/jet-fighter/frames/se-shadow.png": "ced51c338c864ac9814d128d909e167b2e8569ecae78bedda633200cb310f32d"
       }
     },
     {
@@ -377,6 +503,27 @@
         "art/atlas/units/ship-of-the-line/frames/se-color.png": "f3f560601396b58ac2a0c04994215e0a9fcfdeb1d9b390f9e84a18eefc8a2759",
         "art/atlas/units/ship-of-the-line/frames/se-nation.png": "6c896a875ab62d3981a41d6be49e2150f493a4ede33957577d2b257c5cfd2136",
         "art/atlas/units/ship-of-the-line/frames/se-shadow.png": "7a2442f99ba3950474c9f97aa31bfe8bd302d66424f5dfcaef8b6aee25ab330e"
+      }
+    },
+    {
+      "assetId": "stealth-bomber",
+      "creator": "OpenAI image generation",
+      "source": "art/atlas/units/stealth-bomber/creation-record.json",
+      "promptPath": "art/atlas/units/stealth-bomber/prompts/e-v2.txt",
+      "rights": "original-generated",
+      "sourceHash": "13fdc5f7ae1faa5dd045b261e4ff58f0b696f59256ed55df229182ad1cfbac28",
+      "outputHashes": {
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Stealth Bomber-1.png": "20ff1dfeebc5d9785137ae96735a3730f96df8f640778cc5fd05b193c0a86ffe",
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Stealth Bomber.png": "272df09400fe357f147529e1dce0e68e2a58c22dde3ab31f1238601ec49faaf4",
+        "art/atlas/units/stealth-bomber/frames/e-color.png": "a23256c3efaa43dcd472f7abea761866e0c582e383ac7477593c44c6f6de3be1",
+        "art/atlas/units/stealth-bomber/frames/e-nation.png": "b27a806f1e4654551b51a8774418b3ef4e6426734f2d013761b2e4bf9091de33",
+        "art/atlas/units/stealth-bomber/frames/e-shadow.png": "8e298d7192f2d9c6aab65d6d6d67489109670d5ca171eb4bd838f0b236d9bf78",
+        "art/atlas/units/stealth-bomber/frames/ne-color.png": "99de16d11f3cd38240200e318fae9a6785ae0756158c19d6dfaf738512796238",
+        "art/atlas/units/stealth-bomber/frames/ne-nation.png": "6df12a0ea14d482affd67aa9901fd308f5ac535eb1e954b509c08703c80115bb",
+        "art/atlas/units/stealth-bomber/frames/ne-shadow.png": "bb1c48f643b804ee4bab72dc9abd1a833fbdbf87208b72f4ba4451821e08a2e7",
+        "art/atlas/units/stealth-bomber/frames/se-color.png": "c8f2732d805d6d2515f01aa3e73319240fcd684cd63e04c961635154ef8ffcad",
+        "art/atlas/units/stealth-bomber/frames/se-nation.png": "1f6aabf0a5b406350a984233ac66121efdc71654c83c3e20ac4683231029252e",
+        "art/atlas/units/stealth-bomber/frames/se-shadow.png": "a4a67339d8263a27cc76981238efa864b1a4be09bfcc562945338da0723337f1"
       }
     },
     {

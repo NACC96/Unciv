@@ -1,19 +1,95 @@
 {
-"schemaVersion": 1,
-"unitName": "Janissary",
-"assetId": "janissary",
-"reviewState": "missing",
-"canvasWidth": 128,
-"canvasHeight": 128,
-"anchorX": 64,
-"anchorY": 96,
-"clippingMargin": 2,
-"uniqueUnitIdentity": "Janissary",
-"uniqueTo": "The Ottomans",
-"replaces": "Musketman",
-"staticFallbackKey": "TileSets/AtlasUnits/Units/Janissary",
-"framesDirectory": "frames/",
-"applicableStates": [ "IDLE", "MOVE", "ATTACK", "HIT", "DEFEAT" ],
-"facings": [ "E", "NE", "NW", "W", "SW", "SE" ],
-"minimumFrames": { "IDLE": 4, "MOVE": 8, "ATTACK": 8, "HIT": 4, "DEFEAT": 8 }
+  "schemaVersion": 1,
+  "unitName": "Janissary",
+  "assetId": "janissary",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": "Janissary",
+  "uniqueTo": "The Ottomans",
+  "replaces": "Musketman",
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Janissary",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/janissary/e-motion-v1.png",
+      "rawHash": "7e9f3002f124fbb215e2e07d1af2b46a588e86c783c6b34d682182a78b63650c",
+      "promptPath": "art/atlas/units/janissary/prompts/e-v1.txt",
+      "promptHash": "63e5f3c06d236e22abbb2b7a1509e602873f4795a1a753919a2f24dfe4906be7",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/janissary/ne-motion-v1.png",
+      "rawHash": "ea81f21aab18a6413e9841aefc9672a724e62993f0a80c0fe1bb888f3bc21ecc",
+      "promptPath": "art/atlas/units/janissary/prompts/ne-v1.txt",
+      "promptHash": "084b974d7ff3715ed593e3aa4bc9b90241ed3038817f85f07f8a9f545042c838",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/janissary/se-motion-v1.png",
+      "rawHash": "bc191c2dd93e67e5b14a013d81aaacea917f5130dccc85570df569f04a9f42a1",
+      "promptPath": "art/atlas/units/janissary/prompts/se-v1.txt",
+      "promptHash": "ea13ae7dcb33afb020234cf4df7e016abbd2cb20fc3342179e99673b8e343c4c",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
 }

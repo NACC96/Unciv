@@ -1,19 +1,95 @@
 {
-"schemaVersion": 1,
-"unitName": "War Chariot",
-"assetId": "war-chariot",
-"reviewState": "missing",
-"canvasWidth": 128,
-"canvasHeight": 128,
-"anchorX": 64,
-"anchorY": 96,
-"clippingMargin": 2,
-"uniqueUnitIdentity": "War Chariot",
-"uniqueTo": "Egypt",
-"replaces": "Chariot Archer",
-"staticFallbackKey": "TileSets/AtlasUnits/Units/War Chariot",
-"framesDirectory": "frames/",
-"applicableStates": [ "IDLE", "MOVE", "ATTACK", "HIT", "DEFEAT" ],
-"facings": [ "E", "NE", "NW", "W", "SW", "SE" ],
-"minimumFrames": { "IDLE": 4, "MOVE": 8, "ATTACK": 8, "HIT": 4, "DEFEAT": 8 }
+  "schemaVersion": 1,
+  "unitName": "War Chariot",
+  "assetId": "war-chariot",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": "War Chariot",
+  "uniqueTo": "Egypt",
+  "replaces": "Chariot Archer",
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/War Chariot",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/war-chariot/e-motion-v1.png",
+      "rawHash": "239295f3b0304f94b574cce849fffc0e4faf49c335b32becae093ff6abfb552c",
+      "promptPath": "art/atlas/units/war-chariot/prompts/e-v1.txt",
+      "promptHash": "aaaa8cac03674ddaf5253630e3ed9cc3bdeafd648ef7a62d6bbc5187c182cbab",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/war-chariot/ne-motion-v1.png",
+      "rawHash": "45f615b252c7c8814aef5c7e7672e610f56d2f141788ddc1f26ff12f299d71b7",
+      "promptPath": "art/atlas/units/war-chariot/prompts/ne-v1.txt",
+      "promptHash": "327b03c45859b4c8b0311790d8ac5aaea9e97a5ee97d96fa2b46408ab113cd18",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/war-chariot/se-motion-v1.png",
+      "rawHash": "dd79c73f5dcaae2c6f98c18d8eb43f4325a151c8278c46be43ee1f6a29b776e8",
+      "promptPath": "art/atlas/units/war-chariot/prompts/se-v1.txt",
+      "promptHash": "cd409168f164e840dacdbfccd79455dea96e66fba727ef4d6089c7ad6e884acc",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
 }

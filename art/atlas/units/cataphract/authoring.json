@@ -1,19 +1,95 @@
 {
-"schemaVersion": 1,
-"unitName": "Cataphract",
-"assetId": "cataphract",
-"reviewState": "missing",
-"canvasWidth": 128,
-"canvasHeight": 128,
-"anchorX": 64,
-"anchorY": 96,
-"clippingMargin": 2,
-"uniqueUnitIdentity": "Cataphract",
-"uniqueTo": "Byzantium",
-"replaces": "Horseman",
-"staticFallbackKey": "TileSets/AtlasUnits/Units/Cataphract",
-"framesDirectory": "frames/",
-"applicableStates": [ "IDLE", "MOVE", "ATTACK", "HIT", "DEFEAT" ],
-"facings": [ "E", "NE", "NW", "W", "SW", "SE" ],
-"minimumFrames": { "IDLE": 4, "MOVE": 8, "ATTACK": 8, "HIT": 4, "DEFEAT": 8 }
+  "schemaVersion": 1,
+  "unitName": "Cataphract",
+  "assetId": "cataphract",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": "Cataphract",
+  "uniqueTo": "Byzantium",
+  "replaces": "Horseman",
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Cataphract",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/cataphract/e-motion-v1.png",
+      "rawHash": "bed1a561dfc2d6b86e74c1aaf1152bc5d4de63945dc1cd0ec1437b1ea699ed22",
+      "promptPath": "art/atlas/units/cataphract/prompts/e-v1.txt",
+      "promptHash": "bc36578de8ff959f2829614be4a0267ba0545b866ff29a8f493805405e80a233",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/cataphract/ne-motion-v1.png",
+      "rawHash": "276eaf775b138942308d3572297a262246c1ab3596c38248272c5d609c97323d",
+      "promptPath": "art/atlas/units/cataphract/prompts/ne-v1.txt",
+      "promptHash": "cb420437769323454a384a4a4d63f3bc42af3425ac30e18e27c3c8dfd4684233",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/cataphract/se-motion-v1.png",
+      "rawHash": "822de84782c44b221fbd9f26bdd884dd3debfe24cec0532c658b233038b2c093",
+      "promptPath": "art/atlas/units/cataphract/prompts/se-v1.txt",
+      "promptHash": "80f1bd7fc118c30fb1c617bc978b16282a9b19b1a1f900af042c10871ac0a257",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
 }

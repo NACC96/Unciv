@@ -1,19 +1,103 @@
 {
-"schemaVersion": 1,
-"unitName": "Helicopter Gunship",
-"assetId": "helicopter-gunship",
-"reviewState": "missing",
-"canvasWidth": 128,
-"canvasHeight": 128,
-"anchorX": 64,
-"anchorY": 96,
-"clippingMargin": 2,
-"uniqueUnitIdentity": null,
-"uniqueTo": null,
-"replaces": null,
-"staticFallbackKey": "TileSets/AtlasUnits/Units/Helicopter Gunship",
-"framesDirectory": "frames/",
-"applicableStates": [ "IDLE", "MOVE", "ATTACK", "HIT", "DEFEAT" ],
-"facings": [ "E", "NE", "NW", "W", "SW", "SE" ],
-"minimumFrames": { "IDLE": 4, "MOVE": 8, "ATTACK": 8, "HIT": 4, "DEFEAT": 8 }
+  "schemaVersion": 1,
+  "unitName": "Helicopter Gunship",
+  "assetId": "helicopter-gunship",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": null,
+  "uniqueTo": null,
+  "replaces": null,
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Helicopter Gunship",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/helicopter-gunship/e-motion-v2.png",
+      "rawHash": "b3890d02e029911e4f586c3d51ad710267f25ee9cbade7ef155dc26595231a0a",
+      "promptPath": "art/atlas/units/helicopter-gunship/prompts/e-v2.txt",
+      "promptHash": "b1f3b1b97b396c2ecb259cb74c911fe42fee6dcd947dcfe589db21375a45db7e",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/helicopter-gunship/ne-motion-v2.png",
+      "rawHash": "45b85b407703e33b524a4891a73f2c4ae37e4f02b1c4941b5d7de7b301b92f5f",
+      "promptPath": "art/atlas/units/helicopter-gunship/prompts/ne-v2.txt",
+      "promptHash": "dcb243419463138762ff9ff2294004ee1e94609b00418bd21760d7ac3996e2ea",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ],
+      "identityReference": {
+        "path": "/Users/noahkenny/.codex/generated_images/01a1321a-8142-7533-ae7a-eb89a5433c70/exec-2e55f41c-69ea-4f60-9f65-76b86dc3a5aa.png",
+        "sha256": "b3890d02e029911e4f586c3d51ad710267f25ee9cbade7ef155dc26595231a0a"
+      }
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/helicopter-gunship/se-motion-v2.png",
+      "rawHash": "939812eb50090f81d04ddac2d1071cfdc6848450d07a229561409d9492959ac7",
+      "promptPath": "art/atlas/units/helicopter-gunship/prompts/se-v2.txt",
+      "promptHash": "106b97f7b4c723ef89404f127369edbb2f150ebde1dbae085b27575888f07387",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ],
+      "identityReference": {
+        "path": "/Users/noahkenny/.codex/generated_images/01a1321a-8142-7533-ae7a-eb89a5433c70/exec-2e55f41c-69ea-4f60-9f65-76b86dc3a5aa.png",
+        "sha256": "b3890d02e029911e4f586c3d51ad710267f25ee9cbade7ef155dc26595231a0a"
+      }
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
 }

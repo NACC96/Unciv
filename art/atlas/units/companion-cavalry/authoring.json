@@ -1,19 +1,95 @@
 {
-"schemaVersion": 1,
-"unitName": "Companion Cavalry",
-"assetId": "companion-cavalry",
-"reviewState": "missing",
-"canvasWidth": 128,
-"canvasHeight": 128,
-"anchorX": 64,
-"anchorY": 96,
-"clippingMargin": 2,
-"uniqueUnitIdentity": "Companion Cavalry",
-"uniqueTo": "Greece",
-"replaces": "Horseman",
-"staticFallbackKey": "TileSets/AtlasUnits/Units/Companion Cavalry",
-"framesDirectory": "frames/",
-"applicableStates": [ "IDLE", "MOVE", "ATTACK", "HIT", "DEFEAT" ],
-"facings": [ "E", "NE", "NW", "W", "SW", "SE" ],
-"minimumFrames": { "IDLE": 4, "MOVE": 8, "ATTACK": 8, "HIT": 4, "DEFEAT": 8 }
+  "schemaVersion": 1,
+  "unitName": "Companion Cavalry",
+  "assetId": "companion-cavalry",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": "Companion Cavalry",
+  "uniqueTo": "Greece",
+  "replaces": "Horseman",
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Companion Cavalry",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/companion-cavalry/e-motion-v1.png",
+      "rawHash": "0cdbe118edf37b063075a5c6748b17a95653961f89bf4866024e16484ee09fb6",
+      "promptPath": "art/atlas/units/companion-cavalry/prompts/e-v1.txt",
+      "promptHash": "e7970c81ac65de5f966655580377f7c3c097ad8442a491aa5e8c09a4a6e0f4e2",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/companion-cavalry/ne-motion-v1.png",
+      "rawHash": "e7ee3a50d34d7dd1bf3ef22510c14e88ca98188db0acafc7214ef77d4af46629",
+      "promptPath": "art/atlas/units/companion-cavalry/prompts/ne-v1.txt",
+      "promptHash": "22265a6e25fe10da3581a590069385a20232bd691caa866e78b86e31aae41ca2",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/companion-cavalry/se-motion-v1.png",
+      "rawHash": "89a65490e4a11d63e4c98067b3e272c1b382d7674ef5aaf1b35a092329aa24b0",
+      "promptPath": "art/atlas/units/companion-cavalry/prompts/se-v1.txt",
+      "promptHash": "21880609a306b13467fb1f49db59e6507a28e34bbe46efcdaa681c060fb43351",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
 }

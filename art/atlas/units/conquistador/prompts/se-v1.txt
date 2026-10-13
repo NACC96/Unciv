@@ -1,0 +1,7 @@
+Use this reference sheet as the exact identity, equipment, lighting and painting style. Create a new authored transparent motion sheet for Conquistador. All32 poses face SE consistently in the same elevated historical map projection, the mount and rider both facing diagonally lower-right, with more front and left-side visibility. Subject a Spanish mounted conquistador with silver morion helmet, polished breastplate, ivory sleeves and navy surcoat, leather boots, unmarked royal-blue sash and horse caparison, chestnut horse, slender steel sword and travel satchel. Do not rotate the entire raster; author every pose in this direction.
+Exactly8 equal columns x4 equal rows, landscape2:1 PNG, fixed cell scale and ground pivot50%width/78%height. Complete model/equipment in every cell; no overlaps/gutters/text/borders/paper/matte.
+Row1 four idle breath/cloth poses then four hit impact/recoil/stagger/recovery.
+Row2 eight actual MOVE phases horse four-leg walking cycle, alternating hooves and rider bob, caparison sways, all facing SE.
+Row3 eight ATTACK phases mounted sword guard, lift, wind up, slash forward, follow through, draw back and recover with real body/object changes.
+Row4 eight defeat stages horse shies, rider recoils, horse knees buckle, rider slumps, horse/rider tip, ground contact, settle, horse and rider prone within cell, complete inside cell, no blood.
+Royal-blue #2166B4 cloth is the nation material only. Soft violet #A04FA0 ground ellipse shadows only beneath root. Surrounding alpha fully transparent. All4 rows and8 columns required.

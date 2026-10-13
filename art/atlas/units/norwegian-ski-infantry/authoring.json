@@ -1,19 +1,95 @@
 {
-"schemaVersion": 1,
-"unitName": "Norwegian Ski Infantry",
-"assetId": "norwegian-ski-infantry",
-"reviewState": "missing",
-"canvasWidth": 128,
-"canvasHeight": 128,
-"anchorX": 64,
-"anchorY": 96,
-"clippingMargin": 2,
-"uniqueUnitIdentity": "Norwegian Ski Infantry",
-"uniqueTo": "Denmark",
-"replaces": "Rifleman",
-"staticFallbackKey": "TileSets/AtlasUnits/Units/Norwegian Ski Infantry",
-"framesDirectory": "frames/",
-"applicableStates": [ "IDLE", "MOVE", "ATTACK", "HIT", "DEFEAT" ],
-"facings": [ "E", "NE", "NW", "W", "SW", "SE" ],
-"minimumFrames": { "IDLE": 4, "MOVE": 8, "ATTACK": 8, "HIT": 4, "DEFEAT": 8 }
+  "schemaVersion": 1,
+  "unitName": "Norwegian Ski Infantry",
+  "assetId": "norwegian-ski-infantry",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": "Norwegian Ski Infantry",
+  "uniqueTo": "Denmark",
+  "replaces": "Rifleman",
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Norwegian Ski Infantry",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/norwegian-ski-infantry/e-motion-v1.png",
+      "rawHash": "61340949689fcf73203b2a5c772798f76e5d27a65789bcc9c31355c4757c07f8",
+      "promptPath": "art/atlas/units/norwegian-ski-infantry/prompts/e-v1.txt",
+      "promptHash": "460957481d42ab11e4101907edfb80f30219d21d2170cb87b7dc5b88da8ebfe1",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/norwegian-ski-infantry/ne-motion-v1.png",
+      "rawHash": "c98a86baee6be70a1a20a937a9fff8ca45ffe6a2bf0eb85aa898e12570c15486",
+      "promptPath": "art/atlas/units/norwegian-ski-infantry/prompts/ne-v1.txt",
+      "promptHash": "a26f0939bc9e72877d7d0bfbbc126993bec018c1d7a1e3777f2ac25830993217",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/norwegian-ski-infantry/se-motion-v1.png",
+      "rawHash": "ebba7bd7a1ba6b0553ab7cd7598c5b91f6ceccc4e95049db6791169c5450e440",
+      "promptPath": "art/atlas/units/norwegian-ski-infantry/prompts/se-v1.txt",
+      "promptHash": "b0e2db22cef105f6187437cd73f927442b671cca2323e9b4b8fceb2a071a7d1f",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
 }

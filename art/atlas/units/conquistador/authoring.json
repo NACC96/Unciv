@@ -1,19 +1,95 @@
 {
-"schemaVersion": 1,
-"unitName": "Conquistador",
-"assetId": "conquistador",
-"reviewState": "missing",
-"canvasWidth": 128,
-"canvasHeight": 128,
-"anchorX": 64,
-"anchorY": 96,
-"clippingMargin": 2,
-"uniqueUnitIdentity": "Conquistador",
-"uniqueTo": "Spain",
-"replaces": "Knight",
-"staticFallbackKey": "TileSets/AtlasUnits/Units/Conquistador",
-"framesDirectory": "frames/",
-"applicableStates": [ "IDLE", "MOVE", "ATTACK", "HIT", "DEFEAT" ],
-"facings": [ "E", "NE", "NW", "W", "SW", "SE" ],
-"minimumFrames": { "IDLE": 4, "MOVE": 8, "ATTACK": 8, "HIT": 4, "DEFEAT": 8 }
+  "schemaVersion": 1,
+  "unitName": "Conquistador",
+  "assetId": "conquistador",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": "Conquistador",
+  "uniqueTo": "Spain",
+  "replaces": "Knight",
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Conquistador",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/conquistador/e-motion-v1.png",
+      "rawHash": "dc690031abdbbe0fa7741bb44ed9011daeddf25449d60e98e61c0f6e7c29f243",
+      "promptPath": "art/atlas/units/conquistador/prompts/e-v1.txt",
+      "promptHash": "9998af5ef5e58073783e02cbda58ccdfd134f332776cf3fed3c6903b99405b2d",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/conquistador/ne-motion-v1.png",
+      "rawHash": "c2bea0048deb595c34e67ac1d2f689ff93475d91b3f53235e38de98ea9403a70",
+      "promptPath": "art/atlas/units/conquistador/prompts/ne-v1.txt",
+      "promptHash": "f92fa4824adb4a44dc5c307725382ef5a95a7aaf5c2e83f4b63034c0f062ad00",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/conquistador/se-motion-v1.png",
+      "rawHash": "7f00e2b5b2956ce4e49c2509d5d3b56249ce4667c104a8bae04e3368e9507058",
+      "promptPath": "art/atlas/units/conquistador/prompts/se-v1.txt",
+      "promptHash": "55f402885965c03741fd49740e12dcbb8b38086ae1fd03622655e0ceb4448c1f",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
 }

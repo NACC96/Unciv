@@ -1,19 +1,95 @@
 {
-"schemaVersion": 1,
-"unitName": "Atlatlist",
-"assetId": "atlatlist",
-"reviewState": "missing",
-"canvasWidth": 128,
-"canvasHeight": 128,
-"anchorX": 64,
-"anchorY": 96,
-"clippingMargin": 2,
-"uniqueUnitIdentity": "Atlatlist",
-"uniqueTo": "The Maya",
-"replaces": "Archer",
-"staticFallbackKey": "TileSets/AtlasUnits/Units/Atlatlist",
-"framesDirectory": "frames/",
-"applicableStates": [ "IDLE", "MOVE", "ATTACK", "HIT", "DEFEAT" ],
-"facings": [ "E", "NE", "NW", "W", "SW", "SE" ],
-"minimumFrames": { "IDLE": 4, "MOVE": 8, "ATTACK": 8, "HIT": 4, "DEFEAT": 8 }
+  "schemaVersion": 1,
+  "unitName": "Atlatlist",
+  "assetId": "atlatlist",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": "Atlatlist",
+  "uniqueTo": "The Maya",
+  "replaces": "Archer",
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Atlatlist",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/atlatlist/e-motion-v1.png",
+      "rawHash": "a3ce709610be8d30adeef5c07d8bb97de44ad2a982b962d5c627ae6292e34b07",
+      "promptPath": "art/atlas/units/atlatlist/prompts/e-v1.txt",
+      "promptHash": "0c2408cf438f6e7d2cef8a7cfa35d20247b7ff865fc4fe40bc623186e8f2d616",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/atlatlist/ne-motion-v1.png",
+      "rawHash": "d7f4a316c43617937db050cde8c6fbe18194fb55cf56911647de0da19ad44fad",
+      "promptPath": "art/atlas/units/atlatlist/prompts/ne-v1.txt",
+      "promptHash": "4a83c7d9c8383b6896f0195f758907ad797f3c7af30193d8ecf5b5053b1b5b32",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/atlatlist/se-motion-v1.png",
+      "rawHash": "f89c849e246540269e46df5110403e14ae310db749eab85698e2c91ec739a1a2",
+      "promptPath": "art/atlas/units/atlatlist/prompts/se-v1.txt",
+      "promptHash": "9bc1811c7201eb2d61a21408bf4de9b6b0481f9f90918557b36fa70b3d7ad05b",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
 }

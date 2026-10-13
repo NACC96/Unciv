@@ -1,19 +1,95 @@
 {
-"schemaVersion": 1,
-"unitName": "Bowman",
-"assetId": "bowman",
-"reviewState": "missing",
-"canvasWidth": 128,
-"canvasHeight": 128,
-"anchorX": 64,
-"anchorY": 96,
-"clippingMargin": 2,
-"uniqueUnitIdentity": "Bowman",
-"uniqueTo": "Babylon",
-"replaces": "Archer",
-"staticFallbackKey": "TileSets/AtlasUnits/Units/Bowman",
-"framesDirectory": "frames/",
-"applicableStates": [ "IDLE", "MOVE", "ATTACK", "HIT", "DEFEAT" ],
-"facings": [ "E", "NE", "NW", "W", "SW", "SE" ],
-"minimumFrames": { "IDLE": 4, "MOVE": 8, "ATTACK": 8, "HIT": 4, "DEFEAT": 8 }
+  "schemaVersion": 1,
+  "unitName": "Bowman",
+  "assetId": "bowman",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": "Bowman",
+  "uniqueTo": "Babylon",
+  "replaces": "Archer",
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Bowman",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/bowman/e-motion-v1.png",
+      "rawHash": "ffa62de14b31a9396953c22c46cb91eaf8daafba9222bf88b0b7ea32deae1a7c",
+      "promptPath": "art/atlas/units/bowman/prompts/e-v1.txt",
+      "promptHash": "a96dcddc2fd84582a5434b571ec88bc6642ee7f817d4c76a8acd63af8df5eeb6",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/bowman/ne-motion-v1.png",
+      "rawHash": "e1cea8294869b100009e6cb28999ded82640f408d5c28f891d12b66dff7b35ee",
+      "promptPath": "art/atlas/units/bowman/prompts/ne-v1.txt",
+      "promptHash": "ea61b00317a417477dd74f7f69ae5266812e3aa888f44858344da0260d4051c8",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/bowman/se-motion-v1.png",
+      "rawHash": "17ee2732c5147e0e2ca0595d78e518d27a2afa6bbf07dc7d878bc4cc280b4d72",
+      "promptPath": "art/atlas/units/bowman/prompts/se-v1.txt",
+      "promptHash": "fa7e1b455a591d329a70321fc82e5ba9d301267ca9bb28554974a15390a6d19c",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
 }

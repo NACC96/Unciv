@@ -86,6 +86,27 @@
       }
     },
     {
+      "assetId": "carolean",
+      "creator": "OpenAI image generation",
+      "source": "art/atlas/units/carolean/creation-record.json",
+      "promptPath": "art/atlas/units/carolean/prompts/e-v1.txt",
+      "rights": "original-generated",
+      "sourceHash": "0b650d068a8e3a02e7fb11f7448a7e858cdbee17b63488d74dbfb1b05d5cf754",
+      "outputHashes": {
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Carolean-1.png": "8c525d2e6026b2353b47fbbf9f95724ace48116742b013b45264bcb1a141af5c",
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Carolean.png": "a2926c13d9af2da07c1ee0f59751d56be3b3188521fb61fd2523c7db2705101b",
+        "art/atlas/units/carolean/frames/e-color.png": "c358c2f1c32a5d9cb75af53abcced108a6e24877d13e1ffbf74dcd09ebf103d9",
+        "art/atlas/units/carolean/frames/e-nation.png": "933a4e590f4bdd4924849013628929059607cfe787e699550b30d77da3f2e56d",
+        "art/atlas/units/carolean/frames/e-shadow.png": "816dc27fb046b1f3c4194e9e254183fceb19960b1e94f15d3224372ad1321670",
+        "art/atlas/units/carolean/frames/ne-color.png": "295d752811ecb00a68fde30043edc120946993b4f883943be0253b55c3034a9d",
+        "art/atlas/units/carolean/frames/ne-nation.png": "db3f9d9125b70a634ad7abbabe15e9f32f0581c8a4af07d81c3b4d29cf95fb1c",
+        "art/atlas/units/carolean/frames/ne-shadow.png": "cc0e7acfc1d3e2a51ab53b97f732213ad375630e67049fd76d30e5bc9a0bc82e",
+        "art/atlas/units/carolean/frames/se-color.png": "e0b854ece0e05763da3effb10bac9760617c135d3d094c313f68933100b0b5cf",
+        "art/atlas/units/carolean/frames/se-nation.png": "06b5ca941cc9d1d5c2716ce878ae52380bebdfe413d7d060676d29e347125bd5",
+        "art/atlas/units/carolean/frames/se-shadow.png": "351c7abd700f5faf91cbe8f608dce8034b135da0491e77ada12a2d51eac870b2"
+      }
+    },
+    {
       "assetId": "foreign-legion",
       "creator": "OpenAI image generation",
       "source": "art/atlas/units/foreign-legion/creation-record.json",
@@ -188,6 +209,27 @@
         "art/atlas/units/infantry/frames/se-color.png": "f71d129f986ed34b96553174eb92e4648a3d50ee8ce21887abd445962b84b150",
         "art/atlas/units/infantry/frames/se-nation.png": "fb7ea829b9665c6f9c0c712a77534eaccd88510cbe0c4bf9367b1b6285e72eae",
         "art/atlas/units/infantry/frames/se-shadow.png": "a2e0a330612e0123b7fa0f950d0b93122a0aabc2bde335822880d1377d0803cc"
+      }
+    },
+    {
+      "assetId": "janissary",
+      "creator": "OpenAI image generation",
+      "source": "art/atlas/units/janissary/creation-record.json",
+      "promptPath": "art/atlas/units/janissary/prompts/e-v1.txt",
+      "rights": "original-generated",
+      "sourceHash": "fe551d87c774630640093e7c824fda08f4367b283c98f973c24f909709aba982",
+      "outputHashes": {
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Janissary-1.png": "85d4986a21cb550c700a7782c1e84c08fe3de46e42d2875b3fbf8a0bb211b405",
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Janissary.png": "863831f4f2edab68cef3422315c5a30ea16ffd2276bd784728319dc034c7f07f",
+        "art/atlas/units/janissary/frames/e-color.png": "fa030d419061475c2ce7f22ace9923a2b92e2657c7c0ced33fb7226bf8145e86",
+        "art/atlas/units/janissary/frames/e-nation.png": "3bc2c09a76d29e62a21e696fb44339759def5d41b4cac8398439de96748addcb",
+        "art/atlas/units/janissary/frames/e-shadow.png": "79026675518256c3d132f6ac9e0cd277eea6d1b477814d1bca6d5f5fe69a0060",
+        "art/atlas/units/janissary/frames/ne-color.png": "f6d37f5a9372f2fcd988f93938da811aa14feb2ae7d4e8afe6a594082fe9a14c",
+        "art/atlas/units/janissary/frames/ne-nation.png": "e0088fba36309d2d36be13781979a807353cda9bbdeaed153e8a1b9dab1ca6a8",
+        "art/atlas/units/janissary/frames/ne-shadow.png": "4f972de84051f0282649741abb4187c9eb593410cc1b11bbb6ecf5f84d8687fc",
+        "art/atlas/units/janissary/frames/se-color.png": "db9616ab5b5ede980f0c14ceb108b0bd5487566c8b13891a7c1fcbeb4d0fee87",
+        "art/atlas/units/janissary/frames/se-nation.png": "0eddd79700ac91abfb1e2c6ce03bfda61c82e6d0d91e7480f65bf835cec5d8cd",
+        "art/atlas/units/janissary/frames/se-shadow.png": "72752c0eaa8c5bb4c99fac49cdd4b0158acf9677fd790cce76f85f36cb8aa964"
       }
     },
     {
@@ -296,6 +338,27 @@
       }
     },
     {
+      "assetId": "minuteman",
+      "creator": "OpenAI image generation",
+      "source": "art/atlas/units/minuteman/creation-record.json",
+      "promptPath": "art/atlas/units/minuteman/prompts/e-v1.txt",
+      "rights": "original-generated",
+      "sourceHash": "a1b1815d620e9225f9c0ab0166a8d82722c857f583967df68d42697b0e103127",
+      "outputHashes": {
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Minuteman-1.png": "03a94bb41206e343afc28f281a1ce33b74d9fa51f95de120a1636f4b667c5451",
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Minuteman.png": "275e8287ccad88f955f5c155d540ebaf0aa54061aedc8e0479eb471484878d01",
+        "art/atlas/units/minuteman/frames/e-color.png": "e0487e281c6068984c15c992e2437d5bc9daa8ab4a8424ea1fe1fd5495672526",
+        "art/atlas/units/minuteman/frames/e-nation.png": "4d9d79bf1b630be8ab99702ab4383e5ee9b80b68f7c20a5aa8af33000d927a83",
+        "art/atlas/units/minuteman/frames/e-shadow.png": "7e6ad20fe34d52d673829d5111bbd832a39d5944c84d8d969196deabb287e845",
+        "art/atlas/units/minuteman/frames/ne-color.png": "033bcac831b70e3a1132e5211c647d80545946eb5ad7e3402891b2ffb2ef6bce",
+        "art/atlas/units/minuteman/frames/ne-nation.png": "eeab372ae01b1e615309e76fe0692f1a70daf045a605723af853544afb4c380f",
+        "art/atlas/units/minuteman/frames/ne-shadow.png": "a5686e47710e20eef927602c9f09287f711663cd729e83b879faeeedbc9ffd06",
+        "art/atlas/units/minuteman/frames/se-color.png": "5b79c56389342fcd3488f8e2bd3f3f1cb1c58724a4f71fcfc25a72c03d1e4b00",
+        "art/atlas/units/minuteman/frames/se-nation.png": "8fa8804d4ed6c735323dc2c1e1a3ea05fc588da2232fda9bf35e53237f03a47b",
+        "art/atlas/units/minuteman/frames/se-shadow.png": "5572de68c9499391f994b5c99b1dcd6cb56d8559f481092eb002e277f9571b99"
+      }
+    },
+    {
       "assetId": "mobile-sam",
       "creator": "OpenAI image generation",
       "source": "art/atlas/units/mobile-sam/creation-record.json",
@@ -335,6 +398,69 @@
         "art/atlas/units/modern-armor/frames/se-color.png": "ef2c07aa2a79494a33f6d13ae0b288d51f74b01aa5b5daaa91f81f9309e6c417",
         "art/atlas/units/modern-armor/frames/se-nation.png": "2af10d4aae96d173bc8570db6a044a102cab3d18c2348b5a1c5fe5b834cf6856",
         "art/atlas/units/modern-armor/frames/se-shadow.png": "60420c2e6f13146da0eae12c94e424d6d45b8826b48db42ea4846a1e257b377a"
+      }
+    },
+    {
+      "assetId": "musketeer",
+      "creator": "OpenAI image generation",
+      "source": "art/atlas/units/musketeer/creation-record.json",
+      "promptPath": "art/atlas/units/musketeer/prompts/e-v1.txt",
+      "rights": "original-generated",
+      "sourceHash": "7396fc711457a47d47f4287b56aff30f02e89e9aa2dac78fa3f1639689e0ae3a",
+      "outputHashes": {
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Musketeer-1.png": "16d5cbca87d90972649235ada6565de9cd7b70a570a5f486fd1110781d682575",
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Musketeer.png": "d8535f1c15aa908e872f1f435aa28453af934d456ffb826cee6688eaeb279ce4",
+        "art/atlas/units/musketeer/frames/e-color.png": "ca8325d56dd914f93b49281fd3f049e941d25fa34f92daafdf69f8918a13e333",
+        "art/atlas/units/musketeer/frames/e-nation.png": "4bf28f2d5c03c259ddb96583df268ea408b03bf9e27a65f89973456332aabacc",
+        "art/atlas/units/musketeer/frames/e-shadow.png": "12ac34feb7c11dd113b1f7dbc1417b08af665d621abf078cd0015c528b27ca42",
+        "art/atlas/units/musketeer/frames/ne-color.png": "3830d8cacb1e5e477a33de73cd03ceddaa29ab3b36252afd3f79e8c240e66f39",
+        "art/atlas/units/musketeer/frames/ne-nation.png": "52175211b9baa31b0eb000e5ba1a36c02d8612b0aa1ac3629b690631d98043f1",
+        "art/atlas/units/musketeer/frames/ne-shadow.png": "12b346aff343d5551250c234ceb5b0c3d2a2491163438784a0bec12a26112d4e",
+        "art/atlas/units/musketeer/frames/se-color.png": "025b63e2c3aa1ba2828132277e3fc13fb3180361cf250fc06e734ef28ef80b68",
+        "art/atlas/units/musketeer/frames/se-nation.png": "1c8a1a81273e934148b5927b094475b1fce94695584277ecfeacd3123e363839",
+        "art/atlas/units/musketeer/frames/se-shadow.png": "7c35c3d26e38990967388f6ba218e54cdc4277b0713d7e13be6ee49b32ff334a"
+      }
+    },
+    {
+      "assetId": "musketman",
+      "creator": "OpenAI image generation",
+      "source": "art/atlas/units/musketman/creation-record.json",
+      "promptPath": "art/atlas/units/musketman/prompts/e-v1.txt",
+      "rights": "original-generated",
+      "sourceHash": "1e6755ec549b12f8c4cfff1869fb1d1884c54cbb8f01ee1a9c4b69d64cc598b4",
+      "outputHashes": {
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Musketman-1.png": "4de4a19289d091870d29e62fc02a63fd0795672c301a069b419434dd548b8dde",
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Musketman.png": "4232036d8912ae3b5c934477fcbc2a47990ec0f7ab5145eec751e1cc1ff5cb73",
+        "art/atlas/units/musketman/frames/e-color.png": "74f6d1364c6e4351f5fcab0d9abf9a78b3ff74d8c4593661ed1ad59fa0de10f8",
+        "art/atlas/units/musketman/frames/e-nation.png": "32e241d1d3623cf66730d2b984419c9d998ebc836bb07bde511f8c8caa112b93",
+        "art/atlas/units/musketman/frames/e-shadow.png": "bc3444c2e099e87ec80d1b9a534dda2e29d1f5d2bd5ed5052b7f3f9a2c8dfbd4",
+        "art/atlas/units/musketman/frames/ne-color.png": "6a6aa1b9fd2530826877f0cd5f3d00c8d03ff970f0086a6812bc3909f555e578",
+        "art/atlas/units/musketman/frames/ne-nation.png": "7b156efb51727254dbdef0796612dc73a660001c63c01c40ad211d641778db74",
+        "art/atlas/units/musketman/frames/ne-shadow.png": "4e06b395f8366e7a6970980cfcb05e8a2b4ac18c59226ca8f6b6624248096b6d",
+        "art/atlas/units/musketman/frames/se-color.png": "f7ef342f2b0c7ee551851e5c08060de56f0b741c84f35ee88c59ef359be57082",
+        "art/atlas/units/musketman/frames/se-nation.png": "aa96c70256787194ae91019bdc1e1819b37dc2044cfad03e47100c62fbdba147",
+        "art/atlas/units/musketman/frames/se-shadow.png": "f3b09390b10cc3dbb64bd2464ada42507ff5a51dec95995aad08a2842b3c5d89"
+      }
+    },
+    {
+      "assetId": "norwegian-ski-infantry",
+      "creator": "OpenAI image generation",
+      "source": "art/atlas/units/norwegian-ski-infantry/creation-record.json",
+      "promptPath": "art/atlas/units/norwegian-ski-infantry/prompts/e-v1.txt",
+      "rights": "original-generated",
+      "sourceHash": "abb3868f55946fd197e3cf7d80bc2331155860aef14ee3b88ccc28acd7c23fe4",
+      "outputHashes": {
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Norwegian Ski Infantry-1.png": "3bf57ac1160b20634e506f5e35494ac6e2c4444d670aeb82ea27f9d868cf0032",
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Norwegian Ski Infantry.png": "00e6860015f823b08cd14480bef823c1690ac277ace7b83e9cb2d5235c84f453",
+        "art/atlas/units/norwegian-ski-infantry/frames/e-color.png": "b75dd3f94f99715bc140f38e04073ff5be5754625a0a5a6f94e584dc5443eaf6",
+        "art/atlas/units/norwegian-ski-infantry/frames/e-nation.png": "1502a0faa9f1849bbcabe50ea25759beae534c2ae2156ebc3d9819172d67f4cc",
+        "art/atlas/units/norwegian-ski-infantry/frames/e-shadow.png": "e18d747252b792860d97c39e6a1336a58d2856a112fe4a4f3df9b9f33cdaaeb4",
+        "art/atlas/units/norwegian-ski-infantry/frames/ne-color.png": "b846931cd387c14cfe92f5c8323200ee7c9c4cedceebcb87188b537569f85909",
+        "art/atlas/units/norwegian-ski-infantry/frames/ne-nation.png": "dfc6f34e9a043e44934a8281f6bd063de5be9f6ee825b7abc583ef719c34652f",
+        "art/atlas/units/norwegian-ski-infantry/frames/ne-shadow.png": "4c6160cdeca7b690ab3c9a18d3304afe3d95e5f4b217d42fa093e6665d77c44f",
+        "art/atlas/units/norwegian-ski-infantry/frames/se-color.png": "e1f503d1deafd982747b60b24b50a0e10239b3681ce8f626d86c36963ec97683",
+        "art/atlas/units/norwegian-ski-infantry/frames/se-nation.png": "85931db52b7ca7ae8d6101d5a51422018b10fa988d68907bc335f6f9a0237904",
+        "art/atlas/units/norwegian-ski-infantry/frames/se-shadow.png": "2462483d76dd593d6e99989fa8e8caa6ab25e4ffad2d51ffd63629ceb4b32343"
       }
     },
     {

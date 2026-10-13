@@ -1,19 +1,103 @@
 {
-"schemaVersion": 1,
-"unitName": "Guided Missile",
-"assetId": "guided-missile",
-"reviewState": "missing",
-"canvasWidth": 128,
-"canvasHeight": 128,
-"anchorX": 64,
-"anchorY": 96,
-"clippingMargin": 2,
-"uniqueUnitIdentity": null,
-"uniqueTo": null,
-"replaces": null,
-"staticFallbackKey": "TileSets/AtlasUnits/Units/Guided Missile",
-"framesDirectory": "frames/",
-"applicableStates": [ "IDLE", "MOVE", "ATTACK", "HIT", "DEFEAT" ],
-"facings": [ "E", "NE", "NW", "W", "SW", "SE" ],
-"minimumFrames": { "IDLE": 4, "MOVE": 8, "ATTACK": 8, "HIT": 4, "DEFEAT": 8 }
+  "schemaVersion": 1,
+  "unitName": "Guided Missile",
+  "assetId": "guided-missile",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": null,
+  "uniqueTo": null,
+  "replaces": null,
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Guided Missile",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/guided-missile/e-motion-v2.png",
+      "rawHash": "635dc57f4333bd53b15cb2bcd33594e15de96e2194129a14e16d9d7796bd6de6",
+      "promptPath": "art/atlas/units/guided-missile/prompts/e-v2.txt",
+      "promptHash": "8ddcc9864b59b39e091c5e9aef8721710998b376c13447bf2a9be29d67182cd7",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/guided-missile/ne-motion-v2.png",
+      "rawHash": "1923766eb29a51f2775a2325599c26669c0d2c5aa46ce5e4ba199dcc24c8efd8",
+      "promptPath": "art/atlas/units/guided-missile/prompts/ne-v2.txt",
+      "promptHash": "8b5db08797dbe5ae51c69b24646a2b5a654fa7096fb456a406a69e7574047561",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ],
+      "identityReference": {
+        "path": "/Users/noahkenny/.codex/generated_images/01a1321a-8142-7533-ae7a-eb89a5433c70/exec-0e396154-04c8-4bd8-bf57-3bc671bab639.png",
+        "sha256": "635dc57f4333bd53b15cb2bcd33594e15de96e2194129a14e16d9d7796bd6de6"
+      }
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/guided-missile/se-motion-v2.png",
+      "rawHash": "14c9c09fa70cbf45db383403923230d3f5f2a9795ee50f69a34002d49d2d00be",
+      "promptPath": "art/atlas/units/guided-missile/prompts/se-v2.txt",
+      "promptHash": "6a3e4bdb3268a2659ef7404454828e84ab4b264eef895baa3bfd1c61ced5264d",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ],
+      "identityReference": {
+        "path": "/Users/noahkenny/.codex/generated_images/01a1321a-8142-7533-ae7a-eb89a5433c70/exec-0e396154-04c8-4bd8-bf57-3bc671bab639.png",
+        "sha256": "635dc57f4333bd53b15cb2bcd33594e15de96e2194129a14e16d9d7796bd6de6"
+      }
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
 }

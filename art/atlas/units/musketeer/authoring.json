@@ -1,19 +1,95 @@
 {
-"schemaVersion": 1,
-"unitName": "Musketeer",
-"assetId": "musketeer",
-"reviewState": "missing",
-"canvasWidth": 128,
-"canvasHeight": 128,
-"anchorX": 64,
-"anchorY": 96,
-"clippingMargin": 2,
-"uniqueUnitIdentity": "Musketeer",
-"uniqueTo": "France",
-"replaces": "Musketman",
-"staticFallbackKey": "TileSets/AtlasUnits/Units/Musketeer",
-"framesDirectory": "frames/",
-"applicableStates": [ "IDLE", "MOVE", "ATTACK", "HIT", "DEFEAT" ],
-"facings": [ "E", "NE", "NW", "W", "SW", "SE" ],
-"minimumFrames": { "IDLE": 4, "MOVE": 8, "ATTACK": 8, "HIT": 4, "DEFEAT": 8 }
+  "schemaVersion": 1,
+  "unitName": "Musketeer",
+  "assetId": "musketeer",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": "Musketeer",
+  "uniqueTo": "France",
+  "replaces": "Musketman",
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Musketeer",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/musketeer/e-motion-v1.png",
+      "rawHash": "b79274b0901906febb84906a540c0dd68ac764b8abdf85cf02298bac80b0b80b",
+      "promptPath": "art/atlas/units/musketeer/prompts/e-v1.txt",
+      "promptHash": "7e323a318d886a01cd3e45516cdb4d9e50efcc5f736f93fe0e5680e20796de14",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/musketeer/ne-motion-v1.png",
+      "rawHash": "7d7594747a36b357020c760d88b9e823e0299806d3592e4f1ddc7f3773161747",
+      "promptPath": "art/atlas/units/musketeer/prompts/ne-v1.txt",
+      "promptHash": "2616206e37cf3c617f3579bcbccd1237aa344d278457500e458736942a6f77df",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/musketeer/se-motion-v1.png",
+      "rawHash": "7292d8a35a28593062665ffac0b6ccd4c6c2a55b9df898a558c2a7cf452542b5",
+      "promptPath": "art/atlas/units/musketeer/prompts/se-v1.txt",
+      "promptHash": "e1dfbb30fabb9174ccf573d5e9274ac4c042dcfec08c8096c9dee8af1b56744a",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
 }

@@ -1,19 +1,95 @@
 {
-"schemaVersion": 1,
-"unitName": "Mohawk Warrior",
-"assetId": "mohawk-warrior",
-"reviewState": "missing",
-"canvasWidth": 128,
-"canvasHeight": 128,
-"anchorX": 64,
-"anchorY": 96,
-"clippingMargin": 2,
-"uniqueUnitIdentity": "Mohawk Warrior",
-"uniqueTo": "Iroquois",
-"replaces": "Swordsman",
-"staticFallbackKey": "TileSets/AtlasUnits/Units/Mohawk Warrior",
-"framesDirectory": "frames/",
-"applicableStates": [ "IDLE", "MOVE", "ATTACK", "HIT", "DEFEAT" ],
-"facings": [ "E", "NE", "NW", "W", "SW", "SE" ],
-"minimumFrames": { "IDLE": 4, "MOVE": 8, "ATTACK": 8, "HIT": 4, "DEFEAT": 8 }
+  "schemaVersion": 1,
+  "unitName": "Mohawk Warrior",
+  "assetId": "mohawk-warrior",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": "Mohawk Warrior",
+  "uniqueTo": "Iroquois",
+  "replaces": "Swordsman",
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Mohawk Warrior",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/mohawk-warrior/e-motion-v1.png",
+      "rawHash": "06ce68afc4a6f7003656c49f985dd970db68812bbf80d51a9695fcba764dff06",
+      "promptPath": "art/atlas/units/mohawk-warrior/prompts/e-v1.txt",
+      "promptHash": "d25733adf49e34ba579dd370ce5d3b485e04cb19ead0bfba1c6a1b690ece21a4",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/mohawk-warrior/ne-motion-v1.png",
+      "rawHash": "980c0d0fb7916da27f5dbe34c2ea4e1cf4c2eec4cb3860b01e49c9de6384beb9",
+      "promptPath": "art/atlas/units/mohawk-warrior/prompts/ne-v1.txt",
+      "promptHash": "a1e31cbd7eb15467d206844325b9f995a464e10bc2a9f869eb95722c4b3ff46a",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/mohawk-warrior/se-motion-v1.png",
+      "rawHash": "b2321799c820b0bd44c5da38793707ba292dfae10253f2f4e4b8b650b49ad3a8",
+      "promptPath": "art/atlas/units/mohawk-warrior/prompts/se-v1.txt",
+      "promptHash": "23ca9e2a764035de6a6d369d012ff789f9637af4da7110c2d38744dbb592ade5",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
 }

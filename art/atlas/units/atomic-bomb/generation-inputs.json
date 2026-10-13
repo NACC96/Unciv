@@ -1,0 +1,24 @@
+{
+  "facings": {
+    "E": {
+      "rawFile": "e-motion-v2.png",
+      "promptPath": "art/atlas/units/atomic-bomb/prompts/e-v2.txt"
+    },
+    "NE": {
+      "rawFile": "ne-motion-v2.png",
+      "promptPath": "art/atlas/units/atomic-bomb/prompts/ne-v2.txt",
+      "identityReference": {
+        "path": "/Users/noahkenny/.codex/generated_images/01a1321a-8142-7533-ae7a-eb89a5433c70/exec-e45ebc30-6e0e-4a86-9e17-5f94b22c1a98.png",
+        "sha256": "063a3be8898797fe56c6287408abc71016774788402af4c2f3e8393803269df6"
+      }
+    },
+    "SE": {
+      "rawFile": "se-motion-v2.png",
+      "promptPath": "art/atlas/units/atomic-bomb/prompts/se-v2.txt",
+      "identityReference": {
+        "path": "/Users/noahkenny/.codex/generated_images/01a1321a-8142-7533-ae7a-eb89a5433c70/exec-e45ebc30-6e0e-4a86-9e17-5f94b22c1a98.png",
+        "sha256": "063a3be8898797fe56c6287408abc71016774788402af4c2f3e8393803269df6"
+      }
+    }
+  }
+}
