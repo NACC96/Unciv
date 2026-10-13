@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "unitName": "Cannon",
+  "assetId": "cannon",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": null,
+  "uniqueTo": null,
+  "replaces": null,
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Cannon",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/cannon/e-motion-v1.png",
+      "rawHash": "4388a1fdd065e9ef46b58b29f8ff972fd6cb4b1d54cfac0c2e9b5a81f52f8eab",
+      "promptPath": "art/atlas/units/cannon/prompts/e-v1.txt",
+      "promptHash": "6b9083b59a5e292eb49b5230c787c39449489cc07fc04b5f697cf9ef592533a8",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/cannon/ne-motion-v1.png",
+      "rawHash": "ab4c948cf1ef1efce98d9eed9d962fb2be72a69229049e54ac4383e20556b2b7",
+      "promptPath": "art/atlas/units/cannon/prompts/ne-v1.txt",
+      "promptHash": "2baef9e6f490df44b1fa22dc9329e2d3eeed7aa8d59d7d3ff249bafe0a654807",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/cannon/se-motion-v1.png",
+      "rawHash": "7779c71b47b7912ba3375883b77ca29d347327dcbd763e601e9cecec3f0c201a",
+      "promptPath": "art/atlas/units/cannon/prompts/se-v1.txt",
+      "promptHash": "783b3e4c19430ceb64e8d34853f89bc6420f1897df1ef0bea5be4bb8991d050d",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
+}

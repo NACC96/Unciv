@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "unitName": "Pikeman",
+  "assetId": "pikeman",
+  "creator": "OpenAI image generation",
+  "tool": "image_gen.imagegen (built-in)",
+  "rights": "original-generated",
+  "styleReference": {
+    "path": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/concept/unit-art-direction-v1.png",
+    "sha256": "ceb7c639185d98cb53535f21eb0966b1bec01bb782c80de2fdd972d2858ce641",
+    "role": "approved style only"
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/pikeman/e-motion-v1.png",
+      "rawHash": "2442dd9d10607bb325a8f6b4fd6d37e2a76d050b3bddfe8d3c3d86989627b037",
+      "promptPath": "art/atlas/units/pikeman/prompts/e-v1.txt",
+      "promptHash": "465cd238c13238ad59a19b0c31ea37cdd6bd241f0753335c3563f2d5062404bd",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/pikeman/ne-motion-v1.png",
+      "rawHash": "7182016489f87da565801ce929233d8cb5348b45c8a0a20b1733f193cf2ff1fc",
+      "promptPath": "art/atlas/units/pikeman/prompts/ne-v1.txt",
+      "promptHash": "20c0096f7638d53a195d06ce879fe8c4147fd8e05a526768b88ccdf782fff2b5",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/pikeman/se-motion-v1.png",
+      "rawHash": "d1ef906a1526ddfe115a93e6b8442a5b161585e3d7fdb8353e7256830eef8161",
+      "promptPath": "art/atlas/units/pikeman/prompts/se-v1.txt",
+      "promptHash": "51fe3fbccbde488f0575f59791498facfa326cd5d715b46e4352e239c3a1feba",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "processing": {
+    "script": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/normalize_motion.py",
+    "sha256": "8702a1202c3a74035fca6b0cbee4dd8e301d00256f61c035c8d170e64f8d3a01",
+    "operations": [
+      "uniform cell cutting",
+      "constant sheet scale and root alignment",
+      "alpha-preserving resize",
+      "royal-blue nation mask extraction",
+      "violet ground-shadow extraction"
+    ],
+    "poseSynthesis": false,
+    "clonedStaticFrames": false
+  },
+  "reviewState": "candidate",
+  "formalArtReview": "deferred"
+}

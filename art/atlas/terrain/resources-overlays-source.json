@@ -1,0 +1,233 @@
+{
+  "schemaVersion": 1,
+  "batchId": "resources-overlays",
+  "tool": "built-in image_gen",
+  "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/terrain-authoring/raw/resources-overlays.png",
+  "rawSha256": "101058d01a07738f1bb5450990853a3b12536263c3a839d2ef7d0576362fb448",
+  "rawDimensions": [
+    1086,
+    1448
+  ],
+  "promptPath": "art/atlas/terrain/resources-overlays-prompt.txt",
+  "promptSha256": "6960913e8c2431a697e0622882f386cbd4f4d91d3fe11924fb6230a949af422f",
+  "reviewState": "candidate",
+  "formalAcceptance": "deferred by user",
+  "cells": [
+    {
+      "item": "Whales",
+      "cell": 0,
+      "cropBox": [
+        0,
+        0,
+        362,
+        362
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Whales.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "resource",
+      "sha256": "42bf791fd190ac8c158a3b6d70f225cf08b2e615193583a7cbce91bca84a2c6a",
+      "clippingMargin": 0
+    },
+    {
+      "item": "Wheat",
+      "cell": 1,
+      "cropBox": [
+        362,
+        0,
+        724,
+        362
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Wheat.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "resource",
+      "sha256": "95576698ee6ba56e8274a6306052748ac0c60e7467b8573774fa2a112da3b006",
+      "clippingMargin": 0
+    },
+    {
+      "item": "Wine",
+      "cell": 2,
+      "cropBox": [
+        724,
+        0,
+        1086,
+        362
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Wine.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "resource",
+      "sha256": "5b609f01cde8fd93311c22351a4ae21a6b89579526d66eb2da2da6c6214f7500",
+      "clippingMargin": 0
+    },
+    {
+      "item": "@Road",
+      "cell": 3,
+      "cropBox": [
+        0,
+        362,
+        362,
+        724
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Road.png",
+      "canvas": [
+        96,
+        32
+      ],
+      "normalization": "road",
+      "sha256": "8a8007248bffd1b1a2b381c3002003b9c613cfd4d5806f39c64a544b7068e563",
+      "clippingMargin": 0
+    },
+    {
+      "item": "@Railroad",
+      "cell": 4,
+      "cropBox": [
+        362,
+        362,
+        724,
+        724
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Railroad.png",
+      "canvas": [
+        96,
+        32
+      ],
+      "normalization": "road",
+      "sha256": "dc7af874696356a849165b981543579019869d8138a06927a7b7031985a15d04",
+      "clippingMargin": 0
+    },
+    {
+      "item": "River-Bottom",
+      "cell": 5,
+      "cropBox": [
+        724,
+        362,
+        1086,
+        724
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/River-Bottom.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "river",
+      "sha256": "dfd7c592678fe8e034603d3111511dfee869b91fc3b62cb27e74cf4a6a3422a6",
+      "clippingMargin": 0
+    },
+    {
+      "item": "River-BottomLeft",
+      "cell": 6,
+      "cropBox": [
+        0,
+        724,
+        362,
+        1086
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/River-BottomLeft.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "river",
+      "sha256": "3d8e660116910ddf749d578791debe9ecd6cab8f297ebf24c26a3d99df70f404",
+      "clippingMargin": 0
+    },
+    {
+      "item": "River-BottomRight",
+      "cell": 7,
+      "cropBox": [
+        362,
+        724,
+        724,
+        1086
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/River-BottomRight.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "river",
+      "sha256": "de43972a64746c6e981e486a747a34b83d8ef687054f59ca3e9a7fe34badc2a0",
+      "clippingMargin": 0
+    },
+    {
+      "item": "@Crosshair",
+      "cell": 8,
+      "cropBox": [
+        724,
+        724,
+        1086,
+        1086
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Crosshair.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "overlay",
+      "sha256": "9145ccc3b889467f5767ad83349fd3bf48248b4d70d3af4710c3b2a6be1117ea",
+      "clippingMargin": 0
+    },
+    {
+      "item": "@CrosshatchHexagon",
+      "cell": 9,
+      "cropBox": [
+        0,
+        1086,
+        362,
+        1448
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/CrosshatchHexagon.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "hex",
+      "sha256": "b901bd4f0508cd356331532eac19b5a2712f1817de3b9c2f016f2d7962ca0082",
+      "clippingMargin": 0
+    },
+    {
+      "item": "@Highlight",
+      "cell": 10,
+      "cropBox": [
+        362,
+        1086,
+        724,
+        1448
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Highlight.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "hex",
+      "sha256": "2cc32ccede2bca8bb1bd5dd5d9f73137305f198f081d57cca86167af52719d34",
+      "clippingMargin": 0
+    },
+    {
+      "item": "@RememberedFog",
+      "cell": 11,
+      "cropBox": [
+        724,
+        1086,
+        1086,
+        1448
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/RememberedFog.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "hex",
+      "sha256": "7ad4ece109345226ce95a6f5070894d3934575ce3eb06f80540ae95f54ba8e1f",
+      "clippingMargin": 0
+    }
+  ]
+}

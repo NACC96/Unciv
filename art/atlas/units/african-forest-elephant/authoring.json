@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "unitName": "African Forest Elephant",
+  "assetId": "african-forest-elephant",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": "African Forest Elephant",
+  "uniqueTo": "Carthage",
+  "replaces": "Horseman",
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/African Forest Elephant",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/african-forest-elephant/e-motion-v1.png",
+      "rawHash": "9eff63fac2aef8b21a0f5aa1163834fc0003183d6d2c833fbc4f009723a22b3d",
+      "promptPath": "art/atlas/units/african-forest-elephant/prompts/e-v1.txt",
+      "promptHash": "5aa382d248f3c6206aba01a415a16fbba709c89e1921bb1ce1354f8438df17cc",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/african-forest-elephant/ne-motion-v1.png",
+      "rawHash": "2e123bfde57684c5da7ffd1bbe4dbddbb959737090063ed0c553378a990018c0",
+      "promptPath": "art/atlas/units/african-forest-elephant/prompts/ne-v1.txt",
+      "promptHash": "e515b2c7dfb116493218c13e79b2c4c149651d2961b67aa8607f6eae4ed14c49",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/african-forest-elephant/se-motion-v1.png",
+      "rawHash": "736a11798675b325eace6a58c77699dcc54a8c9d28bc51e0a42eaf15fd99de1c",
+      "promptPath": "art/atlas/units/african-forest-elephant/prompts/se-v1.txt",
+      "promptHash": "e16c6ddb23476b2ed9eb8589f612c83ce38e9c97e56acd90c81a61789e674489",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
+}

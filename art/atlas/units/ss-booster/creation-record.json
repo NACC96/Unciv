@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "unitName": "SS Booster",
+  "assetId": "ss-booster",
+  "creator": "OpenAI image generation",
+  "tool": "image_gen.imagegen (built-in)",
+  "rights": "original-generated",
+  "styleReference": {
+    "path": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/concept/unit-art-direction-v1.png",
+    "sha256": "ceb7c639185d98cb53535f21eb0966b1bec01bb782c80de2fdd972d2858ce641",
+    "role": "approved style only"
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/ss-booster/e-motion-v2.png",
+      "rawHash": "422929d433afda98044ad1f7ddef86c14f93f2e5a0b8234f71cd4766176d37c4",
+      "promptPath": "art/atlas/units/ss-booster/prompts/e-v2.txt",
+      "promptHash": "7c998e908a1d8f3ddad6ef89747c760b567de4a1e68850470aa0f85201aa90c2",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/ss-booster/ne-motion-v2.png",
+      "rawHash": "9d76664c927ba4e4d7b2f55511284b05cffc1d8b2c10331f8c9ab06a1f92db6e",
+      "promptPath": "art/atlas/units/ss-booster/prompts/ne-v2.txt",
+      "promptHash": "61b9c82fdbc26a949d3de26539f02644c12798012de5bd9f4ff44754ee258a37",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ],
+      "identityReference": {
+        "path": "/Users/noahkenny/.codex/generated_images/01a1321a-8142-7533-ae7a-eb89a5433c70/exec-aa77c209-d74b-47c0-b3f2-7ca18a95a30f.png",
+        "sha256": "422929d433afda98044ad1f7ddef86c14f93f2e5a0b8234f71cd4766176d37c4"
+      }
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/ss-booster/se-motion-v2.png",
+      "rawHash": "e9c502a34f2220becb4643359fd893bc2ba83c187c8f5c1d3893abf5f0f439d6",
+      "promptPath": "art/atlas/units/ss-booster/prompts/se-v2.txt",
+      "promptHash": "27a9a69ce149e0904b34c5e788b4b5d90f7ce9b2d301305090b8ce734cdadbd2",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ],
+      "identityReference": {
+        "path": "/Users/noahkenny/.codex/generated_images/01a1321a-8142-7533-ae7a-eb89a5433c70/exec-aa77c209-d74b-47c0-b3f2-7ca18a95a30f.png",
+        "sha256": "422929d433afda98044ad1f7ddef86c14f93f2e5a0b8234f71cd4766176d37c4"
+      }
+    }
+  ],
+  "processing": {
+    "script": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/normalize_motion-v3.py",
+    "sha256": "d63316a6cedfaafcf546ecbd87f0163d3d13d0363c473cd389b2dd60c2113bf8",
+    "operations": [
+      "uniform cell cutting",
+      "constant sheet scale and root alignment",
+      "alpha-preserving resize",
+      "royal-blue nation mask extraction",
+      "violet ground-shadow extraction"
+    ],
+    "poseSynthesis": false,
+    "clonedStaticFrames": false
+  },
+  "reviewState": "candidate",
+  "formalArtReview": "deferred"
+}

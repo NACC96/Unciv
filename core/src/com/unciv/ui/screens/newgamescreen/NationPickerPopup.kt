@@ -18,6 +18,8 @@ import com.unciv.models.translations.tr
 import com.unciv.ui.audio.MusicMood
 import com.unciv.ui.audio.MusicTrackChooserFlags
 import com.unciv.ui.components.InputDisabling
+import com.unciv.ui.components.AtlasWidgets
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.UncivTooltip.Companion.addTooltip
 import com.unciv.ui.components.extensions.getCloseButton
 import com.unciv.ui.components.extensions.isNarrowerThan4to3
@@ -63,8 +65,13 @@ internal class NationPickerPopup(
 
     // This Popup's body has two halves of same size, either side by side or arranged vertically
     // depending on screen proportions - determine height for one of those
-    private val partHeight = stageToShowOn.height * (if (stageToShowOn.isNarrowerThan4to3()) 0.45f else 0.8f)
-    private val civBlocksWidth = playerPicker.civBlocksWidth
+    private val stacked = stageToShowOn.isNarrowerThan4to3() || GameUiStyle.isAtlas &&
+        stageToShowOn.width < 850f * settings.fontSizeMultiplier
+    private val partHeight = if (GameUiStyle.isAtlas)
+        (stageToShowOn.height * 0.84f - 104f).coerceAtLeast(120f) / if (stacked) 2f else 1f
+    else stageToShowOn.height * (if (stacked) 0.45f else 0.8f)
+    private val civBlocksWidth = if (GameUiStyle.isAtlas) minOf(playerPicker.civBlocksWidth,
+        (stageToShowOn.width - 80f) / if (stacked) 1f else 2f) else playerPicker.civBlocksWidth
 
     private val nationListTable = Table()
     private val nationListScroll = AutoScrollPane(nationListTable)
@@ -83,10 +90,15 @@ internal class NationPickerPopup(
     private var keyRoundRobin = 0
 
     init {
+        if (GameUiStyle.isAtlas) {
+            innerTable.background = GameUiStyle.panelBackground("Atlas/Setup/NationPicker", 1f)
+            add(AtlasWidgets.header("Choose a civilization")).colspan(if (stacked) 1 else 2)
+                .growX().minWidth(0f).row()
+        }
         nationListScroll.setOverscroll(false, false)
         add(nationListScroll).size( civBlocksWidth + 10f, partHeight )
         // +10, because the nation table has a 5f pad, for a total of +10f
-        if (stageToShowOn.isNarrowerThan4to3()) row()
+        if (stacked) row()
         nationDetailsScroll.setOverscroll(false, false)
         add(nationDetailsScroll).size(civBlocksWidth + 10f, partHeight) // Same here, see above
 
@@ -96,7 +108,7 @@ internal class NationPickerPopup(
         addActionIcons()
 
         nationDetailsTable.touchable = Touchable.enabled
-        nationDetailsTable.onClick { returnSelected() }
+        if (!GameUiStyle.isAtlas) nationDetailsTable.onClick { returnSelected() }
     }
 
     /** Note - [newMode]==null toggles, but this is prepared for key shortcuts _setting_ a mode.
@@ -117,6 +129,23 @@ internal class NationPickerPopup(
         toImageButton(buttonsIconSize, buttonsCircleSize, buttonsBackColor, overColor)
 
     private fun addActionIcons() {
+        if (GameUiStyle.isAtlas) {
+            row()
+            val close = GameUiStyle.button(Constants.close).apply {
+                onActivation { this@NationPickerPopup.close() }
+                keyShortcuts.add(KeyCharAndCode.ESC)
+            }
+            val view = GameUiStyle.button("Switch view").apply { onActivation { toggleListMode() } }
+            val select = GameUiStyle.button("Select", primary = true).apply {
+                onActivation { returnSelected() }
+                keyShortcuts.add(KeyCharAndCode.RETURN)
+            }
+            add(AtlasWidgets.footer(select, listOf(close, view))).colspan(if (stacked) 1 else 2)
+                .growX().minWidth(0f).padTop(8f)
+            GameUiStyle.applyWidget(nationListScroll)
+            GameUiStyle.applyWidget(nationDetailsScroll)
+            return
+        }
         // Despite being a Popup we use our own buttons - floating circular ones
         val closeButton = getCloseButton(buttonsCircleSize, buttonsIconSize, buttonsBackColor, Color.FIREBRICK) { close() }
         closeButton.setPosition(buttonsOffsetFromEdge, buttonsOffsetFromEdge, Align.bottomLeft)

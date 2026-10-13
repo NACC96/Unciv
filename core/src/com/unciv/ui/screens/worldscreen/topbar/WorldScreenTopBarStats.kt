@@ -149,7 +149,7 @@ internal class WorldScreenTopBarStats(private val topbar: WorldScreenTopBar) : S
         faithPerTurnLabel.setText(rateLabel(nextTurnStats.faith))
         faithPerTurnLabel.setFontColor(rateColor(nextTurnStats.faith))
 
-        scaleTo(worldScreen.stage.width)
+        if (!com.unciv.ui.components.GameUiStyle.isAtlas) scaleTo(worldScreen.stage.width)
     }
 
     /** Positive rates stay quiet; a deficit is the value the player must notice. */

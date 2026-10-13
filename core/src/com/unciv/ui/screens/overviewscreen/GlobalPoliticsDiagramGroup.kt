@@ -9,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.CheckBox
 import com.badlogic.gdx.scenes.scene2d.ui.Image
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.utils.Align
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.Constants
 import com.unciv.logic.civilization.Civilization
 import com.unciv.logic.civilization.diplomacy.DiplomacyManager
@@ -60,7 +61,7 @@ class GlobalPoliticsDiagramGroup(
         object War : Relation() {
             override val ordinal = 0
             override val label = "War"
-            override val color: Color = Color.RED
+            override val color: Color get() = if (GameUiStyle.isAtlas) GameUiStyle.error else Color.RED
             override val zOrder = 100
         }
         private class Wrapped(level: RelationshipLevel) : Relation() {
@@ -72,7 +73,7 @@ class GlobalPoliticsDiagramGroup(
         object DefensivePact : Relation() {
             override val ordinal = 99
             override val label = Constants.defensivePact
-            override val color: Color = Color.PURPLE
+            override val color: Color get() = if (GameUiStyle.isAtlas) GameUiStyle.info else Color.PURPLE
             override val zOrder = 99
         }
 

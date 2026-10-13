@@ -77,6 +77,7 @@ class AgentNationSettingsPanelTest {
             Mockito.`when`(session.getNationSettings()).thenAnswer { settings }
             Mockito.`when`(session.getPendingNationChange()).thenAnswer { pending }
             Mockito.`when`(session.canSpectate()).thenReturn(true)
+            Mockito.`when`(session.getVision()).thenReturn(MatchVision.FOG)
             Mockito.`when`(session.getRunState()).thenReturn(AgentRunState.PAUSED)
             Mockito.doAnswer {
                 requests.add(Request(it.getArgument(0), it.getArgument(1), it.getArgument(2)))
@@ -102,6 +103,25 @@ class AgentNationSettingsPanelTest {
     private fun Actor.select(name: String, prefix: String) {
         @Suppress("UNCHECKED_CAST") val box = named(name) as SelectBox<Any>
         box.selected = box.items.first { it.toString().startsWith(prefix) }
+    }
+
+    @Test fun selectedNationImmediatelyReportsItsController() {
+        val f = Fixture(); val panel = AgentNationSettingsPanel(f.screen, f.session)
+        try {
+            panel.toggle(); panel.select("NationPicker", "Greece")
+            assertTrue((panel.named("NationController") as Label).text.toString().contains("Controller: Agent · Greece"))
+        } finally { panel.dispose() }
+    }
+
+    @Test fun pendingControlClearsWhenAuthoritySettles() {
+        val f = Fixture(); val panel = AgentNationSettingsPanel(f.screen, f.session)
+        try {
+            panel.toggle(); f.pending = "Pending takeover of Rome"; panel.refresh()
+            assertTrue((panel.named("NationStatus") as Label).text.toString().contains("Pending takeover"))
+            f.pending = null; panel.refresh()
+            assertFalse("An old pending change must not remain after settlement", (panel.named("NationStatus") as Label).text.toString().contains("Pending takeover"))
+            assertTrue(panel.descendants().filterIsInstance<Label>().any { it.text.toString().contains("Controller: Human") })
+        } finally { panel.dispose() }
     }
 
     @Test fun `saved custom model row is visible and directly editable on opening`() {
@@ -174,6 +194,23 @@ class AgentNationSettingsPanelTest {
             assertEquals(listOf(NationControlChange.PLAY_AS, NationControlChange.SPECTATE), f.requests.map { it.change })
             assertNull(f.requests.last().id)
             assertNull(f.requests.last().profile)
+        } finally { panel.dispose() }
+    }
+
+    @Test fun `active agent settings retain next turn copy but takeover applies immediately`() {
+        val f = Fixture()
+        f.settings = f.settings.map { it.copy(isActive = it.civId == "Greece") }
+        val panel = AgentNationSettingsPanel(f.screen, f.session)
+        try {
+            panel.toggle(); panel.select("NationPicker", "Greece")
+            panel.named("NationSave").press(); f.callback!!(null)
+            assertEquals("Saved. The agent finishes this turn with its previous settings.",
+                (panel.named("NationStatus") as Label).text.toString())
+            panel.named("NationPlay").press(); f.callback!!(null)
+            assertEquals("Applied.", (panel.named("NationStatus") as Label).text.toString())
+            assertFalse("Immediate takeover must not claim to pause the match",
+                panel.descendants().filterIsInstance<Label>().any { it.text.toString().contains("match is paused") })
+            assertEquals(listOf(NationControlChange.SAVE_AGENT_SETTINGS, NationControlChange.PLAY_AS), f.requests.map { it.change })
         } finally { panel.dispose() }
     }
 
@@ -255,7 +292,7 @@ class AgentNationSettingsPanelTest {
             panel.toggle(); panel.validate(); controls.validate()
             assertTrue(panel.x >= 0 && panel.y >= 0 && panel.x + panel.width <= f.width && panel.y + panel.height <= f.height)
             assertTrue(controls.width <= f.width - 16f)
-            for (name in listOf("NationPicker", "NationProvider", "NationModel", "NationDisplayName", "NationPersonality")) {
+            for (name in listOf("MatchVision", "NationPicker", "NationProvider", "NationModel", "NationDisplayName", "NationPersonality")) {
                 val actor = panel.named(name); val pos = actor.localToAscendantCoordinates(panel, Vector2())
                 assertTrue("$name horizontal bounds", pos.x >= 0 && pos.x + actor.width <= panel.width)
             }
@@ -279,5 +316,33 @@ class AgentNationSettingsPanelTest {
                 panel.hide(); assertNull(stage.keyboardFocus)
             } finally { panel.dispose(); stage.dispose(); stage.batch.dispose() }
         }
+    }
+
+    @Test fun `map vision picker shows the match setting and commits only the user's pick`() {
+        val f = Fixture()
+        var vision = MatchVision.FULL
+        val changes = ArrayList<MatchVision>()
+        var done: ((String?) -> Unit)? = null
+        Mockito.`when`(f.session.getVision()).thenAnswer { vision }
+        Mockito.doAnswer { changes.add(it.getArgument(0)); done = it.getArgument(1); null }
+            .`when`(f.session).setVision(Mockito.any(MatchVision::class.java) ?: MatchVision.FOG, Mockito.any<(String?) -> Unit>() ?: {})
+        val panel = AgentNationSettingsPanel(f.screen, f.session)
+        try {
+            panel.toggle()
+            val picker = panel.named("MatchVision") as SelectBox<*>
+            assertEquals("Everything", picker.selected.toString())
+            assertTrue("Opening and refreshing never commits", changes.isEmpty())
+            panel.select("MatchVision", "Map revealed")
+            assertEquals(listOf(MatchVision.MAP), changes)
+            assertTrue("One change at a time", picker.isDisabled)
+            vision = MatchVision.MAP
+            done!!(null)
+            assertFalse(picker.isDisabled)
+            assertTrue((panel.named("NationStatus") as Label).text.toString().startsWith("Map vision: Map revealed"))
+            vision = MatchVision.FOG
+            panel.refresh()
+            assertEquals("Another change to the match is followed", "Fog of war", picker.selected.toString())
+            assertEquals(1, changes.size)
+        } finally { panel.dispose() }
     }
 }

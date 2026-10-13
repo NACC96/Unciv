@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.Constants
 import com.unciv.UncivGame
 import com.unciv.logic.civilization.Civilization
@@ -76,7 +77,12 @@ class GlobalPoliticsOverviewTable(
         persistableData.showDiagram = false
         createGlobalPoliticsHeader()
         createGlobalPoliticsTable()
+        if (GameUiStyle.isAtlas) {
+            AtlasEmpireUi.panel(fixedContent, "PoliticsColumns")
+            AtlasEmpireUi.prepare(this)
+        }
         equalizeColumns(fixedContent, this)
+        applyAtlasPresentation()
     }
 
     /** Clears fixedContent and adds the header cells.
@@ -146,6 +152,7 @@ class GlobalPoliticsOverviewTable(
         civInfoTable.add(leaderName.toLabel(fontSize = 30)).row()
         civInfoTable.add(civ.civName.toLabel(hideIcons = true)).row()
         civInfoTable.add(civ.tech.era.name.toLabel()).row()
+        if (GameUiStyle.isAtlas) AtlasEmpireUi.panel(civInfoTable, "PoliticsDetail")
         return civInfoTable
     }
 
@@ -159,6 +166,7 @@ class GlobalPoliticsOverviewTable(
                 }
                 policiesTable.add("[${branch.name}]: $count".toLabel()).row()
             }
+        if (GameUiStyle.isAtlas) AtlasEmpireUi.panel(policiesTable, "PoliticsDetail")
         return policiesTable
     }
 
@@ -180,6 +188,7 @@ class GlobalPoliticsOverviewTable(
             }
         }
 
+        if (GameUiStyle.isAtlas) AtlasEmpireUi.panel(wonderTable, "PoliticsDetail")
         return wonderTable
     }
 
@@ -195,11 +204,13 @@ class GlobalPoliticsOverviewTable(
         val politicsTable = Table(skin)
 
         if (!viewingPlayer.getCiv().knows(civ) && civ != viewingPlayer.getCiv())
-            return politicsTable
+            if (GameUiStyle.isAtlas) AtlasEmpireUi.panel(politicsTable, "PoliticsDetail")
+        return politicsTable
 
         if (civ.isDefeated()) {
             politicsTable.add("{Defeated} ${Fonts.death}".toLabel())
-            return politicsTable
+            if (GameUiStyle.isAtlas) AtlasEmpireUi.panel(politicsTable, "PoliticsDetail")
+        return politicsTable
         }
 
         // wars
@@ -246,6 +257,7 @@ class GlobalPoliticsOverviewTable(
             }
         }
 
+        if (GameUiStyle.isAtlas) AtlasEmpireUi.panel(politicsTable, "PoliticsDetail")
         return politicsTable
     }
 
@@ -321,6 +333,11 @@ class GlobalPoliticsOverviewTable(
             BaseScreen.skin.get("positive", TextButton.TextButtonStyle::class.java)
         }
         civTableScroll.setScrollingDisabled(portraitMode, portraitMode)
+        if (GameUiStyle.isAtlas) {
+            AtlasEmpireUi.panel(floatingTable, "PoliticsControls")
+            AtlasEmpireUi.panel(civTable, "KnownNations")
+            applyAtlasPresentation()
+        }
     }
 
     /** Same as [Civilization.shouldHideCivCount] but for City-States instead of Major Civs */

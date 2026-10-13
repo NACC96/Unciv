@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
+import com.badlogic.gdx.scenes.scene2d.ui.Button
 import com.badlogic.gdx.scenes.scene2d.ui.Stack
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.utils.Align
@@ -25,6 +26,8 @@ import com.unciv.models.ruleset.Ruleset
 import com.unciv.models.ruleset.RulesetCache
 import com.unciv.models.tilesets.TileSetCache
 import com.unciv.ui.audio.SoundPlayer
+import com.unciv.ui.components.AtlasWidgets
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.UncivTooltip.Companion.addTooltip
 import com.unciv.ui.components.extensions.center
 import com.unciv.ui.components.extensions.surroundWithCircle
@@ -69,7 +72,10 @@ import kotlin.math.ceil
 
 class MainMenuScreen: BaseScreen(), RecreateOnResize {
     private val backgroundStack = Stack()
-    private val singleColumn = isCrampedPortrait()
+    private val singleColumn = if (skinStrings.isAtlas)
+        stage.width < 760f * game.settings.fontSizeMultiplier else isCrampedPortrait()
+    private val menuColumnWidth = if (skinStrings.isAtlas)
+        ((stage.width - 96f) / if (singleColumn) 1f else 2f).coerceIn(120f, 340f) else 0f
 
     private val backgroundMapRuleset: Ruleset
     private var easterEggRuleset: Ruleset? = null  // Cache it so the next 'egg' can be found in Civilopedia
@@ -99,6 +105,20 @@ class MainMenuScreen: BaseScreen(), RecreateOnResize {
         binding: KeyboardBinding,
         function: () -> Unit
     ): Table {
+        if (skinStrings.isAtlas) {
+            return Button(skin).apply {
+                name = "AtlasMenu-$text"
+                GameUiStyle.apply(this)
+                pad(14f, 18f, 14f, 18f)
+                add(ImageGetter.getImage(icon).apply { color = GameUiStyle.ink }).size(28f).padRight(14f)
+                add(text.toLabel(GameUiStyle.ink, GameUiStyle.Type.title, Align.left).apply { wrap = true })
+                    .minWidth(0f).growX().left()
+                onActivation(binding = binding) {
+                    stopBackgroundMapGeneration()
+                    function()
+                }
+            }
+        }
         val table = Table().pad(15f, 30f, 15f, 30f)
         table.background = skinStrings.getUiBackground(
             "MainMenuScreen/MenuButton",
@@ -148,8 +168,12 @@ class MainMenuScreen: BaseScreen(), RecreateOnResize {
         if (game.settings.tileSet in TileSetCache)
             startBackgroundMapGeneration()
 
-        val column1 = Table().apply { defaults().pad(10f).fillX() }
-        val column2 = if (singleColumn) column1 else Table().apply { defaults().pad(10f).fillX() }
+        fun menuColumn() = Table().apply {
+            defaults().pad(if (skinStrings.isAtlas) 4f else 10f).fillX()
+            if (skinStrings.isAtlas) defaults().width(menuColumnWidth).minHeight(56f)
+        }
+        val column1 = menuColumn()
+        val column2 = if (singleColumn) column1 else menuColumn()
 
         if (game.files.autosaves.autosaveExists()) {
             val resumeTable = getMenuButton("Resume","OtherIcons/Resume", KeyboardBinding.Resume)
@@ -192,15 +216,35 @@ class MainMenuScreen: BaseScreen(), RecreateOnResize {
         column2.add(optionsTable).row()
 
 
-        val table = Table().apply { defaults().pad(10f) }
-        table.add(column1)
-        if (!singleColumn) table.add(column2)
+        val table = Table().apply {
+            defaults().pad(if (skinStrings.isAtlas) 4f else 10f)
+            if (skinStrings.isAtlas) {
+                name = "AtlasMainMenu"
+                this.background = GameUiStyle.panelBackground("Atlas/MainMenu/Panel", 0.98f)
+                pad(20f)
+                add(AtlasWidgets.header("Unciv", "Main menu")).colspan(if (singleColumn) 1 else 2)
+                    .growX().padBottom(12f).row()
+            }
+        }
+        table.add(column1).top()
+        if (!singleColumn) table.add(column2).top()
         table.pack()
 
         val scrollPane = AutoScrollPane(table)
-        scrollPane.setFillParent(true)
-        stage.addActor(scrollPane)
-        table.center(scrollPane)
+        val atlasShell = if (skinStrings.isAtlas) Table().apply {
+            name = "AtlasMenuShell"
+            setFillParent(true)
+            pad(16f)
+            add(scrollPane).minWidth(0f).grow().row()
+            scrollPane.setScrollingDisabled(true, false)
+            GameUiStyle.applyWidget(scrollPane)
+            this@MainMenuScreen.stage.addActor(this)
+        } else null
+        if (atlasShell == null) {
+            scrollPane.setFillParent(true)
+            stage.addActor(scrollPane)
+            table.center(scrollPane)
+        }
 
         globalShortcuts.add(KeyboardBinding.QuitMainMenu) {
             if (hasOpenPopups()) {
@@ -221,7 +265,7 @@ class MainMenuScreen: BaseScreen(), RecreateOnResize {
         civilopediaButton.keyShortcuts.add(KeyboardBinding.Civilopedia)
         civilopediaButton.addTooltip(KeyboardBinding.Civilopedia, 30f)
         civilopediaButton.setPosition(buttonsPosFromEdge, buttonsPosFromEdge)
-        stage.addActor(civilopediaButton)
+        if (atlasShell == null) stage.addActor(civilopediaButton)
 
         val rightSideButtons = Table().apply { defaults().space(10f) }
         val discordButton = ImageGetter.getImage("OtherIcons/Discord")
@@ -238,7 +282,7 @@ class MainMenuScreen: BaseScreen(), RecreateOnResize {
 
         rightSideButtons.pack()
         rightSideButtons.setPosition(stage.width - buttonsPosFromEdge, buttonsPosFromEdge, Align.bottomRight)
-        stage.addActor(rightSideButtons)
+        if (atlasShell == null) stage.addActor(rightSideButtons)
 
         val versionLabel = "{Version} ${UncivGame.VERSION.text}".toLabel()
         versionLabel.setAlignment(Align.center)
@@ -255,7 +299,40 @@ class MainMenuScreen: BaseScreen(), RecreateOnResize {
             popup.addCloseButton()
             popup.open()
         }
-        stage.addActor(versionTable)
+        if (atlasShell == null) stage.addActor(versionTable)
+        else {
+            // Keep support/navigation and About outside the scrolling menu, including short windows.
+            val footer = Table().apply {
+                name = "AtlasMenuFooter"
+                defaults().minWidth(0f).minHeight(GameUiStyle.standardControlHeight).space(8f)
+            }
+            val encyclopedia = GameUiStyle.button("Civilopedia").apply {
+                label.wrap = true
+                onActivation(binding = KeyboardBinding.Civilopedia) { openCivilopedia() }
+            }
+            val community = GameUiStyle.button("Discord").apply {
+                onActivation { Gdx.net.openURI("https://discord.gg/bjrB4Xw") }
+            }
+            val source = GameUiStyle.button("GitHub").apply {
+                onActivation { Gdx.net.openURI(Constants.uncivRepoURL) }
+            }
+            val about = GameUiStyle.button("{Version} ${UncivGame.VERSION.text}").apply {
+                label.wrap = true
+                onActivation {
+                    Popup(stage).apply {
+                        add(AboutTab.asTable()).row()
+                        addCloseButton()
+                        open()
+                    }
+                }
+            }
+            footer.add(encyclopedia).growX()
+            footer.add(community).growX()
+            if (singleColumn) footer.row()
+            footer.add(source).growX()
+            footer.add(about).growX()
+            atlasShell.add(footer).growX().padTop(12f)
+        }
     }
 
     private fun startBackgroundMapGeneration() {

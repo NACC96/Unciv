@@ -1,0 +1,197 @@
+{
+  "schemaVersion": 1,
+  "productSource": "7fced2becf07f6fa211a98e49c89659a3c23523a",
+  "executionHead": "f3433f533f3b43f959d0992b692fb252a78b250e",
+  "matrixHarnessHash": "3c0faee708b70ecc109cf1a86871ad361224ea7d8f51e90a74bba62ffaa77b63",
+  "actionHarnessHash": "469c14f53203d9954452ca5cb7df76c19de57a9d0d75a416eff5a0a1737438c9",
+  "evidenceRoot": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/baseline",
+  "screenCaptures": 160,
+  "sizes": [
+    [
+      1440,
+      900
+    ],
+    [
+      1920,
+      1080
+    ],
+    [
+      960,
+      720
+    ],
+    [
+      800,
+      500
+    ],
+    [
+      420,
+      600
+    ]
+  ],
+  "fontScales": [
+    1.0,
+    1.5
+  ],
+  "representativeCoverageOnly": true,
+  "nativeInteractionAcceptance": "pending E1",
+  "seed": 20261012,
+  "map": [
+    164,
+    80
+  ],
+  "civilizations": 15,
+  "units": 180,
+  "warmupSeconds": 10,
+  "measureSeconds": 30,
+  "actionSchedule": [
+    {
+      "seconds": 3,
+      "civId": "America",
+      "unitIndex": 0,
+      "origin": [
+        -5,
+        -5
+      ],
+      "destination": [
+        -5,
+        -4
+      ]
+    },
+    {
+      "seconds": 8,
+      "civId": "America",
+      "unitIndex": 1,
+      "origin": [
+        -3,
+        -3
+      ],
+      "destination": [
+        -3,
+        -2
+      ]
+    },
+    {
+      "seconds": 13,
+      "civId": "America",
+      "unitIndex": 2,
+      "origin": [
+        0,
+        0
+      ],
+      "destination": [
+        1,
+        0
+      ]
+    },
+    {
+      "seconds": 18,
+      "civId": "America",
+      "unitIndex": 3,
+      "origin": [
+        3,
+        3
+      ],
+      "destination": [
+        3,
+        4
+      ]
+    },
+    {
+      "seconds": 23,
+      "civId": "America",
+      "unitIndex": 4,
+      "origin": [
+        5,
+        5
+      ],
+      "destination": [
+        5,
+        6
+      ]
+    },
+    {
+      "seconds": 28,
+      "civId": "America",
+      "unitIndex": 5,
+      "origin": [
+        -5,
+        5
+      ],
+      "destination": [
+        -5,
+        6
+      ]
+    }
+  ],
+  "visibleActionsPerRepeat": 6,
+  "authoritativeFinalStateHash": "9db3e521963795b3a87770dd269ab6fa8a4669b11a083164589171f21d6f7439",
+  "stateHashMeaning": "six engine units: ordered civ/index/name/position/health/movement",
+  "gpuTiming": "unsupported timer queries; GPU timings are null",
+  "nativeDrawable": [
+    2880,
+    1800
+  ],
+  "renderViewportPixels": [
+    1440,
+    900
+  ],
+  "renderer": "Apple M4 Pro",
+  "traces": [
+    {
+      "repeat": 1,
+      "frames": 5953,
+      "medianSwapInclusiveMs": 4.718208,
+      "p95SwapInclusiveMs": 6.912875,
+      "medianCpuSubmissionWallMs": 4.222584,
+      "medianThreadCpuMs": 4.217,
+      "medianDrawCalls": 96,
+      "textureAllocationsDuringMeasurement": 0,
+      "textureAllocationsTotal": 14,
+      "textureUploadBytesTotal": 113141760,
+      "heapMinBytes": 176989928,
+      "heapMaxBytes": 520627264,
+      "idleRenderCount": 6,
+      "meetsTarget": true
+    },
+    {
+      "repeat": 2,
+      "frames": 6079,
+      "medianSwapInclusiveMs": 4.683375,
+      "p95SwapInclusiveMs": 6.339333,
+      "medianCpuSubmissionWallMs": 4.202042,
+      "medianThreadCpuMs": 4.201,
+      "medianDrawCalls": 96,
+      "textureAllocationsDuringMeasurement": 0,
+      "textureAllocationsTotal": 15,
+      "textureUploadBytesTotal": 117336064,
+      "heapMinBytes": 310613168,
+      "heapMaxBytes": 894927040,
+      "idleRenderCount": 6,
+      "meetsTarget": true
+    },
+    {
+      "repeat": 3,
+      "frames": 5319,
+      "medianSwapInclusiveMs": 5.149458,
+      "p95SwapInclusiveMs": 7.84775,
+      "medianCpuSubmissionWallMs": 4.604583,
+      "medianThreadCpuMs": 4.599,
+      "medianDrawCalls": 86,
+      "textureAllocationsDuringMeasurement": 0,
+      "textureAllocationsTotal": 16,
+      "textureUploadBytesTotal": 121530368,
+      "heapMinBytes": 455937384,
+      "heapMaxBytes": 937354992,
+      "idleRenderCount": 6,
+      "meetsTarget": true
+    }
+  ],
+  "concerns": [
+    "Periodic Activity polling produced 6 idle renders in each 2-second observation with continuous rendering off.",
+    "Hidden native rendering verifies the baseline workload; foreground pacing and native interaction remain separate acceptance.",
+    "Existing screen clipping/contrast and rare flows remain pending migration/acceptance.",
+    "Observed heap minima rose across fresh fixture reconstruction; no forced-GC/retention verdict, E1 profiling pending."
+  ],
+  "supplementalCameraOnly": "supplemental-camera-only; earlier default Retina drawable, not the action-performance baseline",
+  "finalValidationHarnessHash": "fde1e0645c167abad925262036aa54b40bec99404e0be1c755230a07f1e3e930"
+}

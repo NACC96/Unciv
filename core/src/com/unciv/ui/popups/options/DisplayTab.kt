@@ -14,6 +14,7 @@ import com.unciv.ui.components.extensions.toTextButton
 import com.unciv.ui.components.input.onClick
 import com.unciv.ui.components.widgets.WrappableLabel
 import com.unciv.ui.images.ImageGetter
+import com.unciv.ui.images.atlas.AtlasAppearance
 import com.unciv.ui.popups.ConfirmPopup
 import com.unciv.ui.screens.worldscreen.NotificationsScroll
 import com.unciv.utils.Display
@@ -43,9 +44,17 @@ internal class DisplayTab(
 
         addHeader("Graphics")
 
+        addAtlasAppearanceButton()
         addTileSetSelectBox()
         addUnitSetSelectBox()
         addSkinSelectBox()
+        addEnumAsStringSelectBox("Unit animation", settings::unitAnimationMode,
+            com.unciv.ui.screens.worldscreen.presentation.WorldVisualTimeline.Mode.entries) {
+            if (GUI.isWorldLoaded()) GUI.getWorldScreen().resetVisualPlayback()
+        }
+        addCheckbox("Follow visible actions", settings::followVisibleActions) {
+            if (GUI.isWorldLoaded()) GUI.getWorldScreen().resetVisualPlayback()
+        }
 
         addHeader("UI")
 
@@ -157,6 +166,22 @@ internal class DisplayTab(
         }
     }
 
+    private fun addAtlasAppearanceButton() {
+        if (!AtlasAppearance.isAvailable() ||
+            AtlasAppearance.skin !in ImageGetter.getAvailableSkins() ||
+            AtlasAppearance.tileSet !in ImageGetter.getAvailableTilesets() ||
+            AtlasAppearance.unitSet !in ImageGetter.getAvailableUnitsets()) return
+        val button = "Use Atlas appearance".toTextButton()
+        button.onClick {
+            AtlasAppearance.apply(settings)
+            SkinCache.assembleSkinConfigs(ImageGetter.ruleset.mods)
+            TileSetCache.assembleTileSetConfigs(ImageGetter.ruleset.mods)
+            settings.save()
+            reloadWorldAndOptions()
+        }
+        add(button).colspan(2).fillX().row()
+    }
+
     private fun addUnitSetSelectBox() {
         val nullValue = "None".tr()
         val choices = sequenceOf(nullValue) + ImageGetter.getAvailableUnitsets()
@@ -169,7 +194,9 @@ internal class DisplayTab(
     }
 
     private fun addSkinSelectBox() {
-        addSelectBox("UI Skin", settings::skin, ImageGetter.getAvailableSkins().asIterable()) { _, _ ->
+        // Keep a selected mod skin visible even while its asset pack is temporarily unavailable.
+        val choices = (sequenceOf(settings.skin) + ImageGetter.getAvailableSkins()).distinct().sorted().toList()
+        addSelectBox("UI Skin", settings::skin, choices) { _, _ ->
             // ImageGetter ruleset should be correct no matter what screen we're on
             SkinCache.assembleSkinConfigs(ImageGetter.ruleset.mods)
             reloadWorldAndOptions()

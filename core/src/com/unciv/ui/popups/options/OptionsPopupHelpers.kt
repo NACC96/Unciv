@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.Array
 import com.unciv.Constants
 import com.unciv.GUI
 import com.unciv.UncivGame
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.extensions.addSeparator
 import com.unciv.ui.components.extensions.setFontColor
 import com.unciv.ui.components.extensions.toCheckBox
@@ -59,6 +60,18 @@ internal interface OptionsPopupHelpers {
      *  Calculated by [OptionsPopup] constructor from stage size.
      */
     val rightWidgetMinWidth: Float
+    val stackedOptionRows: Boolean get() = false
+
+    /** Label/widget rows stack in narrow Atlas dialogs without changing property callbacks. */
+    fun Table.addOptionLabel(text: String, color: Color? = null): Label {
+        val label = text.toLabel(color ?: if (GameUiStyle.isAtlas) GameUiStyle.ink else Color.WHITE)
+        if (GameUiStyle.isAtlas) {
+            label.wrap = true
+            val cell = add(label).minWidth(0f).width(if (stackedOptionRows) rightWidgetMinWidth else 260f).left()
+            if (stackedOptionRows) cell.colspan(2).row()
+        } else add(label).left().fillX()
+        return label
+    }
 
     /** Access the active page of the TabbedPager in [OptionsPopup] */
     val activePage: OptionsPopupPages
@@ -73,7 +86,8 @@ internal interface OptionsPopupHelpers {
     fun Table.addHeader(text: String): Cell<Label> {
         if (!children.isEmpty) // doesn't count empty cells
             addSeparator()
-        val cell = add(text.toLabel(fontSize = Constants.headingFontSize))
+        val cell = add(text.toLabel(if (GameUiStyle.isAtlas) GameUiStyle.accent else Color.WHITE,
+            if (GameUiStyle.isAtlas) GameUiStyle.Type.title else Constants.headingFontSize))
         cell.colspan(2).spaceTop(10f).row()
         return cell
     }
@@ -94,7 +108,9 @@ internal interface OptionsPopupHelpers {
             val worldScreen = GUI.getWorldScreenIfActive()
             if (updateWorld && worldScreen != null) worldScreen.shouldUpdate = true
         }
-        if (newRow) add(checkbox).colspan(2).left().row()
+        GameUiStyle.applyWidget(checkbox)
+        if (newRow && GameUiStyle.isAtlas) add(checkbox).colspan(2).minWidth(0f).growX().left().row()
+        else if (newRow) add(checkbox).colspan(2).left().row()
         else add(checkbox).left()
     }
 
@@ -125,12 +141,15 @@ internal interface OptionsPopupHelpers {
      *  @see addEnumAsStringSelectBox
      */
     fun <T> Table.addSelectBox(text: String, property: KMutableProperty0<T>, items: Iterable<T>, action: ((T, T) -> Unit)? = null): SelectBox<T> {
-        add(text.toLabel()).left().fillX()
+        addOptionLabel(text)
 
         val select = SelectBox<T>(BaseScreen.skin)
         select.setItems(items.toGdxArray())
         select.selected = property.get()
-        add(select).pad(10f).minWidth(rightWidgetMinWidth).right().row()
+        GameUiStyle.applyWidget(select)
+        val cell = add(select).pad(if (GameUiStyle.isAtlas) 6f else 10f).minWidth(rightWidgetMinWidth).right()
+        if (stackedOptionRows) cell.colspan(2).fillX()
+        cell.row()
 
         select.onChange {
             val oldValue = property.get()
@@ -151,9 +170,12 @@ internal interface OptionsPopupHelpers {
      *  @see addEnumAsStringSelectBox
      */
     fun Table.addTranslatedSelectBox(text: String, property: KMutableProperty0<String>, items: Iterable<String>, action: ((String) -> Unit)? = null) {
-        add(text.toLabel()).left().fillX()
+        addOptionLabel(text)
         val select = TranslatedSelectBox(items as? Collection ?: items.toList(), property.get())
-        add(select).pad(10f).minWidth(rightWidgetMinWidth).right().row()
+        GameUiStyle.applyWidget(select)
+        val cell = add(select).pad(if (GameUiStyle.isAtlas) 6f else 10f).minWidth(rightWidgetMinWidth).right()
+        if (stackedOptionRows) cell.colspan(2).fillX()
+        cell.row()
 
         select.onChange {
             val newValue = select.selected.value
@@ -195,12 +217,14 @@ internal interface OptionsPopupHelpers {
         dispatcher: CoroutineDispatcher = Dispatchers.IO,
         action: ((T) -> Unit)? = null
     ) {
-        val label = text.toLabel(Color.GRAY)
+        val label = addOptionLabel(text, if (GameUiStyle.isAtlas) GameUiStyle.muted else Color.GRAY)
         label.wrap = true
-        add(label).left().fillX()
         val select = SelectBox<T>(BaseScreen.skin)
         select.isDisabled = true
-        add(select).pad(10f).minWidth(rightWidgetMinWidth).right().row()
+        GameUiStyle.applyWidget(select)
+        val cell = add(select).pad(if (GameUiStyle.isAtlas) 6f else 10f).minWidth(rightWidgetMinWidth).right()
+        if (stackedOptionRows) cell.colspan(2).fillX()
+        cell.row()
 
         Concurrency.run("Async SelectBox", CoroutineScope(dispatcher)) {
             val items = Array<T>(false, 20)
@@ -211,7 +235,7 @@ internal interface OptionsPopupHelpers {
                 // make sure the instance we pass to select is actually contained in the items array, because Gdx' Selection.set uses identity comparisons
                 select.selected = items.firstOrNull { it == toSelect } // will default to first entry if `null` is passed
                 select.isDisabled = false
-                label.setFontColor(Color.WHITE)
+                label.setFontColor(if (GameUiStyle.isAtlas) GameUiStyle.ink else Color.WHITE)
                 select.onChange {
                     val value = select.selected
                     property.set(value)
@@ -237,7 +261,8 @@ internal interface OptionsPopupHelpers {
         getTipText: ((Float) -> String)? = null,
         action: ((Float, Boolean) -> Unit)
     ): Cell<UncivSlider> {
-        add(text.toLabel()).left().fillX().padTop(5f)
+        val label = addOptionLabel(text)
+        if (!GameUiStyle.isAtlas) getCell(label).padTop(5f)
 
         // lateinit, otherwise the callback can't capture it, and by the time the callback fires this will be initialized
         lateinit var slider: UncivSlider
@@ -249,6 +274,7 @@ internal interface OptionsPopupHelpers {
             action(it, slider.isDragging)
         }
         val cell = add(slider).minWidth(rightWidgetMinWidth).right().pad(5f).padTop(10f)
+        if (stackedOptionRows) cell.colspan(2).fillX()
         cell.row()
         return cell
     }

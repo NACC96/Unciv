@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "unitName": "Cossack",
+  "assetId": "cossack",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": "Cossack",
+  "uniqueTo": "Russia",
+  "replaces": "Cavalry",
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Cossack",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/cossack/e-motion-v1.png",
+      "rawHash": "f3c44de450ab80350ffaef9ad976a10a735c88c9f74b4af43c42b38465e203ff",
+      "promptPath": "art/atlas/units/cossack/prompts/e-v1.txt",
+      "promptHash": "bc72090b257dd9fe5904b22bde7ec4a3df6a3c8546eda0a5b1df2a104a7f3835",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/cossack/ne-motion-v1.png",
+      "rawHash": "1c3421839bdb048b4a0928b673366b9f7fa47ad626da621b6ecfe42f58bdf595",
+      "promptPath": "art/atlas/units/cossack/prompts/ne-v1.txt",
+      "promptHash": "ee4ecfab27624c0be2df784672595352a344826dc4b15a1e7b9d1ef77aab85b5",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/cossack/se-motion-v1.png",
+      "rawHash": "117cfbf23947c03284168a5812ac80e42cc688d9631683cbb413bd9d5466ec4c",
+      "promptPath": "art/atlas/units/cossack/prompts/se-v1.txt",
+      "promptHash": "f2603e68ab8479db28d75e7cd961ad1dc523a213a4b272db1c6ef7413fda5592",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
+}

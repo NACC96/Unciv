@@ -1,5 +1,6 @@
 /** Additive observation v2 contract; mutations retain protocol version 1. */
 export interface HexPosition { x: number; y: number }
+export type MatchVision = "FOG" | "MAP" | "FULL";
 export interface MapQuery {
   mode?: "KNOWN" | "VISIBLE";
   center?: HexPosition;
@@ -13,9 +14,10 @@ export interface MapSummary {
   knownTileCount: number;
   visibleTileCount: number;
   worldWrap: boolean;
+  vision: MatchVision;
 }
 export interface ObservedTile extends HexPosition {
-  visibility: "VISIBLE" | "REMEMBERED";
+  visibility: "VISIBLE" | "REMEMBERED" | "REVEALED";
   detailsKnown: boolean;
   lastSeenTurn: number | null;
   lastSeenRevision: number | null;

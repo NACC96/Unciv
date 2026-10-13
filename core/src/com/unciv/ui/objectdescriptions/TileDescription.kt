@@ -19,7 +19,7 @@ object TileDescription {
     /** Get info on a selected tile, used on WorldScreen (right side above minimap), CityScreen or MapEditorViewTab. */
     fun toMarkup(tileView: TileView, viewingCiv: CivView?, hideUnits: Boolean = false, spyCity: CityView? = null): ArrayList<FormattedLine> {
         val lineList = ArrayList<FormattedLine>()
-        val isViewableToPlayer = viewingCiv == null || DebugUtils.VISIBLE_MAP
+        val isViewableToPlayer = viewingCiv == null || tileView.isForceVisible()
                 || viewingCiv.canSeeTile(tileView)
 
         if (tileView.isCityCenter()) {

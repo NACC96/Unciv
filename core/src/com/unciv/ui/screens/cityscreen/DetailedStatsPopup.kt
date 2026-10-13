@@ -9,6 +9,7 @@ import com.unciv.logic.city.StatTreeNode
 import com.unciv.models.stats.Stat
 import com.unciv.models.stats.Stats
 import com.unciv.models.translations.tr
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.widgets.AutoScrollPane
 import com.unciv.ui.components.input.KeyCharAndCode
 import com.unciv.ui.components.extensions.addSeparator
@@ -38,26 +39,35 @@ class DetailedStatsPopup(
     private var onlyWithStat: Stat? = null
     private var isDetailed: Boolean = false
 
-    private val colorTotal: Color = Color.BLUE.brighten(0.5f)
-    private val colorSelector: Color = Color.GREEN.darken(0.5f)
+    private val colorTotal: Color = if (GameUiStyle.isAtlas) GameUiStyle.raised else Color.BLUE.brighten(0.5f)
+    private val colorSelector: Color = if (GameUiStyle.isAtlas) GameUiStyle.hover else Color.GREEN.darken(0.5f)
 
     private val percentFormatter = DecimalFormat("0.#%").apply { positivePrefix = "+"; multiplier = 1 }
     private val decimalFormatter = DecimalFormat("0.#")
 
     init {
         headerTable.defaults().pad(3f, 0f)
-        add(headerTable).padBottom(0f).row()
+        if (!GameUiStyle.isAtlas) add(headerTable).padBottom(0f).row()
 
         totalTable.defaults().pad(3f, 0f)
 
-        val scrollPane = AutoScrollPane(totalTable)
+        val content = if (GameUiStyle.isAtlas) Table().apply {
+            add(headerTable).growX().row()
+            add(totalTable).growX()
+        } else totalTable
+        val scrollPane = AutoScrollPane(content)
         scrollPane.setOverscroll(false, false)
         val scrollPaneCell = add(scrollPane).padTop(0f)
         scrollPaneCell.maxHeight(cityScreen.stage.height * 3 / 4)
+        if (GameUiStyle.isAtlas) scrollPaneCell.width(cityScreen.stage.width * .88f)
 
         row()
         addCloseButton(additionalKey = KeyCharAndCode.SPACE)
         update()
+        if (GameUiStyle.isAtlas) {
+            innerTable.background = GameUiStyle.panelBackground("Atlas/City/StatsPopup", 1f)
+            GameUiStyle.applyWidget(innerTable)
+        }
 
         showListeners.add { cityScreen.pauseFireworks = true }
         closeListeners.add { cityScreen.pauseFireworks = false }

@@ -9,6 +9,8 @@ import com.unciv.logic.files.MapSaver
 import com.unciv.logic.map.MapGeneratedMainType
 import com.unciv.logic.map.TileMap
 import com.unciv.models.translations.tr
+import com.unciv.ui.components.AtlasWidgets
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.widgets.UncivTextField
 import com.unciv.ui.components.extensions.isEnabled
 import com.unciv.ui.components.extensions.toTextButton
@@ -49,16 +51,24 @@ class MapEditorSaveTab(
     private var chosenMap: FileHandle? = null
 
     init {
+        if (GameUiStyle.isAtlas) {
+            top()
+            pad(8f)
+            defaults().growX().minWidth(0f)
+        }
         mapNameTextField.maxLength = 100
         mapNameTextField.textFieldFilter = TextField.TextFieldFilter { _, char -> char != '\\' && char != '/' }
         mapNameTextField.selectAll()
         // do NOT take the keyboard focus here! We're not even visible.
-        add(mapNameTextField).pad(10f).fillX().row()
+        if (GameUiStyle.isAtlas) {
+            add(AtlasWidgets.field("Map Name", mapNameTextField)).growX().padBottom(8f).row()
+        } else add(mapNameTextField).pad(10f).fillX().row()
 
         val buttonTable = Table(skin)
-        buttonTable.defaults().pad(10f).fillX()
+        buttonTable.defaults().pad(if (GameUiStyle.isAtlas) 4f else 10f).growX().minWidth(0f)
         saveButton.onActivation { saveHandler() }
         saveButton.keyShortcuts.add(KeyCharAndCode.RETURN)
+        mapNameTextField.keyShortcuts.add(KeyCharAndCode.RETURN) { if (saveButton.isEnabled) saveHandler() }
         mapNameTextField.onChange {
             saveButton.isEnabled = mapNameTextField.text.isNotBlank()
         }
@@ -67,12 +77,22 @@ class MapEditorSaveTab(
         deleteButton.onActivation { deleteHandler() }
         deleteButton.keyShortcuts.add(KeyCharAndCode.DEL)
         buttonTable.add(deleteButton)
+        if (GameUiStyle.isAtlas) {
+            deleteButton.style = BaseScreen.skin.get("negative", com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle::class.java)
+            GameUiStyle.applyWidget(deleteButton)
+            deleteButton.label.wrap = true
+        }
 
         quitButton.onClick(editorScreen::closeEditor)
-        buttonTable.add(quitButton)
+        if (!GameUiStyle.isAtlas) buttonTable.add(quitButton)
+        if (GameUiStyle.isAtlas) {
+            GameUiStyle.apply(saveButton, primary = true)
+            saveButton.label.wrap = true
+        }
         buttonTable.pack()
 
-        val fileTableHeight = editorScreen.stage.height - headerHeight - mapNameTextField.prefHeight - buttonTable.height - 22f
+        val fileTableHeight = (editorScreen.getToolsHeight() - headerHeight - mapNameTextField.prefHeight - buttonTable.height -
+            if (GameUiStyle.isAtlas) 62f else 22f).coerceAtLeast(60f)
         add(mapFiles).height(fileTableHeight).fillX().row()
         add(buttonTable).row()
     }
@@ -125,7 +145,7 @@ class MapEditorSaveTab(
         stage.keyboardFocus = mapNameTextField
         saveButton.isEnabled = true
         deleteButton.isEnabled = (file != null)
-        deleteButton.color = if (file != null) Color.SCARLET else Color.BROWN
+        deleteButton.color = if (GameUiStyle.isAtlas) Color.WHITE else if (file != null) Color.SCARLET else Color.BROWN
     }
 
     private fun CoroutineScope.saverThread() {

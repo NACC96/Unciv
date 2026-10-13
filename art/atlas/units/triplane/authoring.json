@@ -1,0 +1,103 @@
+{
+  "schemaVersion": 1,
+  "unitName": "Triplane",
+  "assetId": "triplane",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": null,
+  "uniqueTo": null,
+  "replaces": null,
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Triplane",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/triplane/e-motion-v2.png",
+      "rawHash": "79dfa24ac6c718b45521ba07ea1905b87ad964e9e8b2d6153d0b2777517bd1e3",
+      "promptPath": "art/atlas/units/triplane/prompts/e-v2.txt",
+      "promptHash": "d4bf2cfe9b36ab13679f69eeb9cd190fdc52b9f807aae310740757d6ade25a01",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/triplane/ne-motion-v2.png",
+      "rawHash": "6837ab217e3d90ee782a2be1af71bb2d42fdabcd93ad0dc4694f7368d0979676",
+      "promptPath": "art/atlas/units/triplane/prompts/ne-v2.txt",
+      "promptHash": "a0a878f6f7a3d6f6c57a08f7475cc520f651ffa5ff80d2895d5ccd53a7fd19a6",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ],
+      "identityReference": {
+        "path": "/Users/noahkenny/.codex/generated_images/01a1321a-8142-7533-ae7a-eb89a5433c70/exec-41d4feea-613e-4613-b9da-c43f03d36599.png",
+        "sha256": "79dfa24ac6c718b45521ba07ea1905b87ad964e9e8b2d6153d0b2777517bd1e3"
+      }
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/triplane/se-motion-v2.png",
+      "rawHash": "6d5dcdf4d82597ccdf0098397a1e9eb49f80bf445d27abb7f6614b5a627cabcf",
+      "promptPath": "art/atlas/units/triplane/prompts/se-v2.txt",
+      "promptHash": "4814ca570b5252e007fb769595c98a4c92ff337c82a85c853a9e412bbd8ad055",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ],
+      "identityReference": {
+        "path": "/Users/noahkenny/.codex/generated_images/01a1321a-8142-7533-ae7a-eb89a5433c70/exec-41d4feea-613e-4613-b9da-c43f03d36599.png",
+        "sha256": "79dfa24ac6c718b45521ba07ea1905b87ad964e9e8b2d6153d0b2777517bd1e3"
+      }
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
+}

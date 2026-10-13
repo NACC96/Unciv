@@ -1,6 +1,8 @@
 package com.unciv.ui.popups.options
 
 import com.badlogic.gdx.graphics.Color
+import com.unciv.ui.components.AtlasWidgets
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.extensions.center
 import com.unciv.ui.components.extensions.getCloseButton
 import com.unciv.ui.components.widgets.TabbedPager
@@ -29,6 +31,7 @@ class OptionsPopup(
     override val activePage get() = OptionsPopupPages[tabs.activePage]
     override val rightWidgetMinWidth: Float
     internal val tabMinWidth: Float
+    override val stackedOptionRows: Boolean
 
     //endregion
 
@@ -47,17 +50,24 @@ class OptionsPopup(
         val tabMaxWidth: Float
         val tabMaxHeight: Float
         screen.run {
-            rightWidgetMinWidth = if (stage.width < 600f) 200f else 240f
+            stackedOptionRows = GameUiStyle.isAtlas && stage.width < 850f * settings.fontSizeMultiplier
+            rightWidgetMinWidth = if (stackedOptionRows) (stage.width - 84f).coerceAtMost(420f)
+                else if (stage.width < 600f) 200f else 240f
             tabMaxWidth = if (isPortrait()) stage.width - 10f else 0.8f * stage.width
-            tabMinWidth = 0.6f * stage.width
+            tabMinWidth = if (GameUiStyle.isAtlas) (tabMaxWidth - 24f).coerceAtLeast(1f) else 0.6f * stage.width
             tabMaxHeight = 0.8f * stage.height
         }
         // Since all pages now initialize their content late, on activation, we can't measure their preferred size anymore -> use tabMaxHeight for tabMinHeight
         // That's not really bad, the tabs are long enough so some will always need scrolling even on the largest UI size setting.
         tabs = TabbedPager(
             tabMinWidth, tabMaxWidth, tabMaxHeight, tabMaxHeight,
-            headerFontSize = 21, backgroundColor = Color.CLEAR, capacity = 8
+            headerFontSize = if (GameUiStyle.isAtlas) GameUiStyle.Type.label else 21,
+            backgroundColor = Color.CLEAR, capacity = 8
         )
+        if (GameUiStyle.isAtlas) {
+            add(AtlasWidgets.header("Options")).growX().minWidth(0f).row()
+            innerTable.background = GameUiStyle.panelBackground("Atlas/Options/Panel", 1f)
+        }
         add(tabs).pad(0f).grow().row()
 
         for (page in OptionsPopupPages.entries) {
@@ -67,7 +77,8 @@ class OptionsPopup(
             pageIndex[page] = content
         }
 
-        tabs.decorateHeader(getCloseButton { close() })
+        tabs.decorateHeader(getCloseButton { close() }.also { GameUiStyle.applyWidget(it) })
+        GameUiStyle.applyWidget(tabs)
 
         pack() // Needed to show the background.
         center(screen.stage)

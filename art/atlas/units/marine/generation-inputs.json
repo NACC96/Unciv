@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "facings": {
+    "E": {
+      "rawFile": "e-motion-v1.png",
+      "promptPath": "art/atlas/units/marine/prompts/e-v1.txt"
+    },
+    "NE": {
+      "rawFile": "ne-motion-v1.png",
+      "promptPath": "art/atlas/units/marine/prompts/ne-v1.txt"
+    },
+    "SE": {
+      "rawFile": "se-motion-v1.png",
+      "promptPath": "art/atlas/units/marine/prompts/se-v1.txt"
+    }
+  }
+}

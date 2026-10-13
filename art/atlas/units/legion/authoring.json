@@ -1,0 +1,97 @@
+{
+  "schemaVersion": 1,
+  "unitName": "Legion",
+  "assetId": "legion",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": "Legion",
+  "uniqueTo": "Rome",
+  "replaces": "Swordsman",
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Legion",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT",
+    "WORK"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8,
+    "WORK": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/legion/e-motion-v1.png",
+      "rawHash": "032dbef77b3a38fa73b23a85781a5309fe22a429d1a6a8fe6825cebc2022245b",
+      "promptPath": "art/atlas/units/legion/prompts/e-v1.txt",
+      "promptHash": "bc82a9655053487ea171cab5e1be229a8024c125dee0c2ee9a667ff4aefbc4ea",
+      "cells": {
+        "columns": 8,
+        "rows": 5
+      },
+      "rawDimensions": [
+        1586,
+        992
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/legion/ne-motion-v1.png",
+      "rawHash": "7899b885f6a9e747d5fa66c6e0f605690b08166d3299af71a9a3817e02d5a273",
+      "promptPath": "art/atlas/units/legion/prompts/ne-v1.txt",
+      "promptHash": "c13ab00836d717aa09db326d414dfac8237379614f42da5eb2a114ad5588b3c2",
+      "cells": {
+        "columns": 8,
+        "rows": 5
+      },
+      "rawDimensions": [
+        1586,
+        992
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/legion/se-motion-v1.png",
+      "rawHash": "8dfc72e34809bbf391815d82fbe61809f3d1561f5a6e6aba426eb49fd78a5b08",
+      "promptPath": "art/atlas/units/legion/prompts/se-v1.txt",
+      "promptHash": "d1cb4aaf7b3b6012d5cac392ce067901e655b9c705e0b34667861c657e24b254",
+      "cells": {
+        "columns": 8,
+        "rows": 5
+      },
+      "rawDimensions": [
+        1586,
+        992
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
+}

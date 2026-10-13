@@ -11,6 +11,10 @@ import com.unciv.logic.agents.RespondProtectorAlertCommand
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane
 import com.badlogic.gdx.scenes.scene2d.ui.Table
+import com.unciv.ui.components.GameUiStyle
+import com.unciv.ui.components.AtlasWidgets
+import com.unciv.ui.screens.diplomacyscreen.ProposalStatusView
+import com.unciv.ui.screens.diplomacyscreen.ProposalDisplayState
 import com.unciv.Constants
 import com.unciv.UncivGame
 import com.unciv.logic.agents.DismissAlertCommand
@@ -143,6 +147,22 @@ class AlertPopup(
             AlertType.RecapturedCivilian -> shouldOpen = addRecapturedCivilian()
             AlertType.GameHasBeenWon -> addGameHasBeenWon()
             AlertType.Event -> shouldOpen = addEvent()
+        }
+        if (GameUiStyle.isAtlas && shouldOpen) {
+            name = "AtlasAlert:${popupAlert.type}"
+            val status = when (popupAlert.type) {
+                AlertType.AcceptingDemand -> ProposalDisplayState.ACCEPTED
+                AlertType.RejectingDemand -> ProposalDisplayState.REJECTED
+                else -> null
+            }
+            if (status != null) add(ProposalStatusView.render(status, null, "")).growX().minWidth(0f).row()
+            GameUiStyle.applyWidget(this)
+            bottomTable.background = GameUiStyle.panelBackground("Atlas/Alert/Actions", 1f)
+            for (cell in bottomTable.cells) {
+                val button = cell.actor as? com.badlogic.gdx.scenes.scene2d.ui.TextButton ?: continue
+                button.label.wrap = true
+                cell.minWidth(0f).minHeight(GameUiStyle.standardControlHeight).growX()
+            }
         }
         if (shouldOpen) open()
         else viewingCiv.popupAlerts.remove(popupAlert)
@@ -566,10 +586,16 @@ class AlertPopup(
         addGoodSizedLabel(tech.name)
         addSeparator().padBottom(SEPARATOR_LINE_TO_TEXT_PADDING)
         val centerTable = Table()
-        centerTable.add(tech.quote.toLabel().apply { wrap = true }).width(stageWidth / 3)
-        centerTable.add(ImageGetter.getTechIconPortrait(tech.name, 100f)).pad(20f)
+        if (GameUiStyle.isAtlas && stageWidth < 760f) {
+            centerTable.add(ImageGetter.getTechIconPortrait(tech.name, 80f)).pad(12f).row()
+            centerTable.add(tech.quote.toLabel().apply { wrap = true })
+                .width(stageWidth * 0.8f - 40f).minWidth(0f).row()
+        } else centerTable.add(tech.quote.toLabel().apply { wrap = true }).width(stageWidth / 3)
+        if (!(GameUiStyle.isAtlas && stageWidth < 760f))
+            centerTable.add(ImageGetter.getTechIconPortrait(tech.name, 100f)).pad(20f)
         val descriptionScroll = ScrollPane(tech.getDescription(viewingCiv).toLabel().apply { wrap = true })
-        centerTable.add(descriptionScroll).width(stageWidth / 3).maxHeight(stageHeight / 2)
+        centerTable.add(descriptionScroll).width(if (GameUiStyle.isAtlas && stageWidth < 760f)
+            stageWidth * 0.8f - 40f else stageWidth / 3).minWidth(0f).maxHeight(stageHeight / 2)
         add(centerTable).row()
         addCloseButton()
         music.chooseTrack(tech.name, MusicMood.Researched, MusicTrackChooserFlags.setSpecific)

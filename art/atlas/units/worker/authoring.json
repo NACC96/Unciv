@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "unitName": "Worker",
+  "assetId": "worker",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": null,
+  "uniqueTo": null,
+  "replaces": null,
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Worker",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "HIT",
+    "DEFEAT",
+    "WORK"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "HIT": 4,
+    "DEFEAT": 8,
+    "WORK": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/worker/e-motion-v1.png",
+      "rawHash": "b1004db91c4b13d5040c1d3673b1d1de67d52c836678595a9188c0de153d1e62",
+      "promptPath": "art/atlas/units/worker/prompts/e-v1.txt",
+      "promptHash": "153c2c3754a225b11afbf64f0d184f830ca7b2c119ccf4e887db1ee08038bee7",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/worker/ne-motion-v1.png",
+      "rawHash": "38dea81f791faafdd462c2ec6f58eb59fc8ca59def62cf73a3a39fff190d7d37",
+      "promptPath": "art/atlas/units/worker/prompts/ne-v1.txt",
+      "promptHash": "96bf7daf30e7356b4e5b63675f0168f84312d14234d60d23b265032e9efaf8eb",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/worker/se-motion-v1.png",
+      "rawHash": "511b2cb5dfef19f1437c7f00795181369b0e74c764972b26917103a7abd8f0db",
+      "promptPath": "art/atlas/units/worker/prompts/se-v1.txt",
+      "promptHash": "ac3a789e7249585d5efa86c7c85303128dea92c3b030bed6c8e628f1070ec258",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
+}

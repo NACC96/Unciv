@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "unitName": "Mehal Sefari",
+  "assetId": "mehal-sefari",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": "Mehal Sefari",
+  "uniqueTo": "Ethiopia",
+  "replaces": "Rifleman",
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Mehal Sefari",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/mehal-sefari/e-motion-v1.png",
+      "rawHash": "60a8e6ef927d008f0f1141163e5858d1f5a5ed7313f73210a00ede9ec766b2ab",
+      "promptPath": "art/atlas/units/mehal-sefari/prompts/e-v1.txt",
+      "promptHash": "e4203e06f1d987d02df6ce1230ebfd70650a8ccd4cd5dfefce9f2e5e2626e1ed",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/mehal-sefari/ne-motion-v1.png",
+      "rawHash": "636e43af985f7e4e65f106e92ed3d7ab29cdd74b273ad0d8799af5efa3cb7a6d",
+      "promptPath": "art/atlas/units/mehal-sefari/prompts/ne-v1.txt",
+      "promptHash": "3ff1a102a1dd9d7793f076e698b9d9e29ddad39e74aa35376893f5dde8b92b71",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/mehal-sefari/se-motion-v1.png",
+      "rawHash": "4488344b8f4c1aae3b7a1e1cac5991e89df68bca26775aa55064e441f0c20d2a",
+      "promptPath": "art/atlas/units/mehal-sefari/prompts/se-v1.txt",
+      "promptHash": "e4123558417101c08483710787d3cdf17ec65a335d825c9bce6aae274cf01114",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
+}

@@ -1,0 +1,1985 @@
+{
+  "source_commit": "7fced2becf07f6fa211a98e49c89659a3c23523a",
+  "status": "baseline inventory; new art not implemented",
+  "rulesets": {
+    "Civ V - Vanilla": {
+      "Units": [
+        {
+          "name": "Worker",
+          "unitType": "Civilian",
+          "requiredTech": "Agriculture"
+        },
+        {
+          "name": "Settler",
+          "unitType": "Civilian",
+          "requiredTech": "Agriculture"
+        },
+        {
+          "name": "Scout",
+          "unitType": "Scout",
+          "requiredTech": "Agriculture"
+        },
+        {
+          "name": "Warrior",
+          "unitType": "Sword",
+          "requiredTech": "Agriculture"
+        },
+        {
+          "name": "Maori Warrior",
+          "unitType": "Sword",
+          "uniqueTo": "Polynesia",
+          "replaces": "Warrior",
+          "requiredTech": "Agriculture"
+        },
+        {
+          "name": "Jaguar",
+          "unitType": "Sword",
+          "uniqueTo": "Aztecs",
+          "replaces": "Warrior",
+          "requiredTech": "Agriculture"
+        },
+        {
+          "name": "Brute",
+          "unitType": "Sword",
+          "uniqueTo": "Barbarians",
+          "replaces": "Warrior"
+        },
+        {
+          "name": "Archer",
+          "unitType": "Archery",
+          "requiredTech": "Archery"
+        },
+        {
+          "name": "Bowman",
+          "unitType": "Archery",
+          "uniqueTo": "Babylon",
+          "replaces": "Archer",
+          "requiredTech": "Archery"
+        },
+        {
+          "name": "Slinger",
+          "unitType": "Archery",
+          "uniqueTo": "Inca",
+          "replaces": "Archer",
+          "requiredTech": "Archery"
+        },
+        {
+          "name": "Skirmisher",
+          "unitType": "Archery",
+          "uniqueTo": "Barbarians",
+          "replaces": "Archer",
+          "requiredTech": "Archery"
+        },
+        {
+          "name": "Work Boats",
+          "unitType": "Civilian Water",
+          "requiredTech": "Sailing"
+        },
+        {
+          "name": "Trireme",
+          "unitType": "Ranged Water",
+          "requiredTech": "Sailing"
+        },
+        {
+          "name": "Galley",
+          "unitType": "Ranged Water",
+          "uniqueTo": "Barbarians"
+        },
+        {
+          "name": "Chariot Archer",
+          "unitType": "Archery",
+          "requiredTech": "The Wheel"
+        },
+        {
+          "name": "War Chariot",
+          "unitType": "Archery",
+          "uniqueTo": "Egypt",
+          "replaces": "Chariot Archer",
+          "requiredTech": "The Wheel"
+        },
+        {
+          "name": "War Elephant",
+          "unitType": "Archery",
+          "uniqueTo": "India",
+          "replaces": "Chariot Archer",
+          "requiredTech": "The Wheel"
+        },
+        {
+          "name": "Spearman",
+          "unitType": "Sword",
+          "requiredTech": "Bronze Working"
+        },
+        {
+          "name": "Hoplite",
+          "unitType": "Sword",
+          "uniqueTo": "Greece",
+          "replaces": "Spearman",
+          "requiredTech": "Bronze Working"
+        },
+        {
+          "name": "Persian Immortal",
+          "unitType": "Sword",
+          "uniqueTo": "Persia",
+          "replaces": "Spearman",
+          "requiredTech": "Bronze Working"
+        },
+        {
+          "name": "Marauder",
+          "unitType": "Sword",
+          "uniqueTo": "Barbarians",
+          "replaces": "Spearman",
+          "requiredTech": "Bronze Working"
+        },
+        {
+          "name": "Horseman",
+          "unitType": "Mounted",
+          "requiredTech": "Horseback Riding"
+        },
+        {
+          "name": "Companion Cavalry",
+          "unitType": "Mounted",
+          "uniqueTo": "Greece",
+          "replaces": "Horseman",
+          "requiredTech": "Horseback Riding"
+        },
+        {
+          "name": "Catapult",
+          "unitType": "Siege",
+          "requiredTech": "Mathematics"
+        },
+        {
+          "name": "Ballista",
+          "unitType": "Siege",
+          "uniqueTo": "Rome",
+          "replaces": "Catapult",
+          "requiredTech": "Mathematics"
+        },
+        {
+          "name": "Swordsman",
+          "unitType": "Sword",
+          "requiredTech": "Iron Working"
+        },
+        {
+          "name": "Legion",
+          "unitType": "Sword",
+          "uniqueTo": "Rome",
+          "replaces": "Swordsman",
+          "requiredTech": "Iron Working"
+        },
+        {
+          "name": "Mohawk Warrior",
+          "unitType": "Sword",
+          "uniqueTo": "Iroquois",
+          "replaces": "Swordsman",
+          "requiredTech": "Iron Working"
+        },
+        {
+          "name": "Pikeman",
+          "unitType": "Sword",
+          "requiredTech": "Civil Service"
+        },
+        {
+          "name": "Landsknecht",
+          "unitType": "Sword",
+          "uniqueTo": "Germany",
+          "replaces": "Pikeman",
+          "requiredTech": "Civil Service"
+        },
+        {
+          "name": "Knight",
+          "unitType": "Mounted",
+          "requiredTech": "Chivalry"
+        },
+        {
+          "name": "Camel Archer",
+          "unitType": "Archery",
+          "uniqueTo": "Arabia",
+          "replaces": "Knight",
+          "requiredTech": "Chivalry"
+        },
+        {
+          "name": "Conquistador",
+          "unitType": "Mounted",
+          "uniqueTo": "Spain",
+          "replaces": "Knight",
+          "requiredTech": "Chivalry"
+        },
+        {
+          "name": "Naresuan's Elephant",
+          "unitType": "Mounted",
+          "uniqueTo": "Siam",
+          "replaces": "Knight",
+          "requiredTech": "Chivalry"
+        },
+        {
+          "name": "Mandekalu Cavalry",
+          "unitType": "Mounted",
+          "uniqueTo": "Songhai",
+          "replaces": "Knight",
+          "requiredTech": "Chivalry"
+        },
+        {
+          "name": "Keshik",
+          "unitType": "Archery",
+          "uniqueTo": "Mongolia",
+          "replaces": "Knight",
+          "requiredTech": "Chivalry"
+        },
+        {
+          "name": "Crossbowman",
+          "unitType": "Archery",
+          "requiredTech": "Machinery"
+        },
+        {
+          "name": "Chu-Ko-Nu",
+          "unitType": "Archery",
+          "uniqueTo": "China",
+          "replaces": "Crossbowman",
+          "requiredTech": "Machinery"
+        },
+        {
+          "name": "Longbowman",
+          "unitType": "Archery",
+          "uniqueTo": "England",
+          "replaces": "Crossbowman",
+          "requiredTech": "Machinery"
+        },
+        {
+          "name": "Trebuchet",
+          "unitType": "Siege",
+          "requiredTech": "Physics"
+        },
+        {
+          "name": "Hwach'a",
+          "unitType": "Siege",
+          "uniqueTo": "Korea",
+          "replaces": "Trebuchet",
+          "requiredTech": "Physics"
+        },
+        {
+          "name": "Longswordsman",
+          "unitType": "Sword",
+          "requiredTech": "Steel"
+        },
+        {
+          "name": "Samurai",
+          "unitType": "Sword",
+          "uniqueTo": "Japan",
+          "replaces": "Longswordsman",
+          "requiredTech": "Steel"
+        },
+        {
+          "name": "Berserker",
+          "unitType": "Sword",
+          "uniqueTo": "Denmark",
+          "replaces": "Longswordsman",
+          "requiredTech": "Steel"
+        },
+        {
+          "name": "Caravel",
+          "unitType": "Ranged Water",
+          "requiredTech": "Astronomy"
+        },
+        {
+          "name": "Turtle Ship",
+          "unitType": "Ranged Water",
+          "uniqueTo": "Korea",
+          "replaces": "Caravel",
+          "requiredTech": "Astronomy"
+        },
+        {
+          "name": "Musketman",
+          "unitType": "Gunpowder",
+          "requiredTech": "Gunpowder"
+        },
+        {
+          "name": "Musketeer",
+          "unitType": "Gunpowder",
+          "uniqueTo": "France",
+          "replaces": "Musketman",
+          "requiredTech": "Gunpowder"
+        },
+        {
+          "name": "Janissary",
+          "unitType": "Gunpowder",
+          "uniqueTo": "The Ottomans",
+          "replaces": "Musketman",
+          "requiredTech": "Gunpowder"
+        },
+        {
+          "name": "Minuteman",
+          "unitType": "Gunpowder",
+          "uniqueTo": "America",
+          "replaces": "Musketman",
+          "requiredTech": "Gunpowder"
+        },
+        {
+          "name": "Tercio",
+          "unitType": "Gunpowder",
+          "uniqueTo": "Spain",
+          "replaces": "Musketman",
+          "requiredTech": "Gunpowder"
+        },
+        {
+          "name": "Frigate",
+          "unitType": "Ranged Water",
+          "requiredTech": "Navigation"
+        },
+        {
+          "name": "Ship of the Line",
+          "unitType": "Ranged Water",
+          "uniqueTo": "England",
+          "replaces": "Frigate",
+          "requiredTech": "Navigation"
+        },
+        {
+          "name": "Lancer",
+          "unitType": "Mounted",
+          "requiredTech": "Metallurgy"
+        },
+        {
+          "name": "Sipahi",
+          "unitType": "Mounted",
+          "uniqueTo": "The Ottomans",
+          "replaces": "Lancer",
+          "requiredTech": "Metallurgy"
+        },
+        {
+          "name": "Cannon",
+          "unitType": "Siege",
+          "requiredTech": "Chemistry"
+        },
+        {
+          "name": "Rifleman",
+          "unitType": "Gunpowder",
+          "requiredTech": "Rifling"
+        },
+        {
+          "name": "Norwegian Ski Infantry",
+          "unitType": "Gunpowder",
+          "uniqueTo": "Denmark",
+          "replaces": "Rifleman",
+          "requiredTech": "Rifling"
+        },
+        {
+          "name": "Cavalry",
+          "unitType": "Mounted",
+          "requiredTech": "Military Science"
+        },
+        {
+          "name": "Cossack",
+          "unitType": "Mounted",
+          "uniqueTo": "Russia",
+          "replaces": "Cavalry",
+          "requiredTech": "Military Science"
+        },
+        {
+          "name": "Ironclad",
+          "unitType": "Ranged Water",
+          "requiredTech": "Steam Power"
+        },
+        {
+          "name": "Artillery",
+          "unitType": "Siege",
+          "requiredTech": "Dynamite"
+        },
+        {
+          "name": "Submarine",
+          "unitType": "Submarine",
+          "requiredTech": "Refrigeration"
+        },
+        {
+          "name": "Foreign Legion",
+          "unitType": "Gunpowder",
+          "uniqueTo": "France",
+          "replaces": "Rifleman",
+          "requiredTech": "Rifling"
+        },
+        {
+          "name": "Infantry",
+          "unitType": "Gunpowder",
+          "requiredTech": "Replaceable Parts"
+        },
+        {
+          "name": "Fighter",
+          "unitType": "Fighter",
+          "requiredTech": "Flight"
+        },
+        {
+          "name": "Carrier",
+          "unitType": "Aircraft Carrier",
+          "requiredTech": "Flight"
+        },
+        {
+          "name": "Battleship",
+          "unitType": "Ranged Water",
+          "requiredTech": "Telegraph"
+        },
+        {
+          "name": "Anti-Aircraft Gun",
+          "unitType": "Gunpowder",
+          "requiredTech": "Radio"
+        },
+        {
+          "name": "Destroyer",
+          "unitType": "Melee Water",
+          "requiredTech": "Combustion"
+        },
+        {
+          "name": "Zero",
+          "unitType": "Fighter",
+          "uniqueTo": "Japan",
+          "replaces": "Fighter",
+          "requiredTech": "Flight"
+        },
+        {
+          "name": "Bomber",
+          "unitType": "Bomber",
+          "requiredTech": "Radar"
+        },
+        {
+          "name": "B17",
+          "unitType": "Bomber",
+          "uniqueTo": "America",
+          "replaces": "Bomber",
+          "requiredTech": "Radar"
+        },
+        {
+          "name": "Paratrooper",
+          "unitType": "Gunpowder",
+          "requiredTech": "Radar"
+        },
+        {
+          "name": "Tank",
+          "unitType": "Armored",
+          "requiredTech": "Combustion"
+        },
+        {
+          "name": "Panzer",
+          "unitType": "Armored",
+          "uniqueTo": "Germany",
+          "replaces": "Tank",
+          "requiredTech": "Combustion"
+        },
+        {
+          "name": "Anti-Tank Gun",
+          "unitType": "Gunpowder",
+          "requiredTech": "Replaceable Parts"
+        },
+        {
+          "name": "Atomic Bomb",
+          "unitType": "Atomic Bomber",
+          "requiredTech": "Nuclear Fission"
+        },
+        {
+          "name": "Rocket Artillery",
+          "unitType": "Siege",
+          "requiredTech": "Rocketry"
+        },
+        {
+          "name": "Mobile SAM",
+          "unitType": "Gunpowder",
+          "requiredTech": "Computers"
+        },
+        {
+          "name": "Guided Missile",
+          "unitType": "Missile",
+          "requiredTech": "Satellites"
+        },
+        {
+          "name": "Nuclear Missile",
+          "unitType": "Missile",
+          "requiredTech": "Advanced Ballistics"
+        },
+        {
+          "name": "Helicopter Gunship",
+          "unitType": "Helicopter",
+          "requiredTech": "Rocketry"
+        },
+        {
+          "name": "Nuclear Submarine",
+          "unitType": "Submarine",
+          "requiredTech": "Computers"
+        },
+        {
+          "name": "Mechanized Infantry",
+          "unitType": "Gunpowder",
+          "requiredTech": "Electronics"
+        },
+        {
+          "name": "Missile Cruiser",
+          "unitType": "Ranged Water",
+          "requiredTech": "Robotics"
+        },
+        {
+          "name": "Modern Armor",
+          "unitType": "Armored",
+          "requiredTech": "Lasers"
+        },
+        {
+          "name": "Jet Fighter",
+          "unitType": "Fighter",
+          "requiredTech": "Lasers"
+        },
+        {
+          "name": "Giant Death Robot",
+          "unitType": "Armored",
+          "requiredTech": "Nuclear Fusion"
+        },
+        {
+          "name": "Stealth Bomber",
+          "unitType": "Bomber",
+          "requiredTech": "Stealth"
+        },
+        {
+          "name": "Great Artist",
+          "unitType": "Civilian"
+        },
+        {
+          "name": "Great Scientist",
+          "unitType": "Civilian"
+        },
+        {
+          "name": "Great Merchant",
+          "unitType": "Civilian"
+        },
+        {
+          "name": "Great Engineer",
+          "unitType": "Civilian"
+        },
+        {
+          "name": "Great General",
+          "unitType": "Civilian"
+        },
+        {
+          "name": "Khan",
+          "unitType": "Civilian",
+          "uniqueTo": "Mongolia",
+          "replaces": "Great General"
+        },
+        {
+          "name": "SS Booster",
+          "unitType": "Civilian",
+          "requiredTech": "Robotics"
+        },
+        {
+          "name": "SS Cockpit",
+          "unitType": "Civilian",
+          "requiredTech": "Satellites"
+        },
+        {
+          "name": "SS Engine",
+          "unitType": "Civilian",
+          "requiredTech": "Particle Physics"
+        },
+        {
+          "name": "SS Stasis Chamber",
+          "unitType": "Civilian",
+          "requiredTech": "Nanotechnology"
+        }
+      ],
+      "Terrains": [
+        {
+          "name": "Ocean",
+          "type": "Water"
+        },
+        {
+          "name": "Coast",
+          "type": "Water"
+        },
+        {
+          "name": "Grassland",
+          "type": "Land"
+        },
+        {
+          "name": "Plains",
+          "type": "Land"
+        },
+        {
+          "name": "Tundra",
+          "type": "Land"
+        },
+        {
+          "name": "Desert",
+          "type": "Land"
+        },
+        {
+          "name": "Lakes",
+          "type": "Water"
+        },
+        {
+          "name": "Mountain",
+          "type": "Land"
+        },
+        {
+          "name": "Snow",
+          "type": "Land"
+        },
+        {
+          "name": "Hill",
+          "type": "TerrainFeature"
+        },
+        {
+          "name": "Forest",
+          "type": "TerrainFeature"
+        },
+        {
+          "name": "Jungle",
+          "type": "TerrainFeature"
+        },
+        {
+          "name": "Marsh",
+          "type": "TerrainFeature"
+        },
+        {
+          "name": "Fallout",
+          "type": "TerrainFeature"
+        },
+        {
+          "name": "Oasis",
+          "type": "TerrainFeature"
+        },
+        {
+          "name": "Flood plains",
+          "type": "TerrainFeature"
+        },
+        {
+          "name": "Ice",
+          "type": "TerrainFeature"
+        },
+        {
+          "name": "Atoll",
+          "type": "TerrainFeature"
+        },
+        {
+          "name": "River",
+          "type": "TerrainFeature"
+        },
+        {
+          "name": "Great Barrier Reef",
+          "type": "NaturalWonder"
+        },
+        {
+          "name": "Old Faithful",
+          "type": "NaturalWonder"
+        },
+        {
+          "name": "El Dorado",
+          "type": "NaturalWonder"
+        },
+        {
+          "name": "Fountain of Youth",
+          "type": "NaturalWonder"
+        },
+        {
+          "name": "Grand Mesa",
+          "type": "NaturalWonder"
+        },
+        {
+          "name": "Mount Fuji",
+          "type": "NaturalWonder"
+        },
+        {
+          "name": "Krakatoa",
+          "type": "NaturalWonder"
+        },
+        {
+          "name": "Rock of Gibraltar",
+          "type": "NaturalWonder"
+        },
+        {
+          "name": "Cerro de Potosi",
+          "type": "NaturalWonder"
+        },
+        {
+          "name": "Barringer Crater",
+          "type": "NaturalWonder"
+        }
+      ],
+      "TileResources": [
+        {
+          "name": "Cattle"
+        },
+        {
+          "name": "Sheep"
+        },
+        {
+          "name": "Deer"
+        },
+        {
+          "name": "Bananas"
+        },
+        {
+          "name": "Wheat"
+        },
+        {
+          "name": "Stone"
+        },
+        {
+          "name": "Fish"
+        },
+        {
+          "name": "Horses"
+        },
+        {
+          "name": "Iron"
+        },
+        {
+          "name": "Coal"
+        },
+        {
+          "name": "Oil"
+        },
+        {
+          "name": "Aluminum"
+        },
+        {
+          "name": "Uranium"
+        },
+        {
+          "name": "Furs"
+        },
+        {
+          "name": "Cotton"
+        },
+        {
+          "name": "Dyes"
+        },
+        {
+          "name": "Gems"
+        },
+        {
+          "name": "Gold Ore"
+        },
+        {
+          "name": "Silver"
+        },
+        {
+          "name": "Incense"
+        },
+        {
+          "name": "Ivory"
+        },
+        {
+          "name": "Silk"
+        },
+        {
+          "name": "Spices"
+        },
+        {
+          "name": "Wine"
+        },
+        {
+          "name": "Sugar"
+        },
+        {
+          "name": "Marble"
+        },
+        {
+          "name": "Whales"
+        },
+        {
+          "name": "Pearls"
+        },
+        {
+          "name": "Jewelry"
+        },
+        {
+          "name": "Porcelain"
+        }
+      ],
+      "TileImprovements": [
+        {
+          "name": "Farm"
+        },
+        {
+          "name": "Lumber mill"
+        },
+        {
+          "name": "Mine"
+        },
+        {
+          "name": "Trading post"
+        },
+        {
+          "name": "Camp"
+        },
+        {
+          "name": "Oil well"
+        },
+        {
+          "name": "Offshore Platform"
+        },
+        {
+          "name": "Pasture"
+        },
+        {
+          "name": "Plantation"
+        },
+        {
+          "name": "Quarry"
+        },
+        {
+          "name": "Fishing Boats"
+        },
+        {
+          "name": "Fort"
+        },
+        {
+          "name": "Road"
+        },
+        {
+          "name": "Railroad"
+        },
+        {
+          "name": "Remove Forest"
+        },
+        {
+          "name": "Remove Jungle"
+        },
+        {
+          "name": "Remove Fallout"
+        },
+        {
+          "name": "Remove Marsh"
+        },
+        {
+          "name": "Remove Road"
+        },
+        {
+          "name": "Remove Railroad"
+        },
+        {
+          "name": "Cancel improvement order"
+        },
+        {
+          "name": "Repair"
+        },
+        {
+          "name": "Academy"
+        },
+        {
+          "name": "Landmark"
+        },
+        {
+          "name": "Manufactory"
+        },
+        {
+          "name": "Customs house"
+        },
+        {
+          "name": "Holy site"
+        },
+        {
+          "name": "Citadel"
+        },
+        {
+          "name": "Moai",
+          "uniqueTo": "Polynesia"
+        },
+        {
+          "name": "Terrace farm",
+          "uniqueTo": "Inca"
+        },
+        {
+          "name": "Ancient ruins"
+        },
+        {
+          "name": "City ruins"
+        },
+        {
+          "name": "City center"
+        },
+        {
+          "name": "Barbarian encampment"
+        }
+      ]
+    },
+    "Civ V - Gods & Kings": {
+      "Units": [
+        {
+          "name": "Worker",
+          "unitType": "Civilian",
+          "requiredTech": "Agriculture"
+        },
+        {
+          "name": "Settler",
+          "unitType": "Civilian",
+          "requiredTech": "Agriculture"
+        },
+        {
+          "name": "Scout",
+          "unitType": "Scout",
+          "requiredTech": "Agriculture"
+        },
+        {
+          "name": "Warrior",
+          "unitType": "Sword",
+          "requiredTech": "Agriculture"
+        },
+        {
+          "name": "Maori Warrior",
+          "unitType": "Sword",
+          "uniqueTo": "Polynesia",
+          "replaces": "Warrior",
+          "requiredTech": "Agriculture"
+        },
+        {
+          "name": "Jaguar",
+          "unitType": "Sword",
+          "uniqueTo": "Aztecs",
+          "replaces": "Warrior",
+          "requiredTech": "Agriculture"
+        },
+        {
+          "name": "Brute",
+          "unitType": "Sword",
+          "uniqueTo": "Barbarians",
+          "replaces": "Warrior"
+        },
+        {
+          "name": "Archer",
+          "unitType": "Archery",
+          "requiredTech": "Archery"
+        },
+        {
+          "name": "Bowman",
+          "unitType": "Archery",
+          "uniqueTo": "Babylon",
+          "replaces": "Archer",
+          "requiredTech": "Archery"
+        },
+        {
+          "name": "Slinger",
+          "unitType": "Archery",
+          "uniqueTo": "Inca",
+          "replaces": "Archer",
+          "requiredTech": "Archery"
+        },
+        {
+          "name": "Atlatlist",
+          "unitType": "Archery",
+          "uniqueTo": "The Maya",
+          "replaces": "Archer",
+          "requiredTech": "Agriculture"
+        },
+        {
+          "name": "Skirmisher",
+          "unitType": "Archery",
+          "uniqueTo": "Barbarians",
+          "replaces": "Archer",
+          "requiredTech": "Archery"
+        },
+        {
+          "name": "Work Boats",
+          "unitType": "Civilian Water",
+          "requiredTech": "Sailing"
+        },
+        {
+          "name": "Trireme",
+          "unitType": "Melee Water",
+          "requiredTech": "Sailing"
+        },
+        {
+          "name": "Quinquereme",
+          "unitType": "Melee Water",
+          "uniqueTo": "Carthage",
+          "replaces": "Trireme",
+          "requiredTech": "Sailing"
+        },
+        {
+          "name": "Dromon",
+          "unitType": "Ranged Water",
+          "uniqueTo": "Byzantium",
+          "replaces": "Trireme",
+          "requiredTech": "Sailing"
+        },
+        {
+          "name": "Galley",
+          "unitType": "Melee Water",
+          "uniqueTo": "Barbarians"
+        },
+        {
+          "name": "Chariot Archer",
+          "unitType": "Archery",
+          "requiredTech": "The Wheel"
+        },
+        {
+          "name": "War Chariot",
+          "unitType": "Archery",
+          "uniqueTo": "Egypt",
+          "replaces": "Chariot Archer",
+          "requiredTech": "The Wheel"
+        },
+        {
+          "name": "Horse Archer",
+          "unitType": "Archery",
+          "uniqueTo": "The Huns",
+          "replaces": "Chariot Archer",
+          "requiredTech": "The Wheel"
+        },
+        {
+          "name": "War Elephant",
+          "unitType": "Archery",
+          "uniqueTo": "India",
+          "replaces": "Chariot Archer",
+          "requiredTech": "The Wheel"
+        },
+        {
+          "name": "Spearman",
+          "unitType": "Sword",
+          "requiredTech": "Bronze Working"
+        },
+        {
+          "name": "Hoplite",
+          "unitType": "Sword",
+          "uniqueTo": "Greece",
+          "replaces": "Spearman",
+          "requiredTech": "Bronze Working"
+        },
+        {
+          "name": "Persian Immortal",
+          "unitType": "Sword",
+          "uniqueTo": "Persia",
+          "replaces": "Spearman",
+          "requiredTech": "Bronze Working"
+        },
+        {
+          "name": "Battering Ram",
+          "unitType": "Sword",
+          "uniqueTo": "The Huns",
+          "replaces": "Spearman",
+          "requiredTech": "Bronze Working"
+        },
+        {
+          "name": "Pictish Warrior",
+          "unitType": "Sword",
+          "uniqueTo": "Celts",
+          "replaces": "Spearman",
+          "requiredTech": "Bronze Working"
+        },
+        {
+          "name": "Marauder",
+          "unitType": "Sword",
+          "uniqueTo": "Barbarians",
+          "replaces": "Spearman",
+          "requiredTech": "Bronze Working"
+        },
+        {
+          "name": "Horseman",
+          "unitType": "Mounted",
+          "requiredTech": "Horseback Riding"
+        },
+        {
+          "name": "Companion Cavalry",
+          "unitType": "Mounted",
+          "uniqueTo": "Greece",
+          "replaces": "Horseman",
+          "requiredTech": "Horseback Riding"
+        },
+        {
+          "name": "African Forest Elephant",
+          "unitType": "Mounted",
+          "uniqueTo": "Carthage",
+          "replaces": "Horseman",
+          "requiredTech": "Horseback Riding"
+        },
+        {
+          "name": "Cataphract",
+          "unitType": "Mounted",
+          "uniqueTo": "Byzantium",
+          "replaces": "Horseman",
+          "requiredTech": "Horseback Riding"
+        },
+        {
+          "name": "Catapult",
+          "unitType": "Siege",
+          "requiredTech": "Mathematics"
+        },
+        {
+          "name": "Ballista",
+          "unitType": "Siege",
+          "uniqueTo": "Rome",
+          "replaces": "Catapult",
+          "requiredTech": "Mathematics"
+        },
+        {
+          "name": "Composite Bowman",
+          "unitType": "Archery",
+          "requiredTech": "Construction"
+        },
+        {
+          "name": "Swordsman",
+          "unitType": "Sword",
+          "requiredTech": "Iron Working"
+        },
+        {
+          "name": "Legion",
+          "unitType": "Sword",
+          "uniqueTo": "Rome",
+          "replaces": "Swordsman",
+          "requiredTech": "Iron Working"
+        },
+        {
+          "name": "Mohawk Warrior",
+          "unitType": "Sword",
+          "uniqueTo": "Iroquois",
+          "replaces": "Swordsman",
+          "requiredTech": "Iron Working"
+        },
+        {
+          "name": "Pikeman",
+          "unitType": "Sword",
+          "requiredTech": "Civil Service"
+        },
+        {
+          "name": "Landsknecht",
+          "unitType": "Sword",
+          "uniqueTo": "Germany",
+          "replaces": "Pikeman",
+          "requiredTech": "Civil Service"
+        },
+        {
+          "name": "Galleass",
+          "unitType": "Ranged Water",
+          "requiredTech": "Compass"
+        },
+        {
+          "name": "Knight",
+          "unitType": "Mounted",
+          "requiredTech": "Chivalry"
+        },
+        {
+          "name": "Camel Archer",
+          "unitType": "Archery",
+          "uniqueTo": "Arabia",
+          "replaces": "Knight",
+          "requiredTech": "Chivalry"
+        },
+        {
+          "name": "Conquistador",
+          "unitType": "Mounted",
+          "uniqueTo": "Spain",
+          "replaces": "Knight",
+          "requiredTech": "Chivalry"
+        },
+        {
+          "name": "Naresuan's Elephant",
+          "unitType": "Mounted",
+          "uniqueTo": "Siam",
+          "replaces": "Knight",
+          "requiredTech": "Chivalry"
+        },
+        {
+          "name": "Mandekalu Cavalry",
+          "unitType": "Mounted",
+          "uniqueTo": "Songhai",
+          "replaces": "Knight",
+          "requiredTech": "Chivalry"
+        },
+        {
+          "name": "Keshik",
+          "unitType": "Archery",
+          "uniqueTo": "Mongolia",
+          "replaces": "Knight",
+          "requiredTech": "Chivalry"
+        },
+        {
+          "name": "Crossbowman",
+          "unitType": "Archery",
+          "requiredTech": "Machinery"
+        },
+        {
+          "name": "Chu-Ko-Nu",
+          "unitType": "Archery",
+          "uniqueTo": "China",
+          "replaces": "Crossbowman",
+          "requiredTech": "Machinery"
+        },
+        {
+          "name": "Longbowman",
+          "unitType": "Archery",
+          "uniqueTo": "England",
+          "replaces": "Crossbowman",
+          "requiredTech": "Machinery"
+        },
+        {
+          "name": "Trebuchet",
+          "unitType": "Siege",
+          "requiredTech": "Physics"
+        },
+        {
+          "name": "Hwach'a",
+          "unitType": "Siege",
+          "uniqueTo": "Korea",
+          "replaces": "Trebuchet",
+          "requiredTech": "Physics"
+        },
+        {
+          "name": "Longswordsman",
+          "unitType": "Sword",
+          "requiredTech": "Steel"
+        },
+        {
+          "name": "Samurai",
+          "unitType": "Sword",
+          "uniqueTo": "Japan",
+          "replaces": "Longswordsman",
+          "requiredTech": "Steel"
+        },
+        {
+          "name": "Berserker",
+          "unitType": "Sword",
+          "uniqueTo": "Denmark",
+          "replaces": "Longswordsman",
+          "requiredTech": "Metal Casting"
+        },
+        {
+          "name": "Caravel",
+          "unitType": "Melee Water",
+          "requiredTech": "Astronomy"
+        },
+        {
+          "name": "Turtle Ship",
+          "unitType": "Melee Water",
+          "uniqueTo": "Korea",
+          "replaces": "Caravel",
+          "requiredTech": "Astronomy"
+        },
+        {
+          "name": "Musketman",
+          "unitType": "Gunpowder",
+          "requiredTech": "Gunpowder"
+        },
+        {
+          "name": "Musketeer",
+          "unitType": "Gunpowder",
+          "uniqueTo": "France",
+          "replaces": "Musketman",
+          "requiredTech": "Gunpowder"
+        },
+        {
+          "name": "Janissary",
+          "unitType": "Gunpowder",
+          "uniqueTo": "The Ottomans",
+          "replaces": "Musketman",
+          "requiredTech": "Gunpowder"
+        },
+        {
+          "name": "Minuteman",
+          "unitType": "Gunpowder",
+          "uniqueTo": "America",
+          "replaces": "Musketman",
+          "requiredTech": "Gunpowder"
+        },
+        {
+          "name": "Tercio",
+          "unitType": "Gunpowder",
+          "uniqueTo": "Spain",
+          "replaces": "Musketman",
+          "requiredTech": "Gunpowder"
+        },
+        {
+          "name": "Privateer",
+          "unitType": "Melee Water",
+          "requiredTech": "Navigation"
+        },
+        {
+          "name": "Sea Beggar",
+          "unitType": "Melee Water",
+          "uniqueTo": "The Netherlands",
+          "replaces": "Privateer",
+          "requiredTech": "Navigation"
+        },
+        {
+          "name": "Frigate",
+          "unitType": "Ranged Water",
+          "requiredTech": "Navigation"
+        },
+        {
+          "name": "Ship of the Line",
+          "unitType": "Ranged Water",
+          "uniqueTo": "England",
+          "replaces": "Frigate",
+          "requiredTech": "Navigation"
+        },
+        {
+          "name": "Lancer",
+          "unitType": "Mounted",
+          "requiredTech": "Metallurgy"
+        },
+        {
+          "name": "Sipahi",
+          "unitType": "Mounted",
+          "uniqueTo": "The Ottomans",
+          "replaces": "Lancer",
+          "requiredTech": "Metallurgy"
+        },
+        {
+          "name": "Hakkapeliitta",
+          "unitType": "Mounted",
+          "uniqueTo": "Sweden",
+          "replaces": "Lancer",
+          "requiredTech": "Metallurgy"
+        },
+        {
+          "name": "Cannon",
+          "unitType": "Siege",
+          "requiredTech": "Chemistry"
+        },
+        {
+          "name": "Gatling Gun",
+          "unitType": "Ranged Gunpowder",
+          "requiredTech": "Industrialization"
+        },
+        {
+          "name": "Rifleman",
+          "unitType": "Gunpowder",
+          "requiredTech": "Rifling"
+        },
+        {
+          "name": "Norwegian Ski Infantry",
+          "unitType": "Gunpowder",
+          "uniqueTo": "Denmark",
+          "replaces": "Rifleman",
+          "requiredTech": "Rifling"
+        },
+        {
+          "name": "Carolean",
+          "unitType": "Gunpowder",
+          "uniqueTo": "Sweden",
+          "replaces": "Rifleman",
+          "requiredTech": "Rifling"
+        },
+        {
+          "name": "Mehal Sefari",
+          "unitType": "Gunpowder",
+          "uniqueTo": "Ethiopia",
+          "replaces": "Rifleman",
+          "requiredTech": "Rifling"
+        },
+        {
+          "name": "Cavalry",
+          "unitType": "Mounted",
+          "requiredTech": "Military Science"
+        },
+        {
+          "name": "Cossack",
+          "unitType": "Mounted",
+          "uniqueTo": "Russia",
+          "replaces": "Cavalry",
+          "requiredTech": "Military Science"
+        },
+        {
+          "name": "Hussar",
+          "unitType": "Mounted",
+          "uniqueTo": "Austria",
+          "replaces": "Cavalry",
+          "requiredTech": "Military Science"
+        },
+        {
+          "name": "Ironclad",
+          "unitType": "Melee Water",
+          "requiredTech": "Steam Power"
+        },
+        {
+          "name": "Artillery",
+          "unitType": "Siege",
+          "requiredTech": "Dynamite"
+        },
+        {
+          "name": "Submarine",
+          "unitType": "Submarine",
+          "requiredTech": "Refrigeration"
+        },
+        {
+          "name": "Great War Infantry",
+          "unitType": "Gunpowder",
+          "requiredTech": "Replaceable Parts"
+        },
+        {
+          "name": "Foreign Legion",
+          "unitType": "Gunpowder",
+          "uniqueTo": "France",
+          "replaces": "Great War Infantry",
+          "requiredTech": "Replaceable Parts"
+        },
+        {
+          "name": "Triplane",
+          "unitType": "Fighter",
+          "requiredTech": "Flight"
+        },
+        {
+          "name": "Great War Bomber",
+          "unitType": "Bomber",
+          "requiredTech": "Flight"
+        },
+        {
+          "name": "Infantry",
+          "unitType": "Gunpowder",
+          "requiredTech": "Plastics"
+        },
+        {
+          "name": "Carrier",
+          "unitType": "Aircraft Carrier",
+          "requiredTech": "Electronics"
+        },
+        {
+          "name": "Battleship",
+          "unitType": "Ranged Water",
+          "requiredTech": "Electronics"
+        },
+        {
+          "name": "Machine Gun",
+          "unitType": "Ranged Gunpowder",
+          "requiredTech": "Ballistics"
+        },
+        {
+          "name": "Anti-Aircraft Gun",
+          "unitType": "Gunpowder",
+          "requiredTech": "Ballistics"
+        },
+        {
+          "name": "Landship",
+          "unitType": "Armored",
+          "requiredTech": "Combustion"
+        },
+        {
+          "name": "Destroyer",
+          "unitType": "Melee Water",
+          "requiredTech": "Combustion"
+        },
+        {
+          "name": "Marine",
+          "unitType": "Gunpowder",
+          "requiredTech": "Pharmaceuticals"
+        },
+        {
+          "name": "Fighter",
+          "unitType": "Fighter",
+          "requiredTech": "Radar"
+        },
+        {
+          "name": "Zero",
+          "unitType": "Fighter",
+          "uniqueTo": "Japan",
+          "replaces": "Fighter",
+          "requiredTech": "Radar"
+        },
+        {
+          "name": "Bomber",
+          "unitType": "Bomber",
+          "requiredTech": "Radar"
+        },
+        {
+          "name": "B17",
+          "unitType": "Bomber",
+          "uniqueTo": "America",
+          "replaces": "Bomber",
+          "requiredTech": "Radar"
+        },
+        {
+          "name": "Paratrooper",
+          "unitType": "Gunpowder",
+          "requiredTech": "Radar"
+        },
+        {
+          "name": "Tank",
+          "unitType": "Armored",
+          "requiredTech": "Combined Arms"
+        },
+        {
+          "name": "Panzer",
+          "unitType": "Armored",
+          "uniqueTo": "Germany",
+          "replaces": "Tank",
+          "requiredTech": "Combined Arms"
+        },
+        {
+          "name": "Anti-Tank Gun",
+          "unitType": "Gunpowder",
+          "requiredTech": "Combined Arms"
+        },
+        {
+          "name": "Atomic Bomb",
+          "unitType": "Atomic Bomber",
+          "requiredTech": "Nuclear Fission"
+        },
+        {
+          "name": "Rocket Artillery",
+          "unitType": "Siege",
+          "requiredTech": "Rocketry"
+        },
+        {
+          "name": "Mobile SAM",
+          "unitType": "Gunpowder",
+          "requiredTech": "Rocketry"
+        },
+        {
+          "name": "Guided Missile",
+          "unitType": "Missile",
+          "requiredTech": "Advanced Ballistics"
+        },
+        {
+          "name": "Nuclear Missile",
+          "unitType": "Missile",
+          "requiredTech": "Advanced Ballistics"
+        },
+        {
+          "name": "Helicopter Gunship",
+          "unitType": "Helicopter",
+          "requiredTech": "Computers"
+        },
+        {
+          "name": "Nuclear Submarine",
+          "unitType": "Submarine",
+          "requiredTech": "Telecommunications"
+        },
+        {
+          "name": "Mechanized Infantry",
+          "unitType": "Gunpowder",
+          "requiredTech": "Mobile Tactics"
+        },
+        {
+          "name": "Missile Cruiser",
+          "unitType": "Ranged Water",
+          "requiredTech": "Robotics"
+        },
+        {
+          "name": "Modern Armor",
+          "unitType": "Armored",
+          "requiredTech": "Lasers"
+        },
+        {
+          "name": "Jet Fighter",
+          "unitType": "Fighter",
+          "requiredTech": "Lasers"
+        },
+        {
+          "name": "Giant Death Robot",
+          "unitType": "Armored",
+          "requiredTech": "Nuclear Fusion"
+        },
+        {
+          "name": "Stealth Bomber",
+          "unitType": "Bomber",
+          "requiredTech": "Stealth"
+        },
+        {
+          "name": "Great Artist",
+          "unitType": "Civilian"
+        },
+        {
+          "name": "Great Scientist",
+          "unitType": "Civilian"
+        },
+        {
+          "name": "Great Merchant",
+          "unitType": "Civilian"
+        },
+        {
+          "name": "Great Engineer",
+          "unitType": "Civilian"
+        },
+        {
+          "name": "Great Prophet",
+          "unitType": "Civilian"
+        },
+        {
+          "name": "Great General",
+          "unitType": "Civilian"
+        },
+        {
+          "name": "Khan",
+          "unitType": "Civilian",
+          "uniqueTo": "Mongolia",
+          "replaces": "Great General"
+        },
+        {
+          "name": "Great Admiral",
+          "unitType": "Civilian Water"
+        },
+        {
+          "name": "Missionary",
+          "unitType": "Civilian"
+        },
+        {
+          "name": "Inquisitor",
+          "unitType": "Civilian"
+        },
+        {
+          "name": "SS Booster",
+          "unitType": "Civilian",
+          "requiredTech": "Advanced Ballistics"
+        },
+        {
+          "name": "SS Cockpit",
+          "unitType": "Civilian",
+          "requiredTech": "Satellites"
+        },
+        {
+          "name": "SS Engine",
+          "unitType": "Civilian",
+          "requiredTech": "Particle Physics"
+        },
+        {
+          "name": "SS Stasis Chamber",
+          "unitType": "Civilian",
+          "requiredTech": "Nanotechnology"
+        }
+      ],
+      "Terrains": [
+        {
+          "name": "Ocean",
+          "type": "Water"
+        },
+        {
+          "name": "Coast",
+          "type": "Water"
+        },
+        {
+          "name": "Grassland",
+          "type": "Land"
+        },
+        {
+          "name": "Plains",
+          "type": "Land"
+        },
+        {
+          "name": "Tundra",
+          "type": "Land"
+        },
+        {
+          "name": "Desert",
+          "type": "Land"
+        },
+        {
+          "name": "Lakes",
+          "type": "Water"
+        },
+        {
+          "name": "Mountain",
+          "type": "Land"
+        },
+        {
+          "name": "Snow",
+          "type": "Land"
+        },
+        {
+          "name": "Hill",
+          "type": "TerrainFeature"
+        },
+        {
+          "name": "Forest",
+          "type": "TerrainFeature"
+        },
+        {
+          "name": "Jungle",
+          "type": "TerrainFeature"
+        },
+        {
+          "name": "Marsh",
+          "type": "TerrainFeature"
+        },
+        {
+          "name": "Fallout",
+          "type": "TerrainFeature"
+        },
+        {
+          "name": "Oasis",
+          "type": "TerrainFeature"
+        },
+        {
+          "name": "Flood plains",
+          "type": "TerrainFeature"
+        },
+        {
+          "name": "Ice",
+          "type": "TerrainFeature"
+        },
+        {
+          "name": "Atoll",
+          "type": "TerrainFeature"
+        },
+        {
+          "name": "River",
+          "type": "TerrainFeature"
+        },
+        {
+          "name": "Great Barrier Reef",
+          "type": "NaturalWonder"
+        },
+        {
+          "name": "Old Faithful",
+          "type": "NaturalWonder"
+        },
+        {
+          "name": "El Dorado",
+          "type": "NaturalWonder"
+        },
+        {
+          "name": "Fountain of Youth",
+          "type": "NaturalWonder"
+        },
+        {
+          "name": "Grand Mesa",
+          "type": "NaturalWonder"
+        },
+        {
+          "name": "Mount Fuji",
+          "type": "NaturalWonder"
+        },
+        {
+          "name": "Krakatoa",
+          "type": "NaturalWonder"
+        },
+        {
+          "name": "Rock of Gibraltar",
+          "type": "NaturalWonder"
+        },
+        {
+          "name": "Cerro de Potosi",
+          "type": "NaturalWonder"
+        },
+        {
+          "name": "Barringer Crater",
+          "type": "NaturalWonder"
+        },
+        {
+          "name": "Mount Kailash",
+          "type": "NaturalWonder"
+        },
+        {
+          "name": "Mount Sinai",
+          "type": "NaturalWonder"
+        },
+        {
+          "name": "Sri Pada",
+          "type": "NaturalWonder"
+        },
+        {
+          "name": "Uluru",
+          "type": "NaturalWonder"
+        }
+      ],
+      "TileResources": [
+        {
+          "name": "Cattle"
+        },
+        {
+          "name": "Sheep"
+        },
+        {
+          "name": "Deer"
+        },
+        {
+          "name": "Bananas"
+        },
+        {
+          "name": "Wheat"
+        },
+        {
+          "name": "Stone"
+        },
+        {
+          "name": "Fish"
+        },
+        {
+          "name": "Horses"
+        },
+        {
+          "name": "Iron"
+        },
+        {
+          "name": "Coal"
+        },
+        {
+          "name": "Oil"
+        },
+        {
+          "name": "Aluminum"
+        },
+        {
+          "name": "Uranium"
+        },
+        {
+          "name": "Furs"
+        },
+        {
+          "name": "Cotton"
+        },
+        {
+          "name": "Dyes"
+        },
+        {
+          "name": "Gems"
+        },
+        {
+          "name": "Gold Ore"
+        },
+        {
+          "name": "Silver"
+        },
+        {
+          "name": "Incense"
+        },
+        {
+          "name": "Ivory"
+        },
+        {
+          "name": "Silk"
+        },
+        {
+          "name": "Spices"
+        },
+        {
+          "name": "Wine"
+        },
+        {
+          "name": "Sugar"
+        },
+        {
+          "name": "Marble"
+        },
+        {
+          "name": "Whales"
+        },
+        {
+          "name": "Pearls"
+        },
+        {
+          "name": "Jewelry"
+        },
+        {
+          "name": "Porcelain"
+        },
+        {
+          "name": "Citrus"
+        },
+        {
+          "name": "Copper"
+        },
+        {
+          "name": "Crab"
+        },
+        {
+          "name": "Salt"
+        },
+        {
+          "name": "Truffles"
+        }
+      ],
+      "TileImprovements": [
+        {
+          "name": "Farm"
+        },
+        {
+          "name": "Lumber mill"
+        },
+        {
+          "name": "Mine"
+        },
+        {
+          "name": "Trading post"
+        },
+        {
+          "name": "Camp"
+        },
+        {
+          "name": "Oil well"
+        },
+        {
+          "name": "Offshore Platform"
+        },
+        {
+          "name": "Pasture"
+        },
+        {
+          "name": "Plantation"
+        },
+        {
+          "name": "Quarry"
+        },
+        {
+          "name": "Fishing Boats"
+        },
+        {
+          "name": "Fort"
+        },
+        {
+          "name": "Road"
+        },
+        {
+          "name": "Railroad"
+        },
+        {
+          "name": "Remove Forest"
+        },
+        {
+          "name": "Remove Jungle"
+        },
+        {
+          "name": "Remove Fallout"
+        },
+        {
+          "name": "Remove Marsh"
+        },
+        {
+          "name": "Remove Road"
+        },
+        {
+          "name": "Remove Railroad"
+        },
+        {
+          "name": "Cancel improvement order"
+        },
+        {
+          "name": "Repair"
+        },
+        {
+          "name": "Academy"
+        },
+        {
+          "name": "Landmark"
+        },
+        {
+          "name": "Manufactory"
+        },
+        {
+          "name": "Customs house"
+        },
+        {
+          "name": "Holy site"
+        },
+        {
+          "name": "Citadel"
+        },
+        {
+          "name": "Moai",
+          "uniqueTo": "Polynesia"
+        },
+        {
+          "name": "Terrace farm",
+          "uniqueTo": "Inca"
+        },
+        {
+          "name": "Polder",
+          "uniqueTo": "The Netherlands"
+        },
+        {
+          "name": "Ancient ruins"
+        },
+        {
+          "name": "City ruins"
+        },
+        {
+          "name": "City center"
+        },
+        {
+          "name": "Barbarian encampment"
+        }
+      ]
+    }
+  },
+  "distinct_unit_names": 127
+}

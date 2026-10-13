@@ -4,6 +4,7 @@ import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.unciv.Constants
 import com.unciv.logic.city.CityFocus
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.widgets.ExpanderTab
 import com.unciv.ui.components.extensions.toLabel
 import com.unciv.ui.components.input.KeyboardBinding
@@ -12,23 +13,25 @@ import com.unciv.ui.screens.basescreen.BaseScreen
 
 class CitizenManagementTable(val cityScreen: CityScreen) : Table(BaseScreen.skin) {
     private val cityView = cityScreen.cityView
-    private val numCol = 4
+    private val numCol = if (GameUiStyle.isAtlas) 2 else 4
 
     fun update() {
         clear()
 
-        val colorSelected = BaseScreen.skin.getColor("selection")
-        val colorButton = BaseScreen.skin.getColor("color")
+        val colorSelected = if (GameUiStyle.isAtlas) GameUiStyle.raised else BaseScreen.skin.getColor("selection")
+        val colorButton = if (GameUiStyle.isAtlas) GameUiStyle.inset else BaseScreen.skin.getColor("color")
 
         val topTable = Table() // holds 2 buttons
         // effectively a button, but didn't want to rewrite TextButton style
         // and much more compact and can control backgrounds easily based on settings
         val resetLabel = "Reset Citizens".toLabel()
         val resetCell = Table()
-        resetCell.add(resetLabel).pad(5f)
+        resetLabel.wrap = GameUiStyle.isAtlas
+        resetCell.add(resetLabel).minWidth(0f).growX().pad(5f)
         if (cityScreen.canCityBeChanged()) {
             resetCell.touchable = Touchable.enabled
             resetCell.onActivation(binding = KeyboardBinding.ResetCitizens) {
+                if (!cityScreen.canCityBeChanged()) return@onActivation
                 cityView.tryReassignPopulation(resetLocked = true)
                 cityScreen.updateAsync()
             }
@@ -37,14 +40,16 @@ class CitizenManagementTable(val cityScreen: CityScreen) : Table(BaseScreen.skin
             "CityScreen/CitizenManagementTable/ResetCell",
             tintColor = colorButton
         )
-        topTable.add(resetCell).pad(3f)
+        topTable.add(resetCell).minHeight(40f).growX().pad(3f)
 
         val avoidLabel = "Avoid Growth".toLabel()
         val avoidCell = Table()
-        avoidCell.add(avoidLabel).pad(5f)
+        avoidLabel.wrap = GameUiStyle.isAtlas
+        avoidCell.add(avoidLabel).minWidth(0f).growX().pad(5f)
         if (cityScreen.canCityBeChanged()) {
             avoidCell.touchable = Touchable.enabled
             avoidCell.onActivation(binding = KeyboardBinding.AvoidGrowth) {
+                if (!cityScreen.canCityBeChanged()) return@onActivation
                 cityView.tryToggleAvoidGrowth()
                 cityScreen.updateAsync()
             }
@@ -53,7 +58,7 @@ class CitizenManagementTable(val cityScreen: CityScreen) : Table(BaseScreen.skin
             "CityScreen/CitizenManagementTable/AvoidCell",
             tintColor = if (cityView.avoidGrowth) colorSelected else colorButton
         )
-        topTable.add(avoidCell).pad(3f)
+        topTable.add(avoidCell).minHeight(40f).growX().pad(3f)
         add(topTable).colspan(numCol).growX()
         row()
 
@@ -70,13 +75,15 @@ class CitizenManagementTable(val cityScreen: CityScreen) : Table(BaseScreen.skin
             if (focus == CityFocus.FaithFocus && !cityView.viewingCiv().isReligionEnabled()) continue
             val label = focus.label.toLabel()
             val cell = Table()
-            cell.add(label).pad(5f)
+            label.wrap = GameUiStyle.isAtlas
+            cell.add(label).minWidth(0f).growX().pad(5f)
             if (cityScreen.canCityBeChanged()) {
                 cell.touchable = Touchable.enabled
                 // Note the binding here only works when visible, so the main one is on CityStatsTable.miniStatsTable
                 // If we bind both, both are executed - so only add the one here that re-applies the current focus
                 val binding = if (cityView.getCityFocus() == focus) focus.binding else KeyboardBinding.None
                 cell.onActivation(binding = binding) {
+                    if (!cityScreen.canCityBeChanged()) return@onActivation
                     cityView.trySetCityFocus(focus)
                     cityScreen.updateAsync()
                 }
@@ -103,6 +110,11 @@ class CitizenManagementTable(val cityScreen: CityScreen) : Table(BaseScreen.skin
             }
         }
 
+        if (GameUiStyle.isAtlas) {
+            GameUiStyle.applyWidget(this)
+            for (table in listOf(topTable, defaultTable))
+                for (entry in table.cells) entry.minWidth(0f).uniformX().growX()
+        }
         pack()
     }
 
@@ -111,11 +123,11 @@ class CitizenManagementTable(val cityScreen: CityScreen) : Table(BaseScreen.skin
             title = "{Citizen Management}",
             fontSize = Constants.defaultFontSize,
             persistenceID = "CityStatsTable.CitizenManagement",
-            startsOutOpened = false,
+            startsOutOpened = GameUiStyle.isAtlas,
             toggleKey = KeyboardBinding.CitizenManagement,
             onChange = onChange
         ) {
-            it.add(this)
+            it.add(this).apply { if (GameUiStyle.isAtlas) width(cityScreen.atlasContentWidth - 24f) }.growX()
             update()
         }
     }

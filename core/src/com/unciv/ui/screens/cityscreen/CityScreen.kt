@@ -16,6 +16,7 @@ import com.unciv.models.stats.Stat
 import com.unciv.models.translations.tr
 import com.unciv.ui.audio.CityAmbiencePlayer
 import com.unciv.ui.audio.SoundPlayer
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.ParticleEffectMapFireworks
 import com.unciv.ui.components.extensions.colorFromRGB
 import com.unciv.ui.components.extensions.disable
@@ -55,7 +56,8 @@ class CityScreen(
      *  to avoid premature stops or rewinds. Only the fresh CityScreen from WorldScreen or Overview
      *  will instantiate a new CityAmbiencePlayer and start playing. */
     ambiencePlayer: CityAmbiencePlayer? = null,
-    playCelebrationSound: Boolean = true
+    playCelebrationSound: Boolean = true,
+    internal val displayState: CityScreenState = CityScreenState()
 ): BaseScreen(), RecreateOnResize, AgentSnapshotScreen {
     override val snapshotGameInfo = cityView.getCity().civ.gameInfo
     override val snapshotViewerCivId = game.worldScreen?.takeIf { it.gameInfo.gameId == snapshotGameInfo.gameId }?.currentViewerCivId() ?: cityView.gameView.civView.civID
@@ -63,26 +65,39 @@ class CityScreen(
     override fun show() = refreshAgentSnapshot()
 
     override fun recreateForSnapshot(worldScreen: WorldScreen): BaseScreen? {
-        val city = worldScreen.gameInfo.getCities().firstOrNull { it.id == cityView.getCity().id } ?: return null
+        val city = worldScreen.gameInfo.getCities().firstOrNull { it.id == cityId } ?: return null
+        val sameOwner = city.civ.civID == cityView.getCity().civ.civID
+        rememberDisplayState()
         val view = GameView(worldScreen.gameInfo, worldScreen.viewingCiv, worldScreen.viewingCiv.isSpectator())
             .getForeignCityView(city).tryGetCityView() ?: return null
-        val tile = selectedTile?.position()?.let { pos ->
+        val tile = selectedTile?.takeIf { sameOwner }?.position()?.let { pos ->
             worldScreen.gameInfo.tileMap.values.firstOrNull { it.position == pos }?.let { view.tileView(it) }
         }
-        val construction = selectedConstruction?.name?.let { name ->
-            view.constructions.getConstruction(name)
+        val construction = selectedConstruction?.takeIf { sameOwner }?.name?.let { name ->
+            view.getRuleset().buildings[name] ?: view.getRuleset().units[name]
+                ?: com.unciv.models.ruleset.PerpetualConstruction.perpetualConstructionsMap[name]
         }
-        return CityScreen(view, construction, tile, passOnCityAmbiencePlayer(), playCelebrationSound = false).also { fresh ->
+        return CityScreen(view, construction, tile, passOnCityAmbiencePlayer(), playCelebrationSound = false,
+            displayState = if (sameOwner) displayState.copy() else CityScreenState()).also { fresh ->
             val queuedName = cityView.constructions.constructionQueue.getOrNull(selectedQueueEntry)
             val queue = view.constructions.constructionQueue
             fresh.selectedQueueEntry = when {
-                queuedName == null -> -1
+                !sameOwner || queuedName == null -> -1
                 queue.getOrNull(selectedQueueEntry) == queuedName -> selectedQueueEntry
                 queue.count { it == queuedName } == 1 -> queue.indexOf(queuedName)
                 else -> -1
             }
-            fresh.pickTileData = pickTileData
+            // Pending placement is resolved against the new ruleset and authority, never copied blindly.
+            fresh.pickTileData = pickTileData?.takeIf { sameOwner && fresh.canCityBeChanged() }?.let { pending ->
+                val building = view.getRuleset().buildings[pending.building.name] ?: return@let null
+                val improvement = view.getImprovementToCreate(building) ?: return@let null
+                PickTileForImprovementData(building, improvement, pending.isBuying, pending.buyStat)
+            }
             fresh.updateSync()
+            fresh.mapScrollPane.zoom(mapScrollPane.scaleX)
+            fresh.mapScrollPane.scrollPercentX = mapScrollPane.scrollPercentX
+            fresh.mapScrollPane.scrollPercentY = mapScrollPane.scrollPercentY
+            fresh.mapScrollPane.updateVisualScroll()
         }
     }
 
@@ -94,6 +109,8 @@ class CityScreen(
         const val wltkIconSize = 40f
     }
 
+    private var atlasLayout: AtlasCityLayout? = null
+
     private val viewingCiv: CivView = cityView.gameView.civView
 
     internal val isSpying = cityView.isEspionageEnabled() && !cityView.isOwnedByViewer() && !viewingCiv.isSpectator()
@@ -104,7 +121,18 @@ class CityScreen(
     val viewableCities: List<CityView> = cityView.getViewableCities()
 
     /** Toggles or adds/removes all state changing buttons */
-    val canChangeState = GUI.isAllowedChangeState() && !isSpying
+    val cityId = cityView.getCity().id
+    val selectionKey: String? get() = selectedConstruction?.name
+    internal val atlasRegions get() = CityScreenLayout.calculate(stage.width, stage.height, game.settings.fontSizeMultiplier)
+    internal val atlasContentWidth get() = atlasRegions.details.width - 24f
+    internal fun hasCurrentCity(): Boolean {
+        val world = game.worldScreen ?: return true
+        if (world.agentSession == null) return true
+        return world.gameInfo === snapshotGameInfo &&
+            world.gameInfo.getCities().any { it === cityView.getCity() }
+    }
+    val canChangeState get() = GUI.isAllowedChangeState() && !isSpying &&
+        !viewingCiv.isSpectator() && hasCurrentCity()
 
     // Clockwise from the top-left
 
@@ -112,25 +140,25 @@ class CityScreen(
      *  Not a widget, but manages two: construction queue + buy buttons
      *  in a Table holder on TOP LEFT, and available constructions in a ScrollPane BOTTOM LEFT.
      */
-    private var constructionsTable = CityConstructionsTable(this)
+    internal var constructionsTable = CityConstructionsTable(this)
 
     /** Displays raze city button - sits on TOP CENTER */
-    private var razeCityButtonHolder = Table()
+    internal var razeCityButtonHolder = Table()
 
     /** Displays city stats, population management, religion, built buildings info - TOP RIGHT */
-    private var cityStatsTable = CityStatsTable(this)
+    internal var cityStatsTable = CityStatsTable(this)
 
     /** Displays tile info, alternate with selectedConstructionTable - sits on BOTTOM RIGHT */
-    private var tileTable = CityScreenTileTable(this)
+    internal var tileTable = CityScreenTileTable(this)
 
     /** Displays selected construction info, alternate with tileTable - sits on BOTTOM RIGHT */
-    private var selectedConstructionTable = ConstructionInfoTable(this)
+    internal var selectedConstructionTable = ConstructionInfoTable(this)
 
     /** Displays city name, allows switching between cities - sits on BOTTOM CENTER */
-    private var cityPickerTable = CityScreenCityPickerTable(this)
+    internal var cityPickerTable = CityScreenCityPickerTable(this)
 
     /** Button for exiting the city - sits on BOTTOM CENTER */
-    private val exitCityButton = "Exit city".toTextButton().apply {
+    internal val exitCityButton = "Exit city".toTextButton().apply {
         labelCell.pad(10f)
         keyShortcuts.add(KeyCharAndCode.BACK)
         onActivation {
@@ -143,7 +171,7 @@ class CityScreen(
     private var tileGroups = ArrayList<CityTileGroup>()
 
     /** The ScrollPane for the background map view of the city surroundings */
-    private val mapScrollPane = CityMapHolder()
+    internal val mapScrollPane = CityMapHolder()
 
     /** Support for [UniqueType.CreatesOneImprovement] - need user to pick a tile */
     class PickTileForImprovementData (
@@ -194,13 +222,15 @@ class CityScreen(
         stage.addActor(cityPickerTable)  // add late so it's top in Z-order and doesn't get covered in cramped portrait
         stage.addActor(exitCityButton)
 
+        if (GameUiStyle.isAtlas) atlasLayout = AtlasCityLayout(this)
+
         cityView.updateCityStats()
         updateSync() // NOT async since that gives a "visual flash" when entering the city
 
         globalShortcuts.add(KeyboardBinding.PreviousCity) { page(-1) }
         globalShortcuts.add(KeyboardBinding.NextCity) { page(1) }
 
-        if (isPortrait()) mapScrollPane.apply {
+        if (!GameUiStyle.isAtlas && isPortrait()) mapScrollPane.apply {
             // center scrolling so city center sits more to the bottom right
             scrollX = (maxX - constructionsTable.getLowerWidth() - posFromEdge) / 2
             scrollY = (maxY - cityStatsTable.packIfNeeded().height - posFromEdge + cityPickerTable.top) / 2
@@ -235,6 +265,15 @@ class CityScreen(
     }
 
     internal fun updateWithoutConstructionAndMap() {
+        if (GameUiStyle.isAtlas) {
+            tileTable.update(selectedTile)
+            selectedConstructionTable.update(selectedConstruction)
+            cityPickerTable.update()
+            cityStatsTable.update(atlasRegions.details.height)
+            updateAnnexAndRazeCityButton()
+            atlasLayout?.update()
+            return
+        }
         // Bottom right: Tile or selected construction info
         tileTable.update(selectedTile)
         tileTable.setPosition(stage.width - posFromEdge, posFromEdge, Align.bottomRight)
@@ -335,7 +374,7 @@ class CityScreen(
         fun addWltkIcon(name: String, apply: Image.()->Unit = {}) =
             razeCityButtonHolder.add(ImageGetter.getImage(name).apply(apply)).size(wltkIconSize)
 
-        if (isWLTKday && fireworks == null) {
+        if (!GameUiStyle.isAtlas && isWLTKday && fireworks == null) {
             addWltkIcon("OtherIcons/WLTK LR") { color = Color.GOLD }
             addWltkIcon("OtherIcons/WLTK 1") { color = Color.FIREBRICK }.padRight(10f)
         }
@@ -345,6 +384,7 @@ class CityScreen(
             val annexCityButton = "Annex city".toTextButton()
             annexCityButton.labelCell.pad(10f)
             annexCityButton.onClick {
+                if (!canChangeState) return@onClick
                 cityView.tryAnnexCity()
                 updateAsync()
             }
@@ -353,7 +393,7 @@ class CityScreen(
         } else if (!cityView.isBeingRazed()) {
             val razeCityButton = "Raze city".toTextButton()
             razeCityButton.labelCell.pad(10f)
-            razeCityButton.onClick { cityView.trySetRazing(true); updateAsync() }
+            razeCityButton.onClick { if (canChangeState) { cityView.trySetRazing(true); updateAsync() } }
             if (!canChangeState || !cityView.canBeDestroyed() || !canAnnex) {
                 razeCityButton.disable()
             }
@@ -362,12 +402,12 @@ class CityScreen(
         } else {
             val stopRazingCityButton = "Stop razing city".toTextButton()
             stopRazingCityButton.labelCell.pad(10f)
-            stopRazingCityButton.onClick { cityView.trySetRazing(false); updateAsync() }
+            stopRazingCityButton.onClick { if (canChangeState) { cityView.trySetRazing(false); updateAsync() } }
             if (!canChangeState) stopRazingCityButton.disable()
             razeCityButtonHolder.add(stopRazingCityButton) //.colspan(cityPickerTable.columns)
         }
 
-        if (isWLTKday && fireworks == null) {
+        if (!GameUiStyle.isAtlas && isWLTKday && fireworks == null) {
             addWltkIcon("OtherIcons/WLTK 2") { color = Color.FIREBRICK }.padLeft(10f)
             addWltkIcon("OtherIcons/WLTK LR") {
                 color = Color.GOLD
@@ -377,6 +417,7 @@ class CityScreen(
         }
 
         razeCityButtonHolder.pack()
+        if (GameUiStyle.isAtlas) return
         if(isCrampedPortrait()) {
             // cramped portrait: move raze button down to city picker
             val centerX = cityPickerTable.x + cityPickerTable.width / 2 - razeCityButtonHolder.width / 2
@@ -479,6 +520,7 @@ class CityScreen(
             true,
             restoreDefault = { updateAsync() }
         ) {
+            if (!canChangeState) return@ConfirmPopup
             Concurrency.run {
                 val success = cityView.tryBuyTile(selectedTile)
                 if (!success){
@@ -517,6 +559,10 @@ class CityScreen(
 
         /** [UniqueType.CreatesOneImprovement] support - select tile for improvement */
         if (pickTileData != null) {
+            if (!canCityBeChanged()) {
+                stopPickTileForCreatesOneImprovement()
+                return
+            }
             val pickTileData = this.pickTileData!!
             this.pickTileData = null
             val improvement = pickTileData.improvement
@@ -557,19 +603,24 @@ class CityScreen(
             pickTileData = null
         }
         selectedTile = null
+        displayState.showSelection = true
     }
     private fun selectTile(newTile: TileView?) {
         selectedConstruction = null
         selectedQueueEntryTargetTile = null
         pickTileData = null
         selectedTile = newTile
+        displayState.showSelection = newTile != null
     }
     fun clearSelection() = selectTile(null)
 
     fun startPickTileForCreatesOneImprovement(construction: Building, stat: Stat, isBuying: Boolean) {
+        if (!canCityBeChanged()) return
         val improvement = cityView.getImprovementToCreate(construction) ?: return
+        displayState.page = 0
         pickTileData = PickTileForImprovementData(construction, improvement, isBuying, stat)
         updateTileGroups()
+        atlasLayout?.update()
         ToastPopup("Please select a tile for this building's [${improvement.name}]", this)
     }
     fun stopPickTileForCreatesOneImprovement() {
@@ -610,7 +661,19 @@ class CityScreen(
 
     // Don't use passOnCityAmbiencePlayer here - continuing play on the replacement screen would be nice,
     // but the rapid firing of several resize events will get that un-synced, they would no longer stop on leaving.
-    override fun recreate(): BaseScreen = CityScreen(cityView, selectedConstruction, selectedTile)
+    internal fun rememberDisplayState() {
+        constructionsTable.rememberDisplayState()
+        cityStatsTable.rememberDisplayState()
+        atlasLayout?.rememberDisplayState()
+    }
+
+    override fun recreate(): BaseScreen {
+        rememberDisplayState()
+        return CityScreen(cityView, selectedConstruction, selectedTile, displayState = displayState.copy()).also {
+            it.selectedQueueEntry = selectedQueueEntry
+            it.updateSync()
+        }
+    }
 
     override fun dispose() {
         cityAmbiencePlayer?.dispose()

@@ -112,6 +112,6 @@ internal class WorldScreenTopBarResources(private val topbar: WorldScreenTopBar)
             resourcesWrapper.add(label).padTop(resourceAmountDescentTweak)  // digits don't have descenders, so push them down a little
         }
 
-        scaleTo(worldScreen.stage.width)
+        if (!com.unciv.ui.components.GameUiStyle.isAtlas) scaleTo(worldScreen.stage.width)
     }
 }

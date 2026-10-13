@@ -13,6 +13,8 @@ import com.unciv.logic.map.mapgenerator.MapGenerator
 import com.unciv.models.ruleset.Ruleset
 import com.unciv.models.ruleset.RulesetCache
 import com.unciv.models.translations.tr
+import com.unciv.ui.components.AtlasWidgets
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.widgets.TabbedPager
 import com.unciv.ui.components.extensions.disable
 import com.unciv.ui.components.extensions.enable
@@ -36,7 +38,11 @@ import com.unciv.utils.Log
 class MapEditorGenerateTab(
     private val editorScreen: MapEditorScreen,
     headerHeight: Float
-): TabbedPager(capacity = 2, maximumHeight = headerHeight) {
+): TabbedPager(capacity = 2,
+    maximumWidth = editorScreen.getToolsWidth(),
+    maximumHeight = if (GameUiStyle.isAtlas) editorScreen.getToolsHeight() - 2 * headerHeight else headerHeight,
+    headerFontColor = if (GameUiStyle.isAtlas) GameUiStyle.ink else com.badlogic.gdx.graphics.Color.WHITE,
+    highlightColor = if (GameUiStyle.isAtlas) GameUiStyle.accent else com.badlogic.gdx.graphics.Color.BLUE) {
     private val newTab = MapEditorNewMapTab(this)
     private val partialTab = MapEditorGenerateStepsTab(this)
 
@@ -167,9 +173,11 @@ class MapEditorGenerateTab(
         init {
             top()
             pad(10f)
-            add("Map Options".toLabel(fontSize = 24)).row()
-            add(mapParametersTable).row()
-            add(generateButton).padTop(15f).row()
+            if (GameUiStyle.isAtlas) defaults().growX().minWidth(0f).width(parent.editorScreen.getToolsWidth() - 32f)
+            add(AtlasWidgets.header("Map Options")).row()
+            add(mapParametersTable).growX().row()
+            add(generateButton).growX().minHeight(GameUiStyle.standardControlHeight).padTop(15f).row()
+            if (GameUiStyle.isAtlas) GameUiStyle.apply(generateButton, primary = true)
             generateButton.onClick { parent.generate(MapGeneratorSteps.All) }
             mapParametersTable.resourceSelectBox.onChange {
                 parent.editorScreen.run {
@@ -194,7 +202,8 @@ class MapEditorGenerateTab(
             top()
             pad(10f)
             defaults().pad(2.5f)
-            add("Generator steps".toLabel(fontSize = 24)).row()
+            if (GameUiStyle.isAtlas) defaults().growX().minWidth(0f).width(parent.editorScreen.getToolsWidth() - 32f)
+            add(AtlasWidgets.header("Generator steps")).row()
             optionGroup.setMinCheckCount(0)
             for (option in MapGeneratorSteps.entries) {
                 if (option <= MapGeneratorSteps.All) continue
@@ -202,10 +211,12 @@ class MapEditorGenerateTab(
                         choice = option
                         generateButton.enable()
                     }
+                if (GameUiStyle.isAtlas) { checkBox.label.wrap = true; checkBox.labelCell.growX().minWidth(0f) }
                 add(checkBox).row()
                 optionGroup.add(checkBox)
             }
-            add(generateButton).padTop(15f).row()
+            add(generateButton).growX().minHeight(GameUiStyle.standardControlHeight).padTop(15f).row()
+            if (GameUiStyle.isAtlas) GameUiStyle.apply(generateButton, primary = true)
             generateButton.onClick {
                 parent.generate(choice)
                 choice.copyParameters?.invoke(newMapParameters, actualMapParameters)

@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import com.unciv.logic.files.UncivFiles
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.input.keyShortcuts
 import com.unciv.ui.components.input.onClick
 import com.unciv.ui.components.input.onDoubleClick
@@ -84,6 +85,11 @@ open class VerticalFileListScrollPane(
                 buttonIndex.ensureCapacity(saves.size)
                 for ((index, saveGameFile) in saves.withIndex()) {
                     val button = FileHandleButton(saveGameFile, index)
+                    if (GameUiStyle.isAtlas) {
+                        GameUiStyle.apply(button)
+                        button.label.wrap = true
+                        button.labelCell.minWidth(0f).growX()
+                    }
                     buttonIndex.add(button)
                     button.onClick {
                         selectExistingSave(index)
@@ -93,7 +99,10 @@ open class VerticalFileListScrollPane(
                         onDoubleClickListener?.invoke(saveGameFile)
                     }
                     beforeRowCallback?.invoke(saveGameFile)
-                    existingSavesTable.add(button).pad(5f).row()
+                    if (GameUiStyle.isAtlas)
+                        existingSavesTable.add(button).minWidth(0f).growX()
+                            .minHeight(GameUiStyle.standardControlHeight).pad(4f).row()
+                    else existingSavesTable.add(button).pad(5f).row()
                 }
             }
         }
@@ -103,8 +112,13 @@ open class VerticalFileListScrollPane(
     private fun selectExistingSave(button: FileHandleButton) = selectExistingSave(button.index, button)
     private fun selectExistingSave(index: Int, button: FileHandleButton) {
         selectedIndex = index
-        selectedButton?.color = Color.WHITE
-        button.color = Color.GREEN
+        if (GameUiStyle.isAtlas) {
+            selectedButton?.isChecked = false
+            button.isChecked = true
+        } else {
+            selectedButton?.color = Color.WHITE
+            button.color = Color.GREEN
+        }
         selectedButton = button
 
         onChangeListener?.invoke(button.file)

@@ -34,6 +34,8 @@ import com.unciv.ui.screens.civilopediascreen.FormattedLine
 import com.unciv.ui.screens.civilopediascreen.FormattedLine.IconDisplay
 import com.unciv.ui.screens.civilopediascreen.MarkupRenderer
 import com.unciv.ui.screens.mapeditorscreen.MapEditorScreen
+import com.unciv.ui.components.AtlasWidgets
+import com.unciv.ui.components.GameUiStyle
 
 class MapEditorViewTab(
     private val editorScreen: MapEditorScreen
@@ -51,6 +53,7 @@ class MapEditorViewTab(
         // Note on width: max expander content width + 2 * expander.defaultPad + 2 * the following horizontal pad
         // should not exceed editorScreen.getToolsWidth() or the page will scroll horizontally!
         defaults().pad(5f, 20f)
+        if (GameUiStyle.isAtlas) defaults().growX().minWidth(0f).width(labelWidth)
         update()
     }
 
@@ -105,7 +108,8 @@ class MapEditorViewTab(
         val statsLabel = WrappableLabel(statsText, labelWidth)
         add(statsLabel.apply { wrap = true }).row()
 
-        add(editorScreen.descriptionTextField).growX().row()
+        add(if (GameUiStyle.isAtlas) AtlasWidgets.field("Description", editorScreen.descriptionTextField)
+            else editorScreen.descriptionTextField).growX().row()
 
         // Map editor must not touch tileMap.naturalWonders as it is a by lazy immutable list,
         // and we wouldn't be able to fix it when the natural wonders change
@@ -157,7 +161,7 @@ class MapEditorViewTab(
         row()
 
         addSeparator()
-        add("Exit map editor".toTextButton().apply { onClick(editorScreen::closeEditor) }).row()
+        if (!GameUiStyle.isAtlas) add("Exit map editor".toTextButton().apply { onClick(editorScreen::closeEditor) }).row()
 
         invalidateHierarchy()  //todo - unsure this helps
         validate()

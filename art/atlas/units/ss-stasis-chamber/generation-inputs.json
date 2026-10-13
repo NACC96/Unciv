@@ -1,0 +1,24 @@
+{
+  "facings": {
+    "E": {
+      "rawFile": "e-motion-v2.png",
+      "promptPath": "art/atlas/units/ss-stasis-chamber/prompts/e-v2.txt"
+    },
+    "NE": {
+      "rawFile": "ne-motion-v2.png",
+      "promptPath": "art/atlas/units/ss-stasis-chamber/prompts/ne-v2.txt",
+      "identityReference": {
+        "path": "/Users/noahkenny/.codex/generated_images/01a1321a-8142-7533-ae7a-eb89a5433c70/exec-d5d1f715-559b-4b8c-859e-770f677ba151.png",
+        "sha256": "5985eba281cfef49ffd53d6f92e2a872fe871b8eae7321d934a58f096ee18d61"
+      }
+    },
+    "SE": {
+      "rawFile": "se-motion-v2.png",
+      "promptPath": "art/atlas/units/ss-stasis-chamber/prompts/se-v2.txt",
+      "identityReference": {
+        "path": "/Users/noahkenny/.codex/generated_images/01a1321a-8142-7533-ae7a-eb89a5433c70/exec-d5d1f715-559b-4b8c-859e-770f677ba151.png",
+        "sha256": "5985eba281cfef49ffd53d6f92e2a872fe871b8eae7321d934a58f096ee18d61"
+      }
+    }
+  }
+}

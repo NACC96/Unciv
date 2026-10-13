@@ -1,0 +1,103 @@
+{
+  "schemaVersion": 1,
+  "unitName": "Nuclear Missile",
+  "assetId": "nuclear-missile",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": null,
+  "uniqueTo": null,
+  "replaces": null,
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Nuclear Missile",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/nuclear-missile/e-motion-v2.png",
+      "rawHash": "eee9d9d4124b7bb611e18df98594233ac747f3849cc78c0f811b22f162ec6eb3",
+      "promptPath": "art/atlas/units/nuclear-missile/prompts/e-v2.txt",
+      "promptHash": "75dfa8bb57f992b9e419bd4c011dbb4075048a1072b340e50b0d5124063f321e",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/nuclear-missile/ne-motion-v2.png",
+      "rawHash": "a041b4d953b64f1d878bb2a88b0403dbb0332f648aa977b04896a2585ba87b5f",
+      "promptPath": "art/atlas/units/nuclear-missile/prompts/ne-v2.txt",
+      "promptHash": "0728cb9117ecf5bb5c66bc676982d50d7a24173440923895a6a20b9483ff8f6e",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ],
+      "identityReference": {
+        "path": "/Users/noahkenny/.codex/generated_images/01a1321a-8142-7533-ae7a-eb89a5433c70/exec-002c2471-1115-4644-aee6-8c162962f294.png",
+        "sha256": "eee9d9d4124b7bb611e18df98594233ac747f3849cc78c0f811b22f162ec6eb3"
+      }
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/nuclear-missile/se-motion-v2.png",
+      "rawHash": "53dc754c631e7bab0462377ca7bd26b303f07fe4ff0643f0adfb244b7eebab72",
+      "promptPath": "art/atlas/units/nuclear-missile/prompts/se-v2.txt",
+      "promptHash": "527bba50c0b7ea95b1561e8da538c55b13552c41196edf2989b19adda30afa4e",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ],
+      "identityReference": {
+        "path": "/Users/noahkenny/.codex/generated_images/01a1321a-8142-7533-ae7a-eb89a5433c70/exec-002c2471-1115-4644-aee6-8c162962f294.png",
+        "sha256": "eee9d9d4124b7bb611e18df98594233ac747f3849cc78c0f811b22f162ec6eb3"
+      }
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
+}

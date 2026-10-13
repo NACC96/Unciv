@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "facings": {
+    "E": {
+      "rawFile": "e-motion-v1.png",
+      "promptPath": "art/atlas/units/artillery/prompts/e-v1.txt"
+    },
+    "NE": {
+      "rawFile": "ne-motion-v2.png",
+      "promptPath": "art/atlas/units/artillery/prompts/ne-v2.txt"
+    },
+    "SE": {
+      "rawFile": "se-motion-v2.png",
+      "promptPath": "art/atlas/units/artillery/prompts/se-v2.txt"
+    }
+  }
+}

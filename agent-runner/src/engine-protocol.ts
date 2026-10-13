@@ -9,8 +9,9 @@
  *   streams; those stay on piped grandchild stdio).
  * - Supervisor STDIN: engine responses + desktop controls.
  * - Supervisor STDERR: human-readable logs only, never parsed.
- * - EOF on stdin: graceful shutdown — drain children/logs, reject new game
- *   calls, exit naturally after owned children finish (plan §9).
+ * - EOF on stdin: the engine is gone — reject game calls and cancel the active
+ *   provider process group, then drain logs and exit. A shutdown control from a
+ *   live engine instead drains the admitted turn naturally before exiting.
  */
 export const ENGINE_PROTOCOL_VERSION = 1;
 
@@ -92,7 +93,22 @@ export interface ShutdownControl {
   op: "shutdown";
 }
 
-export type InboundFrame = EngineResponseFrame | RunTurnControl | ShutdownControl;
+/**
+ * Host takeover: cut off the in-flight run NOW (provider killed, or never
+ * spawned) and report run_failed with status "cancelled". A runId that is not
+ * the active run is ignored silently, so a stale cancel never reaches a later run.
+ */
+export interface CancelRunControl {
+  protocol: 1;
+  kind: "control";
+  op: "cancel_run";
+  runId: string;
+}
+
+/** Outcome detail of a host-cancelled run; the desktop maps payload.status, not this text. */
+export const CANCELLED_DETAIL = "cancelled by host";
+
+export type InboundFrame = EngineResponseFrame | RunTurnControl | ShutdownControl | CancelRunControl;
 
 export function parseInbound(line: string): InboundFrame | null {
   const trimmed = line.trim();
@@ -112,6 +128,9 @@ export function parseInbound(line: string): InboundFrame | null {
   }
   if (parsed["kind"] === "control" && parsed["op"] === "shutdown") {
     return parsed as unknown as ShutdownControl;
+  }
+  if (parsed["kind"] === "control" && parsed["op"] === "cancel_run" && typeof parsed["runId"] === "string") {
+    return parsed as unknown as CancelRunControl;
   }
   return null;
 }

@@ -13,6 +13,8 @@ import com.unciv.logic.files.MapSaver
 import com.unciv.logic.map.MapShape
 import com.unciv.logic.map.MapSize
 import com.unciv.models.translations.tr
+import com.unciv.ui.components.AtlasWidgets
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.extensions.addSeparator
 import com.unciv.ui.components.extensions.isEnabled
 import com.unciv.ui.components.extensions.toCheckBox
@@ -33,7 +35,7 @@ import com.unciv.utils.Log
 class MapEditorOptionsTab(
     private val editorScreen: MapEditorScreen
 ): Table(BaseScreen.skin), TabbedPager.IPageExtensions {
-    private val seedLabel = "".toLabel(Color.GOLD)
+    private val seedLabel = "".toLabel(if (GameUiStyle.isAtlas) GameUiStyle.accent else Color.GOLD).apply { wrap = true }
     private val copySeedButton = "Copy to clipboard".toTextButton()
     private val tileMatchGroup = ButtonGroup<CheckBox>()
     private val copyMapButton = "Copy to clipboard".toTextButton()
@@ -56,11 +58,16 @@ class MapEditorOptionsTab(
     init {
         top()
         defaults().pad(10f)
+        if (GameUiStyle.isAtlas) {
+            pad(8f)
+            defaults().growX().minWidth(0f).width(editorScreen.getToolsWidth() - 36f).pad(4f)
+        }
 
-        add("Tile Matching Criteria".toLabel(Color.GOLD)).row()
+        add("Tile Matching Criteria".toLabel(if (GameUiStyle.isAtlas) GameUiStyle.accent else Color.GOLD).apply { wrap = true }).row()
         for (option in TileMatchFuzziness.entries) {
             val check = option.label.toCheckBox(option == tileMatchFuzziness)
             { tileMatchFuzziness = option }
+            if (GameUiStyle.isAtlas) { check.label.wrap = true; check.labelCell.growX().minWidth(0f) }
             add(check).row()
             tileMatchGroup.add(check)
         }
@@ -73,14 +80,15 @@ class MapEditorOptionsTab(
         }
         addSeparator(Color.GRAY)
 
-        add("Map copy and paste".toLabel(Color.GOLD)).row()
+        add("Map copy and paste".toLabel(if (GameUiStyle.isAtlas) GameUiStyle.accent else Color.GOLD)).row()
         copyMapButton.onActivation { copyHandler() }
         copyMapButton.keyShortcuts.add(KeyCharAndCode.ctrl('c'))
         pasteMapButton.onActivation { pasteHandler() }
         pasteMapButton.keyShortcuts.add(KeyCharAndCode.ctrl('v'))
         add(Table().apply {
-            add(copyMapButton).padRight(15f)
-            add(pasteMapButton)
+            add(copyMapButton).growX().minWidth(0f).padRight(if (GameUiStyle.isAtlas) 0f else 15f)
+            if (GameUiStyle.isAtlas) row()
+            add(pasteMapButton).growX().minWidth(0f).padTop(if (GameUiStyle.isAtlas) 4f else 0f)
         }).row()
 
         add("Import a Wesnoth map".toTextButton().onActivation {
@@ -94,7 +102,7 @@ class MapEditorOptionsTab(
         add(worldWrapCheckBox).growX().row()
         addSeparator(Color.GRAY)
 
-        add("Overlay image".toLabel(Color.GOLD)).row()
+        add("Overlay image".toLabel(if (GameUiStyle.isAtlas) GameUiStyle.accent else Color.GOLD)).row()
         overlayFileButton.style = TextButton.TextButtonStyle(overlayFileButton.style)
         showOverlayFileName()
         overlayFileButton.onClick {
@@ -113,11 +121,16 @@ class MapEditorOptionsTab(
             }.open()
         }
         add(overlayFileButton).fillX().row()
+        if (GameUiStyle.isAtlas) {
+            overlayFileButton.label.wrap = true
+            worldWrapCheckBox.label.wrap = true
+            worldWrapCheckBox.labelCell.minWidth(0f).growX()
+        }
 
         overlayAlphaSlider = UncivSlider(0f, 1f, 0.05f, initial = editorScreen.overlayAlpha) {
             editorScreen.overlayAlpha = it
         }
-        add(Table().apply {
+        add(if (GameUiStyle.isAtlas) AtlasWidgets.field("Overlay opacity:", overlayAlphaSlider) else Table().apply {
             add("Overlay opacity:".toLabel(alignment = Align.left)).left()
             add(overlayAlphaSlider).right()
         }).row()
@@ -141,7 +154,7 @@ class MapEditorOptionsTab(
     private fun showOverlayFileName() = overlayFileButton.run {
         if (editorScreen.overlayFile == null) {
             setText("Click to choose a file".tr())
-            style.fontColor.a = 0.5f
+            style.fontColor = if (GameUiStyle.isAtlas) GameUiStyle.muted else style.fontColor.cpy().apply { a = .5f }
         } else {
             setText(editorScreen.overlayFile!!.path())
             style.fontColor.a = 1f

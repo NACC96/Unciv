@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.Align
 import com.unciv.Constants
 import com.unciv.logic.civilization.Civilization
 import com.unciv.models.translations.tr
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.extensions.setSize
 import com.unciv.ui.components.extensions.toLabel
 import com.unciv.ui.images.ImageGetter
@@ -68,11 +69,16 @@ internal class VictoryScreenCivGroup(
         val backgroundColor = civInfo.second
         val labelColor = civInfo.third
 
-        background = BaseScreen.skinStrings.getUiBackground("VictoryScreen/CivGroup", BaseScreen.skinStrings.roundedEdgeRectangleShape, backgroundColor)
-        val label = labelText.toLabel(labelColor, hideIcons = true)
+        background = if (GameUiStyle.isAtlas)
+            GameUiStyle.outlinedBackground("Atlas/Victory/Nation", GameUiStyle.raised, GameUiStyle.hover)
+        else BaseScreen.skinStrings.getUiBackground("VictoryScreen/CivGroup", BaseScreen.skinStrings.roundedEdgeRectangleShape, backgroundColor)
+        val label = labelText.toLabel(if (GameUiStyle.isAtlas) {
+            if (civ.isDefeated()) GameUiStyle.muted else GameUiStyle.ink
+        } else labelColor, hideIcons = true)
         label.setAlignment(Align.center)
 
         add(label).padLeft(10f)
+        if (GameUiStyle.isAtlas) pad(10f)
     }
 
     companion object {

@@ -238,7 +238,10 @@ class UnitOrderResult(
     val receipt: ActionReceipt,
     /** Unit action after the command, null when woken or disbanded. */
     val action: String?,
-    val disbanded: Boolean
+    /** The unit no longer exists: disbanded, or consumed founding [foundedCityId]. */
+    val disbanded: Boolean,
+    /** AUTOMATE founded this city with the unit. */
+    val foundedCityId: String? = null
 ) : CommandResult
 
 /**

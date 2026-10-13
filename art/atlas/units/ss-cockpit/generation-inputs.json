@@ -1,0 +1,24 @@
+{
+  "facings": {
+    "E": {
+      "rawFile": "e-motion-v2.png",
+      "promptPath": "art/atlas/units/ss-cockpit/prompts/e-v2.txt"
+    },
+    "NE": {
+      "rawFile": "ne-motion-v2.png",
+      "promptPath": "art/atlas/units/ss-cockpit/prompts/ne-v2.txt",
+      "identityReference": {
+        "path": "/Users/noahkenny/.codex/generated_images/01a1321a-8142-7533-ae7a-eb89a5433c70/exec-d9197c33-c226-4fcc-9669-126196887766.png",
+        "sha256": "e7f852972116c4b8ef803c079c25e63f045cdac22bca74b94443181cee0f4ea1"
+      }
+    },
+    "SE": {
+      "rawFile": "se-motion-v2.png",
+      "promptPath": "art/atlas/units/ss-cockpit/prompts/se-v2.txt",
+      "identityReference": {
+        "path": "/Users/noahkenny/.codex/generated_images/01a1321a-8142-7533-ae7a-eb89a5433c70/exec-d9197c33-c226-4fcc-9669-126196887766.png",
+        "sha256": "e7f852972116c4b8ef803c079c25e63f045cdac22bca74b94443181cee0f4ea1"
+      }
+    }
+  }
+}

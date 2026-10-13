@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "unitName": "Khan",
+  "assetId": "khan",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": "Khan",
+  "uniqueTo": "Mongolia",
+  "replaces": "Great General",
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Khan",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "HIT",
+    "DEFEAT",
+    "WORK"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "HIT": 4,
+    "DEFEAT": 8,
+    "WORK": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/khan/e-motion-v1.png",
+      "rawHash": "a09a833d95998692a6ba8cef8867f9b967c86d4cfc76444d14f7393b728110e5",
+      "promptPath": "art/atlas/units/khan/prompts/e-v1.txt",
+      "promptHash": "7c8c7f66da1be3221aeccd007ec5ae33dca96fb0fc7582cbe89639e6f2041c75",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/khan/ne-motion-v1.png",
+      "rawHash": "594b3c6e6143ee2a3f0dae96bd03e4c86171f43f782465e8cb5b762f4ac48f37",
+      "promptPath": "art/atlas/units/khan/prompts/ne-v1.txt",
+      "promptHash": "602efd12e58d5a77a66fd1328d829941364589fffa316e34bdf1e3ff8488976a",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/khan/se-motion-v1.png",
+      "rawHash": "046bd731c2f58841ab7e6811425b832ec16b241e40b34613dadc4a4b914da12d",
+      "promptPath": "art/atlas/units/khan/prompts/se-v1.txt",
+      "promptHash": "0b4a94608b58d57935c519a4af2aad2df67e9016d0b9b2b80f8c20e56c574ea2",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
+}

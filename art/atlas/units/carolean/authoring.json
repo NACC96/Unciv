@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "unitName": "Carolean",
+  "assetId": "carolean",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": "Carolean",
+  "uniqueTo": "Sweden",
+  "replaces": "Rifleman",
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Carolean",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/carolean/e-motion-v1.png",
+      "rawHash": "ec0ddee550bd6c38261123af7660bb1792cf793c5cc5b7eafc3e9ebb30f469a8",
+      "promptPath": "art/atlas/units/carolean/prompts/e-v1.txt",
+      "promptHash": "7c0e97e801419333a93b51c9c532fb008fd6b9594c58f6b6066fb6ad80e79817",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/carolean/ne-motion-v1.png",
+      "rawHash": "f1240815cb019206281c60b459123f04f45769828bec8e7c6d0e638e00073dd3",
+      "promptPath": "art/atlas/units/carolean/prompts/ne-v1.txt",
+      "promptHash": "fe2c9b6020f64e6d4fe433d1f73770f27f46f178b2262278b4843f2675a0608a",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/carolean/se-motion-v1.png",
+      "rawHash": "6d6e684848923dc53bb9a8b44d72db67484c7d7420730067437482396ce206dd",
+      "promptPath": "art/atlas/units/carolean/prompts/se-v1.txt",
+      "promptHash": "3fa41c9b403c4253968c4291bd70cfe9782ae27e0cec44c8cb97e00d26decb69",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
+}

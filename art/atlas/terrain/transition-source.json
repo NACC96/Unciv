@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "tool": "technical alpha clipping of generated originals",
+  "sourceHashes": {
+    "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Atoll.png": "6659c25c1b8266d18365006696f9938964797ac41010848dd139d7919b30917d",
+    "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Coast.png": "dbe5f69fa9d37ee46c014b7a4d53ba151076bff964d0460825c48dfe5205b22a",
+    "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Desert.png": "00fd5c954f8a42476d6faa0193306f9d74a40de0bbe8554608b2eaff3e62f162",
+    "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Fallout.png": "e0614d5f1664ae0247dd09096a735eac06d67067603295b19a3afa2ebc96f859",
+    "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Flood plains.png": "2bb8e09430b74a63481e7febb6ae05d2529dda03021ac3fa578afe60a74df3b2",
+    "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Forest.png": "340125f281071e379caeae0d131e4e6ae3f5c61ebc0debe3ab9a47e5bdb866b2",
+    "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Grassland.png": "b56ca8e8438670657c6848772445aae79eb58fe4922094d3ffb25cf7003f95e2",
+    "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Hill.png": "c4047de8da5a734ffdc6698cab90330d80efaeda654e08dbccce4366ca7b51db",
+    "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Ice.png": "350650f47277f8851eb9feb4a6e9cf0557215e24e731b945731a57b7ad115687",
+    "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Jungle.png": "016a975b3973ee55eb3d0622ec4d6383198a3ae18f9c8f4cadd1e84fcac4b38a",
+    "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Lakes.png": "5ef319a8875f8b80d304b5f2667e2dd58137f0dbab9e9f10323c7847e4b50f3d",
+    "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Marsh.png": "c391ae3a529a6f3743f7569689204550be92125ef050942a8a8276329828b639",
+    "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Mountain.png": "d2794e3e4593ad197cce6ec085f7e2de40a2606c54a32f1cec536ebf1cec85ce",
+    "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Oasis.png": "898cca2012ce7739fd4b67f11566f3676145f56c018d5f3025b503d42c9ea949",
+    "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Ocean.png": "9f04b7022158938b42ace37dedd55a414bff9b2fa44ac6f9502fdc5bcfb61624",
+    "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Plains.png": "8f2bd505df37497845714f029ed71443f22fa64d303ccc1d6a7526ff7934a955",
+    "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/River.png": "d4485541090b3ef8cea2236ae3d343acc5760f76f09ec58e4ba1397645b56bdb",
+    "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Snow.png": "b0e7feef705e7129c7f926ec60e60bc123d91c46e51bc788761095c9574ab472",
+    "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Tundra.png": "ddddd18acaaa2892bb875a83427dc385b13bd0b44546986e4770886e5a5a8f29",
+    "art/atlas/terrain/resources-overlays-source.json": "066aa7ea25e003b02479783454e7e96b3ef2142b61d123c95b153b11d1f8b518"
+  },
+  "directions": [
+    "TopRight",
+    "BottomRight",
+    "Bottom",
+    "BottomLeft",
+    "TopLeft",
+    "Top"
+  ],
+  "count": 2523,
+  "reviewState": "candidate",
+  "formalAcceptance": "deferred by user",
+  "note": "Directed lookup aliases share material crops; no hidden-map input, seams/zoom remain unreviewed."
+}

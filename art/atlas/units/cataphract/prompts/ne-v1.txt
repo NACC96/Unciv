@@ -1,0 +1,7 @@
+Use this reference sheet as the exact identity, equipment, lighting and painting style. Create a new authored transparent motion sheet for Cataphract. All32 poses face NE consistently in the same elevated historical map projection, the mount and rider both facing diagonally upper-right, with more of their backs and left sides visible. Subject a Byzantine heavily armored cavalry rider with closed lamellar helmet, scale-and-lamellar horse armor from neck to haunches, long cavalry spear, brass leather fittings, royal-blue saddle cloth and sash. Do not rotate the entire raster; author every pose in this direction.
+Exactly8 equal columns x4 equal rows, landscape2:1 PNG, fixed cell scale and ground pivot50%width/78%height. Complete model/equipment in every cell; no overlaps/gutters/text/borders/paper/matte.
+Row1 four idle breath/cloth poses then four hit impact/recoil/stagger/recovery.
+Row2 eight actual MOVE phases horse four-leg walking cycle, jointed armored knees/hooves, rider and plated tack sway, all facing NE.
+Row3 eight ATTACK phases mounted armored spear guard, draw back, thrust, impact, follow through and recover with real body/object changes.
+Row4 eight defeat stages horse shies, rider recoils, horse knees buckle, rider slumps, horse/rider tip, ground contact, settle, horse and rider prone within cell, complete inside cell, no blood.
+Royal-blue #2166B4 cloth is the nation material only. Soft violet #A04FA0 ground ellipse shadows only beneath root. Surrounding alpha fully transparent. All4 rows and8 columns required.

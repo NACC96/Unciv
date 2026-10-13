@@ -1,5 +1,9 @@
 package com.unciv.logic.battle
 
+import com.unciv.logic.presentation.VisualCapture
+import com.unciv.logic.presentation.VisualAttackKind
+import com.unciv.logic.presentation.VisualAttackOutcome
+
 import com.unciv.logic.city.City
 import com.unciv.logic.civilization.*
 import com.unciv.logic.civilization.diplomacy.DiplomaticModifiers
@@ -57,11 +61,17 @@ object Nuke {
     }
 
     @Suppress("FunctionName")   // Yes we want this name to stand out
-    fun NUKE(attacker: MapUnitCombatant, targetTile: Tile) {
+    fun NUKE(attacker: MapUnitCombatant, targetTile: Tile): Unit = VisualCapture.mutate(attacker.getCivInfo().gameInfo) {
+        nukeInternal(attacker, targetTile)
+    }
+
+    private fun nukeInternal(attacker: MapUnitCombatant, targetTile: Tile) {
         val attackingCiv = attacker.getCivInfo()
         val nukeStrength = attacker.unit.getMatchingUniques(UniqueType.NuclearWeapon)
             .firstOrNull()?.params?.get(0)?.toInt() ?: return
 
+        val visualScope = attackingCiv.gameInfo.visualCaptureSink
+        val visualBefore = visualScope?.beforeAttack(attacker, null, targetTile, VisualAttackKind.NUCLEAR)
         val blastRadius = attacker.unit.getMatchingUniques(UniqueType.BlastRadius)
             .firstOrNull()?.params?.get(0)?.toInt() ?: 2
 
@@ -72,7 +82,10 @@ object Nuke {
 
         addNukeNotifications(targetTile, attacker, notifyDeclaredWarCivs, attackingCiv, hitCivsTerritory)
 
-        if (attacker.isDefeated()) return
+        if (attacker.isDefeated()) {
+            visualScope?.afterAttack(visualBefore, attacker, null, targetTile, VisualAttackOutcome.INTERCEPTED)
+            return
+        }
 
         attacker.unit.attacksSinceTurnStart.add(targetTile.position)
 
@@ -94,6 +107,7 @@ object Nuke {
         if (!attacker.isDefeated()) {
             attacker.unit.attacksThisTurn += 1
         }
+        visualScope?.afterAttack(visualBefore, attacker, null, targetTile)
     }
 
     private fun addNukeNotifications(
@@ -219,7 +233,10 @@ object Nuke {
         if (city != null && tile.position.toHexCoord() == city.location.toHexCoord()) {
             val attackContext = GameContext(attacker.getCivInfo(), ourCombatant = attacker, theirCombatant = CityCombatant(city), tile = tile)
             buildingModifier = city.getAggregateModifier(UniqueType.GarrisonDamageFromNukes)
+            val visualScope = attacker.getCivInfo().gameInfo.visualCaptureSink
+            val visualBefore = visualScope?.beforeAttack(attacker, CityCombatant(city), tile, VisualAttackKind.NUCLEAR)
             doNukeExplosionDamageToCity(city, nukeStrength, damageModifierFromMissingResource, attackContext)
+            visualScope?.afterAttack(visualBefore, attacker, CityCombatant(city), tile)
             Battle.postBattleNotifications(attacker, CityCombatant(city), city.getCenterTile())
             Battle.destroyIfDefeated(city.civ, attacker.getCivInfo(), city.location.toHexCoord())
         }
@@ -227,6 +244,8 @@ object Nuke {
         // Damage and/or destroy units on the tile
         for (unit in tile.getUnits().toList()) { // toList so if it's destroyed there's no concurrent modification
             val defender = MapUnitCombatant(unit)
+            val visualScope = attacker.getCivInfo().gameInfo.visualCaptureSink
+            val visualBefore = visualScope?.beforeAttack(attacker, defender, tile, VisualAttackKind.NUCLEAR)
             val attackContext = GameContext(attacker.getCivInfo(), ourCombatant = attacker, theirCombatant = defender, tile = tile)
             val rng = attackContext.stateBasedRandom("Nuke.doNukeExplosionForTile")
             val damage = (when {
@@ -241,6 +260,7 @@ object Nuke {
             } else {
                 defender.takeDamage(damage)
             }
+            visualScope?.afterAttack(visualBefore, attacker, defender, tile)
             Battle.postBattleNotifications(attacker, defender, defender.getTile())
             Battle.destroyIfDefeated(defender.getCivInfo(), attacker.getCivInfo())
         }
@@ -266,6 +286,13 @@ object Nuke {
     }
 
     private fun applyPillageAndFallout(tile: Tile) {
+        val visualScope = tile.tileMap.gameInfo.visualCaptureSink
+        val visualBefore = visualScope?.improvement(tile)
+        applyPillageAndFalloutInternal(tile)
+        visualScope?.improvementChanged(visualBefore, tile)
+    }
+
+    private fun applyPillageAndFalloutInternal(tile: Tile) {
         val improvement = tile.getUnpillagedTileImprovement()
         if (improvement != null && !improvement.hasUnique(UniqueType.Irremovable)) {
             if (improvement.hasUnique(UniqueType.Unpillagable)) tile.removeImprovement()

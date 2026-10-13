@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "unitName": "Tercio",
+  "assetId": "tercio",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": "Tercio",
+  "uniqueTo": "Spain",
+  "replaces": "Musketman",
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Tercio",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/tercio/e-motion-v1.png",
+      "rawHash": "865efc17d56ab460f77ddbc0910783ef18ea2f49ef93a0894f548c3160980aa5",
+      "promptPath": "art/atlas/units/tercio/prompts/e-v1.txt",
+      "promptHash": "82365f230bf87cc9e0fb824a799c9effcb205791ce7fc53bd288d085d7b8cbdb",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/tercio/ne-motion-v1.png",
+      "rawHash": "17bb24fe9126a64c3c818320e77e67eb66796ebbb7d73676019ad3bd39ec32ab",
+      "promptPath": "art/atlas/units/tercio/prompts/ne-v1.txt",
+      "promptHash": "a7525b26ba6a4d262b881cc7463caf3e5f47a36d1631cf286605f1fae46356e9",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/tercio/se-motion-v1.png",
+      "rawHash": "fb720508cf7acc47f9b6a6a2605a42b846896620d2a4d7980cdc4e253b93f5ba",
+      "promptPath": "art/atlas/units/tercio/prompts/se-v1.txt",
+      "promptHash": "81d4bcabd092ada129927c0fd89444ede90f183f79874061354d47536f2b435a",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
+}

@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "unitName": "Hussar",
+  "assetId": "hussar",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": "Hussar",
+  "uniqueTo": "Austria",
+  "replaces": "Cavalry",
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Hussar",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/hussar/e-motion-v1.png",
+      "rawHash": "02665c0e44108ac1076907357a6f28ba829458b42a42f3a3d9a19b488eb24123",
+      "promptPath": "art/atlas/units/hussar/prompts/e-v1.txt",
+      "promptHash": "6195ac341aa5c3e55f65b705876766381c946f98ca3091278720ab404572cf77",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/hussar/ne-motion-v1.png",
+      "rawHash": "ea054a4cb58495cd8702550d280838760250caadd1d5bff8fed479529da827cb",
+      "promptPath": "art/atlas/units/hussar/prompts/ne-v1.txt",
+      "promptHash": "a2264942cbeea069b270fda381a063af4b37cfa699f16c4f59721b4d509ad256",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/hussar/se-motion-v1.png",
+      "rawHash": "f04cda23247a7788b5272fcc2c897347dfe3db7405cb606dafed1728d50e9c27",
+      "promptPath": "art/atlas/units/hussar/prompts/se-v1.txt",
+      "promptHash": "1c1659269a2a44be97960558f3a3fbe0ffda80750c5009fc49a14c222b4a83f7",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
+}

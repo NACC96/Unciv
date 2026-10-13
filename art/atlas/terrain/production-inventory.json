@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "status": "candidate production inventory only",
+  "categories": {
+    "border": {
+      "candidate": 8,
+      "missingRequired": 0,
+      "accepted": 0
+    },
+    "era-city-style": {
+      "candidate": 0,
+      "missingRequired": 0,
+      "accepted": 0,
+      "missing": 738
+    },
+    "era-city": {
+      "candidate": 9,
+      "missingRequired": 0,
+      "accepted": 0
+    },
+    "improvement-action": {
+      "candidate": 0,
+      "missingRequired": 0,
+      "accepted": 0,
+      "missing": 8
+    },
+    "improvement": {
+      "candidate": 27,
+      "missingRequired": 0,
+      "accepted": 0
+    },
+    "map-overlay": {
+      "candidate": 9,
+      "missingRequired": 0,
+      "accepted": 0
+    },
+    "natural-wonder": {
+      "candidate": 14,
+      "missingRequired": 0,
+      "accepted": 0
+    },
+    "neighbor-transition": {
+      "candidate": 2520,
+      "missingRequired": 0,
+      "accepted": 0
+    },
+    "pillaged-improvement": {
+      "candidate": 25,
+      "missingRequired": 0,
+      "accepted": 0
+    },
+    "resource": {
+      "candidate": 35,
+      "missingRequired": 0,
+      "accepted": 0
+    },
+    "terrain-feature": {
+      "candidate": 10,
+      "missingRequired": 0,
+      "accepted": 0
+    },
+    "terrain": {
+      "candidate": 9,
+      "missingRequired": 0,
+      "accepted": 0
+    }
+  },
+  "sourceCount": 2678,
+  "artAcceptance": "deferred",
+  "renderValidation": "deferred"
+}

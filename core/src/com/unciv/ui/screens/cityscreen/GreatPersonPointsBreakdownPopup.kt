@@ -1,6 +1,7 @@
 package com.unciv.ui.screens.cityscreen
 
 import com.unciv.logic.city.GreatPersonPointsBreakdown
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.extensions.toStringSigned
 import com.unciv.ui.popups.Popup
 import com.unciv.ui.screens.civilopediascreen.FormattedLine
@@ -38,6 +39,10 @@ class GreatPersonPointsBreakdownPopup(cityScreen: CityScreen, gppBreakdown: Grea
         })
 
         addCloseButton()
+        if (GameUiStyle.isAtlas) {
+            innerTable.background = GameUiStyle.panelBackground("Atlas/City/GreatPeoplePopup", 1f)
+            GameUiStyle.applyWidget(innerTable)
+        }
         open(true)
     }
 

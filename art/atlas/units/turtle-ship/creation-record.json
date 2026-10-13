@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "unitName": "Turtle Ship",
+  "assetId": "turtle-ship",
+  "creator": "OpenAI image generation",
+  "tool": "image_gen.imagegen (built-in)",
+  "rights": "original-generated",
+  "styleReference": {
+    "path": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/concept/unit-art-direction-v1.png",
+    "sha256": "ceb7c639185d98cb53535f21eb0966b1bec01bb782c80de2fdd972d2858ce641",
+    "role": "approved style only"
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/turtle-ship/e-motion-v2.png",
+      "rawHash": "1c96951dd7507f77d098653fb4d4d49fac477efe14799b25a790ae1f071bf510",
+      "promptPath": "art/atlas/units/turtle-ship/prompts/e-v2.txt",
+      "promptHash": "e1ceaeb6878f7179eac8511354df5e7b27b648fe320655f57513f4bfcbc16382",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/turtle-ship/ne-motion-v2.png",
+      "rawHash": "40bb4e4ebc6962b87c988a2b8d42dabf9a1c71d4f10b913ae6967ab45ac811b7",
+      "promptPath": "art/atlas/units/turtle-ship/prompts/ne-v2.txt",
+      "promptHash": "10856be5b4ae227d661690ad261587039f1462f34675a2081bdc11cd983da6dc",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/turtle-ship/se-motion-v2.png",
+      "rawHash": "0b38337450ef15fde71487a7b14f1b3c686a86b4c641171d9930b4ba47d5465a",
+      "promptPath": "art/atlas/units/turtle-ship/prompts/se-v2.txt",
+      "promptHash": "6e937952f5dbeed36a1be653cd13f53dfe6a86caf85ec860f9ad8ee56fa934e9",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "processing": {
+    "script": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/normalize_motion.py",
+    "sha256": "f3fd783dbf679b461c7f5b56fe8e3abb9d583d737c06cec9f916fae6044b1a6f",
+    "operations": [
+      "uniform cell cutting",
+      "constant sheet scale and root alignment",
+      "alpha-preserving resize",
+      "royal-blue nation mask extraction",
+      "violet ground-shadow extraction"
+    ],
+    "poseSynthesis": false,
+    "clonedStaticFrames": false
+  },
+  "reviewState": "candidate",
+  "formalArtReview": "deferred"
+}

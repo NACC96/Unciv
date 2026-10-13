@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "unitName": "Caravel",
+  "assetId": "caravel",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": null,
+  "uniqueTo": null,
+  "replaces": null,
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Caravel",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/caravel/e-motion-v1.png",
+      "rawHash": "73865d449c39cf39b5f2d3d73bf7e00203445cfe89bf130466971e464b76854a",
+      "promptPath": "art/atlas/units/caravel/prompts/all-facings-v1.txt",
+      "promptHash": "5bc6b22a13d05c81044f8f4caaebee41517541697490f624708bd094537c6515",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1024,
+        512
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/caravel/ne-motion-v1.png",
+      "rawHash": "3a0279f93cbc3fdb312cdfbe5fcc925eb24351b80ff7b60cf5f08f42d8d191f8",
+      "promptPath": "art/atlas/units/caravel/prompts/all-facings-v1.txt",
+      "promptHash": "5bc6b22a13d05c81044f8f4caaebee41517541697490f624708bd094537c6515",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1024,
+        512
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/caravel/se-motion-v1.png",
+      "rawHash": "46d824bf64e000aea3e2ebc56cac5f24982d6ef4c5fc68bfc866e765d29a5441",
+      "promptPath": "art/atlas/units/caravel/prompts/all-facings-v1.txt",
+      "promptHash": "5bc6b22a13d05c81044f8f4caaebee41517541697490f624708bd094537c6515",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1024,
+        512
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
+}

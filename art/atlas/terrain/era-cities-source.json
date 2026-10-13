@@ -1,0 +1,179 @@
+{
+  "schemaVersion": 1,
+  "batchId": "era-cities",
+  "tool": "built-in image_gen",
+  "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/terrain-authoring/raw/era-cities.png",
+  "rawSha256": "8eae25b1d1ad225f24cef75a34e437dc04b09b7290267af5ebc869ede39c8ee7",
+  "rawDimensions": [
+    1536,
+    1024
+  ],
+  "promptPath": "art/atlas/terrain/era-cities-prompt.txt",
+  "promptSha256": "e6e4d3e1c781ddd0faec62ee7a5504eae8c765d82b0dab1d10b9aff5161c63a2",
+  "reviewState": "candidate",
+  "formalAcceptance": "deferred by user",
+  "cells": [
+    {
+      "item": "City center-Ancient era",
+      "cell": 0,
+      "cropBox": [
+        0,
+        0,
+        512,
+        341
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/City center-Ancient era.png",
+      "canvas": [
+        128,
+        144
+      ],
+      "normalization": "era-city",
+      "sha256": "d93d430a57a6127f4c60f5896405d2de812f9500ccf06f2b0276d0a787bc72c5",
+      "clippingMargin": 16
+    },
+    {
+      "item": "City center-Classical era",
+      "cell": 1,
+      "cropBox": [
+        512,
+        0,
+        1024,
+        341
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/City center-Classical era.png",
+      "canvas": [
+        128,
+        144
+      ],
+      "normalization": "era-city",
+      "sha256": "a9ff7f30b273078ebf4899d97d5df4ea7cbf45320be211d91f5033b0a02fc104",
+      "clippingMargin": 16
+    },
+    {
+      "item": "City center-Medieval era",
+      "cell": 2,
+      "cropBox": [
+        1024,
+        0,
+        1536,
+        341
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/City center-Medieval era.png",
+      "canvas": [
+        128,
+        144
+      ],
+      "normalization": "era-city",
+      "sha256": "729f9e98bac6eadc4bda1950ce0471645483865e9650a4a8bdf48494a88ab940",
+      "clippingMargin": 16
+    },
+    {
+      "item": "City center-Renaissance era",
+      "cell": 3,
+      "cropBox": [
+        0,
+        341,
+        512,
+        683
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/City center-Renaissance era.png",
+      "canvas": [
+        128,
+        144
+      ],
+      "normalization": "era-city",
+      "sha256": "1ac17701699248f7bc59e293ea1f8400f88dfca66895b9d99a312360cd39f9f0",
+      "clippingMargin": 16
+    },
+    {
+      "item": "City center-Industrial era",
+      "cell": 4,
+      "cropBox": [
+        512,
+        341,
+        1024,
+        683
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/City center-Industrial era.png",
+      "canvas": [
+        128,
+        144
+      ],
+      "normalization": "era-city",
+      "sha256": "26736a7c10303ddfd7a381bb5440819dd78327d0959206c894a3f25b57a961c3",
+      "clippingMargin": 16
+    },
+    {
+      "item": "City center-Modern era",
+      "cell": 5,
+      "cropBox": [
+        1024,
+        341,
+        1536,
+        683
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/City center-Modern era.png",
+      "canvas": [
+        128,
+        144
+      ],
+      "normalization": "era-city",
+      "sha256": "29173fa30e96f2030a60ff5c4510cac7f1faf6114b3879fa616fc4445b37a024",
+      "clippingMargin": 16
+    },
+    {
+      "item": "City center-Atomic era",
+      "cell": 6,
+      "cropBox": [
+        0,
+        683,
+        512,
+        1024
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/City center-Atomic era.png",
+      "canvas": [
+        128,
+        144
+      ],
+      "normalization": "era-city",
+      "sha256": "65521b747073bb0e6783507b56a9f83fda069469ee416c8e417fccaac6879575",
+      "clippingMargin": 16
+    },
+    {
+      "item": "City center-Information era",
+      "cell": 7,
+      "cropBox": [
+        512,
+        683,
+        1024,
+        1024
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/City center-Information era.png",
+      "canvas": [
+        128,
+        144
+      ],
+      "normalization": "era-city",
+      "sha256": "b0c68e7d096404808f9e06a0e5b402005c72639d62031a7d3eae4411263b5d37",
+      "clippingMargin": 16
+    },
+    {
+      "item": "City center-Future era",
+      "cell": 8,
+      "cropBox": [
+        1024,
+        683,
+        1536,
+        1024
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/City center-Future era.png",
+      "canvas": [
+        128,
+        144
+      ],
+      "normalization": "era-city",
+      "sha256": "da7896dff3062f68e1d371b63b74077c2eda42304c42f44f09f187bc7d4b1682",
+      "clippingMargin": 16
+    }
+  ]
+}

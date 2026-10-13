@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "unitName": "Persian Immortal",
+  "assetId": "persian-immortal",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": "Persian Immortal",
+  "uniqueTo": "Persia",
+  "replaces": "Spearman",
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Persian Immortal",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/persian-immortal/e-motion-v1.png",
+      "rawHash": "5b6dc1bbdb5adaa77b546f8f9ca7c42bde7d7711ec784f8ff55fd0b367c7d826",
+      "promptPath": "art/atlas/units/persian-immortal/prompts/e-v1.txt",
+      "promptHash": "2a0d7d620cf4a7f1827beea57e495b0fd2d45c1516a6fc07b809d35242161556",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/persian-immortal/ne-motion-v1.png",
+      "rawHash": "402c2cb00a881debb048428ecb5d88475673082924ab949e67863de1ebbdb366",
+      "promptPath": "art/atlas/units/persian-immortal/prompts/ne-v1.txt",
+      "promptHash": "aeeb895ce4a5c4c0825c220e9402a61dc97e9a2766b2cf8df778ccd1a02bea29",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/persian-immortal/se-motion-v1.png",
+      "rawHash": "9aa0682e36d26cab3f8447cf8aaf68f8b85f5f4cd9ddd72897a181ab7084fb99",
+      "promptPath": "art/atlas/units/persian-immortal/prompts/se-v1.txt",
+      "promptHash": "396fda4636e81039aec02f247d6553cf2f0b53257c13aff5d848f80104d79e32",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
+}

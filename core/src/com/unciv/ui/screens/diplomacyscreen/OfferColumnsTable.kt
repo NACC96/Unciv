@@ -1,11 +1,14 @@
 package com.unciv.ui.screens.diplomacyscreen
 
 import com.badlogic.gdx.scenes.scene2d.ui.Table
+import com.unciv.ui.components.AtlasWidgets
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.Constants
 import com.unciv.logic.trade.TradeOffer
 import com.unciv.logic.trade.TradeOffersList
 import com.unciv.logic.trade.TradeOfferType
 import com.unciv.models.translations.tr
+import com.unciv.ui.components.extensions.toLabel
 import com.unciv.ui.components.extensions.addSeparator
 import com.unciv.ui.components.extensions.surroundWithCircle
 import com.unciv.ui.images.ImageGetter
@@ -63,7 +66,23 @@ class OfferColumnsTable(
 
         val columnWidth = screen.getTradeColumnsWidth() - 20f // Subtract padding: ours and OffersListScroll's
 
-        if (!isPortraitMode) {
+        if (GameUiStyle.isAtlas) {
+            val stacked = screen.getTradeColumnsWidth() * 2 < 660f
+            fun side(title: String, items: OffersListScroll, offers: OffersListScroll): Table = Table().apply {
+                background = GameUiStyle.panelBackground("Atlas/Trade/Side", 1f)
+                pad(GameUiStyle.Space.m)
+                add(AtlasWidgets.header(title)).growX().minWidth(0f).row()
+                add("Available".toLabel(GameUiStyle.muted)).left().row()
+                add(items).growX().minWidth(0f).height(if (stacked) 160f else screen.stage.height * 0.35f).row()
+                add("Trade offer".toLabel(GameUiStyle.accent)).left().padTop(GameUiStyle.Space.m).row()
+                add(offers).growX().minWidth(0f).height(if (stacked) 150f else screen.stage.height * 0.24f)
+            }
+            add(side(ourCiv.civName, ourAvailableOffersTable, ourOffersTable))
+                .width(if (stacked) screen.getTradeColumnsWidth() * 2 - 24f else columnWidth).minWidth(0f).top()
+            if (stacked) row()
+            add(side(theirCiv.civName, theirAvailableOffersTable, theirOffersTable))
+                .width(if (stacked) screen.getTradeColumnsWidth() * 2 - 24f else columnWidth).minWidth(0f).top()
+        } else if (!isPortraitMode) {
             // In landscape, arrange in 4 panels: ours left / theirs right ; items top / offers bottom.
             add("Our items".tr())
             add("[${theirCiv.civName}]'s items".tr()).row()

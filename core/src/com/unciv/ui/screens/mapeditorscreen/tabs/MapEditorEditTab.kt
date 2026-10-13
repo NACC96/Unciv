@@ -13,6 +13,7 @@ import com.unciv.logic.map.mapgenerator.RiverGenerator
 import com.unciv.logic.map.tile.Tile
 import com.unciv.models.ruleset.Ruleset
 import com.unciv.models.translations.tr
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.extensions.addSeparator
 import com.unciv.ui.components.extensions.toLabel
 import com.unciv.ui.components.input.KeyCharAndCode
@@ -42,6 +43,7 @@ class MapEditorEditTab(
 
     private var ruleset = editorScreen.ruleset
     internal val randomness = MapGenerationRandomness()  // for auto river
+    internal val brushListWidth get() = if (GameUiStyle.isAtlas) editorScreen.getToolsWidth() - 56f else 0f
 
     enum class BrushHandlerType { None, Direct, Tile, Road, River, RiverFromTo }
     private var brushHandlerType = BrushHandlerType.None
@@ -86,6 +88,10 @@ class MapEditorEditTab(
             defaults().pad(10f).left()
             add(brushLabel)
             brushCell = add().padLeft(0f)
+            if (GameUiStyle.isAtlas) {
+                brushCell.minWidth(0f).growX().width(editorScreen.getToolsWidth() - 150f)
+                row()
+            }
             brushSlider = UncivSlider(1f,6f,1f,
                 initial = 1f,
                 getTipText = { getBrushTip(it).tr() },
@@ -94,12 +100,12 @@ class MapEditorEditTab(
                 brushSize = if (it > 5f) -1 else it.toInt()
                 brushLabel.setText("Brush ([${getBrushTip(it, true)}]):".tr())
             }
-            add(brushSlider).padLeft(0f)
+            add(brushSlider).padLeft(0f).apply { if (GameUiStyle.isAtlas) colspan(2).growX().minWidth(0f) }
         }
 
         // TabbedPager parameters specify content page area. Assume subTabs will have the same headerHeight
         // as the master tabs, the 2f is for the separator, and the 10f for reduced header padding:
-        val subTabsHeight = editorScreen.stage.height - 2 * headerHeight - brushTable.prefHeight - 2f + 10f
+        val subTabsHeight = (editorScreen.getToolsHeight() - 2 * headerHeight - brushTable.prefHeight - 2f + 10f).coerceAtLeast(60f)
         val subTabsWidth = editorScreen.getToolsWidth()
         subTabs = TabbedPager(
             minimumHeight = subTabsHeight,
@@ -107,6 +113,8 @@ class MapEditorEditTab(
             minimumWidth = subTabsWidth,
             maximumWidth = subTabsWidth,
             headerPadding = 5f,
+            headerFontColor = if (GameUiStyle.isAtlas) GameUiStyle.ink else Color.WHITE,
+            highlightColor = if (GameUiStyle.isAtlas) GameUiStyle.accent else Color.BLUE,
             capacity = AllEditSubTabs.entries.size
         )
 
@@ -154,7 +162,8 @@ class MapEditorEditTab(
                  pediaLink: String = icon, isRemove: Boolean = false,
                  applyAction: (Tile)->Unit) {
         brushHandlerType = handlerType
-        val brushActor = FormattedLine(name, icon = icon, iconCrossed = isRemove).render(0f)
+        val brushActor = FormattedLine(name, icon = icon, iconCrossed = isRemove)
+            .render(if (GameUiStyle.isAtlas) editorScreen.getToolsWidth() - 170f else 0f)
         linkCivilopedia(brushActor, pediaLink)
         brushCell.setActor(brushActor)
         brushAction = applyAction
@@ -179,6 +188,11 @@ class MapEditorEditTab(
             ImageGetter.setNewRuleset(ruleset)
             for (page in AllEditSubTabs.entries) {
                 val tab = page.instantiate(this, ruleset)
+                if (GameUiStyle.isAtlas) {
+                    tab.background = GameUiStyle.background("MapEditor/Brushes", GameUiStyle.inset)
+                    tab.pad(8f)
+                    GameUiStyle.applyWidget(tab)
+                }
                 subTabs.replacePage(page.caption, tab)
                 subTabs.setPageDisabled(page.caption, (tab as IMapEditorEditSubTabs).isDisabled())
             }
@@ -192,7 +206,7 @@ class MapEditorEditTab(
     }
 
     override fun deactivated(index: Int, caption: String, pager: TabbedPager) {
-        pager.setScrollDisabled(true)
+        pager.setScrollDisabled(false)
         editorScreen.tileClickHandler = null
     }
 

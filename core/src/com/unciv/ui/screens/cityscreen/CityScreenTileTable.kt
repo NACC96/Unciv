@@ -8,6 +8,7 @@ import com.unciv.ui.objectdescriptions.TileDescription
 import com.unciv.models.stats.Stat
 import com.unciv.models.stats.Stats
 import com.unciv.ui.audio.SoundPlayer
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.extensions.darken
 import com.unciv.ui.components.extensions.disable
 import com.unciv.ui.components.extensions.isEnabled
@@ -87,20 +88,22 @@ class CityScreenTileTable(private val cityScreen: CityScreen) : Table() {
             if (tileView.isLocked()) {
                 val unlockButton = "Unlock".toTextButton()
                 unlockButton.onClick {
+                    if (!cityScreen.canCityBeChanged()) return@onClick
                     cityView.tryUnlockTile(tileView)
                     update(tileView)
                     cityScreen.updateAsync()
                 }
-                if (!cityScreen.canChangeState) unlockButton.disable()
+                if (!cityScreen.canCityBeChanged()) unlockButton.disable()
                 innerTable.add(unlockButton).padTop(5f).row()
             } else {
                 val lockButton = "Lock".toTextButton()
                 lockButton.onClick {
+                    if (!cityScreen.canCityBeChanged()) return@onClick
                     cityView.tryLockTile(tileView)
                     update(tileView)
                     cityScreen.updateAsync()
                 }
-                if (!cityScreen.canChangeState) lockButton.disable()
+                if (!cityScreen.canCityBeChanged()) lockButton.disable()
                 innerTable.add(lockButton).padTop(5f).row()
             }
         }
@@ -113,6 +116,11 @@ class CityScreenTileTable(private val cityScreen: CityScreen) : Table() {
                 })
         }
 
+        if (GameUiStyle.isAtlas) {
+            background = null
+            innerTable.background = GameUiStyle.panelBackground("Atlas/City/TileDetails", 1f)
+            GameUiStyle.applyWidget(this)
+        }
         innerTable.pack()
         pack()
     }
@@ -140,7 +148,7 @@ class CityScreenTileTable(private val cityScreen: CityScreen) : Table() {
                     val cost = getRingCost(ring)
                     val text = "Buy [$count] tiles in ring [$ring] for [$cost][${Stat.Gold.character}]"
                     val button = getButton(text, KeyboardBinding.None) { buyRing(ring) }
-                    button.isDisabled = cost > cityView.viewingCiv().gold
+                    button.isDisabled = !cityScreen.canChangeState || cost > cityView.viewingCiv().gold
                     add(button).row()
                 }
             }
@@ -151,6 +159,7 @@ class CityScreenTileTable(private val cityScreen: CityScreen) : Table() {
         @Readonly private fun getRingCost(ring: Int) = getRing(ring).withIndex()
             .sumOf { cityView.getGoldCostOfTile(it.value, it.index) }
         private fun buyRing(ring: Int) {
+            if (!cityScreen.canChangeState) return
             for (tileView in getRing(ring)) {
                 if (!cityView.tryBuyTile(tileView))
                     break

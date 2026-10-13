@@ -7,6 +7,9 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.ui.Cell
 import com.badlogic.gdx.scenes.scene2d.ui.Table
+import com.badlogic.gdx.scenes.scene2d.ui.TextField
+import com.badlogic.gdx.scenes.scene2d.ui.SelectBox
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.Align
 import com.unciv.Constants
@@ -22,6 +25,7 @@ import com.unciv.models.ruleset.unit.BaseUnit
 import com.unciv.models.stats.Stat
 import com.unciv.models.translations.tr
 import com.unciv.ui.audio.SoundPlayer
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.UncivTooltip.Companion.addTooltip
 import com.unciv.ui.components.extensions.addBorder
 import com.unciv.ui.components.extensions.addCell
@@ -33,6 +37,7 @@ import com.unciv.ui.components.extensions.getTurnsToConstructionString
 import com.unciv.ui.components.extensions.packIfNeeded
 import com.unciv.ui.components.extensions.setEnabled
 import com.unciv.ui.components.extensions.surroundWithCircle
+import com.unciv.ui.components.extensions.toCheckBox
 import com.unciv.ui.components.extensions.toLabel
 import com.unciv.ui.components.extensions.toTextButton
 import com.unciv.ui.components.fonts.Fonts
@@ -82,14 +87,18 @@ class CityConstructionsTable(private val cityScreen: CityScreen) {
     private val lowerTable = Table()
     private val availableConstructionsScrollPane: ScrollPane
     private val availableConstructionsTable = Table()
-    private val lowerTableScrollCell: Cell<ScrollPane>
+    private var lowerTableScrollCell: Cell<ScrollPane>
 
     private val pad = 10f
     private val miniQueueHeight = 54f
     private val posFromEdge = CityScreen.posFromEdge
     private val stageHeight = cityScreen.stage.height
 
-    private val highlightColor = Color.GREEN.darken(0.4f)
+    private val highlightColor = if (GameUiStyle.isAtlas) GameUiStyle.raised else Color.GREEN.darken(0.4f)
+    private var metadataVersion = 0
+    private var cachedConstructions: List<ConstructionButtonDTO> = emptyList()
+    private val state get() = cityScreen.displayState
+    private val cardWidth get() = (cityScreen.atlasRegions.catalog.width - 24f).coerceAtLeast(80f)
 
     /** Gets or sets visibility of [both widgets][CityConstructionsTable] */
     var isVisible: Boolean
@@ -111,7 +120,7 @@ class CityConstructionsTable(private val cityScreen: CityScreen) {
             onChange = { cityScreen.updateAsync() },
             defaultPad = 0f,
             // keep lowerTable at fixed position
-            startsOutOpened = false,
+            startsOutOpened = if (GameUiStyle.isAtlas) state.queueExpanded else false,
             expanderHeight = miniQueueHeight
         )
 
@@ -137,6 +146,74 @@ class CityConstructionsTable(private val cityScreen: CityScreen) {
         )
         lowerTableScrollCell = lowerTable.add(availableConstructionsScrollPane).bottom()
         lowerTable.row()
+        if (GameUiStyle.isAtlas) {
+            constructionsQueueScrollPane.actor = constructionsQueueTable
+            availableConstructionsScrollPane.actor = availableConstructionsTable
+            constructionsQueueScrollPane.setScrollingDisabled(true, false)
+            availableConstructionsScrollPane.setScrollingDisabled(true, false)
+            upperTable.clearChildren()
+            upperTable.pad(8f)
+            upperTable.background = GameUiStyle.panelBackground("Atlas/City/Queue", 1f)
+            upperTable.add(constructionsQueueScrollPane).grow().minSize(0f, 0f).row()
+            val actions = ScrollPane(buttonsTable).apply {
+                setScrollingDisabled(false, true)
+                setOverscroll(false, false)
+            }
+            upperTable.add(actions).growX().minWidth(0f).height(44f)
+            lowerTable.clearChildren()
+            lowerTable.pad(8f)
+            lowerTable.background = GameUiStyle.panelBackground("Atlas/City/Catalog", 1f)
+            val search = TextField(state.search, BaseScreen.skin).apply {
+                messageText = "Search".tr()
+                addListener(object : ChangeListener() {
+                    override fun changed(event: ChangeEvent, actor: Actor) {
+                        state.search = text
+                        state.catalogScroll = 0f
+                        renderAvailableConstructions(cachedConstructions)
+                    }
+                })
+            }
+            lowerTable.add(search).growX().minWidth(0f).height(40f).row()
+            val filters = Table()
+            val categories = listOf("All", "Units", "Buildings", "Wonders", "Other", "Disabled")
+            val category = SelectBox<String>(BaseScreen.skin).apply {
+                setItems(*categories.map { it.tr() }.toTypedArray())
+                selectedIndex = state.category.coerceIn(categories.indices)
+                addListener(object : ChangeListener() {
+                    override fun changed(event: ChangeEvent, actor: Actor) {
+                        state.category = selectedIndex
+                        state.catalogScroll = 0f
+                        renderAvailableConstructions(cachedConstructions)
+                    }
+                })
+            }
+            filters.add(category).growX().minWidth(0f)
+            filters.add("Available".toCheckBox(state.availableOnly) {
+                state.availableOnly = it
+                state.catalogScroll = 0f
+                renderAvailableConstructions(cachedConstructions)
+            }).padLeft(8f)
+            lowerTable.add(filters).growX().minWidth(0f).padTop(4f).padBottom(4f).row()
+            lowerTableScrollCell = lowerTable.add(availableConstructionsScrollPane).grow().minSize(0f, 0f)
+            GameUiStyle.applyWidget(lowerTable)
+        }
+    }
+
+    internal fun rememberDisplayState() {
+        state.queueScroll = constructionsQueueScrollPane.scrollY
+        if (cachedConstructions.isNotEmpty()) state.catalogScroll = availableConstructionsScrollPane.scrollY
+        state.queueExpanded = queueExpander.isOpen
+    }
+
+    internal fun layoutAtlas(regions: CityRegions, showQueue: Boolean, showCatalog: Boolean) {
+        upperTable.isVisible = showQueue
+        lowerTable.isVisible = showQueue && showCatalog
+        upperTable.setBounds(regions.queue.x, regions.queue.y, regions.queue.width, regions.queue.height)
+        lowerTable.setBounds(regions.catalog.x, regions.catalog.y, regions.catalog.width, regions.catalog.height)
+        upperTable.validate()
+        lowerTable.validate()
+        constructionsQueueScrollPane.scrollY = state.queueScroll
+        constructionsQueueScrollPane.updateVisualScroll()
     }
 
     /** Forces layout calculation and returns the upper Table's (construction queue) width */
@@ -153,6 +230,7 @@ class CityConstructionsTable(private val cityScreen: CityScreen) {
     }
 
     fun update(selectedConstruction: IConstruction?) {
+        if (upperTable.stage != null && constructionsQueueScrollPane.height > 0f) rememberDisplayState()
         updateQueueAndButtons(selectedConstruction)
         updateAvailableConstructions()
     }
@@ -160,6 +238,10 @@ class CityConstructionsTable(private val cityScreen: CityScreen) {
     private fun updateQueueAndButtons(construction: IConstruction?) {
         updateButtons(construction)
         updateConstructionQueue()
+        if (GameUiStyle.isAtlas) {
+            constructionsQueueTable.adjustContextMenuIndicators()
+            return
+        }
         upperTable.pack()
         // Need to reposition when height changes as setPosition's alignment does not persist, it's just a readability shortcut to calculate bottomLeft
         upperTable.setPosition(posFromEdge, stageHeight - posFromEdge, Align.topLeft)
@@ -170,6 +252,7 @@ class CityConstructionsTable(private val cityScreen: CityScreen) {
     }
 
     private fun updateButtons(construction: IConstruction?) {
+        buttonsTable.clear()
         if (!cityScreen.canChangeState) return
         /** [UniqueType.MayBuyConstructionsInPuppets] support - we need a buy button for civs that could buy items in puppets */
         if (cityView.isPuppet() && !cityView.hasMatchingUnique(UniqueType.MayBuyConstructionsInPuppets)) return
@@ -197,7 +280,7 @@ class CityConstructionsTable(private val cityScreen: CityScreen) {
     }
 
     private fun updateConstructionQueue() {
-        val queueScrollY = constructionsQueueScrollPane.scrollY
+        val queueScrollY = if (GameUiStyle.isAtlas) state.queueScroll else constructionsQueueScrollPane.scrollY
         constructionsQueueTable.clear()
 
         val cityConstructions = cityView.constructions
@@ -332,7 +415,7 @@ class CityConstructionsTable(private val cityScreen: CityScreen) {
     }
 
     private fun updateAvailableConstructions() {
-        val constructionsScrollY = availableConstructionsScrollPane.scrollY
+        val requestVersion = ++metadataVersion
 
         if (!availableConstructionsTable.hasChildren()) { //
             availableConstructionsTable.add(Constants.loading.toLabel()).pad(10f)
@@ -342,70 +425,96 @@ class CityConstructionsTable(private val cityScreen: CityScreen) {
             // Since this can be a heavy operation and leads to many ANRs on older phones we put the metadata-gathering in another thread.
             val constructionButtonDTOList = getConstructionButtonDTOs()
             launchOnGLThread {
-                val units = ArrayList<Table>()
-                val buildableWonders = ArrayList<Table>()
-                val buildableNationalWonders = ArrayList<Table>()
-                val buildableBuildings = ArrayList<Table>()
-                val specialConstructions = ArrayList<Table>()
-                val blacklisted = ArrayList<Table>()
-                val disabledAutoAssignConstructions: Set<String> = cityView.getDisabledConstructions()
-
-                var maxButtonWidth = constructionsQueueTable.width
-                for (dto in constructionButtonDTOList) {
-
-                    /** filter out showing buildings that have RequiresBuildingInThisCity
-                     * rejection (eg requiredBuilding entry) which are buildable.
-                     * The rejection for RequiresBuildingInThisCity isn't yielded if
-                     * the prerequisite is in the queue
-                     */
-                    if (dto.construction is Building
-                            && dto.rejectionReason?.type == RejectionReasonType.RequiresBuildingInThisCity
-                            && constructionButtonDTOList.any {
-                                (it.construction is Building) && (it.construction.name == dto.construction.requiredBuilding
-                                        || it.construction.replaces == dto.construction.requiredBuilding
-                                        || it.construction.hasTagUnique(dto.construction.requiredBuilding!!, cityView.getState()))
-                            })
-                        continue
-
-                    val constructionButton = getConstructionButton(dto)
-                    if (dto.construction.name in disabledAutoAssignConstructions)
-                        blacklisted.add(constructionButton)
-                    else when (dto.construction) {
-                        is BaseUnit -> units.add(constructionButton)
-                        is Building -> {
-                            when {
-                                dto.construction.isWonder -> buildableWonders += constructionButton
-                                dto.construction.isNationalWonder -> buildableNationalWonders += constructionButton
-                                else -> buildableBuildings += constructionButton
-                            }
-                        }
-                        is PerpetualConstruction -> specialConstructions.add(constructionButton)
-                    }
-                    maxButtonWidth = max(maxButtonWidth, constructionButton.packIfNeeded().width)
-                }
-
-                availableConstructionsTable.apply {
-                    clear()
-                    defaults().left().bottom()
-                    addCategory("Units", units, maxButtonWidth, KeyboardBinding.BuildUnits)
-                    addCategory("Buildings", buildableBuildings, maxButtonWidth, KeyboardBinding.BuildBuildings)
-                    addCategory("Wonders", buildableWonders, maxButtonWidth, KeyboardBinding.BuildWonders)
-                    addCategory("National Wonders", buildableNationalWonders, maxButtonWidth, KeyboardBinding.BuildNationalWonders)
-                    addCategory("Other", specialConstructions, maxButtonWidth, KeyboardBinding.BuildOther)
-                    addCategory("Disabled", blacklisted, maxButtonWidth, KeyboardBinding.BuildDisabled, startsOutOpened = false)
-                    pack()
-                }
-
-                availableConstructionsScrollPane.apply {
-                    setSize(maxButtonWidth, min(availableConstructionsTable.prefHeight, lowerTableScrollCell.maxHeight))
-                    layout()
-                    scrollY = constructionsScrollY
-                    updateVisualScroll()
-                }
-                lowerTable.pack()
-                availableConstructionsTable.adjustContextMenuIndicators()
+                if (requestVersion != metadataVersion || !cityScreen.hasCurrentCity()) return@launchOnGLThread
+                if (GameUiStyle.isAtlas && cachedConstructions.isNotEmpty()) state.catalogScroll = availableConstructionsScrollPane.scrollY
+                cachedConstructions = constructionButtonDTOList
+                renderAvailableConstructions(constructionButtonDTOList)
             }
         }
+    }
+
+    private fun renderAvailableConstructions(constructionButtonDTOList: List<ConstructionButtonDTO>) {
+        val constructionsScrollY = availableConstructionsScrollPane.scrollY
+        val units = ArrayList<Table>()
+        val buildableWonders = ArrayList<Table>()
+        val buildableNationalWonders = ArrayList<Table>()
+        val buildableBuildings = ArrayList<Table>()
+        val specialConstructions = ArrayList<Table>()
+        val blacklisted = ArrayList<Table>()
+        val disabledAutoAssignConstructions: Set<String> = cityView.getDisabledConstructions()
+
+        var maxButtonWidth = constructionsQueueTable.width
+        for (dto in constructionButtonDTOList) {
+            if (GameUiStyle.isAtlas) {
+                val construction = dto.construction
+                if (!construction.name.tr().contains(state.search.trim(), ignoreCase = true)) continue
+                if (state.availableOnly && !cityView.constructions.isBuildable(construction)) continue
+                val matchesCategory = when (state.category) {
+                    1 -> construction is BaseUnit
+                    2 -> construction is Building && !construction.isAnyWonder()
+                    3 -> construction is Building && construction.isAnyWonder()
+                    4 -> construction is PerpetualConstruction
+                    5 -> construction.name in disabledAutoAssignConstructions
+                    else -> true
+                }
+                if (!matchesCategory) continue
+            }
+
+            /** filter out showing buildings that have RequiresBuildingInThisCity
+             * rejection (eg requiredBuilding entry) which are buildable.
+             * The rejection for RequiresBuildingInThisCity isn't yielded if
+             * the prerequisite is in the queue
+             */
+            if (dto.construction is Building
+                    && dto.rejectionReason?.type == RejectionReasonType.RequiresBuildingInThisCity
+                    && constructionButtonDTOList.any {
+                        (it.construction is Building) && (it.construction.name == dto.construction.requiredBuilding
+                                || it.construction.replaces == dto.construction.requiredBuilding
+                                || it.construction.hasTagUnique(dto.construction.requiredBuilding!!, cityView.getState()))
+                    })
+                continue
+
+            val constructionButton = getConstructionButton(dto)
+            if (dto.construction.name in disabledAutoAssignConstructions)
+                blacklisted.add(constructionButton)
+            else when (dto.construction) {
+                is BaseUnit -> units.add(constructionButton)
+                is Building -> {
+                    when {
+                        dto.construction.isWonder -> buildableWonders += constructionButton
+                        dto.construction.isNationalWonder -> buildableNationalWonders += constructionButton
+                        else -> buildableBuildings += constructionButton
+                    }
+                }
+                is PerpetualConstruction -> specialConstructions.add(constructionButton)
+            }
+            maxButtonWidth = if (GameUiStyle.isAtlas) cardWidth else max(maxButtonWidth, constructionButton.packIfNeeded().width)
+        }
+
+        availableConstructionsTable.apply {
+            clear()
+            defaults().left().bottom()
+            addCategory("Units", units, maxButtonWidth, KeyboardBinding.BuildUnits)
+            addCategory("Buildings", buildableBuildings, maxButtonWidth, KeyboardBinding.BuildBuildings)
+            addCategory("Wonders", buildableWonders, maxButtonWidth, KeyboardBinding.BuildWonders)
+            addCategory("National Wonders", buildableNationalWonders, maxButtonWidth, KeyboardBinding.BuildNationalWonders)
+            addCategory("Other", specialConstructions, maxButtonWidth, KeyboardBinding.BuildOther)
+            addCategory("Disabled", blacklisted, maxButtonWidth, KeyboardBinding.BuildDisabled, startsOutOpened = false)
+            if (!hasChildren()) add("No results".toLabel(GameUiStyle.muted)).pad(12f).row()
+            pack()
+        }
+
+        availableConstructionsScrollPane.apply {
+            if (!GameUiStyle.isAtlas) setSize(maxButtonWidth, min(availableConstructionsTable.prefHeight, lowerTableScrollCell.maxHeight))
+            layout()
+            scrollY = if (GameUiStyle.isAtlas) state.catalogScroll else constructionsScrollY
+            updateVisualScroll()
+        }
+        if (GameUiStyle.isAtlas) {
+            GameUiStyle.applyWidget(availableConstructionsTable)
+            lowerTable.validate()
+        } else lowerTable.pack()
+        availableConstructionsTable.adjustContextMenuIndicators()
     }
 
     private fun getQueueEntry(constructionQueueIndex: Int, constructionName: String): Table {
@@ -428,23 +537,41 @@ class CityConstructionsTable(private val cityScreen: CityScreen) {
             text += "\n" + resourceName.getConsumesAmountString(amount, resource.isStockpiled).tr()
         }
 
-        table.defaults().pad(2f).minWidth(40f)
-        if (isFirstConstructionOfItsKind) table.add(getProgressBar(constructionName)).minWidth(5f)
-        else table.add().minWidth(5f)
-        table.add(ImageGetter.getConstructionPortrait(constructionName, 40f)).padRight(10f)
-        table.add(text.toLabel()).expandX().fillX().left()
-
-        if (queueExpander.isOpen) {
-            if (constructionQueueIndex > 0 && cityScreen.canCityBeChanged()){
-                table.add(getRaisePriorityButton(constructionQueueIndex, constructionName)).right()}
-            else table.add().right()
-            if (constructionQueueIndex != cityConstructions.constructionQueue.lastIndex && cityScreen.canCityBeChanged())
-                table.add(getLowerPriorityButton(constructionQueueIndex, constructionName)).right()
+        if (GameUiStyle.isAtlas) {
+            val summary = Table()
+            if (isFirstConstructionOfItsKind) summary.add(getProgressBar(constructionName)).width(5f)
+            summary.add(ImageGetter.getConstructionPortrait(constructionName, 40f)).padRight(8f)
+            summary.add(text.toLabel(GameUiStyle.ink, GameUiStyle.Type.body).apply { wrap = true })
+                .width((cardWidth - 70f).coerceAtLeast(40f)).growX().left()
+            table.add(summary).growX().minWidth(0f).row()
+            if (cityScreen.canCityBeChanged()) {
+                val controls = Table()
+                if (queueExpander.isOpen) {
+                    if (constructionQueueIndex > 0)
+                        controls.add(getRaisePriorityButton(constructionQueueIndex, constructionName)).size(40f)
+                    if (constructionQueueIndex != cityConstructions.constructionQueue.lastIndex)
+                        controls.add(getLowerPriorityButton(constructionQueueIndex, constructionName)).size(40f)
+                }
+                controls.add(getRemoveFromQueueButton(constructionQueueIndex)).size(40f)
+                table.add(controls).right().row()
+            }
+        } else {
+            table.defaults().pad(2f).minWidth(40f)
+            if (isFirstConstructionOfItsKind) table.add(getProgressBar(constructionName)).minWidth(5f)
+            else table.add().minWidth(5f)
+            table.add(ImageGetter.getConstructionPortrait(constructionName, 40f)).padRight(10f)
+            table.add(text.toLabel()).expandX().fillX().left()
+            if (queueExpander.isOpen) {
+                if (constructionQueueIndex > 0 && cityScreen.canCityBeChanged())
+                    table.add(getRaisePriorityButton(constructionQueueIndex, constructionName)).right()
+                else table.add().right()
+                if (constructionQueueIndex != cityConstructions.constructionQueue.lastIndex && cityScreen.canCityBeChanged())
+                    table.add(getLowerPriorityButton(constructionQueueIndex, constructionName)).right()
+                else table.add().right()
+            }
+            if (cityScreen.canCityBeChanged()) table.add(getRemoveFromQueueButton(constructionQueueIndex)).right()
             else table.add().right()
         }
-
-        if (cityScreen.canCityBeChanged()) table.add(getRemoveFromQueueButton(constructionQueueIndex)).right()
-        else table.add().right()
 
         table.touchable = Touchable.enabled
 
@@ -478,6 +605,12 @@ class CityConstructionsTable(private val cityScreen: CityScreen) {
     private fun selectQueueEntry(constructionQueueIndex: Int) = selectQueueEntry(constructionQueueIndex) {}
 
     private fun highlightQueueEntry(queueEntry: Table, highlight: Boolean) {
+        if (GameUiStyle.isAtlas) {
+            queueEntry.background = GameUiStyle.outlinedBackground("Atlas/City/QueueCard",
+                if (highlight) GameUiStyle.raised else GameUiStyle.inset,
+                if (highlight) GameUiStyle.accent else GameUiStyle.hover)
+            return
+        }
         queueEntry.background =
             if (highlight)
                 BaseScreen.skinStrings.getUiBackground(
@@ -520,7 +653,9 @@ class CityConstructionsTable(private val cityScreen: CityScreen) {
         val constructionTable = Table().apply { isTransform = false }
         val resourceTable = Table().apply { isTransform = false }
 
-        val textColor = if (constructionButtonDTO.rejectionReason == null) Color.WHITE else Color.RED
+        val textColor = if (GameUiStyle.isAtlas) {
+            if (constructionButtonDTO.rejectionReason == null) GameUiStyle.ink else GameUiStyle.error
+        } else if (constructionButtonDTO.rejectionReason == null) Color.WHITE else Color.RED
 
         val statIcons = if (construction is Building)
             " " + Stat.entries.filter { cityView.isStatRelated(it, construction) }.map { it.character }.joinToString("")
@@ -529,9 +664,12 @@ class CityConstructionsTable(private val cityScreen: CityScreen) {
         val constructionNameText = "${construction.name.tr(hideIcons = true)}$statIcons"
 
         constructionTable.add(constructionNameText.toLabel(fontColor = textColor, hideIcons = true).apply { wrap=true })
-            .width(cityScreen.stage.width/5).expandX().left().row()
+            .width(if (GameUiStyle.isAtlas) (cardWidth - 106f).coerceAtLeast(30f) else cityScreen.stage.width/5).expandX().left().row()
 
-        resourceTable.add(constructionButtonDTO.buttonText.toLabel()).expandX().left()
+        val cost = if (GameUiStyle.isAtlas && construction is INonPerpetualConstruction)
+            "${cityView.getConstructionProductionCost(construction)}${Stat.Production.character} · " else ""
+        resourceTable.add((cost + constructionButtonDTO.buttonText).toLabel().apply { wrap = GameUiStyle.isAtlas })
+            .minWidth(0f).expandX().left()
         if (constructionButtonDTO.resourcesRequired != null) {
             for ((resource, amount) in constructionButtonDTO.resourcesRequired) {
                 val color = if (constructionButtonDTO.rejectionReason?.type == RejectionReasonType.ConsumesResources)
@@ -568,10 +706,10 @@ class CityConstructionsTable(private val cityScreen: CityScreen) {
             icon.color.a = 0.5f
             if (constructionButtonDTO.rejectionReason.type != RejectionReasonType.ConsumesResources) {
                 pickConstructionButton.add(
-                    ColorMarkupLabel(constructionButtonDTO.rejectionReason.errorMessage, Color.RED)
+                    ColorMarkupLabel(constructionButtonDTO.rejectionReason.errorMessage, if (GameUiStyle.isAtlas) GameUiStyle.error else Color.RED)
                         .apply { wrap = true })
                     .colspan(pickConstructionButton.columns)
-                    .width(cityScreen.stage.width/4).fillX().left().padTop(2f)
+                    .width(if (GameUiStyle.isAtlas) cardWidth - 12f else cityScreen.stage.width/4).fillX().left().padTop(2f)
             }
         }
 
@@ -616,6 +754,17 @@ class CityConstructionsTable(private val cityScreen: CityScreen) {
         highlight: Boolean,
         clearOthers: Boolean = false
     ) {
+        if (GameUiStyle.isAtlas) {
+            pickConstructionButton.background = GameUiStyle.outlinedBackground("Atlas/City/ConstructionCard",
+                if (highlight) GameUiStyle.raised else GameUiStyle.inset,
+                if (highlight) GameUiStyle.accent else GameUiStyle.hover)
+            if (clearOthers) {
+                selectedQueueEntry = -1
+                // Rebuild through the same display adapter so only one card retains its selected rim.
+                renderAvailableConstructions(cachedConstructions)
+            }
+            return
+        }
         val unselected by lazy {
             // Lazy because possibly not needed (highlight true, clearOthers false) and slightly costly
             BaseScreen.skinStrings.getUiBackground(
@@ -709,6 +858,7 @@ class CityConstructionsTable(private val cityScreen: CityScreen) {
         button.touchable = Touchable.enabled
         // Don't bind the queue reordering keys here - those should affect only the selected entry, not all of them
         button.onActivation {
+            if (!cityScreen.canCityBeChanged()) return@onActivation
             // Rejected session commands leave this screen in place, so retain an
             // active control and its current selection until a commit is published.
             if (!usesAgentSession) button.touchable = Touchable.disabled
@@ -741,6 +891,7 @@ class CityConstructionsTable(private val cityScreen: CityScreen) {
         tab.add(ImageGetter.getImage("OtherIcons/Stop").surroundWithCircle(40f))
         tab.touchable = Touchable.enabled
         tab.onClick {
+            if (!cityScreen.canCityBeChanged()) return@onClick
             if (usesAgentSession) {
                 cityView.tryRemoveFromQueue(constructionQueueIndex, false)
                 return@onClick
@@ -765,6 +916,9 @@ class CityConstructionsTable(private val cityScreen: CityScreen) {
     }
 
     private fun getHeader(title: String): Table {
+        if (GameUiStyle.isAtlas) return Table().apply {
+            add(title.toLabel(GameUiStyle.accent, GameUiStyle.Type.label)).growX().left().pad(6f)
+        }
         return Table()
                 .background(
                     BaseScreen.skinStrings.getUiBackground(
@@ -804,6 +958,7 @@ class CityConstructionsTable(private val cityScreen: CityScreen) {
     }
 
     private fun resizeAvailableConstructionsScrollPane() {
+        if (GameUiStyle.isAtlas) { lowerTable.invalidateHierarchy(); return }
         availableConstructionsScrollPane.height =
             min(availableConstructionsTable.prefHeight, lowerTableScrollCell.maxHeight)
         lowerTable.pack()
@@ -814,7 +969,7 @@ class CityConstructionsTable(private val cityScreen: CityScreen) {
         list: ArrayList<Table>,
         prefWidth: Float,
         toggleKey: KeyboardBinding,
-        startsOutOpened: Boolean = !cityScreen.isCrampedPortrait()
+        startsOutOpened: Boolean = GameUiStyle.isAtlas || !cityScreen.isCrampedPortrait()
     ) {
         if (list.isEmpty()) return
 
@@ -830,9 +985,9 @@ class CityConstructionsTable(private val cityScreen: CityScreen) {
         ) {
             for (table in list) {
                 it.addSeparator(colSpan = 1)
-                it.add(table).left().row()
+                it.add(table).minWidth(0f).growX().left().row()
             }
         }
-        add(expander).prefWidth(prefWidth).growX().row()
+        add(expander).minWidth(0f).prefWidth(prefWidth).growX().row()
     }
 }

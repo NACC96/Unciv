@@ -263,6 +263,32 @@ class AgentSecondarySnapshotTest {
         assertEquals(f.greece.civID, f.world.currentViewerCivId())
     }
 
+    @Test fun panelSnapshotRefreshPreservesDraftAndDropsSpectatorActivityOnHumanView() = withFixture(spectator = true) { f ->
+        Mockito.`when`(f.session.getRunState()).thenReturn(AgentRunState.PAUSED)
+        Mockito.`when`(f.session.getMessageContacts()).thenReturn(listOf(MessageContact(f.greece.civID, "Athena", true)))
+        Mockito.`when`(f.session.getMessages()).thenReturn(emptyList())
+        Mockito.`when`(f.session.getActivity()).thenReturn(listOf(
+            AgentActivityEntry("private-greece", f.greece.civID, 1, "message", "", "", "now")))
+        Mockito.`when`(f.session.getActivityDetails("private-greece")).thenReturn("Spectator private strategy")
+        val tech = Mockito.mock(com.unciv.ui.screens.worldscreen.TechPolicyDiplomacyButtons::class.java)
+        Mockito.`when`(tech.y).thenReturn(600f)
+        put(WorldScreen::class.java, "techPolicyAndDiplomacy", f.world, tech)
+        val messages = com.unciv.ui.screens.worldscreen.status.AgentMessagesPanel(f.world, f.session)
+        val feed = com.unciv.ui.screens.worldscreen.status.AgentActivityFeed(f.world, f.session)
+        try {
+            messages.toggle()
+            val composer = messages.descendants().filterIsInstance<com.badlogic.gdx.scenes.scene2d.ui.TextArea>().single()
+            composer.text = "A draft retained across publication"; composer.cursorPosition = 8
+            f.publish(); messages.refresh(); feed.refresh()
+            assertEquals("A draft retained across publication", composer.text); assertEquals(8, composer.cursorPosition)
+            val payload = AgentSnapshotPublication.buildPayload(f.coordinator, f.rome.civID)
+            f.world.installAgentSnapshot(AgentSnapshotPublication.deserializeGame(payload), ResolvedSelection(null, null, null), payload.generation + 1, f.rome.civID)
+            feed.refresh(); messages.refresh()
+            assertFalse(feed.descendants().filterIsInstance<Label>().any { it.text.toString() == "Spectator private strategy" })
+            assertEquals("", composer.text)
+        } finally { messages.dispose(); feed.dispose() }
+    }
+
     @Test fun `native Human handoff replaces private city with retained privacy cover`() = withFixture { f ->
         val filesField = UncivGame::class.java.getDeclaredField("files").apply { isAccessible = true }
         val previousFiles = filesField.get(f.app)

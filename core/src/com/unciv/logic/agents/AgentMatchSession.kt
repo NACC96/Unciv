@@ -87,6 +87,16 @@ interface AgentMatchSession {
         if (image == null) sendMessage(targetCivId, text, onComplete)
         else onComplete("Image messaging is unavailable for this match")
     }
+    /** Match-wide map vision for agents and the local player; ordinary games keep fog of war. */
+    fun getVision(): MatchVision = MatchVision.FOG
+    /** Commits a new [MatchVision] off the rendering thread; completion runs on GL. */
+    fun setVision(vision: MatchVision, onComplete: (String?) -> Unit) {
+        onComplete("Map vision is unavailable for this match")
+    }
+    /** Deletes the viewer's own still-queued message off the rendering thread; completion runs on GL. */
+    fun deleteMessage(messageId: String, onComplete: (String?) -> Unit) {
+        onComplete("Deleting messages is unavailable for this match")
+    }
     /** Reads private preview bytes off the rendering thread; desktop completion runs on GL. */
     fun readMessageImage(messageId: String, attachmentId: String,
                          onComplete: (MessageImageDraft?, String?) -> Unit) {
@@ -97,7 +107,10 @@ interface AgentMatchSession {
     /** Transient intent only: leaving/closing cancels a change before it is durably applied. */
     fun getPendingNationChange(): String? = null
     fun canSpectate(): Boolean = false
-    /** Completion means durable application or a terminal error; live providers drain naturally. */
+    /**
+     * Applies between two atomic moves without pausing play. Completion means durable application
+     * or a terminal error; only Play as on the nation whose provider is mid-turn cuts that run off.
+     */
     fun requestNationChange(civId: String?, change: NationControlChange, profile: AgentProfile?,
                             onComplete: (String?) -> Unit) {
         onComplete("Nation settings are unavailable for this match")

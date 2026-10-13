@@ -80,7 +80,7 @@ export function buildTurnPrompt(input: TurnPromptInput): string {
     history.length ? `Recent private diplomatic correspondence (at most ${MAX_PROMPT_CORRESPONDENCE}, newest response/message first, long text clipped; own sent mail and delivered incoming mail only; game.observe diplomaticHistory has the full records):\n` +
       `Stored acknowledgementText is the recipient's reply on the original message. History is context, not a new acknowledgement requirement.\n` +
       history.map(message => JSON.stringify(message)).join("\n") : "",
-    "Begin with game.observe, inspect terrain before settling/building, preserve current worker progress, resolve decisions explicitly, batch independent commands with game.act_batch, play this turn, save concise notes, then commit game.end_turn.",
+    "Begin with game.observe, weigh the balance of power against your rivals, inspect terrain before settling/building, keep every settler and scout acting, preserve current worker progress, resolve decisions explicitly, batch independent commands with game.act_batch, play this turn, save concise notes, then commit game.end_turn.",
   ];
   return lines.filter(Boolean).join("\n\n");
 }

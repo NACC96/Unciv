@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "unitName": "Musketman",
+  "assetId": "musketman",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": null,
+  "uniqueTo": null,
+  "replaces": null,
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Musketman",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/musketman/e-motion-v1.png",
+      "rawHash": "23ce45ff5f3a33aa2703ea90673692a70feab911316260aa27bbdb3ba99855ac",
+      "promptPath": "art/atlas/units/musketman/prompts/e-v1.txt",
+      "promptHash": "b51514d68847ec2368170c19cac820e4d8d7700d9b5d5018b6059597c1a87eba",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/musketman/ne-motion-v1.png",
+      "rawHash": "134d6786cfa85e796e85b6b1bed157825733bf06f17d8a5c1f24ae85cd338545",
+      "promptPath": "art/atlas/units/musketman/prompts/ne-v1.txt",
+      "promptHash": "1a32d2327c1f6338503abac3bd5fb51dfff79cd40d26273b1f976cb2b6a8cc40",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/musketman/se-motion-v1.png",
+      "rawHash": "789273489bfeb6b587b10725319f2f62f4a26f77e64687e9f832c82a701a2caf",
+      "promptPath": "art/atlas/units/musketman/prompts/se-v1.txt",
+      "promptHash": "f10cda68eba46bd87cbc164cae145703207424d8f56384bdafae69728073df05",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
+}

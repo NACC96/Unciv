@@ -3,6 +3,8 @@ package com.unciv.ui.screens.multiplayerscreens
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import com.unciv.logic.multiplayer.FriendList
+import com.unciv.ui.components.GameUiStyle
+import com.unciv.ui.components.atlas.AtlasTwoPane
 import com.unciv.ui.screens.pickerscreens.PickerScreen
 import com.unciv.ui.popups.Popup
 import com.unciv.ui.components.extensions.disable
@@ -25,6 +27,7 @@ class ViewFriendsListScreen : PickerScreen() {
     private lateinit var selectedFriend: FriendList.Friend
 
     init {
+        setChoiceHeader("Friends")
         setDefaultCloseAction()
         rightSideButton.remove()
 
@@ -41,16 +44,31 @@ class ViewFriendsListScreen : PickerScreen() {
         tab.add(helpButton)
         tab.x = (stage.width - helpButton.width)
         tab.y = (stage.height - helpButton.height)
-        stage.addActor(tab)
+        if (GameUiStyle.isAtlas) {
+            GameUiStyle.apply(helpButton)
+            rightSideGroup.addActor(helpButton)
+        } else stage.addActor(tab)
 
-        val mainTable = Table()
-        mainTable.add(ScrollPane(leftSideTable).apply { setScrollingDisabled(true, false) }).height(stage.height * 2 / 3)
-        mainTable.add(rightSideTable)
-        topTable.add(mainTable).row()
-        scrollPane.setScrollingDisabled(false, true)
+        if (GameUiStyle.isAtlas) {
+            topTable.add(AtlasTwoPane(leftSideTable, rightSideTable, game.settings.fontSizeMultiplier))
+                .grow().minWidth(0f).minHeight(0f)
+            scrollPane.setScrollingDisabled(true, true)
+        } else {
+            val mainTable = Table()
+            mainTable.add(ScrollPane(leftSideTable).apply { setScrollingDisabled(true, false) }).height(stage.height * 2 / 3)
+            mainTable.add(rightSideTable)
+            topTable.add(mainTable).row()
+            scrollPane.setScrollingDisabled(false, true)
+        }
 
         rightSideTable.defaults().fillX()
         rightSideTable.defaults().pad(20.0f)
+        if (GameUiStyle.isAtlas) {
+            rightSideTable.defaults().growX().minWidth(0f).pad(8f)
+            addFriendButton.label.wrap = true
+            editFriendButton.label.wrap = true
+            friendsTable.defaults().growX().minWidth(0f)
+        }
 
         addFriendButton.onClick {
             game.pushScreen{ AddFriendScreen() }
@@ -65,6 +83,7 @@ class ViewFriendsListScreen : PickerScreen() {
         editFriendButton.disable()
 
         refreshFriendsList()
+        GameUiStyle.applyWidget(rightSideTable)
     }
 
     fun refreshFriendsList() {
@@ -72,15 +91,19 @@ class ViewFriendsListScreen : PickerScreen() {
         friendsTable.clear()
 
         for (index in friendsList.indices) {
-            listOfFriendsButtons.add(friendsList[index].name.toTextButton())
+            listOfFriendsButtons.add(friendsList[index].name.toTextButton().apply {
+                GameUiStyle.applyWidget(this)
+                if (GameUiStyle.isAtlas) label.wrap = true
+            })
 
             listOfFriendsButtons[index].onClick {
                 selectedFriend = friendsList[index]
                 editFriendButton.enable()
+                if (GameUiStyle.isAtlas) listOfFriendsButtons.forEachIndexed { i, button -> button.isChecked = i == index }
             }
             friendsTable.add(listOfFriendsButtons[index]).padBottom(10f).row()
         }
         leftSideTable.clear()
-        leftSideTable.add(friendsTable)
+        leftSideTable.add(friendsTable).apply { if (GameUiStyle.isAtlas) growX().minWidth(0f) }
     }
 }

@@ -2,6 +2,7 @@ package com.unciv.logic.agents
 
 import com.unciv.logic.GameInfo
 import com.unciv.logic.map.HexCoord
+import com.unciv.logic.presentation.VisualBatch
 
 /**
  * Snapshot publication contract (AI_AGENT_PLAN.md §9, §11.1).
@@ -26,7 +27,9 @@ class PublicationPayload(
     /** Last-known UI selection handles, re-resolved against the snapshot. */
     var selectedUnitId: Int? = null,
     var selectedCityId: String? = null,
-    var selectedTile: HexCoord? = null
+    var selectedTile: HexCoord? = null,
+    /** In-process only: excluded even if a caller serializes the publication envelope. */
+    @Transient var visualBatch: VisualBatch? = null
 )
 
 /** Resolution outcome for one selection handle against a new snapshot. */
@@ -55,7 +58,8 @@ object AgentSnapshotPublication {
         viewerCivId: String,
         selectedUnitId: Int? = null,
         selectedCityId: String? = null,
-        selectedTile: HexCoord? = null
+        selectedTile: HexCoord? = null,
+        visualBatch: VisualBatch? = null
     ): PublicationPayload {
         val serialized = coordinator.serializeCommittedGameForPublication()
         return PublicationPayload(
@@ -70,7 +74,8 @@ object AgentSnapshotPublication {
             viewerCivId = viewerCivId,
             selectedUnitId = selectedUnitId,
             selectedCityId = selectedCityId,
-            selectedTile = selectedTile
+            selectedTile = selectedTile,
+            visualBatch = visualBatch
         )
     }
 

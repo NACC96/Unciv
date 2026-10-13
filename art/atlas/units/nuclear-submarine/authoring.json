@@ -1,0 +1,103 @@
+{
+  "schemaVersion": 1,
+  "unitName": "Nuclear Submarine",
+  "assetId": "nuclear-submarine",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": null,
+  "uniqueTo": null,
+  "replaces": null,
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Nuclear Submarine",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/nuclear-submarine/e-motion-v2.png",
+      "rawHash": "7935e231fa36a00e49a173a62137bb0f4cb4ed389814bcecc4e27eef46316e34",
+      "promptPath": "art/atlas/units/nuclear-submarine/prompts/e-v2.txt",
+      "promptHash": "0b24945ed3f94e58845b1c4d101e0f643275d8420fef9a266fbc404f97068fbd",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/nuclear-submarine/ne-motion-v2.png",
+      "rawHash": "1d280c40f24fc9300d62039279c95958f79c3da18347c443f163f5981bf88c92",
+      "promptPath": "art/atlas/units/nuclear-submarine/prompts/ne-v2.txt",
+      "promptHash": "a71097b37f789d9b690cfba56a78b8c9c51c9a353d356c0c98acf2cbd4b36970",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ],
+      "identityReference": {
+        "path": "/Users/noahkenny/.codex/generated_images/01a1321a-8142-7533-ae7a-eb89a5433c70/exec-ec091ffb-fb83-4a24-8c5c-9b365d6ddc26.png",
+        "sha256": "7935e231fa36a00e49a173a62137bb0f4cb4ed389814bcecc4e27eef46316e34"
+      }
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/nuclear-submarine/se-motion-v2.png",
+      "rawHash": "162f885d4f35adb7c2085a66e63e8cb933c49446b0303088617c3c5bbc256f67",
+      "promptPath": "art/atlas/units/nuclear-submarine/prompts/se-v2.txt",
+      "promptHash": "6f0756cbbe76334c41541f43c56b3dbff5e31161521fe4be0523d9a7ab4203e5",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ],
+      "identityReference": {
+        "path": "/Users/noahkenny/.codex/generated_images/01a1321a-8142-7533-ae7a-eb89a5433c70/exec-ec091ffb-fb83-4a24-8c5c-9b365d6ddc26.png",
+        "sha256": "7935e231fa36a00e49a173a62137bb0f4cb4ed389814bcecc4e27eef46316e34"
+      }
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
+}

@@ -4,6 +4,33 @@ size: 512, 64
 format: RGBA8888
 filter: Linear, Linear
 repeat: none
+Skins/Atlas/control
+  rotate: false
+  xy: 426, 38
+  size: 16, 16
+  split: 4, 4, 4, 4
+  pad: 3, 3, 3, 3
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+Skins/Atlas/panel
+  rotate: false
+  xy: 426, 38
+  size: 16, 16
+  split: 4, 4, 4, 4
+  pad: 3, 3, 3, 3
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+Skins/Atlas/rim
+  rotate: false
+  xy: 450, 38
+  size: 16, 16
+  split: 4, 4, 4, 4
+  pad: 3, 3, 3, 3
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
 Skins/Minimal/checkbox
   rotate: false
   xy: 291, 23

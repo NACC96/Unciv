@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { spawn } from "node:child_process";
+import { mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { FakeGameService } from "../src/fake-game-mcp.js";
@@ -122,6 +124,62 @@ describe("daemon graceful shutdown", () => {
         write({ protocol: 1, kind: "control", op: "shutdown" });
       }
       await exited;
+    }
+  }, 20000);
+
+  it("stops an active provider at once when the desktop disappears", async () => {
+    const engine = new FakeGameService();
+    const logDir = mkdtempSync(join(tmpdir(), "unciv-daemon-eof-"));
+    const child = spawn(process.execPath, [join(runnerRoot, "dist", "daemon.js")], {
+      stdio: ["pipe", "pipe", "pipe"],
+      env: { ...process.env, UNCIV_AGENT_LOG_DIR: logDir },
+    });
+    let stderr = "";
+    let buffer = "";
+    let observations = 0;
+    const exited = new Promise<number | null>((resolveExit) => { child.once("exit", (code) => resolveExit(code)); });
+    const write = (frame: Record<string, unknown>) => { if (child.stdin.writable) child.stdin.write(JSON.stringify(frame) + "\n"); };
+    const until = async (condition: () => boolean, what: string) => {
+      for (const started = Date.now(); !condition(); await new Promise((r) => setTimeout(r, 20))) {
+        if (Date.now() - started > 10000) throw new Error(`${what} never happened; stderr: ${stderr}`);
+      }
+    };
+    child.stderr.setEncoding("utf-8");
+    child.stderr.on("data", (chunk: string) => { stderr += chunk; });
+    child.stdout.setEncoding("utf-8");
+    child.stdout.on("data", (chunk: string) => {
+      buffer += chunk;
+      const lines = buffer.split("\n");
+      buffer = lines.pop() ?? "";
+      for (const line of lines) {
+        if (!line.trim()) continue;
+        const frame = JSON.parse(line) as Record<string, unknown>;
+        // A provider that keeps retrying, as a real model did for minutes after a desktop crash.
+        if (frame["kind"] === "ready") write({ ...runControl("orphaned-turn"), providerConfig: { extra: { plan: "persist" } } });
+        if (frame["kind"] !== "engine_request") continue;
+        if (frame["method"] === "observe") observations += 1;
+        void Promise.resolve(frame["method"] === "notes_get" ? engine.readNotes() : engine.observe())
+          .then((result) => write({ protocol: 1, kind: "engine_response", id: frame["id"], ok: true, result }));
+      }
+    });
+    let providerPid = 0;
+    try {
+      // Observation 1 is supervisor preflight; later ones come from the provider itself.
+      await until(() => observations >= 2, "a provider observation");
+      await until(() => /Provider pid=\d+/.test(stderr), "the provider pid report");
+      providerPid = Number(/Provider pid=(\d+)/.exec(stderr)?.[1]);
+
+      const disconnectedAt = Date.now();
+      child.stdin.end(); // The desktop exited or crashed.
+      const code = await Promise.race([exited, new Promise<string>((r) => setTimeout(() => r("still running"), 5000))]);
+      expect(code).toBe(0);
+      expect(Date.now() - disconnectedAt).toBeLessThan(3000);
+      expect(() => process.kill(providerPid, 0)).toThrow();
+    } finally {
+      if (providerPid > 0) try { process.kill(providerPid, "SIGKILL"); } catch { /* Already stopped. */ }
+      if (child.exitCode === null && child.signalCode === null) child.kill("SIGKILL");
+      await exited;
+      rmSync(logDir, { recursive: true, force: true });
     }
   }, 20000);
 });

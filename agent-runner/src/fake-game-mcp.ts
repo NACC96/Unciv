@@ -1,4 +1,4 @@
-import type { HexPosition, MapQuery, MapPage, MapSummary, ObservedTile, RulesQuery, RulesResult, WorkerImprovementOption, WorkInProgress } from "./map-types.js";
+import type { HexPosition, MatchVision, MapQuery, MapPage, MapSummary, ObservedTile, RulesQuery, RulesResult, WorkerImprovementOption, WorkInProgress } from "./map-types.js";
 
 /**
  * Engine-service seam (AI_AGENT_PLAN.md §3.1, §7).
@@ -188,6 +188,7 @@ export interface FakeError {
 
 export class FakeGameService implements IGameService {
   revision = 42;
+  vision: MatchVision = "FOG";
   /** actionId -> {requestFingerprint, receipt} for idempotency tests. */
   private receipts = new Map<string, { fingerprint: string; receipt: FakeReceipt }>();
   /** Logical single-mutation slot (plan §5.1): true while a mutation is in flight. */
@@ -211,7 +212,7 @@ export class FakeGameService implements IGameService {
     return {
       observationVersion: 2,
       mapSummary: { observationVersion: 2, coordinateSystem: "UNCIV_HEX", knownTileCount: this.tiles.length,
-        visibleTileCount: this.tiles.filter(t => t.visibility === "VISIBLE").length, worldWrap: false },
+        visibleTileCount: this.tiles.filter(t => t.visibility === "VISIBLE").length, worldWrap: false, vision: this.vision },
       revision: this.revision,
       activeTurn: !this.turnEnded,
       turnEnded: this.turnEnded,
@@ -256,7 +257,7 @@ export class FakeGameService implements IGameService {
         ((query.center === undefined) !== (query.radius === undefined)) ||
         (query.center !== undefined && (!Number.isInteger(query.center.x) || !Number.isInteger(query.center.y))))
       return { protocolVersion: 1, status: "rejected", code: "INVALID_ARGUMENT", message: "invalid map query" };
-    const key = JSON.stringify([query.mode ?? "KNOWN", query.center ?? null, query.radius ?? null, limit]);
+    const key = JSON.stringify([this.vision, query.mode ?? "KNOWN", query.center ?? null, query.radius ?? null, limit]);
     let offset = 0;
     if (query.cursor !== undefined) {
       try {

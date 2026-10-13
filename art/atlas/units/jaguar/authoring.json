@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "unitName": "Jaguar",
+  "assetId": "jaguar",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": "Jaguar",
+  "uniqueTo": "Aztecs",
+  "replaces": "Warrior",
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Jaguar",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/jaguar/e-motion-v2.png",
+      "rawHash": "22321f2ad43cb9ea89ac0fa4177bf9bbd182ca3fa1dc33de2a0a59436dea5b5e",
+      "promptPath": "art/atlas/units/jaguar/prompts/e-v2.txt",
+      "promptHash": "8bd2d76bdc1da7eefb40bf852e6fba1b21fb813d215e4c7a471db5aa869641ee",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/jaguar/ne-motion-v2.png",
+      "rawHash": "47a3d240c44c66c877f3a0fbbe58b759fbcbf0fce01f8ace13304cd85bcaa814",
+      "promptPath": "art/atlas/units/jaguar/prompts/ne-v2.txt",
+      "promptHash": "29e7b9ae0a797617b500489f9ecc056017cfb89f33fa0d0fa203087201eabe6e",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/jaguar/se-motion-v2.png",
+      "rawHash": "931e505f80b0f35dd407f99b69eecaed0050cfdc657fde5f762bf5c221992f47",
+      "promptPath": "art/atlas/units/jaguar/prompts/se-v2.txt",
+      "promptHash": "c98fb5d5a318542cb1070b9696f52a1f949799f17b15c121e9cc40639ba4eecb",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
+}

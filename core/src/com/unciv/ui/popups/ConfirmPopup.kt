@@ -4,6 +4,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle
 import com.badlogic.gdx.utils.Align
 import com.unciv.Constants
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.extensions.toLabel
 import com.unciv.ui.components.input.KeyboardBinding
 import com.unciv.ui.screens.basescreen.BaseScreen
@@ -39,12 +40,24 @@ open class ConfirmPopup(
 
     init {
         promptLabel.setAlignment(Align.center)
-        add(promptLabel).colspan(2).row()
+        if (GameUiStyle.isAtlas) {
+            innerTable.background = GameUiStyle.panelBackground("ConfirmPopup/Panel", 1f)
+            promptLabel.wrap = true
+        }
+        add(promptLabel).colspan(2).apply {
+            if (GameUiStyle.isAtlas) width((maxPopupWidth - 64f).coerceAtMost(540f))
+        }.row()
         addCloseButton(Constants.cancel, KeyboardBinding.Cancel, action = restoreDefault)
         val confirmStyleName = if (isConfirmPositive) "positive" else "negative"
         val confirmStyle = BaseScreen.skin.get(confirmStyleName, TextButtonStyle::class.java)
         addOKButton(confirmText, KeyboardBinding.Confirm, confirmStyle, action = action)
         equalizeLastTwoButtonWidths()
+        if (GameUiStyle.isAtlas) {
+            for (cell in bottomTable.cells) {
+                (cell.actor as? com.badlogic.gdx.scenes.scene2d.ui.TextButton)?.label?.wrap = true
+                cell.minWidth(0f).width(((maxPopupWidth - 64f) / 2f).coerceAtMost(270f)).growX().minHeight(44f)
+            }
+        }
     }
 
 }

@@ -1,0 +1,97 @@
+{
+  "schemaVersion": 1,
+  "unitName": "Samurai",
+  "assetId": "samurai",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": "Samurai",
+  "uniqueTo": "Japan",
+  "replaces": "Longswordsman",
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Samurai",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT",
+    "WORK"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8,
+    "WORK": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/samurai/e-motion-v1.png",
+      "rawHash": "e81ff4fd96925562e7d663955b4c66dcd91c4a31ee6b0ac402f0db13b0ea364c",
+      "promptPath": "art/atlas/units/samurai/prompts/e-v1.txt",
+      "promptHash": "7d5bafe42606caf80c313c876e9efea7ef5a7241943712e7a9909acffd83e534",
+      "cells": {
+        "columns": 8,
+        "rows": 5
+      },
+      "rawDimensions": [
+        1586,
+        992
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/samurai/ne-motion-v1.png",
+      "rawHash": "5c42f7aa03e58b52af8018d9586a67b0d2129d2a5ce75a1b67c32fd19d36b31c",
+      "promptPath": "art/atlas/units/samurai/prompts/ne-v1.txt",
+      "promptHash": "5ecd4c78cfe04e311d4e4e36f698d221d0cd0b883b803e9c088dfdc5b375c231",
+      "cells": {
+        "columns": 8,
+        "rows": 5
+      },
+      "rawDimensions": [
+        1586,
+        992
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/samurai/se-motion-v1.png",
+      "rawHash": "d48ba347356ebe4fa7030db1709d95e16ee8ee245d592ee1a8e10f58d31a1e62",
+      "promptPath": "art/atlas/units/samurai/prompts/se-v1.txt",
+      "promptHash": "4b36c7c053691c22a9a04a18c9094a18fe7be1bd4b7f35dbbcbaef3f837d45c5",
+      "cells": {
+        "columns": 8,
+        "rows": 5
+      },
+      "rawDimensions": [
+        1586,
+        992
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
+}

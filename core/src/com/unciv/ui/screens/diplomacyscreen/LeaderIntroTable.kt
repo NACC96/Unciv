@@ -2,6 +2,7 @@ package com.unciv.ui.screens.diplomacyscreen
 
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.utils.Align
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.Constants
 import com.unciv.UncivGame
 import com.unciv.logic.civilization.Civilization
@@ -33,7 +34,23 @@ class LeaderIntroTable (
         val leaderPortraitFile = "LeaderIcons/" + nation.leaderName
         val leaderLabel = civInfo.getLeaderDisplayName().toLabel(fontSize = Constants.headingFontSize, hideIcons = true)
         val nationIndicator = ImageGetter.getNationPortrait(nation, 24f)
-        if (nation.leaderName.isNotEmpty() && ImageGetter.imageExists(leaderPortraitFile)) {
+        if (GameUiStyle.isAtlas) {
+            name = "AtlasLeaderIdentity"
+            background = GameUiStyle.panelBackground("Atlas/Diplomacy/Identity", 1f)
+            pad(GameUiStyle.Space.l)
+            leaderLabel.wrap = true
+            leaderLabel.color = GameUiStyle.ink
+            val portrait = if (nation.leaderName.isNotEmpty() && ImageGetter.imageExists(leaderPortraitFile))
+                ImageGetter.getImage(leaderPortraitFile) else ImageGetter.getNationPortrait(nation, 56f)
+            add(portrait).size(64f).top().padRight(GameUiStyle.Space.l)
+            val identity = Table().apply {
+                add(leaderLabel).growX().minWidth(0f).left().row()
+                add(nation.name.toLabel(GameUiStyle.muted).apply { wrap = true }).growX().minWidth(0f).left().row()
+                if (hello.isNotEmpty()) add(hello.toLabel(GameUiStyle.ink).apply { wrap = true })
+                    .growX().minWidth(0f).left().padTop(GameUiStyle.Space.m)
+            }
+            add(identity).growX().minWidth(0f)
+        } else if (nation.leaderName.isNotEmpty() && ImageGetter.imageExists(leaderPortraitFile)) {
             val nameTable = Table()
             nameTable.add(leaderLabel)
             nameTable.add(nationIndicator).pad(0f, 10f, 5f, 0f).row()

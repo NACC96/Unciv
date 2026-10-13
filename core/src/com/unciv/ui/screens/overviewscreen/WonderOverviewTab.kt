@@ -3,6 +3,7 @@ package com.unciv.ui.screens.overviewscreen
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.utils.Align
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.UncivGame
 import com.unciv.logic.city.City
 import com.unciv.logic.civilization.Civilization
@@ -49,7 +50,12 @@ class WonderOverviewTab(
 
         createGrid()
 
+        if (GameUiStyle.isAtlas) {
+            AtlasEmpireUi.panel(fixedContent, "WonderColumns")
+            AtlasEmpireUi.prepare(this)
+        }
         equalizeColumns(fixedContent, this)
+        applyAtlasPresentation()
     }
 
     private fun createGrid() {
@@ -73,7 +79,10 @@ class WonderOverviewTab(
             // Terrain image padding is a bit unpredictable, they need ~5f more. Ensure equal line spacing on name, not image:
             add(image).pad(0f, 10f, 0f, 10f)
 
-            add(wonder.getNameColumn().toLabel(hideIcons = true)).pad(15f, 10f, 15f, 10f)
+            val nameLabel = wonder.getNameColumn().toLabel(hideIcons = true)
+            if (GameUiStyle.isAtlas) nameLabel.wrap = true
+            add(nameLabel).minWidth(0f).prefWidth(if (GameUiStyle.isAtlas) 220f else nameLabel.prefWidth)
+                .pad(15f, 10f, 15f, 10f)
             add(wonder.getStatusColumn().toLabel())
             val locationText = wonder.getLocationColumn()
             if (locationText.isNotEmpty()) {

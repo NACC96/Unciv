@@ -1,0 +1,305 @@
+{
+  "schemaVersion": 1,
+  "batchId": "resources-2",
+  "tool": "built-in image_gen",
+  "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/terrain-authoring/raw/resources-2.png",
+  "rawSha256": "7fab6db29834840548c98bad588eb0b66af78724a1588134fc2ddb05345ad02b",
+  "rawDimensions": [
+    1261,
+    1247
+  ],
+  "promptPath": "art/atlas/terrain/resources-2-prompt.txt",
+  "promptSha256": "32ddecc669c70daed0a8b8110b626b1f67f71d7feddba2c96a0dbefbb7e8cba0",
+  "reviewState": "candidate",
+  "formalAcceptance": "deferred by user",
+  "cells": [
+    {
+      "item": "Iron",
+      "cell": 0,
+      "cropBox": [
+        0,
+        0,
+        315,
+        312
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Iron.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "resource",
+      "sha256": "5fa10e18568bd9e04eb09d6739fa6a58674a833be8b06cb66c4aa37a900c0fbb",
+      "clippingMargin": 0
+    },
+    {
+      "item": "Ivory",
+      "cell": 1,
+      "cropBox": [
+        315,
+        0,
+        630,
+        312
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Ivory.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "resource",
+      "sha256": "416b77eaff59d2f2447913aaca6e58c0783adf2db6741a031a1eb2efca8b64b5",
+      "clippingMargin": 0
+    },
+    {
+      "item": "Jewelry",
+      "cell": 2,
+      "cropBox": [
+        630,
+        0,
+        946,
+        312
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Jewelry.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "resource",
+      "sha256": "a228ed53951f50101779931897f3a263ae67a013fc9ae9113b175af2435d7cbc",
+      "clippingMargin": 0
+    },
+    {
+      "item": "Marble",
+      "cell": 3,
+      "cropBox": [
+        946,
+        0,
+        1261,
+        312
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Marble.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "resource",
+      "sha256": "67ded84b214a6e0251bab5652e0989cffdfadb21ecb0e2d8b65ddf511186a437",
+      "clippingMargin": 0
+    },
+    {
+      "item": "Oil",
+      "cell": 4,
+      "cropBox": [
+        0,
+        312,
+        315,
+        624
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Oil.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "resource",
+      "sha256": "fe25b311f194593483c2cf4dc506ed969ad2f305d9da3cb9c727d6182a86ec5d",
+      "clippingMargin": 0
+    },
+    {
+      "item": "Pearls",
+      "cell": 5,
+      "cropBox": [
+        315,
+        312,
+        630,
+        624
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Pearls.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "resource",
+      "sha256": "b920cef263eba9788ee9ed520b4c2bfe53688c6356d0eeb4762ee73b39a971e4",
+      "clippingMargin": 0
+    },
+    {
+      "item": "Porcelain",
+      "cell": 6,
+      "cropBox": [
+        630,
+        312,
+        946,
+        624
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Porcelain.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "resource",
+      "sha256": "79555ad5b1db93ca6b4129ad521f5eecee3d9d91ea78aa41ba23d519d2ff26b8",
+      "clippingMargin": 0
+    },
+    {
+      "item": "Salt",
+      "cell": 7,
+      "cropBox": [
+        946,
+        312,
+        1261,
+        624
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Salt.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "resource",
+      "sha256": "25a33870e3aac5dc7028d318004a6836ad5b5d6ec5069e149f8c543f43c20c9d",
+      "clippingMargin": 0
+    },
+    {
+      "item": "Sheep",
+      "cell": 8,
+      "cropBox": [
+        0,
+        624,
+        315,
+        935
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Sheep.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "resource",
+      "sha256": "4497ab87d2b51bb17de44ef3e1427d96dcbf16d3d2a47be3b63e64070e923d57",
+      "clippingMargin": 0
+    },
+    {
+      "item": "Silk",
+      "cell": 9,
+      "cropBox": [
+        315,
+        624,
+        630,
+        935
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Silk.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "resource",
+      "sha256": "c56b55553090131df8ec43c59202d4903aae465b2cc6e5fda6a4b4e9c5305bdc",
+      "clippingMargin": 0
+    },
+    {
+      "item": "Silver",
+      "cell": 10,
+      "cropBox": [
+        630,
+        624,
+        946,
+        935
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Silver.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "resource",
+      "sha256": "8b91556c944852c16167f25d0cd10f71969b54704df5d5e90a90df1d4e86f0d1",
+      "clippingMargin": 0
+    },
+    {
+      "item": "Spices",
+      "cell": 11,
+      "cropBox": [
+        946,
+        624,
+        1261,
+        935
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Spices.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "resource",
+      "sha256": "58cf26f2306f79bca5299fa1b47d05ea5316422b0ff07a4f7e3bc2fb74d34570",
+      "clippingMargin": 0
+    },
+    {
+      "item": "Stone",
+      "cell": 12,
+      "cropBox": [
+        0,
+        935,
+        315,
+        1247
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Stone.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "resource",
+      "sha256": "1c3cdf21197d96ea307e958aee9555c995087860c3cec8b669826f69a636c951",
+      "clippingMargin": 0
+    },
+    {
+      "item": "Sugar",
+      "cell": 13,
+      "cropBox": [
+        315,
+        935,
+        630,
+        1247
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Sugar.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "resource",
+      "sha256": "450d80f208054144747bb8219eb4f4530ccd1d174977f79ed299d4ed6390d7d0",
+      "clippingMargin": 0
+    },
+    {
+      "item": "Truffles",
+      "cell": 14,
+      "cropBox": [
+        630,
+        935,
+        946,
+        1247
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Truffles.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "resource",
+      "sha256": "4eaf957a6fb2eb972ee272cd1be78309e98e060e70668eb36a258f65ef1aae52",
+      "clippingMargin": 0
+    },
+    {
+      "item": "Uranium",
+      "cell": 15,
+      "cropBox": [
+        946,
+        935,
+        1261,
+        1247
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Uranium.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "resource",
+      "sha256": "aafcbc0425e0c3e0f9aa1d1c32917c69a6a3a2935e4ef5b94af7179dcfa6b24e",
+      "clippingMargin": 0
+    }
+  ]
+}

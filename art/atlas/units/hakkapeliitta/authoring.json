@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "unitName": "Hakkapeliitta",
+  "assetId": "hakkapeliitta",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": "Hakkapeliitta",
+  "uniqueTo": "Sweden",
+  "replaces": "Lancer",
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Hakkapeliitta",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/hakkapeliitta/e-motion-v1.png",
+      "rawHash": "348f2db61c08ed857eb3573f852e0a6b8137b5a71ce4a3c7e2b0a058f8daf092",
+      "promptPath": "art/atlas/units/hakkapeliitta/prompts/e-v1.txt",
+      "promptHash": "61f4ea3ea6be032fcc97f78c3164885de3567a758810e6f80f7070d6dce9ee71",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/hakkapeliitta/ne-motion-v1.png",
+      "rawHash": "e182cb41a30ba7d2f8c7dafb00aa56b64e599ad64b81910de651882494dee10a",
+      "promptPath": "art/atlas/units/hakkapeliitta/prompts/ne-v1.txt",
+      "promptHash": "270e2f3f0ce12836d5c2b06f439841c346a678c38f645b9d31dfe4ef4d7f3f7b",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/hakkapeliitta/se-motion-v1.png",
+      "rawHash": "b82dcf87d21dbaa842c2c5b5cd9547c7fd7a1b4a807e139f725834e5bd8a169e",
+      "promptPath": "art/atlas/units/hakkapeliitta/prompts/se-v1.txt",
+      "promptHash": "acd561155334a41ccd9e02153f309ba54d3bc9f5aa5498fc68f563ae131273c5",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
+}

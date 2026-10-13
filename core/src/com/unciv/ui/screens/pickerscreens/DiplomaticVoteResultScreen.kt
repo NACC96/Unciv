@@ -6,6 +6,9 @@ import com.unciv.logic.civilization.CivFlags
 import com.unciv.logic.civilization.Civilization
 import com.unciv.models.UncivSound
 import com.unciv.models.translations.tr
+import com.unciv.ui.components.GameUiStyle
+import com.unciv.ui.components.atlas.AtlasChoiceCard
+import com.unciv.ui.components.atlas.AtlasChoiceState
 import com.unciv.ui.components.extensions.enable
 import com.unciv.ui.components.extensions.toLabel
 import com.unciv.ui.components.input.KeyCharAndCode
@@ -22,7 +25,8 @@ class DiplomaticVoteResultScreen(
     private val civOwningUN: String?
 
     init {
-        closeButton.remove()
+        setChoiceHeader("Diplomatic Victory", "Voted for")
+        if (GameUiStyle.isAtlas) closeButton.isVisible = false else closeButton.remove()
         topTable.pad(10f)
         topTable.defaults().space(15f)
 
@@ -49,11 +53,27 @@ class DiplomaticVoteResultScreen(
         rightSideButton.keyShortcuts.add(KeyCharAndCode.SPACE)
         rightSideButton.enable()
         rightSideButton.setText("Continue".tr())
-        bottomTable.cells[0].minWidth(rightSideButton.prefWidth + 20f)  // center descriptionLabel
+        if (!GameUiStyle.isAtlas)
+            bottomTable.cells[0].minWidth(rightSideButton.prefWidth + 20f)  // center descriptionLabel
     }
 
     private fun addVote(civ: Civilization, votesReceived: Int) {
         val civName = civ.civName
+        if (GameUiStyle.isAtlas) {
+            val votedCiv = votesCast[civ.civID]?.let { gameInfo.getCivilization(it) }
+                ?.takeUnless { it.isDefeated() }
+            val detail = buildString {
+                if (civ.isMajorCiv()) append("${votesReceived.tr()} ${"Votes received".tr()}\n")
+                append(if (civ.civID == civOwningUN && constructionNameUN != null)
+                    "[2] votes".tr() + " · " + constructionNameUN.tr() else "[1] vote".tr())
+                append("\n" + if (votedCiv == null) "Abstained".tr()
+                    else "${"Voted for".tr()}: ${votedCiv.civName.tr(hideIcons = true)}")
+            }
+            topTable.add(AtlasChoiceCard(civName, detail, AtlasChoiceState.COMPLETED) {}
+                .withIcon(ImageGetter.getNationPortrait(civ.nation, 36f)))
+                .width((stage.width - 40f).coerceAtMost(760f)).minWidth(0f).row()
+            return
+        }
 
         if (civ.isMajorCiv()) topTable.add(votesReceived.toLabel()) else topTable.add()
 

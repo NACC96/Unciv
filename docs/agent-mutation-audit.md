@@ -114,7 +114,12 @@ matches, interceptors yield false and execute the legacy callbacks.
 ### 1. Unit Orders & Actions (`UnitActionsTable.kt`)
 - **Unit orders**: `EXPLORE`, `STOP_EXPLORATION`, `AUTOMATE`, `STOP_AUTOMATION`,
   `GUARD`, `SET_UP`, `AIR_SWEEP`, `ESCORT_FORMATION`, and `STOP_ESCORT_FORMATION`
-  are routed via `UnitOrderCommand`.
+  are routed via `UnitOrderCommand`. Commandable civilizations' standing automation
+  is cleared at their turn start, so `EXPLORE` explores immediately with the unit's
+  remaining movement, like the Explore button. `AUTOMATE` on a city-founding unit
+  runs Unciv's settler choice immediately (best ranked reachable site, founding on
+  arrival) without the UI found-city action, which would route back through the
+  session; on other units it keeps its previous behavior.
 - **Unit movement cancellation**: `UnitActionType.StopMovement` maps to `UnitOrder.WAKE`,
   clearing movement and wake-up state through `UnitOrderCommand`.
 - **Unit gifts**: `UnitActionType.GiftUnit` is routed via `GiftUnitCommand`. Validated

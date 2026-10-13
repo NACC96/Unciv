@@ -4,6 +4,8 @@ import com.badlogic.gdx.scenes.scene2d.Group
 import com.unciv.Constants
 import com.unciv.UncivGame
 import com.unciv.logic.agents.*
+import com.unciv.logic.presentation.VisualBatch
+import com.unciv.logic.presentation.VisualViewKey
 import com.unciv.testing.GdxTestRunner
 import com.unciv.testing.TestGame
 import com.unciv.ui.screens.basescreen.BaseScreen
@@ -22,6 +24,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Answers
 import org.mockito.Mockito
+import java.util.concurrent.atomic.AtomicLong
+import java.util.concurrent.atomic.AtomicReference
 
 @RunWith(GdxTestRunner::class)
 class AgentNationViewTest {
@@ -51,9 +55,16 @@ class AgentNationViewTest {
             put(WorldScreen::class.java, "selectedCiv", spectator)
             put(WorldScreen::class.java, "selectedGameView", GameView(game.gameInfo, spectator, true))
             put(WorldScreen::class.java, "agentPublicationFence", AgentPublicationFence())
+            put(WorldScreen::class.java, "visualLock", Any())
+            put(WorldScreen::class.java, "visualAuthoritySerial", AtomicLong())
+            put(WorldScreen::class.java, "visualViewState", AtomicReference(VisualViewKey(spectator.civID, true, 1L)))
+            put(WorldScreen::class.java, "visualTimelineDelegate", lazy {
+                Mockito.mock(com.unciv.ui.screens.worldscreen.presentation.WorldVisualTimeline::class.java)
+            })
             put(WorldScreen::class.java, "mapHolder", map)
             put(WorldScreen::class.java, "bottomUnitTable", unit)
             put(WorldScreen::class.java, "undoHandler", undo)
+            Mockito.`when`(session.getVision()).thenReturn(MatchVision.FOG)
             screen.agentSession = session
             screen.fogOfWar = false
             UncivGame::class.java.getDeclaredField("worldScreen").apply { isAccessible = true }.set(UncivGame.Current, screen)
@@ -66,9 +77,24 @@ class AgentNationViewTest {
 
     private fun installWithViewer(screen: WorldScreen, game: com.unciv.logic.GameInfo, selection: ResolvedSelection,
                                   generation: Long, viewer: String) {
-        val method = WorldScreen::class.java.methods.firstOrNull { it.name == "installAgentSnapshot" && it.parameterCount == 4 }
+        val method = WorldScreen::class.java.methods.firstOrNull { it.name == "installAgentSnapshot" && it.parameterCount == 5 }
         assertNotNull("Snapshot publication must accept a committed viewer", method)
-        method!!.invoke(screen, game, selection, generation, viewer)
+        method!!.invoke(screen, game, selection, generation, viewer, null)
+    }
+
+    @Test fun `ribbon inspection survives HUD refresh without changing viewer or controller`() {
+        val f = Fixture()
+        f.screen.inspectNation(f.rome.civID)
+        WorldScreen::class.java.getDeclaredMethod("updateSelectedCiv").apply { isAccessible = true }.invoke(f.screen)
+        assertSame(f.rome, f.screen.selectedCiv)
+        assertSame(f.spectator, f.screen.viewingCiv)
+        assertTrue(f.screen.selectedGameView.spectatorMode)
+        assertFalse("Ribbon inspection cannot change control or match vision",
+            Mockito.mockingDetails(f.session).invocations.any { it.method.name in setOf("requestNationChange", "setVision") })
+        installWithViewer(f.screen, f.snapshot(), ResolvedSelection(null, null, null), 1, f.rome.civID)
+        f.screen.inspectNation(f.spectator.civID)
+        assertEquals(f.rome.civID, f.screen.selectedCiv.civID)
+        assertFalse(f.screen.selectedGameView.spectatorMode)
     }
 
     @Test fun `host always consumes Next Turn even when current viewer cannot end it`() {
@@ -103,9 +129,10 @@ class AgentNationViewTest {
         assertSame(snapshot, f.screen.gameInfo)
         assertSame(snapshot.getCivilization(f.rome.civID), f.screen.viewingCiv)
         assertSame(f.screen.viewingCiv, f.screen.selectedCiv)
-        assertTrue(f.screen.fogOfWar)
         assertFalse(f.screen.selectedGameView.spectatorMode)
-        assertSame(f.screen.selectedGameView, f.screen.getGameViewConsideringForOfWar())
+        assertFalse(f.screen.hasSpectatorVision())
+        assertSame("Without a local spectator, a lifted-fog preference cannot reveal anything",
+            f.screen.selectedGameView, f.screen.getGameViewConsideringForOfWar())
         assertNull(selectedTile(f.map))
         assertTrue(Mockito.mockingDetails(f.unit).invocations.any {
             it.method.name.substringBefore('$') == "reselectAfterSnapshot" && it.arguments.all { arg -> arg == null }
@@ -148,9 +175,46 @@ class AgentNationViewTest {
             com.unciv.ui.components.input.KeyboardBindings[com.unciv.ui.components.input.KeyboardBinding.TechnologyTree])
         resolver.updateFor(fog.keyShortcuts)
         resolver.updateFor(tech.keyShortcuts)
+        val fogBefore = f.screen.fogOfWar
         resolver.triggeredActions.forEach { it() }
-        assertTrue("Technology shortcut must retain ordinary fog", f.screen.fogOfWar)
+        assertFalse("A private nation has no fog toggle", fog.isVisible)
+        assertEquals("Technology shortcut must not toggle fog", fogBefore, f.screen.fogOfWar)
+        assertSame(f.screen.selectedGameView, f.screen.getGameViewConsideringForOfWar())
         assertEquals(1, Mockito.mockingDetails(game).invocations.count { it.method.name == "pushScreen" })
+    }
+
+    @Test fun `spectator playing a nation can lift fog without losing that nation's view or T`() {
+        val f = Fixture(); Mockito.`when`(f.session.canSpectate()).thenReturn(true)
+        f.game.addCity(f.rome, f.game.tileMap[0, 0])
+        UncivGame.Current.settings.tutorialTasksCompleted.add("Meet another civilization")
+        com.unciv.ui.components.fonts.Fonts.fontImplementation = com.unciv.dev.FontDesktop()
+        com.unciv.ui.images.ImageGetter.setNewRuleset(f.game.ruleset)
+        val snapshot = f.snapshot()
+        installWithViewer(f.screen, snapshot, ResolvedSelection(null, null, null), 1, f.rome.civID)
+        assertTrue(f.screen.hasSpectatorVision())
+        assertFalse("The fog preference survives the takeover", f.screen.fogOfWar)
+        val unfogged = f.screen.getGameViewConsideringForOfWar()
+        assertTrue(unfogged.revealMap); assertFalse(unfogged.spectatorMode)
+        assertEquals("Ownership and controls stay with the played nation", f.rome.civID, unfogged.civView.getCiv().civID)
+        assertFalse(f.screen.selectedGameView.revealMap)
+        val game = Mockito.mock(UncivGame::class.java)
+        Mockito.`when`(game.gameInfo).thenReturn(snapshot)
+        field(BaseScreen::class.java, "game").set(f.screen, game)
+        val controls = com.unciv.ui.screens.worldscreen.TechPolicyDiplomacyButtons(f.screen)
+        for (name in listOf("updateFogOfWarButton", "updateTechButton"))
+            controls.javaClass.getDeclaredMethod(name).apply { isAccessible = true }.invoke(controls)
+        val fog = field(controls.javaClass, "fogOfWarButtonHolder").get(controls) as com.badlogic.gdx.scenes.scene2d.Actor
+        val tech = field(controls.javaClass, "techButtonHolder").get(controls) as com.badlogic.gdx.scenes.scene2d.Actor
+        assertTrue(fog.isVisible)
+        val resolver = com.unciv.ui.components.input.KeyShortcutDispatcher.Resolver(
+            com.unciv.ui.components.input.KeyboardBindings[com.unciv.ui.components.input.KeyboardBinding.TechnologyTree])
+        resolver.updateFor(fog.keyShortcuts)
+        resolver.updateFor(tech.keyShortcuts)
+        resolver.triggeredActions.forEach { it() }
+        assertFalse("T opens the played nation's technology instead of toggling fog", f.screen.fogOfWar)
+        assertEquals(1, Mockito.mockingDetails(game).invocations.count { it.method.name == "pushScreen" })
+        f.screen.fogOfWar = true
+        assertSame(f.screen.selectedGameView, f.screen.getGameViewConsideringForOfWar())
     }
 
     @Test fun `spectator selection keeps fog visible and its shortcut exclusive`() {
@@ -177,6 +241,25 @@ class AgentNationViewTest {
         assertTrue(f.screen.fogOfWar)
         assertEquals("Spectator T must only toggle fog", 0,
             Mockito.mockingDetails(game).invocations.count { it.method.name == "pushScreen" })
+    }
+
+    @Test fun `restoring fog on a played nation revokes unrestricted visual playback`() {
+        val f = Fixture()
+        Mockito.`when`(f.session.canSpectate()).thenReturn(true)
+        installWithViewer(f.screen, f.snapshot(), ResolvedSelection(null, null, null), 1, f.rome.civID)
+        val revealed = f.screen.currentVisualViewKey()
+        assertFalse(revealed.spectatorMode)
+        assertTrue(revealed.revealMap)
+        assertTrue(revealed.revealUnits)
+        field(WorldScreen::class.java, "pendingVisualBatch").set(f.screen,
+            VisualBatch(revealed, emptyList(), 1L, 0L))
+        f.screen.fogOfWar = true
+        val fogged = f.screen.currentVisualViewKey()
+        assertEquals(f.rome.civID, fogged.viewerCivId)
+        assertTrue("Fog changes must invalidate effects captured under unrestricted vision", fogged.epoch > revealed.epoch)
+        assertFalse(fogged.revealMap)
+        assertFalse(fogged.revealUnits)
+        assertNull("Queued unrestricted effects cannot play after restoring fog", f.screen.takeVisualBatch())
     }
 
     private fun pressCapitalShortcut(f: Fixture, renderedGame: com.unciv.logic.GameInfo): List<com.unciv.view.CityView> {
@@ -243,5 +326,40 @@ class AgentNationViewTest {
         installWithViewer(f.screen, f.snapshot(), ResolvedSelection(null, null, null), 2, f.spectator.civID)
         assertSame(newer, f.screen.gameInfo)
         assertEquals(f.rome.civID, f.screen.currentViewerCivId())
+    }
+
+    @Test fun `match vision widens the played nation's own view for every player`() {
+        val f = Fixture()
+        UncivGame.Current.settings.tutorialTasksCompleted.add("Meet another civilization")
+        f.game.makeHexagonalMap(5)
+        val greece = f.game.addCiv(f.game.ruleset.nations["Greece"]!!)
+        f.game.addCity(f.rome, f.game.tileMap[0, 0])
+        val farTile = f.game.tileMap[0, -5]
+        f.game.addUnit("Warrior", greece, farTile)
+        var vision = MatchVision.MAP
+        Mockito.`when`(f.session.getVision()).thenAnswer { vision }
+        f.screen.fogOfWar = true
+        installWithViewer(f.screen, f.snapshot(), ResolvedSelection(null, null, null), 1, f.rome.civID)
+        val mapView = f.screen.getGameViewConsideringForOfWar()
+        assertSame("Fog on still shows the match's vision", f.screen.selectedGameView, mapView)
+        assertTrue(mapView.revealMap); assertFalse(mapView.revealUnits)
+        val revealed = mapView.getTile(f.screen.gameInfo.tileMap[0, -5])
+        assertTrue("Every tile counts as explored", revealed.isExplored())
+        assertTrue(mapView.civView.hasExplored(revealed))
+        assertFalse("Out of sight keeps fog shading", revealed.isForceVisible())
+        assertTrue("Units outside real sight stay hidden", revealed.getVisibleUnits().isEmpty())
+
+        vision = MatchVision.FULL
+        installWithViewer(f.screen, f.snapshot(), ResolvedSelection(null, null, null), 2, f.rome.civID)
+        val fullView = f.screen.selectedGameView
+        assertTrue(fullView.revealUnits)
+        val seen = fullView.getTile(f.screen.gameInfo.tileMap[0, -5])
+        assertTrue(seen.isForceVisible())
+        assertEquals(1, seen.getVisibleUnits().size)
+
+        vision = MatchVision.FOG
+        installWithViewer(f.screen, f.snapshot(), ResolvedSelection(null, null, null), 3, f.rome.civID)
+        assertFalse(f.screen.selectedGameView.revealMap)
+        assertFalse(f.screen.selectedGameView.getTile(f.screen.gameInfo.tileMap[0, -5]).isExplored())
     }
 }

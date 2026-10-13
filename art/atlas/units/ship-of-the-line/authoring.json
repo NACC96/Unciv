@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "unitName": "Ship of the Line",
+  "assetId": "ship-of-the-line",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": "Ship of the Line",
+  "uniqueTo": "England",
+  "replaces": "Frigate",
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Ship of the Line",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/ship-of-the-line/e-motion-v2.png",
+      "rawHash": "52f95292a131fd0b26dce1ed16292790b0baaec387ffe81de3aa7a99e34081bb",
+      "promptPath": "art/atlas/units/ship-of-the-line/prompts/e-v2.txt",
+      "promptHash": "0298b6112134c26ff11274047dc678f9b0b595e9683758f105bd2d94202769ec",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/ship-of-the-line/ne-motion-v2.png",
+      "rawHash": "722810b9c4e2e804a9656f4ac7da7c5c3e734a2b1d59481b86a1b7bf4be6b369",
+      "promptPath": "art/atlas/units/ship-of-the-line/prompts/ne-v2.txt",
+      "promptHash": "c30eca42aeacc2f42e42dfad522637010213fee8a11c7a4db7e429a73153bd1c",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/ship-of-the-line/se-motion-v2.png",
+      "rawHash": "0a1dd448531a52d56b3fd5c2a7aca749948f12bc1aaab487f42ea885478d658d",
+      "promptPath": "art/atlas/units/ship-of-the-line/prompts/se-v2.txt",
+      "promptHash": "4468af8ae37d8c362c595ce50a39cd8a9a70dab2f442411dd6b473f5cc3eac7d",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
+}

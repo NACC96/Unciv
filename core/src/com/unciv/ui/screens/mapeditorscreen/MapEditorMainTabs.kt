@@ -1,6 +1,8 @@
 package com.unciv.ui.screens.mapeditorscreen
 
 import com.unciv.ui.components.widgets.TabbedPager
+import com.unciv.ui.components.GameUiStyle
+import com.unciv.ui.components.extensions.darken
 import com.unciv.ui.components.input.KeyCharAndCode
 import com.unciv.ui.images.ImageGetter
 import com.unciv.ui.screens.mapeditorscreen.tabs.MapEditorEditTab
@@ -14,9 +16,14 @@ import com.unciv.ui.screens.mapeditorscreen.tabs.MapEditorViewTab
 class MapEditorMainTabs(
     editorScreen: MapEditorScreen
 ) : TabbedPager(
-    minimumHeight = editorScreen.stage.height,
-    maximumHeight = editorScreen.stage.height,
-    headerFontSize = 24,
+    minimumWidth = if (GameUiStyle.isAtlas) editorScreen.getToolsWidth() else 0f,
+    maximumWidth = if (GameUiStyle.isAtlas) editorScreen.getToolsWidth() else Float.MAX_VALUE,
+    minimumHeight = editorScreen.getToolsHeight() - if (GameUiStyle.isAtlas) 52f else 0f,
+    maximumHeight = editorScreen.getToolsHeight() - if (GameUiStyle.isAtlas) 52f else 0f,
+    headerFontSize = if (GameUiStyle.isAtlas) GameUiStyle.Type.label else 24,
+    headerFontColor = if (GameUiStyle.isAtlas) GameUiStyle.ink else com.badlogic.gdx.graphics.Color.WHITE,
+    highlightColor = if (GameUiStyle.isAtlas) GameUiStyle.accent else com.badlogic.gdx.graphics.Color.BLUE,
+    backgroundColor = if (GameUiStyle.isAtlas) GameUiStyle.surface else com.unciv.ui.screens.basescreen.BaseScreen.skinStrings.skinConfig.baseColor.darken(.5f),
     capacity = 7
 ) {
     val view = MapEditorViewTab(editorScreen)

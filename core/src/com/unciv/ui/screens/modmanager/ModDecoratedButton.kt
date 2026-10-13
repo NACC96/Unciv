@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import com.badlogic.gdx.utils.Align
 import com.unciv.models.metadata.ModCategories
 import com.unciv.models.translations.tr
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.extensions.toLabel
 import com.unciv.ui.components.extensions.toTextButton
 import com.unciv.ui.images.ImageGetter
@@ -33,13 +34,18 @@ internal class ModDecoratedButton(private var modInfo: ModUIData) : Table() {
         }
 
         textButton = modInfo.buttonText().toTextButton()
+        if (GameUiStyle.isAtlas) {
+            GameUiStyle.apply(textButton)
+            textButton.label.wrap = true
+        }
         val topicString = categories.joinToString { it.label.tr() }
         if (categories.isNotEmpty()) {
             textButton.row()
-            textButton.add(topicString.toLabel(fontSize = 14))
+            textButton.add(topicString.toLabel(fontSize = 14).apply { wrap = GameUiStyle.isAtlas })
+                .growX().minWidth(0f)
         }
 
-        add(textButton)
+        add(textButton).apply { if (GameUiStyle.isAtlas) growX().minWidth(0f) }
 
         if (modInfo.ruleset == null) {
             stateImages = null
@@ -51,6 +57,11 @@ internal class ModDecoratedButton(private var modInfo: ModUIData) : Table() {
     }
 
     fun updateIndicators() = stateImages?.update(modInfo)
+
+    fun setSelected(selected: Boolean, synchronized: Boolean = false) {
+        if (GameUiStyle.isAtlas) textButton.isChecked = selected
+        else textButton.color = if (!selected) Color.WHITE else if (synchronized) Color.valueOf("7499ab") else Color.BLUE
+    }
 
     fun setText(text: String) = textButton.setText(text)
     override fun setColor(color: Color) { textButton.color = color }

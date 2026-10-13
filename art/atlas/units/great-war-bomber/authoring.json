@@ -1,0 +1,103 @@
+{
+  "schemaVersion": 1,
+  "unitName": "Great War Bomber",
+  "assetId": "great-war-bomber",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": null,
+  "uniqueTo": null,
+  "replaces": null,
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Great War Bomber",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/great-war-bomber/e-motion-v2.png",
+      "rawHash": "0b77dd1b8d2833614f8ecc95c4923a809411800fb5299c41abd40b2f210e755e",
+      "promptPath": "art/atlas/units/great-war-bomber/prompts/e-v2.txt",
+      "promptHash": "c3d7601bd38420f380c111ec8e3aac9b65aa803f4433479063bf50ab9a6db09d",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/great-war-bomber/ne-motion-v2.png",
+      "rawHash": "2dce0a17391130b7fe9bea8877212dd5e17ee9d2bb19a24121d9ad34e59f1d72",
+      "promptPath": "art/atlas/units/great-war-bomber/prompts/ne-v2.txt",
+      "promptHash": "fc85aced5b1beb548d3cea7c666cd939856b0c2fded9d54a3a73276c5060776d",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ],
+      "identityReference": {
+        "path": "/Users/noahkenny/.codex/generated_images/01a1321a-8142-7533-ae7a-eb89a5433c70/exec-d1fb677e-08f2-4605-8ef8-20ea61c9d7d9.png",
+        "sha256": "0b77dd1b8d2833614f8ecc95c4923a809411800fb5299c41abd40b2f210e755e"
+      }
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/great-war-bomber/se-motion-v2.png",
+      "rawHash": "b65f7d8c0be056340fded0f39bd51bd71b6d8dc5e221a4d0a07f47b89e6386c2",
+      "promptPath": "art/atlas/units/great-war-bomber/prompts/se-v2.txt",
+      "promptHash": "a8c2f7d80c798c28c52f9483a4f1bc96e07214dd9d1f384d27302b846b9e7f9a",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ],
+      "identityReference": {
+        "path": "/Users/noahkenny/.codex/generated_images/01a1321a-8142-7533-ae7a-eb89a5433c70/exec-d1fb677e-08f2-4605-8ef8-20ea61c9d7d9.png",
+        "sha256": "0b77dd1b8d2833614f8ecc95c4923a809411800fb5299c41abd40b2f210e755e"
+      }
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
+}

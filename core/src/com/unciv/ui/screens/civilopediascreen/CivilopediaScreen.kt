@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.ui.Button
+import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.SplitPane
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.unciv.UncivGame
@@ -13,6 +14,8 @@ import com.unciv.models.ruleset.RulesetCache
 import com.unciv.models.ruleset.unique.IHasUniques
 import com.unciv.models.stats.INamed
 import com.unciv.models.translations.tr
+import com.unciv.ui.components.AtlasWidgets
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.extensions.colorFromRGB
 import com.unciv.ui.components.extensions.getCloseButton
 import com.unciv.ui.components.extensions.toImageButton
@@ -79,6 +82,9 @@ class CivilopediaScreen(
     private val flavourTable = Table()
 
     private var currentCategory: CivilopediaCategories = CivilopediaCategories.Tutorial
+    private val stackedEntries = GameUiStyle.isAtlas && stage.width < 900f * game.settings.fontSizeMultiplier
+    private val entryLabelWidth = if (stackedEntries) stage.width - 120f else stage.width * 0.3f - 100f
+    private val detailWidth = if (stackedEntries) stage.width - 48f else stage.width * 0.7f - 48f
     private var currentEntry: String = ""
     private val currentEntryPerCategory = HashMap<CivilopediaCategories, String>()
 
@@ -121,10 +127,13 @@ class CivilopediaScreen(
         entryIndex.clear()
         flavourTable.clear()
 
-        for (button in categoryToButtons.values) button.button.color = Color.WHITE
+        for (button in categoryToButtons.values) {
+            if (GameUiStyle.isAtlas) button.button.isChecked = false
+            else button.button.color = Color.WHITE
+        }
         val buttonInfo = categoryToButtons[category]
             ?: return        // defense against being passed a bad selector
-        buttonInfo.button.color = Color.BLUE
+        if (GameUiStyle.isAtlas) buttonInfo.button.isChecked = true else buttonInfo.button.color = Color.BLUE
         buttonTableScroll.scrollX = buttonInfo.x + (buttonInfo.width - buttonTableScroll.width) / 2
 
         if (category !in categoryToEntries) return        // defense, allowing buggy panes to remain empty while others work
@@ -144,7 +153,8 @@ class CivilopediaScreen(
 
         for (entry in entries) {
             val entryButton = Table().apply {
-                background = skinStrings.getUiBackground(
+                background = if (GameUiStyle.isAtlas) GameUiStyle.background("Atlas/Civilopedia/Entry", GameUiStyle.raised)
+                else skinStrings.getUiBackground(
                     "CivilopediaScreen/EntryButton",
                     tintColor = colorFromRGB(50, 75, 125)
                 )
@@ -155,8 +165,14 @@ class CivilopediaScreen(
                     entryButton.add(entry.image).padLeft(20f).padRight(10f)
                 else
                     entryButton.add(entry.image).padLeft(10f)
-            entryButton.left().add(entry.name
-                .toLabel(Color.WHITE, 25, hideIcons = true)).pad(10f)
+            val entryLabel = entry.name.toLabel(if (GameUiStyle.isAtlas) GameUiStyle.ink else Color.WHITE,
+                if (GameUiStyle.isAtlas) GameUiStyle.Type.label else 25, hideIcons = true)
+            if (GameUiStyle.isAtlas) {
+                entryLabel.wrap = true
+                entryLabel.width = entryLabelWidth.coerceAtLeast(80f)
+            }
+            val labelCell = entryButton.left().add(entryLabel).pad(10f)
+            if (GameUiStyle.isAtlas) labelCell.width(entryLabelWidth.coerceAtLeast(80f)).minWidth(0f)
             entryButton.onClick { selectEntry(entry) }
             entryButton.name = entry.name               // make button findable
 
@@ -166,7 +182,8 @@ class CivilopediaScreen(
                 currentSubCategory = entry.subCategory
             }
 
-            val cell = entrySelectTable.add(entryButton).height(75f).growX()
+            val rowHeight = if (GameUiStyle.isAtlas) maxOf(64f, entryLabel.prefHeight + 20f) else 75f
+            val cell = entrySelectTable.add(entryButton).height(rowHeight).growX()
             entrySelectTable.row()
             if (currentY < 0f) currentY = cell.padTop
             entryIndex[entry.name] = entry.withCoordinates(currentY, cell.prefHeight)
@@ -205,12 +222,16 @@ class CivilopediaScreen(
             flavourTable.isVisible = true
             flavourTable.add(
                 entry.flavour.assembleCivilopediaText(ruleset)
-                    .renderCivilopediaText(stage.width * 0.5f) { selectLink(it) })
+                    .renderCivilopediaText(if (GameUiStyle.isAtlas) detailWidth else stage.width * 0.5f) { selectLink(it) })
         } else {
             flavourTable.isVisible = false
         }
         entrySelectTable.children.forEach {
-            it.color = if (it.name == entry.name) Color.BLUE else Color.WHITE
+            if (GameUiStyle.isAtlas && it is Table && it.name != null) {
+                it.background = GameUiStyle.outlinedBackground("Atlas/Civilopedia/Entry",
+                    if (it.name == entry.name) GameUiStyle.pressed else GameUiStyle.raised,
+                    if (it.name == entry.name) GameUiStyle.accent else GameUiStyle.hover)
+            } else if (!GameUiStyle.isAtlas) it.color = if (it.name == entry.name) Color.BLUE else Color.WHITE
         }
     }
     private fun selectDefaultEntry() {
@@ -248,6 +269,10 @@ class CivilopediaScreen(
             if (entries.isEmpty()) continue
             val icon = if (categoryKey.headerIcon.isNotEmpty()) ImageGetter.getImage(categoryKey.headerIcon) else null
             val button = IconTextButton(categoryKey.label, icon)
+            if (GameUiStyle.isAtlas) {
+                GameUiStyle.apply(button)
+                button.label.style = Label.LabelStyle(button.label.style).apply { fontColor = GameUiStyle.ink }
+            }
             button.onActivation(binding = categoryKey.binding) { selectCategory(categoryKey) }
             val cell = buttonTable.add(button)
             categoryToButtons[categoryKey] = CategoryButtonInfo(button, currentX, cell.prefWidth)
@@ -264,6 +289,13 @@ class CivilopediaScreen(
         val closeButton = getCloseButton(imageSize) { game.popScreen() }
 
         val topTable = Table()
+        if (GameUiStyle.isAtlas) {
+            topTable.background = GameUiStyle.panelBackground("Atlas/Civilopedia/Header", 1f)
+            topTable.add(AtlasWidgets.header("Civilopedia")).colspan(3).growX().minWidth(0f).row()
+            GameUiStyle.applyWidget(buttonTableScroll)
+            GameUiStyle.applyWidget(searchButton)
+            GameUiStyle.applyWidget(closeButton)
+        }
         topTable.add(buttonTableScroll).growX()
         topTable.add(searchButton).padLeft(10f)
         topTable.add(closeButton).padLeft(10f).padRight(10f)
@@ -282,9 +314,14 @@ class CivilopediaScreen(
         entrySelectTable.top()
         entrySelectScroll.setOverscroll(false, false)
         val descriptionTable = Table()
+        if (GameUiStyle.isAtlas) {
+            entrySelectTable.background = GameUiStyle.background("Atlas/Civilopedia/List", GameUiStyle.surface)
+            descriptionTable.background = GameUiStyle.background("Atlas/Civilopedia/Details", GameUiStyle.inset)
+            descriptionTable.pad(12f)
+        }
         descriptionTable.add(flavourTable).padTop(7f).padBottom(5f).row()  // 2f of that 7f is used up by Portrait painting e.g. a Nation's outer border *outside its bounds*
-        val entrySplitPane = SplitPane(entrySelectScroll, ScrollPane(descriptionTable), false, skin)
-        entrySplitPane.splitAmount = 0.3f
+        val entrySplitPane = SplitPane(entrySelectScroll, ScrollPane(descriptionTable), stackedEntries, skin)
+        entrySplitPane.splitAmount = if (stackedEntries) 0.36f else 0.3f
         entryTable.addActor(entrySplitPane)
         entrySplitPane.setFillParent(true)
         entrySplitPane.pack()  // ensure selectEntry has correct entrySelectScroll.height and maxY

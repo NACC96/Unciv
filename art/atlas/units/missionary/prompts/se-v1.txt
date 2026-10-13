@@ -1,0 +1,7 @@
+Use this reference sheet as the exact identity, equipment, lighting and painting style. Create a new authored transparent motion sheet for Missionary. All32 poses face SE consistently in the same elevated historical map projection, lower-right diagonally toward camera; show FRONT-RIGHT quarter and face/chest. Subject a travelling religious emissary in warm ivory pilgrim robes, royal-blue cloak, brown sandals and broad straw hat, plain wooden staff, small unmarked scroll and shoulder bag, on foot; no weapon. Do not rotate the entire raster; author every pose in this direction.
+Exactly8 equal columns x4 equal rows, landscape2:1 PNG, fixed cell scale and ground pivot50%width/78%height. Complete model/equipment in every cell; no overlaps/gutters/text/borders/paper/matte.
+Row1 four idle breath/cloth poses then four hit impact/recoil/stagger/recovery.
+Row2 eight actual MOVE phases alternating planted feet, raised knees, swinging arms and travel gear, smooth walking loop, all facing SE.
+Row3 eight WORK phases unrolls a scroll, gives a peaceful open-hand blessing and rolls it closed with real body/object changes.
+Row4 eight defeat stages stagger, buckle, kneel, tip, fall, ground contact, settle, prone, complete inside cell, no blood.
+Royal-blue #2166B4 cloth is the nation material only. Soft violet #A04FA0 ground ellipse shadows only beneath root. Surrounding alpha fully transparent. All4 rows and8 columns required.

@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "unitName": "Ballista",
+  "assetId": "ballista",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": "Ballista",
+  "uniqueTo": "Rome",
+  "replaces": "Catapult",
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Ballista",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/ballista/e-motion-v2.png",
+      "rawHash": "3acc01db79ebe804b38b4db3d6f791c6e8cca8fd58d91c85edc8bd1dab079ad6",
+      "promptPath": "art/atlas/units/ballista/prompts/e-v2.txt",
+      "promptHash": "2bb31ffdc7972a8416423f249fd7b486592583fb7c7f63e23757285506eaad92",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/ballista/ne-motion-v2.png",
+      "rawHash": "57fafc10010dfdc8a03fad960d1957ae916f1729ec5153d1fef09fc988e4ced9",
+      "promptPath": "art/atlas/units/ballista/prompts/ne-v2.txt",
+      "promptHash": "7566518b9fceea801a89089fbd8eb26e42c797b1b243474640e425c499adbee1",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/ballista/se-motion-v2.png",
+      "rawHash": "d212f5c033ab8080f9f451cf366883e79e79beb0322d39ad28b3e0ead2ca760b",
+      "promptPath": "art/atlas/units/ballista/prompts/se-v2.txt",
+      "promptHash": "6800fa35e907ca826b12e032d4967fe34bc81ba38e2373ac15e6a975abd6d3ac",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
+}

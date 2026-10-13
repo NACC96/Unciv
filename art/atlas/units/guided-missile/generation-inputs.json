@@ -1,0 +1,24 @@
+{
+  "facings": {
+    "E": {
+      "rawFile": "e-motion-v2.png",
+      "promptPath": "art/atlas/units/guided-missile/prompts/e-v2.txt"
+    },
+    "NE": {
+      "rawFile": "ne-motion-v2.png",
+      "promptPath": "art/atlas/units/guided-missile/prompts/ne-v2.txt",
+      "identityReference": {
+        "path": "/Users/noahkenny/.codex/generated_images/01a1321a-8142-7533-ae7a-eb89a5433c70/exec-0e396154-04c8-4bd8-bf57-3bc671bab639.png",
+        "sha256": "635dc57f4333bd53b15cb2bcd33594e15de96e2194129a14e16d9d7796bd6de6"
+      }
+    },
+    "SE": {
+      "rawFile": "se-motion-v2.png",
+      "promptPath": "art/atlas/units/guided-missile/prompts/se-v2.txt",
+      "identityReference": {
+        "path": "/Users/noahkenny/.codex/generated_images/01a1321a-8142-7533-ae7a-eb89a5433c70/exec-0e396154-04c8-4bd8-bf57-3bc671bab639.png",
+        "sha256": "635dc57f4333bd53b15cb2bcd33594e15de96e2194129a14e16d9d7796bd6de6"
+      }
+    }
+  }
+}

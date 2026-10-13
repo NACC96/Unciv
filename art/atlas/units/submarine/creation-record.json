@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "unitName": "Submarine",
+  "assetId": "submarine",
+  "creator": "OpenAI image generation",
+  "tool": "image_gen.imagegen (built-in)",
+  "rights": "original-generated",
+  "styleReference": {
+    "path": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/concept/unit-art-direction-v1.png",
+    "sha256": "ceb7c639185d98cb53535f21eb0966b1bec01bb782c80de2fdd972d2858ce641",
+    "role": "approved style only"
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/submarine/e-motion-v2.png",
+      "rawHash": "9e9472ba065bffb24fa14c0e0b921bc9bc0c8e7c783394803e7b3cdf6ddc318b",
+      "promptPath": "art/atlas/units/submarine/prompts/e-v2.txt",
+      "promptHash": "d1255d1c0b94943c81f22078c866253dde685fb6714d497298b55c2dba432964",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/submarine/ne-motion-v2.png",
+      "rawHash": "bf1485cd851661a94f6cec1eec26685f63b0a220744a04a8fcece64099fb9dff",
+      "promptPath": "art/atlas/units/submarine/prompts/ne-v2.txt",
+      "promptHash": "ea9a0545298532b9a47f36182b5af214fa23f6b7b7c9bff82dc466e2c56973ea",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/submarine/se-motion-v2.png",
+      "rawHash": "89b08f84d7f36debc195ef1ec813eb984f65c50503946013bb5a2ef15a103000",
+      "promptPath": "art/atlas/units/submarine/prompts/se-v2.txt",
+      "promptHash": "25fc67ad4d9f8d66f93c6d4d23ffb4587e49b4f312c2b68278ed7b6f195bbe77",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "processing": {
+    "script": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/normalize_motion.py",
+    "sha256": "f3fd783dbf679b461c7f5b56fe8e3abb9d583d737c06cec9f916fae6044b1a6f",
+    "operations": [
+      "uniform cell cutting",
+      "constant sheet scale and root alignment",
+      "alpha-preserving resize",
+      "royal-blue nation mask extraction",
+      "violet ground-shadow extraction"
+    ],
+    "poseSynthesis": false,
+    "clonedStaticFrames": false
+  },
+  "reviewState": "candidate",
+  "formalArtReview": "deferred"
+}

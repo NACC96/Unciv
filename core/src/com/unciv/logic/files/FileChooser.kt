@@ -21,6 +21,8 @@ import com.unciv.UncivGame
 import com.unciv.models.UncivSound
 import com.unciv.models.translations.tr
 import com.unciv.ui.components.widgets.UncivTextField
+import com.unciv.ui.components.AtlasWidgets
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.extensions.addSeparator
 import com.unciv.ui.components.extensions.isEnabled
 import com.unciv.ui.components.extensions.toLabel
@@ -48,7 +50,7 @@ open class FileChooser(
     title: String?,
     startFile: FileHandle? = null,
     private val resultListener: ResultListener? = null
-) : Popup(stageToShowOn, Scrollability.None) {
+) : Popup(stageToShowOn, if (GameUiStyle.isAtlas) Scrollability.WithoutButtons else Scrollability.None) {
     // config
     var filter = FileFilter { true }
         set(value) { field = value; resetList() }
@@ -115,7 +117,9 @@ open class FileChooser(
         override fun drawItem(batch: Batch, font: BitmapFont, index: Int, item: FileListItem,
                               x: Float, y: Float, width: Float): GlyphLayout {
             saveColor.set(font.color)
-            font.setColor(if (item.isFolder) folderColor else Color.WHITE)
+            font.setColor(if (GameUiStyle.isAtlas) {
+                if (item.isFolder) GameUiStyle.accent else GameUiStyle.ink
+            } else if (item.isFolder) folderColor else Color.WHITE)
             val layout = super.drawItem(batch, font, index, item, x, y, width)
             font.setColor(saveColor)
             return layout
@@ -124,6 +128,15 @@ open class FileChooser(
 
     init {
         innerTable.top().left()
+        if (GameUiStyle.isAtlas) {
+            innerTable.background = GameUiStyle.panelBackground("FileChooser/Panel", 1f)
+            pathLabel.wrap = true
+            pathLabel.style.fontColor = GameUiStyle.muted
+            dirTypeLabel.style.fontColor = GameUiStyle.muted
+            pathLabelWrapper.getCell(pathLabel).minWidth(0f).growX()
+            fileNameInput.style = com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldStyle(fileNameInput.style)
+            fileNameWrapper.getCell(fileNameInput).minWidth(0f).minHeight(GameUiStyle.standardControlHeight)
+        }
 
         fileList.selection.setProgrammaticChangeEvents(false)
         fileNameInput.setTextFieldListener { textField, _ ->
@@ -133,12 +146,18 @@ open class FileChooser(
         fileNameInput.textFieldFilter = UncivFiles.fileNameTextFieldFilter()
 
         if (title != null) {
-            addGoodSizedLabel(title).colspan(2).center().row()
+            if (GameUiStyle.isAtlas) add(AtlasWidgets.header(title)).colspan(2).growX().row()
+            else addGoodSizedLabel(title).colspan(2).center().row()
             addSeparator(height = 1f)
         }
-        add(pathLabelWrapper).colspan(2).fillX().row()
+        add(pathLabelWrapper).colspan(2).fillX().apply {
+            if (GameUiStyle.isAtlas) width((maxPopupWidth - 64f).coerceAtMost(680f))
+        }.row()
         addSeparator(Color.GRAY, height = 1f)
-        add(fileScroll).colspan(2).fill().row()
+        add(fileScroll).colspan(2).fill().apply {
+            if (GameUiStyle.isAtlas) width((maxPopupWidth - 64f).coerceAtMost(680f))
+                .height((stageToShowOn.height * .34f).coerceAtLeast(80f)).minWidth(0f)
+        }.row()
         addSeparator(height = 1f)
         fileNameCell = add().colspan(2).growX()
         super.row()
@@ -150,6 +169,13 @@ open class FileChooser(
             reportResult(true)
         }.actor
         equalizeLastTwoButtonWidths()
+        if (GameUiStyle.isAtlas) {
+            GameUiStyle.apply(okButton, primary = true)
+            for (cell in bottomTable.cells) {
+                (cell.actor as? TextButton)?.label?.wrap = true
+                cell.minWidth(0f).growX().minHeight(44f)
+            }
+        }
 
         fileList.onChange {
             val selected = fileList.selected ?: return@onChange
@@ -177,7 +203,7 @@ open class FileChooser(
         }
     }
 
-    override fun getMaxHeight() = maxHeight
+    override fun getMaxHeight() = if (GameUiStyle.isAtlas) stageToShowOn.height else maxHeight
 
     private fun reportResult(success: Boolean) {
         val file = getResult()

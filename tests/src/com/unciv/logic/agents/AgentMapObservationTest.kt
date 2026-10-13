@@ -111,6 +111,29 @@ class AgentMapObservationTest {
         expect(AgentCommandError.STALE_STATE, civ.civID, MapQuery(limit = 1, cursor = first.nextCursor))
     }
 
+    @Test fun map_cursors_are_invalidated_by_each_vision_change_without_a_gameplay_revision() {
+        val f = fixture()
+        val civ = f.addCiv(f.ruleset.nations["Rome"]!!, isPlayer = true)
+        f.addUnit("Scout", civ, f.getTile(0, 0))
+        civ.cache.updateViewableTiles()
+        val state = AgentMatchState(matchId = "m", timelineId = "t", stateRevision = 4)
+        for (before in MatchVision.entries) for (after in MatchVision.entries) {
+            if (before == after) continue
+            state.vision = before
+            val first = buildMapPage(f.gameInfo, state, civ.civID, MapQuery(limit = 1))
+            assertNotNull(first.nextCursor)
+            state.vision = after
+            try {
+                buildMapPage(f.gameInfo, state, civ.civID, MapQuery(limit = 1, cursor = first.nextCursor))
+                fail("Accepted a $before cursor after changing vision to $after")
+            } catch (error: AgentCommandException) {
+                assertEquals(AgentCommandError.INVALID_ARGUMENT, error.code)
+            }
+            assertEquals(4, state.stateRevision)
+            assertNotNull(buildMapPage(f.gameInfo, state, civ.civID, MapQuery(limit = 1)).nextCursor)
+        }
+    }
+
     @Test fun map_bounds_and_radius_are_checked() {
         val f = fixture(); val civ = f.addCiv(f.ruleset.nations["Rome"]!!, isPlayer = true)
         f.addUnit("Scout", civ, f.getTile(0, 0)); civ.cache.updateViewableTiles()

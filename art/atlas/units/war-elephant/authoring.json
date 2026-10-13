@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "unitName": "War Elephant",
+  "assetId": "war-elephant",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": "War Elephant",
+  "uniqueTo": "India",
+  "replaces": "Chariot Archer",
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/War Elephant",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/war-elephant/e-motion-v1.png",
+      "rawHash": "e2f7ba76163394d441015a033d6e3d0a642998b1204e5a4567d0f76ee0e20523",
+      "promptPath": "art/atlas/units/war-elephant/prompts/e-v1.txt",
+      "promptHash": "9cf754a6534f69de4aac1e93ec39142c14e0846800b103ab04cd48aab85d672a",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/war-elephant/ne-motion-v1.png",
+      "rawHash": "960643caab33941a52a2001e6321ac1b99c3b8b4b88e38484f3409dc6d7dbb34",
+      "promptPath": "art/atlas/units/war-elephant/prompts/ne-v1.txt",
+      "promptHash": "930a6f1b3917aa86076367f6baacaf25fea58fecb38df9d02aa8a02fa2e61349",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/war-elephant/se-motion-v1.png",
+      "rawHash": "20af1b1aafe0602f30ea353eccc297ebea5220ca6de230f214f4d12d62a7b0af",
+      "promptPath": "art/atlas/units/war-elephant/prompts/se-v1.txt",
+      "promptHash": "be6de0fcfd0ab142fe5dda6886a1b2d6728ba0cbb63736cca1d532aff793e378",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
+}

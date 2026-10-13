@@ -101,7 +101,7 @@ unit.move -> {unitId:integer,destination:{x:integer,y:integer}}
 research.select -> {techName:string,queue?:boolean=false,useFreeTech?:boolean=false}
 city.produce -> {cityId:string,op:ProductionOp,name?:string,index?:integer,tilePos?:Hex}; name is required for ADD_TOP/ADD_BOTTOM/PURCHASE/SELL, zero-based index for REMOVE/RAISE/LOWER/MOVE_TOP; tilePos for constructions creating a tile improvement. PURCHASE index defaults -1.
 unit.found -> {unitId:integer}
-unit.order -> {unitId:integer,order:UnitOrder}
+unit.order -> {unitId:integer,order:UnitOrder}; EXPLORE explores now with the unit's remaining movement; AUTOMATE on a city-founding unit runs Unciv's settler automation now, moving toward its best-ranked site and founding there. Both last only this turn.
 unit.attack -> {attackerUnitId?:integer,attackerCityId?:string,target:Hex}; supply exactly one attacker.
 conquest.resolve -> {decisionId:string,disposition:ANNEX|PUPPET|RAZE|LIBERATE}
 diplomacy.declareWar -> {targetCivId:string}
@@ -192,7 +192,7 @@ function registerGameTools(mcp: McpServer, game: IGameService, actorCivId: strin
     if (entry) onAcknowledgement?.(entry);
   };
   mcp.registerTool("game.observe", {
-    description: "Permitted overview: revision, active-turn status, required decisions, recent visible events, and private pendingTradeRequests with full recipient-perspective terms. Answer the first request per sender with diplomacy.respondTrade on your turn; re-observe for the next.",
+    description: "Permitted overview: revision, active-turn status, required decisions, recent visible events, your empire with military strength and score ranks, rivals with their strength, attitude and wars, mapSummary.vision, and private pendingTradeRequests with full recipient-perspective terms. Answer the first request per sender with diplomacy.respondTrade on your turn; re-observe for the next.",
     inputSchema: {},
   }, async () => ok(await game.observe()));
 
@@ -237,7 +237,7 @@ function registerGameTools(mcp: McpServer, game: IGameService, actorCivId: strin
   }, extra.requestId));
 
   mcp.registerTool("game.map", {
-    description: "Bounded civilization-scoped structured map: KNOWN includes historical memory, VISIBLE is current sight. Center and radius must be supplied together. Re-query after revision changes; cursors bind to the query/revision.",
+    description: "Bounded civilization-scoped structured map: KNOWN includes historical memory (the whole map under MAP or FULL vision), VISIBLE is current sight (the whole map under FULL vision). Center and radius must be supplied together. Re-query after revision changes; cursors bind to the query/revision.",
     inputSchema: {
       mode: z.enum(["KNOWN", "VISIBLE"]).optional(),
       center: z.object({ x: z.number().int(), y: z.number().int() }).optional(),
@@ -262,7 +262,7 @@ function registerGameTools(mcp: McpServer, game: IGameService, actorCivId: strin
   }, async (query, extra) => readResult(() => game.rules(query), extra.requestId));
 
   mcp.registerTool("game.legal_actions", {
-    description: "Legal moveTargets, attackTargets, orders, movementLeft, canFound, improvements, workInProgress, researchable and promotions for a unit; constructions and researchable for a city. canFound means unit.found is accepted on the unit's current tile now; otherwise foundBlockedReason says why. Supply exactly one unitId or cityId.",
+    description: "Legal moveTargets, attackTargets, orders, movementLeft, canFound, citySites, improvements, workInProgress, researchable and promotions for a unit; constructions and researchable for a city. canFound means unit.found is accepted on the unit's current tile now; otherwise foundBlockedReason says why. citySites lists a founding unit's best-ranked reachable sites with turns to reach. Supply exactly one unitId or cityId.",
     inputSchema: { unitId: z.number().int().optional(), cityId: z.string().min(1).max(128).optional() },
   }, async ({ unitId, cityId }) => {
     if ((unitId === undefined) === (cityId === undefined)) return err("INVALID_ARGUMENT", "supply exactly one unitId or cityId");

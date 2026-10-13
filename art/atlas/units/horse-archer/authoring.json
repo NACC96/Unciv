@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "unitName": "Horse Archer",
+  "assetId": "horse-archer",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": "Horse Archer",
+  "uniqueTo": "The Huns",
+  "replaces": "Chariot Archer",
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Horse Archer",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/horse-archer/e-motion-v1.png",
+      "rawHash": "2b741278f0019c10c9bb1ad3fa4d50bf1b522717e0b33aef5d63795b56062217",
+      "promptPath": "art/atlas/units/horse-archer/prompts/e-v1.txt",
+      "promptHash": "f7b27b90cfec756658db775177b605bf68bdd8d235538ed8a095572d6dd84050",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/horse-archer/ne-motion-v1.png",
+      "rawHash": "d33f7d1c4db9ba787a27359071ad3e7d812ab7c7ac9eea9c286d0da65295ffc7",
+      "promptPath": "art/atlas/units/horse-archer/prompts/ne-v1.txt",
+      "promptHash": "c2057da3f023cd35759985fd78c0338490bd203ecaf5295789ff01fd2499d4e1",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/horse-archer/se-motion-v1.png",
+      "rawHash": "29accf65b9337f8699582bc439e98d116ee9e05f4baf67d336a2dcc8822439bc",
+      "promptPath": "art/atlas/units/horse-archer/prompts/se-v1.txt",
+      "promptHash": "e8d8e39cc8141159c1047c8811775023f0d2f93d4fa05ca31cccb045bd409bcd",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
+}

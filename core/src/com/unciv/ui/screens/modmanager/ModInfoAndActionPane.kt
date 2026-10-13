@@ -13,6 +13,7 @@ import com.unciv.models.metadata.BaseRuleset
 import com.unciv.models.ruleset.Ruleset
 import com.unciv.models.ruleset.validation.ModCompatibility
 import com.unciv.models.translations.tr
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.extensions.UncivDateFormat.formatDate
 import com.unciv.ui.components.extensions.UncivDateFormat.parseDate
 import com.unciv.ui.components.extensions.toCheckBox
@@ -39,6 +40,7 @@ internal class ModInfoAndActionPane : Table() {
 
     init {
         defaults().pad(10f)
+        if (GameUiStyle.isAtlas) { defaults().growX().minWidth(0f); sizeLabel.wrap = true }
     }
 
     /** Recreate the information part of the right-hand column
@@ -83,6 +85,8 @@ internal class ModInfoAndActionPane : Table() {
         // Display metadata
         clear()
         currentRepoName = modName
+        if (GameUiStyle.isAtlas)
+            add(cleanModName(modName).toLabel(GameUiStyle.ink, GameUiStyle.Type.title).apply { wrap = true }).row()
 
         imageHolder.clear()
         when {
@@ -117,6 +121,7 @@ internal class ModInfoAndActionPane : Table() {
             val updateString = "{Updated}: " + date.formatDate()
             add(updateString.toLabel()).row()
         }
+        if (GameUiStyle.isAtlas) GameUiStyle.applyWidget(this)
     }
 
     fun updateSize(size: Int) {
@@ -129,13 +134,17 @@ internal class ModInfoAndActionPane : Table() {
     }
 
     fun addVisualCheckBox(startsOutChecked: Boolean = false, changeAction: ((Boolean)->Unit)? = null) {
-        if (enableVisualCheckBox)
-            add("Permanent audiovisual mod".toCheckBox(startsOutChecked, changeAction)).row()
+        if (enableVisualCheckBox) {
+            val checkbox = "Permanent audiovisual mod".toCheckBox(startsOutChecked, changeAction)
+            if (GameUiStyle.isAtlas) { GameUiStyle.applyWidget(checkbox); checkbox.label.wrap = true }
+            add(checkbox).row()
+        }
     }
 
     fun addUpdateModButton(modInfo: ModUIData): TextButton? {
         if (!modInfo.hasUpdate) return null
         val updateModTextbutton = "Update [${cleanModName(modInfo.name)}]".toTextButton()
+        if (GameUiStyle.isAtlas) { GameUiStyle.apply(updateModTextbutton); updateModTextbutton.label.wrap = true }
         add(updateModTextbutton).row()
         return updateModTextbutton
     }

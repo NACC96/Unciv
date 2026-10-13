@@ -1,8 +1,10 @@
 package com.unciv.logic.agents
 
 import com.unciv.logic.GameInfo
+import com.unciv.logic.automation.unit.CityLocationTileRanker
 import com.unciv.logic.battle.TargetHelper
 import com.unciv.logic.civilization.Civilization
+import com.unciv.logic.civilization.diplomacy.DiplomacyFlags
 import com.unciv.logic.map.HexCoord
 import com.unciv.logic.map.mapunit.MapUnit
 import com.unciv.logic.city.City
@@ -10,6 +12,8 @@ import com.unciv.models.ruleset.unique.UniqueTarget
 import com.unciv.logic.trade.TradeOffer
 import com.unciv.logic.trade.TradeOfferType
 import com.unciv.models.ruleset.unique.UniqueType
+import com.unciv.ui.screens.victoryscreen.RankingType
+import kotlin.math.roundToInt
 
 /**
  * Visibility-filtered observation DTOs (AI_AGENT_PLAN.md §5.1 game.observe /
@@ -22,6 +26,8 @@ import com.unciv.models.ruleset.unique.UniqueType
  * - Visible world: foreign units passing [MapUnit.isVisibleTo] (tile in
  *   viewableTiles + invisibility rules); foreign cities on viewable tiles
  *   expose name/owner/health/population only — never queues or stats.
+ *   [AgentMatchState.vision] widens this: MAP shows every city, FULL every
+ *   unit and city. Game rules, including attack targets, keep real sight.
  * - Explored-but-unseen and unexplored: omitted entirely in v1 (no remembered
  *   foreign state; TileHistory integration is a follow-up). Unexplored geometry
  *   is not enumerated, so exploration orders stay closes over unknowns.
@@ -79,7 +85,16 @@ class EmpireOverview(
     /** Enough culture or a free policy to adopt one now. */
     var canAdoptPolicy: Boolean = false,
     /** Policies and branches civics.adopt accepts now; empty unless [canAdoptPolicy]. */
-    var adoptablePolicies: ArrayList<String> = ArrayList()
+    var adoptablePolicies: ArrayList<String> = ArrayList(),
+    /** Empire happiness; negative slows growth and production and blocks expansion. */
+    var happiness: Int = 0,
+    var goldPerTurn: Int = 0,
+    /** Unciv's military might (the Demographics "Force" ranking), comparable to [ObservedRival.militaryStrength]. */
+    var militaryStrength: Int = 0,
+    var score: Int = 0,
+    /** 1 is strongest among you and the major civilizations in [ObservationDto.rivals]. */
+    var militaryRank: Int = 1,
+    var scoreRank: Int = 1
 ) {
     @Suppress("unused")
     constructor() : this(0, null, ArrayList(), 0, 0, 0, 0, ArrayList(), 0, 0, LinkedHashMap(), false, ArrayList())
@@ -107,6 +122,24 @@ class ObservedTradeRequest(
 
 private fun TradeOffer.toObserved() = ObservedTradeOffer(name, type, amount, duration)
 
+/** A living civilization the actor has met, or any living civilization under revealed vision. */
+class ObservedRival(
+    var civId: String = "",
+    var cityState: Boolean = false,
+    var met: Boolean = false,
+    /** Diplomatic status with you: War, Peace, Protector or DefensivePact; null until met. */
+    var status: String? = null,
+    var declarationOfFriendship: Boolean = false,
+    /** How they regard you, from Unforgivable through Enemy, Afraid, Competitor, Neutral, Favorable and Friend to Ally; null until met. */
+    var attitudeTowardYou: String? = null,
+    var cities: Int = 0,
+    /** Comparable to [EmpireOverview.militaryStrength]. */
+    var militaryStrength: Int = 0,
+    var score: Int = 0,
+    /** Their wars, limited to civilizations you may know about. */
+    var atWarWith: ArrayList<String> = ArrayList()
+)
+
 class ObservationDto(
     var protocolVersion: Int = 1,
     var revision: Int = 0,
@@ -133,7 +166,8 @@ class ObservationDto(
     /** At most twelve recent private records, including replies to the actor's sent mail. */
     var diplomaticHistory: ArrayList<DiplomaticMessage> = ArrayList(),
     /** Recipient-private, first pending request per sender in native queue order. */
-    var pendingTradeRequests: ArrayList<ObservedTradeRequest> = ArrayList()
+    var pendingTradeRequests: ArrayList<ObservedTradeRequest> = ArrayList(),
+    var rivals: ArrayList<ObservedRival> = ArrayList()
 ) {
     @Suppress("unused")
     constructor() : this(1, 0, "", "", 0, TurnPhase.READY_TO_START, "", false, 0,
@@ -173,11 +207,19 @@ class LegalActionsDto(
     var improvements: ArrayList<WorkerImprovementOption> = ArrayList(),
     var workInProgress: WorkInProgress? = null,
     var repair: RepairOption? = null,
-    var canCancelWork: Boolean = false
+    var canCancelWork: Boolean = false,
+    /** City-founding units: Unciv's best-ranked reachable sites nearby, best first. */
+    var citySites: ArrayList<CitySite> = ArrayList()
 ) {
     @Suppress("unused")
     constructor() : this(ArrayList(), ArrayList(), ArrayList(), false, null, 0f, ArrayList(),
         ArrayList(), 0, 0, ArrayList(), false, null, ArrayList())
+}
+
+/** A ranked founding site; [turns] is 0 for the unit's own tile. */
+class CitySite(var x: Int = 0, var y: Int = 0, var score: Int = 0, var turns: Int = 0) {
+    @Suppress("unused")
+    constructor() : this(0, 0, 0, 0)
 }
 
 /** Static rules summary (game.rules): pinned identity + discoverable catalog. */
@@ -204,14 +246,14 @@ private fun MapUnit.toObserved() = ObservedUnit(
  * only when visible (identity + position; movement/orders zeroed); hidden
  * and nonexistent IDs share the null response (no oracle).
  */
-fun buildUnitInspection(game: GameInfo, actorCivId: String, unitId: Int): ObservedUnit? {
+fun buildUnitInspection(game: GameInfo, actorCivId: String, unitId: Int, vision: MatchVision = MatchVision.FOG): ObservedUnit? {
     val civ = game.getCivilizationOrNull(actorCivId) ?: return null
     val own = civ.units.getCivUnits().firstOrNull { it.id == unitId }
     if (own != null && !own.isDestroyed) return own.toObserved()
     for (other in game.civilizations) {
         if (other.civID == actorCivId || other.isSpectator()) continue
         val foreign = other.units.getCivUnits().firstOrNull { it.id == unitId }
-        if (foreign != null && !foreign.isDestroyed && foreign.isVisibleTo(civ)) {
+        if (foreign != null && !foreign.isDestroyed && (vision == MatchVision.FULL || foreign.isVisibleTo(civ))) {
             val observed = foreign.toObserved()
             observed.movementLeft = 0f
             observed.action = null
@@ -296,6 +338,14 @@ fun buildObservation(
         civ.units.getCivUnitsSize(),
         LinkedHashMap(civ.pendingStartingUnits)
     )
+    dto.empire.happiness = civ.getHappiness()
+    dto.empire.goldPerTurn = civ.stats.statsForNextTurn.gold.roundToInt()
+    dto.empire.militaryStrength = civ.getStatForRanking(RankingType.Force)
+    dto.empire.score = civ.getStatForRanking(RankingType.Score)
+    dto.rivals = buildRivals(game, match, civ)
+    val majors = dto.rivals.filter { !it.cityState }
+    dto.empire.militaryRank = 1 + majors.count { it.militaryStrength > dto.empire.militaryStrength }
+    dto.empire.scoreRank = 1 + majors.count { it.score > dto.empire.score }
     dto.empire.canAdoptPolicy = civ.policies.canAdoptPolicy()
     if (dto.empire.canAdoptPolicy) dto.empire.adoptablePolicies = ArrayList(
         game.ruleset.policies.values.filter { civ.policies.isAdoptable(it) }.map { it.name })
@@ -308,7 +358,7 @@ fun buildObservation(
     for (other in game.civilizations) {
         if (other.civID == actorCivId || other.isSpectator()) continue
         for (unit in other.units.getCivUnits()) {
-            if (unit.isDestroyed || !unit.isVisibleTo(civ)) continue
+            if (unit.isDestroyed || !(match.vision == MatchVision.FULL || unit.isVisibleTo(civ))) continue
             // Foreign units expose identity and position only: movement and
             // orders are not observable (and must not leak readiness).
             val observed = unit.toObserved()
@@ -317,10 +367,44 @@ fun buildObservation(
             dto.visibleForeignUnits.add(observed)
         }
         for (city in other.cities) {
-            if (city.getCenterTile() in civ.viewableTiles) dto.visibleForeignCities.add(city.toObservedForeign())
+            if (match.vision != MatchVision.FOG || city.getCenterTile() in civ.viewableTiles)
+                dto.visibleForeignCities.add(city.toObservedForeign())
         }
     }
     return dto
+}
+
+/** Met civilizations, or every living one under revealed vision; third-party wars only between those. */
+private fun buildRivals(game: GameInfo, match: AgentMatchState, civ: Civilization): ArrayList<ObservedRival> {
+    val listed = game.civilizations.filter { other ->
+        other != civ && !other.isSpectator() && !other.isBarbarian && !other.isDefeated() &&
+            (match.vision != MatchVision.FOG || civ.knows(other))
+    }
+    val listedIds = listed.mapTo(HashSet()) { it.civID } + civ.civID
+    return listed.mapTo(ArrayList()) { other ->
+        val ours = civ.getDiplomacyManager(other)
+        ObservedRival(
+            other.civID, other.isCityState, ours != null,
+            ours?.diplomaticStatus?.name,
+            ours?.hasFlag(DiplomacyFlags.DeclarationOfFriendship) == true,
+            other.getDiplomacyManager(civ)?.relationshipLevel()?.name,
+            other.cities.size,
+            other.getStatForRanking(RankingType.Force),
+            other.getStatForRanking(RankingType.Score),
+            other.getKnownCivs().filter { it.civID in listedIds && other.isAtWarWith(it) }.mapTo(ArrayList()) { it.civID }
+        )
+    }
+}
+
+/** Unciv's settler ranking, as its own settler automation uses it, limited to reachable sites. */
+internal fun rankCitySites(unit: MapUnit): List<CitySite> {
+    val minimum = unit.civ.gameInfo.ruleset.modOptions.constants.minimumCityLocationTileValue
+    return CityLocationTileRanker.getBestTilesToFoundCity(unit, null, minimum).tileRankMap.entries
+        .sortedByDescending { it.value }.asSequence()
+        .mapNotNull { (tile, rank) ->
+            val turns = if (tile == unit.getTile()) 0 else unit.movement.getShortestPath(tile).size.takeIf { it > 0 }
+            turns?.let { CitySite(tile.position.x, tile.position.y, rank.roundToInt(), it) }
+        }.take(5).toList()
 }
 
 /**
@@ -371,11 +455,14 @@ fun buildLegalActions(
             dto.orders.add(UnitOrder.SLEEP)
         if (!unit.isSleepingUntilHealed() && unit.canHealInCurrentTile()) dto.orders.add(UnitOrder.SLEEP_UNTIL_HEALED)
         if (unit.action != null) dto.orders.add(UnitOrder.WAKE)
+        if (!unit.baseUnit.isAirUnit() && !unit.isExploring()) dto.orders.add(UnitOrder.EXPLORE)
+        if (unit.isFoundingUnit()) dto.orders.add(UnitOrder.AUTOMATE)
         dto.orders.add(UnitOrder.DISBAND)
         dto.movementLeft = unit.currentMovement
-        if (unit.getMatchingUniques(UniqueType.FoundCity).any() || unit.getMatchingUniques(UniqueType.FoundPuppetCity).any()) {
+        if (unit.isFoundingUnit()) {
             dto.foundBlockedReason = foundCityBlocker(unit)
             dto.canFound = dto.foundBlockedReason == null
+            dto.citySites = ArrayList(rankCitySites(unit))
         }
         if (unit.promotions.canBePromoted())
             dto.promotions = ArrayList(unit.promotions.getAvailablePromotions().map { it.name }.toList())
@@ -421,6 +508,9 @@ fun buildLegalActions(
     }
     return dto
 }
+
+internal fun MapUnit.isFoundingUnit() =
+    getMatchingUniques(UniqueType.FoundCity).any() || getMatchingUniques(UniqueType.FoundPuppetCity).any()
 
 /**
  * Engine founding checks shared by legal_actions and unit.found, so canFound

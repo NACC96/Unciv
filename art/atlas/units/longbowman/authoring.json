@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "unitName": "Longbowman",
+  "assetId": "longbowman",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": "Longbowman",
+  "uniqueTo": "England",
+  "replaces": "Crossbowman",
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Longbowman",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/longbowman/e-motion-v1.png",
+      "rawHash": "1f73116c1b2302c0b4f44c7cf62c080c188d3abf066492ef312a0fb3f92feea4",
+      "promptPath": "art/atlas/units/longbowman/prompts/e-v1.txt",
+      "promptHash": "bdb58f22a4343df6b643d90e1856e8f611889b609f31c5009d8e2e1d0cae2415",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/longbowman/ne-motion-v1.png",
+      "rawHash": "5130cbea17e9de96d0cd53b62fd307049b857f580f65b0b6b4698aa8ada8e0db",
+      "promptPath": "art/atlas/units/longbowman/prompts/ne-v1.txt",
+      "promptHash": "64af3dd73297b003dcefaee7dfa4fd098ce630989982bf161ed3563e6f0097a3",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/longbowman/se-motion-v1.png",
+      "rawHash": "34eeac5ad1f9d644043176e53f31bd3737a5ad93860334ae09617a61f8939a82",
+      "promptPath": "art/atlas/units/longbowman/prompts/se-v1.txt",
+      "promptHash": "ea733a78323f66a776fcf4c89ab48be260818b943bd5de3039ac371333b868a1",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
+}

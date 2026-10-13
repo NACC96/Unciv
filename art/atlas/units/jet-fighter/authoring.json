@@ -1,0 +1,103 @@
+{
+  "schemaVersion": 1,
+  "unitName": "Jet Fighter",
+  "assetId": "jet-fighter",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": null,
+  "uniqueTo": null,
+  "replaces": null,
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Jet Fighter",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/jet-fighter/e-motion-v2.png",
+      "rawHash": "95233a0049cd1f59de570eaef64686b1360c5dc929f22a758744ca26771cb437",
+      "promptPath": "art/atlas/units/jet-fighter/prompts/e-v2.txt",
+      "promptHash": "548fb92829bb6000d7fbeaf5dda04f9bdf67b2c3d54add887ef735f38c50d33d",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/jet-fighter/ne-motion-v2.png",
+      "rawHash": "f8e2b432431c1e7ddb01a166ae249c899dad0c80d9664ce6df97d24b50f94588",
+      "promptPath": "art/atlas/units/jet-fighter/prompts/ne-v2.txt",
+      "promptHash": "bdc6d7932aed162afb1cd1a995e17ed3b1505fc6269595cc9c3e73b81128259f",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ],
+      "identityReference": {
+        "path": "/Users/noahkenny/.codex/generated_images/01a1321a-8142-7533-ae7a-eb89a5433c70/exec-5d93d541-ec46-47a7-a239-e5c6fc2c0eb2.png",
+        "sha256": "95233a0049cd1f59de570eaef64686b1360c5dc929f22a758744ca26771cb437"
+      }
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/jet-fighter/se-motion-v2.png",
+      "rawHash": "c9469fcbdfefd39c210038cd2edfdb3e73635e91f6295cdf89ef7c96bb3ea1f5",
+      "promptPath": "art/atlas/units/jet-fighter/prompts/se-v2.txt",
+      "promptHash": "75088e29da38a0cae354584749ffa935a61825e8935003cfd04d225ef855572c",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ],
+      "identityReference": {
+        "path": "/Users/noahkenny/.codex/generated_images/01a1321a-8142-7533-ae7a-eb89a5433c70/exec-5d93d541-ec46-47a7-a239-e5c6fc2c0eb2.png",
+        "sha256": "95233a0049cd1f59de570eaef64686b1360c5dc929f22a758744ca26771cb437"
+      }
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
+}

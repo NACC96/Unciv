@@ -23,6 +23,7 @@ import com.unciv.models.ruleset.RulesetCache
 import com.unciv.models.ruleset.unique.UniqueType
 import com.unciv.models.tilesets.TileSetCache
 import com.unciv.models.translations.tr
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.extensions.addSeparator
 import com.unciv.ui.components.extensions.disable
 import com.unciv.ui.components.extensions.enable
@@ -119,6 +120,7 @@ class ModManagementScreen private constructor(
     private var onlineHeaderLabel: Label? = null
     private var installedExpanderTab: ExpanderTab? = null
     private var onlineExpanderTab: ExpanderTab? = null
+    private var atlasBrowser: AtlasModBrowser? = null
 
     // Enable re-sorting and syncing entries in 'installed' and 'repo search' ScrollPanes
     // Keep metadata and buttons in separate pools
@@ -142,8 +144,14 @@ class ModManagementScreen private constructor(
 
 
     init {
-        pickerPane.bottomTable.background = skinStrings.getUiBackground("ModManagementScreen/BottomTable", tintColor = skinStrings.skinConfig.clearColor)
-        pickerPane.topTable.background = skinStrings.getUiBackground("ModManagementScreen/TopTable", tintColor = skinStrings.skinConfig.clearColor)
+        setChoiceHeader("Mods")
+        if (!GameUiStyle.isAtlas) {
+            pickerPane.bottomTable.background = skinStrings.getUiBackground("ModManagementScreen/BottomTable", tintColor = skinStrings.skinConfig.clearColor)
+            pickerPane.topTable.background = skinStrings.getUiBackground("ModManagementScreen/TopTable", tintColor = skinStrings.skinConfig.clearColor)
+        } else {
+            installedModsTable.defaults().growX().minWidth(0f).pad(4f)
+            onlineModsTable.defaults().growX().minWidth(0f).pad(4f)
+        }
         topTable.top()  // So short lists won't vertically center everything including headers
 
         //setDefaultCloseAction() // we're adding the tileSet check
@@ -174,7 +182,8 @@ class ModManagementScreen private constructor(
         descriptionScroll.actor = labelWrapper
 
         isPortrait = isNarrowerThan4to3()
-        if (isPortrait) initPortrait()
+        if (GameUiStyle.isAtlas) initAtlas()
+        else if (isPortrait) initPortrait()
         else initLandscape()
         showLoadingImage()
 
@@ -185,6 +194,22 @@ class ModManagementScreen private constructor(
 
         refreshOnlineModTable() // Refresh table - chances are we have cached data...
         reloadOnlineMods() //... and still try to get fresh data from online
+    }
+
+    private fun initAtlas() {
+        optionsCell = topTable.add().growX().minWidth(0f).pad(8f)
+        topTable.row()
+        installedHeaderLabel = optionsManager.getInstalledHeader().toLabel().apply {
+            onClick { optionsManager.installedHeaderClicked() }
+        }
+        onlineHeaderLabel = optionsManager.getOnlineHeader().toLabel().apply {
+            onClick { optionsManager.onlineHeaderClicked() }
+        }
+        val browser = AtlasModBrowser(scrollInstalledMods, scrollOnlineMods, scrollActionTable,
+            installedHeaderLabel!!, onlineHeaderLabel!!, game.settings.fontSizeMultiplier)
+        atlasBrowser = browser
+        topTable.add(browser).grow().minWidth(0f).minHeight(0f)
+        GameUiStyle.applyWidget(topTable)
     }
 
     private fun initPortrait() {
@@ -245,7 +270,7 @@ class ModManagementScreen private constructor(
         val loading = LoadingImage(40f, loadingStyle)
         this.loading = loading
 
-        if (isPortrait) {
+        if (isPortrait || GameUiStyle.isAtlas) {
             optionsCell!!.pad(4f)
             optionsCell!!.setActor(loading)
         } else {// mute complaints - we _know_ it's not null
@@ -271,9 +296,17 @@ class ModManagementScreen private constructor(
         actorToRemove.remove()  // This is able to remove from a Cell or (the floating version) from the parent's children
         actorToRemove.dispose()
 
-        if (isPortrait) {
+        if (isPortrait || GameUiStyle.isAtlas) {
             optionsCell!!.pad(0f)
-            optionsCell!!.setActor(optionsManager.expander)
+            if (GameUiStyle.isAtlas) {
+                val optionsPane = AutoScrollPane(optionsManager.expander).apply {
+                    setScrollingDisabled(true, false)
+                    setOverscroll(false, false)
+                }
+                optionsCell!!.setActor(optionsPane)
+                optionsCell!!.minHeight(0f).maxHeight(stage.height * 0.4f)
+                GameUiStyle.applyWidget(optionsManager.expander)
+            } else optionsCell!!.setActor(optionsManager.expander)
         } else {
             stage.addActor(optionsManager.expander)
             optionsManager.expanderChangeEvent = {
@@ -393,18 +426,18 @@ class ModManagementScreen private constructor(
     }
     private fun syncSelected(modName: String, button: ModDecoratedButton, modNameToData: HashMap<String, ModUIData>, scroll: ScrollPane) {
         // manage selection color for user selection
-        lastSelectedButton?.color = Color.WHITE
-        button.color = Color.BLUE
+        lastSelectedButton?.setSelected(false)
+        button.setSelected(true)
         lastSelectedButton = button
         if (lastSelectedButton != lastSyncMarkedButton)
-            lastSyncMarkedButton?.color = Color.WHITE
+            lastSyncMarkedButton?.setSelected(false)
         lastSyncMarkedButton = null
         // look for sync-able same mod in other list
         val buttonInOtherList = modButtons[modNameToData[modName]] ?: return
         // scroll into view - we know the containing Tables all have cell default padding 10f
         scroll.scrollTo(0f, buttonInOtherList.y - 10f, scroll.actor.width, buttonInOtherList.height + 20f, true, false)
         // and color it so it's easier to find. ROYAL and SLATE too dark.
-        buttonInOtherList.color = Color.valueOf("7499ab")  // about halfway between royal and sky
+        buttonInOtherList.setSelected(true, synchronized = true)
         lastSyncMarkedButton = buttonInOtherList
     }
 
@@ -412,6 +445,7 @@ class ModManagementScreen private constructor(
     /** Create the special "Download from URL" button */
     private fun getDownloadFromUrlButton(): TextButton {
         val downloadButton = "Download mod from URL".toTextButton()
+        if (GameUiStyle.isAtlas) { GameUiStyle.apply(downloadButton); downloadButton.label.wrap = true }
         downloadButton.onClick {
             val popup = Popup(this)
             popup.addGoodSizedLabel("Please enter the mod repository -or- archive zip -or- branch -or- release -or- commit url:").row()
@@ -442,6 +476,7 @@ class ModManagementScreen private constructor(
             }
             popup.add(actualDownloadButton).row()
             popup.addCloseButton()
+            if (GameUiStyle.isAtlas) GameUiStyle.applyWidget(popup)
             popup.open()
         }
         return downloadButton
@@ -489,6 +524,7 @@ class ModManagementScreen private constructor(
 
         selectedMod = repo
         modActionTable.update(repo)
+        atlasBrowser?.showDetails()
     }
 
     private fun TextButton.setStartingDownload() {
@@ -619,6 +655,7 @@ class ModManagementScreen private constructor(
             OptionsPopup(this, OptionsPopupPages.ModCheck, subSelect = mod.name).open()
         }
         modActionTable.add(checkModButton).row()
+        if (GameUiStyle.isAtlas) GameUiStyle.applyWidget(modActionTable)
 
         val updateModButton = modActionTable.addUpdateModButton(modInfo) ?: return
         updateModButton.onClick {
@@ -674,6 +711,7 @@ class ModManagementScreen private constructor(
         // Don't let the player think he can delete Vanilla and G&K rulesets
         rightSideButton.isEnabled = mod.ruleset.folderLocation!=null
         showModDescription(mod.name)
+        atlasBrowser?.showDetails()
         rightSideButton.clearActivationActions(ActivationTypes.Tap)  // clearListeners would also kill mouseover styling
         rightSideButton.onClick {
             rightSideButton.isEnabled = false
