@@ -380,6 +380,27 @@
       }
     },
     {
+      "assetId": "marauder",
+      "creator": "OpenAI image generation",
+      "source": "art/atlas/units/marauder/creation-record.json",
+      "promptPath": "art/atlas/units/marauder/prompts/e-v1.txt",
+      "rights": "original-generated",
+      "sourceHash": "880ed97b3229b4312753acc06da3f5e4730ad60f0243e2cf79e6ef48b0cf0d37",
+      "outputHashes": {
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Marauder-1.png": "51eb9f3d85822d0656adfcb2b76b0c51998af092cd6963b8d12fbcaee13068ac",
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Marauder.png": "c8341d7dac8ef574a8db0600c495c561616a26fa6d3359fe541a52e049db4b38",
+        "art/atlas/units/marauder/frames/e-color.png": "2a5b1f1b8f8ba94b12b5cad439e294c57972b9e842d98fe689e9668b593296b3",
+        "art/atlas/units/marauder/frames/e-nation.png": "4c61b30fa5261640ee1e3b3b19387cee73cf6a399ce329a6aa506f0aeec122c0",
+        "art/atlas/units/marauder/frames/e-shadow.png": "1fc05fca6a7748cdb104d23707c8bec6f003eaf92ddd3e7d8aab556755f1f5bc",
+        "art/atlas/units/marauder/frames/ne-color.png": "708b9509c9699e4d515a7dbd4d9c684894a5511081a40310ef850fd2c8e8abfb",
+        "art/atlas/units/marauder/frames/ne-nation.png": "d4dba598d3485964d77fcb5a1b282d378996d6075b5acdb8d533d3cf4755d1c6",
+        "art/atlas/units/marauder/frames/ne-shadow.png": "d81b462de830e11cb9a4e66f1e94b399833b2f5fd705eff2a12bcd2f9f735227",
+        "art/atlas/units/marauder/frames/se-color.png": "1813e4a2a5742a3f2b0d25498ad517f718a4e5d6c6754482ac51754b8cac87e3",
+        "art/atlas/units/marauder/frames/se-nation.png": "1b137182e6a3c0e14e626e7d2f3523aeaf4e12daf05b82c8779764ec6301a99a",
+        "art/atlas/units/marauder/frames/se-shadow.png": "102d99d0b624163f71357567e7f0f8e0ab445ffffac16fe10e1991301c36e0ef"
+      }
+    },
+    {
       "assetId": "missionary",
       "creator": "OpenAI image generation",
       "source": "art/atlas/units/missionary/creation-record.json",
@@ -503,6 +524,27 @@
         "art/atlas/units/tank/frames/se-color.png": "de788dfb4a790218974c80cc4d004a67e7cd32081892786c355cffe22326f732",
         "art/atlas/units/tank/frames/se-nation.png": "7d4a3dd8b27c743a7607af9d94fa28d3e6f8d1481a6488ae3e39fb633f6cdca1",
         "art/atlas/units/tank/frames/se-shadow.png": "6fd57c69681be93ecc7aa5741e3bd09aab3e893009561c6d754916826b025ef1"
+      }
+    },
+    {
+      "assetId": "tercio",
+      "creator": "OpenAI image generation",
+      "source": "art/atlas/units/tercio/creation-record.json",
+      "promptPath": "art/atlas/units/tercio/prompts/e-v1.txt",
+      "rights": "original-generated",
+      "sourceHash": "c25693a83f4e19af47da9fb9006499214fb420a0935693ce12317c8e18dadb3c",
+      "outputHashes": {
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Tercio-1.png": "578881f4b5799d6e768763dca6201dc75de714a332831ea10897a817c7341755",
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Tercio.png": "b83372810ed783e96f408083241bd8a50d6d588a0eb92f86895b536da3ad76bb",
+        "art/atlas/units/tercio/frames/e-color.png": "fc3aae15f0e646fc9c025c937578eac661422b2e86b366de4dcec207aca9e532",
+        "art/atlas/units/tercio/frames/e-nation.png": "68b2cea709f681f7577e74d7f893dbae52eea1b2b3aed3380c8162af88f8283b",
+        "art/atlas/units/tercio/frames/e-shadow.png": "e4d1be422013321c098e3e8ae58d3a387406ef402009b69dab5ba42c1f17ef8e",
+        "art/atlas/units/tercio/frames/ne-color.png": "411f1725685fdae1b15443436b213e1bbb989eb06aaa8848072c2255f498aff7",
+        "art/atlas/units/tercio/frames/ne-nation.png": "bc6694228112943ec3baf15a65d9d8a6c6a4301c42d0c9877e1fd8e3f43e56bc",
+        "art/atlas/units/tercio/frames/ne-shadow.png": "a90ea0e73a608e0fcc5eb149d4c9d21746e354013b2c82b75bcd44b77fb01512",
+        "art/atlas/units/tercio/frames/se-color.png": "d3da94f37c68e5678c02ff6d1fc7b5a11b8569ca3cfccecde0eaf63fb945d696",
+        "art/atlas/units/tercio/frames/se-nation.png": "b6900634bca5159400aea42f692250958237addef45f86778a506d76c3a40e49",
+        "art/atlas/units/tercio/frames/se-shadow.png": "0bf9b94c27f0662187ecf79d11b2a1c1d94a6cb7650aa207019186086fff0862"
       }
     },
     {

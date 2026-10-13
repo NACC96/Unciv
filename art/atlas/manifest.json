@@ -1670,6 +1670,30 @@
       ]
     },
     {
+      "unitName": "Marauder",
+      "assetId": "marauder",
+      "canvasWidth": 128,
+      "canvasHeight": 128,
+      "anchorX": 64,
+      "anchorY": 96,
+      "staticLayers": [
+        "TileSets/AtlasUnits/Units/Marauder"
+      ],
+      "maskKeys": [
+        "TileSets/AtlasUnits/Units/Marauder-1"
+      ],
+      "shadowKey": null,
+      "clippingMargin": 2,
+      "uniqueUnitIdentity": "Marauder",
+      "applicableStates": [
+        "IDLE",
+        "MOVE",
+        "ATTACK",
+        "HIT",
+        "DEFEAT"
+      ]
+    },
+    {
       "unitName": "Marine",
       "assetId": "marine",
       "canvasWidth": 128,
@@ -2615,6 +2639,30 @@
       "shadowKey": null,
       "clippingMargin": 2,
       "uniqueUnitIdentity": null,
+      "applicableStates": [
+        "IDLE",
+        "MOVE",
+        "ATTACK",
+        "HIT",
+        "DEFEAT"
+      ]
+    },
+    {
+      "unitName": "Tercio",
+      "assetId": "tercio",
+      "canvasWidth": 128,
+      "canvasHeight": 128,
+      "anchorX": 64,
+      "anchorY": 96,
+      "staticLayers": [
+        "TileSets/AtlasUnits/Units/Tercio"
+      ],
+      "maskKeys": [
+        "TileSets/AtlasUnits/Units/Tercio-1"
+      ],
+      "shadowKey": null,
+      "clippingMargin": 2,
+      "uniqueUnitIdentity": "Tercio",
       "applicableStates": [
         "IDLE",
         "MOVE",
@@ -222129,6 +222177,3195 @@
       "frames": []
     },
     {
+      "unitName": "Marauder",
+      "state": "ATTACK",
+      "facing": "E",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Marauder",
+      "looping": false,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/e-color.png",
+            "x": 0,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/e-nation.png",
+                "x": 0,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/e-shadow.png",
+            "x": 0,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/e-color.png",
+            "x": 128,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/e-nation.png",
+                "x": 128,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/e-shadow.png",
+            "x": 128,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/e-color.png",
+            "x": 256,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/e-nation.png",
+                "x": 256,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/e-shadow.png",
+            "x": 256,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/e-color.png",
+            "x": 384,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/e-nation.png",
+                "x": 384,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/e-shadow.png",
+            "x": 384,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/e-color.png",
+            "x": 512,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/e-nation.png",
+                "x": 512,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/e-shadow.png",
+            "x": 512,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/e-color.png",
+            "x": 640,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/e-nation.png",
+                "x": 640,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/e-shadow.png",
+            "x": 640,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/e-color.png",
+            "x": 768,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/e-nation.png",
+                "x": 768,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/e-shadow.png",
+            "x": 768,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/e-color.png",
+            "x": 896,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/e-nation.png",
+                "x": 896,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/e-shadow.png",
+            "x": 896,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Marauder",
+      "state": "ATTACK",
+      "facing": "NE",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Marauder",
+      "looping": false,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/ne-color.png",
+            "x": 0,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/ne-nation.png",
+                "x": 0,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/ne-shadow.png",
+            "x": 0,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/ne-color.png",
+            "x": 128,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/ne-nation.png",
+                "x": 128,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/ne-shadow.png",
+            "x": 128,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/ne-color.png",
+            "x": 256,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/ne-nation.png",
+                "x": 256,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/ne-shadow.png",
+            "x": 256,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/ne-color.png",
+            "x": 384,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/ne-nation.png",
+                "x": 384,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/ne-shadow.png",
+            "x": 384,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/ne-color.png",
+            "x": 512,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/ne-nation.png",
+                "x": 512,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/ne-shadow.png",
+            "x": 512,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/ne-color.png",
+            "x": 640,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/ne-nation.png",
+                "x": 640,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/ne-shadow.png",
+            "x": 640,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/ne-color.png",
+            "x": 768,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/ne-nation.png",
+                "x": 768,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/ne-shadow.png",
+            "x": 768,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/ne-color.png",
+            "x": 896,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/ne-nation.png",
+                "x": 896,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/ne-shadow.png",
+            "x": 896,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Marauder",
+      "state": "ATTACK",
+      "facing": "NW",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Marauder",
+      "looping": false,
+      "mirroredFacing": "NE",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Marauder",
+      "state": "ATTACK",
+      "facing": "SE",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Marauder",
+      "looping": false,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/se-color.png",
+            "x": 0,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/se-nation.png",
+                "x": 0,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/se-shadow.png",
+            "x": 0,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/se-color.png",
+            "x": 128,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/se-nation.png",
+                "x": 128,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/se-shadow.png",
+            "x": 128,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/se-color.png",
+            "x": 256,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/se-nation.png",
+                "x": 256,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/se-shadow.png",
+            "x": 256,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/se-color.png",
+            "x": 384,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/se-nation.png",
+                "x": 384,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/se-shadow.png",
+            "x": 384,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/se-color.png",
+            "x": 512,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/se-nation.png",
+                "x": 512,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/se-shadow.png",
+            "x": 512,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/se-color.png",
+            "x": 640,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/se-nation.png",
+                "x": 640,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/se-shadow.png",
+            "x": 640,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/se-color.png",
+            "x": 768,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/se-nation.png",
+                "x": 768,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/se-shadow.png",
+            "x": 768,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/se-color.png",
+            "x": 896,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/se-nation.png",
+                "x": 896,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/se-shadow.png",
+            "x": 896,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Marauder",
+      "state": "ATTACK",
+      "facing": "SW",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Marauder",
+      "looping": false,
+      "mirroredFacing": "SE",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Marauder",
+      "state": "ATTACK",
+      "facing": "W",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Marauder",
+      "looping": false,
+      "mirroredFacing": "E",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Marauder",
+      "state": "DEFEAT",
+      "facing": "E",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Marauder",
+      "looping": false,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/e-color.png",
+            "x": 0,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/e-nation.png",
+                "x": 0,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/e-shadow.png",
+            "x": 0,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/e-color.png",
+            "x": 128,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/e-nation.png",
+                "x": 128,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/e-shadow.png",
+            "x": 128,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/e-color.png",
+            "x": 256,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/e-nation.png",
+                "x": 256,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/e-shadow.png",
+            "x": 256,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/e-color.png",
+            "x": 384,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/e-nation.png",
+                "x": 384,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/e-shadow.png",
+            "x": 384,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/e-color.png",
+            "x": 512,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/e-nation.png",
+                "x": 512,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/e-shadow.png",
+            "x": 512,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/e-color.png",
+            "x": 640,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/e-nation.png",
+                "x": 640,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/e-shadow.png",
+            "x": 640,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/e-color.png",
+            "x": 768,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/e-nation.png",
+                "x": 768,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/e-shadow.png",
+            "x": 768,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/e-color.png",
+            "x": 896,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/e-nation.png",
+                "x": 896,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/e-shadow.png",
+            "x": 896,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Marauder",
+      "state": "DEFEAT",
+      "facing": "NE",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Marauder",
+      "looping": false,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/ne-color.png",
+            "x": 0,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/ne-nation.png",
+                "x": 0,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/ne-shadow.png",
+            "x": 0,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/ne-color.png",
+            "x": 128,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/ne-nation.png",
+                "x": 128,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/ne-shadow.png",
+            "x": 128,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/ne-color.png",
+            "x": 256,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/ne-nation.png",
+                "x": 256,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/ne-shadow.png",
+            "x": 256,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/ne-color.png",
+            "x": 384,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/ne-nation.png",
+                "x": 384,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/ne-shadow.png",
+            "x": 384,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/ne-color.png",
+            "x": 512,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/ne-nation.png",
+                "x": 512,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/ne-shadow.png",
+            "x": 512,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/ne-color.png",
+            "x": 640,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/ne-nation.png",
+                "x": 640,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/ne-shadow.png",
+            "x": 640,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/ne-color.png",
+            "x": 768,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/ne-nation.png",
+                "x": 768,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/ne-shadow.png",
+            "x": 768,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/ne-color.png",
+            "x": 896,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/ne-nation.png",
+                "x": 896,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/ne-shadow.png",
+            "x": 896,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Marauder",
+      "state": "DEFEAT",
+      "facing": "NW",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Marauder",
+      "looping": false,
+      "mirroredFacing": "NE",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Marauder",
+      "state": "DEFEAT",
+      "facing": "SE",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Marauder",
+      "looping": false,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/se-color.png",
+            "x": 0,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/se-nation.png",
+                "x": 0,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/se-shadow.png",
+            "x": 0,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/se-color.png",
+            "x": 128,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/se-nation.png",
+                "x": 128,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/se-shadow.png",
+            "x": 128,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/se-color.png",
+            "x": 256,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/se-nation.png",
+                "x": 256,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/se-shadow.png",
+            "x": 256,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/se-color.png",
+            "x": 384,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/se-nation.png",
+                "x": 384,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/se-shadow.png",
+            "x": 384,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/se-color.png",
+            "x": 512,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/se-nation.png",
+                "x": 512,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/se-shadow.png",
+            "x": 512,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/se-color.png",
+            "x": 640,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/se-nation.png",
+                "x": 640,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/se-shadow.png",
+            "x": 640,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/se-color.png",
+            "x": 768,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/se-nation.png",
+                "x": 768,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/se-shadow.png",
+            "x": 768,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/se-color.png",
+            "x": 896,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/se-nation.png",
+                "x": 896,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/se-shadow.png",
+            "x": 896,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Marauder",
+      "state": "DEFEAT",
+      "facing": "SW",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Marauder",
+      "looping": false,
+      "mirroredFacing": "SE",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Marauder",
+      "state": "DEFEAT",
+      "facing": "W",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Marauder",
+      "looping": false,
+      "mirroredFacing": "E",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Marauder",
+      "state": "HIT",
+      "facing": "E",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Marauder",
+      "looping": false,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 95,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/e-color.png",
+            "x": 512,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/e-nation.png",
+                "x": 512,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/e-shadow.png",
+            "x": 512,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 95,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/e-color.png",
+            "x": 640,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/e-nation.png",
+                "x": 640,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/e-shadow.png",
+            "x": 640,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 95,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/e-color.png",
+            "x": 768,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/e-nation.png",
+                "x": 768,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/e-shadow.png",
+            "x": 768,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 95,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/e-color.png",
+            "x": 896,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/e-nation.png",
+                "x": 896,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/e-shadow.png",
+            "x": 896,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Marauder",
+      "state": "HIT",
+      "facing": "NE",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Marauder",
+      "looping": false,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 95,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/ne-color.png",
+            "x": 512,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/ne-nation.png",
+                "x": 512,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/ne-shadow.png",
+            "x": 512,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 95,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/ne-color.png",
+            "x": 640,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/ne-nation.png",
+                "x": 640,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/ne-shadow.png",
+            "x": 640,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 95,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/ne-color.png",
+            "x": 768,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/ne-nation.png",
+                "x": 768,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/ne-shadow.png",
+            "x": 768,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 95,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/ne-color.png",
+            "x": 896,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/ne-nation.png",
+                "x": 896,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/ne-shadow.png",
+            "x": 896,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Marauder",
+      "state": "HIT",
+      "facing": "NW",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Marauder",
+      "looping": false,
+      "mirroredFacing": "NE",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Marauder",
+      "state": "HIT",
+      "facing": "SE",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Marauder",
+      "looping": false,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 95,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/se-color.png",
+            "x": 512,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/se-nation.png",
+                "x": 512,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/se-shadow.png",
+            "x": 512,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 95,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/se-color.png",
+            "x": 640,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/se-nation.png",
+                "x": 640,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/se-shadow.png",
+            "x": 640,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 95,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/se-color.png",
+            "x": 768,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/se-nation.png",
+                "x": 768,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/se-shadow.png",
+            "x": 768,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 95,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/se-color.png",
+            "x": 896,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/se-nation.png",
+                "x": 896,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/se-shadow.png",
+            "x": 896,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Marauder",
+      "state": "HIT",
+      "facing": "SW",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Marauder",
+      "looping": false,
+      "mirroredFacing": "SE",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Marauder",
+      "state": "HIT",
+      "facing": "W",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Marauder",
+      "looping": false,
+      "mirroredFacing": "E",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Marauder",
+      "state": "IDLE",
+      "facing": "E",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Marauder",
+      "looping": true,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 160,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/e-color.png",
+            "x": 0,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/e-nation.png",
+                "x": 0,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/e-shadow.png",
+            "x": 0,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 160,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/e-color.png",
+            "x": 128,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/e-nation.png",
+                "x": 128,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/e-shadow.png",
+            "x": 128,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 160,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/e-color.png",
+            "x": 256,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/e-nation.png",
+                "x": 256,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/e-shadow.png",
+            "x": 256,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 160,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/e-color.png",
+            "x": 384,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/e-nation.png",
+                "x": 384,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/e-shadow.png",
+            "x": 384,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Marauder",
+      "state": "IDLE",
+      "facing": "NE",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Marauder",
+      "looping": true,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 160,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/ne-color.png",
+            "x": 0,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/ne-nation.png",
+                "x": 0,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/ne-shadow.png",
+            "x": 0,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 160,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/ne-color.png",
+            "x": 128,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/ne-nation.png",
+                "x": 128,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/ne-shadow.png",
+            "x": 128,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 160,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/ne-color.png",
+            "x": 256,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/ne-nation.png",
+                "x": 256,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/ne-shadow.png",
+            "x": 256,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 160,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/ne-color.png",
+            "x": 384,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/ne-nation.png",
+                "x": 384,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/ne-shadow.png",
+            "x": 384,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Marauder",
+      "state": "IDLE",
+      "facing": "NW",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Marauder",
+      "looping": true,
+      "mirroredFacing": "NE",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Marauder",
+      "state": "IDLE",
+      "facing": "SE",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Marauder",
+      "looping": true,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 160,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/se-color.png",
+            "x": 0,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/se-nation.png",
+                "x": 0,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/se-shadow.png",
+            "x": 0,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 160,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/se-color.png",
+            "x": 128,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/se-nation.png",
+                "x": 128,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/se-shadow.png",
+            "x": 128,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 160,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/se-color.png",
+            "x": 256,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/se-nation.png",
+                "x": 256,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/se-shadow.png",
+            "x": 256,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 160,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/se-color.png",
+            "x": 384,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/se-nation.png",
+                "x": 384,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/se-shadow.png",
+            "x": 384,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Marauder",
+      "state": "IDLE",
+      "facing": "SW",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Marauder",
+      "looping": true,
+      "mirroredFacing": "SE",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Marauder",
+      "state": "IDLE",
+      "facing": "W",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Marauder",
+      "looping": true,
+      "mirroredFacing": "E",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Marauder",
+      "state": "MOVE",
+      "facing": "E",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Marauder",
+      "looping": true,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/e-color.png",
+            "x": 0,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/e-nation.png",
+                "x": 0,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/e-shadow.png",
+            "x": 0,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/e-color.png",
+            "x": 128,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/e-nation.png",
+                "x": 128,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/e-shadow.png",
+            "x": 128,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/e-color.png",
+            "x": 256,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/e-nation.png",
+                "x": 256,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/e-shadow.png",
+            "x": 256,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/e-color.png",
+            "x": 384,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/e-nation.png",
+                "x": 384,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/e-shadow.png",
+            "x": 384,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/e-color.png",
+            "x": 512,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/e-nation.png",
+                "x": 512,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/e-shadow.png",
+            "x": 512,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/e-color.png",
+            "x": 640,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/e-nation.png",
+                "x": 640,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/e-shadow.png",
+            "x": 640,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/e-color.png",
+            "x": 768,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/e-nation.png",
+                "x": 768,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/e-shadow.png",
+            "x": 768,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/e-color.png",
+            "x": 896,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/e-nation.png",
+                "x": 896,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/e-shadow.png",
+            "x": 896,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Marauder",
+      "state": "MOVE",
+      "facing": "NE",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Marauder",
+      "looping": true,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/ne-color.png",
+            "x": 0,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/ne-nation.png",
+                "x": 0,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/ne-shadow.png",
+            "x": 0,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/ne-color.png",
+            "x": 128,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/ne-nation.png",
+                "x": 128,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/ne-shadow.png",
+            "x": 128,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/ne-color.png",
+            "x": 256,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/ne-nation.png",
+                "x": 256,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/ne-shadow.png",
+            "x": 256,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/ne-color.png",
+            "x": 384,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/ne-nation.png",
+                "x": 384,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/ne-shadow.png",
+            "x": 384,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/ne-color.png",
+            "x": 512,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/ne-nation.png",
+                "x": 512,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/ne-shadow.png",
+            "x": 512,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/ne-color.png",
+            "x": 640,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/ne-nation.png",
+                "x": 640,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/ne-shadow.png",
+            "x": 640,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/ne-color.png",
+            "x": 768,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/ne-nation.png",
+                "x": 768,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/ne-shadow.png",
+            "x": 768,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/ne-color.png",
+            "x": 896,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/ne-nation.png",
+                "x": 896,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/ne-shadow.png",
+            "x": 896,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Marauder",
+      "state": "MOVE",
+      "facing": "NW",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Marauder",
+      "looping": true,
+      "mirroredFacing": "NE",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Marauder",
+      "state": "MOVE",
+      "facing": "SE",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Marauder",
+      "looping": true,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/se-color.png",
+            "x": 0,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/se-nation.png",
+                "x": 0,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/se-shadow.png",
+            "x": 0,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/se-color.png",
+            "x": 128,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/se-nation.png",
+                "x": 128,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/se-shadow.png",
+            "x": 128,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/se-color.png",
+            "x": 256,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/se-nation.png",
+                "x": 256,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/se-shadow.png",
+            "x": 256,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/se-color.png",
+            "x": 384,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/se-nation.png",
+                "x": 384,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/se-shadow.png",
+            "x": 384,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/se-color.png",
+            "x": 512,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/se-nation.png",
+                "x": 512,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/se-shadow.png",
+            "x": 512,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/se-color.png",
+            "x": 640,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/se-nation.png",
+                "x": 640,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/se-shadow.png",
+            "x": 640,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/se-color.png",
+            "x": 768,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/se-nation.png",
+                "x": 768,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/se-shadow.png",
+            "x": 768,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/marauder/frames/se-color.png",
+            "x": 896,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/marauder/frames/se-nation.png",
+                "x": 896,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/marauder/frames/se-shadow.png",
+            "x": 896,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Marauder",
+      "state": "MOVE",
+      "facing": "SW",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Marauder",
+      "looping": true,
+      "mirroredFacing": "SE",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Marauder",
+      "state": "MOVE",
+      "facing": "W",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Marauder",
+      "looping": true,
+      "mirroredFacing": "E",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
       "unitName": "Marine",
       "state": "ATTACK",
       "facing": "E",
@@ -345018,6 +348255,3195 @@
       "state": "MOVE",
       "facing": "W",
       "staticFallbackKey": "TileSets/AtlasUnits/Units/Tank",
+      "looping": true,
+      "mirroredFacing": "E",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Tercio",
+      "state": "ATTACK",
+      "facing": "E",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Tercio",
+      "looping": false,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/e-color.png",
+            "x": 0,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/e-nation.png",
+                "x": 0,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/e-shadow.png",
+            "x": 0,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/e-color.png",
+            "x": 128,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/e-nation.png",
+                "x": 128,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/e-shadow.png",
+            "x": 128,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/e-color.png",
+            "x": 256,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/e-nation.png",
+                "x": 256,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/e-shadow.png",
+            "x": 256,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/e-color.png",
+            "x": 384,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/e-nation.png",
+                "x": 384,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/e-shadow.png",
+            "x": 384,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/e-color.png",
+            "x": 512,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/e-nation.png",
+                "x": 512,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/e-shadow.png",
+            "x": 512,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/e-color.png",
+            "x": 640,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/e-nation.png",
+                "x": 640,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/e-shadow.png",
+            "x": 640,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/e-color.png",
+            "x": 768,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/e-nation.png",
+                "x": 768,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/e-shadow.png",
+            "x": 768,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/e-color.png",
+            "x": 896,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/e-nation.png",
+                "x": 896,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/e-shadow.png",
+            "x": 896,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Tercio",
+      "state": "ATTACK",
+      "facing": "NE",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Tercio",
+      "looping": false,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/ne-color.png",
+            "x": 0,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/ne-nation.png",
+                "x": 0,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/ne-shadow.png",
+            "x": 0,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/ne-color.png",
+            "x": 128,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/ne-nation.png",
+                "x": 128,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/ne-shadow.png",
+            "x": 128,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/ne-color.png",
+            "x": 256,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/ne-nation.png",
+                "x": 256,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/ne-shadow.png",
+            "x": 256,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/ne-color.png",
+            "x": 384,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/ne-nation.png",
+                "x": 384,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/ne-shadow.png",
+            "x": 384,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/ne-color.png",
+            "x": 512,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/ne-nation.png",
+                "x": 512,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/ne-shadow.png",
+            "x": 512,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/ne-color.png",
+            "x": 640,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/ne-nation.png",
+                "x": 640,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/ne-shadow.png",
+            "x": 640,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/ne-color.png",
+            "x": 768,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/ne-nation.png",
+                "x": 768,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/ne-shadow.png",
+            "x": 768,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/ne-color.png",
+            "x": 896,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/ne-nation.png",
+                "x": 896,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/ne-shadow.png",
+            "x": 896,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Tercio",
+      "state": "ATTACK",
+      "facing": "NW",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Tercio",
+      "looping": false,
+      "mirroredFacing": "NE",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Tercio",
+      "state": "ATTACK",
+      "facing": "SE",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Tercio",
+      "looping": false,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/se-color.png",
+            "x": 0,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/se-nation.png",
+                "x": 0,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/se-shadow.png",
+            "x": 0,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/se-color.png",
+            "x": 128,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/se-nation.png",
+                "x": 128,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/se-shadow.png",
+            "x": 128,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/se-color.png",
+            "x": 256,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/se-nation.png",
+                "x": 256,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/se-shadow.png",
+            "x": 256,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/se-color.png",
+            "x": 384,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/se-nation.png",
+                "x": 384,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/se-shadow.png",
+            "x": 384,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/se-color.png",
+            "x": 512,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/se-nation.png",
+                "x": 512,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/se-shadow.png",
+            "x": 512,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/se-color.png",
+            "x": 640,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/se-nation.png",
+                "x": 640,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/se-shadow.png",
+            "x": 640,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/se-color.png",
+            "x": 768,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/se-nation.png",
+                "x": 768,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/se-shadow.png",
+            "x": 768,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/se-color.png",
+            "x": 896,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/se-nation.png",
+                "x": 896,
+                "y": 256,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/se-shadow.png",
+            "x": 896,
+            "y": 256,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Tercio",
+      "state": "ATTACK",
+      "facing": "SW",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Tercio",
+      "looping": false,
+      "mirroredFacing": "SE",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Tercio",
+      "state": "ATTACK",
+      "facing": "W",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Tercio",
+      "looping": false,
+      "mirroredFacing": "E",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Tercio",
+      "state": "DEFEAT",
+      "facing": "E",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Tercio",
+      "looping": false,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/e-color.png",
+            "x": 0,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/e-nation.png",
+                "x": 0,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/e-shadow.png",
+            "x": 0,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/e-color.png",
+            "x": 128,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/e-nation.png",
+                "x": 128,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/e-shadow.png",
+            "x": 128,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/e-color.png",
+            "x": 256,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/e-nation.png",
+                "x": 256,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/e-shadow.png",
+            "x": 256,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/e-color.png",
+            "x": 384,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/e-nation.png",
+                "x": 384,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/e-shadow.png",
+            "x": 384,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/e-color.png",
+            "x": 512,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/e-nation.png",
+                "x": 512,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/e-shadow.png",
+            "x": 512,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/e-color.png",
+            "x": 640,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/e-nation.png",
+                "x": 640,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/e-shadow.png",
+            "x": 640,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/e-color.png",
+            "x": 768,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/e-nation.png",
+                "x": 768,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/e-shadow.png",
+            "x": 768,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/e-color.png",
+            "x": 896,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/e-nation.png",
+                "x": 896,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/e-shadow.png",
+            "x": 896,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Tercio",
+      "state": "DEFEAT",
+      "facing": "NE",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Tercio",
+      "looping": false,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/ne-color.png",
+            "x": 0,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/ne-nation.png",
+                "x": 0,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/ne-shadow.png",
+            "x": 0,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/ne-color.png",
+            "x": 128,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/ne-nation.png",
+                "x": 128,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/ne-shadow.png",
+            "x": 128,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/ne-color.png",
+            "x": 256,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/ne-nation.png",
+                "x": 256,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/ne-shadow.png",
+            "x": 256,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/ne-color.png",
+            "x": 384,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/ne-nation.png",
+                "x": 384,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/ne-shadow.png",
+            "x": 384,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/ne-color.png",
+            "x": 512,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/ne-nation.png",
+                "x": 512,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/ne-shadow.png",
+            "x": 512,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/ne-color.png",
+            "x": 640,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/ne-nation.png",
+                "x": 640,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/ne-shadow.png",
+            "x": 640,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/ne-color.png",
+            "x": 768,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/ne-nation.png",
+                "x": 768,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/ne-shadow.png",
+            "x": 768,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/ne-color.png",
+            "x": 896,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/ne-nation.png",
+                "x": 896,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/ne-shadow.png",
+            "x": 896,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Tercio",
+      "state": "DEFEAT",
+      "facing": "NW",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Tercio",
+      "looping": false,
+      "mirroredFacing": "NE",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Tercio",
+      "state": "DEFEAT",
+      "facing": "SE",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Tercio",
+      "looping": false,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/se-color.png",
+            "x": 0,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/se-nation.png",
+                "x": 0,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/se-shadow.png",
+            "x": 0,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/se-color.png",
+            "x": 128,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/se-nation.png",
+                "x": 128,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/se-shadow.png",
+            "x": 128,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/se-color.png",
+            "x": 256,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/se-nation.png",
+                "x": 256,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/se-shadow.png",
+            "x": 256,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/se-color.png",
+            "x": 384,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/se-nation.png",
+                "x": 384,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/se-shadow.png",
+            "x": 384,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/se-color.png",
+            "x": 512,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/se-nation.png",
+                "x": 512,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/se-shadow.png",
+            "x": 512,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/se-color.png",
+            "x": 640,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/se-nation.png",
+                "x": 640,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/se-shadow.png",
+            "x": 640,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/se-color.png",
+            "x": 768,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/se-nation.png",
+                "x": 768,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/se-shadow.png",
+            "x": 768,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 130,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/se-color.png",
+            "x": 896,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/se-nation.png",
+                "x": 896,
+                "y": 384,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/se-shadow.png",
+            "x": 896,
+            "y": 384,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Tercio",
+      "state": "DEFEAT",
+      "facing": "SW",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Tercio",
+      "looping": false,
+      "mirroredFacing": "SE",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Tercio",
+      "state": "DEFEAT",
+      "facing": "W",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Tercio",
+      "looping": false,
+      "mirroredFacing": "E",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Tercio",
+      "state": "HIT",
+      "facing": "E",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Tercio",
+      "looping": false,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 95,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/e-color.png",
+            "x": 512,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/e-nation.png",
+                "x": 512,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/e-shadow.png",
+            "x": 512,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 95,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/e-color.png",
+            "x": 640,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/e-nation.png",
+                "x": 640,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/e-shadow.png",
+            "x": 640,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 95,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/e-color.png",
+            "x": 768,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/e-nation.png",
+                "x": 768,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/e-shadow.png",
+            "x": 768,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 95,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/e-color.png",
+            "x": 896,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/e-nation.png",
+                "x": 896,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/e-shadow.png",
+            "x": 896,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Tercio",
+      "state": "HIT",
+      "facing": "NE",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Tercio",
+      "looping": false,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 95,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/ne-color.png",
+            "x": 512,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/ne-nation.png",
+                "x": 512,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/ne-shadow.png",
+            "x": 512,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 95,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/ne-color.png",
+            "x": 640,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/ne-nation.png",
+                "x": 640,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/ne-shadow.png",
+            "x": 640,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 95,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/ne-color.png",
+            "x": 768,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/ne-nation.png",
+                "x": 768,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/ne-shadow.png",
+            "x": 768,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 95,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/ne-color.png",
+            "x": 896,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/ne-nation.png",
+                "x": 896,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/ne-shadow.png",
+            "x": 896,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Tercio",
+      "state": "HIT",
+      "facing": "NW",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Tercio",
+      "looping": false,
+      "mirroredFacing": "NE",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Tercio",
+      "state": "HIT",
+      "facing": "SE",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Tercio",
+      "looping": false,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 95,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/se-color.png",
+            "x": 512,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/se-nation.png",
+                "x": 512,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/se-shadow.png",
+            "x": 512,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 95,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/se-color.png",
+            "x": 640,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/se-nation.png",
+                "x": 640,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/se-shadow.png",
+            "x": 640,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 95,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/se-color.png",
+            "x": 768,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/se-nation.png",
+                "x": 768,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/se-shadow.png",
+            "x": 768,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 95,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/se-color.png",
+            "x": 896,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/se-nation.png",
+                "x": 896,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/se-shadow.png",
+            "x": 896,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Tercio",
+      "state": "HIT",
+      "facing": "SW",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Tercio",
+      "looping": false,
+      "mirroredFacing": "SE",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Tercio",
+      "state": "HIT",
+      "facing": "W",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Tercio",
+      "looping": false,
+      "mirroredFacing": "E",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Tercio",
+      "state": "IDLE",
+      "facing": "E",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Tercio",
+      "looping": true,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 160,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/e-color.png",
+            "x": 0,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/e-nation.png",
+                "x": 0,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/e-shadow.png",
+            "x": 0,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 160,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/e-color.png",
+            "x": 128,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/e-nation.png",
+                "x": 128,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/e-shadow.png",
+            "x": 128,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 160,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/e-color.png",
+            "x": 256,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/e-nation.png",
+                "x": 256,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/e-shadow.png",
+            "x": 256,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 160,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/e-color.png",
+            "x": 384,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/e-nation.png",
+                "x": 384,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/e-shadow.png",
+            "x": 384,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Tercio",
+      "state": "IDLE",
+      "facing": "NE",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Tercio",
+      "looping": true,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 160,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/ne-color.png",
+            "x": 0,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/ne-nation.png",
+                "x": 0,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/ne-shadow.png",
+            "x": 0,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 160,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/ne-color.png",
+            "x": 128,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/ne-nation.png",
+                "x": 128,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/ne-shadow.png",
+            "x": 128,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 160,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/ne-color.png",
+            "x": 256,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/ne-nation.png",
+                "x": 256,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/ne-shadow.png",
+            "x": 256,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 160,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/ne-color.png",
+            "x": 384,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/ne-nation.png",
+                "x": 384,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/ne-shadow.png",
+            "x": 384,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Tercio",
+      "state": "IDLE",
+      "facing": "NW",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Tercio",
+      "looping": true,
+      "mirroredFacing": "NE",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Tercio",
+      "state": "IDLE",
+      "facing": "SE",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Tercio",
+      "looping": true,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 160,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/se-color.png",
+            "x": 0,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/se-nation.png",
+                "x": 0,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/se-shadow.png",
+            "x": 0,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 160,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/se-color.png",
+            "x": 128,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/se-nation.png",
+                "x": 128,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/se-shadow.png",
+            "x": 128,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 160,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/se-color.png",
+            "x": 256,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/se-nation.png",
+                "x": 256,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/se-shadow.png",
+            "x": 256,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 160,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/se-color.png",
+            "x": 384,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/se-nation.png",
+                "x": 384,
+                "y": 0,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/se-shadow.png",
+            "x": 384,
+            "y": 0,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Tercio",
+      "state": "IDLE",
+      "facing": "SW",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Tercio",
+      "looping": true,
+      "mirroredFacing": "SE",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Tercio",
+      "state": "IDLE",
+      "facing": "W",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Tercio",
+      "looping": true,
+      "mirroredFacing": "E",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Tercio",
+      "state": "MOVE",
+      "facing": "E",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Tercio",
+      "looping": true,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/e-color.png",
+            "x": 0,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/e-nation.png",
+                "x": 0,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/e-shadow.png",
+            "x": 0,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/e-color.png",
+            "x": 128,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/e-nation.png",
+                "x": 128,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/e-shadow.png",
+            "x": 128,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/e-color.png",
+            "x": 256,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/e-nation.png",
+                "x": 256,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/e-shadow.png",
+            "x": 256,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/e-color.png",
+            "x": 384,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/e-nation.png",
+                "x": 384,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/e-shadow.png",
+            "x": 384,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/e-color.png",
+            "x": 512,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/e-nation.png",
+                "x": 512,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/e-shadow.png",
+            "x": 512,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/e-color.png",
+            "x": 640,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/e-nation.png",
+                "x": 640,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/e-shadow.png",
+            "x": 640,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/e-color.png",
+            "x": 768,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/e-nation.png",
+                "x": 768,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/e-shadow.png",
+            "x": 768,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/e-color.png",
+            "x": 896,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/e-nation.png",
+                "x": 896,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/e-shadow.png",
+            "x": 896,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Tercio",
+      "state": "MOVE",
+      "facing": "NE",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Tercio",
+      "looping": true,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/ne-color.png",
+            "x": 0,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/ne-nation.png",
+                "x": 0,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/ne-shadow.png",
+            "x": 0,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/ne-color.png",
+            "x": 128,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/ne-nation.png",
+                "x": 128,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/ne-shadow.png",
+            "x": 128,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/ne-color.png",
+            "x": 256,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/ne-nation.png",
+                "x": 256,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/ne-shadow.png",
+            "x": 256,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/ne-color.png",
+            "x": 384,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/ne-nation.png",
+                "x": 384,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/ne-shadow.png",
+            "x": 384,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/ne-color.png",
+            "x": 512,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/ne-nation.png",
+                "x": 512,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/ne-shadow.png",
+            "x": 512,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/ne-color.png",
+            "x": 640,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/ne-nation.png",
+                "x": 640,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/ne-shadow.png",
+            "x": 640,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/ne-color.png",
+            "x": 768,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/ne-nation.png",
+                "x": 768,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/ne-shadow.png",
+            "x": 768,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/ne-color.png",
+            "x": 896,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/ne-nation.png",
+                "x": 896,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/ne-shadow.png",
+            "x": 896,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Tercio",
+      "state": "MOVE",
+      "facing": "NW",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Tercio",
+      "looping": true,
+      "mirroredFacing": "NE",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Tercio",
+      "state": "MOVE",
+      "facing": "SE",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Tercio",
+      "looping": true,
+      "mirroredFacing": null,
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": [
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/se-color.png",
+            "x": 0,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/se-nation.png",
+                "x": 0,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/se-shadow.png",
+            "x": 0,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/se-color.png",
+            "x": 128,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/se-nation.png",
+                "x": 128,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/se-shadow.png",
+            "x": 128,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/se-color.png",
+            "x": 256,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/se-nation.png",
+                "x": 256,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/se-shadow.png",
+            "x": 256,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/se-color.png",
+            "x": 384,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/se-nation.png",
+                "x": 384,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/se-shadow.png",
+            "x": 384,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/se-color.png",
+            "x": 512,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/se-nation.png",
+                "x": 512,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/se-shadow.png",
+            "x": 512,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/se-color.png",
+            "x": 640,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/se-nation.png",
+                "x": 640,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/se-shadow.png",
+            "x": 640,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/se-color.png",
+            "x": 768,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/se-nation.png",
+                "x": 768,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/se-shadow.png",
+            "x": 768,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        },
+        {
+          "durationMs": 90,
+          "color": {
+            "path": "art/atlas/units/tercio/frames/se-color.png",
+            "x": 896,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          },
+          "masks": [
+            {
+              "id": "nation",
+              "source": {
+                "path": "art/atlas/units/tercio/frames/se-nation.png",
+                "x": 896,
+                "y": 128,
+                "width": 128,
+                "height": 128
+              }
+            }
+          ],
+          "shadow": {
+            "path": "art/atlas/units/tercio/frames/se-shadow.png",
+            "x": 896,
+            "y": 128,
+            "width": 128,
+            "height": 128
+          }
+        }
+      ]
+    },
+    {
+      "unitName": "Tercio",
+      "state": "MOVE",
+      "facing": "SW",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Tercio",
+      "looping": true,
+      "mirroredFacing": "SE",
+      "maskIds": [
+        "nation"
+      ],
+      "hasShadow": true,
+      "frames": []
+    },
+    {
+      "unitName": "Tercio",
+      "state": "MOVE",
+      "facing": "W",
+      "staticFallbackKey": "TileSets/AtlasUnits/Units/Tercio",
       "looping": true,
       "mirroredFacing": "E",
       "maskIds": [

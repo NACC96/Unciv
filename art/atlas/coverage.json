@@ -170254,8 +170254,30 @@
       ],
       "intendedSource": "art/atlas/units/marauder/frames/attack-e.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/e-color.png",
+          "sha256": "2a5b1f1b8f8ba94b12b5cad439e294c57972b9e842d98fe689e9668b593296b3",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/e-nation.png",
+          "sha256": "4c61b30fa5261640ee1e3b3b19387cee73cf6a399ce329a6aa506f0aeec122c0",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/e-shadow.png",
+          "sha256": "1fc05fca6a7748cdb104d23707c8bec6f003eaf92ddd3e7d8aab556755f1f5bc",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": "Barbarians",
       "replaces": "Spearman",
       "uniqueUnitIdentity": "Marauder",
@@ -170275,8 +170297,30 @@
       ],
       "intendedSource": "art/atlas/units/marauder/frames/attack-ne.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/ne-color.png",
+          "sha256": "708b9509c9699e4d515a7dbd4d9c684894a5511081a40310ef850fd2c8e8abfb",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/ne-nation.png",
+          "sha256": "d4dba598d3485964d77fcb5a1b282d378996d6075b5acdb8d533d3cf4755d1c6",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/ne-shadow.png",
+          "sha256": "d81b462de830e11cb9a4e66f1e94b399833b2f5fd705eff2a12bcd2f9f735227",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": "Barbarians",
       "replaces": "Spearman",
       "uniqueUnitIdentity": "Marauder",
@@ -170296,8 +170340,30 @@
       ],
       "intendedSource": "art/atlas/units/marauder/frames/attack-nw.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/ne-color.png",
+          "sha256": "708b9509c9699e4d515a7dbd4d9c684894a5511081a40310ef850fd2c8e8abfb",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/ne-nation.png",
+          "sha256": "d4dba598d3485964d77fcb5a1b282d378996d6075b5acdb8d533d3cf4755d1c6",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/ne-shadow.png",
+          "sha256": "d81b462de830e11cb9a4e66f1e94b399833b2f5fd705eff2a12bcd2f9f735227",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": "Barbarians",
       "replaces": "Spearman",
       "uniqueUnitIdentity": "Marauder",
@@ -170317,8 +170383,30 @@
       ],
       "intendedSource": "art/atlas/units/marauder/frames/attack-se.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/se-color.png",
+          "sha256": "1813e4a2a5742a3f2b0d25498ad517f718a4e5d6c6754482ac51754b8cac87e3",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/se-nation.png",
+          "sha256": "1b137182e6a3c0e14e626e7d2f3523aeaf4e12daf05b82c8779764ec6301a99a",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/se-shadow.png",
+          "sha256": "102d99d0b624163f71357567e7f0f8e0ab445ffffac16fe10e1991301c36e0ef",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": "Barbarians",
       "replaces": "Spearman",
       "uniqueUnitIdentity": "Marauder",
@@ -170338,8 +170426,30 @@
       ],
       "intendedSource": "art/atlas/units/marauder/frames/attack-sw.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/se-color.png",
+          "sha256": "1813e4a2a5742a3f2b0d25498ad517f718a4e5d6c6754482ac51754b8cac87e3",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/se-nation.png",
+          "sha256": "1b137182e6a3c0e14e626e7d2f3523aeaf4e12daf05b82c8779764ec6301a99a",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/se-shadow.png",
+          "sha256": "102d99d0b624163f71357567e7f0f8e0ab445ffffac16fe10e1991301c36e0ef",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": "Barbarians",
       "replaces": "Spearman",
       "uniqueUnitIdentity": "Marauder",
@@ -170359,8 +170469,30 @@
       ],
       "intendedSource": "art/atlas/units/marauder/frames/attack-w.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/e-color.png",
+          "sha256": "2a5b1f1b8f8ba94b12b5cad439e294c57972b9e842d98fe689e9668b593296b3",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/e-nation.png",
+          "sha256": "4c61b30fa5261640ee1e3b3b19387cee73cf6a399ce329a6aa506f0aeec122c0",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/e-shadow.png",
+          "sha256": "1fc05fca6a7748cdb104d23707c8bec6f003eaf92ddd3e7d8aab556755f1f5bc",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": "Barbarians",
       "replaces": "Spearman",
       "uniqueUnitIdentity": "Marauder",
@@ -170380,8 +170512,30 @@
       ],
       "intendedSource": "art/atlas/units/marauder/frames/defeat-e.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/e-color.png",
+          "sha256": "2a5b1f1b8f8ba94b12b5cad439e294c57972b9e842d98fe689e9668b593296b3",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/e-nation.png",
+          "sha256": "4c61b30fa5261640ee1e3b3b19387cee73cf6a399ce329a6aa506f0aeec122c0",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/e-shadow.png",
+          "sha256": "1fc05fca6a7748cdb104d23707c8bec6f003eaf92ddd3e7d8aab556755f1f5bc",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": "Barbarians",
       "replaces": "Spearman",
       "uniqueUnitIdentity": "Marauder",
@@ -170401,8 +170555,30 @@
       ],
       "intendedSource": "art/atlas/units/marauder/frames/defeat-ne.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/ne-color.png",
+          "sha256": "708b9509c9699e4d515a7dbd4d9c684894a5511081a40310ef850fd2c8e8abfb",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/ne-nation.png",
+          "sha256": "d4dba598d3485964d77fcb5a1b282d378996d6075b5acdb8d533d3cf4755d1c6",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/ne-shadow.png",
+          "sha256": "d81b462de830e11cb9a4e66f1e94b399833b2f5fd705eff2a12bcd2f9f735227",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": "Barbarians",
       "replaces": "Spearman",
       "uniqueUnitIdentity": "Marauder",
@@ -170422,8 +170598,30 @@
       ],
       "intendedSource": "art/atlas/units/marauder/frames/defeat-nw.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/ne-color.png",
+          "sha256": "708b9509c9699e4d515a7dbd4d9c684894a5511081a40310ef850fd2c8e8abfb",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/ne-nation.png",
+          "sha256": "d4dba598d3485964d77fcb5a1b282d378996d6075b5acdb8d533d3cf4755d1c6",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/ne-shadow.png",
+          "sha256": "d81b462de830e11cb9a4e66f1e94b399833b2f5fd705eff2a12bcd2f9f735227",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": "Barbarians",
       "replaces": "Spearman",
       "uniqueUnitIdentity": "Marauder",
@@ -170443,8 +170641,30 @@
       ],
       "intendedSource": "art/atlas/units/marauder/frames/defeat-se.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/se-color.png",
+          "sha256": "1813e4a2a5742a3f2b0d25498ad517f718a4e5d6c6754482ac51754b8cac87e3",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/se-nation.png",
+          "sha256": "1b137182e6a3c0e14e626e7d2f3523aeaf4e12daf05b82c8779764ec6301a99a",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/se-shadow.png",
+          "sha256": "102d99d0b624163f71357567e7f0f8e0ab445ffffac16fe10e1991301c36e0ef",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": "Barbarians",
       "replaces": "Spearman",
       "uniqueUnitIdentity": "Marauder",
@@ -170464,8 +170684,30 @@
       ],
       "intendedSource": "art/atlas/units/marauder/frames/defeat-sw.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/se-color.png",
+          "sha256": "1813e4a2a5742a3f2b0d25498ad517f718a4e5d6c6754482ac51754b8cac87e3",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/se-nation.png",
+          "sha256": "1b137182e6a3c0e14e626e7d2f3523aeaf4e12daf05b82c8779764ec6301a99a",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/se-shadow.png",
+          "sha256": "102d99d0b624163f71357567e7f0f8e0ab445ffffac16fe10e1991301c36e0ef",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": "Barbarians",
       "replaces": "Spearman",
       "uniqueUnitIdentity": "Marauder",
@@ -170485,8 +170727,30 @@
       ],
       "intendedSource": "art/atlas/units/marauder/frames/defeat-w.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/e-color.png",
+          "sha256": "2a5b1f1b8f8ba94b12b5cad439e294c57972b9e842d98fe689e9668b593296b3",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/e-nation.png",
+          "sha256": "4c61b30fa5261640ee1e3b3b19387cee73cf6a399ce329a6aa506f0aeec122c0",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/e-shadow.png",
+          "sha256": "1fc05fca6a7748cdb104d23707c8bec6f003eaf92ddd3e7d8aab556755f1f5bc",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": "Barbarians",
       "replaces": "Spearman",
       "uniqueUnitIdentity": "Marauder",
@@ -170506,8 +170770,30 @@
       ],
       "intendedSource": "art/atlas/units/marauder/frames/hit-e.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/e-color.png",
+          "sha256": "2a5b1f1b8f8ba94b12b5cad439e294c57972b9e842d98fe689e9668b593296b3",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/e-nation.png",
+          "sha256": "4c61b30fa5261640ee1e3b3b19387cee73cf6a399ce329a6aa506f0aeec122c0",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/e-shadow.png",
+          "sha256": "1fc05fca6a7748cdb104d23707c8bec6f003eaf92ddd3e7d8aab556755f1f5bc",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": "Barbarians",
       "replaces": "Spearman",
       "uniqueUnitIdentity": "Marauder",
@@ -170527,8 +170813,30 @@
       ],
       "intendedSource": "art/atlas/units/marauder/frames/hit-ne.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/ne-color.png",
+          "sha256": "708b9509c9699e4d515a7dbd4d9c684894a5511081a40310ef850fd2c8e8abfb",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/ne-nation.png",
+          "sha256": "d4dba598d3485964d77fcb5a1b282d378996d6075b5acdb8d533d3cf4755d1c6",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/ne-shadow.png",
+          "sha256": "d81b462de830e11cb9a4e66f1e94b399833b2f5fd705eff2a12bcd2f9f735227",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": "Barbarians",
       "replaces": "Spearman",
       "uniqueUnitIdentity": "Marauder",
@@ -170548,8 +170856,30 @@
       ],
       "intendedSource": "art/atlas/units/marauder/frames/hit-nw.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/ne-color.png",
+          "sha256": "708b9509c9699e4d515a7dbd4d9c684894a5511081a40310ef850fd2c8e8abfb",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/ne-nation.png",
+          "sha256": "d4dba598d3485964d77fcb5a1b282d378996d6075b5acdb8d533d3cf4755d1c6",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/ne-shadow.png",
+          "sha256": "d81b462de830e11cb9a4e66f1e94b399833b2f5fd705eff2a12bcd2f9f735227",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": "Barbarians",
       "replaces": "Spearman",
       "uniqueUnitIdentity": "Marauder",
@@ -170569,8 +170899,30 @@
       ],
       "intendedSource": "art/atlas/units/marauder/frames/hit-se.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/se-color.png",
+          "sha256": "1813e4a2a5742a3f2b0d25498ad517f718a4e5d6c6754482ac51754b8cac87e3",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/se-nation.png",
+          "sha256": "1b137182e6a3c0e14e626e7d2f3523aeaf4e12daf05b82c8779764ec6301a99a",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/se-shadow.png",
+          "sha256": "102d99d0b624163f71357567e7f0f8e0ab445ffffac16fe10e1991301c36e0ef",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": "Barbarians",
       "replaces": "Spearman",
       "uniqueUnitIdentity": "Marauder",
@@ -170590,8 +170942,30 @@
       ],
       "intendedSource": "art/atlas/units/marauder/frames/hit-sw.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/se-color.png",
+          "sha256": "1813e4a2a5742a3f2b0d25498ad517f718a4e5d6c6754482ac51754b8cac87e3",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/se-nation.png",
+          "sha256": "1b137182e6a3c0e14e626e7d2f3523aeaf4e12daf05b82c8779764ec6301a99a",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/se-shadow.png",
+          "sha256": "102d99d0b624163f71357567e7f0f8e0ab445ffffac16fe10e1991301c36e0ef",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": "Barbarians",
       "replaces": "Spearman",
       "uniqueUnitIdentity": "Marauder",
@@ -170611,8 +170985,30 @@
       ],
       "intendedSource": "art/atlas/units/marauder/frames/hit-w.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/e-color.png",
+          "sha256": "2a5b1f1b8f8ba94b12b5cad439e294c57972b9e842d98fe689e9668b593296b3",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/e-nation.png",
+          "sha256": "4c61b30fa5261640ee1e3b3b19387cee73cf6a399ce329a6aa506f0aeec122c0",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/e-shadow.png",
+          "sha256": "1fc05fca6a7748cdb104d23707c8bec6f003eaf92ddd3e7d8aab556755f1f5bc",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": "Barbarians",
       "replaces": "Spearman",
       "uniqueUnitIdentity": "Marauder",
@@ -170632,8 +171028,30 @@
       ],
       "intendedSource": "art/atlas/units/marauder/frames/idle-e.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/e-color.png",
+          "sha256": "2a5b1f1b8f8ba94b12b5cad439e294c57972b9e842d98fe689e9668b593296b3",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/e-nation.png",
+          "sha256": "4c61b30fa5261640ee1e3b3b19387cee73cf6a399ce329a6aa506f0aeec122c0",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/e-shadow.png",
+          "sha256": "1fc05fca6a7748cdb104d23707c8bec6f003eaf92ddd3e7d8aab556755f1f5bc",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": "Barbarians",
       "replaces": "Spearman",
       "uniqueUnitIdentity": "Marauder",
@@ -170653,8 +171071,30 @@
       ],
       "intendedSource": "art/atlas/units/marauder/frames/idle-ne.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/ne-color.png",
+          "sha256": "708b9509c9699e4d515a7dbd4d9c684894a5511081a40310ef850fd2c8e8abfb",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/ne-nation.png",
+          "sha256": "d4dba598d3485964d77fcb5a1b282d378996d6075b5acdb8d533d3cf4755d1c6",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/ne-shadow.png",
+          "sha256": "d81b462de830e11cb9a4e66f1e94b399833b2f5fd705eff2a12bcd2f9f735227",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": "Barbarians",
       "replaces": "Spearman",
       "uniqueUnitIdentity": "Marauder",
@@ -170674,8 +171114,30 @@
       ],
       "intendedSource": "art/atlas/units/marauder/frames/idle-nw.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/ne-color.png",
+          "sha256": "708b9509c9699e4d515a7dbd4d9c684894a5511081a40310ef850fd2c8e8abfb",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/ne-nation.png",
+          "sha256": "d4dba598d3485964d77fcb5a1b282d378996d6075b5acdb8d533d3cf4755d1c6",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/ne-shadow.png",
+          "sha256": "d81b462de830e11cb9a4e66f1e94b399833b2f5fd705eff2a12bcd2f9f735227",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": "Barbarians",
       "replaces": "Spearman",
       "uniqueUnitIdentity": "Marauder",
@@ -170695,8 +171157,30 @@
       ],
       "intendedSource": "art/atlas/units/marauder/frames/idle-se.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/se-color.png",
+          "sha256": "1813e4a2a5742a3f2b0d25498ad517f718a4e5d6c6754482ac51754b8cac87e3",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/se-nation.png",
+          "sha256": "1b137182e6a3c0e14e626e7d2f3523aeaf4e12daf05b82c8779764ec6301a99a",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/se-shadow.png",
+          "sha256": "102d99d0b624163f71357567e7f0f8e0ab445ffffac16fe10e1991301c36e0ef",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": "Barbarians",
       "replaces": "Spearman",
       "uniqueUnitIdentity": "Marauder",
@@ -170716,8 +171200,30 @@
       ],
       "intendedSource": "art/atlas/units/marauder/frames/idle-sw.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/se-color.png",
+          "sha256": "1813e4a2a5742a3f2b0d25498ad517f718a4e5d6c6754482ac51754b8cac87e3",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/se-nation.png",
+          "sha256": "1b137182e6a3c0e14e626e7d2f3523aeaf4e12daf05b82c8779764ec6301a99a",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/se-shadow.png",
+          "sha256": "102d99d0b624163f71357567e7f0f8e0ab445ffffac16fe10e1991301c36e0ef",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": "Barbarians",
       "replaces": "Spearman",
       "uniqueUnitIdentity": "Marauder",
@@ -170737,8 +171243,30 @@
       ],
       "intendedSource": "art/atlas/units/marauder/frames/idle-w.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/e-color.png",
+          "sha256": "2a5b1f1b8f8ba94b12b5cad439e294c57972b9e842d98fe689e9668b593296b3",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/e-nation.png",
+          "sha256": "4c61b30fa5261640ee1e3b3b19387cee73cf6a399ce329a6aa506f0aeec122c0",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/e-shadow.png",
+          "sha256": "1fc05fca6a7748cdb104d23707c8bec6f003eaf92ddd3e7d8aab556755f1f5bc",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": "Barbarians",
       "replaces": "Spearman",
       "uniqueUnitIdentity": "Marauder",
@@ -170758,8 +171286,30 @@
       ],
       "intendedSource": "art/atlas/units/marauder/frames/move-e.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/e-color.png",
+          "sha256": "2a5b1f1b8f8ba94b12b5cad439e294c57972b9e842d98fe689e9668b593296b3",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/e-nation.png",
+          "sha256": "4c61b30fa5261640ee1e3b3b19387cee73cf6a399ce329a6aa506f0aeec122c0",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/e-shadow.png",
+          "sha256": "1fc05fca6a7748cdb104d23707c8bec6f003eaf92ddd3e7d8aab556755f1f5bc",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": "Barbarians",
       "replaces": "Spearman",
       "uniqueUnitIdentity": "Marauder",
@@ -170779,8 +171329,30 @@
       ],
       "intendedSource": "art/atlas/units/marauder/frames/move-ne.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/ne-color.png",
+          "sha256": "708b9509c9699e4d515a7dbd4d9c684894a5511081a40310ef850fd2c8e8abfb",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/ne-nation.png",
+          "sha256": "d4dba598d3485964d77fcb5a1b282d378996d6075b5acdb8d533d3cf4755d1c6",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/ne-shadow.png",
+          "sha256": "d81b462de830e11cb9a4e66f1e94b399833b2f5fd705eff2a12bcd2f9f735227",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": "Barbarians",
       "replaces": "Spearman",
       "uniqueUnitIdentity": "Marauder",
@@ -170800,8 +171372,30 @@
       ],
       "intendedSource": "art/atlas/units/marauder/frames/move-nw.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/ne-color.png",
+          "sha256": "708b9509c9699e4d515a7dbd4d9c684894a5511081a40310ef850fd2c8e8abfb",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/ne-nation.png",
+          "sha256": "d4dba598d3485964d77fcb5a1b282d378996d6075b5acdb8d533d3cf4755d1c6",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/ne-shadow.png",
+          "sha256": "d81b462de830e11cb9a4e66f1e94b399833b2f5fd705eff2a12bcd2f9f735227",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": "Barbarians",
       "replaces": "Spearman",
       "uniqueUnitIdentity": "Marauder",
@@ -170821,8 +171415,30 @@
       ],
       "intendedSource": "art/atlas/units/marauder/frames/move-se.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/se-color.png",
+          "sha256": "1813e4a2a5742a3f2b0d25498ad517f718a4e5d6c6754482ac51754b8cac87e3",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/se-nation.png",
+          "sha256": "1b137182e6a3c0e14e626e7d2f3523aeaf4e12daf05b82c8779764ec6301a99a",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/se-shadow.png",
+          "sha256": "102d99d0b624163f71357567e7f0f8e0ab445ffffac16fe10e1991301c36e0ef",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": "Barbarians",
       "replaces": "Spearman",
       "uniqueUnitIdentity": "Marauder",
@@ -170842,8 +171458,30 @@
       ],
       "intendedSource": "art/atlas/units/marauder/frames/move-sw.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/se-color.png",
+          "sha256": "1813e4a2a5742a3f2b0d25498ad517f718a4e5d6c6754482ac51754b8cac87e3",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/se-nation.png",
+          "sha256": "1b137182e6a3c0e14e626e7d2f3523aeaf4e12daf05b82c8779764ec6301a99a",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/se-shadow.png",
+          "sha256": "102d99d0b624163f71357567e7f0f8e0ab445ffffac16fe10e1991301c36e0ef",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": "Barbarians",
       "replaces": "Spearman",
       "uniqueUnitIdentity": "Marauder",
@@ -170863,8 +171501,30 @@
       ],
       "intendedSource": "art/atlas/units/marauder/frames/move-w.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/e-color.png",
+          "sha256": "2a5b1f1b8f8ba94b12b5cad439e294c57972b9e842d98fe689e9668b593296b3",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/e-nation.png",
+          "sha256": "4c61b30fa5261640ee1e3b3b19387cee73cf6a399ce329a6aa506f0aeec122c0",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/marauder/frames/e-shadow.png",
+          "sha256": "1fc05fca6a7748cdb104d23707c8bec6f003eaf92ddd3e7d8aab556755f1f5bc",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": "Barbarians",
       "replaces": "Spearman",
       "uniqueUnitIdentity": "Marauder",
@@ -221488,8 +222148,30 @@
       ],
       "intendedSource": "art/atlas/units/tercio/frames/attack-e.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/e-color.png",
+          "sha256": "fc3aae15f0e646fc9c025c937578eac661422b2e86b366de4dcec207aca9e532",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/e-nation.png",
+          "sha256": "68b2cea709f681f7577e74d7f893dbae52eea1b2b3aed3380c8162af88f8283b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/e-shadow.png",
+          "sha256": "e4d1be422013321c098e3e8ae58d3a387406ef402009b69dab5ba42c1f17ef8e",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": "Spain",
       "replaces": "Musketman",
       "uniqueUnitIdentity": "Tercio",
@@ -221509,8 +222191,30 @@
       ],
       "intendedSource": "art/atlas/units/tercio/frames/attack-ne.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/ne-color.png",
+          "sha256": "411f1725685fdae1b15443436b213e1bbb989eb06aaa8848072c2255f498aff7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/ne-nation.png",
+          "sha256": "bc6694228112943ec3baf15a65d9d8a6c6a4301c42d0c9877e1fd8e3f43e56bc",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/ne-shadow.png",
+          "sha256": "a90ea0e73a608e0fcc5eb149d4c9d21746e354013b2c82b75bcd44b77fb01512",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": "Spain",
       "replaces": "Musketman",
       "uniqueUnitIdentity": "Tercio",
@@ -221530,8 +222234,30 @@
       ],
       "intendedSource": "art/atlas/units/tercio/frames/attack-nw.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/ne-color.png",
+          "sha256": "411f1725685fdae1b15443436b213e1bbb989eb06aaa8848072c2255f498aff7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/ne-nation.png",
+          "sha256": "bc6694228112943ec3baf15a65d9d8a6c6a4301c42d0c9877e1fd8e3f43e56bc",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/ne-shadow.png",
+          "sha256": "a90ea0e73a608e0fcc5eb149d4c9d21746e354013b2c82b75bcd44b77fb01512",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": "Spain",
       "replaces": "Musketman",
       "uniqueUnitIdentity": "Tercio",
@@ -221551,8 +222277,30 @@
       ],
       "intendedSource": "art/atlas/units/tercio/frames/attack-se.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/se-color.png",
+          "sha256": "d3da94f37c68e5678c02ff6d1fc7b5a11b8569ca3cfccecde0eaf63fb945d696",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/se-nation.png",
+          "sha256": "b6900634bca5159400aea42f692250958237addef45f86778a506d76c3a40e49",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/se-shadow.png",
+          "sha256": "0bf9b94c27f0662187ecf79d11b2a1c1d94a6cb7650aa207019186086fff0862",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": "Spain",
       "replaces": "Musketman",
       "uniqueUnitIdentity": "Tercio",
@@ -221572,8 +222320,30 @@
       ],
       "intendedSource": "art/atlas/units/tercio/frames/attack-sw.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/se-color.png",
+          "sha256": "d3da94f37c68e5678c02ff6d1fc7b5a11b8569ca3cfccecde0eaf63fb945d696",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/se-nation.png",
+          "sha256": "b6900634bca5159400aea42f692250958237addef45f86778a506d76c3a40e49",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/se-shadow.png",
+          "sha256": "0bf9b94c27f0662187ecf79d11b2a1c1d94a6cb7650aa207019186086fff0862",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": "Spain",
       "replaces": "Musketman",
       "uniqueUnitIdentity": "Tercio",
@@ -221593,8 +222363,30 @@
       ],
       "intendedSource": "art/atlas/units/tercio/frames/attack-w.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/e-color.png",
+          "sha256": "fc3aae15f0e646fc9c025c937578eac661422b2e86b366de4dcec207aca9e532",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/e-nation.png",
+          "sha256": "68b2cea709f681f7577e74d7f893dbae52eea1b2b3aed3380c8162af88f8283b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/e-shadow.png",
+          "sha256": "e4d1be422013321c098e3e8ae58d3a387406ef402009b69dab5ba42c1f17ef8e",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": "Spain",
       "replaces": "Musketman",
       "uniqueUnitIdentity": "Tercio",
@@ -221614,8 +222406,30 @@
       ],
       "intendedSource": "art/atlas/units/tercio/frames/defeat-e.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/e-color.png",
+          "sha256": "fc3aae15f0e646fc9c025c937578eac661422b2e86b366de4dcec207aca9e532",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/e-nation.png",
+          "sha256": "68b2cea709f681f7577e74d7f893dbae52eea1b2b3aed3380c8162af88f8283b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/e-shadow.png",
+          "sha256": "e4d1be422013321c098e3e8ae58d3a387406ef402009b69dab5ba42c1f17ef8e",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": "Spain",
       "replaces": "Musketman",
       "uniqueUnitIdentity": "Tercio",
@@ -221635,8 +222449,30 @@
       ],
       "intendedSource": "art/atlas/units/tercio/frames/defeat-ne.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/ne-color.png",
+          "sha256": "411f1725685fdae1b15443436b213e1bbb989eb06aaa8848072c2255f498aff7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/ne-nation.png",
+          "sha256": "bc6694228112943ec3baf15a65d9d8a6c6a4301c42d0c9877e1fd8e3f43e56bc",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/ne-shadow.png",
+          "sha256": "a90ea0e73a608e0fcc5eb149d4c9d21746e354013b2c82b75bcd44b77fb01512",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": "Spain",
       "replaces": "Musketman",
       "uniqueUnitIdentity": "Tercio",
@@ -221656,8 +222492,30 @@
       ],
       "intendedSource": "art/atlas/units/tercio/frames/defeat-nw.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/ne-color.png",
+          "sha256": "411f1725685fdae1b15443436b213e1bbb989eb06aaa8848072c2255f498aff7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/ne-nation.png",
+          "sha256": "bc6694228112943ec3baf15a65d9d8a6c6a4301c42d0c9877e1fd8e3f43e56bc",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/ne-shadow.png",
+          "sha256": "a90ea0e73a608e0fcc5eb149d4c9d21746e354013b2c82b75bcd44b77fb01512",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": "Spain",
       "replaces": "Musketman",
       "uniqueUnitIdentity": "Tercio",
@@ -221677,8 +222535,30 @@
       ],
       "intendedSource": "art/atlas/units/tercio/frames/defeat-se.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/se-color.png",
+          "sha256": "d3da94f37c68e5678c02ff6d1fc7b5a11b8569ca3cfccecde0eaf63fb945d696",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/se-nation.png",
+          "sha256": "b6900634bca5159400aea42f692250958237addef45f86778a506d76c3a40e49",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/se-shadow.png",
+          "sha256": "0bf9b94c27f0662187ecf79d11b2a1c1d94a6cb7650aa207019186086fff0862",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": "Spain",
       "replaces": "Musketman",
       "uniqueUnitIdentity": "Tercio",
@@ -221698,8 +222578,30 @@
       ],
       "intendedSource": "art/atlas/units/tercio/frames/defeat-sw.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/se-color.png",
+          "sha256": "d3da94f37c68e5678c02ff6d1fc7b5a11b8569ca3cfccecde0eaf63fb945d696",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/se-nation.png",
+          "sha256": "b6900634bca5159400aea42f692250958237addef45f86778a506d76c3a40e49",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/se-shadow.png",
+          "sha256": "0bf9b94c27f0662187ecf79d11b2a1c1d94a6cb7650aa207019186086fff0862",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": "Spain",
       "replaces": "Musketman",
       "uniqueUnitIdentity": "Tercio",
@@ -221719,8 +222621,30 @@
       ],
       "intendedSource": "art/atlas/units/tercio/frames/defeat-w.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/e-color.png",
+          "sha256": "fc3aae15f0e646fc9c025c937578eac661422b2e86b366de4dcec207aca9e532",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/e-nation.png",
+          "sha256": "68b2cea709f681f7577e74d7f893dbae52eea1b2b3aed3380c8162af88f8283b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/e-shadow.png",
+          "sha256": "e4d1be422013321c098e3e8ae58d3a387406ef402009b69dab5ba42c1f17ef8e",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": "Spain",
       "replaces": "Musketman",
       "uniqueUnitIdentity": "Tercio",
@@ -221740,8 +222664,30 @@
       ],
       "intendedSource": "art/atlas/units/tercio/frames/hit-e.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/e-color.png",
+          "sha256": "fc3aae15f0e646fc9c025c937578eac661422b2e86b366de4dcec207aca9e532",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/e-nation.png",
+          "sha256": "68b2cea709f681f7577e74d7f893dbae52eea1b2b3aed3380c8162af88f8283b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/e-shadow.png",
+          "sha256": "e4d1be422013321c098e3e8ae58d3a387406ef402009b69dab5ba42c1f17ef8e",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": "Spain",
       "replaces": "Musketman",
       "uniqueUnitIdentity": "Tercio",
@@ -221761,8 +222707,30 @@
       ],
       "intendedSource": "art/atlas/units/tercio/frames/hit-ne.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/ne-color.png",
+          "sha256": "411f1725685fdae1b15443436b213e1bbb989eb06aaa8848072c2255f498aff7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/ne-nation.png",
+          "sha256": "bc6694228112943ec3baf15a65d9d8a6c6a4301c42d0c9877e1fd8e3f43e56bc",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/ne-shadow.png",
+          "sha256": "a90ea0e73a608e0fcc5eb149d4c9d21746e354013b2c82b75bcd44b77fb01512",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": "Spain",
       "replaces": "Musketman",
       "uniqueUnitIdentity": "Tercio",
@@ -221782,8 +222750,30 @@
       ],
       "intendedSource": "art/atlas/units/tercio/frames/hit-nw.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/ne-color.png",
+          "sha256": "411f1725685fdae1b15443436b213e1bbb989eb06aaa8848072c2255f498aff7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/ne-nation.png",
+          "sha256": "bc6694228112943ec3baf15a65d9d8a6c6a4301c42d0c9877e1fd8e3f43e56bc",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/ne-shadow.png",
+          "sha256": "a90ea0e73a608e0fcc5eb149d4c9d21746e354013b2c82b75bcd44b77fb01512",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": "Spain",
       "replaces": "Musketman",
       "uniqueUnitIdentity": "Tercio",
@@ -221803,8 +222793,30 @@
       ],
       "intendedSource": "art/atlas/units/tercio/frames/hit-se.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/se-color.png",
+          "sha256": "d3da94f37c68e5678c02ff6d1fc7b5a11b8569ca3cfccecde0eaf63fb945d696",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/se-nation.png",
+          "sha256": "b6900634bca5159400aea42f692250958237addef45f86778a506d76c3a40e49",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/se-shadow.png",
+          "sha256": "0bf9b94c27f0662187ecf79d11b2a1c1d94a6cb7650aa207019186086fff0862",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": "Spain",
       "replaces": "Musketman",
       "uniqueUnitIdentity": "Tercio",
@@ -221824,8 +222836,30 @@
       ],
       "intendedSource": "art/atlas/units/tercio/frames/hit-sw.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/se-color.png",
+          "sha256": "d3da94f37c68e5678c02ff6d1fc7b5a11b8569ca3cfccecde0eaf63fb945d696",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/se-nation.png",
+          "sha256": "b6900634bca5159400aea42f692250958237addef45f86778a506d76c3a40e49",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/se-shadow.png",
+          "sha256": "0bf9b94c27f0662187ecf79d11b2a1c1d94a6cb7650aa207019186086fff0862",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": "Spain",
       "replaces": "Musketman",
       "uniqueUnitIdentity": "Tercio",
@@ -221845,8 +222879,30 @@
       ],
       "intendedSource": "art/atlas/units/tercio/frames/hit-w.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/e-color.png",
+          "sha256": "fc3aae15f0e646fc9c025c937578eac661422b2e86b366de4dcec207aca9e532",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/e-nation.png",
+          "sha256": "68b2cea709f681f7577e74d7f893dbae52eea1b2b3aed3380c8162af88f8283b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/e-shadow.png",
+          "sha256": "e4d1be422013321c098e3e8ae58d3a387406ef402009b69dab5ba42c1f17ef8e",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": "Spain",
       "replaces": "Musketman",
       "uniqueUnitIdentity": "Tercio",
@@ -221866,8 +222922,30 @@
       ],
       "intendedSource": "art/atlas/units/tercio/frames/idle-e.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/e-color.png",
+          "sha256": "fc3aae15f0e646fc9c025c937578eac661422b2e86b366de4dcec207aca9e532",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/e-nation.png",
+          "sha256": "68b2cea709f681f7577e74d7f893dbae52eea1b2b3aed3380c8162af88f8283b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/e-shadow.png",
+          "sha256": "e4d1be422013321c098e3e8ae58d3a387406ef402009b69dab5ba42c1f17ef8e",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": "Spain",
       "replaces": "Musketman",
       "uniqueUnitIdentity": "Tercio",
@@ -221887,8 +222965,30 @@
       ],
       "intendedSource": "art/atlas/units/tercio/frames/idle-ne.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/ne-color.png",
+          "sha256": "411f1725685fdae1b15443436b213e1bbb989eb06aaa8848072c2255f498aff7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/ne-nation.png",
+          "sha256": "bc6694228112943ec3baf15a65d9d8a6c6a4301c42d0c9877e1fd8e3f43e56bc",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/ne-shadow.png",
+          "sha256": "a90ea0e73a608e0fcc5eb149d4c9d21746e354013b2c82b75bcd44b77fb01512",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": "Spain",
       "replaces": "Musketman",
       "uniqueUnitIdentity": "Tercio",
@@ -221908,8 +223008,30 @@
       ],
       "intendedSource": "art/atlas/units/tercio/frames/idle-nw.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/ne-color.png",
+          "sha256": "411f1725685fdae1b15443436b213e1bbb989eb06aaa8848072c2255f498aff7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/ne-nation.png",
+          "sha256": "bc6694228112943ec3baf15a65d9d8a6c6a4301c42d0c9877e1fd8e3f43e56bc",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/ne-shadow.png",
+          "sha256": "a90ea0e73a608e0fcc5eb149d4c9d21746e354013b2c82b75bcd44b77fb01512",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": "Spain",
       "replaces": "Musketman",
       "uniqueUnitIdentity": "Tercio",
@@ -221929,8 +223051,30 @@
       ],
       "intendedSource": "art/atlas/units/tercio/frames/idle-se.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/se-color.png",
+          "sha256": "d3da94f37c68e5678c02ff6d1fc7b5a11b8569ca3cfccecde0eaf63fb945d696",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/se-nation.png",
+          "sha256": "b6900634bca5159400aea42f692250958237addef45f86778a506d76c3a40e49",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/se-shadow.png",
+          "sha256": "0bf9b94c27f0662187ecf79d11b2a1c1d94a6cb7650aa207019186086fff0862",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": "Spain",
       "replaces": "Musketman",
       "uniqueUnitIdentity": "Tercio",
@@ -221950,8 +223094,30 @@
       ],
       "intendedSource": "art/atlas/units/tercio/frames/idle-sw.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/se-color.png",
+          "sha256": "d3da94f37c68e5678c02ff6d1fc7b5a11b8569ca3cfccecde0eaf63fb945d696",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/se-nation.png",
+          "sha256": "b6900634bca5159400aea42f692250958237addef45f86778a506d76c3a40e49",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/se-shadow.png",
+          "sha256": "0bf9b94c27f0662187ecf79d11b2a1c1d94a6cb7650aa207019186086fff0862",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": "Spain",
       "replaces": "Musketman",
       "uniqueUnitIdentity": "Tercio",
@@ -221971,8 +223137,30 @@
       ],
       "intendedSource": "art/atlas/units/tercio/frames/idle-w.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/e-color.png",
+          "sha256": "fc3aae15f0e646fc9c025c937578eac661422b2e86b366de4dcec207aca9e532",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/e-nation.png",
+          "sha256": "68b2cea709f681f7577e74d7f893dbae52eea1b2b3aed3380c8162af88f8283b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/e-shadow.png",
+          "sha256": "e4d1be422013321c098e3e8ae58d3a387406ef402009b69dab5ba42c1f17ef8e",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": "Spain",
       "replaces": "Musketman",
       "uniqueUnitIdentity": "Tercio",
@@ -221992,8 +223180,30 @@
       ],
       "intendedSource": "art/atlas/units/tercio/frames/move-e.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/e-color.png",
+          "sha256": "fc3aae15f0e646fc9c025c937578eac661422b2e86b366de4dcec207aca9e532",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/e-nation.png",
+          "sha256": "68b2cea709f681f7577e74d7f893dbae52eea1b2b3aed3380c8162af88f8283b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/e-shadow.png",
+          "sha256": "e4d1be422013321c098e3e8ae58d3a387406ef402009b69dab5ba42c1f17ef8e",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": "Spain",
       "replaces": "Musketman",
       "uniqueUnitIdentity": "Tercio",
@@ -222013,8 +223223,30 @@
       ],
       "intendedSource": "art/atlas/units/tercio/frames/move-ne.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/ne-color.png",
+          "sha256": "411f1725685fdae1b15443436b213e1bbb989eb06aaa8848072c2255f498aff7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/ne-nation.png",
+          "sha256": "bc6694228112943ec3baf15a65d9d8a6c6a4301c42d0c9877e1fd8e3f43e56bc",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/ne-shadow.png",
+          "sha256": "a90ea0e73a608e0fcc5eb149d4c9d21746e354013b2c82b75bcd44b77fb01512",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": "Spain",
       "replaces": "Musketman",
       "uniqueUnitIdentity": "Tercio",
@@ -222034,8 +223266,30 @@
       ],
       "intendedSource": "art/atlas/units/tercio/frames/move-nw.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/ne-color.png",
+          "sha256": "411f1725685fdae1b15443436b213e1bbb989eb06aaa8848072c2255f498aff7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/ne-nation.png",
+          "sha256": "bc6694228112943ec3baf15a65d9d8a6c6a4301c42d0c9877e1fd8e3f43e56bc",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/ne-shadow.png",
+          "sha256": "a90ea0e73a608e0fcc5eb149d4c9d21746e354013b2c82b75bcd44b77fb01512",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": "Spain",
       "replaces": "Musketman",
       "uniqueUnitIdentity": "Tercio",
@@ -222055,8 +223309,30 @@
       ],
       "intendedSource": "art/atlas/units/tercio/frames/move-se.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/se-color.png",
+          "sha256": "d3da94f37c68e5678c02ff6d1fc7b5a11b8569ca3cfccecde0eaf63fb945d696",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/se-nation.png",
+          "sha256": "b6900634bca5159400aea42f692250958237addef45f86778a506d76c3a40e49",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/se-shadow.png",
+          "sha256": "0bf9b94c27f0662187ecf79d11b2a1c1d94a6cb7650aa207019186086fff0862",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": "Spain",
       "replaces": "Musketman",
       "uniqueUnitIdentity": "Tercio",
@@ -222076,8 +223352,30 @@
       ],
       "intendedSource": "art/atlas/units/tercio/frames/move-sw.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/se-color.png",
+          "sha256": "d3da94f37c68e5678c02ff6d1fc7b5a11b8569ca3cfccecde0eaf63fb945d696",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/se-nation.png",
+          "sha256": "b6900634bca5159400aea42f692250958237addef45f86778a506d76c3a40e49",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/se-shadow.png",
+          "sha256": "0bf9b94c27f0662187ecf79d11b2a1c1d94a6cb7650aa207019186086fff0862",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": "Spain",
       "replaces": "Musketman",
       "uniqueUnitIdentity": "Tercio",
@@ -222097,8 +223395,30 @@
       ],
       "intendedSource": "art/atlas/units/tercio/frames/move-w.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/e-color.png",
+          "sha256": "fc3aae15f0e646fc9c025c937578eac661422b2e86b366de4dcec207aca9e532",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/e-nation.png",
+          "sha256": "68b2cea709f681f7577e74d7f893dbae52eea1b2b3aed3380c8162af88f8283b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/tercio/frames/e-shadow.png",
+          "sha256": "e4d1be422013321c098e3e8ae58d3a387406ef402009b69dab5ba42c1f17ef8e",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": "Spain",
       "replaces": "Musketman",
       "uniqueUnitIdentity": "Tercio",
@@ -237004,8 +238324,23 @@
       ],
       "intendedSource": "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Marauder.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Marauder.png",
+          "sha256": "c8341d7dac8ef574a8db0600c495c561616a26fa6d3359fe541a52e049db4b38",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Marauder-1.png",
+          "sha256": "51eb9f3d85822d0656adfcb2b76b0c51998af092cd6963b8d12fbcaee13068ac",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": "Barbarians",
       "replaces": "Spearman",
       "uniqueUnitIdentity": "Marauder"
@@ -238311,8 +239646,23 @@
       ],
       "intendedSource": "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Tercio.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": [],
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Tercio.png",
+          "sha256": "b83372810ed783e96f408083241bd8a50d6d588a0eb92f86895b536da3ad76bb",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Tercio-1.png",
+          "sha256": "578881f4b5799d6e768763dca6201dc75de714a332831ea10897a817c7341755",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
       "uniqueTo": "Spain",
       "replaces": "Musketman",
       "uniqueUnitIdentity": "Tercio"
