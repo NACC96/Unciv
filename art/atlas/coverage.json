@@ -333,8 +333,23 @@
       ],
       "intendedSource": "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/EmbarkedUnit-Civilian.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": []
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/EmbarkedUnit-Civilian.png",
+          "sha256": "9bc777875b6c41e3a178ed0c02738b474d3a0d5a88a845ba177563d387c1b871",
+          "reviewer": "Image generation authoring",
+          "note": "Original embarked sprite candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/EmbarkedUnit-Civilian-1.png",
+          "sha256": "3c336516108d204939be5f8ec1a7ef699b46dd013cd98f4fbc62cf3e6dd314c0",
+          "reviewer": "Image generation authoring",
+          "note": "Original embarked sprite candidate; formal art review deferred"
+        }
+      ]
     },
     {
       "id": "embarked-unit|TileSets/AtlasUnits/Units/EmbarkedUnit-Military",
@@ -346,8 +361,23 @@
       ],
       "intendedSource": "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/EmbarkedUnit-Military.png",
       "required": true,
-      "reviewState": "missing",
-      "evidence": []
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/EmbarkedUnit-Military.png",
+          "sha256": "ac4f3171777c5eeced79ce5d0dfefe2dc3c8dfd3004884dce6cce7238434228e",
+          "reviewer": "Image generation authoring",
+          "note": "Original embarked sprite candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/EmbarkedUnit-Military-1.png",
+          "sha256": "c5990642d53abd34b4cd33435907f324fa443d4c510cd956573226e15f396fc0",
+          "reviewer": "Image generation authoring",
+          "note": "Original embarked sprite candidate; formal art review deferred"
+        }
+      ]
     },
     {
       "id": "era-city-style|TileSets/AtlasTerrain/Tiles/City center-Almaty-Ancient era",

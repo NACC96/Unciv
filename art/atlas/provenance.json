@@ -590,6 +590,30 @@
       }
     },
     {
+      "assetId": "embarked-unit-civilian",
+      "creator": "OpenAI image generation",
+      "source": "art/atlas/units/embarked-unit-civilian/creation-record.json",
+      "promptPath": "art/atlas/units/embarked-unit-civilian/prompts/static-v1.txt",
+      "rights": "original-generated",
+      "sourceHash": "937e4fc7d64e4c7e88f988a31c7481562035c5a3ad0a4996f4dedd03320301e1",
+      "outputHashes": {
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/EmbarkedUnit-Civilian.png": "9bc777875b6c41e3a178ed0c02738b474d3a0d5a88a845ba177563d387c1b871",
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/EmbarkedUnit-Civilian-1.png": "3c336516108d204939be5f8ec1a7ef699b46dd013cd98f4fbc62cf3e6dd314c0"
+      }
+    },
+    {
+      "assetId": "embarked-unit-military",
+      "creator": "OpenAI image generation",
+      "source": "art/atlas/units/embarked-unit-military/creation-record.json",
+      "promptPath": "art/atlas/units/embarked-unit-military/prompts/static-v1.txt",
+      "rights": "original-generated",
+      "sourceHash": "4a20ac1bba6ba20cf41d43a56813fc6ff1ede5477445e8d694929d79980a2c26",
+      "outputHashes": {
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/EmbarkedUnit-Military.png": "ac4f3171777c5eeced79ce5d0dfefe2dc3c8dfd3004884dce6cce7238434228e",
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/EmbarkedUnit-Military-1.png": "c5990642d53abd34b4cd33435907f324fa443d4c510cd956573226e15f396fc0"
+      }
+    },
+    {
       "assetId": "fighter",
       "creator": "OpenAI image generation",
       "source": "art/atlas/units/fighter/creation-record.json",
