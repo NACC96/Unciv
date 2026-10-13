@@ -1643,6 +1643,27 @@
       }
     },
     {
+      "assetId": "nuclear-missile",
+      "creator": "OpenAI image generation",
+      "source": "art/atlas/units/nuclear-missile/creation-record.json",
+      "promptPath": "art/atlas/units/nuclear-missile/prompts/e-v2.txt",
+      "rights": "original-generated",
+      "sourceHash": "a1b382faf592f87c11e884ef2e341992e91ef13e45c79a31418fa62c79f715a9",
+      "outputHashes": {
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Nuclear Missile-1.png": "b9ff77184794726c6b4a895f58faa92ec518231835c031198b0eaefc9250b3b1",
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Nuclear Missile.png": "a5a838ffc5b7c7f83d4ba0d1e4abbe6a69f804d2065b5da1806dc1bd42957703",
+        "art/atlas/units/nuclear-missile/frames/e-color.png": "00d26dd5dc5a0207119c4db8525d52bb0c0fba1beac4320ac41c859f39b3f3b4",
+        "art/atlas/units/nuclear-missile/frames/e-nation.png": "55e799cfd59fc653d0ac896c781a876c9f4dc1aee6191f0f8dc157a6726ec921",
+        "art/atlas/units/nuclear-missile/frames/e-shadow.png": "3e31bdce3cb0e2dc8a3e2c81ab33c02cb6a91570f19cacfac489a5325a48ae15",
+        "art/atlas/units/nuclear-missile/frames/ne-color.png": "3f4339f91a04d95f3ac780d49f7e1d8d2a5cbe72cb7f68bfea2caa37a1e94d0e",
+        "art/atlas/units/nuclear-missile/frames/ne-nation.png": "6c5e5bd3b268d82b250beb981df0dea52d4808d2603b17ac5f40c0cda9eaa9fa",
+        "art/atlas/units/nuclear-missile/frames/ne-shadow.png": "8931b5681ef12c191aba8c7e8cdbef807e360ec54d41b336a5f382c152ca0aa6",
+        "art/atlas/units/nuclear-missile/frames/se-color.png": "07ade4ffdc9883ee6ced86b6ac5ec6a21f040fc2af2e16980b6892397a8a030d",
+        "art/atlas/units/nuclear-missile/frames/se-nation.png": "7f75fcff2b2a3749f6804cfbcef062bbed8b8310ea37c961232364da3affaa99",
+        "art/atlas/units/nuclear-missile/frames/se-shadow.png": "9b89d5bce4cb6e4ccea063bb8a67704f9e47bb324eedd42a69b580b1610a83a5"
+      }
+    },
+    {
       "assetId": "nuclear-submarine",
       "creator": "OpenAI image generation",
       "source": "art/atlas/units/nuclear-submarine/creation-record.json",
@@ -1997,6 +2018,90 @@
         "art/atlas/units/spearman/frames/se-color.png": "006b83f2a25964242cf2d6583918f48cc1fe34ea4003f6f35c9a07c57cf1c82c",
         "art/atlas/units/spearman/frames/se-nation.png": "18a426468c33e792299df345d8835a6c22b9d23d931374db2b590e2426e82b7e",
         "art/atlas/units/spearman/frames/se-shadow.png": "736174ba397c029ef7d9d8766af62970163e937b89da6f468219ed3399799a15"
+      }
+    },
+    {
+      "assetId": "ss-booster",
+      "creator": "OpenAI image generation",
+      "source": "art/atlas/units/ss-booster/creation-record.json",
+      "promptPath": "art/atlas/units/ss-booster/prompts/e-v2.txt",
+      "rights": "original-generated",
+      "sourceHash": "28668947e7d2879f7ad71a1a392d180f6442c34fbbd66a20b1d3d88be580dd89",
+      "outputHashes": {
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/SS Booster-1.png": "153a578d5357de367d503646cdb39b4db258192e7ce39b67326edf3e3052d8e1",
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/SS Booster.png": "ffff7db6665fdf5d538bf218b43339d4b2d4c3bd49818a87b3b713948294a96e",
+        "art/atlas/units/ss-booster/frames/e-color.png": "d32c3390b7f77956778ec511fd18be8f6e79e2eb47a6dc331f8b00c318cfb261",
+        "art/atlas/units/ss-booster/frames/e-nation.png": "121f2caa1ecb55061bc7bb640547c458e798fe46a7bfed91118ed1a04bed6b32",
+        "art/atlas/units/ss-booster/frames/e-shadow.png": "ad85f2c9118e3a08ce074198d701d48c0d6b9550deec10c890f8529dce9f07aa",
+        "art/atlas/units/ss-booster/frames/ne-color.png": "3061d0067b209cec10f7e5cfe6bf5f3841ce07e683d31505c7765390ef65c99b",
+        "art/atlas/units/ss-booster/frames/ne-nation.png": "fd5cddc83921a57ab8484c07eaa7e801c806d47ffba4869c422800b52b93b8ec",
+        "art/atlas/units/ss-booster/frames/ne-shadow.png": "f6c11633a9f7b58332f56f3057693a54f596856a201b494701e139e2044bdcb7",
+        "art/atlas/units/ss-booster/frames/se-color.png": "0dcc337869735ae92f871e2b6fe9421c4bb8ca70fac5eff54e3c008d390b0800",
+        "art/atlas/units/ss-booster/frames/se-nation.png": "360e976675eaaedf4c6aa93a4fd91df49b44265ddb3011b6f099eae2a76da730",
+        "art/atlas/units/ss-booster/frames/se-shadow.png": "3f4aa1d7ca43b82e428512ec45995f04eb68ca59a0b08d5958632b87a8549db6"
+      }
+    },
+    {
+      "assetId": "ss-cockpit",
+      "creator": "OpenAI image generation",
+      "source": "art/atlas/units/ss-cockpit/creation-record.json",
+      "promptPath": "art/atlas/units/ss-cockpit/prompts/e-v2.txt",
+      "rights": "original-generated",
+      "sourceHash": "63e73d00136a123d3af17fa7833e2bfccc49639127650b00a782d63b5e1aece0",
+      "outputHashes": {
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/SS Cockpit-1.png": "ca1a12f1361345589ffeb9fe27b8b2413ee1a83f855b375b39ac83754c9c2cb4",
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/SS Cockpit.png": "76aad250aa6da07617afda581671aa0dabeb01e4d19299bdd1fa0e435182b3c8",
+        "art/atlas/units/ss-cockpit/frames/e-color.png": "a8c16289cd699b4e841d809b0059f1b47eff3ba0462d2941d04b665f36cfa4b3",
+        "art/atlas/units/ss-cockpit/frames/e-nation.png": "74bf97290f397a1cb4d6a5f95d7e2997cdb321465174253362aca6020108bb35",
+        "art/atlas/units/ss-cockpit/frames/e-shadow.png": "467fa7251bce5fe420b7916c79c1cba6727b0f5991ae8b36adbedbb73d17f064",
+        "art/atlas/units/ss-cockpit/frames/ne-color.png": "539fd46cd94d8de6d9c0c6e146f4b66c688e64924dcacbea7cf5ef0fde92ee42",
+        "art/atlas/units/ss-cockpit/frames/ne-nation.png": "d5c5b306dcdec99a69a19659e4b92a3f34941f4f983193cde6473c6aabb861ba",
+        "art/atlas/units/ss-cockpit/frames/ne-shadow.png": "be6bf5f65eb6743c71340ce970eee342d46418739821e876ea0850b872fe5c1f",
+        "art/atlas/units/ss-cockpit/frames/se-color.png": "1e850e2738298c4b740b4ef5e25d151489e65a3665e0d919e9ad6dec1482f2a9",
+        "art/atlas/units/ss-cockpit/frames/se-nation.png": "8e46ea1025fd034adc7280028c509bfd00e77789a81d970a09294a767b18b57d",
+        "art/atlas/units/ss-cockpit/frames/se-shadow.png": "c629a1dd8b268cf719184ccd78a400a06fe56d6a976f2fc121a808ab5b7bfcdf"
+      }
+    },
+    {
+      "assetId": "ss-engine",
+      "creator": "OpenAI image generation",
+      "source": "art/atlas/units/ss-engine/creation-record.json",
+      "promptPath": "art/atlas/units/ss-engine/prompts/e-v2.txt",
+      "rights": "original-generated",
+      "sourceHash": "838703bb87cb54e894fb1d2701f0290892e43fa10cfc6f09ad65b5eb714c0977",
+      "outputHashes": {
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/SS Engine-1.png": "354d8f691d8ac46a4010a103425c0da10b341ba51c271bab95664957052d3c54",
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/SS Engine.png": "a64949fc870ed0e476c1d2caf6336636dde3806a347234bcc1b15b4ca57368a2",
+        "art/atlas/units/ss-engine/frames/e-color.png": "1f748b2f180f95544d5da6459599f4c1e6ffe47ae8c5231dc5c4861b45d31bd9",
+        "art/atlas/units/ss-engine/frames/e-nation.png": "a8a4a86569ddf1b4dc52d365e1c8626667aa7b90b1c2353654690615917224ab",
+        "art/atlas/units/ss-engine/frames/e-shadow.png": "5e9ccd7df71634dcdeb11ebed96b5ac2048e18521f004d19894a662200e9c406",
+        "art/atlas/units/ss-engine/frames/ne-color.png": "4eb2d6664ed3903dc6948cd10968553938ee9358396ad20a4c1d5b668f667ded",
+        "art/atlas/units/ss-engine/frames/ne-nation.png": "cd10871cac07b1ebda4f82d9f3187c7d12d86b69ba1b862783cee285aedb1a3f",
+        "art/atlas/units/ss-engine/frames/ne-shadow.png": "7e5d69ccc7dc45c36144a687708339061a00a9028ea91f2c5be1969fffa894c4",
+        "art/atlas/units/ss-engine/frames/se-color.png": "e6cf6dd1c62eac7c922b22eb91dd580cbe471c99a4b748cae1975f289640fc6d",
+        "art/atlas/units/ss-engine/frames/se-nation.png": "57a26c4ab7fb06a2ec2ae99fd5146cd8686b66ffad9effc4166ba60ba8eaefaf",
+        "art/atlas/units/ss-engine/frames/se-shadow.png": "39106021423d98e0fca710287aa031a6c644a7f0462dcf6675286cd9722b287c"
+      }
+    },
+    {
+      "assetId": "ss-stasis-chamber",
+      "creator": "OpenAI image generation",
+      "source": "art/atlas/units/ss-stasis-chamber/creation-record.json",
+      "promptPath": "art/atlas/units/ss-stasis-chamber/prompts/e-v2.txt",
+      "rights": "original-generated",
+      "sourceHash": "a2461ce40d62fec6c396f27dedfd8773dd9c9a7b90a37c2c44ede066188446cd",
+      "outputHashes": {
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/SS Stasis Chamber-1.png": "946b9dddc06d318035b37eeaae1d04080d9b6fa816df07fb3451132a3f89b5e3",
+        "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/SS Stasis Chamber.png": "e0dacbfecbe80396e3fcd20618a395cc46d150280957c6df68bf6d464ddc8114",
+        "art/atlas/units/ss-stasis-chamber/frames/e-color.png": "f107f045c3b8d96f15c63935bd7cdd0838042b55a1a4693c723c0b27dd37f2da",
+        "art/atlas/units/ss-stasis-chamber/frames/e-nation.png": "d7787ce1541bb69f9a1e14703f889381d1603f48d82e4dd580966ca349fbcd53",
+        "art/atlas/units/ss-stasis-chamber/frames/e-shadow.png": "b7575d0e226c85bcbf9954a46a05b8d922d593177a143ed7a3c2803c579e4351",
+        "art/atlas/units/ss-stasis-chamber/frames/ne-color.png": "22bd59bd0808a4113d938a6a44a2a402fe5a62e700e339f9e827490dd1cda6b9",
+        "art/atlas/units/ss-stasis-chamber/frames/ne-nation.png": "db3d47e2a6b61d66484c4ef879c644fdffb95619fc321705c04e30c3fc32c7f2",
+        "art/atlas/units/ss-stasis-chamber/frames/ne-shadow.png": "5238d66335eec6fe27faa11bd6d0f44eb9eaa2caa613f198ae4d1c09415b0776",
+        "art/atlas/units/ss-stasis-chamber/frames/se-color.png": "20bb51aa2491678601bef0d9ee1143adde0cb2461019ce79542080a2c8c1eb6b",
+        "art/atlas/units/ss-stasis-chamber/frames/se-nation.png": "5ca6f73ae6aa485b67cd41dc013330d8062eb008382ad0d71e213bf4e2dec641",
+        "art/atlas/units/ss-stasis-chamber/frames/se-shadow.png": "278a72182b50c39d9e16e9ccba7434f37a9a4dfc9d69e4443e79094535b20b9a"
       }
     },
     {

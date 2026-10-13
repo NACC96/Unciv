@@ -1,0 +1,24 @@
+{
+  "facings": {
+    "E": {
+      "rawFile": "e-motion-v2.png",
+      "promptPath": "art/atlas/units/nuclear-missile/prompts/e-v2.txt"
+    },
+    "SE": {
+      "rawFile": "se-motion-v2.png",
+      "promptPath": "art/atlas/units/nuclear-missile/prompts/se-v2.txt",
+      "identityReference": {
+        "path": "/Users/noahkenny/.codex/generated_images/01a1321a-8142-7533-ae7a-eb89a5433c70/exec-002c2471-1115-4644-aee6-8c162962f294.png",
+        "sha256": "eee9d9d4124b7bb611e18df98594233ac747f3849cc78c0f811b22f162ec6eb3"
+      }
+    },
+    "NE": {
+      "rawFile": "ne-motion-v2.png",
+      "promptPath": "art/atlas/units/nuclear-missile/prompts/ne-v2.txt",
+      "identityReference": {
+        "path": "/Users/noahkenny/.codex/generated_images/01a1321a-8142-7533-ae7a-eb89a5433c70/exec-002c2471-1115-4644-aee6-8c162962f294.png",
+        "sha256": "eee9d9d4124b7bb611e18df98594233ac747f3849cc78c0f811b22f162ec6eb3"
+      }
+    }
+  }
+}

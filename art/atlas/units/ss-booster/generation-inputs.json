@@ -1,0 +1,24 @@
+{
+  "facings": {
+    "E": {
+      "rawFile": "e-motion-v2.png",
+      "promptPath": "art/atlas/units/ss-booster/prompts/e-v2.txt"
+    },
+    "SE": {
+      "rawFile": "se-motion-v2.png",
+      "promptPath": "art/atlas/units/ss-booster/prompts/se-v2.txt",
+      "identityReference": {
+        "path": "/Users/noahkenny/.codex/generated_images/01a1321a-8142-7533-ae7a-eb89a5433c70/exec-aa77c209-d74b-47c0-b3f2-7ca18a95a30f.png",
+        "sha256": "422929d433afda98044ad1f7ddef86c14f93f2e5a0b8234f71cd4766176d37c4"
+      }
+    },
+    "NE": {
+      "rawFile": "ne-motion-v2.png",
+      "promptPath": "art/atlas/units/ss-booster/prompts/ne-v2.txt",
+      "identityReference": {
+        "path": "/Users/noahkenny/.codex/generated_images/01a1321a-8142-7533-ae7a-eb89a5433c70/exec-aa77c209-d74b-47c0-b3f2-7ca18a95a30f.png",
+        "sha256": "422929d433afda98044ad1f7ddef86c14f93f2e5a0b8234f71cd4766176d37c4"
+      }
+    }
+  }
+}
