@@ -3,7 +3,7 @@ set -euo pipefail
 repo=$(cd "$(dirname "$0")/../.." && pwd)
 source "$repo/scripts/atlas/paths.sh"
 command=${1:-}
-case "$command" in validate|pack|coverage) ;; *) echo 'Usage: assets.sh validate|pack|coverage [--require-complete]' >&2; exit 2 ;; esac
+case "$command" in validate|pack|coverage|pack-static) ;; *) echo 'Usage: assets.sh validate|pack|coverage|pack-static [--require-complete]' >&2; exit 2 ;; esac
 shift
 require_complete=false
 if [[ ${1:-} == --require-complete ]]; then require_complete=true; shift; fi
@@ -15,4 +15,9 @@ export UNCIV_ATLAS_BUILD_ROOT=${UNCIV_ATLAS_BUILD_ROOT:-$(atlas_default_build_ro
 export UNCIV_ATLAS_ASSET_COMMAND=$command
 export UNCIV_ATLAS_REQUIRE_COMPLETE=$require_complete
 cd "$repo"
-./gradlew -I "$repo/scripts/atlas/build.gradle" --console=plain atlasAssets
+task=atlasAssets
+if [[ $command == pack-static ]]; then
+    [[ $require_complete == false ]] || { echo 'Static packing does not certify art coverage' >&2; exit 2; }
+    task=packAtlasUnitStatic
+fi
+./gradlew -I "$repo/scripts/atlas/build.gradle" --console=plain "$task"

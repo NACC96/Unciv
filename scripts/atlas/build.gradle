@@ -17,6 +17,19 @@ gradle.taskGraph.whenReady { graph ->
 // Pack only the built-in skin sources, without a launcher, Android SDK or mod scan.
 // Uses the same libGDX TexturePacker/settings as the existing AndroidImagePacker.
 gradle.projectsEvaluated {
+    rootProject.tasks.register('packAtlasUnitStatic') {
+        doLast {
+            def loader = rootProject.buildscript.classLoader
+            def packer = loader.loadClass('com.badlogic.gdx.tools.texturepacker.TexturePacker')
+            def settingsType = loader.loadClass('com.badlogic.gdx.tools.texturepacker.TexturePacker$Settings')
+            def jsonType = loader.loadClass('com.badlogic.gdx.utils.Json')
+            def input = new File(rootProject.rootDir, 'android/Images.AtlasUnits')
+            def settings = jsonType.getDeclaredConstructor().newInstance().fromJson(settingsType,
+                new File(input, 'TexturePacker.settings').text)
+            packer.getMethod('process', settingsType, String, String, String).invoke(null, settings,
+                input.path, new File(rootProject.rootDir, 'android/assets').path, 'AtlasUnits')
+        }
+    }
     rootProject.tasks.register('atlasAssets') {
         doLast {
             def command = System.getenv('UNCIV_ATLAS_ASSET_COMMAND') ?: 'validate'
