@@ -36,7 +36,7 @@ class LoadingScreen(
                 setFillParent(true)
                 background = GameUiStyle.background("Atlas/Loading/Background", GameUiStyle.inset)
                 pad(24f)
-                add(card).width((stage.width - 48f).coerceAtMost(360f))
+                add(card).width((this@LoadingScreen.stage.width - 48f).coerceAtMost(360f))
             })
         } else {
             screenshot = takeScreenshot(previousScreen)
