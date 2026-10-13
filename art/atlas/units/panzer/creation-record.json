@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "unitName": "Panzer",
+  "assetId": "panzer",
+  "creator": "OpenAI image generation",
+  "tool": "image_gen.imagegen (built-in)",
+  "rights": "original-generated",
+  "styleReference": {
+    "path": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/concept/unit-art-direction-v1.png",
+    "sha256": "ceb7c639185d98cb53535f21eb0966b1bec01bb782c80de2fdd972d2858ce641",
+    "role": "approved style only"
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/panzer/e-motion-v1.png",
+      "rawHash": "2f9ffe79afac6cebadcd31247145babb89cb4d2fb6f51e2f30bd9bfd50a1f041",
+      "promptPath": "art/atlas/units/panzer/prompts/e-v1.txt",
+      "promptHash": "5902fc603ae59fb0980d539703cfb7d8b21351c5c9842cb284a0eaec24d99583",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/panzer/ne-motion-v1.png",
+      "rawHash": "39e93bd92e0ab7d5f5cc5b6dceb355daa073b19c2c5dc5232fba2c057981092f",
+      "promptPath": "art/atlas/units/panzer/prompts/ne-v1.txt",
+      "promptHash": "d9b6ed05a6b281db3c03641c970f49a491fadae28b893ac5a2ad9b5a9f7d43b1",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/panzer/se-motion-v1.png",
+      "rawHash": "69c7fcd94907ce73e904c6df7208dc245dc98317dc6504f4dba7ec769a3e0f45",
+      "promptPath": "art/atlas/units/panzer/prompts/se-v1.txt",
+      "promptHash": "17935f2bb8c59aeb142bc5d9be3cab3d444b1fc9f44886caa4d75dbde7ff10bb",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "processing": {
+    "script": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/normalize_motion.py",
+    "sha256": "7fc3f10a010ce16d768a6e7d70f05c039febb02b1756335299f4e78e6d94aff7",
+    "operations": [
+      "uniform cell cutting",
+      "constant sheet scale and root alignment",
+      "alpha-preserving resize",
+      "royal-blue nation mask extraction",
+      "violet ground-shadow extraction"
+    ],
+    "poseSynthesis": false,
+    "clonedStaticFrames": false
+  },
+  "reviewState": "candidate",
+  "formalArtReview": "deferred"
+}

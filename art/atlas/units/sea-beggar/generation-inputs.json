@@ -1,0 +1,16 @@
+{
+  "facings": {
+    "E": {
+      "rawFile": "e-motion-v2.png",
+      "promptPath": "art/atlas/units/sea-beggar/prompts/e-v2.txt"
+    },
+    "NE": {
+      "rawFile": "ne-motion-v2.png",
+      "promptPath": "art/atlas/units/sea-beggar/prompts/ne-v2.txt"
+    },
+    "SE": {
+      "rawFile": "se-motion-v2.png",
+      "promptPath": "art/atlas/units/sea-beggar/prompts/se-v2.txt"
+    }
+  }
+}

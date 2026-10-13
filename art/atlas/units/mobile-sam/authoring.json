@@ -1,19 +1,95 @@
 {
-"schemaVersion": 1,
-"unitName": "Mobile SAM",
-"assetId": "mobile-sam",
-"reviewState": "missing",
-"canvasWidth": 128,
-"canvasHeight": 128,
-"anchorX": 64,
-"anchorY": 96,
-"clippingMargin": 2,
-"uniqueUnitIdentity": null,
-"uniqueTo": null,
-"replaces": null,
-"staticFallbackKey": "TileSets/AtlasUnits/Units/Mobile SAM",
-"framesDirectory": "frames/",
-"applicableStates": [ "IDLE", "MOVE", "ATTACK", "HIT", "DEFEAT" ],
-"facings": [ "E", "NE", "NW", "W", "SW", "SE" ],
-"minimumFrames": { "IDLE": 4, "MOVE": 8, "ATTACK": 8, "HIT": 4, "DEFEAT": 8 }
+  "schemaVersion": 1,
+  "unitName": "Mobile SAM",
+  "assetId": "mobile-sam",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": null,
+  "uniqueTo": null,
+  "replaces": null,
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Mobile SAM",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/mobile-sam/e-motion-v1.png",
+      "rawHash": "f593db5dbd6806ee21dbbd1800e1501fe78faff11ba12f46d72af7a44a94a8b2",
+      "promptPath": "art/atlas/units/mobile-sam/prompts/e-v1.txt",
+      "promptHash": "7161d25b1ccbf4f894dec2cf05b32e656557b418b07c44f13d04e1b395cc3682",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/mobile-sam/ne-motion-v1.png",
+      "rawHash": "8f31aa55d9aea36435608a044d0ceadfda7b2a975399e0cf385368896cd5dd75",
+      "promptPath": "art/atlas/units/mobile-sam/prompts/ne-v1.txt",
+      "promptHash": "179b7f134e5804818c3a09039135bd53cbf1848efe986931ea3d0ae8aa9b61d6",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/mobile-sam/se-motion-v1.png",
+      "rawHash": "65286c57155ad2652ec4d2c1d7f54dcddc7a36fdc0c9ffb4cfaa43ad22e5869c",
+      "promptPath": "art/atlas/units/mobile-sam/prompts/se-v1.txt",
+      "promptHash": "58273e555e4efcfb4d04f3471b96cae53009b5bad281f9676f4b3bb781934948",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
 }

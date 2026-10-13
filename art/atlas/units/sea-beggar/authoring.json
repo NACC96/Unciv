@@ -1,19 +1,95 @@
 {
-"schemaVersion": 1,
-"unitName": "Sea Beggar",
-"assetId": "sea-beggar",
-"reviewState": "missing",
-"canvasWidth": 128,
-"canvasHeight": 128,
-"anchorX": 64,
-"anchorY": 96,
-"clippingMargin": 2,
-"uniqueUnitIdentity": "Sea Beggar",
-"uniqueTo": "The Netherlands",
-"replaces": "Privateer",
-"staticFallbackKey": "TileSets/AtlasUnits/Units/Sea Beggar",
-"framesDirectory": "frames/",
-"applicableStates": [ "IDLE", "MOVE", "ATTACK", "HIT", "DEFEAT" ],
-"facings": [ "E", "NE", "NW", "W", "SW", "SE" ],
-"minimumFrames": { "IDLE": 4, "MOVE": 8, "ATTACK": 8, "HIT": 4, "DEFEAT": 8 }
+  "schemaVersion": 1,
+  "unitName": "Sea Beggar",
+  "assetId": "sea-beggar",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": "Sea Beggar",
+  "uniqueTo": "The Netherlands",
+  "replaces": "Privateer",
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Sea Beggar",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/sea-beggar/e-motion-v2.png",
+      "rawHash": "b0305c9784c9b8b1aa1a00a920e5ae5463ad6b74ef861fc77bb40be705942b7c",
+      "promptPath": "art/atlas/units/sea-beggar/prompts/e-v2.txt",
+      "promptHash": "a4778c3ac7037ca6b0ccfaf86591b229ab16b0e334c72929cc40bfce56cddc27",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/sea-beggar/ne-motion-v2.png",
+      "rawHash": "3c931f38d2c206828181503a21f840dded291ca51048e414fc42cbc448573744",
+      "promptPath": "art/atlas/units/sea-beggar/prompts/ne-v2.txt",
+      "promptHash": "549be2851711d0123ed62554058db1252d6255f905ca648f81d9843e07b62d55",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/sea-beggar/se-motion-v2.png",
+      "rawHash": "9de6857caa86901bbbe983812b7cc39e10ba9575940a830f022dc2134e2a315c",
+      "promptPath": "art/atlas/units/sea-beggar/prompts/se-v2.txt",
+      "promptHash": "5b8a0d08422260ac0808607ca4537620ef8bb45973c2a1b3ddd5a594347512d5",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
 }

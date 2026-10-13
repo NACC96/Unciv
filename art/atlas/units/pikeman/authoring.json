@@ -1,19 +1,95 @@
 {
-"schemaVersion": 1,
-"unitName": "Pikeman",
-"assetId": "pikeman",
-"reviewState": "missing",
-"canvasWidth": 128,
-"canvasHeight": 128,
-"anchorX": 64,
-"anchorY": 96,
-"clippingMargin": 2,
-"uniqueUnitIdentity": null,
-"uniqueTo": null,
-"replaces": null,
-"staticFallbackKey": "TileSets/AtlasUnits/Units/Pikeman",
-"framesDirectory": "frames/",
-"applicableStates": [ "IDLE", "MOVE", "ATTACK", "HIT", "DEFEAT" ],
-"facings": [ "E", "NE", "NW", "W", "SW", "SE" ],
-"minimumFrames": { "IDLE": 4, "MOVE": 8, "ATTACK": 8, "HIT": 4, "DEFEAT": 8 }
+  "schemaVersion": 1,
+  "unitName": "Pikeman",
+  "assetId": "pikeman",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": null,
+  "uniqueTo": null,
+  "replaces": null,
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Pikeman",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/pikeman/e-motion-v1.png",
+      "rawHash": "2442dd9d10607bb325a8f6b4fd6d37e2a76d050b3bddfe8d3c3d86989627b037",
+      "promptPath": "art/atlas/units/pikeman/prompts/e-v1.txt",
+      "promptHash": "465cd238c13238ad59a19b0c31ea37cdd6bd241f0753335c3563f2d5062404bd",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/pikeman/ne-motion-v1.png",
+      "rawHash": "7182016489f87da565801ce929233d8cb5348b45c8a0a20b1733f193cf2ff1fc",
+      "promptPath": "art/atlas/units/pikeman/prompts/ne-v1.txt",
+      "promptHash": "20c0096f7638d53a195d06ce879fe8c4147fd8e05a526768b88ccdf782fff2b5",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/pikeman/se-motion-v1.png",
+      "rawHash": "d1ef906a1526ddfe115a93e6b8442a5b161585e3d7fdb8353e7256830eef8161",
+      "promptPath": "art/atlas/units/pikeman/prompts/se-v1.txt",
+      "promptHash": "51fe3fbccbde488f0575f59791498facfa326cd5d715b46e4352e239c3a1feba",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
 }

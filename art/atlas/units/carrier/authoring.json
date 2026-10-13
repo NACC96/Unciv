@@ -1,19 +1,95 @@
 {
-"schemaVersion": 1,
-"unitName": "Carrier",
-"assetId": "carrier",
-"reviewState": "missing",
-"canvasWidth": 128,
-"canvasHeight": 128,
-"anchorX": 64,
-"anchorY": 96,
-"clippingMargin": 2,
-"uniqueUnitIdentity": null,
-"uniqueTo": null,
-"replaces": null,
-"staticFallbackKey": "TileSets/AtlasUnits/Units/Carrier",
-"framesDirectory": "frames/",
-"applicableStates": [ "IDLE", "MOVE", "ATTACK", "HIT", "DEFEAT" ],
-"facings": [ "E", "NE", "NW", "W", "SW", "SE" ],
-"minimumFrames": { "IDLE": 4, "MOVE": 8, "ATTACK": 8, "HIT": 4, "DEFEAT": 8 }
+  "schemaVersion": 1,
+  "unitName": "Carrier",
+  "assetId": "carrier",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": null,
+  "uniqueTo": null,
+  "replaces": null,
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Carrier",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/carrier/e-motion-v2.png",
+      "rawHash": "24d71f997afab4931555dae1d95fbea17c860c5800b7921aaf0fcc2ebc8f1b7b",
+      "promptPath": "art/atlas/units/carrier/prompts/e-v2.txt",
+      "promptHash": "df29e412f010dc247aebf52d25446d35b5b4bf6831065c2c3161c91a2b804e03",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/carrier/ne-motion-v2.png",
+      "rawHash": "e03d09d84de819cc098bd76514e106c23a41ff361c15b244b2b8a13821d832e6",
+      "promptPath": "art/atlas/units/carrier/prompts/ne-v2.txt",
+      "promptHash": "579b6a4bf92cd7bd9f5149e0a64bf0e63c75164fbdd05e1bf379c3dbc859f2af",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/carrier/se-motion-v2.png",
+      "rawHash": "0576e70fdc96ba54e992bd92bb1c9d33ccf33e4bace8a1b7a0b7b2fa3d7b6077",
+      "promptPath": "art/atlas/units/carrier/prompts/se-v2.txt",
+      "promptHash": "8669ae252c1dd74ebdd0e1ee46e45c77a2b170fc6d5cf24e93de84f51e9ac6ba",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
 }

@@ -1,19 +1,95 @@
 {
-"schemaVersion": 1,
-"unitName": "Crossbowman",
-"assetId": "crossbowman",
-"reviewState": "missing",
-"canvasWidth": 128,
-"canvasHeight": 128,
-"anchorX": 64,
-"anchorY": 96,
-"clippingMargin": 2,
-"uniqueUnitIdentity": null,
-"uniqueTo": null,
-"replaces": null,
-"staticFallbackKey": "TileSets/AtlasUnits/Units/Crossbowman",
-"framesDirectory": "frames/",
-"applicableStates": [ "IDLE", "MOVE", "ATTACK", "HIT", "DEFEAT" ],
-"facings": [ "E", "NE", "NW", "W", "SW", "SE" ],
-"minimumFrames": { "IDLE": 4, "MOVE": 8, "ATTACK": 8, "HIT": 4, "DEFEAT": 8 }
+  "schemaVersion": 1,
+  "unitName": "Crossbowman",
+  "assetId": "crossbowman",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": null,
+  "uniqueTo": null,
+  "replaces": null,
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Crossbowman",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/crossbowman/e-motion-v1.png",
+      "rawHash": "cb2b0e5c20b39ec900d3b28090310f898fd29dfb5b33b555df8627e33684e4f9",
+      "promptPath": "art/atlas/units/crossbowman/prompts/e-v1.txt",
+      "promptHash": "51211b17f3f411dfe6e4a06ce553512124b6d2faf0b45cd5933ee452d76f2b96",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/crossbowman/ne-motion-v1.png",
+      "rawHash": "683e7fc2e3cb9ee9522ec1cc6d2855396ff390cb5d7e0f256719eadf04b1ce77",
+      "promptPath": "art/atlas/units/crossbowman/prompts/ne-v1.txt",
+      "promptHash": "f59457cc27648fff819d84d6c68cd863f22dc8f9b1ae92e2e302a92613753f95",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/crossbowman/se-motion-v1.png",
+      "rawHash": "c1df3c8d980d0e0bf6fbdcd2e81ff9c863bc73d53fb7000279913879e7fac578",
+      "promptPath": "art/atlas/units/crossbowman/prompts/se-v1.txt",
+      "promptHash": "416eb7c756ccf77dc31b1807cb8972bc00685e99700c491ad16c2ad2ffcacf46",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
 }

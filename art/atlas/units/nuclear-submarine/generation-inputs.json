@@ -1,0 +1,24 @@
+{
+  "facings": {
+    "E": {
+      "rawFile": "e-motion-v2.png",
+      "promptPath": "art/atlas/units/nuclear-submarine/prompts/e-v2.txt"
+    },
+    "SE": {
+      "rawFile": "se-motion-v2.png",
+      "promptPath": "art/atlas/units/nuclear-submarine/prompts/se-v2.txt",
+      "identityReference": {
+        "path": "/Users/noahkenny/.codex/generated_images/01a1321a-8142-7533-ae7a-eb89a5433c70/exec-ec091ffb-fb83-4a24-8c5c-9b365d6ddc26.png",
+        "sha256": "7935e231fa36a00e49a173a62137bb0f4cb4ed389814bcecc4e27eef46316e34"
+      }
+    },
+    "NE": {
+      "rawFile": "ne-motion-v2.png",
+      "promptPath": "art/atlas/units/nuclear-submarine/prompts/ne-v2.txt",
+      "identityReference": {
+        "path": "/Users/noahkenny/.codex/generated_images/01a1321a-8142-7533-ae7a-eb89a5433c70/exec-ec091ffb-fb83-4a24-8c5c-9b365d6ddc26.png",
+        "sha256": "7935e231fa36a00e49a173a62137bb0f4cb4ed389814bcecc4e27eef46316e34"
+      }
+    }
+  }
+}

@@ -9002,6 +9002,1014 @@
       "minimumFrames": 8
     },
     {
+      "id": "unit-clip|Inquisitor|DEFEAT|E",
+      "rulesetKey": "Inquisitor",
+      "category": "unit-clip",
+      "assetKey": "Inquisitor|DEFEAT|E",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/inquisitor/frames/defeat-e.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/e-color.png",
+          "sha256": "1ac5848a2fc98f6d9599392c839aeb5a32fe7dd37b35cb4ec81c9256094d3901",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/e-nation.png",
+          "sha256": "4d97196fb629212099e0031b458627b87176748436869277e48fbfec41816a04",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/e-shadow.png",
+          "sha256": "3d667ed9f40ff7f1706277a3e3ccf2475b96116c9e9927d4fd3985f4b6185a70",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Inquisitor",
+      "state": "DEFEAT",
+      "facing": "E",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Inquisitor|DEFEAT|NE",
+      "rulesetKey": "Inquisitor",
+      "category": "unit-clip",
+      "assetKey": "Inquisitor|DEFEAT|NE",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/inquisitor/frames/defeat-ne.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/ne-color.png",
+          "sha256": "a69885f8d35f62a6586d68afbd4d0df27b7711485c1004aac1ab1e1c975a894e",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/ne-nation.png",
+          "sha256": "c17eeb1bf747579de038ccca8b3a719e45d5fd9aa8a26efedf8afc49f8d3449c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/ne-shadow.png",
+          "sha256": "5b7cad3b0f66c8a1bbdf537b92baab55e1d858d88dbf7d8f05113e45f3eec9a3",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Inquisitor",
+      "state": "DEFEAT",
+      "facing": "NE",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Inquisitor|DEFEAT|NW",
+      "rulesetKey": "Inquisitor",
+      "category": "unit-clip",
+      "assetKey": "Inquisitor|DEFEAT|NW",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/inquisitor/frames/defeat-nw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/ne-color.png",
+          "sha256": "a69885f8d35f62a6586d68afbd4d0df27b7711485c1004aac1ab1e1c975a894e",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/ne-nation.png",
+          "sha256": "c17eeb1bf747579de038ccca8b3a719e45d5fd9aa8a26efedf8afc49f8d3449c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/ne-shadow.png",
+          "sha256": "5b7cad3b0f66c8a1bbdf537b92baab55e1d858d88dbf7d8f05113e45f3eec9a3",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Inquisitor",
+      "state": "DEFEAT",
+      "facing": "NW",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Inquisitor|DEFEAT|SE",
+      "rulesetKey": "Inquisitor",
+      "category": "unit-clip",
+      "assetKey": "Inquisitor|DEFEAT|SE",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/inquisitor/frames/defeat-se.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/se-color.png",
+          "sha256": "a5c331eb7e8a99b6f47862cfd2953f9829885eb7a8a367a01db63e4d6e2538a7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/se-nation.png",
+          "sha256": "8a38c647be75966ee1ec9f3451517425031434cf69af79ccfc640fec52268677",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/se-shadow.png",
+          "sha256": "f3fe5f8f75fe1a9557bb383e2d5dae4be1055573173f8279c0c8bbed23569b82",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Inquisitor",
+      "state": "DEFEAT",
+      "facing": "SE",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Inquisitor|DEFEAT|SW",
+      "rulesetKey": "Inquisitor",
+      "category": "unit-clip",
+      "assetKey": "Inquisitor|DEFEAT|SW",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/inquisitor/frames/defeat-sw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/se-color.png",
+          "sha256": "a5c331eb7e8a99b6f47862cfd2953f9829885eb7a8a367a01db63e4d6e2538a7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/se-nation.png",
+          "sha256": "8a38c647be75966ee1ec9f3451517425031434cf69af79ccfc640fec52268677",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/se-shadow.png",
+          "sha256": "f3fe5f8f75fe1a9557bb383e2d5dae4be1055573173f8279c0c8bbed23569b82",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Inquisitor",
+      "state": "DEFEAT",
+      "facing": "SW",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Inquisitor|DEFEAT|W",
+      "rulesetKey": "Inquisitor",
+      "category": "unit-clip",
+      "assetKey": "Inquisitor|DEFEAT|W",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/inquisitor/frames/defeat-w.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/e-color.png",
+          "sha256": "1ac5848a2fc98f6d9599392c839aeb5a32fe7dd37b35cb4ec81c9256094d3901",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/e-nation.png",
+          "sha256": "4d97196fb629212099e0031b458627b87176748436869277e48fbfec41816a04",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/e-shadow.png",
+          "sha256": "3d667ed9f40ff7f1706277a3e3ccf2475b96116c9e9927d4fd3985f4b6185a70",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Inquisitor",
+      "state": "DEFEAT",
+      "facing": "W",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Inquisitor|HIT|E",
+      "rulesetKey": "Inquisitor",
+      "category": "unit-clip",
+      "assetKey": "Inquisitor|HIT|E",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/inquisitor/frames/hit-e.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/e-color.png",
+          "sha256": "1ac5848a2fc98f6d9599392c839aeb5a32fe7dd37b35cb4ec81c9256094d3901",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/e-nation.png",
+          "sha256": "4d97196fb629212099e0031b458627b87176748436869277e48fbfec41816a04",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/e-shadow.png",
+          "sha256": "3d667ed9f40ff7f1706277a3e3ccf2475b96116c9e9927d4fd3985f4b6185a70",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Inquisitor",
+      "state": "HIT",
+      "facing": "E",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Inquisitor|HIT|NE",
+      "rulesetKey": "Inquisitor",
+      "category": "unit-clip",
+      "assetKey": "Inquisitor|HIT|NE",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/inquisitor/frames/hit-ne.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/ne-color.png",
+          "sha256": "a69885f8d35f62a6586d68afbd4d0df27b7711485c1004aac1ab1e1c975a894e",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/ne-nation.png",
+          "sha256": "c17eeb1bf747579de038ccca8b3a719e45d5fd9aa8a26efedf8afc49f8d3449c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/ne-shadow.png",
+          "sha256": "5b7cad3b0f66c8a1bbdf537b92baab55e1d858d88dbf7d8f05113e45f3eec9a3",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Inquisitor",
+      "state": "HIT",
+      "facing": "NE",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Inquisitor|HIT|NW",
+      "rulesetKey": "Inquisitor",
+      "category": "unit-clip",
+      "assetKey": "Inquisitor|HIT|NW",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/inquisitor/frames/hit-nw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/ne-color.png",
+          "sha256": "a69885f8d35f62a6586d68afbd4d0df27b7711485c1004aac1ab1e1c975a894e",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/ne-nation.png",
+          "sha256": "c17eeb1bf747579de038ccca8b3a719e45d5fd9aa8a26efedf8afc49f8d3449c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/ne-shadow.png",
+          "sha256": "5b7cad3b0f66c8a1bbdf537b92baab55e1d858d88dbf7d8f05113e45f3eec9a3",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Inquisitor",
+      "state": "HIT",
+      "facing": "NW",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Inquisitor|HIT|SE",
+      "rulesetKey": "Inquisitor",
+      "category": "unit-clip",
+      "assetKey": "Inquisitor|HIT|SE",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/inquisitor/frames/hit-se.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/se-color.png",
+          "sha256": "a5c331eb7e8a99b6f47862cfd2953f9829885eb7a8a367a01db63e4d6e2538a7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/se-nation.png",
+          "sha256": "8a38c647be75966ee1ec9f3451517425031434cf69af79ccfc640fec52268677",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/se-shadow.png",
+          "sha256": "f3fe5f8f75fe1a9557bb383e2d5dae4be1055573173f8279c0c8bbed23569b82",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Inquisitor",
+      "state": "HIT",
+      "facing": "SE",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Inquisitor|HIT|SW",
+      "rulesetKey": "Inquisitor",
+      "category": "unit-clip",
+      "assetKey": "Inquisitor|HIT|SW",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/inquisitor/frames/hit-sw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/se-color.png",
+          "sha256": "a5c331eb7e8a99b6f47862cfd2953f9829885eb7a8a367a01db63e4d6e2538a7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/se-nation.png",
+          "sha256": "8a38c647be75966ee1ec9f3451517425031434cf69af79ccfc640fec52268677",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/se-shadow.png",
+          "sha256": "f3fe5f8f75fe1a9557bb383e2d5dae4be1055573173f8279c0c8bbed23569b82",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Inquisitor",
+      "state": "HIT",
+      "facing": "SW",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Inquisitor|HIT|W",
+      "rulesetKey": "Inquisitor",
+      "category": "unit-clip",
+      "assetKey": "Inquisitor|HIT|W",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/inquisitor/frames/hit-w.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/e-color.png",
+          "sha256": "1ac5848a2fc98f6d9599392c839aeb5a32fe7dd37b35cb4ec81c9256094d3901",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/e-nation.png",
+          "sha256": "4d97196fb629212099e0031b458627b87176748436869277e48fbfec41816a04",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/e-shadow.png",
+          "sha256": "3d667ed9f40ff7f1706277a3e3ccf2475b96116c9e9927d4fd3985f4b6185a70",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Inquisitor",
+      "state": "HIT",
+      "facing": "W",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Inquisitor|IDLE|E",
+      "rulesetKey": "Inquisitor",
+      "category": "unit-clip",
+      "assetKey": "Inquisitor|IDLE|E",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/inquisitor/frames/idle-e.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/e-color.png",
+          "sha256": "1ac5848a2fc98f6d9599392c839aeb5a32fe7dd37b35cb4ec81c9256094d3901",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/e-nation.png",
+          "sha256": "4d97196fb629212099e0031b458627b87176748436869277e48fbfec41816a04",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/e-shadow.png",
+          "sha256": "3d667ed9f40ff7f1706277a3e3ccf2475b96116c9e9927d4fd3985f4b6185a70",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Inquisitor",
+      "state": "IDLE",
+      "facing": "E",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Inquisitor|IDLE|NE",
+      "rulesetKey": "Inquisitor",
+      "category": "unit-clip",
+      "assetKey": "Inquisitor|IDLE|NE",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/inquisitor/frames/idle-ne.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/ne-color.png",
+          "sha256": "a69885f8d35f62a6586d68afbd4d0df27b7711485c1004aac1ab1e1c975a894e",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/ne-nation.png",
+          "sha256": "c17eeb1bf747579de038ccca8b3a719e45d5fd9aa8a26efedf8afc49f8d3449c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/ne-shadow.png",
+          "sha256": "5b7cad3b0f66c8a1bbdf537b92baab55e1d858d88dbf7d8f05113e45f3eec9a3",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Inquisitor",
+      "state": "IDLE",
+      "facing": "NE",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Inquisitor|IDLE|NW",
+      "rulesetKey": "Inquisitor",
+      "category": "unit-clip",
+      "assetKey": "Inquisitor|IDLE|NW",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/inquisitor/frames/idle-nw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/ne-color.png",
+          "sha256": "a69885f8d35f62a6586d68afbd4d0df27b7711485c1004aac1ab1e1c975a894e",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/ne-nation.png",
+          "sha256": "c17eeb1bf747579de038ccca8b3a719e45d5fd9aa8a26efedf8afc49f8d3449c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/ne-shadow.png",
+          "sha256": "5b7cad3b0f66c8a1bbdf537b92baab55e1d858d88dbf7d8f05113e45f3eec9a3",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Inquisitor",
+      "state": "IDLE",
+      "facing": "NW",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Inquisitor|IDLE|SE",
+      "rulesetKey": "Inquisitor",
+      "category": "unit-clip",
+      "assetKey": "Inquisitor|IDLE|SE",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/inquisitor/frames/idle-se.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/se-color.png",
+          "sha256": "a5c331eb7e8a99b6f47862cfd2953f9829885eb7a8a367a01db63e4d6e2538a7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/se-nation.png",
+          "sha256": "8a38c647be75966ee1ec9f3451517425031434cf69af79ccfc640fec52268677",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/se-shadow.png",
+          "sha256": "f3fe5f8f75fe1a9557bb383e2d5dae4be1055573173f8279c0c8bbed23569b82",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Inquisitor",
+      "state": "IDLE",
+      "facing": "SE",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Inquisitor|IDLE|SW",
+      "rulesetKey": "Inquisitor",
+      "category": "unit-clip",
+      "assetKey": "Inquisitor|IDLE|SW",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/inquisitor/frames/idle-sw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/se-color.png",
+          "sha256": "a5c331eb7e8a99b6f47862cfd2953f9829885eb7a8a367a01db63e4d6e2538a7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/se-nation.png",
+          "sha256": "8a38c647be75966ee1ec9f3451517425031434cf69af79ccfc640fec52268677",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/se-shadow.png",
+          "sha256": "f3fe5f8f75fe1a9557bb383e2d5dae4be1055573173f8279c0c8bbed23569b82",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Inquisitor",
+      "state": "IDLE",
+      "facing": "SW",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Inquisitor|IDLE|W",
+      "rulesetKey": "Inquisitor",
+      "category": "unit-clip",
+      "assetKey": "Inquisitor|IDLE|W",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/inquisitor/frames/idle-w.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/e-color.png",
+          "sha256": "1ac5848a2fc98f6d9599392c839aeb5a32fe7dd37b35cb4ec81c9256094d3901",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/e-nation.png",
+          "sha256": "4d97196fb629212099e0031b458627b87176748436869277e48fbfec41816a04",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/e-shadow.png",
+          "sha256": "3d667ed9f40ff7f1706277a3e3ccf2475b96116c9e9927d4fd3985f4b6185a70",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Inquisitor",
+      "state": "IDLE",
+      "facing": "W",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Inquisitor|MOVE|E",
+      "rulesetKey": "Inquisitor",
+      "category": "unit-clip",
+      "assetKey": "Inquisitor|MOVE|E",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/inquisitor/frames/move-e.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/e-color.png",
+          "sha256": "1ac5848a2fc98f6d9599392c839aeb5a32fe7dd37b35cb4ec81c9256094d3901",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/e-nation.png",
+          "sha256": "4d97196fb629212099e0031b458627b87176748436869277e48fbfec41816a04",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/e-shadow.png",
+          "sha256": "3d667ed9f40ff7f1706277a3e3ccf2475b96116c9e9927d4fd3985f4b6185a70",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Inquisitor",
+      "state": "MOVE",
+      "facing": "E",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Inquisitor|MOVE|NE",
+      "rulesetKey": "Inquisitor",
+      "category": "unit-clip",
+      "assetKey": "Inquisitor|MOVE|NE",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/inquisitor/frames/move-ne.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/ne-color.png",
+          "sha256": "a69885f8d35f62a6586d68afbd4d0df27b7711485c1004aac1ab1e1c975a894e",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/ne-nation.png",
+          "sha256": "c17eeb1bf747579de038ccca8b3a719e45d5fd9aa8a26efedf8afc49f8d3449c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/ne-shadow.png",
+          "sha256": "5b7cad3b0f66c8a1bbdf537b92baab55e1d858d88dbf7d8f05113e45f3eec9a3",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Inquisitor",
+      "state": "MOVE",
+      "facing": "NE",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Inquisitor|MOVE|NW",
+      "rulesetKey": "Inquisitor",
+      "category": "unit-clip",
+      "assetKey": "Inquisitor|MOVE|NW",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/inquisitor/frames/move-nw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/ne-color.png",
+          "sha256": "a69885f8d35f62a6586d68afbd4d0df27b7711485c1004aac1ab1e1c975a894e",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/ne-nation.png",
+          "sha256": "c17eeb1bf747579de038ccca8b3a719e45d5fd9aa8a26efedf8afc49f8d3449c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/ne-shadow.png",
+          "sha256": "5b7cad3b0f66c8a1bbdf537b92baab55e1d858d88dbf7d8f05113e45f3eec9a3",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Inquisitor",
+      "state": "MOVE",
+      "facing": "NW",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Inquisitor|MOVE|SE",
+      "rulesetKey": "Inquisitor",
+      "category": "unit-clip",
+      "assetKey": "Inquisitor|MOVE|SE",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/inquisitor/frames/move-se.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/se-color.png",
+          "sha256": "a5c331eb7e8a99b6f47862cfd2953f9829885eb7a8a367a01db63e4d6e2538a7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/se-nation.png",
+          "sha256": "8a38c647be75966ee1ec9f3451517425031434cf69af79ccfc640fec52268677",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/se-shadow.png",
+          "sha256": "f3fe5f8f75fe1a9557bb383e2d5dae4be1055573173f8279c0c8bbed23569b82",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Inquisitor",
+      "state": "MOVE",
+      "facing": "SE",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Inquisitor|MOVE|SW",
+      "rulesetKey": "Inquisitor",
+      "category": "unit-clip",
+      "assetKey": "Inquisitor|MOVE|SW",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/inquisitor/frames/move-sw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/se-color.png",
+          "sha256": "a5c331eb7e8a99b6f47862cfd2953f9829885eb7a8a367a01db63e4d6e2538a7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/se-nation.png",
+          "sha256": "8a38c647be75966ee1ec9f3451517425031434cf69af79ccfc640fec52268677",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/se-shadow.png",
+          "sha256": "f3fe5f8f75fe1a9557bb383e2d5dae4be1055573173f8279c0c8bbed23569b82",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Inquisitor",
+      "state": "MOVE",
+      "facing": "SW",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Inquisitor|MOVE|W",
+      "rulesetKey": "Inquisitor",
+      "category": "unit-clip",
+      "assetKey": "Inquisitor|MOVE|W",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/inquisitor/frames/move-w.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/e-color.png",
+          "sha256": "1ac5848a2fc98f6d9599392c839aeb5a32fe7dd37b35cb4ec81c9256094d3901",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/e-nation.png",
+          "sha256": "4d97196fb629212099e0031b458627b87176748436869277e48fbfec41816a04",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/inquisitor/frames/e-shadow.png",
+          "sha256": "3d667ed9f40ff7f1706277a3e3ccf2475b96116c9e9927d4fd3985f4b6185a70",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Inquisitor",
+      "state": "MOVE",
+      "facing": "W",
+      "minimumFrames": 8
+    },
+    {
       "id": "unit-clip|Khan|DEFEAT|E",
       "rulesetKey": "Khan",
       "category": "unit-clip",
@@ -10292,6 +11300,1014 @@
       "minimumFrames": 8
     },
     {
+      "id": "unit-clip|Missionary|DEFEAT|E",
+      "rulesetKey": "Missionary",
+      "category": "unit-clip",
+      "assetKey": "Missionary|DEFEAT|E",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/missionary/frames/defeat-e.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/e-color.png",
+          "sha256": "3f5fc95b6790af05eb6bcfe9d69512184e09418e455cc5b0ac8adc2b46f649f8",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/e-nation.png",
+          "sha256": "f44fd8845020aa1a4785a58309dc56753a33194e497bd6ba714462e93a512311",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/e-shadow.png",
+          "sha256": "f07fb81a89ba6659c026b1d4ae737d21fd09d4166647421a8663d52df7e495cb",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Missionary",
+      "state": "DEFEAT",
+      "facing": "E",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Missionary|DEFEAT|NE",
+      "rulesetKey": "Missionary",
+      "category": "unit-clip",
+      "assetKey": "Missionary|DEFEAT|NE",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/missionary/frames/defeat-ne.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/ne-color.png",
+          "sha256": "5c37c70f796b3ee04f75aaa5ae66cb0c56789f5c3619bdb9339f703130eff9a8",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/ne-nation.png",
+          "sha256": "0dd3e5fe705293cc19771c73aaa528997bd25b5e080a714196bc5604ba18a148",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/ne-shadow.png",
+          "sha256": "ed1c99f100225b5ee2ed4576c5b44976ba11b6ad091632791a6fc96af545e1c9",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Missionary",
+      "state": "DEFEAT",
+      "facing": "NE",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Missionary|DEFEAT|NW",
+      "rulesetKey": "Missionary",
+      "category": "unit-clip",
+      "assetKey": "Missionary|DEFEAT|NW",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/missionary/frames/defeat-nw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/ne-color.png",
+          "sha256": "5c37c70f796b3ee04f75aaa5ae66cb0c56789f5c3619bdb9339f703130eff9a8",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/ne-nation.png",
+          "sha256": "0dd3e5fe705293cc19771c73aaa528997bd25b5e080a714196bc5604ba18a148",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/ne-shadow.png",
+          "sha256": "ed1c99f100225b5ee2ed4576c5b44976ba11b6ad091632791a6fc96af545e1c9",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Missionary",
+      "state": "DEFEAT",
+      "facing": "NW",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Missionary|DEFEAT|SE",
+      "rulesetKey": "Missionary",
+      "category": "unit-clip",
+      "assetKey": "Missionary|DEFEAT|SE",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/missionary/frames/defeat-se.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/se-color.png",
+          "sha256": "de1f7797ae8771abb97b40c59fea285f82206593a9e700c2b28a183e5d934e23",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/se-nation.png",
+          "sha256": "7fe7a98cbf881f89cc62ca58a5af0644633d2f21ab757344c7bc3e066c5d63ce",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/se-shadow.png",
+          "sha256": "8e4c8b858895cd4ed3208b3f6b367a554544b17c1db21f664ab6248eec8e8dae",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Missionary",
+      "state": "DEFEAT",
+      "facing": "SE",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Missionary|DEFEAT|SW",
+      "rulesetKey": "Missionary",
+      "category": "unit-clip",
+      "assetKey": "Missionary|DEFEAT|SW",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/missionary/frames/defeat-sw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/se-color.png",
+          "sha256": "de1f7797ae8771abb97b40c59fea285f82206593a9e700c2b28a183e5d934e23",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/se-nation.png",
+          "sha256": "7fe7a98cbf881f89cc62ca58a5af0644633d2f21ab757344c7bc3e066c5d63ce",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/se-shadow.png",
+          "sha256": "8e4c8b858895cd4ed3208b3f6b367a554544b17c1db21f664ab6248eec8e8dae",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Missionary",
+      "state": "DEFEAT",
+      "facing": "SW",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Missionary|DEFEAT|W",
+      "rulesetKey": "Missionary",
+      "category": "unit-clip",
+      "assetKey": "Missionary|DEFEAT|W",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/missionary/frames/defeat-w.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/e-color.png",
+          "sha256": "3f5fc95b6790af05eb6bcfe9d69512184e09418e455cc5b0ac8adc2b46f649f8",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/e-nation.png",
+          "sha256": "f44fd8845020aa1a4785a58309dc56753a33194e497bd6ba714462e93a512311",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/e-shadow.png",
+          "sha256": "f07fb81a89ba6659c026b1d4ae737d21fd09d4166647421a8663d52df7e495cb",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Missionary",
+      "state": "DEFEAT",
+      "facing": "W",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Missionary|HIT|E",
+      "rulesetKey": "Missionary",
+      "category": "unit-clip",
+      "assetKey": "Missionary|HIT|E",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/missionary/frames/hit-e.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/e-color.png",
+          "sha256": "3f5fc95b6790af05eb6bcfe9d69512184e09418e455cc5b0ac8adc2b46f649f8",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/e-nation.png",
+          "sha256": "f44fd8845020aa1a4785a58309dc56753a33194e497bd6ba714462e93a512311",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/e-shadow.png",
+          "sha256": "f07fb81a89ba6659c026b1d4ae737d21fd09d4166647421a8663d52df7e495cb",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Missionary",
+      "state": "HIT",
+      "facing": "E",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Missionary|HIT|NE",
+      "rulesetKey": "Missionary",
+      "category": "unit-clip",
+      "assetKey": "Missionary|HIT|NE",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/missionary/frames/hit-ne.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/ne-color.png",
+          "sha256": "5c37c70f796b3ee04f75aaa5ae66cb0c56789f5c3619bdb9339f703130eff9a8",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/ne-nation.png",
+          "sha256": "0dd3e5fe705293cc19771c73aaa528997bd25b5e080a714196bc5604ba18a148",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/ne-shadow.png",
+          "sha256": "ed1c99f100225b5ee2ed4576c5b44976ba11b6ad091632791a6fc96af545e1c9",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Missionary",
+      "state": "HIT",
+      "facing": "NE",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Missionary|HIT|NW",
+      "rulesetKey": "Missionary",
+      "category": "unit-clip",
+      "assetKey": "Missionary|HIT|NW",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/missionary/frames/hit-nw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/ne-color.png",
+          "sha256": "5c37c70f796b3ee04f75aaa5ae66cb0c56789f5c3619bdb9339f703130eff9a8",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/ne-nation.png",
+          "sha256": "0dd3e5fe705293cc19771c73aaa528997bd25b5e080a714196bc5604ba18a148",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/ne-shadow.png",
+          "sha256": "ed1c99f100225b5ee2ed4576c5b44976ba11b6ad091632791a6fc96af545e1c9",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Missionary",
+      "state": "HIT",
+      "facing": "NW",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Missionary|HIT|SE",
+      "rulesetKey": "Missionary",
+      "category": "unit-clip",
+      "assetKey": "Missionary|HIT|SE",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/missionary/frames/hit-se.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/se-color.png",
+          "sha256": "de1f7797ae8771abb97b40c59fea285f82206593a9e700c2b28a183e5d934e23",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/se-nation.png",
+          "sha256": "7fe7a98cbf881f89cc62ca58a5af0644633d2f21ab757344c7bc3e066c5d63ce",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/se-shadow.png",
+          "sha256": "8e4c8b858895cd4ed3208b3f6b367a554544b17c1db21f664ab6248eec8e8dae",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Missionary",
+      "state": "HIT",
+      "facing": "SE",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Missionary|HIT|SW",
+      "rulesetKey": "Missionary",
+      "category": "unit-clip",
+      "assetKey": "Missionary|HIT|SW",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/missionary/frames/hit-sw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/se-color.png",
+          "sha256": "de1f7797ae8771abb97b40c59fea285f82206593a9e700c2b28a183e5d934e23",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/se-nation.png",
+          "sha256": "7fe7a98cbf881f89cc62ca58a5af0644633d2f21ab757344c7bc3e066c5d63ce",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/se-shadow.png",
+          "sha256": "8e4c8b858895cd4ed3208b3f6b367a554544b17c1db21f664ab6248eec8e8dae",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Missionary",
+      "state": "HIT",
+      "facing": "SW",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Missionary|HIT|W",
+      "rulesetKey": "Missionary",
+      "category": "unit-clip",
+      "assetKey": "Missionary|HIT|W",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/missionary/frames/hit-w.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/e-color.png",
+          "sha256": "3f5fc95b6790af05eb6bcfe9d69512184e09418e455cc5b0ac8adc2b46f649f8",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/e-nation.png",
+          "sha256": "f44fd8845020aa1a4785a58309dc56753a33194e497bd6ba714462e93a512311",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/e-shadow.png",
+          "sha256": "f07fb81a89ba6659c026b1d4ae737d21fd09d4166647421a8663d52df7e495cb",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Missionary",
+      "state": "HIT",
+      "facing": "W",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Missionary|IDLE|E",
+      "rulesetKey": "Missionary",
+      "category": "unit-clip",
+      "assetKey": "Missionary|IDLE|E",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/missionary/frames/idle-e.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/e-color.png",
+          "sha256": "3f5fc95b6790af05eb6bcfe9d69512184e09418e455cc5b0ac8adc2b46f649f8",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/e-nation.png",
+          "sha256": "f44fd8845020aa1a4785a58309dc56753a33194e497bd6ba714462e93a512311",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/e-shadow.png",
+          "sha256": "f07fb81a89ba6659c026b1d4ae737d21fd09d4166647421a8663d52df7e495cb",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Missionary",
+      "state": "IDLE",
+      "facing": "E",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Missionary|IDLE|NE",
+      "rulesetKey": "Missionary",
+      "category": "unit-clip",
+      "assetKey": "Missionary|IDLE|NE",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/missionary/frames/idle-ne.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/ne-color.png",
+          "sha256": "5c37c70f796b3ee04f75aaa5ae66cb0c56789f5c3619bdb9339f703130eff9a8",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/ne-nation.png",
+          "sha256": "0dd3e5fe705293cc19771c73aaa528997bd25b5e080a714196bc5604ba18a148",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/ne-shadow.png",
+          "sha256": "ed1c99f100225b5ee2ed4576c5b44976ba11b6ad091632791a6fc96af545e1c9",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Missionary",
+      "state": "IDLE",
+      "facing": "NE",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Missionary|IDLE|NW",
+      "rulesetKey": "Missionary",
+      "category": "unit-clip",
+      "assetKey": "Missionary|IDLE|NW",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/missionary/frames/idle-nw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/ne-color.png",
+          "sha256": "5c37c70f796b3ee04f75aaa5ae66cb0c56789f5c3619bdb9339f703130eff9a8",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/ne-nation.png",
+          "sha256": "0dd3e5fe705293cc19771c73aaa528997bd25b5e080a714196bc5604ba18a148",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/ne-shadow.png",
+          "sha256": "ed1c99f100225b5ee2ed4576c5b44976ba11b6ad091632791a6fc96af545e1c9",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Missionary",
+      "state": "IDLE",
+      "facing": "NW",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Missionary|IDLE|SE",
+      "rulesetKey": "Missionary",
+      "category": "unit-clip",
+      "assetKey": "Missionary|IDLE|SE",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/missionary/frames/idle-se.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/se-color.png",
+          "sha256": "de1f7797ae8771abb97b40c59fea285f82206593a9e700c2b28a183e5d934e23",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/se-nation.png",
+          "sha256": "7fe7a98cbf881f89cc62ca58a5af0644633d2f21ab757344c7bc3e066c5d63ce",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/se-shadow.png",
+          "sha256": "8e4c8b858895cd4ed3208b3f6b367a554544b17c1db21f664ab6248eec8e8dae",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Missionary",
+      "state": "IDLE",
+      "facing": "SE",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Missionary|IDLE|SW",
+      "rulesetKey": "Missionary",
+      "category": "unit-clip",
+      "assetKey": "Missionary|IDLE|SW",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/missionary/frames/idle-sw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/se-color.png",
+          "sha256": "de1f7797ae8771abb97b40c59fea285f82206593a9e700c2b28a183e5d934e23",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/se-nation.png",
+          "sha256": "7fe7a98cbf881f89cc62ca58a5af0644633d2f21ab757344c7bc3e066c5d63ce",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/se-shadow.png",
+          "sha256": "8e4c8b858895cd4ed3208b3f6b367a554544b17c1db21f664ab6248eec8e8dae",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Missionary",
+      "state": "IDLE",
+      "facing": "SW",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Missionary|IDLE|W",
+      "rulesetKey": "Missionary",
+      "category": "unit-clip",
+      "assetKey": "Missionary|IDLE|W",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/missionary/frames/idle-w.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/e-color.png",
+          "sha256": "3f5fc95b6790af05eb6bcfe9d69512184e09418e455cc5b0ac8adc2b46f649f8",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/e-nation.png",
+          "sha256": "f44fd8845020aa1a4785a58309dc56753a33194e497bd6ba714462e93a512311",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/e-shadow.png",
+          "sha256": "f07fb81a89ba6659c026b1d4ae737d21fd09d4166647421a8663d52df7e495cb",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Missionary",
+      "state": "IDLE",
+      "facing": "W",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Missionary|MOVE|E",
+      "rulesetKey": "Missionary",
+      "category": "unit-clip",
+      "assetKey": "Missionary|MOVE|E",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/missionary/frames/move-e.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/e-color.png",
+          "sha256": "3f5fc95b6790af05eb6bcfe9d69512184e09418e455cc5b0ac8adc2b46f649f8",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/e-nation.png",
+          "sha256": "f44fd8845020aa1a4785a58309dc56753a33194e497bd6ba714462e93a512311",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/e-shadow.png",
+          "sha256": "f07fb81a89ba6659c026b1d4ae737d21fd09d4166647421a8663d52df7e495cb",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Missionary",
+      "state": "MOVE",
+      "facing": "E",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Missionary|MOVE|NE",
+      "rulesetKey": "Missionary",
+      "category": "unit-clip",
+      "assetKey": "Missionary|MOVE|NE",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/missionary/frames/move-ne.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/ne-color.png",
+          "sha256": "5c37c70f796b3ee04f75aaa5ae66cb0c56789f5c3619bdb9339f703130eff9a8",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/ne-nation.png",
+          "sha256": "0dd3e5fe705293cc19771c73aaa528997bd25b5e080a714196bc5604ba18a148",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/ne-shadow.png",
+          "sha256": "ed1c99f100225b5ee2ed4576c5b44976ba11b6ad091632791a6fc96af545e1c9",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Missionary",
+      "state": "MOVE",
+      "facing": "NE",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Missionary|MOVE|NW",
+      "rulesetKey": "Missionary",
+      "category": "unit-clip",
+      "assetKey": "Missionary|MOVE|NW",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/missionary/frames/move-nw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/ne-color.png",
+          "sha256": "5c37c70f796b3ee04f75aaa5ae66cb0c56789f5c3619bdb9339f703130eff9a8",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/ne-nation.png",
+          "sha256": "0dd3e5fe705293cc19771c73aaa528997bd25b5e080a714196bc5604ba18a148",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/ne-shadow.png",
+          "sha256": "ed1c99f100225b5ee2ed4576c5b44976ba11b6ad091632791a6fc96af545e1c9",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Missionary",
+      "state": "MOVE",
+      "facing": "NW",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Missionary|MOVE|SE",
+      "rulesetKey": "Missionary",
+      "category": "unit-clip",
+      "assetKey": "Missionary|MOVE|SE",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/missionary/frames/move-se.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/se-color.png",
+          "sha256": "de1f7797ae8771abb97b40c59fea285f82206593a9e700c2b28a183e5d934e23",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/se-nation.png",
+          "sha256": "7fe7a98cbf881f89cc62ca58a5af0644633d2f21ab757344c7bc3e066c5d63ce",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/se-shadow.png",
+          "sha256": "8e4c8b858895cd4ed3208b3f6b367a554544b17c1db21f664ab6248eec8e8dae",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Missionary",
+      "state": "MOVE",
+      "facing": "SE",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Missionary|MOVE|SW",
+      "rulesetKey": "Missionary",
+      "category": "unit-clip",
+      "assetKey": "Missionary|MOVE|SW",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/missionary/frames/move-sw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/se-color.png",
+          "sha256": "de1f7797ae8771abb97b40c59fea285f82206593a9e700c2b28a183e5d934e23",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/se-nation.png",
+          "sha256": "7fe7a98cbf881f89cc62ca58a5af0644633d2f21ab757344c7bc3e066c5d63ce",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/se-shadow.png",
+          "sha256": "8e4c8b858895cd4ed3208b3f6b367a554544b17c1db21f664ab6248eec8e8dae",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Missionary",
+      "state": "MOVE",
+      "facing": "SW",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Missionary|MOVE|W",
+      "rulesetKey": "Missionary",
+      "category": "unit-clip",
+      "assetKey": "Missionary|MOVE|W",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "art/atlas/units/missionary/frames/move-w.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/e-color.png",
+          "sha256": "3f5fc95b6790af05eb6bcfe9d69512184e09418e455cc5b0ac8adc2b46f649f8",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/e-nation.png",
+          "sha256": "f44fd8845020aa1a4785a58309dc56753a33194e497bd6ba714462e93a512311",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/missionary/frames/e-shadow.png",
+          "sha256": "f07fb81a89ba6659c026b1d4ae737d21fd09d4166647421a8663d52df7e495cb",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Missionary",
+      "state": "MOVE",
+      "facing": "W",
+      "minimumFrames": 8
+    },
+    {
       "id": "unit-clip|Rifleman|ATTACK|E",
       "rulesetKey": "Rifleman",
       "category": "unit-clip",
@@ -11577,6 +13593,2328 @@
       "replaces": null,
       "uniqueUnitIdentity": null,
       "unitName": "Rifleman",
+      "state": "MOVE",
+      "facing": "W",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Scout|ATTACK|E",
+      "rulesetKey": "Scout",
+      "category": "unit-clip",
+      "assetKey": "Scout|ATTACK|E",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/scout/frames/attack-e.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/e-color.png",
+          "sha256": "656a0d35235ac7d96c6627f63efbc9e014d9f8c5efa0dee47c849a8da3d817bf",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/e-nation.png",
+          "sha256": "f8ec70d05b44c0e19b4f0ce2296e218666615b5dba895458feb35cf7f31ec396",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/e-shadow.png",
+          "sha256": "056629f3a83496d3f128ffb490fbe4d1de4af33e89af7600f90ec6f01c5ff19b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Scout",
+      "state": "ATTACK",
+      "facing": "E",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Scout|ATTACK|NE",
+      "rulesetKey": "Scout",
+      "category": "unit-clip",
+      "assetKey": "Scout|ATTACK|NE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/scout/frames/attack-ne.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/ne-color.png",
+          "sha256": "df5aaf0256eeab2cbdea131d1df653adbe34b9ddcd28e65d471b8b9c74078c4a",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/ne-nation.png",
+          "sha256": "da40c12d3a6894adbc1f1be132f69323d9e1c8d6817476792b41b8472cf6c89b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/ne-shadow.png",
+          "sha256": "282a4df7c51c8c2c5fc62b647db185a50b370441d81e6c0ca6a68c081955e048",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Scout",
+      "state": "ATTACK",
+      "facing": "NE",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Scout|ATTACK|NW",
+      "rulesetKey": "Scout",
+      "category": "unit-clip",
+      "assetKey": "Scout|ATTACK|NW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/scout/frames/attack-nw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/ne-color.png",
+          "sha256": "df5aaf0256eeab2cbdea131d1df653adbe34b9ddcd28e65d471b8b9c74078c4a",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/ne-nation.png",
+          "sha256": "da40c12d3a6894adbc1f1be132f69323d9e1c8d6817476792b41b8472cf6c89b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/ne-shadow.png",
+          "sha256": "282a4df7c51c8c2c5fc62b647db185a50b370441d81e6c0ca6a68c081955e048",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Scout",
+      "state": "ATTACK",
+      "facing": "NW",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Scout|ATTACK|SE",
+      "rulesetKey": "Scout",
+      "category": "unit-clip",
+      "assetKey": "Scout|ATTACK|SE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/scout/frames/attack-se.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/se-color.png",
+          "sha256": "6edccd4c89c8a8c8ab909cb2904f8ba2fb7005c15a4838d46ee175d57055fa52",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/se-nation.png",
+          "sha256": "6b86ad9be48b7ef6b80958984631a4c47629f98b29162630dde898be7ad190a1",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/se-shadow.png",
+          "sha256": "b97537eb05db43bbba9cb0e58baec380034cb221ce600fff15af05956e848a4f",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Scout",
+      "state": "ATTACK",
+      "facing": "SE",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Scout|ATTACK|SW",
+      "rulesetKey": "Scout",
+      "category": "unit-clip",
+      "assetKey": "Scout|ATTACK|SW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/scout/frames/attack-sw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/se-color.png",
+          "sha256": "6edccd4c89c8a8c8ab909cb2904f8ba2fb7005c15a4838d46ee175d57055fa52",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/se-nation.png",
+          "sha256": "6b86ad9be48b7ef6b80958984631a4c47629f98b29162630dde898be7ad190a1",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/se-shadow.png",
+          "sha256": "b97537eb05db43bbba9cb0e58baec380034cb221ce600fff15af05956e848a4f",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Scout",
+      "state": "ATTACK",
+      "facing": "SW",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Scout|ATTACK|W",
+      "rulesetKey": "Scout",
+      "category": "unit-clip",
+      "assetKey": "Scout|ATTACK|W",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/scout/frames/attack-w.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/e-color.png",
+          "sha256": "656a0d35235ac7d96c6627f63efbc9e014d9f8c5efa0dee47c849a8da3d817bf",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/e-nation.png",
+          "sha256": "f8ec70d05b44c0e19b4f0ce2296e218666615b5dba895458feb35cf7f31ec396",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/e-shadow.png",
+          "sha256": "056629f3a83496d3f128ffb490fbe4d1de4af33e89af7600f90ec6f01c5ff19b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Scout",
+      "state": "ATTACK",
+      "facing": "W",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Scout|DEFEAT|E",
+      "rulesetKey": "Scout",
+      "category": "unit-clip",
+      "assetKey": "Scout|DEFEAT|E",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/scout/frames/defeat-e.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/e-color.png",
+          "sha256": "656a0d35235ac7d96c6627f63efbc9e014d9f8c5efa0dee47c849a8da3d817bf",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/e-nation.png",
+          "sha256": "f8ec70d05b44c0e19b4f0ce2296e218666615b5dba895458feb35cf7f31ec396",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/e-shadow.png",
+          "sha256": "056629f3a83496d3f128ffb490fbe4d1de4af33e89af7600f90ec6f01c5ff19b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Scout",
+      "state": "DEFEAT",
+      "facing": "E",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Scout|DEFEAT|NE",
+      "rulesetKey": "Scout",
+      "category": "unit-clip",
+      "assetKey": "Scout|DEFEAT|NE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/scout/frames/defeat-ne.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/ne-color.png",
+          "sha256": "df5aaf0256eeab2cbdea131d1df653adbe34b9ddcd28e65d471b8b9c74078c4a",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/ne-nation.png",
+          "sha256": "da40c12d3a6894adbc1f1be132f69323d9e1c8d6817476792b41b8472cf6c89b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/ne-shadow.png",
+          "sha256": "282a4df7c51c8c2c5fc62b647db185a50b370441d81e6c0ca6a68c081955e048",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Scout",
+      "state": "DEFEAT",
+      "facing": "NE",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Scout|DEFEAT|NW",
+      "rulesetKey": "Scout",
+      "category": "unit-clip",
+      "assetKey": "Scout|DEFEAT|NW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/scout/frames/defeat-nw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/ne-color.png",
+          "sha256": "df5aaf0256eeab2cbdea131d1df653adbe34b9ddcd28e65d471b8b9c74078c4a",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/ne-nation.png",
+          "sha256": "da40c12d3a6894adbc1f1be132f69323d9e1c8d6817476792b41b8472cf6c89b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/ne-shadow.png",
+          "sha256": "282a4df7c51c8c2c5fc62b647db185a50b370441d81e6c0ca6a68c081955e048",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Scout",
+      "state": "DEFEAT",
+      "facing": "NW",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Scout|DEFEAT|SE",
+      "rulesetKey": "Scout",
+      "category": "unit-clip",
+      "assetKey": "Scout|DEFEAT|SE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/scout/frames/defeat-se.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/se-color.png",
+          "sha256": "6edccd4c89c8a8c8ab909cb2904f8ba2fb7005c15a4838d46ee175d57055fa52",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/se-nation.png",
+          "sha256": "6b86ad9be48b7ef6b80958984631a4c47629f98b29162630dde898be7ad190a1",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/se-shadow.png",
+          "sha256": "b97537eb05db43bbba9cb0e58baec380034cb221ce600fff15af05956e848a4f",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Scout",
+      "state": "DEFEAT",
+      "facing": "SE",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Scout|DEFEAT|SW",
+      "rulesetKey": "Scout",
+      "category": "unit-clip",
+      "assetKey": "Scout|DEFEAT|SW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/scout/frames/defeat-sw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/se-color.png",
+          "sha256": "6edccd4c89c8a8c8ab909cb2904f8ba2fb7005c15a4838d46ee175d57055fa52",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/se-nation.png",
+          "sha256": "6b86ad9be48b7ef6b80958984631a4c47629f98b29162630dde898be7ad190a1",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/se-shadow.png",
+          "sha256": "b97537eb05db43bbba9cb0e58baec380034cb221ce600fff15af05956e848a4f",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Scout",
+      "state": "DEFEAT",
+      "facing": "SW",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Scout|DEFEAT|W",
+      "rulesetKey": "Scout",
+      "category": "unit-clip",
+      "assetKey": "Scout|DEFEAT|W",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/scout/frames/defeat-w.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/e-color.png",
+          "sha256": "656a0d35235ac7d96c6627f63efbc9e014d9f8c5efa0dee47c849a8da3d817bf",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/e-nation.png",
+          "sha256": "f8ec70d05b44c0e19b4f0ce2296e218666615b5dba895458feb35cf7f31ec396",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/e-shadow.png",
+          "sha256": "056629f3a83496d3f128ffb490fbe4d1de4af33e89af7600f90ec6f01c5ff19b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Scout",
+      "state": "DEFEAT",
+      "facing": "W",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Scout|HIT|E",
+      "rulesetKey": "Scout",
+      "category": "unit-clip",
+      "assetKey": "Scout|HIT|E",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/scout/frames/hit-e.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/e-color.png",
+          "sha256": "656a0d35235ac7d96c6627f63efbc9e014d9f8c5efa0dee47c849a8da3d817bf",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/e-nation.png",
+          "sha256": "f8ec70d05b44c0e19b4f0ce2296e218666615b5dba895458feb35cf7f31ec396",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/e-shadow.png",
+          "sha256": "056629f3a83496d3f128ffb490fbe4d1de4af33e89af7600f90ec6f01c5ff19b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Scout",
+      "state": "HIT",
+      "facing": "E",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Scout|HIT|NE",
+      "rulesetKey": "Scout",
+      "category": "unit-clip",
+      "assetKey": "Scout|HIT|NE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/scout/frames/hit-ne.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/ne-color.png",
+          "sha256": "df5aaf0256eeab2cbdea131d1df653adbe34b9ddcd28e65d471b8b9c74078c4a",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/ne-nation.png",
+          "sha256": "da40c12d3a6894adbc1f1be132f69323d9e1c8d6817476792b41b8472cf6c89b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/ne-shadow.png",
+          "sha256": "282a4df7c51c8c2c5fc62b647db185a50b370441d81e6c0ca6a68c081955e048",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Scout",
+      "state": "HIT",
+      "facing": "NE",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Scout|HIT|NW",
+      "rulesetKey": "Scout",
+      "category": "unit-clip",
+      "assetKey": "Scout|HIT|NW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/scout/frames/hit-nw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/ne-color.png",
+          "sha256": "df5aaf0256eeab2cbdea131d1df653adbe34b9ddcd28e65d471b8b9c74078c4a",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/ne-nation.png",
+          "sha256": "da40c12d3a6894adbc1f1be132f69323d9e1c8d6817476792b41b8472cf6c89b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/ne-shadow.png",
+          "sha256": "282a4df7c51c8c2c5fc62b647db185a50b370441d81e6c0ca6a68c081955e048",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Scout",
+      "state": "HIT",
+      "facing": "NW",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Scout|HIT|SE",
+      "rulesetKey": "Scout",
+      "category": "unit-clip",
+      "assetKey": "Scout|HIT|SE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/scout/frames/hit-se.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/se-color.png",
+          "sha256": "6edccd4c89c8a8c8ab909cb2904f8ba2fb7005c15a4838d46ee175d57055fa52",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/se-nation.png",
+          "sha256": "6b86ad9be48b7ef6b80958984631a4c47629f98b29162630dde898be7ad190a1",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/se-shadow.png",
+          "sha256": "b97537eb05db43bbba9cb0e58baec380034cb221ce600fff15af05956e848a4f",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Scout",
+      "state": "HIT",
+      "facing": "SE",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Scout|HIT|SW",
+      "rulesetKey": "Scout",
+      "category": "unit-clip",
+      "assetKey": "Scout|HIT|SW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/scout/frames/hit-sw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/se-color.png",
+          "sha256": "6edccd4c89c8a8c8ab909cb2904f8ba2fb7005c15a4838d46ee175d57055fa52",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/se-nation.png",
+          "sha256": "6b86ad9be48b7ef6b80958984631a4c47629f98b29162630dde898be7ad190a1",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/se-shadow.png",
+          "sha256": "b97537eb05db43bbba9cb0e58baec380034cb221ce600fff15af05956e848a4f",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Scout",
+      "state": "HIT",
+      "facing": "SW",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Scout|HIT|W",
+      "rulesetKey": "Scout",
+      "category": "unit-clip",
+      "assetKey": "Scout|HIT|W",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/scout/frames/hit-w.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/e-color.png",
+          "sha256": "656a0d35235ac7d96c6627f63efbc9e014d9f8c5efa0dee47c849a8da3d817bf",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/e-nation.png",
+          "sha256": "f8ec70d05b44c0e19b4f0ce2296e218666615b5dba895458feb35cf7f31ec396",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/e-shadow.png",
+          "sha256": "056629f3a83496d3f128ffb490fbe4d1de4af33e89af7600f90ec6f01c5ff19b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Scout",
+      "state": "HIT",
+      "facing": "W",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Scout|IDLE|E",
+      "rulesetKey": "Scout",
+      "category": "unit-clip",
+      "assetKey": "Scout|IDLE|E",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/scout/frames/idle-e.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/e-color.png",
+          "sha256": "656a0d35235ac7d96c6627f63efbc9e014d9f8c5efa0dee47c849a8da3d817bf",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/e-nation.png",
+          "sha256": "f8ec70d05b44c0e19b4f0ce2296e218666615b5dba895458feb35cf7f31ec396",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/e-shadow.png",
+          "sha256": "056629f3a83496d3f128ffb490fbe4d1de4af33e89af7600f90ec6f01c5ff19b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Scout",
+      "state": "IDLE",
+      "facing": "E",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Scout|IDLE|NE",
+      "rulesetKey": "Scout",
+      "category": "unit-clip",
+      "assetKey": "Scout|IDLE|NE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/scout/frames/idle-ne.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/ne-color.png",
+          "sha256": "df5aaf0256eeab2cbdea131d1df653adbe34b9ddcd28e65d471b8b9c74078c4a",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/ne-nation.png",
+          "sha256": "da40c12d3a6894adbc1f1be132f69323d9e1c8d6817476792b41b8472cf6c89b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/ne-shadow.png",
+          "sha256": "282a4df7c51c8c2c5fc62b647db185a50b370441d81e6c0ca6a68c081955e048",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Scout",
+      "state": "IDLE",
+      "facing": "NE",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Scout|IDLE|NW",
+      "rulesetKey": "Scout",
+      "category": "unit-clip",
+      "assetKey": "Scout|IDLE|NW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/scout/frames/idle-nw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/ne-color.png",
+          "sha256": "df5aaf0256eeab2cbdea131d1df653adbe34b9ddcd28e65d471b8b9c74078c4a",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/ne-nation.png",
+          "sha256": "da40c12d3a6894adbc1f1be132f69323d9e1c8d6817476792b41b8472cf6c89b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/ne-shadow.png",
+          "sha256": "282a4df7c51c8c2c5fc62b647db185a50b370441d81e6c0ca6a68c081955e048",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Scout",
+      "state": "IDLE",
+      "facing": "NW",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Scout|IDLE|SE",
+      "rulesetKey": "Scout",
+      "category": "unit-clip",
+      "assetKey": "Scout|IDLE|SE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/scout/frames/idle-se.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/se-color.png",
+          "sha256": "6edccd4c89c8a8c8ab909cb2904f8ba2fb7005c15a4838d46ee175d57055fa52",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/se-nation.png",
+          "sha256": "6b86ad9be48b7ef6b80958984631a4c47629f98b29162630dde898be7ad190a1",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/se-shadow.png",
+          "sha256": "b97537eb05db43bbba9cb0e58baec380034cb221ce600fff15af05956e848a4f",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Scout",
+      "state": "IDLE",
+      "facing": "SE",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Scout|IDLE|SW",
+      "rulesetKey": "Scout",
+      "category": "unit-clip",
+      "assetKey": "Scout|IDLE|SW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/scout/frames/idle-sw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/se-color.png",
+          "sha256": "6edccd4c89c8a8c8ab909cb2904f8ba2fb7005c15a4838d46ee175d57055fa52",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/se-nation.png",
+          "sha256": "6b86ad9be48b7ef6b80958984631a4c47629f98b29162630dde898be7ad190a1",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/se-shadow.png",
+          "sha256": "b97537eb05db43bbba9cb0e58baec380034cb221ce600fff15af05956e848a4f",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Scout",
+      "state": "IDLE",
+      "facing": "SW",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Scout|IDLE|W",
+      "rulesetKey": "Scout",
+      "category": "unit-clip",
+      "assetKey": "Scout|IDLE|W",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/scout/frames/idle-w.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/e-color.png",
+          "sha256": "656a0d35235ac7d96c6627f63efbc9e014d9f8c5efa0dee47c849a8da3d817bf",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/e-nation.png",
+          "sha256": "f8ec70d05b44c0e19b4f0ce2296e218666615b5dba895458feb35cf7f31ec396",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/e-shadow.png",
+          "sha256": "056629f3a83496d3f128ffb490fbe4d1de4af33e89af7600f90ec6f01c5ff19b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Scout",
+      "state": "IDLE",
+      "facing": "W",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Scout|MOVE|E",
+      "rulesetKey": "Scout",
+      "category": "unit-clip",
+      "assetKey": "Scout|MOVE|E",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/scout/frames/move-e.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/e-color.png",
+          "sha256": "656a0d35235ac7d96c6627f63efbc9e014d9f8c5efa0dee47c849a8da3d817bf",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/e-nation.png",
+          "sha256": "f8ec70d05b44c0e19b4f0ce2296e218666615b5dba895458feb35cf7f31ec396",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/e-shadow.png",
+          "sha256": "056629f3a83496d3f128ffb490fbe4d1de4af33e89af7600f90ec6f01c5ff19b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Scout",
+      "state": "MOVE",
+      "facing": "E",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Scout|MOVE|NE",
+      "rulesetKey": "Scout",
+      "category": "unit-clip",
+      "assetKey": "Scout|MOVE|NE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/scout/frames/move-ne.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/ne-color.png",
+          "sha256": "df5aaf0256eeab2cbdea131d1df653adbe34b9ddcd28e65d471b8b9c74078c4a",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/ne-nation.png",
+          "sha256": "da40c12d3a6894adbc1f1be132f69323d9e1c8d6817476792b41b8472cf6c89b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/ne-shadow.png",
+          "sha256": "282a4df7c51c8c2c5fc62b647db185a50b370441d81e6c0ca6a68c081955e048",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Scout",
+      "state": "MOVE",
+      "facing": "NE",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Scout|MOVE|NW",
+      "rulesetKey": "Scout",
+      "category": "unit-clip",
+      "assetKey": "Scout|MOVE|NW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/scout/frames/move-nw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/ne-color.png",
+          "sha256": "df5aaf0256eeab2cbdea131d1df653adbe34b9ddcd28e65d471b8b9c74078c4a",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/ne-nation.png",
+          "sha256": "da40c12d3a6894adbc1f1be132f69323d9e1c8d6817476792b41b8472cf6c89b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/ne-shadow.png",
+          "sha256": "282a4df7c51c8c2c5fc62b647db185a50b370441d81e6c0ca6a68c081955e048",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Scout",
+      "state": "MOVE",
+      "facing": "NW",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Scout|MOVE|SE",
+      "rulesetKey": "Scout",
+      "category": "unit-clip",
+      "assetKey": "Scout|MOVE|SE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/scout/frames/move-se.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/se-color.png",
+          "sha256": "6edccd4c89c8a8c8ab909cb2904f8ba2fb7005c15a4838d46ee175d57055fa52",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/se-nation.png",
+          "sha256": "6b86ad9be48b7ef6b80958984631a4c47629f98b29162630dde898be7ad190a1",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/se-shadow.png",
+          "sha256": "b97537eb05db43bbba9cb0e58baec380034cb221ce600fff15af05956e848a4f",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Scout",
+      "state": "MOVE",
+      "facing": "SE",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Scout|MOVE|SW",
+      "rulesetKey": "Scout",
+      "category": "unit-clip",
+      "assetKey": "Scout|MOVE|SW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/scout/frames/move-sw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/se-color.png",
+          "sha256": "6edccd4c89c8a8c8ab909cb2904f8ba2fb7005c15a4838d46ee175d57055fa52",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/se-nation.png",
+          "sha256": "6b86ad9be48b7ef6b80958984631a4c47629f98b29162630dde898be7ad190a1",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/se-shadow.png",
+          "sha256": "b97537eb05db43bbba9cb0e58baec380034cb221ce600fff15af05956e848a4f",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Scout",
+      "state": "MOVE",
+      "facing": "SW",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Scout|MOVE|W",
+      "rulesetKey": "Scout",
+      "category": "unit-clip",
+      "assetKey": "Scout|MOVE|W",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/scout/frames/move-w.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/e-color.png",
+          "sha256": "656a0d35235ac7d96c6627f63efbc9e014d9f8c5efa0dee47c849a8da3d817bf",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/e-nation.png",
+          "sha256": "f8ec70d05b44c0e19b4f0ce2296e218666615b5dba895458feb35cf7f31ec396",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/scout/frames/e-shadow.png",
+          "sha256": "056629f3a83496d3f128ffb490fbe4d1de4af33e89af7600f90ec6f01c5ff19b",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Scout",
+      "state": "MOVE",
+      "facing": "W",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Settler|DEFEAT|E",
+      "rulesetKey": "Settler",
+      "category": "unit-clip",
+      "assetKey": "Settler|DEFEAT|E",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/settler/frames/defeat-e.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/e-color.png",
+          "sha256": "75c8f2ce9a0fe971c0817f62c0f82a45353bfdeea2ef4e839f6ed8e7a0ad64e0",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/e-nation.png",
+          "sha256": "2c129f609dbeea6d5489ec483b5b8ae40111a1971b4d561c7035d3b0067fbd19",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/e-shadow.png",
+          "sha256": "9e2a71f7aca1062ca7e0852e751c97cbf68ba308981be01994c01dff349ca1a7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Settler",
+      "state": "DEFEAT",
+      "facing": "E",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Settler|DEFEAT|NE",
+      "rulesetKey": "Settler",
+      "category": "unit-clip",
+      "assetKey": "Settler|DEFEAT|NE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/settler/frames/defeat-ne.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/ne-color.png",
+          "sha256": "55def434a115acd686301a2af4cbf80f576056e7afa84244df828c19a6e4d397",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/ne-nation.png",
+          "sha256": "2db95fb4eb5a32943712b209436a7b6611675b2cbfc0926f66d5dcf3e3d35caa",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/ne-shadow.png",
+          "sha256": "de87d7e0a223ffa545de8a5ae6a8729324c4fa07c646bb78270ea0b1f7eaba7d",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Settler",
+      "state": "DEFEAT",
+      "facing": "NE",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Settler|DEFEAT|NW",
+      "rulesetKey": "Settler",
+      "category": "unit-clip",
+      "assetKey": "Settler|DEFEAT|NW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/settler/frames/defeat-nw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/ne-color.png",
+          "sha256": "55def434a115acd686301a2af4cbf80f576056e7afa84244df828c19a6e4d397",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/ne-nation.png",
+          "sha256": "2db95fb4eb5a32943712b209436a7b6611675b2cbfc0926f66d5dcf3e3d35caa",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/ne-shadow.png",
+          "sha256": "de87d7e0a223ffa545de8a5ae6a8729324c4fa07c646bb78270ea0b1f7eaba7d",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Settler",
+      "state": "DEFEAT",
+      "facing": "NW",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Settler|DEFEAT|SE",
+      "rulesetKey": "Settler",
+      "category": "unit-clip",
+      "assetKey": "Settler|DEFEAT|SE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/settler/frames/defeat-se.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/se-color.png",
+          "sha256": "2b6fa1cccc26ed526fb193a12bb82e0241d2f7a0b9e7e24d71ae073fe918a9ff",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/se-nation.png",
+          "sha256": "72a7f5aebf9154664f8c698ecd3314c8a5d87a1e323717868aa017edde72a213",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/se-shadow.png",
+          "sha256": "e1bb96e5ab9b4fb34301452608fc590c0fa70f81e679c4ae54d28261511d3f0c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Settler",
+      "state": "DEFEAT",
+      "facing": "SE",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Settler|DEFEAT|SW",
+      "rulesetKey": "Settler",
+      "category": "unit-clip",
+      "assetKey": "Settler|DEFEAT|SW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/settler/frames/defeat-sw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/se-color.png",
+          "sha256": "2b6fa1cccc26ed526fb193a12bb82e0241d2f7a0b9e7e24d71ae073fe918a9ff",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/se-nation.png",
+          "sha256": "72a7f5aebf9154664f8c698ecd3314c8a5d87a1e323717868aa017edde72a213",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/se-shadow.png",
+          "sha256": "e1bb96e5ab9b4fb34301452608fc590c0fa70f81e679c4ae54d28261511d3f0c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Settler",
+      "state": "DEFEAT",
+      "facing": "SW",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Settler|DEFEAT|W",
+      "rulesetKey": "Settler",
+      "category": "unit-clip",
+      "assetKey": "Settler|DEFEAT|W",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/settler/frames/defeat-w.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/e-color.png",
+          "sha256": "75c8f2ce9a0fe971c0817f62c0f82a45353bfdeea2ef4e839f6ed8e7a0ad64e0",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/e-nation.png",
+          "sha256": "2c129f609dbeea6d5489ec483b5b8ae40111a1971b4d561c7035d3b0067fbd19",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/e-shadow.png",
+          "sha256": "9e2a71f7aca1062ca7e0852e751c97cbf68ba308981be01994c01dff349ca1a7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Settler",
+      "state": "DEFEAT",
+      "facing": "W",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Settler|HIT|E",
+      "rulesetKey": "Settler",
+      "category": "unit-clip",
+      "assetKey": "Settler|HIT|E",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/settler/frames/hit-e.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/e-color.png",
+          "sha256": "75c8f2ce9a0fe971c0817f62c0f82a45353bfdeea2ef4e839f6ed8e7a0ad64e0",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/e-nation.png",
+          "sha256": "2c129f609dbeea6d5489ec483b5b8ae40111a1971b4d561c7035d3b0067fbd19",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/e-shadow.png",
+          "sha256": "9e2a71f7aca1062ca7e0852e751c97cbf68ba308981be01994c01dff349ca1a7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Settler",
+      "state": "HIT",
+      "facing": "E",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Settler|HIT|NE",
+      "rulesetKey": "Settler",
+      "category": "unit-clip",
+      "assetKey": "Settler|HIT|NE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/settler/frames/hit-ne.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/ne-color.png",
+          "sha256": "55def434a115acd686301a2af4cbf80f576056e7afa84244df828c19a6e4d397",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/ne-nation.png",
+          "sha256": "2db95fb4eb5a32943712b209436a7b6611675b2cbfc0926f66d5dcf3e3d35caa",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/ne-shadow.png",
+          "sha256": "de87d7e0a223ffa545de8a5ae6a8729324c4fa07c646bb78270ea0b1f7eaba7d",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Settler",
+      "state": "HIT",
+      "facing": "NE",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Settler|HIT|NW",
+      "rulesetKey": "Settler",
+      "category": "unit-clip",
+      "assetKey": "Settler|HIT|NW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/settler/frames/hit-nw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/ne-color.png",
+          "sha256": "55def434a115acd686301a2af4cbf80f576056e7afa84244df828c19a6e4d397",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/ne-nation.png",
+          "sha256": "2db95fb4eb5a32943712b209436a7b6611675b2cbfc0926f66d5dcf3e3d35caa",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/ne-shadow.png",
+          "sha256": "de87d7e0a223ffa545de8a5ae6a8729324c4fa07c646bb78270ea0b1f7eaba7d",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Settler",
+      "state": "HIT",
+      "facing": "NW",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Settler|HIT|SE",
+      "rulesetKey": "Settler",
+      "category": "unit-clip",
+      "assetKey": "Settler|HIT|SE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/settler/frames/hit-se.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/se-color.png",
+          "sha256": "2b6fa1cccc26ed526fb193a12bb82e0241d2f7a0b9e7e24d71ae073fe918a9ff",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/se-nation.png",
+          "sha256": "72a7f5aebf9154664f8c698ecd3314c8a5d87a1e323717868aa017edde72a213",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/se-shadow.png",
+          "sha256": "e1bb96e5ab9b4fb34301452608fc590c0fa70f81e679c4ae54d28261511d3f0c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Settler",
+      "state": "HIT",
+      "facing": "SE",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Settler|HIT|SW",
+      "rulesetKey": "Settler",
+      "category": "unit-clip",
+      "assetKey": "Settler|HIT|SW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/settler/frames/hit-sw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/se-color.png",
+          "sha256": "2b6fa1cccc26ed526fb193a12bb82e0241d2f7a0b9e7e24d71ae073fe918a9ff",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/se-nation.png",
+          "sha256": "72a7f5aebf9154664f8c698ecd3314c8a5d87a1e323717868aa017edde72a213",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/se-shadow.png",
+          "sha256": "e1bb96e5ab9b4fb34301452608fc590c0fa70f81e679c4ae54d28261511d3f0c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Settler",
+      "state": "HIT",
+      "facing": "SW",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Settler|HIT|W",
+      "rulesetKey": "Settler",
+      "category": "unit-clip",
+      "assetKey": "Settler|HIT|W",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/settler/frames/hit-w.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/e-color.png",
+          "sha256": "75c8f2ce9a0fe971c0817f62c0f82a45353bfdeea2ef4e839f6ed8e7a0ad64e0",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/e-nation.png",
+          "sha256": "2c129f609dbeea6d5489ec483b5b8ae40111a1971b4d561c7035d3b0067fbd19",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/e-shadow.png",
+          "sha256": "9e2a71f7aca1062ca7e0852e751c97cbf68ba308981be01994c01dff349ca1a7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Settler",
+      "state": "HIT",
+      "facing": "W",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Settler|IDLE|E",
+      "rulesetKey": "Settler",
+      "category": "unit-clip",
+      "assetKey": "Settler|IDLE|E",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/settler/frames/idle-e.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/e-color.png",
+          "sha256": "75c8f2ce9a0fe971c0817f62c0f82a45353bfdeea2ef4e839f6ed8e7a0ad64e0",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/e-nation.png",
+          "sha256": "2c129f609dbeea6d5489ec483b5b8ae40111a1971b4d561c7035d3b0067fbd19",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/e-shadow.png",
+          "sha256": "9e2a71f7aca1062ca7e0852e751c97cbf68ba308981be01994c01dff349ca1a7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Settler",
+      "state": "IDLE",
+      "facing": "E",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Settler|IDLE|NE",
+      "rulesetKey": "Settler",
+      "category": "unit-clip",
+      "assetKey": "Settler|IDLE|NE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/settler/frames/idle-ne.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/ne-color.png",
+          "sha256": "55def434a115acd686301a2af4cbf80f576056e7afa84244df828c19a6e4d397",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/ne-nation.png",
+          "sha256": "2db95fb4eb5a32943712b209436a7b6611675b2cbfc0926f66d5dcf3e3d35caa",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/ne-shadow.png",
+          "sha256": "de87d7e0a223ffa545de8a5ae6a8729324c4fa07c646bb78270ea0b1f7eaba7d",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Settler",
+      "state": "IDLE",
+      "facing": "NE",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Settler|IDLE|NW",
+      "rulesetKey": "Settler",
+      "category": "unit-clip",
+      "assetKey": "Settler|IDLE|NW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/settler/frames/idle-nw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/ne-color.png",
+          "sha256": "55def434a115acd686301a2af4cbf80f576056e7afa84244df828c19a6e4d397",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/ne-nation.png",
+          "sha256": "2db95fb4eb5a32943712b209436a7b6611675b2cbfc0926f66d5dcf3e3d35caa",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/ne-shadow.png",
+          "sha256": "de87d7e0a223ffa545de8a5ae6a8729324c4fa07c646bb78270ea0b1f7eaba7d",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Settler",
+      "state": "IDLE",
+      "facing": "NW",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Settler|IDLE|SE",
+      "rulesetKey": "Settler",
+      "category": "unit-clip",
+      "assetKey": "Settler|IDLE|SE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/settler/frames/idle-se.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/se-color.png",
+          "sha256": "2b6fa1cccc26ed526fb193a12bb82e0241d2f7a0b9e7e24d71ae073fe918a9ff",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/se-nation.png",
+          "sha256": "72a7f5aebf9154664f8c698ecd3314c8a5d87a1e323717868aa017edde72a213",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/se-shadow.png",
+          "sha256": "e1bb96e5ab9b4fb34301452608fc590c0fa70f81e679c4ae54d28261511d3f0c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Settler",
+      "state": "IDLE",
+      "facing": "SE",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Settler|IDLE|SW",
+      "rulesetKey": "Settler",
+      "category": "unit-clip",
+      "assetKey": "Settler|IDLE|SW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/settler/frames/idle-sw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/se-color.png",
+          "sha256": "2b6fa1cccc26ed526fb193a12bb82e0241d2f7a0b9e7e24d71ae073fe918a9ff",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/se-nation.png",
+          "sha256": "72a7f5aebf9154664f8c698ecd3314c8a5d87a1e323717868aa017edde72a213",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/se-shadow.png",
+          "sha256": "e1bb96e5ab9b4fb34301452608fc590c0fa70f81e679c4ae54d28261511d3f0c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Settler",
+      "state": "IDLE",
+      "facing": "SW",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Settler|IDLE|W",
+      "rulesetKey": "Settler",
+      "category": "unit-clip",
+      "assetKey": "Settler|IDLE|W",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/settler/frames/idle-w.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/e-color.png",
+          "sha256": "75c8f2ce9a0fe971c0817f62c0f82a45353bfdeea2ef4e839f6ed8e7a0ad64e0",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/e-nation.png",
+          "sha256": "2c129f609dbeea6d5489ec483b5b8ae40111a1971b4d561c7035d3b0067fbd19",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/e-shadow.png",
+          "sha256": "9e2a71f7aca1062ca7e0852e751c97cbf68ba308981be01994c01dff349ca1a7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Settler",
+      "state": "IDLE",
+      "facing": "W",
+      "minimumFrames": 4
+    },
+    {
+      "id": "unit-clip|Settler|MOVE|E",
+      "rulesetKey": "Settler",
+      "category": "unit-clip",
+      "assetKey": "Settler|MOVE|E",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/settler/frames/move-e.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/e-color.png",
+          "sha256": "75c8f2ce9a0fe971c0817f62c0f82a45353bfdeea2ef4e839f6ed8e7a0ad64e0",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/e-nation.png",
+          "sha256": "2c129f609dbeea6d5489ec483b5b8ae40111a1971b4d561c7035d3b0067fbd19",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/e-shadow.png",
+          "sha256": "9e2a71f7aca1062ca7e0852e751c97cbf68ba308981be01994c01dff349ca1a7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Settler",
+      "state": "MOVE",
+      "facing": "E",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Settler|MOVE|NE",
+      "rulesetKey": "Settler",
+      "category": "unit-clip",
+      "assetKey": "Settler|MOVE|NE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/settler/frames/move-ne.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/ne-color.png",
+          "sha256": "55def434a115acd686301a2af4cbf80f576056e7afa84244df828c19a6e4d397",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/ne-nation.png",
+          "sha256": "2db95fb4eb5a32943712b209436a7b6611675b2cbfc0926f66d5dcf3e3d35caa",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/ne-shadow.png",
+          "sha256": "de87d7e0a223ffa545de8a5ae6a8729324c4fa07c646bb78270ea0b1f7eaba7d",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Settler",
+      "state": "MOVE",
+      "facing": "NE",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Settler|MOVE|NW",
+      "rulesetKey": "Settler",
+      "category": "unit-clip",
+      "assetKey": "Settler|MOVE|NW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/settler/frames/move-nw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/ne-color.png",
+          "sha256": "55def434a115acd686301a2af4cbf80f576056e7afa84244df828c19a6e4d397",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/ne-nation.png",
+          "sha256": "2db95fb4eb5a32943712b209436a7b6611675b2cbfc0926f66d5dcf3e3d35caa",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/ne-shadow.png",
+          "sha256": "de87d7e0a223ffa545de8a5ae6a8729324c4fa07c646bb78270ea0b1f7eaba7d",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Settler",
+      "state": "MOVE",
+      "facing": "NW",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Settler|MOVE|SE",
+      "rulesetKey": "Settler",
+      "category": "unit-clip",
+      "assetKey": "Settler|MOVE|SE",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/settler/frames/move-se.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/se-color.png",
+          "sha256": "2b6fa1cccc26ed526fb193a12bb82e0241d2f7a0b9e7e24d71ae073fe918a9ff",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/se-nation.png",
+          "sha256": "72a7f5aebf9154664f8c698ecd3314c8a5d87a1e323717868aa017edde72a213",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/se-shadow.png",
+          "sha256": "e1bb96e5ab9b4fb34301452608fc590c0fa70f81e679c4ae54d28261511d3f0c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Settler",
+      "state": "MOVE",
+      "facing": "SE",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Settler|MOVE|SW",
+      "rulesetKey": "Settler",
+      "category": "unit-clip",
+      "assetKey": "Settler|MOVE|SW",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/settler/frames/move-sw.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/se-color.png",
+          "sha256": "2b6fa1cccc26ed526fb193a12bb82e0241d2f7a0b9e7e24d71ae073fe918a9ff",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/se-nation.png",
+          "sha256": "72a7f5aebf9154664f8c698ecd3314c8a5d87a1e323717868aa017edde72a213",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/se-shadow.png",
+          "sha256": "e1bb96e5ab9b4fb34301452608fc590c0fa70f81e679c4ae54d28261511d3f0c",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Settler",
+      "state": "MOVE",
+      "facing": "SW",
+      "minimumFrames": 8
+    },
+    {
+      "id": "unit-clip|Settler|MOVE|W",
+      "rulesetKey": "Settler",
+      "category": "unit-clip",
+      "assetKey": "Settler|MOVE|W",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "art/atlas/units/settler/frames/move-w.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/e-color.png",
+          "sha256": "75c8f2ce9a0fe971c0817f62c0f82a45353bfdeea2ef4e839f6ed8e7a0ad64e0",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/e-nation.png",
+          "sha256": "2c129f609dbeea6d5489ec483b5b8ae40111a1971b4d561c7035d3b0067fbd19",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "art/atlas/units/settler/frames/e-shadow.png",
+          "sha256": "9e2a71f7aca1062ca7e0852e751c97cbf68ba308981be01994c01dff349ca1a7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null,
+      "unitName": "Settler",
       "state": "MOVE",
       "facing": "W",
       "minimumFrames": 8
@@ -16965,6 +21303,37 @@
       "uniqueUnitIdentity": null
     },
     {
+      "id": "unit-static|TileSets/AtlasUnits/Units/Inquisitor",
+      "rulesetKey": "Inquisitor",
+      "category": "unit-static",
+      "assetKey": "TileSets/AtlasUnits/Units/Inquisitor",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Inquisitor.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Inquisitor.png",
+          "sha256": "cd987b852b75fe41eee481f942fb8557e7b013dad6e80c1ae3373fcbfdb1e03f",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Inquisitor-1.png",
+          "sha256": "4fa02379fec8f4cc8664e6affdef3b4f04c22f8062eb655516e76f9347296268",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null
+    },
+    {
       "id": "unit-static|TileSets/AtlasUnits/Units/Khan",
       "rulesetKey": "Khan",
       "category": "unit-static",
@@ -16997,6 +21366,37 @@
       "uniqueUnitIdentity": "Khan"
     },
     {
+      "id": "unit-static|TileSets/AtlasUnits/Units/Missionary",
+      "rulesetKey": "Missionary",
+      "category": "unit-static",
+      "assetKey": "TileSets/AtlasUnits/Units/Missionary",
+      "rulesets": [
+        "Civ V - Gods & Kings"
+      ],
+      "intendedSource": "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Missionary.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Missionary.png",
+          "sha256": "718374a18d4e6b437faa28f84cd184a131f1bfe400fd3cc2eaf3b29676db96a5",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Missionary-1.png",
+          "sha256": "941697bc76877905c019bbc2f45c82fd034bc899de533a65fab177f711bd7063",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null
+    },
+    {
       "id": "unit-static|TileSets/AtlasUnits/Units/Rifleman",
       "rulesetKey": "Rifleman",
       "category": "unit-static",
@@ -17020,6 +21420,70 @@
           "kind": "source",
           "path": "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Rifleman-1.png",
           "sha256": "61bba667a4368da17d55dd260b7545e96b8c19a37a823a489af8e1d16e608793",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null
+    },
+    {
+      "id": "unit-static|TileSets/AtlasUnits/Units/Scout",
+      "rulesetKey": "Scout",
+      "category": "unit-static",
+      "assetKey": "TileSets/AtlasUnits/Units/Scout",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Scout.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Scout.png",
+          "sha256": "5326e736b8f84bb59e215d7eeeaf7adc0eb6c332a90831c9af253e5963b3ad00",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Scout-1.png",
+          "sha256": "89708e68a0050026e201ecf8fa91eeb871c2d5ad2a35d8bafa7ef1e0a698798d",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        }
+      ],
+      "uniqueTo": null,
+      "replaces": null,
+      "uniqueUnitIdentity": null
+    },
+    {
+      "id": "unit-static|TileSets/AtlasUnits/Units/Settler",
+      "rulesetKey": "Settler",
+      "category": "unit-static",
+      "assetKey": "TileSets/AtlasUnits/Units/Settler",
+      "rulesets": [
+        "Civ V - Gods & Kings",
+        "Civ V - Vanilla"
+      ],
+      "intendedSource": "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Settler.png",
+      "required": true,
+      "reviewState": "candidate",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Settler.png",
+          "sha256": "f3ddb3cffda929c7158364b5a925ee517b4c2ebde02ec9972247318dc05f3ef7",
+          "reviewer": "Image generation authoring",
+          "note": "Original generated motion/source candidate; formal art review deferred"
+        },
+        {
+          "kind": "source",
+          "path": "android/Images.AtlasUnits/TileSets/AtlasUnits/Units/Settler-1.png",
+          "sha256": "00e590b0b8fbb12101b00059c8804f662c6f27fe5db512ef22a8056df3b641fe",
           "reviewer": "Image generation authoring",
           "note": "Original generated motion/source candidate; formal art review deferred"
         }

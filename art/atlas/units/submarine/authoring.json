@@ -1,19 +1,95 @@
 {
-"schemaVersion": 1,
-"unitName": "Submarine",
-"assetId": "submarine",
-"reviewState": "missing",
-"canvasWidth": 128,
-"canvasHeight": 128,
-"anchorX": 64,
-"anchorY": 96,
-"clippingMargin": 2,
-"uniqueUnitIdentity": null,
-"uniqueTo": null,
-"replaces": null,
-"staticFallbackKey": "TileSets/AtlasUnits/Units/Submarine",
-"framesDirectory": "frames/",
-"applicableStates": [ "IDLE", "MOVE", "ATTACK", "HIT", "DEFEAT" ],
-"facings": [ "E", "NE", "NW", "W", "SW", "SE" ],
-"minimumFrames": { "IDLE": 4, "MOVE": 8, "ATTACK": 8, "HIT": 4, "DEFEAT": 8 }
+  "schemaVersion": 1,
+  "unitName": "Submarine",
+  "assetId": "submarine",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": null,
+  "uniqueTo": null,
+  "replaces": null,
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Submarine",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/submarine/e-motion-v2.png",
+      "rawHash": "9e9472ba065bffb24fa14c0e0b921bc9bc0c8e7c783394803e7b3cdf6ddc318b",
+      "promptPath": "art/atlas/units/submarine/prompts/e-v2.txt",
+      "promptHash": "d1255d1c0b94943c81f22078c866253dde685fb6714d497298b55c2dba432964",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/submarine/ne-motion-v2.png",
+      "rawHash": "bf1485cd851661a94f6cec1eec26685f63b0a220744a04a8fcece64099fb9dff",
+      "promptPath": "art/atlas/units/submarine/prompts/ne-v2.txt",
+      "promptHash": "ea9a0545298532b9a47f36182b5af214fa23f6b7b7c9bff82dc466e2c56973ea",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/submarine/se-motion-v2.png",
+      "rawHash": "89b08f84d7f36debc195ef1ec813eb984f65c50503946013bb5a2ef15a103000",
+      "promptPath": "art/atlas/units/submarine/prompts/se-v2.txt",
+      "promptHash": "25fc67ad4d9f8d66f93c6d4d23ffb4587e49b4f312c2b68278ed7b6f195bbe77",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
 }

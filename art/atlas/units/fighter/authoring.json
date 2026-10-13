@@ -1,19 +1,103 @@
 {
-"schemaVersion": 1,
-"unitName": "Fighter",
-"assetId": "fighter",
-"reviewState": "missing",
-"canvasWidth": 128,
-"canvasHeight": 128,
-"anchorX": 64,
-"anchorY": 96,
-"clippingMargin": 2,
-"uniqueUnitIdentity": null,
-"uniqueTo": null,
-"replaces": null,
-"staticFallbackKey": "TileSets/AtlasUnits/Units/Fighter",
-"framesDirectory": "frames/",
-"applicableStates": [ "IDLE", "MOVE", "ATTACK", "HIT", "DEFEAT" ],
-"facings": [ "E", "NE", "NW", "W", "SW", "SE" ],
-"minimumFrames": { "IDLE": 4, "MOVE": 8, "ATTACK": 8, "HIT": 4, "DEFEAT": 8 }
+  "schemaVersion": 1,
+  "unitName": "Fighter",
+  "assetId": "fighter",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": null,
+  "uniqueTo": null,
+  "replaces": null,
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Fighter",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/fighter/e-motion-v2.png",
+      "rawHash": "73c62d3913c98b8bde5b2bbeecfebde8160f2612faff337be42b4eccef15d573",
+      "promptPath": "art/atlas/units/fighter/prompts/e-v2.txt",
+      "promptHash": "93a202e74d9468da215f472d448fdc67024069126f3888618d70380492e35a4f",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/fighter/ne-motion-v2.png",
+      "rawHash": "fb80cdb2200386358f7bc3cd2f1c6441ab1e36219e5813e1c10a4934dcac83b3",
+      "promptPath": "art/atlas/units/fighter/prompts/ne-v2.txt",
+      "promptHash": "bc3b099a38e85772e9160927c84cdf492d9f11ae60abfda3cf493246cc6d89fb",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ],
+      "identityReference": {
+        "path": "/Users/noahkenny/.codex/generated_images/01a1321a-8142-7533-ae7a-eb89a5433c70/exec-6c31f944-5c21-44e3-908f-1b69b6cd898b.png",
+        "sha256": "73c62d3913c98b8bde5b2bbeecfebde8160f2612faff337be42b4eccef15d573"
+      }
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/fighter/se-motion-v2.png",
+      "rawHash": "199ea7ab4e59d300d76f7d61eb05f2949d1b3695b9b8d14df847c3d992da76c9",
+      "promptPath": "art/atlas/units/fighter/prompts/se-v2.txt",
+      "promptHash": "a653360953ce7f0292e34c9531cdec337819f471430c5998cc4c0f384998a2f6",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ],
+      "identityReference": {
+        "path": "/Users/noahkenny/.codex/generated_images/01a1321a-8142-7533-ae7a-eb89a5433c70/exec-6c31f944-5c21-44e3-908f-1b69b6cd898b.png",
+        "sha256": "73c62d3913c98b8bde5b2bbeecfebde8160f2612faff337be42b4eccef15d573"
+      }
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
 }

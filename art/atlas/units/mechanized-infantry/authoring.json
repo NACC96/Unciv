@@ -1,19 +1,95 @@
 {
-"schemaVersion": 1,
-"unitName": "Mechanized Infantry",
-"assetId": "mechanized-infantry",
-"reviewState": "missing",
-"canvasWidth": 128,
-"canvasHeight": 128,
-"anchorX": 64,
-"anchorY": 96,
-"clippingMargin": 2,
-"uniqueUnitIdentity": null,
-"uniqueTo": null,
-"replaces": null,
-"staticFallbackKey": "TileSets/AtlasUnits/Units/Mechanized Infantry",
-"framesDirectory": "frames/",
-"applicableStates": [ "IDLE", "MOVE", "ATTACK", "HIT", "DEFEAT" ],
-"facings": [ "E", "NE", "NW", "W", "SW", "SE" ],
-"minimumFrames": { "IDLE": 4, "MOVE": 8, "ATTACK": 8, "HIT": 4, "DEFEAT": 8 }
+  "schemaVersion": 1,
+  "unitName": "Mechanized Infantry",
+  "assetId": "mechanized-infantry",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": null,
+  "uniqueTo": null,
+  "replaces": null,
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Mechanized Infantry",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/mechanized-infantry/e-motion-v1.png",
+      "rawHash": "b1f8cecc4c6eef339166a5dd3775a234215586c2932d2ec7173f2280a024f784",
+      "promptPath": "art/atlas/units/mechanized-infantry/prompts/e-v1.txt",
+      "promptHash": "1a0b75abade30fd05872b074b498ab51ad26fa8c3623857ca01d1e4e1c3c2501",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/mechanized-infantry/ne-motion-v1.png",
+      "rawHash": "5b81b54ac2f8ffd1dbb35fe9673ae7dd2b88ea4262f4525d808fe2ffe4517dfb",
+      "promptPath": "art/atlas/units/mechanized-infantry/prompts/ne-v1.txt",
+      "promptHash": "4a820d8fcfb4c4e10fff7dfaa0df740723ddd6efadaed2e43f257404b1f5561c",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/mechanized-infantry/se-motion-v1.png",
+      "rawHash": "cf5a50a908614bdc81f510c3ab0b92890d38308ca5f7e7d4b4ba2ac7a39d44a3",
+      "promptPath": "art/atlas/units/mechanized-infantry/prompts/se-v1.txt",
+      "promptHash": "664e1888b2c831819488d0f0c7b8ff91a0e628c15163e908b68bdff56a0882cc",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
 }

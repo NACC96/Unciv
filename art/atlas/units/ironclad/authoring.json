@@ -1,19 +1,95 @@
 {
-"schemaVersion": 1,
-"unitName": "Ironclad",
-"assetId": "ironclad",
-"reviewState": "missing",
-"canvasWidth": 128,
-"canvasHeight": 128,
-"anchorX": 64,
-"anchorY": 96,
-"clippingMargin": 2,
-"uniqueUnitIdentity": null,
-"uniqueTo": null,
-"replaces": null,
-"staticFallbackKey": "TileSets/AtlasUnits/Units/Ironclad",
-"framesDirectory": "frames/",
-"applicableStates": [ "IDLE", "MOVE", "ATTACK", "HIT", "DEFEAT" ],
-"facings": [ "E", "NE", "NW", "W", "SW", "SE" ],
-"minimumFrames": { "IDLE": 4, "MOVE": 8, "ATTACK": 8, "HIT": 4, "DEFEAT": 8 }
+  "schemaVersion": 1,
+  "unitName": "Ironclad",
+  "assetId": "ironclad",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": null,
+  "uniqueTo": null,
+  "replaces": null,
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Ironclad",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/ironclad/e-motion-v2.png",
+      "rawHash": "61a2d0c86b58a6c0d419eb120813e17933ab09441b0e170329fcb7f4486248e9",
+      "promptPath": "art/atlas/units/ironclad/prompts/e-v2.txt",
+      "promptHash": "2b6fbef9a3fdd49d8ec88560ddaa29274c0b772fc751368b315fbcb62b8fe9d7",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/ironclad/ne-motion-v2.png",
+      "rawHash": "d5bdc6a5dc86d76779bfcb7fed88e4a5c5f920d8faf31e807481fc5c527a275b",
+      "promptPath": "art/atlas/units/ironclad/prompts/ne-v2.txt",
+      "promptHash": "43d59539d5dafcfd7171bf4aed8493642d6be2b94da95f7a1153130d0e4ee521",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/ironclad/se-motion-v2.png",
+      "rawHash": "e59a8af9e66f8a10c1d3ec7c201412ef1fcc7976b4e3899bf1a270b5aff1c302",
+      "promptPath": "art/atlas/units/ironclad/prompts/se-v2.txt",
+      "promptHash": "3d5498aa8aae58de9043a51f9f65528b8e9d8a30b0c99e099c0d6b33c1ae697b",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
 }

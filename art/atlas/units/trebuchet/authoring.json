@@ -1,19 +1,95 @@
 {
-"schemaVersion": 1,
-"unitName": "Trebuchet",
-"assetId": "trebuchet",
-"reviewState": "missing",
-"canvasWidth": 128,
-"canvasHeight": 128,
-"anchorX": 64,
-"anchorY": 96,
-"clippingMargin": 2,
-"uniqueUnitIdentity": null,
-"uniqueTo": null,
-"replaces": null,
-"staticFallbackKey": "TileSets/AtlasUnits/Units/Trebuchet",
-"framesDirectory": "frames/",
-"applicableStates": [ "IDLE", "MOVE", "ATTACK", "HIT", "DEFEAT" ],
-"facings": [ "E", "NE", "NW", "W", "SW", "SE" ],
-"minimumFrames": { "IDLE": 4, "MOVE": 8, "ATTACK": 8, "HIT": 4, "DEFEAT": 8 }
+  "schemaVersion": 1,
+  "unitName": "Trebuchet",
+  "assetId": "trebuchet",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": null,
+  "uniqueTo": null,
+  "replaces": null,
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Trebuchet",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/trebuchet/e-motion-v1.png",
+      "rawHash": "ea4cb51fb1ef7f2ff005ab03b2ffe4cac7fe97272b4092de2e04d0442449c89c",
+      "promptPath": "art/atlas/units/trebuchet/prompts/e-v1.txt",
+      "promptHash": "dda86f39420fa927a0973ac58d39c12b08e2c2bbfc2848dc509eb4a4240e7b4e",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/trebuchet/ne-motion-v1.png",
+      "rawHash": "53108db65ec3379a50e196a1605db1a9942f0d757a16402d954011d937ae6cc5",
+      "promptPath": "art/atlas/units/trebuchet/prompts/ne-v1.txt",
+      "promptHash": "50e60e729bd82dc53f9bc9d7bc450cb9fed67c98f883dad253d10bed9a42fb0a",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/trebuchet/se-motion-v1.png",
+      "rawHash": "f51db799ac52d0b3483822258acb1f104837a90fdf35129655d24f21d8b64449",
+      "promptPath": "art/atlas/units/trebuchet/prompts/se-v1.txt",
+      "promptHash": "3cb119e2a2dae242e9b49b9d80e1fd1bffcc9efb64db8e3716331b0d508cd26e",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
 }

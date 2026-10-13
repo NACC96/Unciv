@@ -1,19 +1,93 @@
 {
-"schemaVersion": 1,
-"unitName": "Great Admiral",
-"assetId": "great-admiral",
-"reviewState": "missing",
-"canvasWidth": 128,
-"canvasHeight": 128,
-"anchorX": 64,
-"anchorY": 96,
-"clippingMargin": 2,
-"uniqueUnitIdentity": null,
-"uniqueTo": null,
-"replaces": null,
-"staticFallbackKey": "TileSets/AtlasUnits/Units/Great Admiral",
-"framesDirectory": "frames/",
-"applicableStates": [ "IDLE", "MOVE", "HIT", "DEFEAT" ],
-"facings": [ "E", "NE", "NW", "W", "SW", "SE" ],
-"minimumFrames": { "IDLE": 4, "MOVE": 8, "HIT": 4, "DEFEAT": 8 }
+  "schemaVersion": 1,
+  "unitName": "Great Admiral",
+  "assetId": "great-admiral",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": null,
+  "uniqueTo": null,
+  "replaces": null,
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Great Admiral",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/great-admiral/e-motion-v2.png",
+      "rawHash": "6105c6e99b455d03b8e00ff9ebf86b63107d70b22821d55b1eea0619f9c1a4da",
+      "promptPath": "art/atlas/units/great-admiral/prompts/e-v2.txt",
+      "promptHash": "d803a26e56ff5d930a31c9f6aa904c21aa98255fe6d26ef6335e60d2cc00f08e",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/great-admiral/ne-motion-v2.png",
+      "rawHash": "45e37e0a1afd92bb29c283652af0c6f2001af821bfc3b63c2e15c1ff86b13445",
+      "promptPath": "art/atlas/units/great-admiral/prompts/ne-v2.txt",
+      "promptHash": "114773baa3aff50569fd63fef625de80ae769afe0f38321b825d040e0520dc1f",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/great-admiral/se-motion-v2.png",
+      "rawHash": "2dd665d344c46478054755cee16cd166bc39e65e796341a00e49d149916d964d",
+      "promptPath": "art/atlas/units/great-admiral/prompts/se-v2.txt",
+      "promptHash": "17cc5eb7579125254efc6f632dfe97fec13158a58976e1ba6080265aa02ac473",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
 }

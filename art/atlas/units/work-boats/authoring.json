@@ -1,19 +1,93 @@
 {
-"schemaVersion": 1,
-"unitName": "Work Boats",
-"assetId": "work-boats",
-"reviewState": "missing",
-"canvasWidth": 128,
-"canvasHeight": 128,
-"anchorX": 64,
-"anchorY": 96,
-"clippingMargin": 2,
-"uniqueUnitIdentity": null,
-"uniqueTo": null,
-"replaces": null,
-"staticFallbackKey": "TileSets/AtlasUnits/Units/Work Boats",
-"framesDirectory": "frames/",
-"applicableStates": [ "IDLE", "MOVE", "HIT", "DEFEAT" ],
-"facings": [ "E", "NE", "NW", "W", "SW", "SE" ],
-"minimumFrames": { "IDLE": 4, "MOVE": 8, "HIT": 4, "DEFEAT": 8 }
+  "schemaVersion": 1,
+  "unitName": "Work Boats",
+  "assetId": "work-boats",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": null,
+  "uniqueTo": null,
+  "replaces": null,
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Work Boats",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/work-boats/e-motion-v2.png",
+      "rawHash": "bf445d2dfc5af5bfc542c8575717c7a159583fc8b633a629bd7d69dad632ba2f",
+      "promptPath": "art/atlas/units/work-boats/prompts/e-v2.txt",
+      "promptHash": "9f55da912616f7718f785a52fac1831c79caa83c60bde4fa34f6f72f123f15d1",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/work-boats/ne-motion-v2.png",
+      "rawHash": "047c27b101b119e868d5d77eca4ee12bae6985884157098ae766080e7bba6bfd",
+      "promptPath": "art/atlas/units/work-boats/prompts/ne-v2.txt",
+      "promptHash": "ad3593ad028a10d706ddd6d140dccf8218873e478975d0d0e78867c4244d6ea2",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/work-boats/se-motion-v2.png",
+      "rawHash": "508d6989b2a7213784b5a3fa2f6c0d6cdeb69e6d62c33fff44a2fad537b8bb86",
+      "promptPath": "art/atlas/units/work-boats/prompts/se-v2.txt",
+      "promptHash": "47e4a890d00bf4d702c0956ec01188e611e6589d8a0fdc909e1e77eb69d32b80",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
 }

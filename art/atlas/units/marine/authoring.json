@@ -1,19 +1,95 @@
 {
-"schemaVersion": 1,
-"unitName": "Marine",
-"assetId": "marine",
-"reviewState": "missing",
-"canvasWidth": 128,
-"canvasHeight": 128,
-"anchorX": 64,
-"anchorY": 96,
-"clippingMargin": 2,
-"uniqueUnitIdentity": null,
-"uniqueTo": null,
-"replaces": null,
-"staticFallbackKey": "TileSets/AtlasUnits/Units/Marine",
-"framesDirectory": "frames/",
-"applicableStates": [ "IDLE", "MOVE", "ATTACK", "HIT", "DEFEAT" ],
-"facings": [ "E", "NE", "NW", "W", "SW", "SE" ],
-"minimumFrames": { "IDLE": 4, "MOVE": 8, "ATTACK": 8, "HIT": 4, "DEFEAT": 8 }
+  "schemaVersion": 1,
+  "unitName": "Marine",
+  "assetId": "marine",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": null,
+  "uniqueTo": null,
+  "replaces": null,
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Marine",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/marine/e-motion-v1.png",
+      "rawHash": "a718bb09d61e054434264963a4390ab89f5e55b766a8bd87a80ebe1df890d75c",
+      "promptPath": "art/atlas/units/marine/prompts/e-v1.txt",
+      "promptHash": "9dc0aee6dcbefd431ddde18829dbcbb0709e505f9a99d70b4dc88f6c3982b8ce",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/marine/ne-motion-v1.png",
+      "rawHash": "ca837ccfa6a7609f7508d579185dadd34d207483c9d23433366d1423f987b97a",
+      "promptPath": "art/atlas/units/marine/prompts/ne-v1.txt",
+      "promptHash": "5405d6b10544410282ba2f980630a35416021aea9bc835c91abc9c37e6618b86",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/marine/se-motion-v1.png",
+      "rawHash": "70dda37ceae9c16dffa21c2a612e4693e6bfd649f4d1b2cd445c5c3effcce257",
+      "promptPath": "art/atlas/units/marine/prompts/se-v1.txt",
+      "promptHash": "b061b20ba6ee327e914f048fc99478739d3e8eed9e67ee310352ad8a50380129",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
 }
