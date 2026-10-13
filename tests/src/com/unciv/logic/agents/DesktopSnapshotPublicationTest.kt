@@ -6,6 +6,7 @@ import com.badlogic.gdx.Graphics
 import com.unciv.app.desktop.agents.DesktopAgentMatch
 import com.unciv.logic.GameInfo
 import com.unciv.logic.map.HexCoord
+import com.unciv.logic.presentation.VisualViewKey
 import com.unciv.models.metadata.BaseRuleset
 import com.unciv.testing.BaseTestRunner
 import com.unciv.testing.TestGame
@@ -69,10 +70,12 @@ class DesktopSnapshotPublicationTest {
             val screen = Mockito.mock(WorldScreen::class.java) { invocation ->
                 if (invocation.method.name == "installAgentSnapshot") {
                     published.add(invocation.getArgument(0))
-                    null
+                    true
                 } else Answers.RETURNS_DEFAULTS.answer(invocation)
             }
             Mockito.`when`(screen.currentViewerCivId()).thenReturn(viewer.civID)
+            Mockito.`when`(screen.currentVisualViewKey()).thenReturn(VisualViewKey(viewer.civID, spectatorViewer, 1L))
+            Mockito.`when`(screen.fogOfWar).thenReturn(true)
             host = DesktopAgentMatch(game.gameInfo, match, AgentMatchSetup(),
                 Files.createTempDirectory("unciv-publication-").toFile(), worldScreen = screen)
             // Match the production attachment: human input requires this host's installed view.

@@ -64,6 +64,7 @@ class AtlasAgentPanelsTest {
             val getter = screen.javaClass.methods.single { it.name.substringBefore('$') == "getTechPolicyAndDiplomacy" }
             Mockito.`when`(getter.invoke(screen) as TechPolicyDiplomacyButtons?).thenReturn(tech)
             Mockito.`when`(session.getRunState()).thenReturn(AgentRunState.AGENT_DECIDING)
+            Mockito.`when`(session.getVision()).thenReturn(MatchVision.FOG)
             Mockito.`when`(session.getActiveCivId()).thenReturn(rome.civID)
             Mockito.`when`(session.getAgentProfile(Mockito.anyString())).thenAnswer { AgentProfile.defaultFor(it.getArgument(0)) }
             Mockito.`when`(session.getActivity()).thenAnswer { entries }
@@ -125,7 +126,8 @@ class AtlasAgentPanelsTest {
     }
     @Test fun atlasComposerAndActionsRemainInsideTheirAllocatedPanels() {
         val f = Fixture()
-        Mockito.`when`(f.session.getMessages()).thenReturn(emptyList())
+        Mockito.`when`(f.session.getMessages()).thenReturn(listOf(
+            DiplomaticMessage("queued-atlas", f.spectator.civID, "Greece", "Scout the river frontier.", 1, null, "SPECTATOR")))
         Mockito.`when`(f.session.getMessageContacts()).thenReturn(listOf(MessageContact("Greece", "Athena", true)))
         Mockito.`when`(f.session.getNationSettings()).thenReturn(listOf(NationSetting("Rome", "Rome", ControllerKind.HUMAN, AgentProfile.defaultFor("Rome"), true)))
         for ((w, h) in listOf(1440f to 900f, 1920f to 1080f, 960f to 720f, 800f to 500f, 420f to 600f)) {
@@ -145,10 +147,22 @@ class AtlasAgentPanelsTest {
                     }
                     val reading = panel.descendants().single { it.name == "MessageReadingPane" }
                     assertTrue(reading.height >= 80f)
+                    panel.descendants().single { it.name == "MessageDelete" }.press()
+                    panel.validate()
+                    val delete = panel.descendants().single { it.name == "MessageDelete" }
+                    assertEquals("Confirm delete", (delete as TextButton).text.toString())
+                    val card = panel.descendants().single { it.name == "MessageRow/queued-atlas" }
+                    assertTrue("The delete action stays with its dispatch", delete.isDescendantOf(card))
+                    val deletePosition = delete.localToAscendantCoordinates(card, com.badlogic.gdx.math.Vector2())
+                    assertTrue("$w x $h @$scale: confirmed delete must fit its dispatch",
+                        deletePosition.x >= -.5f && deletePosition.x + delete.width <= card.width + .5f)
                     settings.toggle(); settings.validate()
-                    val save = settings.descendants().single { it.name == "NationSave" }
-                    val p = save.localToAscendantCoordinates(settings, com.badlogic.gdx.math.Vector2())
-                    assertTrue(p.x >= -.5f && p.y >= -.5f && p.x + save.width <= settings.width + .5f && p.y + save.height <= settings.height + .5f)
+                    for (name in listOf("NationSave", "MatchVision", "MatchVisionField")) {
+                        val actor = settings.descendants().single { it.name == name }
+                        val p = actor.localToAscendantCoordinates(settings, com.badlogic.gdx.math.Vector2())
+                        assertTrue("$w x $h @$scale: $name must fit the settings panel",
+                            p.x >= -.5f && p.y >= -.5f && p.x + actor.width <= settings.width + .5f && p.y + actor.height <= settings.height + .5f)
+                    }
                 } finally { panel.dispose(); settings.dispose() }
             }
         }

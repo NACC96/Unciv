@@ -1,0 +1,23 @@
+# Agent strategy and intelligence
+
+Every leader receives the same strategic doctrine in its shared instructions (`agent-runner/src/game-instructions.ts`, `STRATEGY_INSTRUCTIONS`). A nation's personality text still applies on top of it and can be stricter.
+
+## Doctrine: brutal realpolitik
+
+- **Aim**: win. Other nations are rivals; each decision is judged by whether it improves the leader's relative position in cities, land, production, technology and military power.
+- **Expansion**: found cities early and keep founding while reachable land remains and happiness stays non-negative. Settlers never sit idle. With no free land left, expansion continues by conquest.
+- **War**: a normal instrument of policy. With a clear military edge over a neighbor, especially when no free land remains, leaders prepare, declare war and take cities, then make peace once the war stops paying. Large armies are not left idle.
+- **Agreements**: instruments, not obligations. Leaders keep pacts while they serve them and break them when the gain outweighs the lost trust.
+- **Diplomacy**: used every turn as a weapon: alliances of convenience, isolating targets, turning rivals against each other, extracting concessions. Leaders may posture and bluff, but never misreport game facts or engine results to the spectator. Nuclear weapons remain a last resort.
+
+## What leaders can read
+
+`game.observe` adds to the empire overview `happiness`, `goldPerTurn`, `militaryStrength` (Unciv's Demographics "Force"), `score`, and `militaryRank`/`scoreRank` among the major nations listed in `rivals`.
+
+`rivals` lists every living civilization the leader has met, or every living civilization under `MAP`/`FULL` [map vision](agent-map-tools.md#map-vision). Each entry has `cityState`, `met`, `status` with the leader (`War`, `Peace`, `Protector` or `DefensivePact`; null until met), `declarationOfFriendship`, `attitudeTowardYou` (Unciv's relationship level, `Unforgivable` through `Ally`), `cities`, `militaryStrength`, `score` and `atWarWith` (limited to civilizations the leader may know about).
+
+`game.legal_actions` for a city-founding unit adds `citySites`: up to five of Unciv's best-ranked reachable founding sites nearby, best first, each with `x`, `y`, `score` and `turns` to reach (0 for the unit's own tile). The ranking is the one Unciv's own settler automation uses, over explored land.
+
+## Settlers and scouts
+
+`EXPLORE` explores immediately with the unit's remaining movement. `AUTOMATE` on a city-founding unit runs Unciv's settler choice immediately: it settles in place when that is nearly as good as the best ranked reachable site, otherwise heads there and founds on arrival, returning `foundedCityId` when a city is founded. Agent nations' standing automation is cleared at each turn start, so both orders last one turn; the doctrine tells leaders to repeat them, and to automate a settler that has no reachable site or has gone two turns without founding.

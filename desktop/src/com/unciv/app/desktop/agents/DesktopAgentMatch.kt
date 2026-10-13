@@ -29,6 +29,7 @@ import com.unciv.logic.agents.EngineCallException
 import com.unciv.logic.agents.FileCheckpointStore
 import com.unciv.logic.agents.HumanCommandExecutor
 import com.unciv.logic.agents.MatchCoordinator
+import com.unciv.logic.agents.MatchVision
 import com.unciv.logic.agents.SetControllerCommand
 import com.unciv.logic.agents.NationControl
 import com.unciv.logic.agents.NationControlChange
@@ -167,6 +168,45 @@ class DesktopAgentMatch(
         }
     }
 
+    override fun deleteMessage(messageId: String, onComplete: (String?) -> Unit) {
+        val viewer = worldScreen?.currentViewerCivId()
+        Concurrency.runOnNonDaemonThreadPool("Delete diplomatic message") {
+            val error = try {
+                synchronized(lock) {
+                    require(viewer != null) { "Messaging requires an attached player or spectator" }
+                    checkMessageViewerLocked(viewer)
+                    publishCommittedChangesLocked { coordinator.deletePlayerMessage(viewer, messageId) }
+                }
+                null
+            } catch (ex: Exception) { ex.message ?: "Could not delete the message" }
+            Concurrency.runOnGLThread {
+                onComplete(error)
+                Gdx.graphics.requestRendering()
+            }
+        }
+    }
+
+    override fun getVision(): MatchVision = vision
+
+    override fun setVision(vision: MatchVision, onComplete: (String?) -> Unit) {
+        Concurrency.runOnNonDaemonThreadPool("Change map vision") {
+            val error = try {
+                synchronized(lock) {
+                    check(!closed.get()) { "The match is closed" }
+                    publishCommittedChangesLocked {
+                        coordinator.setVision(vision)
+                        this@DesktopAgentMatch.vision = vision
+                    }
+                }
+                null
+            } catch (ex: Exception) { ex.message ?: "Could not change map vision" }
+            Concurrency.runOnGLThread {
+                onComplete(error)
+                Gdx.graphics.requestRendering()
+            }
+        }
+    }
+
     override fun readMessageImage(messageId: String, attachmentId: String,
                                   onComplete: (MessageImageDraft?, String?) -> Unit) {
         val viewer = worldScreen?.currentViewerCivId()
@@ -202,6 +242,8 @@ class DesktopAgentMatch(
     val coordinator = MatchCoordinator(game, match.deepCopy().also {
         NationControl.initialize(game, it, if (recoveryLineage == null) worldScreen?.currentViewerCivId() else null)
     }, fileStore(dataDir, recoveryDirectory, match.matchId))
+    /** Read by snapshot installation on the GL thread without taking the host or coordinator lock. */
+    @Volatile private var vision = coordinator.getVision()
     private val imageStore = FileMessageImageStore(dataDir)
     private val bridge = AgentEngineBridge(coordinator)
     private val humanExecutor = HumanCommandExecutor(coordinator)
@@ -213,6 +255,11 @@ class DesktopAgentMatch(
     private var authorityEpoch = 1
     /** Host-side identity remains bound to the admitted run, including its final reads. */
     private var providerRunCivId: String? = null
+    private var providerRunId: String? = null
+    /** A takeover revoked this run mid-turn; its outcome is a handoff, not a failure. */
+    private var cancelledRunId: String? = null
+    /** A settings change landed mid-run; that run's session must not outlive it. */
+    private var staleSessionRunId: String? = null
     private val runTimer = AgentRunTimer(clockNanos)
     private val sessions = HashMap<String, String>() // civId -> provider session ID
     /** Turns the civ's current provider session has served (session rotation). */
@@ -246,7 +293,7 @@ class DesktopAgentMatch(
     private val visualViewListener: () -> Unit = {
         Concurrency.runOnNonDaemonThreadPool("Refresh visual view") {
             synchronized(lock) {
-                if (!closed.get() && worldScreen?.agentSession === this) publishSnapshotLocked()
+                if (!closed.get() && worldScreen?.agentSession === this@DesktopAgentMatch) publishSnapshotLocked()
             }
         }
     }
@@ -264,17 +311,15 @@ class DesktopAgentMatch(
         }
         val authority = listOf(coordinator.getLocalControlCivId(), coordinator.getLocalViewingCivId(),
             coordinator.getControllers().mapValues { it.value.kind }, authorityEpoch)
-        if (visualAuthority != null && visualAuthority != authority) {
+        var desired = resolvedVisualViewLocked(screen)
+        if (visualSession?.view == desired && visualAuthority == authority) return
+        if ((visualAuthority != null && visualAuthority != authority) ||
+            desired != screen.currentVisualViewKey()) {
             visualSession?.invalidate()
             visualSession = null
-            screen.invalidateVisualAuthority()
+            desired = desired.copy(epoch = screen.invalidateVisualAuthority().epoch)
         }
         visualAuthority = authority
-        val local = coordinator.getLocalViewingCivId() ?: screen.currentViewerCivId()
-        val requested = screen.currentVisualViewKey()
-        val desired = if (screen.currentViewerCivId() == local && coordinator.isSpectatorViewer(local)) requested
-            else VisualViewKey(local, coordinator.isSpectatorViewer(local), requested.epoch)
-        if (visualSession?.view == desired) return
         visualSession?.invalidate()
         visualJournal.reset(desired)
         installedVisualSequence = 0L
@@ -289,6 +334,21 @@ class DesktopAgentMatch(
             visualSession = null
             coordinator.configureVisualCapture(null)
         }
+    }
+
+    /** Derive pending viewer/vision changes from committed authority before the GL view catches up. */
+    private fun resolvedVisualViewLocked(screen: WorldScreen): VisualViewKey {
+        val local = coordinator.getLocalViewingCivId() ?: screen.currentViewerCivId()
+        val requested = screen.currentVisualViewKey()
+        val spectator = coordinator.isSpectatorViewer(local)
+        val desired = if (screen.currentViewerCivId() == local && spectator) requested
+            else requested.copy(viewerCivId = local, spectatorMode = spectator)
+        val viewerIsSpectator = coordinator.isSpectatorViewer(desired.viewerCivId)
+        val unrestricted = !viewerIsSpectator && coordinator.canSpectate() && !screen.fogOfWar
+        val matchVision = coordinator.getVision()
+        return desired.copy(
+            revealMap = !viewerIsSpectator && (unrestricted || matchVision != MatchVision.FOG),
+            revealUnits = !viewerIsSpectator && (unrestricted || matchVision == MatchVision.FULL))
     }
 
     /** Production requires the actual rendered viewer; explicit injected fixtures can be headless. */
@@ -308,7 +368,7 @@ class DesktopAgentMatch(
     }
     override fun getPendingNationChange(): String? = synchronized(lock) {
         pendingNationChange?.let {
-            pendingNationReason ?: "Pending nation change — waiting for the agent to finish. Leaving cancels this change."
+            pendingNationReason ?: "Applying the nation change…"
         }
     }
 
@@ -327,7 +387,6 @@ class DesktopAgentMatch(
                     coordinator.getLocalControlCivId(), viewer, onComplete)
                 pendingNationChange = request
                 pendingNationReason = null
-                runState = AgentRunState.PAUSING
             }
         } catch (ex: Exception) {
             completeNationChange(onComplete, ex.message ?: "Could not change nation settings")
@@ -336,9 +395,8 @@ class DesktopAgentMatch(
         refreshUi()
         Concurrency.runOnNonDaemonThreadPool("Save nation settings") {
             synchronized(lock) {
-                if (pendingNationChange !== request) return@synchronized
-                // An admitted or selected loop owns its final bookkeeping and drains in finally.
-                if (!isLoopRunning.get() && providerRunCivId == null) applyPendingNationChangeLocked()
+                // A dispatching run may already have applied it before admission.
+                if (pendingNationChange === request) applyPendingNationChangeLocked()
             }
         }
     }
@@ -358,8 +416,8 @@ class DesktopAgentMatch(
         val pending = pendingNationChange ?: return
         pendingNationChange = null
         pendingNationReason = null
-        if (!isLoopRunning.get() && providerRunCivId == null)
-            runState = if (pendingViewRefresh || coordinator.isPaused()) AgentRunState.NEEDS_ATTENTION else AgentRunState.PAUSED
+        // A saved assignment whose view never installed must be republished on re-entry.
+        if (pending.committed) pendingViewRefresh = true
         completeNationChange(pending.onComplete, if (pending.committed)
             "The nation change was saved, but the match was closed or left before its view was installed" else reason)
     }
@@ -377,25 +435,51 @@ class DesktopAgentMatch(
         val completion = if (error != null && pending.committed) {
             if (error.contains("was saved")) error else markViewRefreshFailedLocked(error)
         } else error
-        if (completion == null) {
-            pendingViewRefresh = false
-            failureReason = coordinator.getPausedReason()
-            runState = if (coordinator.isPaused()) AgentRunState.NEEDS_ATTENTION else AgentRunState.PAUSED
-        } else if (!pending.committed) {
-            failureReason = coordinator.getPausedReason() ?: completion
-            runState = if (coordinator.isPaused()) AgentRunState.NEEDS_ATTENTION else AgentRunState.PAUSED
-        }
         pendingNationChange = null
         pendingNationReason = null
+        if (completion == null) pendingViewRefresh = false
+        if (coordinator.isPaused()) {
+            failureReason = coordinator.getPausedReason()
+            runState = if (isLoopRunning.get()) AgentRunState.PAUSING else AgentRunState.NEEDS_ATTENTION
+        } else if (completion == null && !isLoopRunning.get()) {
+            continueAfterNationChangeLocked()
+        }
         refreshUi()
         completeNationChange(pending.onComplete, completion)
     }
 
-    /** Always holds the same lock as Resume, and runs only after loop ownership is released. */
+    /** A nation change never pauses play: a live match keeps going and a paused one stays paused. */
+    private fun continueAfterNationChangeLocked() {
+        when (runState) {
+            AgentRunState.STARTING, AgentRunState.WAITING_HUMAN -> run()
+            AgentRunState.PAUSING, AgentRunState.NEEDS_ATTENTION -> {
+                // Taking over or reconfiguring the failed nation is its recovery.
+                failureReason = null
+                runState = AgentRunState.PAUSED
+            }
+            else -> {}
+        }
+    }
+
+    /** Takeover revokes the admitted provider at once; every move it already committed stays. */
+    private fun cancelAdmittedRunLocked() {
+        val runId = providerRunId ?: return
+        cancelledRunId = runId
+        providerRunCivId = null // Rejects every further engine call from this run.
+        runTimer.clear()
+        supervisor?.cancelRun(runId)
+    }
+
+    /**
+     * Always holds the same lock as engine calls, so it lands between two atomic provider moves.
+     * Only Play as on the nation whose provider is mid-turn interrupts that run.
+     */
     private fun applyPendingNationChangeLocked() {
         val pending = pendingNationChange ?: return
         if (pending.committed) return // The durable change is waiting for its GL installation.
-        check(!isLoopRunning.get() && providerRunCivId == null)
+        val runningCivId = providerRunCivId
+        val takesOverRun = runningCivId != null && pending.change == NationControlChange.PLAY_AS &&
+            pending.civId == runningCivId
         val beforeGeneration = coordinator.getPublicationGeneration()
         try {
             check(!closed.get() && matchOpen) { "This match is not open" }
@@ -404,16 +488,17 @@ class DesktopAgentMatch(
             coordinator.applyNationChange(pending.civId, pending.change, pending.profile)
             pending.committed = true
             if (pending.change != NationControlChange.SPECTATE) {
-                authorityEpoch = AgentRunControls.nextEpoch(authorityEpoch)
+                // Another nation's admitted run keeps its authority.
+                if (runningCivId == null || takesOverRun) authorityEpoch = AgentRunControls.nextEpoch(authorityEpoch)
                 pending.civId?.let {
                     sessions.remove(it)
                     sessionTurns.remove(it)
                     lastSummaries.remove(it)
                 }
+                if (runningCivId != null && runningCivId == pending.civId && !takesOverRun) staleSessionRunId = providerRunId
             }
-            pendingViewRefresh = true
+            if (takesOverRun) cancelAdmittedRunLocked()
             viewInstallInFlight = true
-            runState = AgentRunState.PAUSING
             pendingNationReason = "The nation change was saved; updating the view."
             publishSnapshotLocked { error ->
                 synchronized(lock) {
@@ -636,11 +721,7 @@ class DesktopAgentMatch(
             return
         }
         configureVisualCaptureLocked()
-        val localViewer = coordinator.getLocalViewingCivId() ?: screen.currentViewerCivId()
-        val captureView = visualSession?.view ?: screen.currentVisualViewKey().let {
-            if (localViewer == screen.currentViewerCivId() && coordinator.isSpectatorViewer(localViewer)) it
-            else VisualViewKey(localViewer, coordinator.isSpectatorViewer(localViewer), it.epoch)
-        }
+        val captureView = visualSession?.view ?: resolvedVisualViewLocked(screen)
         val payload = AgentSnapshotPublication.buildPayload(
             coordinator,
             viewerCivId = coordinator.getLocalViewingCivId() ?: screen.currentViewerCivId(),
@@ -656,7 +737,7 @@ class DesktopAgentMatch(
         val selection = AgentSnapshotPublication.resolveSelection(snapshot, payload)
         Concurrency.runOnGLThread {
             synchronized(lock) {
-                if (closed.get() || !matchOpen || screen.agentSession !== this ||
+                if (closed.get() || !matchOpen || screen.agentSession !== this@DesktopAgentMatch ||
                     payload.visualBatch?.view?.epoch?.let { it != screen.currentVisualViewKey().epoch } == true) {
                     onInstalled?.invoke("The match view changed before installation")
                     return@synchronized
@@ -835,7 +916,7 @@ class DesktopAgentMatch(
 
     override fun startAutomaticPlay() {
         synchronized(lock) {
-            if (closed.get() || !matchOpen || pendingNationChange != null || pendingViewRefresh) return
+            if (closed.get() || !matchOpen || pendingViewRefresh) return
             if (coordinator.getTurnPhase() == TurnPhase.READY_TO_START) {
                 publishCommittedChangesLocked { coordinator.beginAwaitingTurn() }
             }
@@ -855,7 +936,7 @@ class DesktopAgentMatch(
     /** Continuous agent play, advancing across civs and pausing at human turns or failures. */
     fun run() {
         synchronized(lock) {
-            if (closed.get() || !matchOpen || pendingNationChange != null || pendingViewRefresh || runState == AgentRunState.PAUSING) return
+            if (closed.get() || !matchOpen || pendingViewRefresh || runState == AgentRunState.PAUSING) return
             if (coordinator.isPaused()) return
             if (runState == AgentRunState.FINISHED) return
             if (coordinator.getTurnPhase() == TurnPhase.COMPLETED) {
@@ -882,7 +963,7 @@ class DesktopAgentMatch(
 
     private fun triggerRunLoop() {
         synchronized(lock) {
-            if (closed.get() || !matchOpen || pendingNationChange != null || pendingViewRefresh || runState != AgentRunState.STARTING) return
+            if (closed.get() || !matchOpen || pendingViewRefresh || runState != AgentRunState.STARTING) return
             if (!isLoopRunning.compareAndSet(false, true)) return
             Concurrency.runOnNonDaemonThreadPool("AgentMatch") {
                 try {
@@ -901,12 +982,6 @@ class DesktopAgentMatch(
                                 runState = AgentRunState.NEEDS_ATTENTION
                             } else if (pendingViewRefresh && !viewInstallInFlight) {
                                 runState = AgentRunState.NEEDS_ATTENTION
-                            }
-                            if (pendingNationChange != null) {
-                                if (coordinator.isPaused() || runState == AgentRunState.NEEDS_ATTENTION) {
-                                    pendingNationReason = "Blocked: ${failureReason ?: "the provider failed"}. Retry before applying; leaving cancels this change."
-                                    runState = AgentRunState.NEEDS_ATTENTION
-                                } else applyPendingNationChangeLocked()
                             }
                             // Resume/retry may arrive after the loop publishes its boundary,
                             // but before this worker releases ownership. Hand off that request.
@@ -1078,13 +1153,16 @@ class DesktopAgentMatch(
     //endregion
     //region Supervisor process
 
+    /** Preparation can save nation changes or guidance and enter recovery before reservation. */
+    private fun providerAdmissionAllowedLocked(): Boolean =
+        !closed.get() && matchOpen && !coordinator.isPaused() && !pendingViewRefresh &&
+            (runState == AgentRunState.STARTING || runState == AgentRunState.AGENT_DECIDING ||
+                runState == AgentRunState.APPLYING)
+
     private fun runAgentTurn(civId: String) {
         synchronized(lock) {
             // Pause can arrive after runLoop selects the next civ but before dispatch claims it.
-            if (closed.get() || !matchOpen) return
-            if (runState == AgentRunState.PAUSING || runState == AgentRunState.PAUSED) return
-            if (runState != AgentRunState.STARTING && runState != AgentRunState.AGENT_DECIDING
-                && runState != AgentRunState.APPLYING) return
+            if (!providerAdmissionAllowedLocked()) return
             runState = AgentRunState.AGENT_DECIDING
         }
         refreshUi()
@@ -1094,12 +1172,6 @@ class DesktopAgentMatch(
             fail("Cannot start supervisor: ${ex.message}")
             return
         }
-        val profile = synchronized(lock) {
-            coordinator.getController(civId)?.agentProfile
-        } ?: run {
-            fail("No agent profile for $civId")
-            return
-        }
         val runId = "run-${UUID.randomUUID()}"
         // Read per turn so the session experiment can change without restarting the app.
         val sessionSettings = AgentSessionPolicy.parseSettings(
@@ -1107,13 +1179,15 @@ class DesktopAgentMatch(
         var resumeId: String? = null
         var sessionAge = 0
         val control: Map<String, Any?> = try { synchronized(lock) {
-            if (pendingViewRefresh) {
-                runState = AgentRunState.PAUSING
-                return
-            }
-            if (closed.get() || !matchOpen || pendingNationChange != null ||
-                runState !in setOf(AgentRunState.STARTING, AgentRunState.AGENT_DECIDING, AgentRunState.APPLYING)) return
+            if (!providerAdmissionAllowedLocked()) return
+            // A request made before admission lands first, so a takeover never admits the provider.
+            if (pendingNationChange?.committed == false) applyPendingNationChangeLocked()
+            if (!providerAdmissionAllowedLocked()) return
+            val controller = coordinator.getController(civId)
+            if (controller?.kind == ControllerKind.HUMAN) return // The loop hands this turn to its human.
+            val profile = checkNotNull(controller?.agentProfile) { "No agent profile for $civId" }
             val turnGuidance = publishCommittedChangesLocked { coordinator.takeGuidanceForDelivery(civId) }
+            if (!providerAdmissionAllowedLocked()) return
             val sessionArm = AgentSessionPolicy.armFor(civId, coordinator.getAgentCivsInTurnOrder(), sessionSettings)
             resumeId = sessions[civId]?.takeIf {
                 AgentSessionPolicy.shouldResume(sessionArm, sessionTurns[civId] ?: 0, sessionSettings)
@@ -1142,8 +1216,9 @@ class DesktopAgentMatch(
                     "continuityNote" to (if (resumeId == null) lastSummaries[civId] else null),
                     "session" to mapOf("arm" to sessionArm, "age" to sessionAge)),
                 "guidance" to turnGuidance).also {
-                    // From this reservation onward a later pause must drain, never cancel this run.
+                    // From this reservation onward a pause drains this run; only a takeover cancels it.
                     providerRunCivId = civId
+                    providerRunId = runId
                 }
         } } catch (ex: Exception) {
             fail(coordinator.getPausedReason() ?: "Cannot prepare agent turn: ${ex.message}")
@@ -1155,10 +1230,20 @@ class DesktopAgentMatch(
             refreshUi()
             proc.runTurn(control)
         } finally {
-            synchronized(lock) { runTimer.clear(); providerRunCivId = null }
+            synchronized(lock) { runTimer.clear(); providerRunCivId = null; providerRunId = null }
         }
         synchronized(lock) {
-            val session = outcome.sessionId
+            if (cancelledRunId == runId) {
+                // The human already holds this turn; the loop hands it over at its next boundary.
+                cancelledRunId = null
+                runState = if (closed.get() || !matchOpen || runState == AgentRunState.PAUSING || runState == AgentRunState.PAUSED)
+                    AgentRunState.PAUSED else AgentRunState.STARTING
+                refreshUi()
+                return
+            }
+            val stale = staleSessionRunId == runId
+            if (stale) staleSessionRunId = null
+            val session = outcome.sessionId?.takeUnless { stale }
             if (session != null) {
                 sessionTurns[civId] = if (session == resumeId) sessionAge + 1 else 1
                 sessions[civId] = session
@@ -1166,7 +1251,7 @@ class DesktopAgentMatch(
             if (outcome.status == "completed_turn") {
                 // A turn without a closing summary must not relabel an older one as "previous".
                 val summary = outcome.summary
-                if (summary == null) lastSummaries.remove(civId)
+                if (summary == null || stale) lastSummaries.remove(civId)
                 else lastSummaries[civId] = "Your closing summary from your previous turn: $summary"
                 publishSnapshotLocked()
                 if (!closed.get() && (coordinator.isPaused() || pendingViewRefresh)) {

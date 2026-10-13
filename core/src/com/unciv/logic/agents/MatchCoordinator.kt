@@ -6,6 +6,8 @@ import com.unciv.logic.GameInfo
 import com.unciv.logic.presentation.CaptureScope
 import com.unciv.logic.presentation.VisualCapture
 import com.unciv.logic.presentation.VisualProvenance
+import com.unciv.logic.automation.unit.CityLocationTileRanker
+import com.unciv.logic.automation.unit.UnitAutomation
 import com.unciv.logic.battle.AttackableTile
 import com.unciv.logic.battle.Battle
 import com.unciv.logic.battle.CityCombatant
@@ -99,8 +101,14 @@ class MatchCoordinator(
     private fun isVisualViewPermitted(view: com.unciv.logic.presentation.VisualViewKey): Boolean {
         val local = committedMatch.localViewingCivId ?: return false
         if (committedGame.civilizations.none { it.civID == view.viewerCivId }) return false
-        return if (isSpectatorViewer(local)) view.spectatorMode
-            else !view.spectatorMode && view.viewerCivId == local
+        if (isSpectatorViewer(local)) return view.spectatorMode
+        if (view.spectatorMode || view.viewerCivId != local) return false
+        // A saved spectator principal retains presentation-only full vision while playing.
+        // Ordinary human viewers remain bounded by the committed match setting, including
+        // between a restrictive vision change and its next UI snapshot installation.
+        if (canSpectate()) return true
+        if (view.revealMap && committedMatch.vision == MatchVision.FOG) return false
+        return !view.revealUnits || committedMatch.vision == MatchVision.FULL
     }
 
     private fun beginVisualCapture(game: GameInfo, actionId: String): CaptureScope {
@@ -367,6 +375,48 @@ class MatchCoordinator(
         return message.copy()
     }
 
+    /**
+     * The player or spectator who sent mail may delete it until the recipient's turn delivers it.
+     * Undelivered mail was never visible to the recipient, so removal leaves no trace there.
+     */
+    @Synchronized
+    fun deletePlayerMessage(senderCivId: String, messageId: String) {
+        val sender = requireMessageViewer(senderCivId)
+        if (!sender.isSpectator() && committedMatch.controllers[senderCivId]?.kind != ControllerKind.HUMAN)
+            throw AgentCommandException(AgentCommandError.AUTHORITY_REVOKED,
+                "Only the human player or spectator may delete their messages")
+        if (committedMatch.matchPaused)
+            throw AgentCommandException(AgentCommandError.MATCH_PAUSED, "Match requires recovery before changing mail")
+        if (committedMatch.turnPhase == TurnPhase.COMPLETED)
+            throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Cannot change mail after play has ended")
+        val message = committedMatch.diplomaticMessages.firstOrNull {
+            it.messageId == messageId && it.senderCivId == senderCivId
+        } ?: throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "No such message of yours")
+        if (message.deliveredTurnSerial != null)
+            throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION,
+                "This message was already delivered and can no longer be deleted")
+        val candidate = committedMatch.deepCopy()
+        candidate.diplomaticMessages.removeAll { it.messageId == messageId }
+        commit(candidateGame = null, candidateMatch = candidate)
+    }
+
+    @Synchronized
+    fun getVision(): MatchVision = committedMatch.vision
+
+    /**
+     * Match-wide map vision for agent observations and local human views. A metadata commit:
+     * no gameplay revision, and game rules keep every civilization's real sight.
+     */
+    @Synchronized
+    fun setVision(vision: MatchVision) {
+        if (committedMatch.vision == vision) return
+        if (committedMatch.matchPaused)
+            throw AgentCommandException(AgentCommandError.MATCH_PAUSED, "Match requires recovery before changing settings")
+        val candidate = committedMatch.deepCopy()
+        candidate.vision = vision
+        commit(candidateGame = null, candidateMatch = candidate)
+    }
+
     /** Cheap read-only preflight before a host writes image bytes. Queueing repeats every check. */
     @Synchronized
     fun validatePlayerMessage(senderCivId: String, messageId: String, targetCivId: String,
@@ -418,7 +468,7 @@ class MatchCoordinator(
     /** Single-unit inspection with visibility policy (null = hidden/nonexistent). */
     fun inspectUnit(actorCivId: String, unitId: Int): ObservedUnit? {
         requireController(actorCivId)
-        return buildUnitInspection(committedGame, actorCivId, unitId)?.also { unit ->
+        return buildUnitInspection(committedGame, actorCivId, unitId, committedMatch.vision)?.also { unit ->
             if (unit.ownerCivId == actorCivId)
                 unit.tile = buildPermittedTile(committedGame, committedMatch, actorCivId, HexCoord(unit.x, unit.y))
         }
@@ -1235,19 +1285,42 @@ class MatchCoordinator(
             val tile = unit.getTile()
             // Same checks legal_actions reports as canFound/foundBlockedReason.
             foundCityBlocker(unit)?.let { throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, it) }
-            val unique = unit.getMatchingUniques(UniqueType.FoundCity).firstOrNull()
-                ?: unit.getMatchingUniques(UniqueType.FoundPuppetCity).first()
-            // Engine path mirrors UnitActionsFromUniques without its tutorial/
-            // render side effects (those belong to snapshot publication).
-            // "By consuming this unit" is the standard modifier and maps to
-            // consume(); anything else was rejected above.
-            val city = civ.addCity(tile.position, unit)
-            if (unique.type == UniqueType.FoundPuppetCity) city.isPuppet = true
-            unit.consume()
-            candidateGame.visualCaptureSink?.let { it.removeUnit(it.unit(unit)) }
-            city.id
+            foundCityHere(civ, unit, tile)
         }
         return CityFoundedResult(command.actorCivId, receipt, receipt.resultJson)
+    }
+
+    /** Caller has checked [foundCityBlocker]. Returns the new city's ID. */
+    private fun foundCityHere(civ: Civilization, unit: MapUnit, tile: Tile = unit.getTile()): String {
+        val unique = unit.getMatchingUniques(UniqueType.FoundCity).firstOrNull()
+            ?: unit.getMatchingUniques(UniqueType.FoundPuppetCity).first()
+        // Engine path mirrors UnitActionsFromUniques without its tutorial/
+        // render side effects (those belong to snapshot publication).
+        // "By consuming this unit" is the standard modifier and maps to
+        // consume(); anything else was rejected by foundCityBlocker.
+        val city = civ.addCity(tile.position, unit)
+        if (unique.type == UniqueType.FoundPuppetCity) city.isPuppet = true
+        unit.consume()
+        civ.gameInfo.visualCaptureSink?.let { it.removeUnit(it.unit(unit)) }
+        return city.id
+    }
+
+    /**
+     * Unciv's settler automation choice, without its UI found-city action (which routes through
+     * the screen and may ask for confirmation): settle in place when nearly as good as the best
+     * ranked reachable site, otherwise head there, founding on arrival. Returns the new city's ID.
+     */
+    private fun autoSettle(unit: MapUnit): String? {
+        if (!unit.hasMovement()) throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Unit has no movement left")
+        val minimum = unit.civ.gameInfo.ruleset.modOptions.constants.minimumCityLocationTileValue
+        val ranked = CityLocationTileRanker.getBestTilesToFoundCity(unit, null, minimum)
+        val best = ranked.bestTile ?: throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION,
+            "No reachable city site in explored land nearby; explore or move the unit first")
+        val here = ranked.tileRankMap[unit.getTile()]
+        val site = if (here != null && here >= ranked.bestTileRank - 2) unit.getTile() else best
+        if (site != unit.getTile()) unit.movement.headTowards(site)
+        if (unit.isDestroyed || unit.getTile() != site || foundCityBlocker(unit) != null) return null
+        return foundCityHere(unit.civ, unit)
     }
 
     private fun executeOrder(command: UnitOrderCommand): UnitOrderResult {
@@ -1258,6 +1331,7 @@ class MatchCoordinator(
         ) { candidateGame, _ ->
             val unit = requireOwnUnit(candidateGame, command.actorCivId, command.unitId)
             var disbanded = false
+            var foundedCityId: String? = null
             when (command.order) {
                 UnitOrder.FORTIFY -> {
                     if (!unit.canFortify() || !unit.hasMovement())
@@ -1299,6 +1373,9 @@ class MatchCoordinator(
                     if (unit.baseUnit.isAirUnit() || unit.isExploring())
                         throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Unit cannot explore now")
                     unit.action = UnitActionType.Explore.value
+                    // Explores now with the movement left, as the Explore button does. Agent civs'
+                    // standing automation clears at their next turn start, so it lasts this turn.
+                    if (unit.hasMovement()) UnitAutomation.automatedExplore(unit)
                 }
                 UnitOrder.STOP_EXPLORATION -> {
                     if (!unit.isExploring())
@@ -1306,9 +1383,14 @@ class MatchCoordinator(
                     unit.action = null
                 }
                 UnitOrder.AUTOMATE -> {
-                    if (unit.isAutomated())
-                        throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Unit is already automated")
-                    unit.action = UnitActionType.Automate.value
+                    if (unit.isFoundingUnit()) {
+                        foundedCityId = autoSettle(unit)
+                        disbanded = foundedCityId != null
+                    } else {
+                        if (unit.isAutomated())
+                            throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Unit is already automated")
+                        unit.action = UnitActionType.Automate.value
+                    }
                 }
                 UnitOrder.STOP_AUTOMATION -> {
                     if (!unit.isAutomated())
@@ -1343,12 +1425,13 @@ class MatchCoordinator(
                     unit.stopEscorting()
                 }
             }
-            "${unit.action ?: ""}|$disbanded"
+            "${unit.action.takeUnless { disbanded } ?: ""}|$disbanded|${foundedCityId ?: ""}"
         }
-        val (action, disbanded) = receipt.resultJson.split("|")
+        val (action, disbanded, foundedCityId) = receipt.resultJson.split("|")
         return UnitOrderResult(
             command.actorCivId, receipt,
-            action = action.ifEmpty { null }, disbanded = disbanded.toBoolean()
+            action = action.ifEmpty { null }, disbanded = disbanded.toBoolean(),
+            foundedCityId = foundedCityId.ifEmpty { null }
         )
     }
 

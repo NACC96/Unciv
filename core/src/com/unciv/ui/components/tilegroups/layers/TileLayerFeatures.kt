@@ -25,14 +25,26 @@ class TileLayerFeatures(tileGroup: TileGroup, size: Float) : TileLayer(tileGroup
 
         val tileView = tileGroup.tileView
         val tileMapView = tileView.getTileMap()
-        val isTileVisible = viewingCiv == null || viewingCiv.canSeeTile(tileView)
+        // Roads are map information. MAP reveals them without widening unit sight or game visibility.
+        val revealsMap = viewingCiv?.gameView?.revealMap == true
+        val isTileVisible = viewingCiv == null || revealsMap || viewingCiv.canSeeTile(tileView)
+        val visibleNeighbors = tileView.getVisibleNeighbors().toList()
 
-        for (neighbor in tileView.getVisibleNeighbors()) {
+        // A view change may hide previously revealed neighbors; they no longer enter the update loop.
+        val staleRoads = roadImages.entries.iterator()
+        while (staleRoads.hasNext()) {
+            val entry = staleRoads.next()
+            if (entry.key in visibleNeighbors) continue
+            entry.value.image?.let { removeOwnedActor(it) }
+            staleRoads.remove()
+        }
+
+        for (neighbor in visibleNeighbors) {
             var roadImage = roadImages[neighbor]
             val currentStatus = roadImage?.roadStatus ?: RoadStatus.None
 
             val roadStatus = when {
-                !isTileVisible && !viewingCiv.canSeeTile(neighbor) -> RoadStatus.None // don't show roads on non-visible tiles
+                !isTileVisible && !viewingCiv.canSeeTile(neighbor) -> RoadStatus.None // fog keeps real sight
                 tileView.roadStatus == RoadStatus.None || neighbor.roadStatus === RoadStatus.None -> RoadStatus.None
                 tileView.roadStatus == RoadStatus.Road || neighbor.roadStatus === RoadStatus.Road -> RoadStatus.Road
                 else -> RoadStatus.Railroad

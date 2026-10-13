@@ -118,6 +118,9 @@ class AgentMessagesPanel(
     private var disposed = false
     private var initializedPosition = false
     private var viewerId: String? = null
+    /** A queued message awaiting the second click that deletes it, and the one being deleted. */
+    private var confirmDeleteId: String? = null
+    private var deletingId: String? = null
     private var generation = 0
     private var visibleLimit = 100
     private var historyTailOffset = 0
@@ -262,6 +265,7 @@ class AgentMessagesPanel(
         if (viewerId != id) {
             pendingScrollAnchor = null
             viewerId = id; generation++; sending = false
+            confirmDeleteId = null; deletingId = null
             clipboardGeneration++; clipboardPending = false; imageDraft = null; releaseDraftTexture(); imagePreview.clearChildren()
             releaseHistoryTextures()
             body.text = ""; setStatus(""); options = emptyList(); mail = emptyList()
@@ -553,6 +557,8 @@ class AgentMessagesPanel(
             receipt.add("Sent turn ${message.sent}".toLabel(WorldScreenStyle.muted, GameUiStyle.Type.caption)).minWidth(0f).left().expandX()
             if (GameUiStyle.isAtlas && width < 440f) receipt.row()
             receipt.add(state.toLabel(stateColor, 11).apply { wrap = true }).minWidth(0f).growX().right().padLeft(8f)
+            if (message.delivered == null && message.sender == viewerId)
+                receipt.add(deleteButton(message.id)).minHeight(GameUiStyle.compactControlHeight).right().padLeft(8f)
             card.add(receipt).width(messageWidth).left().padTop(3f).row()
             val text = Label(message.text, Label.LabelStyle(BaseScreen.skin.get(Label.LabelStyle::class.java))).apply {
                 setFontSize(13); color = WorldScreenStyle.ink; wrap = true
@@ -573,6 +579,41 @@ class AgentMessagesPanel(
             }
         }
         history.invalidateHierarchy(); scroll.invalidate()
+    }
+
+    /** Only the sender's still-queued mail is deletable; the second click confirms. */
+    private fun deleteButton(messageId: String): Button {
+        val text = when (messageId) {
+            deletingId -> "Deleting…"
+            confirmDeleteId -> "Confirm delete"
+            else -> "Delete"
+        }
+        return WorldScreenStyle.button(text, size = GameUiStyle.ButtonSize.Compact).apply {
+            name = "MessageDelete"
+            if (messageId == confirmDeleteId) label.color = WorldScreenStyle.error
+            WorldScreenStyle.setEnabled(this, deletingId == null)
+            onClick { requestDelete(messageId) }
+        }
+    }
+
+    private fun requestDelete(messageId: String) {
+        if (deletingId != null) return
+        if (confirmDeleteId != messageId) {
+            confirmDeleteId = messageId
+            rebuildHistory()
+            return
+        }
+        confirmDeleteId = null; deletingId = messageId
+        val requestGeneration = generation
+        rebuildHistory()
+        session.deleteMessage(messageId) { error ->
+            if (disposed || requestGeneration != generation) return@deleteMessage
+            deletingId = null
+            if (error == null) { status.color = WorldScreenStyle.muted; setStatus("Message deleted.") }
+            else { status.color = WorldScreenStyle.error; setStatus(error) }
+            refresh()
+            rebuildHistory()
+        }
     }
 
     private fun rememberScrollPosition(forceEnd: Boolean = false) {

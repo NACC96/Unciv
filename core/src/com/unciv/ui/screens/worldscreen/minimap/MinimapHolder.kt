@@ -32,6 +32,9 @@ class MinimapHolder(val mapHolder: WorldMapHolder) : Table() {
     private var lastTileMap: TileMap? = null
     private var lastRequestedSize = Int.MIN_VALUE
     private var lastViewportSize = Vector2()
+    private var lastRestrictingCivId: String? = null
+    private var viewingCiv: Civilization? = null
+    private var revealMap = false
     private var resizeDragListener: ResizeDragListener? = null
     lateinit var minimap: Minimap
 
@@ -85,15 +88,18 @@ class MinimapHolder(val mapHolder: WorldMapHolder) : Table() {
     }
 
     private fun rebuildIfSizeChanged(civInfo: Civilization) {
-        // For Spectator should not restrict minimap
-        val civ: Civilization? = civInfo.takeUnless { GUI.getWorldScreen().selectedGameView.spectatorMode }
+        // For Spectator (also one playing a nation with fog lifted) should not restrict minimap
+        val civ: Civilization? = civInfo.takeUnless {
+            revealMap || it.isSpectator() || worldScreen.selectedGameView.spectatorMode
+        }
         val newMinimapSize = worldScreen.game.settings.minimapSize
         val cutoutSetting = worldScreen.game.settings.androidCutout
         val viewportChanged = com.unciv.ui.components.GameUiStyle.isAtlas &&
             (lastViewportSize.x != worldScreen.stage.width || lastViewportSize.y != worldScreen.stage.height)
         if (!viewportChanged && newMinimapSize == lastRequestedSize && civ?.exploredRegion?.shouldUpdateMinimap() != true
-            && cutoutSetting == lastCutoutSetting && lastTileMap === mapHolder.tileMap) return
+            && cutoutSetting == lastCutoutSetting && lastTileMap === mapHolder.tileMap && civ?.civID == lastRestrictingCivId) return
         lastViewportSize.set(worldScreen.stage.width, worldScreen.stage.height)
+        lastRestrictingCivId = civ?.civID
         lastCutoutSetting = cutoutSetting
         lastRequestedSize = newMinimapSize
         minimapSize = newMinimapSize
@@ -139,7 +145,7 @@ class MinimapHolder(val mapHolder: WorldMapHolder) : Table() {
     private fun rebuildAndUpdateMap(civInfo: Civilization?) {
         InputDisabling.withInputDisabled {
             rebuild(civInfo) // re-create views
-            civInfo?.let { minimap.update(it) } // update map
+            viewingCiv?.let { minimap.update(it, revealMap) } // update the same presentation immediately
             minimap.mapHolder.onViewportChanged() // update scroll position
         }
     }
@@ -242,11 +248,13 @@ class MinimapHolder(val mapHolder: WorldMapHolder) : Table() {
         return toggleIconTable
     }
 
-    fun update(civInfo: Civilization) {
+    fun update(civInfo: Civilization, revealMap: Boolean = false) {
+        viewingCiv = civInfo
+        this.revealMap = revealMap
         rebuildIfSizeChanged(civInfo)
         isVisible = UncivGame.Current.settings.showMinimap
         if (isVisible) {
-            minimap.update(civInfo)
+            minimap.update(civInfo, revealMap)
             for (button in buttons) button.update()
         }
     }

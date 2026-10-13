@@ -12,6 +12,9 @@ import com.unciv.testing.BaseTestRunner
 import com.unciv.testing.TestGame
 import com.unciv.ui.screens.worldscreen.WorldScreen
 import com.unciv.logic.map.HexCoord
+import com.unciv.logic.presentation.VisualBatch
+import com.unciv.logic.presentation.VisualEvent
+import com.unciv.logic.presentation.VisualViewKey
 import com.unciv.json.json
 import org.mockito.Mockito
 import org.mockito.Answers
@@ -26,6 +29,7 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.atomic.AtomicLong
 import java.util.concurrent.atomic.AtomicReference
 
 @RunWith(BaseTestRunner::class)
@@ -47,11 +51,15 @@ class DesktopNationControlTest {
         val installFence = AgentPublicationFence()
         val acceptedGenerations = CopyOnWriteArrayList<Long>()
         var installFailure: String? = null
+        var duringSupervisorSetup: (() -> Unit)? = null
         val started = CountDownLatch(1)
         val release = CountDownLatch(1)
         val returned = CountDownLatch(1)
         val calls = AtomicInteger()
         val kills = AtomicInteger()
+        val cancels = CopyOnWriteArrayList<String>()
+        @Volatile var cancelled = false
+        val callAfterCancel = AtomicReference<String>()
         val shutdowns = AtomicInteger()
         val callbacks = AtomicInteger()
         val completed = CountDownLatch(1)
@@ -61,7 +69,9 @@ class DesktopNationControlTest {
         val spectator: String
         val romeUnit: Int
         val renderedViewer = AtomicReference<String>()
+        val visualEpoch = AtomicLong(1L)
         val publishedViewers = CopyOnWriteArrayList<String>()
+        val publishedBatches = CopyOnWriteArrayList<VisualBatch>()
         val screen: WorldScreen?
         init {
             val game = TestGame(baseRuleset = BaseRuleset.Civ_V_Vanilla)
@@ -85,24 +95,41 @@ class DesktopNationControlTest {
                 if (invocation.method.name == "installAgentSnapshot") {
                     installAttempts.incrementAndGet()
                     val generation = invocation.getArgument<Long>(2)
-                    if (!installFence.accept(generation)) return@mock null
+                    if (!installFence.accept(generation)) return@mock false
                     acceptedGenerations.add(generation)
                     installFailure?.let { throw IllegalStateException(it) }
-                    publishedViewers.add(invocation.getArgument(3)); null
+                    publishedViewers.add(invocation.getArgument(3))
+                    publishedBatches.add(invocation.getArgument(4)); true
                 } else Answers.RETURNS_DEFAULTS.answer(invocation)
             }.also {
                 Mockito.`when`(it.currentViewerCivId()).thenAnswer { renderedViewer.get() }
+                Mockito.`when`(it.currentVisualViewKey()).thenAnswer {
+                    VisualViewKey(renderedViewer.get(), renderedViewer.get() == spectator, visualEpoch.get())
+                }
+                Mockito.`when`(it.isVisualTransportAvailable()).thenReturn(true)
+                Mockito.`when`(it.fogOfWar).thenReturn(true)
+                Mockito.`when`(it.invalidateVisualAuthority()).thenAnswer {
+                    VisualViewKey(renderedViewer.get(), renderedViewer.get() == spectator, visualEpoch.incrementAndGet())
+                }
             } else null
             host = DesktopAgentMatch(game.gameInfo, match, AgentMatchSetup(),
                 Files.createTempDirectory("unciv-nation-boundary-").toFile(), worldScreen = screen, supervisorFactory = {
                     supervisorEntered.countDown()
                     check(releaseSupervisor.await(10, TimeUnit.SECONDS))
+                    duringSupervisorSetup?.invoke()
                     object : SupervisorRunner {
                         override fun isAlive() = true
                         override fun runTurn(control: Map<String, Any?>): SupervisorProcess.TurnOutcome {
                             calls.incrementAndGet(); started.countDown()
                             try {
                                 check(release.await(10, TimeUnit.SECONDS))
+                                if (cancelled) {
+                                    // A revoked run cannot commit anything more after the takeover.
+                                    callAfterCancel.set(try {
+                                        host.answerEngineRequest("observe", mapOf("civId" to rome)); "accepted"
+                                    } catch (ex: EngineCallException) { ex.code })
+                                    return SupervisorProcess.TurnOutcome("cancelled", "resume-rome", null, false, emptyList(), "cancelled by host")
+                                }
                                 if (failProvider) {
                                     host.answerEngineRequest("act", mapOf("protocolVersion" to 1, "actionId" to "partial-move",
                                         "expectedRevision" to host.coordinator.getStateRevision(), "type" to "unit.move",
@@ -116,6 +143,7 @@ class DesktopNationControlTest {
                                 return SupervisorProcess.TurnOutcome("completed_turn", "resume-rome", null, true, emptyList(), "done")
                             } finally { returned.countDown() }
                         }
+                        override fun cancelRun(runId: String) { cancels.add(runId); cancelled = true; release.countDown() }
                         override fun shutdown() { shutdowns.incrementAndGet() }
                         override fun kill() { kills.incrementAndGet() }
                     }
@@ -137,6 +165,15 @@ class DesktopNationControlTest {
         fixtures.forEach { f -> if (f.started.count == 0L) assertTrue(f.returned.await(5, TimeUnit.SECONDS)) }
         Gdx.app = previousApp; Gdx.graphics = previousGraphics
     }
+    private fun Fixture.lock(): Any = DesktopAgentMatch::class.java.getDeclaredField("lock").apply { isAccessible = true }.get(host)
+    private fun Fixture.dispatchSelectedTurn() {
+        synchronized(lock()) {
+            DesktopAgentMatch::class.java.getDeclaredField("runState").apply { isAccessible = true }
+                .set(host, AgentRunState.STARTING)
+            DesktopAgentMatch::class.java.getDeclaredMethod("runAgentTurn", String::class.java)
+                .apply { isAccessible = true }.invoke(host, rome)
+        }
+    }
     private fun awaitCondition(condition: () -> Boolean): Boolean {
         val deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(5)
         while (System.nanoTime() < deadline) {
@@ -146,36 +183,178 @@ class DesktopNationControlTest {
         return condition()
     }
 
-    @Test fun `admitted provider drains with unchanged authority before exactly one durable change`() {
+    @Test fun `another nation's change applies mid-run without disturbing the admitted provider`() {
         val f = Fixture(); f.sessions()[f.greece] = "old-greece"; f.sessions()[f.rome] = "old-rome"
         f.host.startAutomaticPlay(); assertTrue(f.started.await(5, TimeUnit.SECONDS))
         val revision = f.host.coordinator.getStateRevision(); val epoch = f.epoch()
-        f.request()
-        assertNotNull(f.host.getPendingNationChange())
-        assertEquals(AgentRunState.PAUSING, f.host.getRunState())
-        assertEquals(revision, f.host.coordinator.getStateRevision())
-        assertEquals(epoch, f.epoch()); assertEquals("old-greece", f.sessions()[f.greece])
-        assertEquals(0, f.callbacks.get()); assertEquals(0, f.kills.get()); assertEquals(0, f.shutdowns.get())
-        f.host.resume(); assertFalse(f.host.canResume())
-        f.release.countDown(); assertTrue(f.completed.await(5, TimeUnit.SECONDS))
-        assertNull(f.error); assertEquals(1, f.callbacks.get()); assertEquals(1, f.calls.get())
+        f.request(); assertTrue(f.completed.await(5, TimeUnit.SECONDS))
+        assertNull(f.error); assertEquals(1, f.callbacks.get()); assertNull(f.host.getPendingNationChange())
         assertEquals(ControllerKind.HUMAN, f.host.coordinator.getController(f.greece)!!.kind)
-        assertEquals(AgentRunState.PAUSED, f.host.getRunState()); assertNull(f.host.getPendingNationChange())
-        assertEquals(epoch + 1, f.epoch()); assertNull(f.sessions()[f.greece]); assertEquals("resume-rome", f.sessions()[f.rome])
-        assertEquals(0, f.kills.get())
+        assertEquals(revision + 1, f.host.coordinator.getStateRevision())
+        assertEquals("Rome's admitted run keeps its authority", epoch, f.epoch()); assertNull(f.sessions()[f.greece])
+        assertEquals(AgentRunState.AGENT_DECIDING, f.host.getRunState())
+        assertTrue(f.cancels.isEmpty()); assertEquals(0, f.kills.get()); assertEquals(0, f.shutdowns.get())
+        f.release.countDown(); assertTrue(f.returned.await(5, TimeUnit.SECONDS))
+        // Play continues to Greece's turn, which now waits for its human.
+        assertTrue(awaitCondition { f.host.getRunState() == AgentRunState.WAITING_HUMAN })
+        assertEquals(f.greece, f.host.getActiveCivId())
+        assertEquals(1, f.calls.get()); assertEquals("resume-rome", f.sessions()[f.rome]); assertEquals(0, f.kills.get())
     }
 
-    @Test fun `request during supervisor setup prevents final provider admission`() {
+    @Test fun `play as the active nation cuts off its admitted provider and hands over the turn`() {
+        val f = Fixture(); f.sessions()[f.rome] = "old-rome"
+        f.host.startAutomaticPlay(); assertTrue(f.started.await(5, TimeUnit.SECONDS))
+        val epoch = f.epoch()
+        f.request(f.rome); assertTrue(f.completed.await(5, TimeUnit.SECONDS))
+        assertNull(f.error)
+        assertEquals(ControllerKind.HUMAN, f.host.coordinator.getController(f.rome)!!.kind)
+        assertEquals(f.rome, f.host.coordinator.getLocalViewingCivId())
+        assertEquals(1, f.cancels.size); assertEquals(epoch + 1, f.epoch()); assertNull(f.sessions()[f.rome])
+        assertTrue(f.returned.await(5, TimeUnit.SECONDS))
+        assertEquals("AUTHORITY_REVOKED", f.callAfterCancel.get())
+        assertTrue(awaitCondition { f.host.isHumanInputAllowed() })
+        assertEquals(AgentRunState.WAITING_HUMAN, f.host.getRunState()); assertEquals(f.rome, f.host.getActiveCivId())
+        assertNull("A cancelled run's session must not survive the takeover", f.sessions()[f.rome])
+        assertEquals(1, f.calls.get()); assertEquals(0, f.kills.get()); assertEquals(0, f.shutdowns.get())
+        assertNull(f.host.getFailureReason())
+    }
+
+    @Test fun `spectate applies mid-run without touching the admitted provider`() {
+        val f = Fixture(wrongViewer = true)
+        f.host.startAutomaticPlay(); assertTrue(f.started.await(5, TimeUnit.SECONDS))
+        val epoch = f.epoch()
+        f.request(change = NationControlChange.SPECTATE); assertTrue(f.completed.await(5, TimeUnit.SECONDS))
+        assertNull(f.error); assertEquals(f.spectator, f.host.coordinator.getLocalViewingCivId())
+        assertEquals(epoch, f.epoch()); assertTrue(f.cancels.isEmpty())
+        assertEquals(AgentRunState.AGENT_DECIDING, f.host.getRunState())
+        f.host.pause(); f.release.countDown(); assertTrue(f.returned.await(5, TimeUnit.SECONDS))
+        assertTrue(awaitCondition { f.host.getRunState() == AgentRunState.PAUSED })
+        assertEquals("resume-rome", f.sessions()[f.rome]); assertEquals(1, f.calls.get())
+    }
+
+    @Test fun `handing the active human turn to an agent keeps play going`() {
+        val f = Fixture(human = true)
+        f.host.startAutomaticPlay(); assertEquals(AgentRunState.WAITING_HUMAN, f.host.getRunState())
+        f.request(f.rome, NationControlChange.HAND_TO_AGENT, AgentProfile.defaultFor("Rome"))
+        assertTrue(f.completed.await(5, TimeUnit.SECONDS)); assertNull(f.error)
+        assertEquals(ControllerKind.EXTERNAL_AGENT, f.host.coordinator.getController(f.rome)!!.kind)
+        assertTrue("The agent picks up the rest of the turn without Resume", f.started.await(5, TimeUnit.SECONDS))
+        assertEquals(1, f.calls.get())
+    }
+
+    @Test fun `takeover during supervisor setup never admits the provider`() {
         val f = Fixture(stallSupervisor = true)
         f.host.startAutomaticPlay(); assertTrue(f.supervisorEntered.await(5, TimeUnit.SECONDS))
-        val revision = f.host.coordinator.getStateRevision()
-        f.request(); assertEquals(AgentRunState.PAUSING, f.host.getRunState())
-        assertEquals(revision, f.host.coordinator.getStateRevision()); assertEquals(0, f.calls.get())
+        f.request(f.rome); assertTrue(f.completed.await(5, TimeUnit.SECONDS))
+        assertNull(f.error); assertEquals(0, f.calls.get())
+        assertEquals(ControllerKind.HUMAN, f.host.coordinator.getController(f.rome)!!.kind)
         f.releaseSupervisor.countDown()
-        assertTrue("A pending request must apply without admitting a provider", f.completed.await(5, TimeUnit.SECONDS))
-        assertNull(f.error); assertEquals(0, f.calls.get()); assertEquals(0, f.kills.get())
+        assertTrue(awaitCondition { f.host.getRunState() == AgentRunState.WAITING_HUMAN })
+        assertEquals(0, f.calls.get()); assertEquals(0, f.kills.get()); assertTrue(f.cancels.isEmpty())
+        assertEquals(1, f.callbacks.get())
+    }
+
+    @Test fun `failed unrelated nation checkpoint during supervisor setup blocks provider admission`() {
+        val f = Fixture()
+        val writer = InMemoryCheckpointWriter().apply { failNextWrite = true }
+        MatchCoordinator::class.java.getDeclaredField("writer").apply { isAccessible = true }
+            .set(f.host.coordinator, writer)
+        f.sessions()[f.rome] = "old-rome"; f.sessions()[f.greece] = "old-greece"
+        val epoch = f.epoch()
+        f.duringSupervisorSetup = { f.request() }
+        f.dispatchSelectedTurn()
+        assertTrue(f.completed.await(5, TimeUnit.SECONDS)); assertNotNull(f.error)
+        assertTrue(f.host.coordinator.isPaused()); assertEquals(AgentRunState.NEEDS_ATTENTION, f.host.getRunState())
+        assertEquals(ControllerKind.EXTERNAL_AGENT, f.host.coordinator.getController(f.greece)!!.kind)
+        assertEquals(epoch, f.epoch()); assertEquals("old-rome", f.sessions()[f.rome]); assertEquals("old-greece", f.sessions()[f.greece])
+        assertEquals(0, f.calls.get()); assertEquals(1, f.callbacks.get()); assertNull(f.host.getPendingNationChange())
+        assertNull(f.host.getActiveRunTiming()); assertTrue(f.cancels.isEmpty()); assertTrue(f.host.canRetry())
+        try {
+            f.host.answerEngineRequest("observe", mapOf("civId" to f.rome))
+            fail("An unsuccessful preparation must not reserve provider authority")
+        } catch (ex: EngineCallException) { assertEquals("AUTHORITY_REVOKED", ex.code) }
+    }
+
+    @Test fun `saved unrelated nation with failed view during supervisor setup blocks provider admission`() {
+        val f = Fixture(attachScreen = true)
+        Mockito.`when`(f.screen!!.currentSelectedCityId()).thenThrow(IllegalStateException("injected view preparation failure"))
+        f.duringSupervisorSetup = { f.request() }
+        f.dispatchSelectedTurn()
+        assertTrue(f.completed.await(5, TimeUnit.SECONDS)); assertTrue(f.error, f.error?.contains("was saved") == true)
         assertEquals(ControllerKind.HUMAN, f.host.coordinator.getController(f.greece)!!.kind)
-        assertEquals(AgentRunState.PAUSED, f.host.getRunState()); assertEquals(1, f.callbacks.get())
+        assertEquals(ControllerKind.EXTERNAL_AGENT, f.host.coordinator.getController(f.rome)!!.kind)
+        assertFalse(f.host.coordinator.isPaused()); assertTrue(f.host.canRetry())
+        assertEquals(AgentRunState.NEEDS_ATTENTION, f.host.getRunState()); assertEquals(0, f.calls.get())
+        assertEquals(1, f.callbacks.get()); assertNull(f.host.getPendingNationChange()); assertNull(f.host.getActiveRunTiming())
+    }
+
+    @Test fun `failed guidance view publication blocks reservation after preparation`() {
+        val f = Fixture(attachScreen = true)
+        f.host.queueGuidance(f.rome, "Preserve this guidance")
+        f.installFailure = "injected guidance install failure"
+        f.dispatchSelectedTurn()
+        assertFalse(f.host.coordinator.isPaused()); assertTrue(f.host.canRetry())
+        assertEquals(AgentRunState.NEEDS_ATTENTION, f.host.getRunState())
+        assertEquals(0, f.calls.get()); assertNull(f.host.getActiveRunTiming())
+    }
+
+    @Test fun `takeover preserves committed movement and revokes the previous visual authority`() {
+        val f = Fixture(attachScreen = true)
+        f.host.startAutomaticPlay(); assertTrue(f.started.await(5, TimeUnit.SECONDS))
+        f.host.answerEngineRequest("act", mapOf("protocolVersion" to 1, "actionId" to "move-before-takeover",
+            "expectedRevision" to f.host.coordinator.getStateRevision(), "type" to "unit.move",
+            "actorCivId" to f.rome, "args" to mapOf("unitId" to f.romeUnit,
+                "destination" to mapOf("x" to 1, "y" to 0))))
+        val committedMove = f.publishedBatches.last()
+        assertTrue(committedMove.events.any { it is VisualEvent.Move && it.unit.unitId == f.romeUnit })
+        f.request(f.rome); assertTrue(f.completed.await(5, TimeUnit.SECONDS)); assertNull(f.error)
+        assertTrue(f.returned.await(5, TimeUnit.SECONDS))
+        assertEquals(HexCoord(1, 0), f.host.coordinator.getUnitPosition(f.rome, f.romeUnit))
+        val handover = f.publishedBatches.last()
+        assertEquals(f.rome, handover.view.viewerCivId); assertFalse(handover.view.spectatorMode)
+        assertTrue(handover.view.epoch > committedMove.view.epoch)
+        assertTrue("Effects from the previous viewer cannot survive the handover", handover.events.isEmpty())
+        assertEquals(1, f.cancels.size); assertEquals("AUTHORITY_REVOKED", f.callAfterCancel.get())
+        assertNull(f.sessions()[f.rome]); assertEquals(0, f.kills.get())
+    }
+
+    @Test fun `pending takeover publishes committed vision before the rendered viewer changes`() {
+        for (matchVision in MatchVision.entries) {
+            val f = Fixture(attachScreen = true)
+            val visionSaved = CountDownLatch(1)
+            val visionError = AtomicReference<String>()
+            f.host.setVision(matchVision) { visionError.set(it); visionSaved.countDown() }
+            assertTrue(visionSaved.await(5, TimeUnit.SECONDS)); assertNull(visionError.get())
+            f.request(f.rome); assertTrue(f.completed.await(5, TimeUnit.SECONDS)); assertNull(f.error)
+            val view = f.publishedBatches.last().view
+            assertEquals(f.rome, view.viewerCivId); assertFalse(view.spectatorMode)
+            assertEquals(matchVision != MatchVision.FOG, view.revealMap)
+            assertEquals(matchVision == MatchVision.FULL, view.revealUnits)
+            assertEquals(f.spectator, f.renderedViewer.get()); assertEquals(0, f.calls.get())
+        }
+    }
+
+    @Test fun `vision change replaces stale flags for the current playable viewer`() {
+        val f = Fixture(human = true, attachScreen = true)
+        val oldView = f.screen!!.currentVisualViewKey()
+        val completed = CountDownLatch(1)
+        val error = AtomicReference<String>()
+        f.host.setVision(MatchVision.FULL) { error.set(it); completed.countDown() }
+        assertTrue(completed.await(5, TimeUnit.SECONDS)); assertNull(error.get())
+        val view = f.publishedBatches.last().view
+        assertEquals(f.rome, view.viewerCivId); assertFalse(view.spectatorMode)
+        assertTrue(view.revealMap); assertTrue(view.revealUnits); assertTrue(view.epoch > oldView.epoch)
+        assertEquals(0, f.calls.get())
+    }
+
+    @Test fun `takeover preserves the local spectator's unfogged view preference`() {
+        val f = Fixture(attachScreen = true)
+        Mockito.`when`(f.screen!!.fogOfWar).thenReturn(false)
+        f.request(f.rome); assertTrue(f.completed.await(5, TimeUnit.SECONDS)); assertNull(f.error)
+        val view = f.publishedBatches.last().view
+        assertEquals(MatchVision.FOG, f.host.getVision())
+        assertEquals(f.rome, view.viewerCivId); assertFalse(view.spectatorMode)
+        assertTrue(view.revealMap); assertTrue(view.revealUnits); assertEquals(0, f.calls.get())
     }
 
     @Test fun `queued GL install failure reports saved change and Retry installs without provider dispatch`() {
@@ -239,10 +418,9 @@ class DesktopNationControlTest {
     @Test fun `leaving before idle nation worker dispatch returns to a resumable pause`() {
         val f = Fixture(human = true)
         // Holding the host monitor deterministically defers the worker until leave cancels it.
-        val lock = DesktopAgentMatch::class.java.getDeclaredField("lock").apply { isAccessible = true }.get(f.host)
-        synchronized(lock) {
+        synchronized(f.lock()) {
             f.request()
-            assertEquals(AgentRunState.PAUSING, f.host.getRunState())
+            assertEquals("A nation change never pauses play", AgentRunState.PAUSED, f.host.getRunState())
             f.host.onMatchLeft()
             assertEquals(AgentRunState.PAUSED, f.host.getRunState())
         }
@@ -254,43 +432,51 @@ class DesktopNationControlTest {
         assertEquals(1, f.callbacks.get())
     }
 
-    @Test fun `selected but not admitted turn is rejected after a nation request`() {
+    @Test fun `selected but not admitted turn applies a pending takeover before admission`() {
         val f = Fixture()
-        DesktopAgentMatch::class.java.getDeclaredField("runState").apply { isAccessible = true }.set(f.host, AgentRunState.STARTING)
-        f.request(); assertTrue(f.completed.await(5, TimeUnit.SECONDS)); assertNull(f.error)
-        DesktopAgentMatch::class.java.getDeclaredMethod("runAgentTurn", String::class.java).apply { isAccessible = true }.invoke(f.host, f.rome)
-        assertEquals(0, f.calls.get()); assertEquals(AgentRunState.PAUSED, f.host.getRunState())
+        // Holding the host monitor keeps the request pending until dispatch reaches its reservation.
+        synchronized(f.lock()) {
+            DesktopAgentMatch::class.java.getDeclaredField("runState").apply { isAccessible = true }.set(f.host, AgentRunState.STARTING)
+            f.request(f.rome)
+            assertNotNull(f.host.getPendingNationChange())
+            DesktopAgentMatch::class.java.getDeclaredMethod("runAgentTurn", String::class.java).apply { isAccessible = true }.invoke(f.host, f.rome)
+        }
+        assertTrue(f.completed.await(5, TimeUnit.SECONDS)); assertNull(f.error)
+        assertEquals(0, f.calls.get()); assertEquals(1, f.callbacks.get())
+        assertEquals(ControllerKind.HUMAN, f.host.coordinator.getController(f.rome)!!.kind)
     }
 
     @Test fun `leaving and closing cancel pending request without interrupting provider`() {
         for (close in listOf(false, true)) {
             val f = Fixture(); f.host.startAutomaticPlay(); assertTrue(f.started.await(5, TimeUnit.SECONDS))
-            f.request()
-            if (close) f.host.close() else f.host.onMatchLeft()
+            synchronized(f.lock()) {
+                f.request()
+                if (close) f.host.close() else f.host.onMatchLeft()
+            }
             assertTrue(f.completed.await(5, TimeUnit.SECONDS)); assertNotNull(f.error)
-            assertEquals(0, f.kills.get()); assertEquals(0, f.shutdowns.get())
+            assertEquals(0, f.kills.get()); assertEquals(0, f.shutdowns.get()); assertTrue(f.cancels.isEmpty())
             f.release.countDown(); assertTrue(f.returned.await(5, TimeUnit.SECONDS))
             assertEquals(ControllerKind.EXTERNAL_AGENT, f.host.coordinator.getController(f.greece)!!.kind)
             assertEquals(1, f.callbacks.get())
         }
     }
 
-    @Test fun `failed provider leaves request blocked until retry applies it without redispatch`() {
+    @Test fun `settings saved mid-run apply at once and the running turn keeps its old session out`() {
         val f = Fixture(failProvider = true)
         f.host.startAutomaticPlay(); assertTrue(f.started.await(5, TimeUnit.SECONDS))
+        val epoch = f.epoch()
         val profile = f.host.getNationSettings().first { it.civId == f.rome }.profile!!.apply {
             displayName = "Replacement strategist"; personality = "Preserve the partial move"
         }
         f.request(f.rome, NationControlChange.SAVE_AGENT_SETTINGS, profile)
-        f.release.countDown(); assertTrue(f.returned.await(5, TimeUnit.SECONDS))
-        assertTrue(awaitCondition { f.host.canRetry() && f.host.getPendingNationChange()?.startsWith("Blocked:") == true })
-        assertEquals(0, f.callbacks.get()); assertEquals(1, f.calls.get())
-        assertEquals(HexCoord(1, 0), f.host.coordinator.getUnitPosition(f.rome, f.romeUnit))
-        f.host.retry(); assertTrue(f.completed.await(5, TimeUnit.SECONDS)); assertNull(f.error)
-        assertEquals(1, f.callbacks.get()); assertEquals(1, f.calls.get()); assertEquals(0, f.kills.get())
+        assertTrue(f.completed.await(5, TimeUnit.SECONDS)); assertNull(f.error)
         assertEquals("Replacement strategist", f.host.coordinator.getController(f.rome)!!.agentProfile!!.displayName)
+        assertEquals("Settings never cut off the running turn", epoch, f.epoch()); assertTrue(f.cancels.isEmpty())
+        f.release.countDown(); assertTrue(f.returned.await(5, TimeUnit.SECONDS))
+        assertTrue(awaitCondition { f.host.canRetry() })
+        assertEquals(1, f.callbacks.get()); assertEquals(1, f.calls.get()); assertEquals(0, f.kills.get())
         assertEquals(HexCoord(1, 0), f.host.coordinator.getUnitPosition(f.rome, f.romeUnit))
-        assertEquals(AgentRunState.PAUSED, f.host.getRunState())
+        assertNull("The old profile's session must not resume under the new settings", f.sessions()[f.rome])
     }
 
     @Test fun `committed viewer change allows no input until actual rendered view installs`() {

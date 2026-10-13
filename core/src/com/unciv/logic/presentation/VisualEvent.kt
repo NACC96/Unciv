@@ -3,7 +3,13 @@ package com.unciv.logic.presentation
 import java.util.Collections
 
 /** A local presentation authority. Epoch changes on load/view changes, never per frame. */
-data class VisualViewKey(val viewerCivId: String, val spectatorMode: Boolean, val epoch: Long)
+data class VisualViewKey(
+    val viewerCivId: String,
+    val spectatorMode: Boolean,
+    val epoch: Long,
+    val revealMap: Boolean = false,
+    val revealUnits: Boolean = false
+)
 data class VisualEventId(val gameId: String, val timelineId: String, val sequence: Long)
 data class VisualProvenance(val committedRevision: Int? = null, val actionId: String? = null)
 data class VisualPosition(val x: Int, val y: Int)

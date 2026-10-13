@@ -14,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable
 import com.badlogic.gdx.utils.Align
 import com.unciv.GUI
+import com.unciv.logic.agents.ControllerKind
 import com.unciv.logic.civilization.Notification
 import com.unciv.logic.civilization.NotificationCategory
 import com.unciv.models.translations.tr
@@ -90,6 +91,13 @@ class NotificationsScroll(
 
     //region private fields
     private var notificationsHash: Int = 0
+    /** What the list showed at the last update. Agent snapshots reload unchanged notifications
+     *  as new objects (Notification has no equality contract), so identity alone means nothing new. */
+    private var contentSignature: Int = 0
+    /** News arriving while another nation acts remains unread until its viewer can act. */
+    private val pendingContentViewers = HashSet<String>()
+    /** Turn number and current player at the last update, to notice the viewer's own turn starting. */
+    private var lastTurnKey: String? = null
 
     private var notificationsTable = Table()
     private var topSpacerCell: Cell<Actor?>? = null
@@ -179,6 +187,24 @@ class NotificationsScroll(
 
         enlargeHighlight = GUI.getSettings().enlargeSelectedNotification
 
+        // Hidden by the user or the Hidden setting: a rebuild must never drag it back into view.
+        val keptHidden = restoreButton.isActive && !userSettingChanged
+        val newSignature = notifications.contentSignature()
+        val hasNewContent = newSignature != contentSignature
+        contentSignature = newSignature
+        val gameInfo = worldScreen.gameInfo
+        val turnKey = "${gameInfo.turns}/${gameInfo.currentPlayer}"
+        val viewer = worldScreen.viewingCiv
+        val session = worldScreen.agentSession
+        val humanViewer = !viewer.isSpectator() && if (session == null) viewer.isHuman() else
+            session.getNationSettings().any { it.civId == viewer.civID && it.kind == ControllerKind.HUMAN }
+        val ownTurnStarted = turnKey != lastTurnKey && humanViewer &&
+            viewer.civID == gameInfo.currentPlayer
+        lastTurnKey = turnKey
+        if (keptHidden && hasNewContent && humanViewer)
+            pendingContentViewers.add(viewer.civID)
+        val hasPendingContent = viewer.civID in pendingContentViewers
+
         // Remember scroll position _relative to topRight_
         val previousScrollXinv = when {
             isScrollingDisabledX -> 0f  // switching from Permanent - scrollX and maxX are 0
@@ -196,7 +222,7 @@ class NotificationsScroll(
             updateSpacers(coveredNotificationsTop, coveredNotificationsBottom)
         }
 
-        scrollX = maxX - previousScrollXinv
+        scrollX = if (keptHidden) 0f else maxX - previousScrollXinv
         scrollY = if (selectedCell == null) {
             previousScrollY
         } else selectedCell!!.let {
@@ -217,14 +243,30 @@ class NotificationsScroll(
 
         if (!userSetting.static) {
             restoreButton.unblock()
-            if (contentChanged && !userSettingChanged && isHidden)
+            if (!userSettingChanged && isHidden && mayReveal(hasNewContent || hasPendingContent, keptHidden, ownTurnStarted))
                 isHidden = false
         }
+        if (!isHidden) pendingContentViewers.remove(viewer.civID)
 
         // Do the positioning here since WorldScreen may also call update when just its geometry changed
         setPosition(stage.width - width * scaleFactor, 0f)
         restoreButton.setPosition(coveredNotificationsBottom)
     }
+
+    /**
+     * New notifications reopen a hidden list, except in agent matches: their many snapshots per turn
+     * (diplomacy between other nations included) would keep reopening it. There a list the user hid
+     * reopens only when the viewer's own human turn starts, including news received during another
+     * nation's turn; the bell still counts and flashes. Spectators never accumulate pending news.
+     */
+    private fun mayReveal(hasNewContent: Boolean, keptHidden: Boolean, ownTurnStarted: Boolean): Boolean = when {
+        !hasNewContent -> false
+        worldScreen.agentSession == null || !keptHidden -> true
+        else -> ownTurnStarted
+    }
+
+    private fun List<Notification>.contentSignature(): Int =
+        map { Triple(it.category, it.text, it.icons) }.hashCode()
 
     private fun updateContent(
         notifications: List<Notification>,
@@ -275,6 +317,9 @@ class NotificationsScroll(
         val backgroundDrawable = if (com.unciv.ui.components.GameUiStyle.isAtlas)
             com.unciv.ui.components.GameUiStyle.panelBackground("Atlas/World/Notifications")
         else BaseScreen.skinStrings.getUiBackground("WorldScreen/Notification", BaseScreen.skinStrings.roundedEdgeRectangleShape)
+
+        // Sliding the list sideways also hides it, but nothing on screen says so.
+        if (!userSetting.static) notificationsTable.add(HideButton(backgroundDrawable)).right().row()
 
         val orderedNotifications = (additionalNotification + notifications)
             .groupBy { it.category }
@@ -373,6 +418,20 @@ class NotificationsScroll(
         }
     }
 
+    private inner class HideButton(backgroundDrawable: Drawable) : Table() {
+        init {
+            val pill = Table()
+            pill.background = backgroundDrawable
+            val ink = if (com.unciv.ui.components.GameUiStyle.isAtlas) WorldScreenStyle.ink else ImageGetter.CHARCOAL
+            pill.add(ImageGetter.getImage("OtherIcons/Close").apply { color = ink })
+                .size(iconSize * 0.6f).padRight(8f)
+            pill.add("Hide".toLabel(ink, fontSize))
+            add(pill).pad(listItemPad, listItemPad, listItemPad, rightPadToScreenEdge)
+            touchable = Touchable.enabled
+            onClick { isHidden = true }
+        }
+    }
+
     private inner class ListItem(
         notification: Notification,
         backgroundDrawable: Drawable
@@ -464,6 +523,8 @@ class NotificationsScroll(
         private var blockCheck = true
         private var blockAct = true
         private var active = false
+        /** The list is hidden and this bell stands in for it. */
+        val isActive get() = active
         private var shownCount = -1
         private val countLabel: Label
         private val bellIcon = ImageGetter.getImage("OtherIcons/Notifications")

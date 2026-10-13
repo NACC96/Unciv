@@ -369,6 +369,39 @@ class AgentMessagesPanelTest {
         } finally { controls.dispose() }
     }
 
+    @Test fun `only the viewer's own queued mail offers a confirmed delete`() {
+        val f = Fixture()
+        val deletes = ArrayList<String>()
+        var deleteCompletion: ((String?) -> Unit)? = null
+        Mockito.doAnswer { deletes.add(it.getArgument(0)); deleteCompletion = it.getArgument(1); null }
+            .`when`(f.session).deleteMessage(Mockito.anyString(), Mockito.any<(String?) -> Unit>() ?: {})
+        val own = DiplomaticMessage("own-queued", f.spectator.civID, "Rome", "Scout north", 1, null, "SPECTATOR")
+        val delivered = DiplomaticMessage("own-delivered", f.spectator.civID, "Rome", "Old note", 1, 2, "SPECTATOR")
+        val foreign = DiplomaticMessage("rome-queued", "Rome", "Greece", "Hello", 1, null, "NATION")
+        f.messages = listOf(own, delivered, foreign)
+        val controls = AgentMatchControlTable(f.session, f.screen)
+        try {
+            val panel = controls.openPanel(f)
+            fun deleteButtons() = panel.descendants().filterIsInstance<TextButton>().filter { it.name == "MessageDelete" }.toList()
+            assertEquals("Delivered and other senders' mail cannot be deleted", 1, deleteButtons().size)
+            deleteButtons().single().press()
+            assertTrue("The first click only asks for confirmation", deletes.isEmpty())
+            assertEquals("Confirm delete", deleteButtons().single().text.toString())
+            deleteButtons().single().press()
+            assertEquals(listOf("own-queued"), deletes)
+            assertEquals("Deleting…", deleteButtons().single().text.toString())
+            deleteCompletion!!("This message was already delivered and can no longer be deleted")
+            assertTrue(panel.labels().any { it.startsWith("This message was already delivered") })
+            assertEquals("Delete", deleteButtons().single().text.toString())
+            deleteButtons().single().press(); deleteButtons().single().press()
+            f.messages = listOf(delivered, foreign)
+            deleteCompletion!!(null)
+            assertTrue(deleteButtons().isEmpty())
+            assertTrue("Message deleted." in panel.labels())
+            assertFalse("Scout north" in panel.labels())
+        } finally { controls.dispose() }
+    }
+
     @Test fun `composer waits for acknowledgement preserves failures and clears only successful sends`() {
         val f = Fixture()
         val controls = AgentMatchControlTable(f.session, f.screen)

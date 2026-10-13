@@ -18,7 +18,7 @@ object VisualEventProjector : VisualProjection {
         val viewer = game.civilizations.firstOrNull { it.civID == view.viewerCivId } ?: return null
         // A real spectator is unrestricted; spectatorMode alone never grants extra map knowledge.
         if (viewer.isSpectator() && !view.spectatorMode) return null
-        return GameView(game, viewer, view.spectatorMode)
+        return GameView(game, viewer, view.spectatorMode, view.revealMap, view.revealUnits)
     }
 
     private fun visible(view: GameView, tile: Tile): Boolean {
@@ -39,7 +39,7 @@ object VisualEventProjector : VisualProjection {
         val current = gameView(game, view) ?: return null
         val viewer = current.civView.getCiv()
         if (!visible(current, atTile)) return null
-        if (unit.civ !== viewer && !viewer.isSpectator()) {
+        if (unit.civ !== viewer && !viewer.isSpectator() && !current.revealUnits) {
             if (atTile === unit.currentTile) {
                 if (!unit.isVisibleTo(viewer)) return null
             } else {
