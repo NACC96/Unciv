@@ -1,19 +1,95 @@
 {
-"schemaVersion": 1,
-"unitName": "Landsknecht",
-"assetId": "landsknecht",
-"reviewState": "missing",
-"canvasWidth": 128,
-"canvasHeight": 128,
-"anchorX": 64,
-"anchorY": 96,
-"clippingMargin": 2,
-"uniqueUnitIdentity": "Landsknecht",
-"uniqueTo": "Germany",
-"replaces": "Pikeman",
-"staticFallbackKey": "TileSets/AtlasUnits/Units/Landsknecht",
-"framesDirectory": "frames/",
-"applicableStates": [ "IDLE", "MOVE", "ATTACK", "HIT", "DEFEAT" ],
-"facings": [ "E", "NE", "NW", "W", "SW", "SE" ],
-"minimumFrames": { "IDLE": 4, "MOVE": 8, "ATTACK": 8, "HIT": 4, "DEFEAT": 8 }
+  "schemaVersion": 1,
+  "unitName": "Landsknecht",
+  "assetId": "landsknecht",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": "Landsknecht",
+  "uniqueTo": "Germany",
+  "replaces": "Pikeman",
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Landsknecht",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/landsknecht/e-motion-v1.png",
+      "rawHash": "c2a14bee88a67819e6d47d667064fa0d990e2a18ff5bf0ee8f7093f399773311",
+      "promptPath": "art/atlas/units/landsknecht/prompts/e-v1.txt",
+      "promptHash": "bcc711f2acbc761960cce27792e9546de7d64374b7c15d02fd0d62eba09c9d84",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/landsknecht/ne-motion-v1.png",
+      "rawHash": "270a0b83bc8ba174fcf50e2ef2617561fb8cd6f9daddfff44571c82781c06250",
+      "promptPath": "art/atlas/units/landsknecht/prompts/ne-v1.txt",
+      "promptHash": "2238a15c8e379e92b855f0c1012d0be9d9dd4e127842aea60709a3db77d4710c",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/landsknecht/se-motion-v1.png",
+      "rawHash": "bbd01a889684b252fc6feb1b3905f28c3b44cb278d4ab096c0bada93a5d151c9",
+      "promptPath": "art/atlas/units/landsknecht/prompts/se-v1.txt",
+      "promptHash": "5f4c4679a3be6c7cbef9319c7cf387a13b14e291107a7c55d26afbc53ec82f67",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
 }
