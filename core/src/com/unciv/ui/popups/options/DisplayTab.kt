@@ -14,6 +14,7 @@ import com.unciv.ui.components.extensions.toTextButton
 import com.unciv.ui.components.input.onClick
 import com.unciv.ui.components.widgets.WrappableLabel
 import com.unciv.ui.images.ImageGetter
+import com.unciv.ui.images.atlas.AtlasAppearance
 import com.unciv.ui.popups.ConfirmPopup
 import com.unciv.ui.screens.worldscreen.NotificationsScroll
 import com.unciv.utils.Display
@@ -43,6 +44,7 @@ internal class DisplayTab(
 
         addHeader("Graphics")
 
+        addAtlasAppearanceButton()
         addTileSetSelectBox()
         addUnitSetSelectBox()
         addSkinSelectBox()
@@ -162,6 +164,22 @@ internal class DisplayTab(
             TileSetCache.assembleTileSetConfigs(ImageGetter.ruleset.mods)
             reloadWorldAndOptions()
         }
+    }
+
+    private fun addAtlasAppearanceButton() {
+        if (!AtlasAppearance.isAvailable() ||
+            AtlasAppearance.skin !in ImageGetter.getAvailableSkins() ||
+            AtlasAppearance.tileSet !in ImageGetter.getAvailableTilesets() ||
+            AtlasAppearance.unitSet !in ImageGetter.getAvailableUnitsets()) return
+        val button = "Use Atlas appearance".toTextButton()
+        button.onClick {
+            AtlasAppearance.apply(settings)
+            SkinCache.assembleSkinConfigs(ImageGetter.ruleset.mods)
+            TileSetCache.assembleTileSetConfigs(ImageGetter.ruleset.mods)
+            settings.save()
+            reloadWorldAndOptions()
+        }
+        add(button).colspan(2).fillX().row()
     }
 
     private fun addUnitSetSelectBox() {

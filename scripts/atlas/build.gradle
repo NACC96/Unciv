@@ -1,4 +1,4 @@
-// APFS compiler/cache scratch only. Evidence remains at the caller's Lexar output.
+// APFS compiler/cache scratch, preferably backed by the Lexar build volume.
 def scratch = System.getenv('UNCIV_ATLAS_BUILD_ROOT')
 if (!scratch) throw new GradleException('Set UNCIV_ATLAS_BUILD_ROOT through scripts/atlas/check.sh')
 def configureScratch = { project ->

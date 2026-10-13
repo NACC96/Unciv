@@ -35,7 +35,7 @@ object AtlasAssetPacker {
                 val authored = readAuthoring(root)
                 checkProvenance(root, authored)
                 checkCoverage(root, requiredCoverage(root), requireComplete)
-                pack(root, authored)
+                pack(root, authored, requireComplete)
             }
             else -> error("Use validate, pack or coverage")
         }
@@ -219,7 +219,7 @@ object AtlasAssetPacker {
         return Trimmed(f, left, top, right - left + 1, bottom - top + 1, images)
     }
 
-    private fun pack(root: File, authored: Authoring) {
+    private fun pack(root: File, authored: Authoring, coverageComplete: Boolean) {
         val destination = File(root, "android/assets/atlas-animation")
         require(!destination.isSymbolicLink()) { "Animation output cannot be a symlink" }
         val scratch = File(root, "android/assets/atlas-animation.new")
@@ -227,7 +227,14 @@ object AtlasAssetPacker {
         scratch.mkdirs()
         val pages = arrayListOf<Map<String, Any?>>()
         val clips = linkedMapOf<String, Map<String, Any?>>()
+        val appearance = File(root, "android/assets/atlas-appearance.json")
+        require(!appearance.isSymbolicLink()) { "Appearance metadata cannot be a symlink" }
+        fun writeAppearance(ready: Boolean) = write(appearance, linkedMapOf(
+            "schemaVersion" to 1, "coverageComplete" to ready,
+            "skin" to "Atlas", "tileSet" to "AtlasTerrain", "unitSet" to "AtlasUnits"))
         try {
+            // Candidate packing cannot retain an earlier release's opt-in readiness marker.
+            writeAppearance(false)
             for (clip in authored.clips.filter { it.mirror == null }.sortedBy { it.key }) {
                 val frames = clip.frames.map { trim(root, clip.unit, it) }
                 try {
@@ -297,7 +304,7 @@ object AtlasAssetPacker {
             write(File(scratch, "manifest.json"), runtime)
             write(File(scratch, "packing-report.json"), linkedMapOf("schemaVersion" to 1,
                 "sourceManifestHash" to sha256(File(root, "art/atlas/manifest.json")), "pageCount" to pages.size,
-                "clipCount" to clips.size, "unitCount" to authored.units.size, "coverageComplete" to false,
+                "clipCount" to clips.size, "unitCount" to authored.units.size, "coverageComplete" to coverageComplete,
                 "outputs" to scratch.listFiles()!!.sortedBy { it.name }.associate { it.name to sha256(it) }))
             // Replace only this pipeline's output. Fail rather than deleting an unrelated directory.
             if (destination.exists()) {
@@ -309,6 +316,7 @@ object AtlasAssetPacker {
                 require(destination.deleteRecursively()) { "Could not replace animation output" }
             }
             require(scratch.renameTo(destination)) { "Could not install packed source output" }
+            writeAppearance(coverageComplete)
             println("Packed ${clips.size} clips / ${pages.size} separate animation pages. Production coverage is not certified by packing.")
         } catch (ex: Throwable) {
             scratch.deleteRecursively()
