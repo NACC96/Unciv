@@ -308,8 +308,15 @@ object GameUiStyle {
         if (button is ImageTextButton) button.label.setFontSize(size.fontSize)
         if (button is CheckBox) button.imageCell.minHeight(
             (if (size == ButtonSize.Regular) standardControlHeight else compactControlHeight) - 2 * size.padVertical)
-        button.pad(size.padVertical, size.padHorizontal, size.padVertical, size.padHorizontal)
+        padControl(button, size)
         button.pack()
+    }
+
+    /** Compact Quiet and Ghost text keeps clear of the rounded [Radius.control] corner. */
+    private fun padControl(button: Button, size: ButtonSize) {
+        val rounded = isAtlas && role(button).emphasis.let { it == Emphasis.Quiet || it == Emphasis.Ghost }
+        val horizontal = if (rounded && size == ButtonSize.Compact) Space.m else size.padHorizontal
+        button.pad(size.padVertical, horizontal, size.padVertical, horizontal)
     }
 
     private fun buttonStyle(source: TextButton.TextButtonStyle, emphasis: Emphasis = Emphasis.Secondary,
@@ -505,8 +512,7 @@ object GameUiStyle {
             is TextButton -> {
                 actor.style = controlStyle(actor, actor.style)
                 val size = role(actor).size
-                if (size == null) actor.pad(Space.m, Space.l, Space.m, Space.l)
-                else actor.pad(size.padVertical, size.padHorizontal, size.padVertical, size.padHorizontal)
+                if (size == null) actor.pad(Space.m, Space.l, Space.m, Space.l) else padControl(actor, size)
             }
             is ImageButton, is ImageTextButton -> {
                 val source = if (actor is ImageTextButton) actor.style else BaseScreen.skin.get(TextButton.TextButtonStyle::class.java)

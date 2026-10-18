@@ -556,7 +556,8 @@ class AtlasThemeTest {
                     for (state in backgrounds(style)) assertEquals(size.controlHeight, state.minHeight, 0f)
                     button.pack()
                     assertTrue(button.height >= size.controlHeight)
-                    assertEquals(size.padHorizontal, button.padLeft, 0f)
+                    // Compact text stays clear of the rounded corner.
+                    assertEquals(maxOf(size.padHorizontal, GameUiStyle.Radius.control), button.padLeft, 0f)
                     assertSame(Fonts.font, style.font)
                     assertSame(owner, button.userObject)
                     assertEquals(listeners, button.listeners.toList())
