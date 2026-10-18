@@ -67,7 +67,7 @@ object AtlasRenderCheck {
                     val actors = screen.stage.root.atlasDescendants().toList()
                     val labels = actors.filterIsInstance<Label>()
                     check(labels.isNotEmpty() || id == "terrain") { "Fixture lacks real content" }
-                    val representative = mapOf("world" to "WorldMapHolder", "activity" to "AgentActivityFeed",
+                    val representative = mapOf("world" to "WorldMapHolder", "world-atlas-art" to "WorldMapHolder", "activity" to "AgentActivityFeed",
                         "messages" to "AgentMessagesPanel", "overview" to "CivilizationOverviewPanel",
                         "nation-control" to "AgentNationSettingsPanel", "terrain" to "WorldMapHolder",
                         "units" to "UnitTable", "setup" to "PickerPane")
