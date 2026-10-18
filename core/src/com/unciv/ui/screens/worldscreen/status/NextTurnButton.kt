@@ -30,7 +30,9 @@ class NextTurnButton(
     private val unitsDueCell: Cell<Label>
 
     init {
-        WorldScreenStyle.apply(this, primary = com.unciv.ui.components.GameUiStyle.isAtlas)
+        // Atlas: the world HUD's rounded brass primary; other skins keep their own button.
+        if (com.unciv.ui.components.GameUiStyle.isAtlas) WorldScreenStyle.apply(this, com.unciv.ui.components.GameUiStyle.Emphasis.Accent)
+        else WorldScreenStyle.apply(this)
         onActivation { nextTurnAction.action(worldScreen) }
         addContextMenu { NextTurnMenu(stage, this, worldScreen) }
         keyShortcuts.add(KeyboardBinding.NextTurn)

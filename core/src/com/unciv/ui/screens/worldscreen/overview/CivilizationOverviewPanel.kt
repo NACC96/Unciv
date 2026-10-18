@@ -15,7 +15,6 @@ import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.Timer
 import com.unciv.models.translations.tr
-import com.unciv.logic.agents.AgentRunState
 import com.unciv.ui.components.extensions.toLabel
 import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.AtlasWidgets
@@ -76,7 +75,8 @@ class CivilizationOverviewPanel(private val screen: WorldScreen) : Table(BaseScr
 
     init {
         name = "CivilizationOverviewPanel"
-        background = WorldScreenStyle.panelBackground("WorldScreen/Overview")
+        background = if (GameUiStyle.isAtlas) WorldScreenStyle.surface("WorldScreen/Overview", 0.94f)
+            else WorldScreenStyle.panelBackground("WorldScreen/Overview")
         touchable = Touchable.enabled
         pad(14f)
         val header = Table(skin).apply { touchable = Touchable.enabled }
@@ -162,7 +162,10 @@ class CivilizationOverviewPanel(private val screen: WorldScreen) : Table(BaseScr
         compact = panelWidth < 520f
         setSize(panelWidth, panelHeight)
         if (!initializedPosition) {
-            setPosition(screen.stage.width - width - 8f, screen.stage.height - height - 122f)
+            // Atlas opens below the actual world header; other skins keep their offset.
+            val top = if (GameUiStyle.isAtlas) com.unciv.ui.screens.worldscreen.status.AgentPanelLayout.headerBottom(screen.stage) - 8f
+                else screen.stage.height - 122f
+            setPosition(screen.stage.width - width - 8f, top - height)
             initializedPosition = true
         }
         clampPosition()
@@ -339,16 +342,7 @@ class CivilizationOverviewPanel(private val screen: WorldScreen) : Table(BaseScr
 
     private fun signed(value: Int?) = if (value != null && value > 0) "+$value" else "$value"
 
-    private fun stateName() = when (data?.runState) {
-        AgentRunState.AGENT_DECIDING -> "Thinking"
-        AgentRunState.PAUSED -> "Paused"
-        AgentRunState.PAUSING -> "Pausing…"
-        AgentRunState.NEEDS_ATTENTION -> "Needs attention"
-        AgentRunState.FINISHED -> "Finished"
-        AgentRunState.STARTING -> "Starting"
-        null -> "Current turn"
-        else -> "Playing"
-    }
+    private fun stateName() = com.unciv.ui.screens.worldscreen.status.AgentStatusFormat.label(data?.runState)
 
     override fun dispose() {
         if (disposed) return

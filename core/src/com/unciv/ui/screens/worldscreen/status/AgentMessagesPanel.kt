@@ -117,6 +117,7 @@ class AgentMessagesPanel(
     private var sending = false
     private var disposed = false
     private var initializedPosition = false
+    private var userDragged = false
     private var viewerId: String? = null
     /** A queued message awaiting the second click that deletes it, and the one being deleted. */
     private var confirmDeleteId: String? = null
@@ -130,17 +131,14 @@ class AgentMessagesPanel(
 
     init {
         name = "AgentMessagesPanel"
-        background = WorldScreenStyle.panelBackground("WorldScreen/Messages")
+        background = if (GameUiStyle.isAtlas) WorldScreenStyle.surface("WorldScreen/Messages", 0.94f)
+            else WorldScreenStyle.panelBackground("WorldScreen/Messages")
         touchable = Touchable.enabled
         pad(14f)
-        val close = Button(skin).apply {
-            WorldScreenStyle.apply(this); pad(4f)
-            add(ImageGetter.getImage("OtherIcons/Close")).size(12f)
-            onClick { setShown(false) }
-        }
+        val close = AgentPanelLayout.closeButton { setShown(false) }
         header.add("Messages".toLabel(WorldScreenStyle.ink, 17)).expandX().left()
         header.add(WorldScreenStyle.dragGrip()).padRight(8f)
-        header.add(close).size(26f)
+        header.add(close).size(if (GameUiStyle.isAtlas) 28f else 26f)
         header.addListener(object : InputListener() {
             private val origin = Vector2()
             private val pointerOrigin = Vector2()
@@ -152,6 +150,7 @@ class AgentMessagesPanel(
                 return true
             }
             override fun touchDragged(event: InputEvent, x: Float, y: Float, pointer: Int) {
+                userDragged = true
                 setPosition(origin.x + event.stageX - pointerOrigin.x, origin.y + event.stageY - pointerOrigin.y)
                 clampPosition(); Gdx.graphics.requestRendering()
             }
@@ -290,7 +289,10 @@ class AgentMessagesPanel(
             updating = false
         }
         val w = minOf(if (GameUiStyle.isAtlas) 520f else 480f, screen.stage.width - 16f).coerceAtLeast(1f)
-        val h = minOf(650f, screen.stage.height - if (GameUiStyle.isAtlas) 24f else 130f).coerceAtLeast(1f)
+        // Atlas: a right-side sheet below the header and, when it fits, above the minimap.
+        val sheet = if (GameUiStyle.isAtlas) AgentPanelLayout.rightSheet(screen.stage, w,
+            400f * UncivGame.Current.settings.fontSizeMultiplier, 650f) else null
+        val h = sheet?.height ?: minOf(650f, screen.stage.height - 130f).coerceAtLeast(1f)
         val resized = w != width || h != height
         if (resized) { rememberScrollPosition(); setSize(w, h) }
         (if (GameUiStyle.isAtlas) composer.getCell(body) else getCell(body)).height(if (h < 500f) 54f else 82f)
@@ -310,10 +312,11 @@ class AgentMessagesPanel(
             updating = false
             rebuildHistory()
         } else if (history.children.size == 0 || resized) rebuildHistory()
-        if (!initializedPosition) {
+        if (sheet != null && !userDragged) setPosition(sheet.x, sheet.y)
+        else if (!initializedPosition) {
             setPosition(screen.stage.width - width - 8f, screen.stage.height - height - 116f)
-            initializedPosition = true
         }
+        initializedPosition = true
         clampPosition()
         updateSendState()
         invalidateHierarchy()

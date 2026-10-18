@@ -71,13 +71,16 @@ class AgentNationSettingsPanel(private val screen: WorldScreen, private val sess
 
     init {
         name = "AgentNationSettingsPanel"
-        background = WorldScreenStyle.panelBackground("WorldScreen/NationSettings")
+        background = if (GameUiStyle.isAtlas) WorldScreenStyle.surface("WorldScreen/NationSettings", 0.94f)
+            else WorldScreenStyle.panelBackground("WorldScreen/NationSettings")
         touchable = Touchable.enabled; pad(14f)
-        val close = WorldScreenStyle.button("Close").apply { onClick { hide() } }
+        // Atlas sheets share the Messages X; other skins keep their text button.
+        val close = if (GameUiStyle.isAtlas) AgentPanelLayout.closeButton { hide() }
+            else WorldScreenStyle.button("Close").apply { onClick { hide() } }
         val header = Table(skin)
         header.add("Nation settings".toLabel(WorldScreenStyle.ink, 17)).minWidth(0f).growX().left()
         header.add(WorldScreenStyle.dragGrip()).padRight(8f)
-        header.add(close)
+        if (GameUiStyle.isAtlas) header.add(close).size(28f) else header.add(close)
         header.addListener(object : InputListener() {
             val origin = Vector2(); val pointerOrigin = Vector2()
             override fun touchDown(event: InputEvent, x: Float, y: Float, pointer: Int, button: Int): Boolean {
@@ -153,16 +156,20 @@ class AgentNationSettingsPanel(private val screen: WorldScreen, private val sess
         nation.onChange { if (!updating && !requesting) loadDraft(nation.selected?.id) }
         provider.onChange {
             if (!updating) currentDraft()?.let {
+                val oldProvider = it.provider; val oldModel = it.modelId
                 it.provider = provider.selected
                 val spec = AgentModelCatalog.getDefaultModel(it.provider)
                 it.modelId = spec.id; it.reasoning = spec.defaultThinkingLevel.wireValue; populateModels(it)
+                syncDisplayName(it, oldProvider, oldModel)
             }
         }
         model.onChange {
             if (!updating) currentDraft()?.let {
                 val choice = model.selected ?: return@let
+                val oldModel = it.modelId
                 it.modelId = if (choice.customEntry) customModel.text.trim() else choice.spec.id
                 showCustom(choice.customEntry || choice.spec.isCustom); populateReasoning(it)
+                syncDisplayName(it, it.provider, oldModel)
             }
         }
         reasoning.onChange { if (!updating) currentDraft()?.reasoning = reasoning.selected?.wireValue }
@@ -170,8 +177,10 @@ class AgentNationSettingsPanel(private val screen: WorldScreen, private val sess
         personality.onChange { if (!updating) currentDraft()?.personality = personality.text }
         customModel.onChange {
             if (!updating && model.selected?.customEntry == true) currentDraft()?.let {
+                val oldModel = it.modelId
                 it.modelId = customModel.text.trim()
                 populateReasoning(it)
+                syncDisplayName(it, it.provider, oldModel)
             }
         }
         save.onClick { request(NationControlChange.SAVE_AGENT_SETTINGS) }
@@ -202,6 +211,15 @@ class AgentNationSettingsPanel(private val screen: WorldScreen, private val sess
         }
     }
     private fun currentDraft() = selectedId?.let { drafts[it] }
+    /** A default display name follows the model; a custom one is kept. */
+    private fun syncDisplayName(draft: AgentProfile, oldProvider: String, oldModelId: String) {
+        val civ = settings.firstOrNull { it.civId == selectedId }?.nationName ?: selectedId.orEmpty()
+        val name = AgentSlotLogic.displayNameAfterModelChange(draft.displayName, civ, oldProvider, oldModelId, draft.provider, draft.modelId)
+        if (name == draft.displayName) return
+        draft.displayName = name
+        val wasUpdating = updating; updating = true
+        try { displayName.text = name } finally { updating = wasUpdating }
+    }
     private fun loadDraft(id: String?) {
         selectedId = id
         val setting = settings.firstOrNull { it.civId == id }
@@ -289,11 +307,17 @@ class AgentNationSettingsPanel(private val screen: WorldScreen, private val sess
         previousPending = pending
         val w = minOf(480f, screen.stage.width - 16f).coerceAtLeast(1f)
         val anchorTop = if (isVisible) controlsAnchor?.localToStageCoordinates(Vector2())?.y?.minus(8f) else null
-        val h = minOf(650f, screen.stage.height - if (GameUiStyle.isAtlas) 24f else 130f, anchorTop?.minus(8f) ?: Float.MAX_VALUE).coerceAtLeast(1f)
+        // Atlas without an anchor: the same right-side sheet as Messages, below the header.
+        val sheet = if (GameUiStyle.isAtlas && controlsAnchor == null) AgentPanelLayout.rightSheet(screen.stage, w,
+            400f * UncivGame.Current.settings.fontSizeMultiplier, 650f) else null
+        val h = sheet?.height ?: minOf(650f, screen.stage.height - if (GameUiStyle.isAtlas) 24f else 130f, anchorTop?.minus(8f) ?: Float.MAX_VALUE).coerceAtLeast(1f)
         setSize(w, h)
         // Controls are not mounted/laid out during hidden construction. Follow their real stage
         // bottom only after showing; an explicit drag preserves the user's placement on resize.
-        if (isVisible && (!positioned || controlsAnchor != null && !userDragged)) {
+        if (isVisible && sheet != null && !userDragged) {
+            setPosition(sheet.x, sheet.y)
+            positioned = true
+        } else if (isVisible && (!positioned || controlsAnchor != null && !userDragged)) {
             setPosition(screen.stage.width - width - 8f, (anchorTop ?: (screen.stage.height - 116f)) - height)
             positioned = true
         }

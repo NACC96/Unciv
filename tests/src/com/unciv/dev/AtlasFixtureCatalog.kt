@@ -265,10 +265,11 @@ object AtlasFixtureCatalog {
                             hud.layout()
                         }
                         if (id == "world-control") {
-                            val control = status.children.filterIsInstance<TextButton>().single { it.text.toString() == "Control" }
-                            control.listeners.filterIsInstance<com.unciv.ui.components.input.ActivationListener>().single().tap(
-                                com.badlogic.gdx.scenes.scene2d.InputEvent().apply { listenerActor = control }, 1f, 1f, 1, 0)
-                            check(status.agentMatchControlTable?.isVisible == true)
+                            // The agent card is always in the turn slot: no separate Control toggle.
+                            val card = checkNotNull(status.agentMatchControlTable) { "world-control has no agent card" }
+                            check(card.isVisible && card.parent === status) { "The agent card must live in the turn slot" }
+                            check(status.children.filterIsInstance<TextButton>().none { it.text.toString() == "Control" })
+                            check(card.atlasDescendants().filterIsInstance<TextButton>().any { it.text.toString() == "Resume" && it.isVisible })
                         }
                         if (id == "world-map-roundtrip") {
                             val before = com.badlogic.gdx.math.Vector2(minimap.width, minimap.height)

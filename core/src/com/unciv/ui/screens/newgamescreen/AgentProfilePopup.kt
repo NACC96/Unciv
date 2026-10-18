@@ -4,6 +4,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.utils.Align
 import com.unciv.logic.agents.AgentModelCatalog
 import com.unciv.logic.agents.AgentProfile
+import com.unciv.logic.agents.AgentSlotLogic
 import com.unciv.logic.agents.ModelSpec
 import com.unciv.logic.agents.ThinkingLevel
 import com.unciv.models.metadata.Player
@@ -214,16 +215,26 @@ class AgentProfilePopup(
             updateThinkingLevels(specToUse)
         }
 
+        // A default display name follows the model; a custom one is never overwritten.
+        fun syncDisplayName(oldProvider: String, oldModelId: String) {
+            val name = AgentSlotLogic.displayNameAfterModelChange(nameField.text, player.chosenCiv,
+                oldProvider, oldModelId, workingProfile.provider, workingProfile.modelId)
+            if (name != nameField.text) nameField.text = name
+        }
+
         // Listeners
         providerBox.onChange {
             if (updatingChoices) return@onChange
             val newProvider = providerBox.selected
             if (newProvider != workingProfile.provider) {
+                val oldProvider = workingProfile.provider
+                val oldModel = workingProfile.modelId
                 workingProfile.provider = newProvider
                 val defaultSpec = AgentModelCatalog.getDefaultModel(newProvider)
                 workingProfile.modelId = defaultSpec.id
                 workingProfile.reasoning = defaultSpec.defaultThinkingLevel.wireValue
                 updateModelChoices(newProvider)
+                syncDisplayName(oldProvider, oldModel)
             }
         }
 
@@ -231,6 +242,7 @@ class AgentProfilePopup(
             if (updatingChoices) return@onChange
             val selected = modelBox.selected ?: return@onChange
             val isCustom = selected.isCustomChoice
+            val oldModel = workingProfile.modelId
             showCustomModelFields(isCustom)
             if (isCustom) {
                 workingProfile.modelId = customModelField.text.trim()
@@ -240,11 +252,14 @@ class AgentProfilePopup(
                 workingProfile.modelId = selected.spec.id
                 updateThinkingLevels(selected.spec)
             }
+            syncDisplayName(workingProfile.provider, oldModel)
         }
 
         customModelField.onChange {
             if (modelBox.selected?.isCustomChoice == true) {
+                val oldModel = workingProfile.modelId
                 workingProfile.modelId = customModelField.text.trim()
+                syncDisplayName(workingProfile.provider, oldModel)
             }
         }
 

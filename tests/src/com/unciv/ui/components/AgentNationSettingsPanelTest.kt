@@ -105,6 +105,25 @@ class AgentNationSettingsPanelTest {
         box.selected = box.items.first { it.toString().startsWith(prefix) }
     }
 
+    @Test fun `a default display name follows the model while a custom name is kept`() {
+        val f = Fixture(); val panel = AgentNationSettingsPanel(f.screen, f.session)
+        try {
+            panel.toggle(); panel.select("NationPicker", "Greece")
+            val name = panel.named("NationDisplayName") as TextField
+            @Suppress("UNCHECKED_CAST") val model = panel.named("NationModel") as SelectBox<Any>
+            fun otherModel() = model.items.first { it.toString() != "Custom model…" && it != model.selected }
+            val other = otherModel()
+            model.selected = other
+            assertEquals("$other Greece", name.text)
+            panel.named("NationSave").press()
+            assertEquals("$other Greece", f.requests.single().profile!!.displayName)
+            f.callback!!(null)
+            panel.select("NationPicker", "Rome")
+            model.selected = otherModel()
+            assertEquals("Patient ruler", name.text)
+        } finally { panel.dispose() }
+    }
+
     @Test fun selectedNationImmediatelyReportsItsController() {
         val f = Fixture(); val panel = AgentNationSettingsPanel(f.screen, f.session)
         try {

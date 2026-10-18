@@ -146,7 +146,7 @@ class AtlasAgentPanelsTest {
                         assertTrue("$w x $h @$scale: $name $p ${actor.width} ${actor.height}", p.x >= -.5f && p.y >= -.5f && p.x + actor.width <= panel.width + .5f && p.y + actor.height <= panel.height + .5f)
                     }
                     val reading = panel.descendants().single { it.name == "MessageReadingPane" }
-                    assertTrue(reading.height >= 80f)
+                    assertTrue("$w x $h @$scale: reading pane ${reading.height} in ${panel.height}", reading.height >= 80f)
                     panel.descendants().single { it.name == "MessageDelete" }.press()
                     panel.validate()
                     val delete = panel.descendants().single { it.name == "MessageDelete" }

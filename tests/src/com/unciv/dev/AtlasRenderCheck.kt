@@ -141,7 +141,23 @@ object AtlasRenderCheck {
                     "bounds" to listOf(p.x, p.y, button.width, button.height))
             }.toList()
 
+    /** Spectators and agent turns have no NextTurnButton: the agent card is their turn slot. */
     private fun worldActionEvidence(screen: BaseScreen, pixels: Pixmap): List<Map<String, Any?>> =
+        turnButtonEvidence(screen, pixels) + screen.stage.root.atlasDescendants()
+            .filterIsInstance<com.unciv.ui.screens.worldscreen.status.AgentMatchControlTable>()
+            .filter { card -> generateSequence(card as com.badlogic.gdx.scenes.scene2d.Actor?) { it.parent }.all { it.isVisible } }
+            .map { card ->
+                val p = card.localToStageCoordinates(Vector2())
+                val clipped = generateSequence(card.parent) { it.parent }.filterIsInstance<com.badlogic.gdx.scenes.scene2d.ui.ScrollPane>().any { host ->
+                    val h = host.localToStageCoordinates(Vector2())
+                    p.x < h.x - .5f || p.y < h.y - .5f || p.x + card.width > h.x + host.width + .5f || p.y + card.height > h.y + host.height + .5f
+                }
+                linkedMapOf("name" to "AgentMatchControlTable", "bounds" to listOf(p.x, p.y, card.width, card.height),
+                    "clippedByHost" to clipped, "hostsTurnButton" to card.atlasDescendants().any { it is com.unciv.ui.screens.worldscreen.status.NextTurnButton },
+                    "buttons" to card.atlasDescendants().filterIsInstance<com.badlogic.gdx.scenes.scene2d.ui.TextButton>().filter { it.isVisible }.map { it.text.toString() }.toList())
+            }.toList()
+
+    private fun turnButtonEvidence(screen: BaseScreen, pixels: Pixmap): List<Map<String, Any?>> =
         screen.stage.root.atlasDescendants().filterIsInstance<com.unciv.ui.images.IconTextButton>()
             .filter { it is com.unciv.ui.screens.worldscreen.status.NextTurnButton || it.name?.startsWith("AtlasUnitActionEvidence:") == true }
             .filter { button -> generateSequence(button as com.badlogic.gdx.scenes.scene2d.Actor?) { it.parent }.all { it.isVisible } }

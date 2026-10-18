@@ -22,8 +22,9 @@ import yairm210.purity.annotations.Readonly
 
 enum class NextTurnAction(protected val text: String, val color: Color) {
     AgentMatch("Agent match", Color.GOLD) {
+        // Short "state · nation"; the session's full statusText() stays in logs.
         override fun getText(worldScreen: WorldScreen) =
-            worldScreen.agentSession?.statusText() ?: text
+            worldScreen.agentSession?.let { AgentStatusFormat.status(it.getRunState(), it.getActiveCivId()) } ?: text
         override fun isChoice(worldScreen: WorldScreen) =
             worldScreen.agentSession != null
         override fun action(worldScreen: WorldScreen) {
