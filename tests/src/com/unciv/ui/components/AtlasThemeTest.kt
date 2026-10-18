@@ -30,6 +30,8 @@ import org.mockito.Mockito
 import com.unciv.ui.screens.basescreen.BaseScreen
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.graphics.g2d.Batch
+import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable
 import com.badlogic.gdx.utils.viewport.ScreenViewport
 import com.unciv.testing.GdxTestRunner
 import org.junit.After
@@ -429,6 +431,171 @@ class AtlasThemeTest {
             assertTrue(button.label.height >= button.label.prefHeight)
             assertEquals(state.name, if (state.disabled) GameUiStyle.muted else GameUiStyle.surface, button.resolvedFontColor())
         }
+    }
+
+    @Test fun modernShapesArePackedAsNinePatches() {
+        for (shape in listOf("surface", "surface-rim", "surface-shadow", "control-r8", "control-r8-rim", "pill", "pill-rim"))
+            assertTrue("Skins/Atlas/$shape must be packed into Skin.atlas", ImageGetter.ninePatchImageExists("Skins/Atlas/$shape"))
+        // The original shapes keep serving every other Atlas screen.
+        for (shape in listOf("control", "panel", "rim"))
+            assertTrue(ImageGetter.ninePatchImageExists("Skins/Atlas/$shape"))
+    }
+
+    @Test fun modernSurfacesDrawHalfScaleArtWithTheirOwnInsets() {
+        selectSkin("Atlas")
+        val card = GameUiStyle.surface("Probe/Card")
+        assertTrue(card.minWidth > 0f && card.minHeight > 0f)
+        // Tables using a card as background keep a small default inset, not the 12-unit corner.
+        for (inset in listOf(card.leftWidth, card.rightWidth, card.topHeight, card.bottomHeight))
+            assertEquals(GameUiStyle.Space.m, inset, 0f)
+        val control = GameUiStyle.control("Probe/Control", GameUiStyle.raised) as NinePatchDrawable
+        assertEquals(GameUiStyle.Radius.control, control.patch.leftWidth, 0.01f)
+        assertEquals(GameUiStyle.raised, control.patch.color)
+        val pill = GameUiStyle.pill("Probe/Pill") as NinePatchDrawable
+        assertEquals(GameUiStyle.raised, pill.patch.color)
+        assertEquals(14f, pill.patch.leftWidth, 0.01f)
+        for (drawable in listOf(control, pill, GameUiStyle.pill("Probe/Pill", GameUiStyle.accent, GameUiStyle.ink),
+            GameUiStyle.control("Probe/Control", GameUiStyle.raised, GameUiStyle.accent)))
+            assertTrue(drawable.minWidth > 0f && drawable.minHeight > 0f)
+        // Scaling works on copies; the shared cached patch keeps its 2x geometry.
+        assertEquals(24f, ImageGetter.getNinePatch("Skins/Atlas/surface").patch.leftWidth, 0f)
+        assertEquals(16f, ImageGetter.getNinePatch("Skins/Atlas/control-r8").patch.leftWidth, 0f)
+        val dot = GameUiStyle.dot(GameUiStyle.info)
+        assertEquals(8f, dot.prefWidth, 0f)
+        assertEquals(GameUiStyle.info, dot.color)
+    }
+
+    @Test fun modArtAtAnOverridePathKeepsItsAuthoredSize() {
+        @Suppress("UNCHECKED_CAST")
+        val patches = ImageGetter::class.java.getDeclaredField("ninePatchDrawables").apply { isAccessible = true }
+            .get(null) as MutableMap<String, NinePatchDrawable>
+        patches["Skins/Atlas/Probe/Override"] = patches.getValue("Skins/Atlas/control")
+        SkinCache["Atlas"] = json().fromJson(SkinConfig::class.java,
+            """{"fallbackSkin":"Minimal","skinVariants":{"Probe/Variant":{"image":"control"}}}""")
+        selectSkin("Atlas")
+        fun corner(path: String) = (GameUiStyle.control(path, GameUiStyle.raised) as NinePatchDrawable).patch.leftWidth
+        assertEquals(4f, corner("Probe/Override"), 0f)
+        assertEquals(4f, corner("Probe/Variant"), 0f)
+        assertEquals(GameUiStyle.Radius.control, corner("Probe/Default"), 0f)
+    }
+
+    @Test fun roundedShapesNeverDrawOutsideTheirBoundsWhenSmallerThanTheirCorners() {
+        selectSkin("Atlas")
+        val quads = ArrayList<FloatArray>()
+        val batch = Mockito.mock(Batch::class.java)
+        Mockito.`when`(batch.color).thenReturn(Color.WHITE)
+        Mockito.doAnswer { quads += it.getArgument<FloatArray>(1).copyOf(it.getArgument(3)); null }
+            .`when`(batch).draw(Mockito.any(Texture::class.java), Mockito.any(FloatArray::class.java), Mockito.anyInt(), Mockito.anyInt())
+        fun extent(drawable: Drawable, width: Float, height: Float): List<Float> {
+            quads.clear()
+            drawable.draw(batch, 100f, 50f, width, height)
+            assertTrue(quads.isNotEmpty())
+            val xs = quads.flatMap { v -> (v.indices step 5).map { v[it] } }
+            val ys = quads.flatMap { v -> (v.indices step 5).map { v[it + 1] } }
+            return listOf(xs.min() - 100f, ys.min() - 50f, xs.max() - 100f, ys.max() - 50f)
+        }
+        fun assertFills(expected: List<Float>, actual: List<Float>) =
+            expected.zip(actual).forEach { (e, a) -> assertEquals("Drawn extent $actual", e, a, 0.01f) }
+        // A 6-unit control, a 10-unit pill and a 10-unit flat card are all below their corner sums.
+        assertFills(listOf(0f, 0f, 6f, 6f), extent(GameUiStyle.control("Probe/Small", GameUiStyle.raised), 6f, 6f))
+        assertFills(listOf(0f, 0f, 40f, 10f), extent(GameUiStyle.pill("Probe/Small"), 40f, 10f))
+        assertFills(listOf(0f, 0f, 60f, 44f), extent(GameUiStyle.pill("Probe/Tall", GameUiStyle.raised, GameUiStyle.ink), 60f, 44f))
+        assertFills(listOf(0f, 0f, 10f, 10f), extent(GameUiStyle.surface("Probe/Small", elevated = false), 10f, 10f))
+        // The halo surrounds an elevated card by its margin, with the card's footprint knocked out.
+        assertFills(listOf(-18f, -18f, 118f, 78f), extent(GameUiStyle.surface("Probe/Card"), 100f, 60f))
+    }
+
+    @Test fun modernHelpersFallBackToLegacyShapesOutsideAtlas() {
+        selectSkin("Minimal")
+        val card = GameUiStyle.surface("Probe/Card", 0.9f)
+        val reference = GameUiStyle.panelBackground("Probe/Card", 0.9f)
+        assertSame(reference.javaClass, card.javaClass)
+        assertEquals(listOf(reference.minWidth, reference.minHeight, reference.leftWidth, reference.topHeight),
+            listOf(card.minWidth, card.minHeight, card.leftWidth, card.topHeight))
+        val legacyShape = BaseScreen.skinStrings.getUiBackground("Probe", BaseScreen.skinStrings.roundedEdgeRectangleSmallShape).patch
+        for (drawable in listOf(GameUiStyle.control("Probe/Control", GameUiStyle.raised), GameUiStyle.pill("Probe/Pill"))) {
+            val patch = (drawable as NinePatchDrawable).patch
+            assertSame(legacyShape.texture, patch.texture)
+            assertEquals(legacyShape.totalWidth, patch.totalWidth, 0f)
+            assertEquals(GameUiStyle.raised, patch.color)
+        }
+        val outlined = GameUiStyle.outlinedBackground("Probe/Outlined", GameUiStyle.raised, GameUiStyle.ink)
+        assertSame(outlined.javaClass, GameUiStyle.pill("Probe/Pill", GameUiStyle.raised, GameUiStyle.ink).javaClass)
+        assertSame(outlined.javaClass, GameUiStyle.control("Probe/Control", GameUiStyle.raised, GameUiStyle.ink).javaClass)
+        // Quiet and Ghost are the legacy secondary control on other skins.
+        val secondary = GameUiStyle.button("Secondary").style
+        for (emphasis in listOf(GameUiStyle.Emphasis.Quiet, GameUiStyle.Emphasis.Ghost)) {
+            val style = GameUiStyle.button("Quiet", emphasis).style
+            assertEquals(foregrounds(secondary), foregrounds(style))
+            assertEquals(secondary.up.minHeight, style.up.minHeight, 0f)
+            assertEquals((secondary.up as NinePatchDrawable).patch.color, (style.up as NinePatchDrawable).patch.color)
+        }
+    }
+
+    @Test fun quietAndGhostRolesSurviveRootPassesAndSkinReload() {
+        selectSkin("Atlas")
+        for (emphasis in listOf(GameUiStyle.Emphasis.Quiet, GameUiStyle.Emphasis.Ghost)) {
+            for (size in listOf(GameUiStyle.ButtonSize.Regular, GameUiStyle.ButtonSize.Compact)) {
+                val button = GameUiStyle.button("Activity", emphasis, size)
+                button.onActivation {}; button.keyShortcuts.add('a')
+                val owner = button.userObject
+                val listeners = button.listeners.toList()
+                val row = Table().apply { add(button) }
+                fun verify() {
+                    val style = button.style
+                    assertEquals(GameUiStyle.ink, style.fontColor)
+                    assertEquals(GameUiStyle.accent, style.checkedFontColor)
+                    assertEquals(GameUiStyle.muted, style.disabledFontColor)
+                    // No outline: hover is a plain rounded fill, not the secondary rim/fill pair.
+                    assertEquals(GameUiStyle.hover, (style.over as NinePatchDrawable).patch.color)
+                    if (emphasis == GameUiStyle.Emphasis.Quiet)
+                        assertEquals(GameUiStyle.raised, (style.up as NinePatchDrawable).patch.color)
+                    else assertFalse("Ghost rests transparent", style.up is NinePatchDrawable)
+                    assertNotNull("Keyboard focus stays visible while checked", style.checkedFocused)
+                    assertNotNull(style.focused)
+                    for (state in backgrounds(style)) assertEquals(size.controlHeight, state.minHeight, 0f)
+                    button.pack()
+                    assertTrue(button.height >= size.controlHeight)
+                    assertEquals(size.padHorizontal, button.padLeft, 0f)
+                    assertSame(Fonts.font, style.font)
+                    assertSame(owner, button.userObject)
+                    assertEquals(listeners, button.listeners.toList())
+                    assertTrue(KeyCharAndCode('a') in button.keyShortcuts)
+                }
+                verify()
+                repeat(2) { GameUiStyle.applyWidget(row); verify() }
+                BaseScreen.setSkin()
+                GameUiStyle.applyWidget(row)
+                verify()
+                // Re-sizing through the boolean overload keeps the role.
+                GameUiStyle.apply(button, size = size)
+                verify()
+            }
+        }
+        val promoted = GameUiStyle.button("Resume", GameUiStyle.Emphasis.Quiet)
+        GameUiStyle.apply(promoted, primary = true)
+        assertEquals(GameUiStyle.accent, (promoted.style.up as NinePatchDrawable).patch.color)
+        GameUiStyle.apply(promoted, GameUiStyle.Emphasis.Secondary)
+        assertEquals(GameUiStyle.selection, promoted.style.checkedFontColor)
+        assertFalse("Secondary keeps its outlined fill", promoted.style.over is NinePatchDrawable)
+    }
+
+    @Test fun quietControlsKeepReadableText() {
+        selectSkin("Atlas")
+        val quiet = GameUiStyle.button("Messages", GameUiStyle.Emphasis.Quiet).style
+        val ghost = GameUiStyle.button("Logs", GameUiStyle.Emphasis.Ghost).style
+        assertTrue(contrast(quiet.fontColor, GameUiStyle.raised) >= 4.5)
+        assertTrue(contrast(quiet.overFontColor, GameUiStyle.hover) >= 4.5)
+        assertTrue(contrast(quiet.downFontColor, GameUiStyle.pressed) >= 4.5)
+        assertTrue(contrast(ghost.fontColor, GameUiStyle.surface) >= 4.5)
+        val checkedFill = composite(GameUiStyle.accent.cpy().apply { a = 0.2f }, GameUiStyle.surface)
+        val drawnFill = (quiet.checked as NinePatchDrawable).patch.color
+        assertEquals(checkedFill.r, drawnFill.r, 0.002f)
+        assertEquals(checkedFill.g, drawnFill.g, 0.002f)
+        assertEquals(checkedFill.b, drawnFill.b, 0.002f)
+        assertEquals("Checked fill is opaque, so the map never shows through it", 1f, drawnFill.a, 0f)
+        assertTrue(contrast(quiet.checkedFontColor, checkedFill) >= 3.0)
+        assertTrue(contrast(quiet.checkedOverFontColor, (quiet.checkedOver as NinePatchDrawable).patch.color) >= 3.0)
     }
 
     private fun backgrounds(style: Button.ButtonStyle) = listOf(style.up, style.over, style.down,

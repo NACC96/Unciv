@@ -2,11 +2,13 @@ package com.unciv.ui.components
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.Batch
+import com.badlogic.gdx.graphics.g2d.NinePatch
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.Group
 import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.ui.Button
 import com.badlogic.gdx.scenes.scene2d.ui.CheckBox
+import com.badlogic.gdx.scenes.scene2d.ui.Image
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton
 import com.badlogic.gdx.scenes.scene2d.ui.ImageTextButton
@@ -19,6 +21,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import com.badlogic.gdx.scenes.scene2d.utils.BaseDrawable
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable
+import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable
 import com.unciv.ui.components.UncivTooltip.Companion.addTooltip
 import com.unciv.ui.components.extensions.setFontSize
 import com.unciv.ui.components.extensions.toTextButton
@@ -70,12 +73,26 @@ object GameUiStyle {
         const val xl = 16f
     }
 
+    /** Corner radii of the world screen's floating surfaces and their controls. */
+    object Radius {
+        const val panel = 12f
+        const val control = 8f
+    }
+
+    /** Secondary and Primary are the skin-wide defaults. Quiet (a filled control without an
+     * outline) and Ghost (transparent until hovered) are opt-in roles for world HUD controls. */
+    enum class Emphasis { Secondary, Primary, Quiet, Ghost }
+
     /** UI-thread presentation metadata never occupies Actor.userObject (owned by input/callers).
      * Weak keys and templates containing only copied colors/drawables retain neither actor nor style keys.
-     * Templates omit fonts; each pass binds the current selected platform font. */
-    private data class ButtonRole(val primary: Boolean = false,
+     * Templates omit fonts; each pass binds the current selected platform font.
+     * A role assigned through an explicit [Emphasis] also remembers its size for later passes. */
+    private data class ButtonRole(val emphasis: Emphasis = Emphasis.Secondary,
         val semanticStyle: TextButton.TextButtonStyle? = null,
-        val semanticForeground: TextButton.TextButtonStyle? = null)
+        val semanticForeground: TextButton.TextButtonStyle? = null,
+        val size: ButtonSize? = null) {
+        val primary get() = emphasis == Emphasis.Primary
+    }
     private val buttonRoles = WeakHashMap<Button, ButtonRole>()
     private val namedSemanticStyles = WeakHashMap<Button.ButtonStyle, String>()
 
@@ -103,7 +120,7 @@ object GameUiStyle {
         }
         when {
             source != null && namedSemanticStyles.containsKey(source) -> ButtonRole(semanticStyle = template(source))
-            source?.fontColor == surface -> ButtonRole(primary = true)
+            source?.fontColor == surface -> ButtonRole(Emphasis.Primary)
             button is ImageTextButton && source?.fontColor != null && source.fontColor != Color.WHITE &&
                 source.fontColor != ink && source.fontColor != Color.valueOf("eef2f4") ->
                 ButtonRole(semanticForeground = TextButton.TextButtonStyle().also { copyForeground(source, it) })
@@ -112,12 +129,12 @@ object GameUiStyle {
     }
 
     private fun controlStyle(button: Button, source: TextButton.TextButtonStyle,
-        minHeight: Float = standardControlHeight): TextButton.TextButtonStyle {
+        minHeight: Float? = null): TextButton.TextButtonStyle {
         val role = role(button)
         return if (role.semanticStyle != null) TextButton.TextButtonStyle(role.semanticStyle).also {
             copyForeground(role.semanticStyle, it)
             it.font = Fonts.font
-        } else buttonStyle(source, role.primary, minHeight).also {
+        } else buttonStyle(source, role.emphasis, minHeight ?: role.size?.controlHeight ?: standardControlHeight).also {
             role.semanticForeground?.let { colors -> copyForeground(colors, it) }
         }
     }
@@ -125,7 +142,9 @@ object GameUiStyle {
     enum class ButtonSize(val fontSize: Int, val padVertical: Float, val padHorizontal: Float) {
         Regular(Type.label, Space.m, Space.l),
         Compact(Type.caption, 6f, Space.xs),
-        Icon(Type.label, Space.s, Space.s),
+        Icon(Type.label, Space.s, Space.s);
+
+        val controlHeight get() = if (this == Regular) standardControlHeight else compactControlHeight
     }
 
     fun background(path: String, color: Color = surface): Drawable =
@@ -168,15 +187,122 @@ object GameUiStyle {
         }
     }
 
+    /** A floating world-screen card: a soft shadow halo (when [elevated]), a rounded fill and a
+     * hairline rim. Its insets are [Space.m], not its corner size, so tables keep their own padding.
+     * Other skins keep [panelBackground]. Build once; never per frame. */
+    fun surface(path: String, opacity: Float = 0.90f, elevated: Boolean = true): Drawable {
+        if (!isAtlas) return panelBackground(path, opacity)
+        val fill = rounded(path, "surface", surface.apply { a = opacity.coerceIn(0f, 1f) })
+        val rim = rounded("$path/Rim", "surface-rim", ink.apply { a = 0.09f })
+        val shadow = if (elevated) rounded("Atlas/Surface/Shadow", "surface-shadow", Color(0f, 0f, 0f, 0.35f)) else null
+        return SurfaceDrawable(fill, rim, shadow).apply { inset(Space.m, Space.m, 2 * Radius.panel) }
+    }
+
+    /** A fully rounded chip at any height, optionally with a hairline [rim]. */
+    fun pill(path: String, color: Color = raised, rim: Color? = null): Drawable {
+        if (!isAtlas) return if (rim == null) background(path, color) else outlinedBackground(path, color, rim)
+        val fill = rounded(path, "pill", color, fullyRounded = true)
+        val drawable = if (rim == null) fill else Outlined(fill, rounded("$path/Rim", "pill-rim", rim, fullyRounded = true))
+        return drawable.apply { inset(Space.l, Space.s, 2 * Space.l) }
+    }
+
+    /** A control fill with the [Radius.control] corner, optionally with a hairline [rim]. */
+    fun control(path: String, color: Color, rim: Color? = null): Drawable {
+        if (!isAtlas) return if (rim == null) background(path, color) else outlinedBackground(path, color, rim)
+        val fill = rounded(path, "control-r8", color)
+        val drawable = if (rim == null) fill else Outlined(fill, rounded("$path/Rim", "control-r8-rim", rim))
+        return drawable.apply { inset(Space.s, Space.s, 2 * Radius.control) }
+    }
+
+    /** A round status mark, e.g. [info] running, [warning] paused, [error] failed, [muted] idle. */
+    fun dot(color: Color, size: Float = 8f): Image = ImageGetter.getCircle(color, size)
+
+    /** Generated 2x art (scripts/atlas/gen_ui_ninepatches.py) drawn at half scale. Mod art at
+     * Skins/<skin>/<path>, or a skin variant's own image, keeps its authored size. */
+    private fun rounded(path: String, shape: String, tint: Color, fullyRounded: Boolean = false): RoundedPatch {
+        val strings = BaseScreen.skinStrings
+        val location = "Skins/${strings.skin}/"
+        val variant = strings.skinConfig.skinVariants[path]?.image
+        val modArt = ImageGetter.ninePatchImageExists(location + path) ||
+            variant != null && variant != shape && ImageGetter.ninePatchImageExists(location + variant)
+        // Copy before scaling: an untinted lookup returns the shared cached drawable.
+        val patch = NinePatch(strings.getUiBackground(path, shape, tint).patch)
+        if (!modArt) patch.scale(0.5f, 0.5f)
+        return RoundedPatch(patch, fullyRounded)
+    }
+
+    private fun BaseDrawable.inset(horizontal: Float, vertical: Float, minSize: Float) {
+        leftWidth = horizontal; rightWidth = horizontal
+        topHeight = vertical; bottomHeight = vertical
+        minWidth = minSize; minHeight = minSize
+    }
+
+    /** NinePatch has no clamp: below its corner sum the corners overlap and invert. Smaller sizes
+     * shrink the whole patch uniformly instead, so corners stay round. A fully rounded patch always
+     * fits its corners to the drawn height. */
+    private class RoundedPatch(patch: NinePatch, private val fullyRounded: Boolean) : NinePatchDrawable(patch) {
+        override fun draw(batch: Batch, x: Float, y: Float, width: Float, height: Float) {
+            if (width <= 0f || height <= 0f) return
+            var scale = if (fullyRounded) height / patch.totalHeight else 1f
+            val cornersX = patch.leftWidth + patch.rightWidth
+            val cornersY = patch.topHeight + patch.bottomHeight
+            if (cornersX > 0f) scale = minOf(scale, width / cornersX)
+            if (cornersY > 0f) scale = minOf(scale, height / cornersY)
+            if (scale == 1f) patch.draw(batch, x, y, width, height)
+            else patch.draw(batch, x, y, 0f, 0f, width / scale, height / scale, scale, scale, 0f)
+        }
+    }
+
+    /** A fill with a hairline ring over it; geometry, insets and minimum size follow the fill. */
+    private class Outlined(private val fill: Drawable, private val rim: Drawable) : BaseDrawable(fill) {
+        override fun draw(batch: Batch, x: Float, y: Float, width: Float, height: Float) {
+            fill.draw(batch, x, y, width, height)
+            rim.draw(batch, x, y, width, height)
+        }
+    }
+
+    /** The halo is generated for a [Radius.panel] footprint with its downward offset baked in.
+     * Its corners exceed that radius by the margin it is drawn outside the panel, and its
+     * knocked-out interior leaves a translucent fill translucent. */
+    private class SurfaceDrawable(private val fill: RoundedPatch, private val rim: RoundedPatch,
+        private val shadow: RoundedPatch?) : BaseDrawable() {
+        override fun draw(batch: Batch, x: Float, y: Float, width: Float, height: Float) {
+            if (width <= 0f || height <= 0f) return
+            if (shadow != null) {
+                val scale = minOf(1f, width / (2 * Radius.panel), height / (2 * Radius.panel))
+                val margin = (shadow.patch.leftWidth - Radius.panel).coerceAtLeast(0f) * scale
+                shadow.draw(batch, x - margin, y - margin, width + 2 * margin, height + 2 * margin)
+            }
+            fill.draw(batch, x, y, width, height)
+            rim.draw(batch, x, y, width, height)
+        }
+    }
+
     fun button(text: String, primary: Boolean = false, size: ButtonSize = ButtonSize.Regular): TextButton =
         text.toTextButton().also { apply(it, primary, size) }
 
+    /** A button with an explicit [emphasis], e.g. a world HUD [Emphasis.Quiet] or [Emphasis.Ghost] control. */
+    fun button(text: String, emphasis: Emphasis, size: ButtonSize = ButtonSize.Regular): TextButton =
+        text.toTextButton().also { apply(it, emphasis, size) }
+
     fun apply(button: Button, primary: Boolean = false, size: ButtonSize = ButtonSize.Regular) {
         val previous = role(button)
-        buttonRoles[button] = if (primary) ButtonRole(primary = true)
-            else if (previous.primary) ButtonRole() else previous
-        val style = controlStyle(button, BaseScreen.skin.get(TextButton.TextButtonStyle::class.java),
-            if (size == ButtonSize.Regular) standardControlHeight else compactControlHeight)
+        buttonRoles[button] = if (primary) ButtonRole(Emphasis.Primary)
+            else if (previous.primary) ButtonRole() else previous.copy(size = previous.size?.let { size })
+        restyle(button, size)
+    }
+
+    /** Assigns [emphasis] and [size]; later [applyWidget] passes and skin reloads keep both.
+     * Other skins draw Quiet and Ghost as their secondary control. */
+    fun apply(button: Button, emphasis: Emphasis, size: ButtonSize = ButtonSize.Regular) {
+        val previous = role(button)
+        buttonRoles[button] = if (emphasis == Emphasis.Secondary && previous.emphasis == Emphasis.Secondary)
+            previous.copy(size = size) else ButtonRole(emphasis, size = size)
+        restyle(button, size)
+    }
+
+    private fun restyle(button: Button, size: ButtonSize) {
+        val style = controlStyle(button, BaseScreen.skin.get(TextButton.TextButtonStyle::class.java), size.controlHeight)
         button.style = typedButtonStyle(button, style)
         if (button is TextButton) button.label.setFontSize(size.fontSize)
         if (button is ImageTextButton) button.label.setFontSize(size.fontSize)
@@ -186,8 +312,10 @@ object GameUiStyle {
         button.pack()
     }
 
-    private fun buttonStyle(source: TextButton.TextButtonStyle, primary: Boolean = false, minHeight: Float = standardControlHeight): TextButton.TextButtonStyle =
+    private fun buttonStyle(source: TextButton.TextButtonStyle, emphasis: Emphasis = Emphasis.Secondary,
+        minHeight: Float = standardControlHeight): TextButton.TextButtonStyle =
         TextButton.TextButtonStyle(source).apply {
+            val primary = emphasis == Emphasis.Primary
             font = Fonts.font
             disabled = outlinedBackground("WorldScreen/Controls/Disabled", surface, if (isAtlas) muted else hover)
             disabledFontColor = muted
@@ -220,19 +348,45 @@ object GameUiStyle {
             checkedDownFontColor = checkedFontColor?.cpy()
             checkedOver = if (primary) over else checked
             checkedDown = down
+            checkedFocused = null
+            if (isAtlas && (emphasis == Emphasis.Quiet || emphasis == Emphasis.Ghost))
+                quietStates(emphasis == Emphasis.Ghost)
             if (isAtlas) {
                 // The fill's geometry can be small; its actual hit/layout target remains accessible.
-                for (drawable in listOf(up, over, down, checked, focused, disabled, checkedOver, checkedDown))
+                for (drawable in listOf(up, over, down, checked, focused, disabled, checkedOver, checkedDown, checkedFocused))
                     if (drawable is BaseDrawable) drawable.minHeight = minHeight
             }
         }
+
+    /** World HUD states without the secondary outline. Quiet rests on a raised fill; Ghost is
+     * transparent until hovered. Checked (e.g. an open sheet) is an opaque brass tint with brass
+     * text, and keyboard focus keeps a brass ring in both checked and unchecked states. */
+    private fun TextButton.TextButtonStyle.quietStates(ghost: Boolean) {
+        val path = if (ghost) "Atlas/Button/Ghost" else "Atlas/Button/Quiet"
+        val checkedFill = surface.lerp(accent, 0.2f)
+        // Every state shares the control insets, so an unpadded button never shifts between states.
+        val transparent = BaseDrawable().apply { inset(Space.s, Space.s, 2 * Radius.control) }
+        up = if (ghost) transparent else control("$path/Up", raised)
+        over = control("$path/Over", hover)
+        down = control("$path/Down", pressed)
+        checked = control("$path/Checked", checkedFill)
+        checkedOver = control("$path/CheckedOver", surface.lerp(accent, 0.26f))
+        checkedDown = down
+        focused = if (ghost) Outlined(transparent, rounded("$path/Focused/Rim", "control-r8-rim", accent))
+            else control("$path/Focused", raised, accent)
+        checkedFocused = control("$path/CheckedFocused", checkedFill, accent)
+        disabled = if (ghost) transparent else control("$path/Disabled", surface.lerp(raised, 0.5f))
+        fontColor = ink; overFontColor = ink; downFontColor = ink; focusedFontColor = ink
+        checkedFontColor = accent; checkedOverFontColor = accent; checkedDownFontColor = accent
+        disabledFontColor = muted
+    }
 
     /** Scene2D subclasses require their own style type. Preserve semantic image states and fonts. */
     private fun typedButtonStyle(button: Button, common: TextButton.TextButtonStyle): Button.ButtonStyle {
         fun Button.ButtonStyle.withStates() = apply {
             up = common.up; over = common.over; down = common.down; checked = common.checked
             focused = common.focused; disabled = common.disabled
-            checkedOver = common.checkedOver; checkedDown = common.checkedDown
+            checkedOver = common.checkedOver; checkedDown = common.checkedDown; checkedFocused = common.checkedFocused
         }
         return when (button) {
             is CheckBox -> if (isAtlas) checkBoxStyle(button.style, preserveImages = true) else CheckBox.CheckBoxStyle(button.style)
@@ -350,7 +504,9 @@ object GameUiStyle {
             }
             is TextButton -> {
                 actor.style = controlStyle(actor, actor.style)
-                actor.pad(Space.m, Space.l, Space.m, Space.l)
+                val size = role(actor).size
+                if (size == null) actor.pad(Space.m, Space.l, Space.m, Space.l)
+                else actor.pad(size.padVertical, size.padHorizontal, size.padVertical, size.padHorizontal)
             }
             is ImageButton, is ImageTextButton -> {
                 val source = if (actor is ImageTextButton) actor.style else BaseScreen.skin.get(TextButton.TextButtonStyle::class.java)
