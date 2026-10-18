@@ -2,6 +2,7 @@ package com.unciv.dev
 
 import com.unciv.logic.GameInfo
 import com.unciv.logic.agents.AgentMatchSession
+import com.unciv.logic.agents.AgentRunState
 import com.unciv.ui.screens.worldscreen.WorldScreen
 import com.unciv.ui.screens.worldscreen.status.NextTurnAction
 import com.unciv.ui.screens.worldscreen.status.NextTurnButton
@@ -55,7 +56,10 @@ internal object AtlasTurnFixtures {
             val session = Mockito.mock(AgentMatchSession::class.java)
             Mockito.`when`(screen.agentSession).thenReturn(session)
             Mockito.`when`(session.isHumanInputAllowed()).thenReturn(case != "AgentMatchPaused")
-            Mockito.`when`(session.statusText()).thenReturn(if (case == "AgentMatchPaused") "Paused · America" else "Your turn · America")
+            Mockito.`when`(session.statusText()).thenReturn("Synthetic debug status · rev 432")
+            // The turn button shows the short shared "state · nation"; statusText() stays in logs.
+            Mockito.`when`(session.getRunState()).thenReturn(if (case == "AgentMatchPaused") AgentRunState.PAUSED else AgentRunState.WAITING_HUMAN)
+            Mockito.`when`(session.getActiveCivId()).thenReturn("America")
         }
         when (expected) {
             NextTurnAction.AgentUnsupportedChoice -> Mockito.`when`(civ.canFoundPantheon()).thenReturn(true)

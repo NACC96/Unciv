@@ -92,6 +92,23 @@ object AgentSlotLogic {
         }
     }
 
+    /** The default display name: the catalog label of [provider]/[modelId], then the civilization. */
+    fun defaultDisplayName(provider: String, modelId: String, civ: String): String {
+        val label = AgentModelCatalog.findModel(provider, modelId).label
+        return if (civ.isNotBlank()) "$label $civ" else label
+    }
+
+    /** The name to keep after a model or provider change: a blank or default name follows the new
+     * model, so it never names a model the agent no longer uses; a custom name is never overwritten. */
+    fun displayNameAfterModelChange(
+        current: String, civ: String,
+        oldProvider: String, oldModelId: String,
+        newProvider: String, newModelId: String
+    ): String =
+        if (newModelId.isNotBlank() && (current.isBlank() || current.trim() == defaultDisplayName(oldProvider, oldModelId, civ)))
+            defaultDisplayName(newProvider, newModelId, civ)
+        else current
+
     /** Structural slot errors (duplicates, non-fixed picks); profile/rule validation lives in [AgentMatchSetup.validate]. */
     fun collectSlotErrors(
         players: List<Player>,

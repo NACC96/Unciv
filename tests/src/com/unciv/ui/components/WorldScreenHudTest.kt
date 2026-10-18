@@ -19,7 +19,9 @@ import com.unciv.logic.agents.AgentRunState
 import com.unciv.logic.agents.AgentRunTiming
 import com.unciv.ui.screens.worldscreen.status.AgentMatchControlTable
 import com.badlogic.gdx.utils.Timer
+import com.unciv.models.skins.SkinCache
 import com.unciv.models.translations.tr
+import com.unciv.ui.screens.basescreen.BaseScreen
 import com.unciv.testing.GdxTestRunner
 import com.unciv.testing.TestGame
 import com.unciv.ui.components.fonts.FontRulesetIcons
@@ -533,6 +535,83 @@ class WorldScreenHudTest {
         assertEquals(4, labels.count { it == "Atlas" }) // turn heading plus three messages
         assertTrue("Atlas · Thinking" in labels)
         assertTrue("Atlas · Tools" in labels)
+    }
+
+    /** Atlas-only behaviour runs under the Atlas skin; the shared fixture otherwise keeps the default skin.
+     * The fixture's ruleset load resets the skin, so the skin is selected after it. */
+    private fun withAtlasSkin(block: (Fixture) -> Unit) {
+        val snapshot = SetupUiStateSnapshot()
+        try {
+            val f = Fixture()
+            SkinCache.loadSkinConfigs(); UncivGame.Current.settings.skin = "Atlas"; BaseScreen.setSkin()
+            block(f)
+        } finally {
+            controls.forEach { it.dispose() }; controls.clear()
+            feeds.forEach { it.dispose() }; feeds.clear()
+            snapshot.restore()
+        }
+    }
+
+    @Test fun `atlas feed names the speaker once per turn and keeps kind only captions`() = withAtlasSkin { f ->
+        f.activity = listOf(entry("first"), entry("thinking", "reasoning"), entry("call1", "tool"), entry("call2", "tool"),
+            entry("run-1", "run").copy(title = "Provider completed in 01:05", summary = "Duration 01:05", status = "completed"))
+        val feed = f.feed()
+        fun labels() = feed.descendants().filterIsInstance<Label>().map { it.text.toString() }.toList()
+        assertEquals("Only the turn heading names the agent", 1, labels().count { it == "Atlas" })
+        for (kind in listOf("Thinking", "Tools", "Run completed")) assertTrue("$kind caption missing from ${labels()}", kind in labels())
+        assertFalse(labels().any { it.startsWith("Atlas · ") })
+        assertFalse("One header row: no title, identity, elapsed or state rows", labels().any {
+            it == "Agent activity" || it == "No active provider run" || it.contains(" activity · ") })
+        feed.selectNation("All nations")
+        assertTrue("All nations keeps full speaker captions", "Atlas · Thinking" in labels() && "Atlas · Run completed" in labels())
+    }
+
+    @Test fun `atlas Live chip floats only while reading and Earlier appears only with older history`() = withAtlasSkin { f ->
+        f.activity = (1..40).map { entry("$it") }
+        val feed = f.feed()
+        val live = feed.descendants().filterIsInstance<TextButton>().single { it.text.toString() == "Live" }
+        val earlier = feed.descendants().filterIsInstance<TextButton>().single { it.text.toString() == "Earlier" }
+        val scroll = feed.descendants().filterIsInstance<AutoScrollPane>().single()
+        assertFalse("Following needs no Live control", live.isVisible)
+        assertFalse("No older history to offer", earlier.isVisible)
+        assertTrue("Earlier sits atop the entries, not in a footer", earlier.isDescendantOf(scroll))
+        scroll.captureListeners.filterIsInstance<InputListener>().forEach { it.scrolled(InputEvent(), 0f, 0f, 0f, -1f) }
+        scroll.scrollY = 20f
+        f.activity = f.activity + (1..3).map { entry("new-$it") }
+        feed.refreshNow()
+        feed.validate()
+        assertTrue(live.isVisible)
+        assertEquals("3 new", live.text.toString())
+        assertTrue("The chip floats inside the sheet", live.parent === feed && live.x >= 0f && live.x + live.width <= feed.width)
+        live.press()
+        assertFalse(live.isVisible)
+        assertEquals(scroll.maxY, scroll.scrollY, 0.1f)
+        f.activity = (1..200).map { entry("old-$it") }
+        feed.refreshNow()
+        assertTrue("Older history offers Earlier", earlier.isVisible)
+    }
+
+    @Test fun `atlas agent card lives in the turn slot and hosts the turn action only while a human may act`() = withAtlasSkin { f ->
+        Mockito.`when`(f.session.canResume()).thenReturn(true)
+        val next = com.unciv.ui.screens.worldscreen.status.NextTurnButton(f.screen)
+        val status = com.unciv.ui.screens.worldscreen.status.StatusButtons(next, f.screen)
+        try {
+            status.update(false)
+            val card = status.agentMatchControlTable!!
+            assertSame(status, card.parent)
+            assertNull("Spectators and agent turns get no turn button", next.parent)
+            val buttons = card.descendants().filterIsInstance<TextButton>().map { it.text.toString() }.toList()
+            assertEquals(listOf("Resume", "Activity", "Messages", "Settings"), buttons)
+            val resume = card.descendants().filterIsInstance<TextButton>().first()
+            assertEquals(GameUiStyle.accent, (resume.style.up as com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable).patch.color)
+            assertTrue("The HUD measures an honest turn slot", status.prefHeight >= card.height - .5f && status.prefWidth >= card.width - .5f)
+            assertTrue(card.descendants().filterIsInstance<Label>().any { it.text.toString() == "Thinking · Rome" })
+            Mockito.`when`(f.session.canResume()).thenReturn(false)
+            Mockito.`when`(f.session.isHumanInputAllowed()).thenReturn(true)
+            status.update(false)
+            assertTrue("A human turn puts the turn button in the card", next.isDescendantOf(card))
+            assertFalse(card.descendants().filterIsInstance<TextButton>().any { it.text.toString() in setOf("Control", "Resume") })
+        } finally { status.dispose() }
     }
 
     @Test fun `mouse wheel scrolls by a small fixed step rather than a fraction of the history`() {

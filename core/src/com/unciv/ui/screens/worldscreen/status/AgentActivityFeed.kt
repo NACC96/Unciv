@@ -8,6 +8,8 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.InputListener
 import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.ui.Button
+import com.badlogic.gdx.scenes.scene2d.ui.Container
+import com.badlogic.gdx.scenes.scene2d.ui.Stack
 import com.badlogic.gdx.scenes.scene2d.ui.List as GdxList
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane
 import com.badlogic.gdx.scenes.scene2d.ui.SelectBox
@@ -17,6 +19,7 @@ import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Array as GdxArray
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.Timer
+import com.unciv.UncivGame
 import com.unciv.logic.agents.AgentActivityEntry
 import com.unciv.logic.agents.AgentMatchSession
 import com.unciv.logic.agents.AgentRunState
@@ -36,6 +39,7 @@ import java.io.File
 /** Floating transcript: compact tools, readable agent identity, and live following. */
 class AgentActivityFeed(private val screen: WorldScreen, private val session: AgentMatchSession,
                         private val controlsAnchor: Actor? = null) : Table(BaseScreen.skin), Disposable {
+    private val atlas = GameUiStyle.isAtlas
     private val muted = WorldScreenStyle.muted
     private val ink = WorldScreenStyle.ink
     private val entriesTable = Table(skin)
@@ -59,9 +63,23 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
     private var lastActiveAgentCivId: String? = null
     private var effectiveFilterKey: String? = null
     private var deliberateFilterSwitch = false
-    private val liveLink = WorldScreenStyle.button("Live").apply { label.setFontSize(11) }
-    private val earlier = WorldScreenStyle.button("Earlier").apply { label.setFontSize(11) }
-    private val logsLink = WorldScreenStyle.button("Logs").apply { label.setFontSize(11) }
+    // Atlas: Earlier is a quiet row atop the entries, Live a floating "↓ N new" chip, Logs a header link.
+    private val liveLink = if (atlas) WorldScreenStyle.quietButton("Live", GameUiStyle.ButtonSize.Compact).apply {
+        val arrow = ImageGetter.getImage("OtherIcons/ArrowRight").apply {
+            color = ink; setSize(10f, 10f); setOrigin(Align.center); rotation = -90f
+        }
+        clearChildren()
+        add(arrow).size(10f).padRight(GameUiStyle.Space.s)
+        add(label)
+        pack()
+    } else WorldScreenStyle.button("Live").apply { label.setFontSize(11) }
+    private val earlier = if (atlas) WorldScreenStyle.quietButton("Earlier", GameUiStyle.ButtonSize.Compact)
+        else WorldScreenStyle.button("Earlier").apply { label.setFontSize(11) }
+    private val logsLink = if (atlas) WorldScreenStyle.ghostButton("Logs", GameUiStyle.ButtonSize.Compact)
+        else WorldScreenStyle.button("Logs").apply { label.setFontSize(11) }
+    /** Atlas: one muted line, shown only while the filter shows a nation other than the active one. */
+    private val contextLabel = "".toLabel(muted, GameUiStyle.Type.caption).apply { name = "ActivityContext"; setEllipsis(true); isVisible = false }
+    private var contextCell: com.badlogic.gdx.scenes.scene2d.ui.Cell<*>? = null
     private val expanded = HashSet<String>()
     private val expandedRuns = HashSet<String>()
     private val bodies = HashMap<String, Pair<String, String>>()
@@ -91,22 +109,22 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
 
     init {
         name = "AgentActivityFeed"
-        background = WorldScreenStyle.panelBackground("WorldScreen/AgentActivityFeed")
+        background = if (atlas) WorldScreenStyle.surface("WorldScreen/AgentActivityFeed", 0.94f)
+            else WorldScreenStyle.panelBackground("WorldScreen/AgentActivityFeed")
         touchable = Touchable.enabled
-        pad(12f, 14f, 12f, 14f)
-        val header = Table(skin)
-        header.add("Agent activity".toLabel(ink, 17)).left().expandX()
-        val close = Button(BaseScreen.skin).apply {
-            WorldScreenStyle.apply(this)
-            pad(4f)
-            add(ImageGetter.getImage("OtherIcons/Close")).size(12f)
-            onClick { setShown(false) }
+        if (atlas) pad(GameUiStyle.Space.l) else pad(12f, 14f, 12f, 14f)
+        val close = AgentPanelLayout.closeButton { setShown(false) }
+        if (!atlas) {
+            val header = Table(skin)
+            header.add("Agent activity".toLabel(ink, 17)).left().expandX()
+            header.add(close).size(24f).padLeft(8f)
+            add(header).growX().row()
         }
-        header.add(close).size(24f).padLeft(8f)
-        add(header).growX().row()
         nationPicker.style = SelectBox.SelectBoxStyle(nationPicker.style).apply {
-            background = WorldScreenStyle.background("WorldScreen/AgentActivityFeed/Filter", WorldScreenStyle.raised)
-            backgroundOver = WorldScreenStyle.background("WorldScreen/AgentActivityFeed/FilterHover", WorldScreenStyle.hover)
+            background = if (atlas) chip("WorldScreen/AgentActivityFeed/Filter", WorldScreenStyle.raised)
+                else WorldScreenStyle.background("WorldScreen/AgentActivityFeed/Filter", WorldScreenStyle.raised)
+            backgroundOver = if (atlas) chip("WorldScreen/AgentActivityFeed/FilterHover", WorldScreenStyle.hover)
+                else WorldScreenStyle.background("WorldScreen/AgentActivityFeed/FilterHover", WorldScreenStyle.hover)
             backgroundOpen = backgroundOver
             fontColor = ink
             listStyle = GdxList.ListStyle(listStyle).apply {
@@ -128,23 +146,40 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
                 refresh()
             }
         })
-        val filterRow = Table(skin)
-        // SelectBox otherwise takes the longest nation's name as its minimum width.
-        filterRow.add(nationPicker).minWidth(0f).growX()
-        filterRow.add(ImageGetter.getImage("OtherIcons/ArrowRight").apply {
+        val filterArrow = ImageGetter.getImage("OtherIcons/ArrowRight").apply {
             color = muted
             setSize(10f, 10f)
             setOrigin(Align.center)
             rotation = -90f
             touchable = Touchable.enabled
             onClick { nationPicker.showScrollPane() }
-        }).size(10f).padLeft(8f)
-        add(filterRow).minWidth(0f).growX().padTop(8f).row()
-        add(identityLabel).minWidth(0f).growX().left().padTop(8f).row()
-        add(elapsedLabel).minWidth(0f).growX().left().padTop(3f).row()
-        stateLabel.wrap = true
-        add(stateLabel).growX().left().padTop(5f).padBottom(10f).row()
-        entriesTable.top().left()
+        }
+        if (atlas) {
+            // One header row: nation chip, Logs and close. The card owns state and the timer.
+            nationPicker.fontSize = GameUiStyle.Type.caption
+            val chipHeight = 28f * UncivGame.Current.settings.fontSizeMultiplier
+            val arrowHost = Container(filterArrow).apply { right().padRight(GameUiStyle.Space.l); touchable = Touchable.childrenOnly }
+            val header = Table(skin)
+            // SelectBox otherwise takes the longest nation's name as its minimum width.
+            header.add(Stack(nationPicker, arrowHost)).minWidth(0f).growX().height(chipHeight)
+            header.add(logsLink).padLeft(GameUiStyle.Space.s)
+            header.add(close).size(28f).padLeft(GameUiStyle.Space.xs)
+            add(header).minWidth(0f).growX().row()
+            contextCell = add(contextLabel).minWidth(0f).growX().left().height(0f)
+            row()
+            entriesTable.top().left()
+        } else {
+            val filterRow = Table(skin)
+            // SelectBox otherwise takes the longest nation's name as its minimum width.
+            filterRow.add(nationPicker).minWidth(0f).growX()
+            filterRow.add(filterArrow).size(10f).padLeft(8f)
+            add(filterRow).minWidth(0f).growX().padTop(8f).row()
+            add(identityLabel).minWidth(0f).growX().left().padTop(8f).row()
+            add(elapsedLabel).minWidth(0f).growX().left().padTop(3f).row()
+            stateLabel.wrap = true
+            add(stateLabel).growX().left().padTop(5f).padBottom(10f).row()
+            entriesTable.top().left()
+        }
         scroll.setScrollingDisabled(true, false)
         scroll.setFadeScrollBars(false)
         scroll.setOverscroll(false, false)
@@ -160,25 +195,43 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
                 return false
             }
         })
-        add(scroll).grow().row()
-        val footer = Table(skin)
+        add(scroll).grow().padTop(if (atlas) GameUiStyle.Space.m else 0f).row()
         earlier.onClick {
             holdPosition()
             if (visibleLimit < 600) visibleLimit += 120 else historyTailOffset = minOf(historyTailOffset + 120, (shownEntries.size - visibleLimit).coerceAtLeast(0))
             rebuild()
         }
-        footer.add(earlier).left()
         liveLink.onClick {
             followLive = true; unreadCount = 0; historyTailOffset = 0; visibleLimit = 120
             rebuild(); refresh(); jumpToLive(); updateFooter()
         }
-        footer.add(liveLink).expandX().center()
         logsLink.onClick { session.getActivityDirectory()?.let { Gdx.net.openURI(File(it).toURI().toString()) } }
-        footer.add(logsLink).right()
-        add(footer).growX().padTop(12f)
+        if (atlas) {
+            // Floats over the bottom of the transcript; positioned in layout(), never a cell.
+            liveLink.isVisible = false
+            addActor(liveLink)
+        } else {
+            val footer = Table(skin)
+            footer.add(earlier).left()
+            footer.add(liveLink).expandX().center()
+            footer.add(logsLink).right()
+            add(footer).growX().padTop(12f)
+        }
         screen.stage.addActor(this)
         refresh()
         Timer.schedule(refreshTask, 0.35f, 0.35f)
+    }
+
+    /** A compact pill whose right inset leaves room for the dropdown arrow drawn over it. */
+    private fun chip(path: String, color: Color) = WorldScreenStyle.pill(path, color).also {
+        if (it is com.badlogic.gdx.scenes.scene2d.utils.BaseDrawable) it.rightWidth = 30f
+    }
+
+    override fun layout() {
+        super.layout()
+        if (!atlas) return
+        liveLink.pack()
+        liveLink.setPosition(((width - liveLink.width) / 2f).coerceAtLeast(0f), padBottom + GameUiStyle.Space.m)
     }
 
     override fun act(delta: Float) {
@@ -212,10 +265,13 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
     }
 
     private fun setShown(shown: Boolean) {
+        val wasVisible = isVisible
         atlasUserVisible = shown
         isVisible = shown && (atlasViewport == null || atlasTabVisible)
         if (!shown && screen.stage.scrollFocus?.isDescendantOf(this) == true) screen.stage.scrollFocus = screen.mapHolder
         if (shown) { toFront(); refresh(); if (followLive) jumpToLive() }
+        // The left column and the selection band reflow around the sheet.
+        if (atlas && !disposed && wasVisible != isVisible) screen.relayoutHud()
         Gdx.graphics.requestRendering()
     }
 
@@ -249,15 +305,6 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
         val resized = width != panelWidth || height != panelHeight
         if (resized) { panelWidth = width; panelHeight = height; setSize(width, height) }
         setPosition(atlasViewport?.x ?: 10f, atlasViewport?.y ?: (top - height).coerceAtLeast(8f))
-        val state = when (session.getRunState()) {
-            AgentRunState.AGENT_DECIDING -> "Thinking"
-            AgentRunState.PAUSED -> "Paused"
-            AgentRunState.PAUSING -> "Pausing…"
-            AgentRunState.NEEDS_ATTENTION -> "Needs attention"
-            AgentRunState.FINISHED -> "Finished"
-            AgentRunState.WAITING_HUMAN -> "Your turn"
-            else -> "Playing"
-        }
         val spectator = viewer.isSpectator()
         val active = session.getActiveCivId()?.takeIf { spectator || it == viewer.civID }
         if (active != null && session.getAgentProfile(active) != null) lastActiveAgentCivId = active
@@ -288,18 +335,23 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
             historyTailOffset = 0
             shownEntries = emptyList()
         }
-        val activityState = when {
-            !followLive -> "Reading"
-            viewedCiv == null || viewedCiv == active -> state
-            session.getRunState() in setOf(AgentRunState.PAUSED, AgentRunState.PAUSING, AgentRunState.FINISHED) -> state
-            else -> "Recent activity"
+        if (atlas) setContext(if (selectedFilter.mode != FilterMode.ALL && viewedCiv != null && viewedCiv != active)
+            "$viewedCiv · recent activity" else null)
+        else {
+            val state = AgentStatusFormat.label(session.getRunState())
+            val activityState = when {
+                !followLive -> "Reading"
+                viewedCiv == null || viewedCiv == active -> state
+                session.getRunState() in setOf(AgentRunState.PAUSED, AgentRunState.PAUSING, AgentRunState.FINISHED) -> state
+                else -> "Recent activity"
+            }
+            identityLabel.setText(if (selectedFilter.mode == FilterMode.ALL) "All nations" else
+                viewedCiv?.let { "${agentName(it)} · $it" } ?: "Agent activity")
+            identityLabel.setFontColor((viewedCiv ?: active)?.let { AgentActivityAppearance.color(screen.gameInfo, it) } ?: ink)
+            stateLabel.setText(if (selectedFilter.mode == FilterMode.ALL) "$state · ${active?.let(::agentName) ?: "Agents"}" else "${viewedCiv ?: "Agent"} activity · $activityState")
+            val timing = session.getActiveRunTiming()?.takeIf { (spectator || it.civId == viewer.civID) && (viewedCiv == null || it.civId == viewedCiv) }
+            elapsedLabel.setText(timing?.let { "Elapsed ${formatAgentRunDuration(it.elapsedMillis)}" } ?: "No active provider run")
         }
-        identityLabel.setText(if (selectedFilter.mode == FilterMode.ALL) "All nations" else
-            viewedCiv?.let { "${agentName(it)} · $it" } ?: "Agent activity")
-        identityLabel.setFontColor((viewedCiv ?: active)?.let { AgentActivityAppearance.color(screen.gameInfo, it) } ?: ink)
-        stateLabel.setText(if (selectedFilter.mode == FilterMode.ALL) "$state · ${active?.let(::agentName) ?: "Agents"}" else "${viewedCiv ?: "Agent"} activity · $activityState")
-        val timing = session.getActiveRunTiming()?.takeIf { (spectator || it.civId == viewer.civID) && (viewedCiv == null || it.civId == viewedCiv) }
-        elapsedLabel.setText(timing?.let { "Elapsed ${formatAgentRunDuration(it.elapsedMillis)}" } ?: "No active provider run")
         val latest = when {
             selectedFilter.mode == FilterMode.ALL -> activity
             viewedCiv != null -> activity.filter { it.civId == viewedCiv }
@@ -351,8 +403,19 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
     private fun updateFooter() {
         liveLink.isChecked = followLive
         liveLink.setText(if (followLive || unreadCount == 0) "Live" else "$unreadCount new")
+        // The floating chip appears only while reading; following needs no control.
+        if (atlas) liveLink.isVisible = !followLive
         WorldScreenStyle.setEnabled(earlier, shownEntries.size > visibleLimit + historyTailOffset)
         WorldScreenStyle.setEnabled(logsLink, session.getActivityDirectory() != null)
+    }
+
+    private fun setContext(text: String?) {
+        val shown = text != null
+        if (contextLabel.isVisible == shown && contextLabel.text.toString() == (text ?: "")) return
+        contextLabel.isVisible = shown
+        contextLabel.setText(text ?: "")
+        contextCell?.height(if (shown) contextLabel.prefHeight else 0f)?.padTop(if (shown) GameUiStyle.Space.s else 0f)
+        invalidateHierarchy()
     }
 
     private fun agentName(civId: String) = session.getAgentProfile(civId)?.displayName?.takeIf { it.isNotBlank() } ?: civId
@@ -407,6 +470,13 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
         val rowWidth = (panelWidth - 38f).coerceAtLeast(120f)
         entriesTable.clear()
         rowAnchors.clear()
+        if (atlas) {
+            // Older history is one quiet row above the oldest shown entry, present only when it exists.
+            val older = shownEntries.size > visibleLimit + historyTailOffset
+            earlier.isVisible = older
+            entriesTable.add(earlier).left().height(if (older) earlier.prefHeight else 0f)
+                .padBottom(if (older) GameUiStyle.Space.m else 0f).row()
+        }
         val entries = shownEntries.dropLast(historyTailOffset.coerceAtMost(shownEntries.size)).takeLast(visibleLimit)
         val ids = entries.map { it.id }.toSet()
         bodies.keys.retainAll(ids)
@@ -477,6 +547,11 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
     }
 
     private fun addSpeaker(entry: AgentActivityEntry, kind: String?, width: Float) {
+        // Atlas, one nation shown: the turn heading names the speaker once; blocks keep a kind caption.
+        if (atlas && selectedFilter.mode != FilterMode.ALL) {
+            if (kind != null) addRow(text(kind, muted, GameUiStyle.Type.caption), "speaker/${entry.id}", width, bottom = 4f)
+            return
+        }
         val label = agentName(entry.civId) + if (kind == null) "" else " · $kind"
         addRow(text(label, AgentActivityAppearance.color(screen.gameInfo, entry.civId), if (kind == null) 13 else 12),
             "speaker/${entry.id}", width, bottom = 5f)

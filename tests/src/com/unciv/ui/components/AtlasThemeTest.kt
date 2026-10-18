@@ -599,6 +599,33 @@ class AtlasThemeTest {
         assertTrue(contrast(quiet.checkedOverFontColor, (quiet.checkedOver as NinePatchDrawable).patch.color) >= 3.0)
     }
 
+    @Test fun accentIsTheRoundedWorldPrimaryAndPrimaryOnOtherSkins() {
+        selectSkin("Atlas")
+        val square = GameUiStyle.button("Confirm", primary = true).style
+        for (size in listOf(GameUiStyle.ButtonSize.Regular, GameUiStyle.ButtonSize.Compact)) {
+            val button = GameUiStyle.button("Resume", GameUiStyle.Emphasis.Accent, size)
+            fun verify() {
+                val style = button.style
+                assertEquals(GameUiStyle.accent, (style.up as NinePatchDrawable).patch.color)
+                assertNotSame("Accent uses the rounded control art, not the square primary", square.up.javaClass, style.up.javaClass)
+                assertEquals(foregrounds(square), foregrounds(style))
+                assertTrue(contrast(style.fontColor, GameUiStyle.accent) >= 4.5)
+                for (state in backgrounds(style)) assertEquals(size.controlHeight, state.minHeight, 0f)
+                if (size == GameUiStyle.ButtonSize.Compact) assertEquals(GameUiStyle.Space.l, button.padLeft, 0f)
+            }
+            verify()
+            GameUiStyle.applyWidget(Table().apply { add(button) })
+            verify()
+            // The skin-wide primary stays the square role.
+            assertSame(square.up.javaClass, GameUiStyle.button("Confirm", primary = true).style.up.javaClass)
+        }
+        selectSkin("Minimal")
+        val legacyPrimary = GameUiStyle.button("Confirm", primary = true).style
+        val legacyAccent = GameUiStyle.button("Resume", GameUiStyle.Emphasis.Accent).style
+        assertEquals(foregrounds(legacyPrimary), foregrounds(legacyAccent))
+        assertEquals((legacyPrimary.up as NinePatchDrawable).patch.color, (legacyAccent.up as NinePatchDrawable).patch.color)
+    }
+
     private fun backgrounds(style: Button.ButtonStyle) = listOf(style.up, style.over, style.down,
         style.checked, style.focused, style.disabled, style.checkedOver, style.checkedDown)
     private fun foregrounds(style: TextButton.TextButtonStyle) = listOf(style.fontColor, style.overFontColor,
