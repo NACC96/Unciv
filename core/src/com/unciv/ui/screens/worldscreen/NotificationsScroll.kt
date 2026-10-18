@@ -1,8 +1,11 @@
 package com.unciv.ui.screens.worldscreen
 
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.math.MathUtils
+import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.Actor
+import com.badlogic.gdx.scenes.scene2d.Group
 import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.actions.TemporalAction
@@ -18,6 +21,7 @@ import com.unciv.logic.agents.ControllerKind
 import com.unciv.logic.civilization.Notification
 import com.unciv.logic.civilization.NotificationCategory
 import com.unciv.models.translations.tr
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.MayaCalendar.toMayaNumerals
 import com.unciv.ui.components.extensions.packIfNeeded
 import com.unciv.ui.components.extensions.removeFontColorFromStatIcons
@@ -50,14 +54,12 @@ class NotificationsScroll(
     }
 
     private companion object {
-        /** Scale the entire ScrollPane by this factor */
-        const val scaleFactor = 0.5f
-        /** Complement of [scaleFactor] because multiplication is cheaper */
-        const val inverseScaleFactor = 1f / scaleFactor
         /** Limit width by wrapping labels to this percentage of the stage */
         const val maxWidthOfStage = 0.333f
         /** Logical size of the notification icons */
         const val iconSize = 30f
+        /** Atlas notification icon size, drawn at stage scale */
+        const val atlasIconSize = 20f
         /** Logical font size used in notification and category labels */
         const val fontSize = 30
         /** This is the spacing between categories and also the spacing between the next turn button and the first header */
@@ -84,12 +86,25 @@ class NotificationsScroll(
         const val restoreButtonNumberFontSize = 13
         /** The x/y coords of the center of the number+circle within the restore button */
         const val restoreButtonNumbersCenter = restoreButtonSize - restoreButtonNumbersSize / 2
+        /** Atlas bell: a quiet rounded icon button */
+        const val atlasBellSize = 36f
+        /** Atlas drawer margin from the screen edge and the covered header / minimap */
+        const val atlasEdgeMargin = 8f
+        /** Atlas drawer room for the surface halo inside this clipping pane */
+        const val atlasHaloMargin = 18f
         /** Background tint for [oneTimeNotification] */
         private val oneTimeNotificationColor get() =
             skinStrings.getUIColor("NotificationScroll/OneTimeNotificationColor", Color.valueOf("#fceea8"))
     }
 
     //region private fields
+    /** Atlas shows one drawer at stage scale on a rounded surface; other skins keep the half-scale list. */
+    private val atlas = GameUiStyle.isAtlas
+    /** Scale the entire ScrollPane by this factor */
+    private val scaleFactor = if (atlas) 1f else 0.5f
+    /** Complement of [scaleFactor] because multiplication is cheaper */
+    private val inverseScaleFactor = 1f / scaleFactor
+
     private var notificationsHash: Int = 0
     /** What the list showed at the last update. Agent snapshots reload unchanged notifications
      *  as new objects (Notification has no equality contract), so identity alone means nothing new. */
@@ -103,7 +118,7 @@ class NotificationsScroll(
     private var topSpacerCell: Cell<Actor?>? = null
     private var bottomSpacerCell: Cell<Actor?>? = null
 
-    private val maxEntryWidth = (if (com.unciv.ui.components.GameUiStyle.isAtlas) (if (worldScreen.stage.width < 960f) worldScreen.stage.width - 32f else minOf(260f, worldScreen.stage.width * .25f)) else worldScreen.stage.width * maxWidthOfStage) * inverseScaleFactor
+    private val maxEntryWidth = (if (atlas) (if (worldScreen.stage.width < 960f) worldScreen.stage.width - 32f else minOf(260f, worldScreen.stage.width * .25f)) else worldScreen.stage.width * maxWidthOfStage) * inverseScaleFactor
 
     /** For category header decoration lines */
     private val minCategoryLineWidth = worldScreen.stage.width * 0.075f
@@ -123,7 +138,7 @@ class NotificationsScroll(
     /** Set _only_ during updateContent to draw the highlighted entry with a colored background */
     private var coloredHighlight = false
     /** Used once after updateContent to scroll the highlighted notification into view */
-    private var selectedCell: Cell<ListItem>? = null
+    private var selectedCell: Cell<out Table>? = null
     //endregion
 
     /** Display one additional notification once, to re-show an entry from the history in overview */
@@ -179,7 +194,7 @@ class NotificationsScroll(
     ) {
         getUserSetting()
         if (userSetting == UserSetting.Disabled) {
-            restoreButton.setPosition(coveredNotificationsBottom)
+            restoreButton.place(coveredNotificationsTop, coveredNotificationsBottom)
             applyUserSettingChange()
             restoreButton.updateCount(notifications.size)
             return
@@ -229,7 +244,8 @@ class NotificationsScroll(
             /** Note: This now works for [ListItem]'s wrapped 0 or 1 times. If the hierarchy of the
                 selection *relative to* [notificationsTable] changes again, this will need patching.
             */
-            val trueActorY = it.actorY + (if (it.table == notificationsTable) 0f else it.table.y)
+            val trueActorY = if (atlas) it.actor.localToAscendantCoordinates(notificationsTable, Vector2()).y
+                else it.actorY + (if (it.table == notificationsTable) 0f else it.table.y)
             val actualBottom = (trueActorY + notificationsTable.y) * scaleFactor
             val actualTop = (trueActorY + it.actorHeight + notificationsTable.y) * scaleFactor
             val fullyVisible = actualBottom >= coveredNotificationsBottom && actualTop <= stage.height - coveredNotificationsTop
@@ -250,7 +266,7 @@ class NotificationsScroll(
 
         // Do the positioning here since WorldScreen may also call update when just its geometry changed
         setPosition(stage.width - width * scaleFactor, 0f)
-        restoreButton.setPosition(coveredNotificationsBottom)
+        restoreButton.place(coveredNotificationsTop, coveredNotificationsBottom)
     }
 
     /**
@@ -311,8 +327,16 @@ class NotificationsScroll(
         val itemWidths = mutableListOf<Float>()
 
         topSpacerCell = notificationsTable.add()
-            .height(coveredNotificationsTop * inverseScaleFactor)
+            .height(topSpace(coveredNotificationsTop))
         notificationsTable.row()
+
+        if (atlas) {
+            addAtlasDrawer(additionalNotification + notifications, notifications.size)
+            bottomSpacerCell = notificationsTable.add().height(bottomSpace(coveredNotificationsBottom)).expandY()
+            notificationsTable.row()
+            highlightNotification = null
+            return true
+        }
 
         val backgroundDrawable = if (com.unciv.ui.components.GameUiStyle.isAtlas)
             com.unciv.ui.components.GameUiStyle.panelBackground("Atlas/World/Notifications")
@@ -371,10 +395,85 @@ class NotificationsScroll(
         }
 
         bottomSpacerCell = notificationsTable.add()
-            .height(coveredNotificationsBottom * inverseScaleFactor).expandY()
+            .height(bottomSpace(coveredNotificationsBottom)).expandY()
         notificationsTable.row()
         highlightNotification = null  // no longer needed
         return true
+    }
+
+    /**
+     *  Atlas: one drawer surface. A header row ("Notifications · N" and Hide), muted category
+     *  captions without rules, and plain rows with 20-unit icons; no per-item cards.
+     */
+    private fun addAtlasDrawer(entries: Sequence<Notification>, count: Int) {
+        val contentWidth = maxEntryWidth - 2 * GameUiStyle.Space.l
+        val drawer = Table().apply {
+            name = "AtlasNotificationsDrawer"
+            background = WorldScreenStyle.surface("Atlas/World/Notifications")
+            pad(GameUiStyle.Space.m, GameUiStyle.Space.l, GameUiStyle.Space.m, GameUiStyle.Space.l)
+            touchable = Touchable.enabled // stop clicks going through to the map
+        }
+        val header = Table()
+        header.add("${"Notifications".tr()} · ${count.tr()}".toLabel(WorldScreenStyle.ink, GameUiStyle.Type.label, hideIcons = true))
+            .left().expandX()
+        // Sliding the list sideways also hides it, but nothing on screen says so.
+        if (!userSetting.static)
+            header.add(WorldScreenStyle.ghostButton("Hide", GameUiStyle.ButtonSize.Compact).apply { onClick { isHidden = true } })
+                .right()
+        drawer.add(header).width(contentWidth).minHeight(GameUiStyle.compactControlHeight).row()
+
+        val ordered = entries.groupBy { it.category }.toSortedMap()
+        for ((category, categoryNotifications) in ordered) {
+            val rows = Table()
+            fun fillRows() {
+                for (notification in categoryNotifications) {
+                    val cell = rows.add(AtlasListItem(notification, contentWidth)).width(contentWidth)
+                    if (notification == highlightNotification) selectedCell = cell
+                    cell.row()
+                }
+            }
+            if (category != NotificationCategory.General) {
+                val caption = Table().apply {
+                    touchable = Touchable.enabled
+                    add(category.name.toLabel(WorldScreenStyle.muted, GameUiStyle.Type.caption)).left().expandX()
+                    onClick {
+                        if (rows.hasChildren()) rows.clear() else fillRows()
+                        rows.pack()
+                    }
+                }
+                drawer.add(caption).width(contentWidth).padTop(GameUiStyle.Space.m).padBottom(GameUiStyle.Space.xs).row()
+            }
+            fillRows()
+            drawer.add(rows).width(contentWidth).row()
+        }
+        notificationsTable.add(drawer).right().pad(0f, atlasHaloMargin, 0f, atlasEdgeMargin).row()
+    }
+
+    private inner class AtlasListItem(notification: Notification, rowWidth: Float) : Table() {
+        init {
+            val isSelected = notification === highlightNotification  // Notification does not implement equality contract
+            if (isSelected) background = WorldScreenStyle.control("Atlas/World/NotificationSelected",
+                WorldScreenStyle.raised, if (coloredHighlight) WorldScreenStyle.warning else WorldScreenStyle.accent)
+            pad(GameUiStyle.Space.s, GameUiStyle.Space.s, GameUiStyle.Space.s, GameUiStyle.Space.s)
+            val icons = Table()
+            notification.addNotificationIconsTo(icons, worldScreen.gameInfo.ruleset, atlasIconSize)
+            // Silhouettes authored for light plates (e.g. unit icons) read as ink on the dark drawer.
+            for (icon in icons.children)
+                if (icon is Image && icon.color.r * .299f + icon.color.g * .587f + icon.color.b * .114f < .35f)
+                    icon.color = WorldScreenStyle.ink
+            val iconsWidth = if (icons.hasChildren()) icons.prefWidth + GameUiStyle.Space.xs else 0f
+            val label = notification.text.toLabel(WorldScreenStyle.ink, GameUiStyle.Type.body, hideIcons = true)
+            label.removeFontColorFromStatIcons()
+            label.wrap = true
+            if (icons.hasChildren()) add(icons).top().padRight(GameUiStyle.Space.xs)
+            add(label).width((rowWidth - iconsWidth - 2 * GameUiStyle.Space.s).coerceAtLeast(40f)).left()
+            touchable = Touchable.enabled
+            onClick {
+                notification.execute(worldScreen)
+                clickedNotification = notification
+                GUI.setUpdateWorldOnNextRender()
+            }
+        }
     }
 
     private inner class CategoryHeader(
@@ -508,10 +607,13 @@ class NotificationsScroll(
     }
 
     private fun updateSpacers(coveredNotificationsTop: Float, coveredNotificationsBottom: Float) {
-        topSpacerCell?.height(coveredNotificationsTop * inverseScaleFactor)
-        bottomSpacerCell?.height(coveredNotificationsBottom * inverseScaleFactor)
+        topSpacerCell?.height(topSpace(coveredNotificationsTop))
+        bottomSpacerCell?.height(bottomSpace(coveredNotificationsBottom))
         layout()
     }
+
+    private fun topSpace(covered: Float) = covered * inverseScaleFactor + if (atlas) atlasEdgeMargin else 0f
+    private fun bottomSpace(covered: Float) = covered * inverseScaleFactor + if (atlas) atlasEdgeMargin else 0f
 
     override fun scrollX(pixelsX: Float) {
         super.scrollX(pixelsX)
@@ -519,7 +621,7 @@ class NotificationsScroll(
         restoreButton.checkScrollX(pixelsX)
     }
 
-    inner class RestoreButton : Container<IconCircleGroup>() {
+    inner class RestoreButton : Container<Group>() {
         private var blockCheck = true
         private var blockAct = true
         private var active = false
@@ -532,16 +634,30 @@ class NotificationsScroll(
         private val labelOuterCircle: Image
 
         init {
-            actor = bellIcon
-                .surroundWithCircle(restoreButtonSize * 0.9f, color = BaseScreen.skinStrings.skinConfig.baseColor)
-                .surroundWithCircle(restoreButtonSize, resizeActor = false)
-            size(restoreButtonSize)
+            if (atlas) {
+                // A quiet rounded icon button with a small brass count badge.
+                actor = Group().apply { setSize(atlasBellSize, atlasBellSize) }
+                bellIcon.color = WorldScreenStyle.ink
+                bellIcon.setBounds((atlasBellSize - 20f) / 2, (atlasBellSize - 20f) / 2, 20f, 20f)
+                actor.addActor(bellIcon)
+                setBackground(WorldScreenStyle.control("Atlas/World/NotificationBell",
+                    WorldScreenStyle.raised.cpy().apply { a = 0.94f }), false)
+                size(atlasBellSize)
+                countLabel = "".toLabel(WorldScreenStyle.surface, GameUiStyle.Type.caption, Align.center)
+                labelInnerCircle = ImageGetter.getCircle(WorldScreenStyle.accent, 16f)
+                labelOuterCircle = ImageGetter.getCircle(WorldScreenStyle.surface, 18f)
+            } else {
+                actor = bellIcon
+                    .surroundWithCircle(restoreButtonSize * 0.9f, color = BaseScreen.skinStrings.skinConfig.baseColor)
+                    .surroundWithCircle(restoreButtonSize, resizeActor = false)
+                size(restoreButtonSize)
 
-            countLabel = "".toLabel(ImageGetter.CHARCOAL, restoreButtonNumberFontSize, Align.center)
-            // not using surroundWithCircle for the count, as the centering will break if positioned within another IconCircleGroup (why?)
-            labelInnerCircle = ImageGetter.getCircle(Color.WHITE, restoreButtonNumbersSize * 0.9f)
+                countLabel = "".toLabel(ImageGetter.CHARCOAL, restoreButtonNumberFontSize, Align.center)
+                // not using surroundWithCircle for the count, as the centering will break if positioned within another IconCircleGroup (why?)
+                labelInnerCircle = ImageGetter.getCircle(Color.WHITE, restoreButtonNumbersSize * 0.9f)
+                labelOuterCircle = ImageGetter.getCircle(ImageGetter.CHARCOAL, restoreButtonNumbersSize)
+            }
             labelInnerCircle.centerAtNumberPosition()
-            labelOuterCircle = ImageGetter.getCircle(ImageGetter.CHARCOAL, restoreButtonNumbersSize)
             labelOuterCircle.centerAtNumberPosition()
             actor.addActor(labelOuterCircle)
             actor.addActor(labelInnerCircle)
@@ -553,15 +669,23 @@ class NotificationsScroll(
             pack()  // `this` needs to adopt the size of `actor`, won't happen automatically (surprisingly)
         }
 
-        /** Set RestoreButton position - relative to the screen as parent is stage.root */
-        fun setPosition(coveredNotificationsBottom: Float) =
-            setPosition(
-                this@NotificationsScroll.stage.width - restoreButtonPad,
-                coveredNotificationsBottom + restoreButtonPad,
-                Align.bottomRight
-            )
+        /** Set RestoreButton position - relative to the screen as parent is stage.root.
+         *  Atlas anchors it right-aligned just under the header, clear of the map's unit tokens. */
+        fun place(coveredNotificationsTop: Float, coveredNotificationsBottom: Float) {
+            val stage = this@NotificationsScroll.stage
+            if (atlas) setPosition(stage.width - atlasEdgeMargin,
+                stage.height - coveredNotificationsTop - atlasEdgeMargin, Align.topRight)
+            else setPosition(stage.width - restoreButtonPad, coveredNotificationsBottom + restoreButtonPad, Align.bottomRight)
+        }
 
-        private fun Actor.centerAtNumberPosition() = setPosition(restoreButtonNumbersCenter, restoreButtonNumbersCenter, Align.center)
+        private fun Actor.centerAtNumberPosition() =
+            if (atlas) setPosition(atlasBellSize - 6f, atlasBellSize - 6f, Align.center)
+            else setPosition(restoreButtonNumbersCenter, restoreButtonNumbersCenter, Align.center)
+
+        /** Atlas hides the bell while there is nothing to count. */
+        private val isEmptyAtlasBell get() = atlas && shownCount <= 0
+        override fun draw(batch: Batch, parentAlpha: Float) { if (!isEmptyAtlasBell) super.draw(batch, parentAlpha) }
+        override fun hit(x: Float, y: Float, touchable: Boolean): Actor? = if (isEmptyAtlasBell) null else super.hit(x, y, touchable)
 
         fun updateCount(count: Int) {
             if (count == shownCount) return

@@ -14,6 +14,8 @@ import com.unciv.dev.FontDesktop
 import com.unciv.logic.city.City
 import com.unciv.logic.city.CityFlags
 import com.unciv.logic.civilization.Civilization
+import com.unciv.models.skins.SkinCache
+import com.unciv.models.skins.SkinStrings
 import com.unciv.models.tilesets.TileSetCache
 import com.unciv.testing.GdxTestRunner
 import com.unciv.testing.TestGame
@@ -25,6 +27,7 @@ import com.unciv.ui.components.tilegroups.WorldTileGroup
 import com.unciv.ui.components.tilegroups.citybutton.CityButton
 import com.unciv.ui.components.tilegroups.layers.CityButtonMapLayer
 import com.unciv.ui.images.ImageGetter
+import com.unciv.ui.screens.basescreen.BaseScreen
 import com.unciv.ui.screens.worldscreen.WorldScreen
 import com.unciv.ui.screens.worldscreen.minimap.MapOverlayToggleButton
 import com.unciv.ui.screens.worldscreen.unit.UnitTable
@@ -195,6 +198,34 @@ class MapAnnotationPolishTest {
         val disc = foreign.descendants().filterIsInstance<com.unciv.ui.images.IconCircleGroup>().first()
         val glyph = disc.descendants().filterIsInstance<com.badlogic.gdx.scenes.scene2d.ui.Image>().last()
         assertEquals(f.arabia.nation.getInnerColor().toString(), glyph.color.toString())
+    }
+
+    @Test fun `atlas map banners are one compact row with the same privacy and rim contract`() {
+        val f = Fixture()
+        val prior = BaseScreen.skinStrings
+        SkinCache.loadSkinConfigs()
+        BaseScreen.skinStrings = SkinStrings("Atlas")
+        try {
+            f.romanCity.name = "A very long capital name beside the northern mountains and coastal trade routes"
+            val own = f.plaque(f.romanCity, f.rome)
+            val foreign = f.plaque(f.foreignCity, f.rome)
+            val spectator = f.plaque(f.foreignCity, f.spectator)
+            assertEquals(2, own.descendants().filterIsInstance<ImageGetter.ProgressBar>().count())
+            assertEquals(0, foreign.descendants().filterIsInstance<ImageGetter.ProgressBar>().count())
+            assertEquals(2, spectator.descendants().filterIsInstance<ImageGetter.ProgressBar>().count())
+            assertTrue("One row, not the stacked plaque: ${own.height}", own.height <= 24.5f)
+            val label = own.descendants().filterIsInstance<Label>().single { it.text.startsWith("A very long capital") }
+            assertTrue(label.text.toString().endsWith("..."))
+            assertTrue(label.width <= 150.5f)
+            assertEquals(1, label.glyphLayout.runs.map { it.y }.distinct().size)
+            assertTrue("Own banners keep a 2-unit rim", own.borderSize >= 2f && own.borderOnTop)
+            assertTrue("Neutral rims stay a hairline", foreign.borderSize < 2f)
+            val disc = foreign.descendants().filterIsInstance<com.unciv.ui.images.IconCircleGroup>().first()
+            val glyph = disc.descendants().filterIsInstance<com.badlogic.gdx.scenes.scene2d.ui.Image>().last()
+            assertEquals(f.arabia.nation.getInnerColor().toString(), glyph.color.toString())
+        } finally {
+            BaseScreen.skinStrings = prior
+        }
     }
 
     @Test fun `layer controls initialize from flags and keep their original toggle callback`() {

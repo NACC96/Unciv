@@ -100,7 +100,8 @@ class AtlasWorldStateTest {
         holder.update(viewer)
         val before = Vector2(holder.width, holder.height)
         val allocation = com.unciv.ui.screens.worldscreen.WorldHudLayout.calculate(width, height, 1f, true).minimap
-        assertTrue("map and layer controls exceed their host: ${holder.height}", holder.height + 8f <= allocation.height + .5f)
+        // The layer toggles live in a popover and tile info has its own card: the map card uses the whole host.
+        assertTrue("map card exceeds its host: ${holder.height}", holder.height <= allocation.height + .5f)
         fun pressToggle() {
             val toggle = descendants(holder).filterIsInstance<com.badlogic.gdx.scenes.scene2d.ui.Table>().first { actor -> actor.listeners.any { it is ActivationListener } }
             toggle.listeners.filterIsInstance<ActivationListener>().single().tap(InputEvent().apply { listenerActor = toggle }, 1f, 1f, 1, 0)

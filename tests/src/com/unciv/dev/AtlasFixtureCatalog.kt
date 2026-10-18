@@ -268,6 +268,12 @@ object AtlasFixtureCatalog {
                             getter(facade, "getNotificationsScroll", notifications)
                             screen.stage.addActor(notifications)
                             game.settings.notificationScroll = com.unciv.ui.screens.worldscreen.NotificationsScroll.UserSetting.Permanent.name
+                            // City banner badges: a damaged capital with aircraft shows health, defence and air chips.
+                            civ.cities.first().let { capital ->
+                                capital.health = 100 // of the usual 200
+                                fixture.addUnit("Fighter", civ, capital.getCenterTile())
+                            }
+                            holder.tileGroups.values.forEach { it.update(view.civView) }
                             val entries = listOf(
                                 com.unciv.logic.civilization.Notification("A new unit is ready for orders in Washington", arrayOf("Warrior"), null, com.unciv.logic.civilization.NotificationCategory.Units),
                                 com.unciv.logic.civilization.Notification("Research completed: Pottery. Choose the next technology for your civilization.", arrayOf("Pottery"), null, com.unciv.logic.civilization.NotificationCategory.General))
@@ -295,9 +301,15 @@ object AtlasFixtureCatalog {
                                 hud.layout()
                             }
                             check(kotlin.math.abs(minimap.width - before.x) < .01f && kotlin.math.abs(minimap.height - before.y) < .01f)
-                            check(minimap.height + 8f <= hud.regions.minimap.height + .5f) { "Layer row exceeds the Atlas map viewport" }
+                            check(minimap.height <= hud.regions.minimap.height + .5f) { "Map card exceeds the Atlas map viewport" }
                             check(game.settings.minimapSize == saved)
                             check(camera == listOf(holder.scrollX, holder.scrollY, holder.scaleX, holder.scaleY))
+                            // The layer toggles live behind the card's Layers button; show that menu open.
+                            val layers = minimap.atlasDescendants().single { it.name == "MinimapLayers" }
+                            layers.listeners.filterIsInstance<com.unciv.ui.components.input.ActivationListener>().single().tap(
+                                com.badlogic.gdx.scenes.scene2d.InputEvent().apply { listenerActor = layers }, 1f, 1f, 1, 0)
+                            check(screen.stage.root.atlasDescendants().any { it.name == "AtlasMinimapLayers" }) { "Layers menu did not open" }
+                            check(minimap.buttons.all { button -> button.stage != null }) { "Layer toggles are not in the open menu" }
                         }
                         val section = when (id) { "world-selection", "world-fortified", "world-siege", "world-promote", "world-exhausted" -> "Selection"; "world-research" -> "Research"; "world-activity" -> "Activity"; "world-map", "world-map-roundtrip" -> "Map"; else -> null }
                         if (width < 960 && section != null) {
