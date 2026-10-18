@@ -142,6 +142,8 @@ class AtlasWorldStateTest {
         for (case in com.unciv.dev.AtlasTurnFixtures.cases) {
             val button = com.unciv.dev.AtlasTurnFixtures.button(case, screen)
             assertTrue(button.label.text.isNotEmpty())
+            // Agent turns show the short shared "state · nation", never the session's debug statusText().
+            if (case == "AgentMatchPaused") assertEquals("Paused · America", button.label.text.toString())
             assertEquals(case in setOf("Working", "Waiting", "AgentMatchPaused", "Autosave"), button.isDisabled)
             assertEquals(if (button.isDisabled) GameUiStyle.muted else GameUiStyle.surface, button.label.style.fontColor)
         }
