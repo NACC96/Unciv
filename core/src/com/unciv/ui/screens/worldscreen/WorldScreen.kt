@@ -769,8 +769,9 @@ class WorldScreen(
         notificationsScroll.isVisible = uiEnabled
         minimapWrapper.isVisible = uiEnabled
         bottomUnitTable.isVisible = uiEnabled
-        atlasHud?.setVisible(uiEnabled)
+        // The battle preview updates first, so the HUD layout can place it above the selection card.
         if (uiEnabled) battleTable.update() else battleTable.isVisible = false
+        atlasHud?.setVisible(uiEnabled)
     }
 
     private fun addKeyboardListener() {
@@ -836,8 +837,11 @@ class WorldScreen(
             minimapWrapper.update(minimapView.civView.getCiv(), minimapView.revealMap)
             bottomTileInfoTable.civView = getGameViewConsideringForOfWar().civView
             bottomTileInfoTable.updateTileTable(mapHolder.selectedTile)
-            bottomTileInfoTable.x = stage.width - bottomTileInfoTable.width
-            bottomTileInfoTable.y = if (game.settings.showMinimap) minimapWrapper.height + 5f else 0f
+            // Atlas hosts these actors in HUD panes; absolute positions would fight their tables.
+            if (atlasHud == null) {
+                bottomTileInfoTable.x = stage.width - bottomTileInfoTable.width
+                bottomTileInfoTable.y = if (game.settings.showMinimap) minimapWrapper.height + 5f else 0f
+            }
 
             battleTable.update()
 
@@ -871,7 +875,7 @@ class WorldScreen(
 
         if (uiEnabled) {
             // UnitActionsTable measures geometry (its own y, techPolicyAndDiplomacy and fogOfWarButton), so call update this late
-            unitActionsTable.y = bottomUnitTable.height
+            if (atlasHud == null) unitActionsTable.y = bottomUnitTable.height
             unitActionsTable.update(bottomUnitTable.selectedUnit?.getUnit())
         }
 
@@ -907,15 +911,17 @@ class WorldScreen(
 
         updateGameplayButtons()
 
-        val coveredNotificationsTop = atlasHud?.regions?.header?.height ?: (stage.height - statusButtons.y)
-        val coveredNotificationsBottom = atlasHud?.regions?.let { if (it.compact) it.turnAction.y + it.turnAction.height else it.minimap.y + it.minimap.height } ?: (bottomTileInfoTable.height + bottomTileInfoTable.y)
+        // Lay the Atlas HUD out first, so notifications clear this update's panels, not the last ones.
+        if (uiEnabled) atlasHud?.layout()
+        val coveredNotificationsTop = atlasHud?.notificationCover?.y ?: (stage.height - statusButtons.y)
+        val coveredNotificationsBottom = atlasHud?.notificationCover?.x ?: (bottomTileInfoTable.height + bottomTileInfoTable.y)
 //                (if (game.settings.showMinimap) minimapWrapper.height else 0f)
         notificationsScroll.update(viewingCiv.notifications, coveredNotificationsTop, coveredNotificationsBottom)
+        if (uiEnabled) atlasHud?.applyNotificationLayer()
 
         val posZoomFromRight = if (game.settings.showMinimap) minimapWrapper.width
         else bottomTileInfoTable.width
         zoomController.setPosition(stage.width - posZoomFromRight - 10f, 10f, Align.bottomRight)
-        if (uiEnabled) atlasHud?.layout()
     }
 
     @Readonly
@@ -1007,13 +1013,22 @@ class WorldScreen(
 
     private var inspectedNationId: String? = null
 
-    /** Ribbon inspection is local presentation state, never a viewer/controller handoff. */
+    /** Nation inspection is local presentation state, never a viewer/controller handoff. */
     fun inspectNation(civId: String) {
         val permitted = com.unciv.ui.screens.worldscreen.topbar.NationTurnRoster.read(gameInfo, viewingCiv, gameInfo.currentPlayer)
             .firstOrNull { it.civ.civID == civId } ?: return
         inspectedNationId = permitted.civ.civID
         bottomUnitTable.selectUnit()
         setSelectedCiv(permitted.civ)
+        shouldUpdate = true
+    }
+
+    /** "Follow active nation": drop any inspection or selection, back to the spectator's own view.
+     *  Like [inspectNation], this never touches the session, controller or match vision. */
+    fun clearInspectedNation() {
+        inspectedNationId = null
+        bottomUnitTable.selectUnit()
+        setSelectedCiv(viewingCiv)
         shouldUpdate = true
     }
 
@@ -1207,6 +1222,8 @@ class WorldScreen(
         updateMultiplayerStatusButton()
 
         statusButtons.update(false)
+        // Atlas places the turn action and chat button in HUD panes (AtlasWorldHud).
+        if (atlasHud != null) return
         val maxWidth = stage.width - techPolicyAndDiplomacy.width - 25f
         if(statusButtons.width > maxWidth) {
             statusButtons.update(true)

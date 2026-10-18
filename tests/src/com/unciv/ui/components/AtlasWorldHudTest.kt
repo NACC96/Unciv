@@ -12,7 +12,7 @@ class AtlasWorldHudTest {
     @org.junit.Before fun remember() { snapshot = SetupUiStateSnapshot(); SetupLayoutFixture(800f, 500f) }
     @org.junit.After fun restore() { snapshot.restore() }
 
-    @Test fun viewSelectionDoesNotGrantControl() {
+    @Test fun nationSwitcherOnlyInspectsAndNeverTouchesTheSession() {
         val game = com.unciv.testing.TestGame()
         val rome = game.addCiv(game.ruleset.nations.getValue("Rome"), isPlayer = true)
         val spectator = game.addCiv(game.ruleset.nations.getValue(com.unciv.Constants.spectator))
@@ -24,15 +24,20 @@ class AtlasWorldHudTest {
         org.mockito.Mockito.`when`(screen.viewingCiv).thenReturn(spectator)
         org.mockito.Mockito.`when`(screen.selectedCiv).thenReturn(spectator)
         org.mockito.Mockito.`when`(screen.agentSession).thenReturn(session)
-        val ribbon = com.unciv.ui.screens.worldscreen.topbar.NationTurnRibbon()
-        ribbon.update(screen)
+        val switcher = com.unciv.ui.screens.worldscreen.topbar.NationSwitcher(screen)
+        switcher.rebuild()
         org.mockito.Mockito.clearInvocations(session)
         fun descendants(actor: com.badlogic.gdx.scenes.scene2d.Actor): List<com.badlogic.gdx.scenes.scene2d.Actor> =
             listOf(actor) + if (actor is com.badlogic.gdx.scenes.scene2d.Group && !org.mockito.Mockito.mockingDetails(actor).isMock) actor.children.flatMap { descendants(it) } else emptyList()
-        val button = descendants(ribbon).first { it.name == "NationTurnEntry:Rome" }
-        button.listeners.filterIsInstance<com.unciv.ui.components.input.ActivationListener>().single().tap(
-            com.badlogic.gdx.scenes.scene2d.InputEvent().apply { listenerActor = button }, 1f, 1f, 1, 0)
+        fun press(name: String) {
+            val button = descendants(switcher).first { it.name == name }
+            button.listeners.filterIsInstance<com.unciv.ui.components.input.ActivationListener>().single().tap(
+                com.badlogic.gdx.scenes.scene2d.InputEvent().apply { listenerActor = button }, 1f, 1f, 1, 0)
+        }
+        press("NationSwitcherEntry:Rome")
         org.mockito.Mockito.verify(screen).inspectNation(rome.civID)
+        press("NationSwitcherFollow")
+        org.mockito.Mockito.verify(screen).clearInspectedNation()
         org.mockito.Mockito.verifyNoInteractions(session)
     }
 
@@ -46,31 +51,11 @@ class AtlasWorldHudTest {
         val roster = com.unciv.ui.screens.worldscreen.topbar.NationTurnRoster
         assertEquals(listOf("Rome"), roster.read(game.gameInfo, rome, "Korea").map { it.civ.civID })
         assertEquals(listOf("Previous in order", "Current", "Next in order"), roster.read(game.gameInfo, spectator, "Korea").map { it.marker })
-    }
-
-    @Test fun fifteenLongNamesScrollAtLargeFontWithoutShrinking() {
-        com.unciv.UncivGame.Current.settings.fontSizeMultiplier = 1.5f
-        val game = com.unciv.testing.TestGame()
-        for (nation in game.ruleset.nations.values.filter { it.isMajorCiv }.take(15)) game.addCiv(nation)
-        val spectator = game.addCiv(game.ruleset.nations.getValue(com.unciv.Constants.spectator))
-        com.unciv.ui.images.ImageGetter.setNewRuleset(game.ruleset)
-        val screen = org.mockito.Mockito.mock(com.unciv.ui.screens.worldscreen.WorldScreen::class.java)
-        org.mockito.Mockito.`when`(screen.gameInfo).thenReturn(game.gameInfo)
-        org.mockito.Mockito.`when`(screen.game).thenReturn(com.unciv.UncivGame.Current)
-        org.mockito.Mockito.`when`(screen.viewingCiv).thenReturn(spectator)
-        org.mockito.Mockito.`when`(screen.selectedCiv).thenReturn(spectator)
-        val ribbon = com.unciv.ui.screens.worldscreen.topbar.NationTurnRibbon()
-        ribbon.update(screen)
-        val content = ribbon.scroll.actor as com.badlogic.gdx.scenes.scene2d.ui.Table
-        assertEquals(15, content.children.size)
-        content.children.filterIsInstance<com.badlogic.gdx.scenes.scene2d.ui.TextButton>().forEach {
-            it.setText("A very long translated civilization name with diacritics São Paulo")
-            assertEquals(1f, it.scaleX, 0f)
-        }
-        ribbon.setSize(420f, 90f); ribbon.validate(); ribbon.scroll.validate()
-        assertTrue(ribbon.scroll.maxX > 0f)
-        ribbon.scroll.scrollX = ribbon.scroll.maxX
-        assertEquals(ribbon.scroll.maxX, ribbon.scroll.scrollX, .01f)
+        val pair = com.unciv.testing.TestGame()
+        for (nation in listOf("Rome", "Korea")) pair.addUnit("Settler", pair.addCiv(pair.ruleset.nations.getValue(nation)), null)
+        val pairSpectator = pair.addCiv(pair.ruleset.nations.getValue(com.unciv.Constants.spectator))
+        // With two living nations the other one always plays next.
+        assertEquals(listOf("Next in order", "Current"), roster.read(pair.gameInfo, pairSpectator, "Korea").map { it.marker })
     }
 
     @Test fun compactTabsRetainActorsScrollPositionAndReachableAction() {
@@ -108,6 +93,32 @@ class AtlasWorldHudTest {
         assertTrue(position.x >= 0 && position.y >= 0 && position.x + next.width <= 420f && position.y + next.height <= 600f)
         press(next)
         assertEquals(1, invoked)
+    }
+
+    @Test fun wideHudHidesEmptyPanelsAndHugsTheSelection() {
+        val fixture = SetupLayoutFixture(1440f, 900f)
+        val screen = org.mockito.Mockito.mock(com.unciv.ui.screens.worldscreen.WorldScreen::class.java)
+        org.mockito.Mockito.`when`(screen.stage).thenReturn(fixture.stage)
+        org.mockito.Mockito.`when`(screen.game).thenReturn(com.unciv.UncivGame.Current)
+        val top = org.mockito.Mockito.mock(com.unciv.ui.screens.worldscreen.topbar.WorldScreenTopBar::class.java)
+        val getter = screen.javaClass.methods.single { it.name.substringBefore('$') == "getTopBar" }
+        org.mockito.Mockito.`when`(getter.invoke(screen)).thenReturn(top)
+        val unit = com.badlogic.gdx.scenes.scene2d.ui.Table()
+        val hud = com.unciv.ui.screens.worldscreen.AtlasWorldHud(screen,
+            com.badlogic.gdx.scenes.scene2d.ui.Table(), unit, com.badlogic.gdx.scenes.scene2d.ui.Table(),
+            org.mockito.Mockito.mock(com.unciv.ui.screens.worldscreen.minimap.MinimapHolder::class.java),
+            GameUiStyle.button("Next turn"), com.badlogic.gdx.scenes.scene2d.ui.Table())
+        hud.layout()
+        fun pane(name: String) = fixture.root.children.single { it.name == name }
+        assertFalse("Nothing selected: no empty dock", pane("AtlasUnitDock").isVisible)
+        assertFalse("An empty tracker takes no room", pane("AtlasTracker").isVisible)
+        assertFalse(pane("AtlasTileInfo").isVisible)
+        assertEquals(56f, hud.regions.header.height, .01f)
+        unit.add(GameUiStyle.button("Selected Warrior")).width(200f)
+        hud.layout()
+        assertTrue(pane("AtlasUnitDock").isVisible)
+        assertTrue("The selection card hugs its content", hud.regions.unitDock.width in 200f..210f)
+        assertTrue(hud.regions.unitDock.x > 0f && hud.regions.unitDock.x + hud.regions.unitDock.width < hud.regions.turnAction.x)
     }
 
     @Test fun primaryTurnActionUsesContrastingTextForEnabledAndDisabledStates() {

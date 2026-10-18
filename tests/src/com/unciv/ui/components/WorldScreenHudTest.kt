@@ -618,12 +618,12 @@ class WorldScreenHudTest {
         val feed = f.feed()
         val picker = feed.descendants().filterIsInstance<SelectBox<*>>().single()
         assertEquals(listOf("Follow active nation", "All nations",
-            "1. Current · Rome · Atlas", "2. Eliminated · Korea · Nova", "3. Previous in order · China"),
+            "1. Current · Rome · Atlas", "2. Eliminated · Korea · Nova", "3. China"),
             picker.items.map { it.toString() })
         f.active = "China"
         feed.refreshNow()
         assertEquals(listOf("Follow active nation", "All nations",
-            "1. Previous in order · Rome · Atlas", "2. Eliminated · Korea · Nova", "3. Current · China"),
+            "1. Rome · Atlas", "2. Eliminated · Korea · Nova", "3. Current · China"),
             picker.items.map { it.toString() })
     }
 
@@ -640,7 +640,8 @@ class WorldScreenHudTest {
         scroll.scrollY = 20f
         f.active = "Korea"
         feed.refreshNow()
-        assertEquals("1. Previous in order · Rome · Atlas", picker.selected.toString())
+        // Two nations: Rome plays next, and the picker leaves "Next in order" unmarked.
+        assertEquals("1. Rome · Atlas", picker.selected.toString())
         assertEquals(20f, scroll.scrollY, 0.1f)
         assertTrue(feed.messageIds().all { it.startsWith("Message rome") })
         assertFalse(feed.descendants().filterIsInstance<TextButton>().single { it.text.toString() == "Live" }.isChecked)

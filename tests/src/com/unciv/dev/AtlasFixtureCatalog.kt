@@ -70,7 +70,7 @@ object AtlasFixtureCatalog {
     const val SEED = 20261012
     val nations = listOf("America", "Arabia", "Germany", "China", "Russia", "The Ottomans",
         "Persia", "England", "France", "Rome", "Korea", "Babylon", "Polynesia", "Mongolia", "Egypt")
-    private val registered = linkedSetOf("world", "world-selection", "world-activity", "world-map", "world-legacy", "world-fortified", "world-siege", "world-promote", "world-exhausted", "world-research", "world-notifications", "world-control", "world-map-roundtrip", "world-atlas-art", "activity", "messages", "overview", "nation-control",
+    private val registered = linkedSetOf("world", "world-selection", "world-activity", "world-map", "world-legacy", "world-fortified", "world-siege", "world-promote", "world-exhausted", "world-research", "world-notifications", "world-control", "world-map-roundtrip", "world-atlas-art", "world-idle", "activity", "messages", "overview", "nation-control",
         "terrain", "units", "city", "research", "policies", "religion", "promotions", "diplomacy",
         "setup", "menu", "supporting", "supporting-atlas", "supporting-atlas-end", "supporting-atlas-states")
     private val scopes = IdentityHashMap<BaseScreen, AtlasDataScope>()
@@ -99,8 +99,8 @@ object AtlasFixtureCatalog {
                 showTutorials = false
                 enableEasterEggs = false
                 // world-atlas-art shows borders and banners on the AtlasAppearance art the user plays.
-                tileSet = if (id == "world-atlas-art") "AtlasTerrain" else "HexaRealm"
-                unitSet = if (id == "world-atlas-art") "AtlasUnits" else "AbsoluteUnits"
+                tileSet = if (id in setOf("world-atlas-art", "world-idle")) "AtlasTerrain" else "HexaRealm"
+                unitSet = if (id in setOf("world-atlas-art", "world-idle")) "AtlasUnits" else "AbsoluteUnits"
                 minimapSize = 12
                 showTileYields = true
                 showPixelImprovements = true
@@ -251,6 +251,18 @@ object AtlasFixtureCatalog {
                         val tileInfo = com.unciv.ui.screens.worldscreen.bottombar.TileInfoTable(facade)
                         val hud = com.unciv.ui.screens.worldscreen.AtlasWorldHud(facade, tech, unit, actions, minimap, status, tileInfo)
                         hud.layout()
+                        if (id == "world-idle") {
+                            // The reported state: an idle spectator following the active agent, nothing selected.
+                            Mockito.`when`(facade.selectedCiv).thenReturn(observer)
+                            Mockito.`when`(facade.selectedGameView).thenReturn(GameView(fixture.gameInfo, observer, true))
+                            holder.zoom(1f)
+                            holder.layout()
+                            holder.setCenterPosition(fixture.tileMap[1, 8].position, immediately = true, selectUnit = false)
+                            unit.selectUnit(); unit.update()
+                            actions.update(null)
+                            bar.callInternal("update", observer)
+                            hud.layout()
+                        }
                         if (id == "world-notifications") {
                             val notifications = com.unciv.ui.screens.worldscreen.NotificationsScroll(facade)
                             getter(facade, "getNotificationsScroll", notifications)

@@ -82,19 +82,30 @@ class AgentNationViewTest {
         method!!.invoke(screen, game, selection, generation, viewer, null)
     }
 
-    @Test fun `ribbon inspection survives HUD refresh without changing viewer or controller`() {
+    @Test fun `nation inspection survives HUD refresh without changing viewer or controller`() {
         val f = Fixture()
         f.screen.inspectNation(f.rome.civID)
         WorldScreen::class.java.getDeclaredMethod("updateSelectedCiv").apply { isAccessible = true }.invoke(f.screen)
         assertSame(f.rome, f.screen.selectedCiv)
         assertSame(f.spectator, f.screen.viewingCiv)
         assertTrue(f.screen.selectedGameView.spectatorMode)
-        assertFalse("Ribbon inspection cannot change control or match vision",
+        assertFalse("Nation inspection cannot change control or match vision",
             Mockito.mockingDetails(f.session).invocations.any { it.method.name in setOf("requestNationChange", "setVision") })
         installWithViewer(f.screen, f.snapshot(), ResolvedSelection(null, null, null), 1, f.rome.civID)
         f.screen.inspectNation(f.spectator.civID)
         assertEquals(f.rome.civID, f.screen.selectedCiv.civID)
         assertFalse(f.screen.selectedGameView.spectatorMode)
+    }
+
+    @Test fun `follow active nation clears inspection without changing viewer or controller`() {
+        val f = Fixture()
+        f.screen.inspectNation(f.rome.civID)
+        f.screen.clearInspectedNation()
+        WorldScreen::class.java.getDeclaredMethod("updateSelectedCiv").apply { isAccessible = true }.invoke(f.screen)
+        assertSame(f.spectator, f.screen.selectedCiv)
+        assertSame(f.spectator, f.screen.viewingCiv)
+        assertTrue(f.screen.selectedGameView.spectatorMode)
+        assertFalse(Mockito.mockingDetails(f.session).invocations.any { it.method.name in setOf("requestNationChange", "setVision") })
     }
 
     @Test fun `host always consumes Next Turn even when current viewer cannot end it`() {

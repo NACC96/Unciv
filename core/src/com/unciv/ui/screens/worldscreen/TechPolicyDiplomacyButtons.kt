@@ -9,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Container
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.unciv.models.UncivSound
 import com.unciv.models.translations.tr
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.extensions.disable
 import com.unciv.ui.components.extensions.setFontSize
 import com.unciv.ui.components.extensions.toLabel
@@ -116,7 +117,8 @@ class TechPolicyDiplomacyButtons(val worldScreen: WorldScreen) : Table(BaseScree
         if (game.gameInfo!!.isEspionageEnabled())
             updateEspionageButton()
         pack()
-        setPosition(10f, worldScreen.topBar.y - height - 10f)
+        // In Atlas the tracker pane's table places this actor; an absolute position would fight it.
+        if (!GameUiStyle.isAtlas) setPosition(10f, worldScreen.topBar.y - height - 10f)
         return result
     }
 

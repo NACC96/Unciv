@@ -22,7 +22,9 @@ import com.unciv.ui.screens.overviewscreen.EmpireOverviewCategories
 import com.unciv.ui.screens.victoryscreen.VictoryScreen
 
 internal class WorldScreenTopBarResources(private val topbar: WorldScreenTopBar) : ScalingTableWrapper() {
-    private val turnsLabel = "Turns: 0/400".toLabel(WorldScreenStyle.muted, 12)
+    /** Atlas places this as the turn chip in the top bar's right cluster instead of in this table. */
+    internal val turnsLabel = "Turns: 0/400".toLabel(WorldScreenStyle.muted, 12)
+    private val atlas = com.unciv.ui.components.GameUiStyle.isAtlas
     private data class ResourceActors(val resource: TileResource, val label: Label, val icon: Group)
     private val resourceActors = ArrayList<ResourceActors>(12)
     private val resourcesWrapper = Table()
@@ -70,7 +72,7 @@ internal class WorldScreenTopBarResources(private val topbar: WorldScreenTopBar)
             resourceActors += ResourceActors(resource, resourceLabel, resourceImage)
         }
 
-        add(turnsLabel)
+        if (!atlas) add(turnsLabel)
 
         // in case the icons are configured higher than a label, we add a dummy - height will be measured once before it's updated
         if (resourceActors.isNotEmpty()) {
@@ -79,13 +81,16 @@ internal class WorldScreenTopBarResources(private val topbar: WorldScreenTopBar)
         }
     }
 
+    val hasResources get() = resourcesWrapper.hasChildren()
+
     fun update(civInfo: Civilization) {
         resetScale()
 
         val yearText = YearTextUtil.toYearText(
             civInfo.gameInfo.getYear(), civInfo.isLongCountDisplay()
         )
-        turnsLabel.setText(Fonts.turn + "\u2004" + civInfo.gameInfo.turns.tr() + "\u2004|\u2004" + yearText) // U+2004: Three-Per-Em Space
+        if (atlas) turnsLabel.setText("T${civInfo.gameInfo.turns.tr()} · $yearText")
+        else turnsLabel.setText(Fonts.turn + "\u2004" + civInfo.gameInfo.turns.tr() + "\u2004|\u2004" + yearText) // U+2004: Three-Per-Em Space
 
         resourcesWrapper.clearChildren()
         val civResources = civInfo.getCivResourcesByName()
@@ -99,6 +104,7 @@ internal class WorldScreenTopBarResources(private val topbar: WorldScreenTopBar)
 
             if (!civInfo.canSeeResource(resource) && amount == 0) // You cannot trade for resources you cannot process yourself yet
                 continue
+            if (atlas && amount == 0) continue // Atlas: an empty stockpile is not news
 
             resourcesWrapper.add(icon).padLeft(if (index == 0) 0f else extraPadBetweenResources)
 
