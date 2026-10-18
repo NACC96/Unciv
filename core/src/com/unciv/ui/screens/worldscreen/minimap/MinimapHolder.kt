@@ -181,7 +181,7 @@ class MinimapHolder(val mapHolder: WorldMapHolder) : Table() {
     private fun mapButtonPlate(icon: Actor, alignment: Int): Table {
         val plate = Table().apply {
             background = WorldScreenStyle.control("WorldScreen/Minimap/ResizePlate",
-                WorldScreenStyle.raised.cpy().apply { a = 0.9f })
+                WorldScreenStyle.raised.cpy().apply { a = 0.94f }, WorldScreenStyle.ink.cpy().apply { a = 0.18f })
             touchable = Touchable.disabled
             add(icon).size(16f).pad(5f)
         }
@@ -192,12 +192,16 @@ class MinimapHolder(val mapHolder: WorldMapHolder) : Table() {
     }
 
     private fun getLayersButton(alignment: Int): Table {
-        // Two offset hexagon outlines read as stacked map layers.
+        // An outlined hexagon behind a filled one reads as stacked map layers.
         val icon = Group().apply {
             setSize(16f, 16f)
-            for (offset in listOf(0f, 5f)) addActor(ImageGetter.getImage("OtherIcons/HexagonOutline").apply {
+            addActor(ImageGetter.getImage("OtherIcons/HexagonOutline").apply {
                 color = WorldScreenStyle.ink
-                setBounds(offset, 5f - offset, 11f, 11f)
+                setBounds(5f, 5f, 11f, 11f)
+            })
+            addActor(ImageGetter.getImage("OtherIcons/Hexagon").apply {
+                color = WorldScreenStyle.ink
+                setBounds(0f, 0f, 11f, 11f)
             })
         }
         return mapButtonPlate(icon, alignment).apply {
