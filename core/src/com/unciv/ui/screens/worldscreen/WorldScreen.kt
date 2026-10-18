@@ -1000,6 +1000,11 @@ class WorldScreen(
         tutorialTaskTable.isVisible = true
     }
 
+    /** Re-places the Atlas HUD panes after a panel opens, closes or changes size, without a full screen update. */
+    internal fun relayoutHud() {
+        if (uiEnabled) atlasHud?.layout()
+    }
+
     private var inspectedNationId: String? = null
 
     /** Ribbon inspection is local presentation state, never a viewer/controller handoff. */
