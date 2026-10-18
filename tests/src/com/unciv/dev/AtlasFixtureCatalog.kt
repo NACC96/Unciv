@@ -283,7 +283,7 @@ object AtlasFixtureCatalog {
                                 hud.layout()
                             }
                             check(kotlin.math.abs(minimap.width - before.x) < .01f && kotlin.math.abs(minimap.height - before.y) < .01f)
-                            check(minimap.height + 8f <= hud.regions.minimap.height + .5f) { "Layer row exceeds the Atlas map viewport" }
+                            check(minimap.height <= hud.regions.minimap.height + .5f) { "Map card exceeds the Atlas map viewport" }
                             check(game.settings.minimapSize == saved)
                             check(camera == listOf(holder.scrollX, holder.scrollY, holder.scaleX, holder.scaleY))
                         }

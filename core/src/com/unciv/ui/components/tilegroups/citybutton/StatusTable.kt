@@ -5,6 +5,7 @@ import com.unciv.GUI
 import com.unciv.logic.city.City
 import com.unciv.logic.civilization.Civilization
 import com.unciv.models.TutorialTrigger
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.images.ImageGetter
 import com.unciv.ui.screens.worldscreen.WorldScreenStyle
 
@@ -53,7 +54,10 @@ internal class StatusTable(
         }
 
         // Existing status art stays intact; a quiet backing separates it from busy terrain.
-        if (cells.size > 0)
+        if (cells.size > 0 && GameUiStyle.isAtlas) {
+            background = cityChip("WorldScreen/CityButton/StatusTable")
+            pad(2f, 6f, 2f, 6f)
+        } else if (cells.size > 0)
             background = WorldScreenStyle.background("WorldScreen/CityButton/StatusTable",
                 WorldScreenStyle.surface.cpy().apply { a = 0.9f })
     }

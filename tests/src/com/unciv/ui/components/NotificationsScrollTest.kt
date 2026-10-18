@@ -16,12 +16,15 @@ import com.unciv.logic.agents.ControllerKind
 import com.unciv.logic.agents.NationSetting
 import com.unciv.logic.civilization.Notification
 import com.unciv.logic.civilization.NotificationCategory
+import com.unciv.models.skins.SkinCache
+import com.unciv.models.skins.SkinStrings
 import com.unciv.testing.GdxTestRunner
 import com.unciv.testing.TestGame
 import com.unciv.ui.components.fonts.FontRulesetIcons
 import com.unciv.ui.components.fonts.Fonts
 import com.unciv.ui.components.input.ActivationListener
 import com.unciv.ui.images.ImageGetter
+import com.unciv.ui.screens.basescreen.BaseScreen
 import com.unciv.ui.screens.basescreen.UncivStage
 import com.unciv.ui.screens.worldscreen.NotificationsScroll
 import com.unciv.ui.screens.worldscreen.WorldScreen
@@ -169,6 +172,31 @@ class NotificationsScrollTest {
         game.gameInfo.turns++
         update(news)
         assertTrue("Previously revealed news cannot reopen the list again", scroll.isHidden)
+    }
+
+    @Test fun `atlas shows one drawer and anchors the bell under the header`() {
+        val prior = BaseScreen.skinStrings
+        // The fixture loads its ruleset, which reloads the configured skin; switch afterwards.
+        val fixture = Fixture(agentMatch = true)
+        SkinCache.loadSkinConfigs()
+        BaseScreen.skinStrings = SkinStrings("Atlas")
+        try {
+            fixture.use {
+                NotificationsScroll::class.java.methods.single { it.name.substringBefore('$') == "update" && it.parameterCount == 3 }
+                    .invoke(scroll, diplomacy("Russia and The Ottomans have signed a Declaration of Friendship!"), 56f, 300f)
+                val drawers = scroll.descendants().filter { it.name == "AtlasNotificationsDrawer" }.toList()
+                assertEquals(1, drawers.size)
+                assertTrue(drawers.single().descendants().any { it is Label && it.text.toString().endsWith("· 1") })
+                assertFalse(scroll.descendants().any { it.name == "AtlasNotificationIcon" })
+                hide()
+                assertTrue(scroll.isHidden)
+                val bell = stage.root.children.single { it is NotificationsScroll.RestoreButton }
+                assertEquals(stage.width - 8f, bell.x + bell.width, .5f)
+                assertEquals(stage.height - 56f - 8f, bell.y + bell.height, .5f)
+            }
+        } finally {
+            BaseScreen.skinStrings = prior
+        }
     }
 
     @Test fun `an agent controlled viewer stays quiet on its own engine turn`() = Fixture(agentMatch = true).use {

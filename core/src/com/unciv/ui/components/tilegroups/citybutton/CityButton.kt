@@ -9,6 +9,9 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.utils.Align
 import com.unciv.GUI
+import com.unciv.logic.city.City
+import com.unciv.logic.civilization.Civilization
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.extensions.center
 import com.unciv.ui.components.extensions.centerX
 import com.unciv.ui.components.input.onClick
@@ -37,11 +40,15 @@ import yairm210.purity.annotations.Readonly
  *  Floating:
  *  - Health bar (if damaged and viewable), positioned just inside the upper border of [CityTable]
  *  - Hidden unit markers (as little triangles just below [CityTable])
+ *
+ *  The Atlas skin uses a single-row banner instead, see [updateBanner].
  */
 class CityButton(val foreignCityView: ForeignCityView, private val tileGroup: TileGroup) : Table(BaseScreen.skin) {
     companion object {
         val ColorConstruction: Color = Color.valueOf("#C48C3E")
         val ColorGrowth: Color = Color.valueOf("#82E14E")
+        /** The Atlas banner covers only the lower part of the city tile (its origin is ~27 below the hex centre). */
+        private const val BANNER_Y = -6f
     }
 
     init {
@@ -59,6 +66,7 @@ class CityButton(val foreignCityView: ForeignCityView, private val tileGroup: Ti
     @Readonly private fun belongsToViewingCiv() = foreignCityView.belongsTo(viewingPlayer)
 
     fun update(isCityViewable: Boolean) {
+        if (GameUiStyle.isAtlas) return updateBanner(isCityViewable)
         val selectedPlayer = foreignCityView.getViewingCiv()
         isViewable = isCityViewable
 
@@ -104,6 +112,74 @@ class CityButton(val foreignCityView: ForeignCityView, private val tileGroup: Ti
         centerX(tileGroup)
 
         updateHiddenUnitMarkers(isCityViewable)
+    }
+
+    /**
+     *  Atlas: the compact one-row [CityTable] pill sits on the lower part of the city tile, so the
+     *  city art stays visible. Badges float around it instead of stacking rows:
+     *  defence and air units as chips on its top corners, status icons inline to its right,
+     *  health as a thin bar along its top inner edge.
+     */
+    private fun updateBanner(isCityViewable: Boolean) {
+        val selectedPlayer = foreignCityView.getViewingCiv()
+        val city = foreignCityView.getCity()
+        isViewable = isCityViewable
+
+        clear()
+        setButtonActions()
+
+        cityTable = CityTable(foreignCityView.gameView.getCityView(city))
+        add(cityTable).row()
+
+        if (foreignCityView.isCityState() && foreignCityView.civKnows(selectedPlayer)) {
+            val diplomacyManager = foreignCityView.getDiplomacyManagerWith(selectedPlayer)!!
+            add(InfluenceTable(diplomacyManager.getInfluence(), diplomacyManager.relationshipLevel(),
+                (cityTable.width - 24f).coerceIn(40f, 100f), 3f)).padTop(2f).row()
+        }
+        pack()
+
+        val top = cityTable.y + cityTable.height
+        val isDamaged = isCityViewable && foreignCityView.getHealth() < foreignCityView.getMaxHealth()
+        if (isDamaged) {
+            val healthBar = ImageGetter.getHealthBar(foreignCityView.getHealth().toFloat(),
+                foreignCityView.getMaxHealth().toFloat(), (cityTable.width - 36f).coerceAtLeast(12f), 2f)
+            addActor(healthBar)
+            healthBar.setPosition(cityTable.x + (cityTable.width - healthBar.width) / 2, top - healthBar.height - 2f)
+        }
+
+        if (isDamaged || isDefenceRelevant(city, selectedPlayer)) {
+            val defence = DefenceTable(city, selectedPlayer)
+            defence.pack()
+            addActor(defence)
+            defence.setPosition(cityTable.x + 8f, top - 3f)
+        }
+
+        val visibleAirUnits = tileGroup.tileView.getVisibleUnits().filter { it.isAirUnit() }
+        if (isCityViewable && visibleAirUnits.isNotEmpty()) {
+            val air = AirUnitTable(city, visibleAirUnits.size, 11f)
+            air.pack()
+            addActor(air)
+            air.setPosition(cityTable.x + cityTable.width - air.width - 8f, top - 3f)
+        }
+
+        val status = StatusTable(city, selectedPlayer, 14f)
+        if (status.cells.size > 0) {
+            status.pack()
+            addActor(status)
+            status.setPosition(cityTable.x + cityTable.width + 2f, cityTable.y + (cityTable.height - status.height) / 2)
+        }
+
+        setOrigin(Align.center)
+        centerX(tileGroup)
+        y = BANNER_Y
+
+        updateHiddenUnitMarkers(isCityViewable)
+    }
+
+    /** Strength matters when the owner is at war: with the viewer, or with anyone for spectators and the owner itself. */
+    private fun isDefenceRelevant(city: City, viewer: Civilization): Boolean = when {
+        viewer.isSpectator() || city.civ == viewer -> city.civ.isAtWar()
+        else -> city.civ.isAtWarWith(viewer)
     }
 
     private enum class HiddenUnitMarkerPosition {Left, Center, Right}
