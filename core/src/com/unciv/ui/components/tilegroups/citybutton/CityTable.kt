@@ -207,7 +207,7 @@ internal class CityTable(
         if (progress.nextTurnPercentage > progress.percentage)
             bar.setSemiProgress(progress.color.cpy().darken(0.4f), progress.nextTurnPercentage)
         bar.touchable = Touchable.disabled
-        bar.setPosition(left, 3f)
+        bar.setPosition(left, 2f) // just inside the rim, below text descenders
         addActor(bar)
     }
 
