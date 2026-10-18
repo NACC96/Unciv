@@ -1,12 +1,12 @@
 
 Skin.png
-size: 512, 64
+size: 256, 256
 format: RGBA8888
 filter: Linear, Linear
 repeat: none
 Skins/Atlas/control
   rotate: false
-  xy: 426, 38
+  xy: 222, 102
   size: 16, 16
   split: 4, 4, 4, 4
   pad: 3, 3, 3, 3
@@ -15,25 +15,81 @@ Skins/Atlas/control
   index: -1
 Skins/Atlas/panel
   rotate: false
-  xy: 426, 38
+  xy: 222, 102
   size: 16, 16
   split: 4, 4, 4, 4
   pad: 3, 3, 3, 3
   orig: 16, 16
+  offset: 0, 0
+  index: -1
+Skins/Atlas/control-r8
+  rotate: false
+  xy: 180, 108
+  size: 34, 34
+  split: 16, 16, 16, 16
+  orig: 34, 34
+  offset: 0, 0
+  index: -1
+Skins/Atlas/control-r8-rim
+  rotate: false
+  xy: 180, 150
+  size: 34, 34
+  split: 16, 16, 16, 16
+  orig: 34, 34
+  offset: 0, 0
+  index: -1
+Skins/Atlas/pill
+  rotate: false
+  xy: 134, 192
+  size: 58, 56
+  split: 28, 28, 27, 27
+  orig: 58, 56
+  offset: 0, 0
+  index: -1
+Skins/Atlas/pill-rim
+  rotate: false
+  xy: 4, 62
+  size: 58, 56
+  split: 28, 28, 27, 27
+  orig: 58, 56
   offset: 0, 0
   index: -1
 Skins/Atlas/rim
   rotate: false
-  xy: 450, 38
+  xy: 219, 78
   size: 16, 16
   split: 4, 4, 4, 4
   pad: 3, 3, 3, 3
   orig: 16, 16
   offset: 0, 0
   index: -1
+Skins/Atlas/surface
+  rotate: false
+  xy: 70, 68
+  size: 50, 50
+  split: 24, 24, 24, 24
+  orig: 50, 50
+  offset: 0, 0
+  index: -1
+Skins/Atlas/surface-rim
+  rotate: false
+  xy: 4, 4
+  size: 50, 50
+  split: 24, 24, 24, 24
+  orig: 50, 50
+  offset: 0, 0
+  index: -1
+Skins/Atlas/surface-shadow
+  rotate: false
+  xy: 4, 126
+  size: 122, 122
+  split: 60, 60, 60, 60
+  orig: 122, 122
+  offset: 0, 0
+  index: -1
 Skins/Minimal/checkbox
   rotate: false
-  xy: 291, 23
+  xy: 176, 30
   size: 31, 31
   split: 0, 0, 0, 0
   orig: 31, 31
@@ -41,7 +97,7 @@ Skins/Minimal/checkbox
   index: -1
 Skins/Minimal/checkbox-pressed
   rotate: false
-  xy: 252, 23
+  xy: 180, 69
   size: 31, 31
   split: 0, 0, 0, 0
   orig: 31, 31
@@ -49,7 +105,7 @@ Skins/Minimal/checkbox-pressed
   index: -1
 Skins/Minimal/rectangleWithOutline
   rotate: false
-  xy: 64, 5
+  xy: 219, 67
   size: 3, 3
   split: 0, 0, 0, 0
   orig: 3, 3
@@ -57,7 +113,7 @@ Skins/Minimal/rectangleWithOutline
   index: -1
 Skins/Minimal/roundedEdgeRectangle
   rotate: false
-  xy: 4, 4
+  xy: 200, 198
   size: 52, 50
   split: 19, 20, 19, 21
   pad: 12, 13, 7, 7
@@ -66,7 +122,7 @@ Skins/Minimal/roundedEdgeRectangle
   index: -1
 Skins/Minimal/roundedEdgeRectangle-mid
   rotate: false
-  xy: 110, 16
+  xy: 134, 100
   size: 38, 38
   split: 17, 17, 15, 15
   pad: 17, 17, -1, -1
@@ -75,7 +131,7 @@ Skins/Minimal/roundedEdgeRectangle-mid
   index: -1
 Skins/Minimal/roundedEdgeRectangle-mid-border
   rotate: false
-  xy: 64, 16
+  xy: 134, 146
   size: 38, 38
   split: 18, 18, 18, 18
   orig: 38, 38
@@ -83,7 +139,7 @@ Skins/Minimal/roundedEdgeRectangle-mid-border
   index: -1
 Skins/Minimal/roundedEdgeRectangle-small
   rotate: false
-  xy: 330, 30
+  xy: 222, 166
   size: 24, 24
   split: 10, 10, 10, 10
   pad: 10, 10, 2, 2
@@ -92,7 +148,7 @@ Skins/Minimal/roundedEdgeRectangle-small
   index: -1
 Skins/Minimal/roundedTopEdgeRectangle-small
   rotate: false
-  xy: 394, 42
+  xy: 222, 126
   size: 24, 12
   split: 10, 10, 10, 0
   pad: 10, 10, -1, -1
@@ -101,7 +157,7 @@ Skins/Minimal/roundedTopEdgeRectangle-small
   index: -1
 Skins/Minimal/roundedTopEdgeRectangle-small-border
   rotate: false
-  xy: 362, 42
+  xy: 222, 146
   size: 24, 12
   split: 10, 10, 10, 0
   orig: 24, 12
@@ -109,7 +165,7 @@ Skins/Minimal/roundedTopEdgeRectangle-small-border
   index: -1
 Skins/Minimal/select-box
   rotate: false
-  xy: 204, 24
+  xy: 70, 30
   size: 40, 30
   split: 7, 9, 7, 7
   orig: 40, 30
@@ -117,7 +173,7 @@ Skins/Minimal/select-box
   index: -1
 Skins/Minimal/select-box-pressed
   rotate: false
-  xy: 156, 24
+  xy: 128, 62
   size: 40, 30
   split: 7, 9, 7, 7
   orig: 40, 30
