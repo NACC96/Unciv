@@ -249,7 +249,7 @@ internal class AdvancedTab(
     }
 
     private fun addMaxZoomSlider() {
-        addSlider("Max zoom out", settings::maxWorldZoomOut, 2f, 6f, 1f) {
+        addSlider("Max zoom out", settings::maxWorldZoomOut, 2f, 8f, 1f) {
             if (GUI.isWorldLoaded())
                 GUI.getMap().reloadMaxZoom()
         }.padTop(20f)
