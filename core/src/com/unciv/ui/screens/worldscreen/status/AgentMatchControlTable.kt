@@ -196,7 +196,9 @@ class AgentMatchControlTable(
         head.add(status).minWidth(0f).growX().left()
         head.add(elapsed).prefWidth(elapsedWidth).minWidth(0f).padLeft(elapsedGap).right()
         add(head).width(content).row()
-        if (model.text.isNotEmpty()) add(model).width(content).left().padTop(GameUiStyle.Space.xs).row()
+        // The caption lines up under the status text, past the dot.
+        val indent = 8f + GameUiStyle.Space.m
+        if (model.text.isNotEmpty()) add(model).width(content - indent).left().padLeft(indent).padTop(GameUiStyle.Space.xs).row()
         var top = GameUiStyle.Space.m + GameUiStyle.Space.xs
         if (primary != null) {
             val turnRow = Table()
