@@ -31,6 +31,10 @@ def hex_mask():
 
 
 def normalize(crop, mode):
+    if mode == 'border':
+        # Stretching a generated ribbon to the full strip overshoots every hex corner.
+        # Border strips are exact mitred engine geometry drawn by gen_borders.py.
+        raise ValueError('Border strips are drawn by art/atlas/terrain/gen_borders.py, not cut from a sheet')
     # Preserve original pixels and alpha, cutting away only transparent cell gutters.
     bounds = crop.getchannel('A').point(lambda a: 255 if a > 12 else 0).getbbox()
     if bounds is None:
@@ -40,8 +44,6 @@ def normalize(crop, mode):
         image = crop.resize(CANVAS, Image.Resampling.LANCZOS)
         image.putalpha(ImageChops.multiply(image.getchannel('A'), hex_mask()))
         return image
-    if mode == 'border':
-        return crop.resize((128, 24), Image.Resampling.LANCZOS)
     if mode == 'road':
         return crop.resize((96, 32), Image.Resampling.LANCZOS)
     if mode == 'river':
@@ -75,7 +77,9 @@ def process_batch(batch, provenance):
             category = 'road'
         elif item.startswith('River-'):
             category = 'river'
-        elif item.startswith('@') and not item.startswith('@Borders/'):
+        elif item.startswith('@Borders/'):
+            category = 'border'
+        elif item.startswith('@'):
             category = 'overlay'
         elif batch['id'] == 'resources-overlays' and index > 2:
             category = 'overlay'

@@ -170,9 +170,9 @@
         {
           "kind": "source",
           "path": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Borders/ConcaveConvexInner.png",
-          "sha256": "1a4a52cfd448e5e7b6a648f293e8ee27063255d056f1a5277d6b40be2d94bf6f",
+          "sha256": "fe413bba1a49c0f8d606644350614334b7a1d6fd8cdc7aad276ef30d06e0b8fa",
           "reviewer": "production authoring",
-          "note": "Original generated candidate; formal art acceptance deferred."
+          "note": "Procedural candidate from art/atlas/terrain/gen_borders.py; formal art acceptance deferred."
         }
       ]
     },
@@ -191,9 +191,9 @@
         {
           "kind": "source",
           "path": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Borders/ConcaveConvexOuter.png",
-          "sha256": "ce7caf76bcf0de2310e9c4cf0a9a44dfc6a7dd5cbe0419e70bc3fb8225b40c46",
+          "sha256": "5e9b4bc2f53f309c3311da44641b67049c684b6795ca635ec9a0b18c349abd37",
           "reviewer": "production authoring",
-          "note": "Original generated candidate; formal art acceptance deferred."
+          "note": "Procedural candidate from art/atlas/terrain/gen_borders.py; formal art acceptance deferred."
         }
       ]
     },
@@ -212,9 +212,9 @@
         {
           "kind": "source",
           "path": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Borders/ConcaveInner.png",
-          "sha256": "9e2f6b4f77bad6d0ab012ed0a7037ca0808f498aaad8ee44e273189efc1157d9",
+          "sha256": "b51a0c48b0eac091379fc35045eb164fdcd3b32c06351211bcbea4ee5b342c2e",
           "reviewer": "production authoring",
-          "note": "Original generated candidate; formal art acceptance deferred."
+          "note": "Procedural candidate from art/atlas/terrain/gen_borders.py; formal art acceptance deferred."
         }
       ]
     },
@@ -233,9 +233,9 @@
         {
           "kind": "source",
           "path": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Borders/ConcaveOuter.png",
-          "sha256": "b7f33e76978a59da4137ce14f9afc6444af130f42494b3523971a53f58e104d0",
+          "sha256": "0197dbef9b18e0af0515a086a01535bd5392c6f1241778cadc0715f494aacebe",
           "reviewer": "production authoring",
-          "note": "Original generated candidate; formal art acceptance deferred."
+          "note": "Procedural candidate from art/atlas/terrain/gen_borders.py; formal art acceptance deferred."
         }
       ]
     },
@@ -254,9 +254,9 @@
         {
           "kind": "source",
           "path": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Borders/ConvexConcaveInner.png",
-          "sha256": "5bdb977abcf8394824013fb143437f1f81f3a8e56c2053b472149055648a151a",
+          "sha256": "393d2341cd084a28673097aae390ff7b35dde509671c9db523f86ef713836c3b",
           "reviewer": "production authoring",
-          "note": "Original generated candidate; formal art acceptance deferred."
+          "note": "Procedural candidate from art/atlas/terrain/gen_borders.py; formal art acceptance deferred."
         }
       ]
     },
@@ -275,9 +275,9 @@
         {
           "kind": "source",
           "path": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Borders/ConvexConcaveOuter.png",
-          "sha256": "8f4b672f9c7bdd0f53d701790b5bf6d400786327b82e3eb1ecc76a261e8ed955",
+          "sha256": "f6a73f6f7d36f35f7d4a57b318642b65d611c6cb57ace0f83727c17c47200353",
           "reviewer": "production authoring",
-          "note": "Original generated candidate; formal art acceptance deferred."
+          "note": "Procedural candidate from art/atlas/terrain/gen_borders.py; formal art acceptance deferred."
         }
       ]
     },
@@ -296,9 +296,9 @@
         {
           "kind": "source",
           "path": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Borders/ConvexInner.png",
-          "sha256": "62f1678b7bc595a22b1c58e4e0dfd5f310d1989337eff907a5a581f6c479761f",
+          "sha256": "0bc404269e4683e1183688f274bc08bfdc0d626477b87411b1017b64bcc5267c",
           "reviewer": "production authoring",
-          "note": "Original generated candidate; formal art acceptance deferred."
+          "note": "Procedural candidate from art/atlas/terrain/gen_borders.py; formal art acceptance deferred."
         }
       ]
     },
@@ -317,9 +317,9 @@
         {
           "kind": "source",
           "path": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Borders/ConvexOuter.png",
-          "sha256": "241ad2dd58326a4871113a810f7220ddaa564ab9893a417c0b79993dd1c566d2",
+          "sha256": "12ad60e054434e9befb69bafb569f4b5943948aca5c34a8775626958330035bb",
           "reviewer": "production authoring",
-          "note": "Original generated candidate; formal art acceptance deferred."
+          "note": "Procedural candidate from art/atlas/terrain/gen_borders.py; formal art acceptance deferred."
         }
       ]
     },

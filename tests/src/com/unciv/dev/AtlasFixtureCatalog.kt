@@ -70,7 +70,7 @@ object AtlasFixtureCatalog {
     const val SEED = 20261012
     val nations = listOf("America", "Arabia", "Germany", "China", "Russia", "The Ottomans",
         "Persia", "England", "France", "Rome", "Korea", "Babylon", "Polynesia", "Mongolia", "Egypt")
-    private val registered = linkedSetOf("world", "world-selection", "world-activity", "world-map", "world-legacy", "world-fortified", "world-siege", "world-promote", "world-exhausted", "world-research", "world-notifications", "world-control", "world-map-roundtrip", "activity", "messages", "overview", "nation-control",
+    private val registered = linkedSetOf("world", "world-selection", "world-activity", "world-map", "world-legacy", "world-fortified", "world-siege", "world-promote", "world-exhausted", "world-research", "world-notifications", "world-control", "world-map-roundtrip", "world-atlas-art", "activity", "messages", "overview", "nation-control",
         "terrain", "units", "city", "research", "policies", "religion", "promotions", "diplomacy",
         "setup", "menu", "supporting", "supporting-atlas", "supporting-atlas-end", "supporting-atlas-states")
     private val scopes = IdentityHashMap<BaseScreen, AtlasDataScope>()
@@ -98,8 +98,9 @@ object AtlasFixtureCatalog {
                 fontSizeMultiplier = fontScale
                 showTutorials = false
                 enableEasterEggs = false
-                tileSet = "HexaRealm"
-                unitSet = "AbsoluteUnits"
+                // world-atlas-art shows borders and banners on the AtlasAppearance art the user plays.
+                tileSet = if (id == "world-atlas-art") "AtlasTerrain" else "HexaRealm"
+                unitSet = if (id == "world-atlas-art") "AtlasUnits" else "AbsoluteUnits"
                 minimapSize = 12
                 showTileYields = true
                 showPixelImprovements = true
@@ -206,6 +207,12 @@ object AtlasFixtureCatalog {
                     if (id.startsWith("world") && id != "world-legacy") {
                         // World review camera is interior; the immutable F1 performance camera is unchanged.
                         holder.setCenterPosition(if (viewer.isSpectator()) fixture.tileMap[0, 0].position else civ.units.getCivUnits().first().getTile().position, immediately = true, selectUnit = false)
+                        if (id == "world-atlas-art") {
+                            // Default 1x zoom over Seoul, Honolulu, Thebes and Rome: touching and separate borders.
+                            holder.zoom(1f)
+                            holder.layout()
+                            holder.setCenterPosition(fixture.tileMap[1, 8].position, immediately = true, selectUnit = false)
+                        }
                         Mockito.`when`(scope.session.statusText()).thenReturn("Paused · America")
                         if (id in setOf("world-selection", "world-fortified", "world-siege", "world-promote", "world-exhausted", "world-turn-AgentMatchHuman", "world-turn-AgentPickTech", "world-turn-AgentUnsupportedChoice")) {
                             Mockito.`when`(scope.session.isHumanInputAllowed()).thenReturn(true)

@@ -2502,21 +2502,21 @@
       }
     },
     {
-      "assetId": "terrain-batch-borders",
-      "creator": "OpenAI built-in image_gen",
+      "assetId": "terrain-borders",
+      "creator": "Procedural geometry (art/atlas/terrain/gen_borders.py)",
       "source": "art/atlas/terrain/borders-source.json",
-      "promptPath": "art/atlas/terrain/borders-prompt.txt",
-      "rights": "original-generated",
-      "sourceHash": "5e2ed321b009407cab71846cb0db0ad947ba8efb36d5e0c7330970608693b47d",
+      "promptPath": "art/atlas/terrain/gen_borders.py",
+      "rights": "original",
+      "sourceHash": "6dbfd84eef406f3c68b30bb0d24ecf44e7cd94b5405a2041d633fe45df9d93f7",
       "outputHashes": {
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Borders/ConcaveInner.png": "9e2f6b4f77bad6d0ab012ed0a7037ca0808f498aaad8ee44e273189efc1157d9",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Borders/ConcaveOuter.png": "b7f33e76978a59da4137ce14f9afc6444af130f42494b3523971a53f58e104d0",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Borders/ConvexInner.png": "62f1678b7bc595a22b1c58e4e0dfd5f310d1989337eff907a5a581f6c479761f",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Borders/ConvexOuter.png": "241ad2dd58326a4871113a810f7220ddaa564ab9893a417c0b79993dd1c566d2",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Borders/ConcaveConvexInner.png": "1a4a52cfd448e5e7b6a648f293e8ee27063255d056f1a5277d6b40be2d94bf6f",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Borders/ConcaveConvexOuter.png": "ce7caf76bcf0de2310e9c4cf0a9a44dfc6a7dd5cbe0419e70bc3fb8225b40c46",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Borders/ConvexConcaveInner.png": "5bdb977abcf8394824013fb143437f1f81f3a8e56c2053b472149055648a151a",
-        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Borders/ConvexConcaveOuter.png": "8f4b672f9c7bdd0f53d701790b5bf6d400786327b82e3eb1ecc76a261e8ed955"
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Borders/ConcaveInner.png": "b51a0c48b0eac091379fc35045eb164fdcd3b32c06351211bcbea4ee5b342c2e",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Borders/ConcaveOuter.png": "0197dbef9b18e0af0515a086a01535bd5392c6f1241778cadc0715f494aacebe",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Borders/ConvexInner.png": "0bc404269e4683e1183688f274bc08bfdc0d626477b87411b1017b64bcc5267c",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Borders/ConvexOuter.png": "12ad60e054434e9befb69bafb569f4b5943948aca5c34a8775626958330035bb",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Borders/ConcaveConvexInner.png": "fe413bba1a49c0f8d606644350614334b7a1d6fd8cdc7aad276ef30d06e0b8fa",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Borders/ConcaveConvexOuter.png": "5e9b4bc2f53f309c3311da44641b67049c684b6795ca635ec9a0b18c349abd37",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Borders/ConvexConcaveInner.png": "393d2341cd084a28673097aae390ff7b35dde509671c9db523f86ef713836c3b",
+        "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Borders/ConvexConcaveOuter.png": "f6a73f6f7d36f35f7d4a57b318642b65d611c6cb57ace0f83727c17c47200353"
       }
     },
     {
