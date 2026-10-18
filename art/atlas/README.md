@@ -24,6 +24,8 @@ Runtime `AtlasArtManifest` parses mutable DTOs into immutable defensive collecti
 
 Provenance entries have exactly `{assetId, creator, source, promptPath, rights, sourceHash, outputHashes}`. Rights are `original` or `original-generated`. `promptPath` is a tracked authoring prompt/creation record. `source` is a relative path to the original creation input or generation record, and `sourceHash` verifies its SHA-256; `outputHashes` maps every shipped source path to its SHA-256. Source references and third-party inspiration do not become shipped art. Large rejected candidates, contact sheets and raw timing artifacts stay on Lexar. Accepted source PNGs, prompts, provenance and compact packing metadata are tracked.
 
+AtlasTerrain border strips are exact engine geometry rather than illustration: a thin line on the shared hex edge and a soft inner tint, with mitred ends. `art/atlas/terrain/gen_borders.py` draws all eight, patches their packed regions into `android/assets/AtlasTerrain.png` in place, and refreshes their provenance, coverage evidence and packaging hashes. `normalize_sources.py` refuses border cells.
+
 Coverage review states are `missing`, `candidate`, `accepted`. Evidence is an ordered list of `{kind, path, sha256, reviewer, note}`; accepted rows need both `source` and `art-review` entries pointing to tracked, exact-case, hash-matching files. Acceptance is explicit and separate from existence, packing or compilation.
 
 Implementation-pass validation is deferred: no tests, render audit, review, performance/native acceptance or complete-coverage claim accompanies this foundation.

@@ -260,24 +260,6 @@
       "category": "era-city",
       "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/terrain-authoring/raw/damaged-cities.png",
       "promptPath": "art/atlas/terrain/damaged-cities-prompt.txt"
-    },
-    {
-      "id": "borders",
-      "columns": 4,
-      "rows": 2,
-      "items": [
-        "@Borders/ConcaveInner",
-        "@Borders/ConcaveOuter",
-        "@Borders/ConvexInner",
-        "@Borders/ConvexOuter",
-        "@Borders/ConcaveConvexInner",
-        "@Borders/ConcaveConvexOuter",
-        "@Borders/ConvexConcaveInner",
-        "@Borders/ConvexConcaveOuter"
-      ],
-      "category": "border",
-      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/terrain-authoring/raw/borders.png",
-      "promptPath": "art/atlas/terrain/borders-prompt.txt"
     }
   ]
 }
