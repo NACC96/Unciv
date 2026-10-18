@@ -197,7 +197,10 @@ class UnitActionsTable(val worldScreen: WorldScreen) : Table() {
             actionButton.color = Color.GREEN.brighten(0.5f)
 
         if (com.unciv.ui.components.GameUiStyle.isAtlas) {
-            com.unciv.ui.components.GameUiStyle.apply(actionButton, primary = unitAction.isCurrentAction)
+            // Actions float beside the selection card, so they use quiet rounded chips rather than outlines.
+            com.unciv.ui.components.GameUiStyle.apply(actionButton,
+                if (unitAction.isCurrentAction) com.unciv.ui.components.GameUiStyle.Emphasis.Primary
+                else com.unciv.ui.components.GameUiStyle.Emphasis.Quiet)
         }
         actionButton.pack()
 
