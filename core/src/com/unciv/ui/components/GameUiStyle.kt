@@ -80,8 +80,9 @@ object GameUiStyle {
     }
 
     /** Secondary and Primary are the skin-wide defaults. Quiet (a filled control without an
-     * outline) and Ghost (transparent until hovered) are opt-in roles for world HUD controls. */
-    enum class Emphasis { Secondary, Primary, Quiet, Ghost }
+     * outline), Ghost (transparent until hovered) and Accent (the world HUD's rounded brass
+     * primary action) are opt-in roles for world HUD controls. Other skins draw Accent as Primary. */
+    enum class Emphasis { Secondary, Primary, Quiet, Ghost, Accent }
 
     /** UI-thread presentation metadata never occupies Actor.userObject (owned by input/callers).
      * Weak keys and templates containing only copied colors/drawables retain neither actor nor style keys.
@@ -312,17 +313,20 @@ object GameUiStyle {
         button.pack()
     }
 
-    /** Compact Quiet and Ghost text keeps clear of the rounded [Radius.control] corner. */
+    /** Compact Quiet and Ghost text keeps clear of the rounded [Radius.control] corner; a compact
+     * Accent action gets a little more room so its brass fill reads as the primary choice. */
     private fun padControl(button: Button, size: ButtonSize) {
-        val rounded = isAtlas && role(button).emphasis.let { it == Emphasis.Quiet || it == Emphasis.Ghost }
-        val horizontal = if (rounded && size == ButtonSize.Compact) Space.m else size.padHorizontal
+        val emphasis = role(button).emphasis
+        val rounded = isAtlas && (emphasis == Emphasis.Quiet || emphasis == Emphasis.Ghost || emphasis == Emphasis.Accent)
+        val horizontal = if (!rounded || size != ButtonSize.Compact) size.padHorizontal
+            else if (emphasis == Emphasis.Accent) Space.l else Space.m
         button.pad(size.padVertical, horizontal, size.padVertical, horizontal)
     }
 
     private fun buttonStyle(source: TextButton.TextButtonStyle, emphasis: Emphasis = Emphasis.Secondary,
         minHeight: Float = standardControlHeight): TextButton.TextButtonStyle =
         TextButton.TextButtonStyle(source).apply {
-            val primary = emphasis == Emphasis.Primary
+            val primary = emphasis == Emphasis.Primary || emphasis == Emphasis.Accent
             font = Fonts.font
             disabled = outlinedBackground("WorldScreen/Controls/Disabled", surface, if (isAtlas) muted else hover)
             disabledFontColor = muted
@@ -358,6 +362,7 @@ object GameUiStyle {
             checkedFocused = null
             if (isAtlas && (emphasis == Emphasis.Quiet || emphasis == Emphasis.Ghost))
                 quietStates(emphasis == Emphasis.Ghost)
+            if (isAtlas && emphasis == Emphasis.Accent) accentStates()
             if (isAtlas) {
                 // The fill's geometry can be small; its actual hit/layout target remains accessible.
                 for (drawable in listOf(up, over, down, checked, focused, disabled, checkedOver, checkedDown, checkedFocused))
@@ -386,6 +391,21 @@ object GameUiStyle {
         fontColor = ink; overFontColor = ink; downFontColor = ink; focusedFontColor = ink
         checkedFontColor = accent; checkedOverFontColor = accent; checkedDownFontColor = accent
         disabledFontColor = muted
+    }
+
+    /** The world HUD primary: the brass fill and dark text of [Emphasis.Primary], drawn with the
+     * rounded [Radius.control] corner of the quiet controls beside it. */
+    private fun TextButton.TextButtonStyle.accentStates() {
+        val path = "Atlas/Button/Accent"
+        up = control("$path/Up", accent)
+        over = control("$path/Over", accent.lerp(ink, 0.35f))
+        down = control("$path/Down", accent.lerp(surface, 0.3f))
+        checked = down
+        checkedOver = over
+        checkedDown = down
+        focused = control("$path/Focused", accent, ink)
+        checkedFocused = control("$path/CheckedFocused", accent.lerp(surface, 0.3f), ink)
+        disabled = control("$path/Disabled", surface.lerp(raised, 0.5f))
     }
 
     /** Scene2D subclasses require their own style type. Preserve semantic image states and fonts. */

@@ -46,6 +46,10 @@ object WorldScreenStyle {
     fun quietButton(text: String, size: GameUiStyle.ButtonSize = GameUiStyle.ButtonSize.Regular): TextButton =
         GameUiStyle.button(text, GameUiStyle.Emphasis.Quiet, size)
 
+    /** The rounded brass primary of the world HUD (e.g. Resume, Next turn); [button] with primary elsewhere. */
+    fun accentButton(text: String, size: GameUiStyle.ButtonSize = GameUiStyle.ButtonSize.Regular): TextButton =
+        GameUiStyle.button(text, GameUiStyle.Emphasis.Accent, size)
+
     /** Transparent until hovered, for the lowest-priority actions (Logs, Earlier, close). */
     fun ghostButton(text: String, size: GameUiStyle.ButtonSize = GameUiStyle.ButtonSize.Regular): TextButton =
         GameUiStyle.button(text, GameUiStyle.Emphasis.Ghost, size)
