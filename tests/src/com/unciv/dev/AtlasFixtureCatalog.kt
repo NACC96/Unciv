@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.ImageButton
 import com.badlogic.gdx.scenes.scene2d.ui.ImageTextButton
 import com.badlogic.gdx.scenes.scene2d.ui.SelectBox
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane
+import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.viewport.ScreenViewport
@@ -379,10 +380,110 @@ object AtlasFixtureCatalog {
             content.setPosition(12f + panel * (panelWidth + 12f), height - content.height - 12f)
             galleries.addActor(content)
         }
+        // Sits in the same root as the state panels, so its roles go through the same repeat/reload passes.
+        galleries.addActor(modernWorldSample(width))
         screen.stage.addActor(galleries)
         repeat(2) { GameUiStyle.applyWidget(galleries) }
         BaseScreen.setSkin()
         GameUiStyle.applyWidget(galleries)
+    }
+
+    /** Modern world HUD primitives floating over the map, half of them over a bright parchment band:
+     * an agent card, a header cluster with chips and dots, quiet/ghost states and undersized shapes. */
+    private fun modernWorldSample(width: Int): WidgetGroup {
+        val space = GameUiStyle.Space
+        val type = GameUiStyle.Type
+        val compact = GameUiStyle.ButtonSize.Compact
+        fun quiet(text: String, checked: Boolean = false) =
+            GameUiStyle.button(text, GameUiStyle.Emphasis.Quiet, compact).apply { isChecked = checked }
+        val agent = Table().apply {
+            name = "AtlasModern/AgentCard"
+            background = GameUiStyle.surface("Atlas/Sample/AgentCard")
+            pad(space.l); defaults().left()
+            add(Table().apply {
+                add(GameUiStyle.dot(GameUiStyle.warning)).padRight(space.m)
+                add("Paused · America".toLabel(GameUiStyle.ink, type.label)).expandX().left()
+                add("04:12".toLabel(GameUiStyle.muted, type.small)).padLeft(space.l)
+            }).growX().row()
+            add("GPT-6.1 Sol · Medium".toLabel(GameUiStyle.muted, type.caption)).padTop(space.xs).row()
+            add(Table().apply {
+                defaults().padRight(space.s)
+                add(GameUiStyle.button("Resume", GameUiStyle.Emphasis.Primary, compact))
+                add(quiet("Activity", checked = true)); add(quiet("Messages")); add(quiet("Settings"))
+            }).padTop(space.m)
+        }
+        val header = Table().apply {
+            name = "AtlasModern/Header"
+            background = GameUiStyle.surface("Atlas/Sample/Header")
+            pad(space.s)
+            add(GameUiStyle.button("≡", GameUiStyle.Emphasis.Ghost, GameUiStyle.ButtonSize.Icon)).size(40f)
+            add(Table().apply {
+                background = GameUiStyle.pill("Atlas/Sample/Identity", GameUiStyle.raised)
+                add(GameUiStyle.dot(GameUiStyle.info, 10f)).padRight(space.m)
+                add("America".toLabel(GameUiStyle.ink, type.label))
+            }).height(32f).padLeft(space.s)
+            add(Table().apply {
+                background = GameUiStyle.pill("Atlas/Sample/Turn", GameUiStyle.inset, GameUiStyle.ink.apply { a = 0.12f })
+                add("T32 · 2,720 BC".toLabel(GameUiStyle.muted, type.small))
+            }).height(28f).padLeft(space.m).padRight(space.s)
+        }
+        val states = Table().apply {
+            name = "AtlasModern/States"
+            background = GameUiStyle.surface("Atlas/Sample/States", 0.94f)
+            pad(space.l); defaults().left().padRight(space.s).padBottom(space.s)
+            val perRow = if (width >= 600) 6 else 3
+            for ((caption, emphasis) in listOf("Quiet" to GameUiStyle.Emphasis.Quiet, "Ghost" to GameUiStyle.Emphasis.Ghost)) {
+                add(caption.toLabel(GameUiStyle.muted, type.caption)).minWidth(40f)
+                for ((index, state) in listOf(AtlasButtonState.Normal, AtlasButtonState.Hover, AtlasButtonState.Pressed,
+                        AtlasButtonState.Focused, AtlasButtonState.Checked, AtlasButtonState.Disabled).withIndex()) {
+                    if (index > 0 && index % perRow == 0) { row(); add() }
+                    val button = AtlasStateButton(state, ImageTextButton.ImageTextButtonStyle().apply {
+                        font = Fonts.font; fontColor = GameUiStyle.ink
+                    }).apply { name = "AtlasModern/$caption/${state.name}"; label.wrap = false }
+                    GameUiStyle.apply(button, emphasis, compact)
+                    add(button)
+                }
+                row()
+            }
+            add("Shapes".toLabel(GameUiStyle.muted, type.caption))
+            add(Table().apply {
+                // Below their corner sums: each shape shrinks uniformly instead of inverting.
+                add(Table().apply { background = GameUiStyle.surface("Atlas/Sample/Tiny", elevated = false) }).size(16f).padRight(space.m)
+                add(Table().apply { background = GameUiStyle.control("Atlas/Sample/TinyControl", GameUiStyle.accent) }).size(10f).padRight(space.m)
+                add(Table().apply { background = GameUiStyle.pill("Atlas/Sample/TinyPill", GameUiStyle.positive) }).size(36f, 12f).padRight(space.m)
+                for (color in listOf(GameUiStyle.info, GameUiStyle.warning, GameUiStyle.error, GameUiStyle.muted))
+                    add(GameUiStyle.dot(color)).padRight(space.s)
+                add(Table().apply {
+                    background = GameUiStyle.pill("Atlas/Sample/Status", GameUiStyle.raised, GameUiStyle.ink.apply { a = 0.09f })
+                    add(GameUiStyle.dot(GameUiStyle.info)).padRight(space.s)
+                    add("Running".toLabel(GameUiStyle.ink, type.small))
+                }).height(24f).padLeft(space.m)
+            }).colspan(perRow).left()
+        }
+        // A bright band under half of the sample shows the shadow and rim on light terrain.
+        val band = ImageGetter.getWhiteDot().apply { color = Color.valueOf("F1E7C7") }
+        // Re-pack after the repeat/reload passes restyle fonts and buttons.
+        return object : WidgetGroup() {
+            override fun layout() {
+                for (table in listOf(agent, header, states)) table.pack()
+                states.setPosition(20f, 20f)
+                if (width >= 960) {
+                    agent.setPosition(states.x + states.width + 32f, 20f)
+                    // The map's lower edge runs behind the header cluster.
+                    header.setPosition(agent.x, 440f)
+                } else {
+                    agent.setPosition(20f, states.y + states.height + 24f)
+                    header.setPosition(20f, agent.y + agent.height + 24f)
+                }
+                val left = states.x + states.width / 2f
+                band.setBounds(left, 0f, width - left, agent.y + agent.height + 32f)
+            }
+        }.apply {
+            name = "AtlasModernSample"
+            setSize(width.toFloat(), 0f)
+            addActor(band)
+            for (table in listOf(agent, header, states)) addActor(table)
+        }
     }
 
     /** Explicit Atlas variant over the same real mixed-biome map; supporting retains MapEditorScreen. */
