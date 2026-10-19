@@ -260,8 +260,7 @@ class AgentTurnInsightsTest {
     fun `worker rejections name the engine blocker`() {
         val f = Fixture()
         val boats = f.rejection(BuildImprovementCommand(f.romeId, "boats", f.rev(), f.workBoatsId, "Fishing Boats"))
-        assertTrue(boats, boats.startsWith("Unit cannot work on improvements now: Work Boats has no worker build ability"))
-        assertTrue(boats, boats.contains("consumed"))
+        assertEquals("Unit cannot create improvements here: Work Boats must stand on a water tile with a resource", boats)
 
         val farm = f.rejection(BuildImprovementCommand(f.romeId, "farm", f.rev(), f.workerId, "Farm"))
         assertTrue(farm, farm.startsWith("Improvement cannot be built on this tile now: Farm "))

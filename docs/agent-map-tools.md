@@ -53,7 +53,7 @@ Each map/tile/rules read response is limited to **96 KiB of serialized UTF-8 JSO
 
 ## Worker choices and progress
 
-`game.legal_actions({unitId:49})` includes the current `revision`, `improvements`, `workInProgress`, `repair` and `canCancelWork`. City `constructions` are a separate list. Worker options identify the exact legal name, kind (`IMPROVEMENT`, `ROAD`, `REMOVE_FEATURE`, `REMOVE_IMPROVEMENT`), turns to build, replaced improvement, resource connection and optional yield delta.
+`game.legal_actions({unitId:49})` includes the current `revision`, `improvements`, `workInProgress`, `repair` and `canCancelWork`. City `constructions` are a separate list. Worker options identify the exact legal name, kind (`IMPROVEMENT`, `ROAD`, `REMOVE_FEATURE`, `REMOVE_IMPROVEMENT`), turns to build, replaced improvement, resource connection and optional yield delta. A Work Boat standing on a sea resource gets one option, the resource's improvement with `consumesUnit:true` and `turnsToBuild:0`: `unit.build` creates it at once, uses up the boat, and its receipt reports the unit as gone.
 
 `yieldDelta:null` currently means no computed comparison is available. Do not read it as zero. Tile yields identify actor-general or actor-own-city context; static catalog yields do not predict every conditional effect or live eligibility.
 

@@ -2061,8 +2061,16 @@ class MatchCoordinator(
                 ?: throw AgentCommandException(
                     AgentCommandError.INVALID_ARGUMENT, "Unknown improvement ${command.improvementName}"
                 )
-            requireWorkerBuildAllowed(WorkerBuildContext(candidateGame, command.actorCivId, unit), improvement)
+            val context = WorkerBuildContext(candidateGame, command.actorCivId, unit)
             val tile = unit.getTile()
+            if (isWaterImprovementCreation(context, improvement)) {
+                // Work Boats: the engine's "Create [improvement]" action, which uses up the unit.
+                requireWaterImprovementAllowed(context, improvement)
+                tile.setImprovement(improvement, unit.civ, unit)
+                unit.destroy()
+                return@runGameplayMutation "0"
+            }
+            requireWorkerBuildAllowed(context, improvement)
             tile.startWorkingOnImprovement(improvement, unit.civ, unit)
             unit.action = null
             tile.turnsToImprovement.toString()
