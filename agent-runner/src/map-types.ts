@@ -60,6 +60,8 @@ export interface WorkerImprovementOption {
   replacesImprovement: string | null;
   connectsResource: boolean;
   yieldDelta: { context: "actor-own-city-tile"; yields: Record<string, number> } | null;
+  /** Built at once and uses up the unit (Work Boats on a water resource); omitted otherwise. */
+  consumesUnit?: boolean;
 }
 export interface WorkInProgress { name: string; turnsRemaining: number }
 export interface RuleEntry {

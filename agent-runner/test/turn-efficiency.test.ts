@@ -66,14 +66,18 @@ describe("model-facing result compaction", () => {
     expect(compactObservation(observation, "Rome", { includeHistory: true })).toMatchObject({ diplomaticHistory: [{ messageId: "m1" }] });
   });
 
-  it("keeps the map page envelope and drops empty option lists from legal actions", () => {
+  it("keeps the map page envelope and drops empty lists and option fields from legal actions", () => {
     expect(compactMapPage({ protocolVersion: 1, observationVersion: 2, matchId: "m", timelineId: "t", revision: 3, tiles: [fullTile], nextCursor: null }))
       .toEqual({ protocolVersion: 1, observationVersion: 2, matchId: "m", timelineId: "t", revision: 3, tiles: [compactTile(fullTile)] });
     expect(compactLegalActions({ moveTargets: [], attackTargets: [{ targetX: 1, targetY: 2, targetKind: "unit", attackFromX: null }],
       orders: [], canFound: false, foundBlockedReason: null, movementLeft: 0, constructions: [{ name: "Walls", turns: 3, cost: 60, goldCost: null }],
-      researchable: ["Writing"], freeTechs: 0, revision: 5 }))
+      researchable: ["Writing"], freeTechs: 0, revision: 5, improvements: [
+        { name: "Farm", kind: "IMPROVEMENT", turnsToBuild: 5, replacesImprovement: null, connectsResource: false, yieldDelta: null, consumesUnit: false },
+        { name: "Fishing Boats", kind: "IMPROVEMENT", turnsToBuild: 0, replacesImprovement: null, connectsResource: true, yieldDelta: null, consumesUnit: true }] }))
       .toEqual({ attackTargets: [{ targetX: 1, targetY: 2, targetKind: "unit" }], movementLeft: 0,
-        constructions: [{ name: "Walls", turns: 3, cost: 60 }], researchable: ["Writing"], freeTechs: 0, revision: 5 });
+        constructions: [{ name: "Walls", turns: 3, cost: 60 }], researchable: ["Writing"], freeTechs: 0, revision: 5, improvements: [
+          { name: "Farm", kind: "IMPROVEMENT", turnsToBuild: 5 },
+          { name: "Fishing Boats", kind: "IMPROVEMENT", turnsToBuild: 0, connectsResource: true, consumesUnit: true }] });
   });
 });
 

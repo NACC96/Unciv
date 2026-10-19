@@ -104,7 +104,7 @@ export function compactMapPage(page: unknown): unknown {
 export function compactLegalActions(result: unknown): unknown {
   if (!isObject(result)) return result;
   const out = dropEmpty(result) as Json;
-  for (const list of ["attackTargets", "constructions", "citySites"]) {
+  for (const list of ["attackTargets", "constructions", "citySites", "improvements"]) {
     const entries = out[list];
     if (Array.isArray(entries)) out[list] = entries.map(entry => isObject(entry) ? dropEmpty(entry) : entry);
   }
