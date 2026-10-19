@@ -62,5 +62,5 @@ object WorldScreenStyle {
 
     fun setEnabled(button: Button, enabled: Boolean) = GameUiStyle.setEnabled(button, enabled)
 
-    fun dragGrip() = GameUiStyle.dragGrip()
+    fun dragGrip(tooltip: String = "Drag to move") = GameUiStyle.dragGrip(tooltip)
 }

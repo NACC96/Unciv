@@ -18,8 +18,9 @@ object AgentPanelLayout {
     fun calculate(width: Float, height: Float, fontScale: Float): PanelRegions {
         require(width.isFinite() && height.isFinite() && fontScale.isFinite())
         require(width > 0f && height > 0f && fontScale > 0f)
-        val footerHeight = minOf(84f * fontScale, height * .28f)
-        val composerHeight = minOf(192f * fontScale, height * .4f)
+        // Reading is the main job: the composer and its actions keep only what they need.
+        val footerHeight = minOf(76f * fontScale, height * .24f)
+        val composerHeight = minOf(150f * fontScale, height * .34f)
         return PanelRegions(
             Rectangle(0f, footerHeight + composerHeight, width, height - footerHeight - composerHeight),
             Rectangle(0f, footerHeight, width, composerHeight),
@@ -38,6 +39,24 @@ object AgentPanelLayout {
     /** Bottom edge of the world header: sheets open below it rather than at a fixed offset. */
     fun headerBottom(stage: Stage): Float =
         WorldHudLayout.calculate(stage.width, stage.height, UncivGame.Current.settings.fontSizeMultiplier, true).header.y
+
+    /** A tall Atlas reading sheet of [width]: from under the header to the bottom margin, just left of
+     * the right-hand HUD column (minimap, tile info, turn action) so those stay visible. Screens too
+     * narrow for that put it at the right edge; compact screens give it the full height. */
+    fun tallSheet(stage: Stage, width: Float): Rectangle {
+        val gap = GameUiStyle.Space.m
+        val regions = WorldHudLayout.calculate(stage.width, stage.height, UncivGame.Current.settings.fontSizeMultiplier, true)
+        val top = (if (regions.compact) stage.height else regions.header.y) - gap
+        val height = (top - gap).coerceAtLeast(1f)
+        // Panes report what the HUD actually placed; their bounds include the card halo.
+        fun cardLeft(name: String) = stage.root.findActor<com.badlogic.gdx.scenes.scene2d.Actor>(name)
+            ?.takeIf { it.isVisible }?.let { it.x + com.unciv.ui.screens.worldscreen.AtlasWorldHud.halo }
+        val columnLeft = listOfNotNull(cardLeft("AtlasMinimap"), cardLeft("AtlasTileInfo"), cardLeft("AtlasTurnAction")).minOrNull()
+            ?: regions.turnAction.x
+        var x = columnLeft - gap - width
+        if (regions.compact || x < gap) x = stage.width - width - gap
+        return Rectangle(x.coerceAtLeast(0f), top - height, width, height)
+    }
 
     /** An Atlas right-side sheet of [width], below the header. It stays above the minimap when
      * [minHeight] fits there, else extends down to the turn action, and covers the header only

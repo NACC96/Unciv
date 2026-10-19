@@ -118,6 +118,10 @@ class AgentMessagesPanel(
     private var disposed = false
     private var initializedPosition = false
     private var userDragged = false
+    /** The size the user dragged the Atlas sheet to; null keeps the default tall sheet. */
+    private var userSize: Vector2? = null
+    private val resizeGrip = WorldScreenStyle.dragGrip("Drag to resize").apply { name = "MessageResize" }
+    private val pickerHeight get() = if (GameUiStyle.isAtlas) 28f * UncivGame.Current.settings.fontSizeMultiplier else 30f
     private var viewerId: String? = null
     /** A queued message awaiting the second click that deletes it, and the one being deleted. */
     private var confirmDeleteId: String? = null
@@ -172,8 +176,9 @@ class AgentMessagesPanel(
                 scrollStyle = ScrollPane.ScrollPaneStyle(scrollStyle).apply { background = listStyle.background }
             }
             picker.setMaxListCount(7)
+            if (GameUiStyle.isAtlas) picker.fontSize = GameUiStyle.Type.label
         }
-        add(conversation).minWidth(0f).growX().height(30f).padBottom(8f).row()
+        add(conversation).minWidth(0f).growX().height(pickerHeight).padBottom(8f).row()
         scroll.setScrollingDisabled(true, false)
         scroll.setFadeScrollBars(false)
         scroll.setOverscroll(false, false)
@@ -182,7 +187,7 @@ class AgentMessagesPanel(
             composer.background = WorldScreenStyle.background("WorldScreen/Messages/Draft", WorldScreenStyle.inset)
             composer.pad(8f)
             composer.add("To".toLabel(WorldScreenStyle.muted, GameUiStyle.Type.caption)).left().row()
-            composer.add(recipient).minWidth(0f).growX().height(32f).padTop(4f).padBottom(6f).row()
+            composer.add(recipient).minWidth(0f).growX().height(pickerHeight).padTop(4f).padBottom(6f).row()
             composer.add(body).growX().height(82f).row()
             composer.add(count).minWidth(0f).growX().left().padTop(4f).row()
             composer.add(imagePreview).growX().row()
@@ -197,6 +202,35 @@ class AgentMessagesPanel(
             }
             footer.add(statusPane).colspan(2).minWidth(0f).growX().height(28f * UncivGame.Current.settings.fontSizeMultiplier).padTop(4f).row()
             add(footer).growX().row()
+            // Bottom-left corner grip: drags that corner while the top-right corner stays put.
+            addActor(resizeGrip)
+            resizeGrip.addListener(object : InputListener() {
+                private var right = 0f
+                private var top = 0f
+                private val startSize = Vector2()
+                private val pointerOrigin = Vector2()
+                override fun touchDown(event: InputEvent, x: Float, y: Float, pointer: Int, button: Int): Boolean {
+                    right = this@AgentMessagesPanel.x + width; top = this@AgentMessagesPanel.y + height
+                    startSize.set(width, height)
+                    pointerOrigin.set(event.stageX, event.stageY)
+                    toFront(); event.stop()
+                    return true
+                }
+                override fun touchDragged(event: InputEvent, x: Float, y: Float, pointer: Int) {
+                    val stage = screen.stage
+                    val w = (startSize.x + pointerOrigin.x - event.stageX)
+                        .coerceIn(minOf(320f, stage.width - 16f), (right - 8f).coerceAtLeast(1f))
+                    val h = (startSize.y + pointerOrigin.y - event.stageY)
+                        .coerceIn(minOf(360f * UncivGame.Current.settings.fontSizeMultiplier, stage.height - 16f), (top - 8f).coerceAtLeast(1f))
+                    userSize = Vector2(w, h); userDragged = true
+                    rememberScrollPosition(); setSize(w, h); setPosition(right - w, top - h)
+                    invalidateHierarchy(); Gdx.graphics.requestRendering()
+                }
+                // Message rows wrap to the content width, so rebuild them once at the final size.
+                override fun touchUp(event: InputEvent, x: Float, y: Float, pointer: Int, button: Int) {
+                    rememberScrollPosition(); rebuildHistory()
+                }
+            })
         } else {
             add("To".toLabel(WorldScreenStyle.muted, 11)).left().padTop(12f).row()
             add(recipient).minWidth(0f).growX().height(32f).padTop(4f).padBottom(6f).row()
@@ -288,14 +322,15 @@ class AgentMessagesPanel(
             options.firstOrNull { it.id == selected }?.let { recipient.selected = it }
             updating = false
         }
-        val w = minOf(if (GameUiStyle.isAtlas) 520f else 480f, screen.stage.width - 16f).coerceAtLeast(1f)
-        // Atlas: a right-side sheet below the header and, when it fits, above the minimap.
-        val sheet = if (GameUiStyle.isAtlas) AgentPanelLayout.rightSheet(screen.stage, w,
-            400f * UncivGame.Current.settings.fontSizeMultiplier, 650f) else null
-        val h = sheet?.height ?: minOf(650f, screen.stage.height - 130f).coerceAtLeast(1f)
+        val maxW = (screen.stage.width - 16f).coerceAtLeast(1f)
+        val w = userSize?.x?.coerceAtMost(maxW) ?: minOf(if (GameUiStyle.isAtlas) 420f else 480f, maxW)
+        // Atlas: a tall, narrow reading sheet beside the right-hand HUD column; the user may resize it.
+        val sheet = if (GameUiStyle.isAtlas) AgentPanelLayout.tallSheet(screen.stage, w) else null
+        val h = userSize?.y?.coerceAtMost((screen.stage.height - 16f).coerceAtLeast(1f))
+            ?: sheet?.height ?: minOf(650f, screen.stage.height - 130f).coerceAtLeast(1f)
         val resized = w != width || h != height
         if (resized) { rememberScrollPosition(); setSize(w, h) }
-        (if (GameUiStyle.isAtlas) composer.getCell(body) else getCell(body)).height(if (h < 500f) 54f else 82f)
+        (if (GameUiStyle.isAtlas) composer.getCell(body) else getCell(body)).height(if (GameUiStyle.isAtlas || h < 500f) 54f else 82f)
         val latest = orderedDiplomaticMessages(session.getMessages()).filter { spectator || it.senderCivId == id || it.targetCivId == id }.map { Mail(it.messageId, it.senderCivId, it.targetCivId, it.text,
             it.sentTurnSerial, it.deliveredTurnSerial, it.origin,
             it.acknowledgedTurnSerial, it.acknowledgementText, it.acknowledgedRevision,
@@ -639,7 +674,7 @@ class AgentMessagesPanel(
     override fun layout() {
         if (GameUiStyle.isAtlas) {
             val availableWidth = (width - padLeft - padRight).coerceAtLeast(1f)
-            val chrome = padTop + padBottom + header.prefHeight + identity.prefHeight + 4f + 10f + 30f + 8f
+            val chrome = padTop + padBottom + header.prefHeight + identity.prefHeight + 4f + 10f + pickerHeight + 8f
             val regions = AgentPanelLayout.calculate(availableWidth, (height - chrome).coerceAtLeast(1f), UncivGame.Current.settings.fontSizeMultiplier)
             getCell(scroll).height(regions.content.height).minHeight(0f)
             getCell(composerScroll).height(regions.composer.height).minHeight(0f)
@@ -648,6 +683,7 @@ class AgentMessagesPanel(
             composer.cells.forEach { it.width(inputWidth) }
         }
         super.layout()
+        if (resizeGrip.parent === this) { resizeGrip.pack(); resizeGrip.setPosition(4f, 4f) }
         // Parent bounds and wrapped labels must settle before calculating the final scroll range.
         scroll.validate()
         val anchor = pendingScrollAnchor
