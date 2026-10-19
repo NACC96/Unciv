@@ -6,12 +6,14 @@ import com.unciv.logic.battle.AttackableTile
 import com.unciv.logic.battle.Battle
 import com.unciv.logic.battle.BattleDamage
 import com.unciv.logic.battle.CityCombatant
+import com.unciv.logic.battle.ICombatant
 import com.unciv.logic.battle.MapUnitCombatant
 import com.unciv.logic.battle.TargetHelper
 import com.unciv.logic.civilization.Civilization
 import com.unciv.logic.civilization.diplomacy.DiplomacyFlags
 import com.unciv.logic.map.HexCoord
 import com.unciv.logic.map.mapunit.MapUnit
+import com.unciv.logic.map.tile.Tile
 import com.unciv.logic.city.City
 import com.unciv.models.ruleset.INonPerpetualConstruction
 import com.unciv.models.ruleset.PerpetualConstruction
@@ -246,7 +248,7 @@ class AttackOption(
     var targetX: Int = 0,
     var targetY: Int = 0,
     var targetKind: String = "",
-    /** Unit type or city name. */
+    /** Unit type or city name; this, owner and health stay empty for a defender the actor cannot see (air sweeps). */
     var targetName: String = "",
     var targetOwnerCivId: String = "",
     /** Unit health (0-100) or current city health. */
@@ -442,16 +444,24 @@ internal fun distinctAttackOptions(unit: MapUnit): List<AttackableTile> {
     return TargetHelper.getAttackableEnemies(unit, unit.movement.getDistanceToTiles()).distinctBy { it.tileToAttack }
 }
 
+/** The same rule game.observe applies to foreign units and cities under fog. */
+private fun isVisibleDefender(civ: Civilization, tile: Tile, defender: ICombatant): Boolean =
+    tile in civ.viewableTiles && (defender !is MapUnitCombatant || defender.unit.isVisibleTo(civ))
+
 /** [AttackOption] with the battle table's preview (BattleTable.simulateBattle) for [option]. */
 internal fun attackPreview(unit: MapUnit, option: AttackableTile): AttackOption {
     val target = option.tileToAttack
     val from = option.tileToAttackFrom
-    val result = AttackOption(target.position.x, target.position.y, if (target.isCityCenter()) "city" else "unit")
+    // A city stays hidden on tiles the actor has never explored, like on its map.
+    val kind = if (target.isCityCenter() && target.isExplored(unit.civ)) "city" else "unit"
+    val result = AttackOption(target.position.x, target.position.y, kind)
     if (from != unit.getTile()) {
         result.attackFromX = from.position.x
         result.attackFromY = from.position.y
     }
-    val defender = option.combatant ?: Battle.getMapCombatantOfTile(target) ?: return result
+    // Air sweeps list every tile in range, seen or not; only a visible defender gets a preview.
+    val defender = (option.combatant ?: Battle.getMapCombatantOfTile(target))
+        ?.takeIf { isVisibleDefender(unit.civ, target, it) } ?: return result
     result.targetName = defender.getName()
     result.targetOwnerCivId = defender.getCivInfo().civID
     result.targetHealth = defender.getHealth()

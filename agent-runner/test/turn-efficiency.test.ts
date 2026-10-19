@@ -7,8 +7,11 @@ import { compactLegalActions, compactMapPage, compactObservation, compactTile } 
 import { FakeGameService } from "../src/fake-game-mcp.js";
 import { startGameMcpServer, type StartedGameMcpServer } from "../src/game-mcp-server.js";
 import { codexSpawn } from "../src/provider-spawn.js";
-import { providerTurnFeatures } from "../src/daemon.js";
+import { providerTurnFeatures, settleCompaction, type Compaction } from "../src/daemon.js";
 import { NodeRunner, Supervisor } from "../src/supervisor.js";
+import { MAX_IMAGE_TILES, renderCivMapImage } from "../src/map-overview.js";
+import { hexDistance } from "../src/map-image.js";
+import type { IGameService } from "../src/fake-game-mcp.js";
 import { buildTurnPrompt } from "../src/turn-prompt.js";
 import { parseCodexStream } from "../src/provider-events.js";
 
@@ -63,9 +66,9 @@ describe("model-facing result compaction", () => {
     expect(compactObservation(observation, "Rome", { includeHistory: true })).toMatchObject({ diplomaticHistory: [{ messageId: "m1" }] });
   });
 
-  it("drops engine bookkeeping from map pages and empty option lists from legal actions", () => {
+  it("keeps the map page envelope and drops empty option lists from legal actions", () => {
     expect(compactMapPage({ protocolVersion: 1, observationVersion: 2, matchId: "m", timelineId: "t", revision: 3, tiles: [fullTile], nextCursor: null }))
-      .toEqual({ protocolVersion: 1, observationVersion: 2, revision: 3, tiles: [compactTile(fullTile)] });
+      .toEqual({ protocolVersion: 1, observationVersion: 2, matchId: "m", timelineId: "t", revision: 3, tiles: [compactTile(fullTile)] });
     expect(compactLegalActions({ moveTargets: [], attackTargets: [{ targetX: 1, targetY: 2, targetKind: "unit", attackFromX: null }],
       orders: [], canFound: false, foundBlockedReason: null, movementLeft: 0, constructions: [{ name: "Walls", turns: 3, cost: 60, goldCost: null }],
       researchable: ["Writing"], freeTechs: 0, revision: 5 }))
@@ -114,6 +117,48 @@ describe("game tools", () => {
   });
 });
 
+/** A known map of width × height axial tiles served the way the engine pages game.map (x, then y). */
+function largeMapGame(width: number, height: number): IGameService {
+  const tiles: { x: number; y: number; visibility: string; detailsKnown: boolean; terrain: string }[] = [];
+  for (let x = 0; x < width; x++) for (let y = 0; y < height; y++)
+    tiles.push({ x, y, visibility: "REMEMBERED", detailsKnown: true, terrain: "Grassland" });
+  const game = {
+    observe: async () => ({ mapSummary: { worldWrap: false, knownTileCount: tiles.length }, ownUnits: [], ownCities: [] }),
+    map: async (query: { center?: { x: number; y: number }; radius?: number; limit?: number; cursor?: string } = {}) => {
+      if ((query.radius ?? 0) > 8) return { status: "rejected", code: "INVALID_ARGUMENT", message: "radius 0..8" };
+      const selected = query.center ? tiles.filter(t => hexDistance(t.x, t.y, query.center!.x, query.center!.y) <= query.radius!) : tiles;
+      const start = Number(query.cursor ?? 0);
+      const end = start + (query.limit ?? 64);
+      return { protocolVersion: 1, observationVersion: 2, matchId: "m", timelineId: "t", revision: 1,
+        tiles: selected.slice(start, end), nextCursor: end < selected.length ? String(end) : null };
+    },
+  };
+  return game as unknown as IGameService;
+}
+
+describe("map pictures on large maps", () => {
+  it("reads every known tile of a 164×80-sized map and finds wide close-ups anywhere on it", async () => {
+    const game = largeMapGame(164, 80);
+    const whole = await renderCivMapImage(game, "Rome");
+    expect(whole).toMatchObject({ complete: true, tileCount: 164 * 80 });
+    expect(whole!.legend).not.toContain("Partial");
+
+    // The last columns, which a prefix of the whole map would miss.
+    const tail = await renderCivMapImage(game, "Rome", { center: { x: 160, y: 40 }, radius: 9 });
+    expect(tail).not.toBeNull();
+    let inWindow = 0;
+    for (let x = 0; x < 164; x++) for (let y = 0; y < 80; y++) if (hexDistance(x, y, 160, 40) <= 9) inWindow++;
+    expect(tail!.tileCount).toBe(inWindow);
+  });
+
+  it("says when the tile cap cut the whole-map picture short", async () => {
+    const width = Math.ceil((MAX_IMAGE_TILES + 1000) / 100);
+    const partial = await renderCivMapImage(largeMapGame(width, 100), "Rome");
+    expect(partial!.complete).toBe(false);
+    expect(partial!.legend).toContain(`Partial picture: it shows the first ${MAX_IMAGE_TILES} of ${width * 100} known tiles`);
+  });
+});
+
 describe("turn prompt and provider spawn", () => {
   it("embeds the opening observation and starts from it", () => {
     const prompt = buildTurnPrompt({ displayName: "Ada", personality: "", rulesetName: "Civ V", protocolVersion: 1, civId: "Rome",
@@ -143,6 +188,41 @@ describe("turn prompt and provider spawn", () => {
 });
 
 describe("post-turn compaction", () => {
+  function pendingCompaction() {
+    let finish!: () => void;
+    const kills: number[] = [];
+    const compaction: Compaction = {
+      done: new Promise<void>(resolve => { finish = resolve; }),
+      kill: () => { kills.push(Date.now()); finish(); },
+    };
+    return { compaction, finish: () => finish(), kills };
+  }
+
+  it("lets a cancel end the wait for a compacting session while the session stays excluded", async () => {
+    const { compaction, finish, kills } = pendingCompaction();
+    const compactions = new Map([["s1", compaction]]);
+    const cancel = new AbortController();
+    const waiting = settleCompaction(compactions, "s1", cancel.signal, 60_000);
+    cancel.abort();
+    expect(await waiting).toBe("cancelled");
+    expect(compactions.get("s1")).toBe(compaction);
+    expect(kills).toEqual([]);
+
+    const next = settleCompaction(compactions, "s1", new AbortController().signal, 60_000);
+    finish();
+    expect(await next).toBe("settled");
+    expect(compactions.has("s1")).toBe(false);
+  });
+
+  it("abandons a compaction that outlasts the wait", async () => {
+    const { compaction, kills } = pendingCompaction();
+    const compactions = new Map([["s1", compaction]]);
+    expect(await settleCompaction(compactions, "s1", new AbortController().signal, 10)).toBe("settled");
+    expect(kills).toHaveLength(1);
+    expect(compactions.has("s1")).toBe(false);
+    expect(await settleCompaction(compactions, "other", AbortSignal.abort(), 10)).toBe("settled");
+  });
+
   it("releases the turn at the closing message, revokes game tools and leaves the provider compacting", async () => {
     const engine = new FakeGameService();
     const logRoot = mkdtempSync(join(tmpdir(), "compaction-logs-"));

@@ -532,6 +532,11 @@ export class Supervisor {
     try {
       const image = await renderCivMapImage(args.engine, args.binding.civId);
       if (!image) return undefined;
+      // The prompt carries no legend, so a partial picture would pass for the whole map.
+      if (!image.complete) {
+        process.stderr.write(`Turn-start map image skipped: ${image.legend.split("\n").at(-1)}\n`);
+        return undefined;
+      }
       const path = join(args.cwd, `overview-${args.binding.runId}.png`);
       writeFileSync(path, image.png, { mode: 0o600 });
       return path;

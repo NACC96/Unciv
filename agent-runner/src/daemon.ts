@@ -152,6 +152,45 @@ export function providerTurnFeatures(provider: RunTurnControl["provider"], confi
  */
 export const COMPACTION_WAIT_MS = 4 * 60 * 1000;
 
+/** A provider process still compacting its session after a released turn. */
+export interface Compaction { done: Promise<unknown>; kill(): void }
+
+/**
+ * Waits until [sessionId] has no compaction in [compactions], abandoning one that outlasts
+ * [waitMs]. A cancel ends the wait at once ("cancelled") and leaves the compaction running,
+ * so the session stays excluded until it finishes.
+ */
+export async function settleCompaction(
+  compactions: Map<string, Compaction>,
+  sessionId: string | undefined,
+  signal: AbortSignal,
+  waitMs = COMPACTION_WAIT_MS,
+): Promise<"settled" | "cancelled"> {
+  const compaction = sessionId ? compactions.get(sessionId) : undefined;
+  if (!compaction) return "settled";
+  let timer: NodeJS.Timeout | undefined;
+  let onAbort: (() => void) | undefined;
+  const result = await Promise.race([
+    compaction.done.then(() => "finished" as const, () => "finished" as const),
+    new Promise<"timeout">(resolve => { timer = setTimeout(() => resolve("timeout"), waitMs); }),
+    new Promise<"cancelled">(resolve => {
+      onAbort = () => resolve("cancelled");
+      if (signal.aborted) onAbort();
+      else signal.addEventListener("abort", onAbort, { once: true });
+    }),
+  ]);
+  clearTimeout(timer);
+  signal.removeEventListener("abort", onAbort!);
+  if (result === "cancelled") return result;
+  if (result === "timeout") {
+    process.stderr.write(`Session ${sessionId} still compacting after ${waitMs}ms; resuming it uncompacted.\n`);
+    compaction.kill();
+    await compaction.done.catch(() => undefined);
+  }
+  if (compactions.get(sessionId!) === compaction) compactions.delete(sessionId!);
+  return "settled";
+}
+
 /** The leader's closing summary seeds the next fresh session; bounded so it cannot crowd the prompt. */
 export const MAX_TURN_SUMMARY_CHARS = 2000;
 
@@ -204,21 +243,7 @@ export async function main(): Promise<void> {
   let shuttingDown = false;
   let activeTurn: Promise<void> | null = null;
   // Sessions still compacting after a released turn, by provider session ID.
-  const compactions = new Map<string, { done: Promise<unknown>; kill(): void }>();
-  const settleCompaction = async (sessionId: string | undefined) => {
-    const compaction = sessionId ? compactions.get(sessionId) : undefined;
-    if (!compaction) return;
-    let timer: NodeJS.Timeout | undefined;
-    const finished = await Promise.race([compaction.done.then(() => true, () => true),
-      new Promise<false>(resolve => { timer = setTimeout(() => resolve(false), COMPACTION_WAIT_MS); })]);
-    clearTimeout(timer);
-    if (!finished) {
-      process.stderr.write(`Session ${sessionId} still compacting after ${COMPACTION_WAIT_MS}ms; resuming it uncompacted.\n`);
-      compaction.kill();
-      await compaction.done.catch(() => undefined);
-    }
-    compactions.delete(sessionId!);
-  };
+  const compactions = new Map<string, Compaction>();
   // The only run cancel_run may touch; cleared with activeTurn.
   let activeRun: { runId: string; cancel: AbortController } | null = null;
 
@@ -313,7 +338,11 @@ export async function main(): Promise<void> {
       parseForProvider(control.provider),
     );
     try {
-      await settleCompaction(control.providerConfig.resumeId);
+      // A takeover must not wait out the previous turn's compaction.
+      if (await settleCompaction(compactions, control.providerConfig.resumeId, signal) === "cancelled") {
+        emit("run_failed", { status: "cancelled", revision: null, turnEnded: false, detail: CANCELLED_DETAIL, toolCalls: [] });
+        return;
+      }
       const outcome = await supervisor.runLeaderTurn({
         ...providerTurnFeatures(control.provider, control.providerConfig),
         engine: backend,

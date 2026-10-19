@@ -208,6 +208,8 @@ describe("renderMapImage geometry", () => {
     // No overlap: every pixel of tile i's colour lies inside hex i (closest centre, within R),
     // and the unlabelled ring hexes each cover one full hexagon's area (3√3/2·R²).
     const counts = colours.map(() => 0);
+    // Collected rather than asserted per pixel: hundreds of thousands of expect() calls take seconds.
+    const strayPixels: string[] = [];
     for (let py = 0; py < raster.height; py++) {
       for (let px = 0; px < raster.width; px++) {
         const owner = colours.indexOf(pixel(raster, px, py).join(","));
@@ -215,10 +217,10 @@ describe("renderMapImage geometry", () => {
         counts[owner]!++;
         const p = { px: px + 0.5, py: py + 0.5 };
         const own = dist(p, centres[owner]!);
-        expect(own).toBeLessThanOrEqual(R);
-        for (const other of centres) expect(own).toBeLessThanOrEqual(dist(p, other) + 1e-9);
+        if (own > R || centres.some(other => own > dist(p, other) + 1e-9)) strayPixels.push(`${px},${py}`);
       }
     }
+    expect(strayPixels).toEqual([]);
     const expected = (3 * SQRT3 / 2) * R * R;
     for (const area of counts.slice(1)) {
       expect(area).toBeGreaterThan(expected * 0.88);

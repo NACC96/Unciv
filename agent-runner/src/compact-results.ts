@@ -92,11 +92,10 @@ export function compactInspection(entity: unknown, actorCivId: string): unknown 
   return compactEntity(entity, actorCivId);
 }
 
-/** game.map page for the model. Match/timeline IDs are supervisor bookkeeping. */
+/** game.map page for the model: the MapPage envelope with compact tiles. */
 export function compactMapPage(page: unknown): unknown {
   if (!isObject(page) || !Array.isArray(page["tiles"])) return page;
-  const { matchId: _matchId, timelineId: _timelineId, ...rest } = page;
-  const out: Json = { ...rest, tiles: page["tiles"].map(tile => isObject(tile) ? compactTile(tile) : tile) };
+  const out: Json = { ...page, tiles: page["tiles"].map(tile => isObject(tile) ? compactTile(tile) : tile) };
   if (out["nextCursor"] === null) delete out["nextCursor"];
   return out;
 }

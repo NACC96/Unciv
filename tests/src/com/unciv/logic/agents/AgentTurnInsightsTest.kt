@@ -8,6 +8,7 @@ import com.unciv.logic.civilization.diplomacy.WarType
 import com.unciv.logic.map.HexCoord
 import com.unciv.models.metadata.BaseRuleset
 import com.unciv.models.stats.Stat
+import com.unciv.models.UnitActionType
 import com.unciv.testing.BaseTestRunner
 import com.unciv.testing.TestGame
 import org.junit.Assert.assertEquals
@@ -314,5 +315,50 @@ class AgentTurnInsightsTest {
         val wire = (AgentEngineBridge(coordinator).observe(rome.civID) as Map<String, Any?>)["mapSummary"] as Map<String, Any?>
         assertEquals(expected, wire["maxLongitude"])
         assertNotNull(wire["worldWrap"])
+    }
+
+    @Test
+    fun `air sweep previews describe only defenders the actor can see`() {
+        val game = TestGame(baseRuleset = BaseRuleset.Civ_V_Vanilla)
+        game.gameInfo.gameParameters.baseRuleset = BaseRuleset.Civ_V_Vanilla.fullName
+        game.makeHexagonalMap(9)
+        val rome = game.addCiv(game.ruleset.nations["Rome"]!!, isPlayer = true)
+        val greece = game.addCiv(game.ruleset.nations["Greece"]!!, isPlayer = true)
+        game.addCity(rome, game.getTile(0, 0))
+        game.addCity(greece, game.getTile(-8, -8))
+        rome.diplomacyFunctions.makeCivilizationsMeet(greece)
+        rome.getDiplomacyManager(greece)!!.declareWar(DeclareWarReason(WarType.DirectWar))
+        // Sight 6, sweep range 8.
+        val fighterId = game.addUnit("Fighter", rome, game.getTile(0, 0))
+            .apply { action = UnitActionType.AirSweep.value }.id
+        val seen = HexCoord(1, 1)
+        val hidden = HexCoord(8, 8)
+        game.addUnit("Warrior", greece, game.getTile(seen))
+        game.addUnit("Warrior", greece, game.getTile(hidden)).health = 37
+        game.gameInfo.currentPlayer = rome.civID
+        game.gameInfo.currentPlayerCiv = rome
+        val match = AgentMatchState(matchId = "m1", timelineId = "t1", turnPhase = TurnPhase.AWAITING_DECISIONS)
+        match.controllers[rome.civID] = CivilizationController(rome.civID, ControllerKind.EXTERNAL_AGENT,
+            AgentProfile("p1", "Ada", "codex", "m", null, "", 1))
+        val coordinator = MatchCoordinator(game.gameInfo, match, InMemoryCheckpointWriter())
+        assertEquals("Precondition: only the near warrior is in sight", listOf(seen),
+            coordinator.observe(rome.civID).visibleForeignUnits.map { HexCoord(it.x, it.y) })
+        assertNull("Precondition: the Greek city tile is unknown", coordinator.inspectTile(rome.civID, HexCoord(-8, -8)))
+
+        val targets = coordinator.legalActions(rome.civID, unitId = fighterId).attackTargets
+        fun at(coord: HexCoord) = targets.single { it.targetX == coord.x && it.targetY == coord.y }
+        val visible = at(seen)
+        assertEquals("Warrior", visible.targetName)
+        assertEquals(greece.civID, visible.targetOwnerCivId)
+        assertEquals(100, visible.targetHealth)
+
+        // Sweep geometry stays legal; the unseen defender is not described.
+        val unseen = at(hidden)
+        assertEquals("unit", unseen.targetKind)
+        assertEquals("", unseen.targetName)
+        assertEquals("", unseen.targetOwnerCivId)
+        assertEquals(0, unseen.targetHealth)
+        assertNull(unseen.expectedDamageToTarget)
+        assertEquals("An unexplored city is not revealed", "unit", at(HexCoord(-8, -8)).targetKind)
     }
 }
