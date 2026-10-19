@@ -11,9 +11,9 @@
  * use the W1-proven spawn builders (their config file/dir setup is owned by
  * the desktop, which passes absolute paths through providerConfig).
  */
-import { GAME_TOOL_ALLOWLIST, codexSpawn, claudeSpawn, opencodeSpawn, type SpawnSpec } from "./provider-spawn.js";
+import { GAME_TOOL_ALLOWLIST, TOOL_TIMEOUT_SEC, codexSpawn, claudeSpawn, opencodeSpawn, type SpawnSpec } from "./provider-spawn.js";
 import { parseClaudeStream, parseCodexStream, parseOpencodeStream, type NormalizedRun } from "./provider-events.js";
-import { Supervisor } from "./supervisor.js";
+import { Supervisor, type SpawnExtras } from "./supervisor.js";
 import { StdioEngineBackend } from "./stdio-engine.js";
 import { CANCELLED_DETAIL, parseInbound, encodeFrame, type RunTurnControl } from "./engine-protocol.js";
 import { mkdirSync, writeFileSync } from "node:fs";
@@ -28,6 +28,7 @@ export function buildSpawnForProvider(
   bearer: string,
   config: RunTurnControl["providerConfig"],
   scratchCwd: string,
+  extras: SpawnExtras = {},
 ): { spec: SpawnSpec; env: NodeJS.ProcessEnv } {
   switch (provider) {
     case "codex":
@@ -41,6 +42,8 @@ export function buildSpawnForProvider(
           sandboxDangerous: true,
           model: config.model,
           reasoning: config.reasoning,
+          compactAfterTurn: config.compactAfterTurn,
+          imagePath: extras.imagePath,
         }),
         // Bearer travels by environment; only the var NAME is in argv/config.
         env: { GAME_MCP_BEARER: bearer },
@@ -76,7 +79,7 @@ export function buildSpawnForProvider(
           mcp: {
             game: {
               type: "remote", url: serverUrl, enabled: true, oauth: false,
-              headers: { Authorization: "Bearer {env:OPENCODE_GAME_MCP_BEARER}" }, timeout: 30000,
+              headers: { Authorization: "Bearer {env:OPENCODE_GAME_MCP_BEARER}" }, timeout: TOOL_TIMEOUT_SEC * 1000,
             },
           },
           tools: { "*": false, ...Object.fromEntries(GAME_TOOL_ALLOWLIST.map(name => [`game_${name.replaceAll(".", "_")}`, true])) },
@@ -132,6 +135,62 @@ export function promptCarriesStaticInstructions(provider: RunTurnControl["provid
   return true;
 }
 
+/**
+ * Codex alone attaches image files to its prompt and compacts after a turn
+ * (other providers still read map pictures through game.map_image).
+ */
+export function providerTurnFeatures(provider: RunTurnControl["provider"], config: RunTurnControl["providerConfig"]):
+  { attachMapImage: boolean; releaseAfterEndTurn: boolean } {
+  const codex = provider === "codex";
+  return { attachMapImage: codex, releaseAfterEndTurn: codex && config.compactAfterTurn === true };
+}
+
+/**
+ * A session compacting after its turn is resumed only once compaction ends.
+ * Other leaders' turns normally hide it; a lone leader waits at most this long
+ * before the compaction is abandoned and the uncompacted session resumes.
+ */
+export const COMPACTION_WAIT_MS = 4 * 60 * 1000;
+
+/** A provider process still compacting its session after a released turn. */
+export interface Compaction { done: Promise<unknown>; kill(): void }
+
+/**
+ * Waits until [sessionId] has no compaction in [compactions], abandoning one that outlasts
+ * [waitMs]. A cancel ends the wait at once ("cancelled") and leaves the compaction running,
+ * so the session stays excluded until it finishes.
+ */
+export async function settleCompaction(
+  compactions: Map<string, Compaction>,
+  sessionId: string | undefined,
+  signal: AbortSignal,
+  waitMs = COMPACTION_WAIT_MS,
+): Promise<"settled" | "cancelled"> {
+  const compaction = sessionId ? compactions.get(sessionId) : undefined;
+  if (!compaction) return "settled";
+  let timer: NodeJS.Timeout | undefined;
+  let onAbort: (() => void) | undefined;
+  const result = await Promise.race([
+    compaction.done.then(() => "finished" as const, () => "finished" as const),
+    new Promise<"timeout">(resolve => { timer = setTimeout(() => resolve("timeout"), waitMs); }),
+    new Promise<"cancelled">(resolve => {
+      onAbort = () => resolve("cancelled");
+      if (signal.aborted) onAbort();
+      else signal.addEventListener("abort", onAbort, { once: true });
+    }),
+  ]);
+  clearTimeout(timer);
+  signal.removeEventListener("abort", onAbort!);
+  if (result === "cancelled") return result;
+  if (result === "timeout") {
+    process.stderr.write(`Session ${sessionId} still compacting after ${waitMs}ms; resuming it uncompacted.\n`);
+    compaction.kill();
+    await compaction.done.catch(() => undefined);
+  }
+  if (compactions.get(sessionId!) === compaction) compactions.delete(sessionId!);
+  return "settled";
+}
+
 /** The leader's closing summary seeds the next fresh session; bounded so it cannot crowd the prompt. */
 export const MAX_TURN_SUMMARY_CHARS = 2000;
 
@@ -183,11 +242,15 @@ export async function main(): Promise<void> {
 
   let shuttingDown = false;
   let activeTurn: Promise<void> | null = null;
+  // Sessions still compacting after a released turn, by provider session ID.
+  const compactions = new Map<string, Compaction>();
   // The only run cancel_run may touch; cleared with activeTurn.
   let activeRun: { runId: string; cancel: AbortController } | null = null;
 
   const finish = () => {
     backend.disconnect();
+    // An unfinished compaction only leaves its session uncompacted.
+    for (const compaction of compactions.values()) compaction.kill();
     process.exit(0);
   };
   const requestShutdown = (transportDisconnected = false) => {
@@ -265,8 +328,8 @@ export async function main(): Promise<void> {
     };
     emit("run_started", { provider: control.provider, civ: control.binding.civId });
     const supervisor = new Supervisor(
-      (prompt, resumeId, serverUrl, bearer) => {
-        const built = buildSpawnForProvider(control.provider, prompt, resumeId, serverUrl, bearer, control.providerConfig, scratch);
+      (prompt, resumeId, serverUrl, bearer, extras) => {
+        const built = buildSpawnForProvider(control.provider, prompt, resumeId, serverUrl, bearer, control.providerConfig, scratch, extras);
         return { ...built, spec: { ...built.spec, context: { ...control.binding, turnSerial: control.context.turnSerial,
           provider: control.provider, model: control.providerConfig.model, reasoning: control.providerConfig.reasoning,
           resumed: Boolean(resumeId),
@@ -275,7 +338,13 @@ export async function main(): Promise<void> {
       parseForProvider(control.provider),
     );
     try {
+      // A takeover must not wait out the previous turn's compaction.
+      if (await settleCompaction(compactions, control.providerConfig.resumeId, signal) === "cancelled") {
+        emit("run_failed", { status: "cancelled", revision: null, turnEnded: false, detail: CANCELLED_DETAIL, toolCalls: [] });
+        return;
+      }
       const outcome = await supervisor.runLeaderTurn({
+        ...providerTurnFeatures(control.provider, control.providerConfig),
         engine: backend,
         binding: control.binding,
         profile: {
@@ -292,6 +361,14 @@ export async function main(): Promise<void> {
       });
       if (outcome.run.sessionId) {
         emit("session_bound", { sessionId: outcome.run.sessionId });
+      }
+      if (outcome.background) {
+        const sessionId = outcome.run.sessionId;
+        const background = outcome.background;
+        if (sessionId) {
+          compactions.set(sessionId, background);
+          void background.done.finally(() => { if (compactions.get(sessionId) === background) compactions.delete(sessionId); });
+        } else background.kill(); // An unbound session can never be resumed.
       }
       const cancelled = outcome.status === "cancelled";
       emit(outcome.status === "failed" || cancelled ? "run_failed" : "run_completed", {

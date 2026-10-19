@@ -1193,6 +1193,7 @@ class DesktopAgentMatch(
                 AgentSessionPolicy.shouldResume(sessionArm, sessionTurns[civId] ?: 0, sessionSettings)
             }
             sessionAge = if (resumeId != null) sessionTurns[civId] ?: 0 else 0
+            val compactAfterTurn = AgentSessionPolicy.compactAfterTurn(sessionArm, sessionAge + 1, sessionSettings)
             mapOf(
                 "protocol" to 1,
                 "kind" to "control",
@@ -1202,7 +1203,8 @@ class DesktopAgentMatch(
                 "providerConfig" to mapOf(
                     "model" to profile.modelId,
                     "reasoning" to profile.reasoning,
-                    "resumeId" to resumeId),
+                    "resumeId" to resumeId,
+                    "compactAfterTurn" to compactAfterTurn),
                 "binding" to mapOf("matchId" to matchId,
                     "timelineId" to coordinator.getTimelineId(),
                     "civId" to civId, "runId" to runId,
@@ -1362,6 +1364,7 @@ class DesktopAgentMatch(
                 when (method) {
                     "observe" -> bridge.observe(actor)
                     "inspect" -> bridge.inspect(actor, integer("unitId"))
+                    "inspect_city" -> bridge.inspectCity(actor, string("cityId"))
                     "inspect_tile" -> bridge.inspectTile(actor, params)
                     "map" -> bridge.map(actor, params)
                     "rules" -> bridge.rules(params)

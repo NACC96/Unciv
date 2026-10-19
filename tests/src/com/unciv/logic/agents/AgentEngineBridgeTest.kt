@@ -23,6 +23,7 @@ class AgentEngineBridgeTest {
         lateinit var romeId: String
         var warriorId: Int = -1
         var scoutId: Int = -1
+        var settlerId: Int = -1
         var rev = 0
 
         init {
@@ -32,6 +33,7 @@ class AgentEngineBridgeTest {
             romeId = rome.civID
             warriorId = testGame.addUnit("Warrior", rome, testGame.getTile(0, 0)).id
             scoutId = testGame.addUnit("Scout", rome, testGame.getTile(-1, 0)).id
+            settlerId = testGame.addUnit("Settler", rome, testGame.getTile(-2, 0)).id
             val match = AgentMatchState(
                 matchId = "m1", timelineId = "t1", turnPhase = TurnPhase.AWAITING_DECISIONS)
             match.controllers[romeId] = CivilizationController(
@@ -179,5 +181,43 @@ class AgentEngineBridgeTest {
         @Suppress("UNCHECKED_CAST")
         val missing = f.bridge.actionResult("nope") as Map<String, Any?>
         Assert.assertEquals("rejected", missing["status"])
+    }
+
+    @Test
+    fun `concurrent dto conversion never mixes writers`() {
+        val f = Fixture()
+        val pool = java.util.concurrent.Executors.newFixedThreadPool(8)
+        val start = java.util.concurrent.CountDownLatch(1)
+        try {
+            val results = (0 until 8).map { thread ->
+                pool.submit<Int> {
+                    start.await()
+                    repeat(300) { i ->
+                        val offer = ObservedTradeOffer("offer-$thread-$i", com.unciv.logic.trade.TradeOfferType.Gold, i, thread)
+                        Assert.assertEquals(mapOf("name" to "offer-$thread-$i", "type" to "Gold", "amount" to i, "duration" to thread),
+                            f.bridge.toJsonMap(offer))
+                    }
+                    thread
+                }
+            }
+            start.countDown()
+            for ((thread, result) in results.withIndex()) Assert.assertEquals(thread, result.get(60, java.util.concurrent.TimeUnit.SECONDS))
+        } finally {
+            pool.shutdownNow()
+        }
+    }
+
+    @Test
+    fun `inspect_city reads own cities and shares null for the rest`() {
+        val f = Fixture()
+        val city = f.act("found", "unit.found", mapOf("unitId" to f.settlerId))
+        @Suppress("UNCHECKED_CAST")
+        val cityId = (city["result"] as Map<String, Any?>)["cityId"] as String
+        @Suppress("UNCHECKED_CAST")
+        val inspected = f.bridge.inspectCity(f.romeId, cityId) as Map<String, Any?>
+        Assert.assertEquals(cityId, inspected["cityId"])
+        Assert.assertEquals(1, inspected["population"])
+        Assert.assertNull(f.bridge.inspectCity(f.romeId, "no-such-city"))
+        Assert.assertEquals("INVALID_ARGUMENT", f.errOf { f.bridge.inspectCity("Atlantis", cityId) }.code)
     }
 }

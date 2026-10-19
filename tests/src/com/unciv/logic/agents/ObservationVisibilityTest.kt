@@ -123,7 +123,7 @@ class ObservationVisibilityTest {
 
         // City answers constructions; foreign cities are invisible to it.
         val cityLegal = f.coordinator.legalActions(f.romeId, cityId = f.cityId)
-        Assert.assertTrue(cityLegal.constructions.contains("Monument"))
+        Assert.assertTrue(cityLegal.constructions.any { it.name == "Monument" })
         try {
             f.coordinator.legalActions(f.greeceId, cityId = f.cityId)
             Assert.fail("expected ILLEGAL_ACTION")

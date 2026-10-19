@@ -13,9 +13,13 @@ game.tile({x:48,y:-33})
 game.legal_actions({unitId:49})
 ```
 
-Coordinates are Unciv engine hex coordinates, not screen pixels or geographic latitude/longitude. Use the canonical x/y returned by the engine. World-wrap distance follows the engine's hex geometry; coordinates at a wrapped seam describe canonical tiles once. Legal `moveTargets` determine movement destinations and routes.
+Coordinates are Unciv engine hex coordinates, not screen pixels or geographic latitude/longitude. Use the canonical x/y returned by the engine. World-wrap distance follows the engine's hex geometry; coordinates at a wrapped seam describe canonical tiles once. `moveTargets` lists a unit's adjacent steps; `unit.move` accepts any known destination, walks as far as the unit can this turn and continues on later turns, so leaders give the final destination once.
 
-`game.tile({x,y})` returns permitted current or remembered facts for one known tile. Unknown and nonexistent tiles share the same safe rejection. Each tile has visibility, detail/age metadata, terrain/features, land/water/hill/coast/freshwater flags and river edges, permitted resource knowledge, ownership/public city details, improvement/road status, actor-context yields and own work. Null fields mean unavailable knowledge, not evidence that the corresponding fact is absent.
+`game.tile({x,y})` returns permitted current or remembered facts for one known tile. Unknown and nonexistent tiles share the same safe rejection. Each tile has visibility, detail/age metadata, terrain/features, land/water/hill/coast/freshwater flags and river edges, permitted resource knowledge, ownership/public city details, improvement/road status, actor-context yields and own work. Model-facing reads omit null, false, zero and empty fields: tile `yields` lists only nonzero yields (with `yieldCity` naming the own city whose bonuses apply) and `riverEdges` lists only the edges that carry a river. An absent field means unavailable knowledge, not evidence that the corresponding fact is absent.
+
+## Map pictures
+
+`game.map_image({})` renders everything the civilization knows as a PNG; `game.map_image({center:{x:48,y:-33},radius:6})` renders a close-up. The picture uses the same committed reads as `game.observe` and `game.map` (so the same map vision and memory rules), never a screenshot of the window, which can show spectator vision. It shows terrain, borders in per-civilization colours (the leader's own colour is fixed), cities as squares and units as dots, with `x,y` labels on a sparse grid, every city tile and the center. Remembered tiles are dimmed. The text part of the result is the legend. A picture costs roughly 1–2K image tokens, against up to ~20K tokens for a radius-4 `game.map` page, so leaders use it for fronts, routes and open land and confirm exact facts with structured reads. Codex leaders also receive the whole-map picture with each turn prompt. A picture keeps up to 32,768 known tiles, which covers every predefined map size and large custom ones; past that the legend says the picture is partial and names the tiles it shows, and the turn prompt goes without one. Close-ups wider than radius 8 page through the whole map but keep only their own tiles, so they are complete anywhere.
 
 ## Map vision
 
@@ -31,7 +35,7 @@ Map vision is observation and presentation only. Attacks, movement, founding and
 
 `VISIBLE` tiles reflect normal current sight. `REMEMBERED` tiles are historical knowledge, not current enemy intelligence. `lastSeenTurn` and `lastSeenRevision` state the sighting's age; cities, owners, improvements and resource facts can change while out of sight. A resource records `updatedTurn`, `updatedRevision` and `source` (`SIGHTING` or `TECHNOLOGY`), independently of the tile's last sighting. Technology can disclose a resource on an already explored tile without refreshing unrelated hidden facts.
 
-Agent saves use format version **2**, with explicit migration from version 1. Already explored legacy tiles can have `detailsKnown:false`, nullable age and no reconstructed terrain details. New normal sightings fill those details. Migration does not reconstruct unseen historic maps from current hidden state. Existing saves load in the updated app; updated saves require the updated app so an older build cannot silently discard memory. There are no screenshots in the model contract.
+Agent saves use format version **2**, with explicit migration from version 1. Already explored legacy tiles can have `detailsKnown:false`, nullable age and no reconstructed terrain details. New normal sightings fill those details. Migration does not reconstruct unseen historic maps from current hidden state. Existing saves load in the updated app; updated saves require the updated app so an older build cannot silently discard memory.
 
 ## Bounded map queries
 

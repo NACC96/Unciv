@@ -12,12 +12,16 @@ import { accessSync, constants, readdirSync, statSync } from "node:fs";
 import { homedir } from "node:os";
 import { delimiter, isAbsolute, join, resolve } from "node:path";
 
+/** Covers game.end_turn, which runs other nations' turns (END_TURN_TIMEOUT_MS); other reads answer in well under a second. */
+export const TOOL_TIMEOUT_SEC = 180;
+
 export const GAME_TOOL_ALLOWLIST = [
   "game.observe",
   "game.message_image",
   "game.inspect",
   "game.tile",
   "game.map",
+  "game.map_image",
   "game.rules",
   "game.legal_actions",
   "game.act",
@@ -92,6 +96,10 @@ export function codexSpawn(args: {
   sandboxDangerous: true;
   model?: string;
   reasoning?: string;
+  /** Compact the session after the turn's closing message, so the next resume starts small. */
+  compactAfterTurn?: boolean;
+  /** Picture attached to the turn prompt. */
+  imagePath?: string;
 }): SpawnSpec {
   // macOS seatbelt blocks loopback for sandboxed MCP; danger-full-access is
   // required on this platform (CP-010). Shell restriction for Codex comes
@@ -117,11 +125,16 @@ export function codexSpawn(args: {
   if (args.reasoning) {
     argv.push("-c", `model_reasoning_effort="${args.reasoning}"`);
   }
+  // Compacts whenever the context holds more than 1% of the window, i.e. after every turn.
+  if (args.compactAfterTurn) argv.push("-c", "model_post_turn_compact_threshold_percent=1");
   argv.push(
     "-c",
-    `mcp_servers.game={url="${args.mcpUrl}", bearer_token_env_var="${args.bearerEnvVar}", required=true, startup_timeout_sec=20, tool_timeout_sec=30, default_tools_approval_mode="auto", enabled_tools=${JSON.stringify(GAME_TOOL_ALLOWLIST)}}`,
+    `mcp_servers.game={url="${args.mcpUrl}", bearer_token_env_var="${args.bearerEnvVar}", required=true, startup_timeout_sec=20, tool_timeout_sec=${TOOL_TIMEOUT_SEC}, default_tools_approval_mode="auto", enabled_tools=${JSON.stringify(GAME_TOOL_ALLOWLIST)}}`,
   );
-  if (args.resumeId) argv.push("resume", args.resumeId);
+  if (args.resumeId) argv.push("resume");
+  // `--image=` keeps the multi-value option from swallowing the session ID or prompt.
+  if (args.imagePath) argv.push(`--image=${args.imagePath}`);
+  if (args.resumeId) argv.push(args.resumeId);
   argv.push(args.prompt);
   return { executable: resolveProviderExecutable("codex"), argv, cwd: args.cwd };
 }

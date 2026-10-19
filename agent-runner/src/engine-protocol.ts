@@ -19,6 +19,7 @@ export type EngineMethod =
   | "observe"
   | "message_image"
   | "inspect"
+  | "inspect_city"
   | "inspect_tile"
   | "map"
   | "rules"
@@ -64,6 +65,11 @@ export interface RunTurnControl {
     model?: string;
     reasoning?: string;
     resumeId?: string;
+    /**
+     * The desktop will resume this session next turn: compact it after the
+     * closing message, in the background while other leaders play (Codex).
+     */
+    compactAfterTurn?: boolean;
     /** Provider-specific extras (cwd override, scripted plan, bearer env name). */
     extra?: Record<string, unknown>;
   };

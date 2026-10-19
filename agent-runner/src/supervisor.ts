@@ -14,13 +14,15 @@
 import { ActivityNormalizer, redactImageLine, type ActivityEntry } from "./activity.js";
 import { StringDecoder } from "node:string_decoder";
 import { spawn, type ChildProcess } from "node:child_process";
-import { appendFileSync, mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
+import { appendFileSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { delimiter, dirname, join } from "node:path";
 import { CANCELLED_DETAIL } from "./engine-protocol.js";
 import type { IGameService } from "./fake-game-mcp.js";
 import { startGameMcpServer, type RunBinding } from "./game-mcp-server.js";
 import { buildTurnPrompt } from "./turn-prompt.js";
+import { compactObservation } from "./compact-results.js";
+import { renderCivMapImage } from "./map-overview.js";
 import type { NormalizedRun } from "./provider-events.js";
 import type { SpawnSpec } from "./provider-spawn.js";
 
@@ -49,6 +51,12 @@ export type TurnOutcomeStatus =
 export interface TurnOutcome {
   status: TurnOutcomeStatus;
   /**
+   * Set when the turn was released before the provider exited (post-turn
+   * session compaction). The provider keeps running without game tools;
+   * resume its session only after `done` settles.
+   */
+  background?: { done: Promise<unknown>; kill(): void };
+  /**
    * Engine revision after the turn (unchanged when nothing committed); null
    * only when a cancellation landed before the pre-flight observe returned.
    */
@@ -70,8 +78,17 @@ export interface RunningChild {
   kill(): void;
   /** Committed engine receipts remain visible even if the provider omits its tool-result stream. */
   recordActivity?(entry: ActivityEntry): void;
-  /** Turn completion is classified from engine commits after the process exits. */
+  /**
+   * Turn completion is classified from engine commits after the process
+   * exits, or at an early release while the provider compacts its session.
+   */
   recordOutcome?(outcome: TurnOutcome): void;
+}
+
+/** Extra spawn inputs prepared by the supervisor for one invocation. */
+export interface SpawnExtras {
+  /** Turn-start map picture for providers that accept image files with the prompt. */
+  imagePath?: string;
 }
 
 export interface LeaderTurnArgs {
@@ -91,6 +108,41 @@ export interface LeaderTurnArgs {
    * it from starting; either way the outcome is "cancelled".
    */
   signal?: AbortSignal;
+  /** Attach a rendered overview of the leader's map knowledge to the turn prompt (SpawnExtras.imagePath). */
+  attachMapImage?: boolean;
+  /**
+   * The provider compacts its session after its closing message (Codex
+   * post-turn compaction). Once the engine has committed end_turn and that
+   * message arrives, the turn is released: game tools are revoked and the
+   * outcome returns while the provider finishes compacting in `background`.
+   */
+  releaseAfterEndTurn?: boolean;
+}
+
+/** After a committed end_turn, wait this long for the closing message before releasing anyway. */
+const END_TURN_SUMMARY_GRACE_MS = 30_000;
+
+/** Codex stream events that close a turn once end_turn has committed: the closing message, or the turn's end. */
+function closesTurnAfterEndTurn(event: Record<string, unknown>): boolean {
+  const item = event["item"] as Record<string, unknown> | undefined;
+  return event["type"] === "turn.completed" || (event["type"] === "item.completed" && item?.["type"] === "agent_message");
+}
+
+/** The stream's own record of a completed game.end_turn call. */
+function completesEndTurn(event: Record<string, unknown>): boolean {
+  const item = event["item"] as Record<string, unknown> | undefined;
+  return event["type"] === "item.completed" && item?.["type"] === "mcp_tool_call" &&
+    item["tool"] === "game.end_turn" && !item["error"];
+}
+
+/**
+ * The opening observation embedded in the turn prompt, without the parts the
+ * prompt already states (events, decisions, inbox, correspondence).
+ */
+function openingObservation(observation: unknown, civId: string): string {
+  const { recentEvents: _events, requiredDecisions: _decisions, inbox: _inbox, ...rest } =
+    observation as Record<string, unknown>;
+  return JSON.stringify(compactObservation(rest, civId));
 }
 
 /**
@@ -200,6 +252,8 @@ export class NodeRunner implements ProviderRunner {
         } catch { /* Partial/non-JSON output remains in the raw stream log. */ }
       }
     });
+    // Set when the turn was released before exit (post-turn compaction).
+    let releasedAtMs: number | undefined;
     child.on("close", (code, signal) => {
       const durationMs = elapsedMs();
       Object.assign(metadata, { endedAt: new Date().toISOString(), exitCode: code, signal, durationMs });
@@ -210,6 +264,14 @@ export class NodeRunner implements ProviderRunner {
         for (const entry of normalizer.fromLine(line)) appendActivity(entry);
       }
       flushStderr(true);
+      if (releasedAtMs !== undefined) {
+        // The turn's own run-end entry was recorded at release and stays the run's outcome.
+        const compaction = formatRunDuration(durationMs - releasedAtMs);
+        appendActivity({ id: "session-compaction", kind: "system",
+          title: code === 0 ? `Session compacted in ${compaction}` : `Session compaction failed after ${compaction}`,
+          text: JSON.stringify(metadata, null, 2), timestamp: metadata["endedAt"] });
+        return;
+      }
       const status = code === 0 ? "exited" : "failed";
       const duration = formatRunDuration(durationMs);
       appendActivity({ id: "run-end", kind: "run", status, durationMs, title: `Provider ${status} in ${duration}`,
@@ -234,16 +296,20 @@ export class NodeRunner implements ProviderRunner {
       pid: child.pid,
       recordActivity: appendActivity,
       recordOutcome(outcome) {
+        if (outcome.background && metadata["durationMs"] === undefined) {
+          releasedAtMs = elapsedMs();
+          Object.assign(metadata, { releasedAt: new Date().toISOString(), turnDurationMs: releasedAtMs });
+        }
         Object.assign(metadata, { turnOutcome: outcome.status, turnDetail: outcome.detail });
         saveMetadata();
         const label = { completed_turn: "completed", incomplete_turn: "incomplete", guard_paused: "paused", failed: "failed",
           cancelled: "cancelled" }[outcome.status];
-        // A cancelled provider may be abandoned before its close event records the duration.
+        // A cancelled or released provider may still be running when its outcome is recorded.
         const durationMs = (metadata["durationMs"] as number | undefined) ?? elapsedMs();
         const duration = formatRunDuration(durationMs);
         appendActivity({ id: "run-end", kind: "run", status: outcome.status, durationMs,
           title: `Provider ${label} in ${duration}`, summary: `Duration ${duration}. ${outcome.detail}`,
-          text: JSON.stringify(metadata, null, 2), timestamp: metadata["endedAt"] });
+          text: JSON.stringify(metadata, null, 2), timestamp: metadata["endedAt"] ?? new Date().toISOString() });
       },
       stdoutLines(onLine) {
         const decoder = new StringDecoder("utf8");
@@ -280,6 +346,7 @@ export class Supervisor {
       resumeId: string | undefined,
       serverUrl: string,
       bearer: string,
+      extras: SpawnExtras,
     ) => { spec: SpawnSpec; env: NodeJS.ProcessEnv },
     private readonly parseStream: (jsonl: string) => NormalizedRun,
     private readonly runner: ProviderRunner = new NodeRunner(),
@@ -324,16 +391,32 @@ export class Supervisor {
       diplomaticHistory: preFlight.diplomaticHistory,
       continuityNote: args.resumeId ? `Resumed provider session ${args.resumeId}.` : args.context.continuityNote,
       includeStaticInstructions: args.includeStaticInstructions,
+      openingObservation: openingObservation(preFlight, args.binding.civId),
     });
+    const imagePath = args.attachMapImage ? await this.writeOverviewImage(args) : undefined;
 
     let currentChild: RunningChild | undefined;
-    const server = await startGameMcpServer(args.engine, args.binding, entry => currentChild?.recordActivity?.(entry));
+    // Early release (post-turn compaction) needs both the engine's commit and the stream's closing message.
+    let engineTurnEnded = false;
+    let streamTurnEnded = false;
+    let releaseTurn: (() => void) | undefined;
+    const released = new Promise<"released">((resolve) => { releaseTurn = () => resolve("released"); });
+    let releaseTimer: NodeJS.Timeout | undefined;
+    const server = await startGameMcpServer(args.engine, args.binding, {
+      onAcknowledgement: entry => currentChild?.recordActivity?.(entry),
+      onTurnEnded: () => {
+        if (!args.releaseAfterEndTurn) return;
+        engineTurnEnded = true;
+        releaseTimer ??= setTimeout(() => releaseTurn?.(), END_TURN_SUMMARY_GRACE_MS);
+      },
+    });
+    let background: TurnOutcome["background"];
     try {
       // Cancelled before spawn: the provider never starts.
       if (signal?.aborted) {
         return { status: "cancelled", revision: revisionBefore, turnEnded: false, run: this.parseStream(""), detail: CANCELLED_DETAIL };
       }
-      const built = this.buildSpawn(prompt, args.resumeId, server.url, server.bearer);
+      const built = this.buildSpawn(prompt, args.resumeId, server.url, server.bearer, imagePath ? { imagePath } : {});
       // Invocation credentials must win over inherited or supplemental env.
       const child = this.runner.spawn({ ...built.spec, context: { ...built.spec.context,
         matchId: args.binding.matchId, civId: args.binding.civId, turnSerial: args.context.turnSerial, runId: args.binding.runId } }, { ...process.env, ...args.extraEnv, ...built.env });
@@ -345,8 +428,17 @@ export class Supervisor {
       let guardHit: string | null = null;
       const toolPattern = /"(?:tool|name)"\s*:\s*"[^"]*game[^"]*"/;
       const done = child.wait();
+      let releasedEarly = false;
       child.stdoutLines((line) => {
+        if (releasedEarly) return;
         lines.push(redactImageLine(line));
+        if (args.releaseAfterEndTurn && line.startsWith("{")) {
+          try {
+            const event = JSON.parse(line) as Record<string, unknown>;
+            if (completesEndTurn(event)) streamTurnEnded = true;
+            else if (engineTurnEnded && streamTurnEnded && closesTurnAfterEndTurn(event)) releaseTurn?.();
+          } catch { /* Partial or non-JSON output never releases a turn. */ }
+        }
         // Output still draining from a cancelled provider never counts toward the cap.
         if (!guardHit && !signal?.aborted && toolPattern.test(line)) {
           toolCallCount++;
@@ -361,9 +453,23 @@ export class Supervisor {
           process.stderr.write(`Provider pid=${child.pid} is still active after ${this.turnTimeoutMs}ms; inspect its logs and process before taking action.\n`);
         }
       }, this.turnTimeoutMs);
-      const settled = await Promise.race([done, nullAfterAbort(signal, CANCELLED_EXIT_GRACE_MS)]);
+      const settled = await Promise.race([done, nullAfterAbort(signal, CANCELLED_EXIT_GRACE_MS), released]);
       clearTimeout(timeout);
+      clearTimeout(releaseTimer);
       signal?.removeEventListener("abort", killOnCancel);
+      if (settled === "released") {
+        // The engine committed end_turn and the leader gave its closing message:
+        // the turn is over while the provider compacts its session. Game tools
+        // are revoked in finally, before the next leader can be admitted.
+        releasedEarly = true;
+        background = { done, kill: () => child.kill() };
+        const run = this.parseStream(lines.join("\n"));
+        const postFlight = await args.engine.observe().catch(() => null);
+        const outcome: TurnOutcome = { status: "completed_turn", revision: postFlight?.revision ?? revisionBefore,
+          turnEnded: true, run, detail: "engine committed end_turn; provider compacting its session", background };
+        child.recordOutcome?.(outcome);
+        return outcome;
+      }
       if (!settled) {
         process.stderr.write(`Provider pid=${child.pid} still open ${CANCELLED_EXIT_GRACE_MS}ms after its cancellation kill; abandoning it.\n`);
       }
@@ -412,7 +518,31 @@ export class Supervisor {
       });
     } finally {
       await server.close();
+      // A background provider read its image at startup; it can go once the provider is done.
+      if (imagePath) {
+        const removeImage = () => rmSync(imagePath, { force: true });
+        if (background) void background.done.finally(removeImage);
+        else removeImage();
+      }
     }
   }
 
+  /** Renders the turn-start overview; a failed render only skips the picture. */
+  private async writeOverviewImage(args: LeaderTurnArgs): Promise<string | undefined> {
+    try {
+      const image = await renderCivMapImage(args.engine, args.binding.civId);
+      if (!image) return undefined;
+      // The prompt carries no legend, so a partial picture would pass for the whole map.
+      if (!image.complete) {
+        process.stderr.write(`Turn-start map image skipped: ${image.legend.split("\n").at(-1)}\n`);
+        return undefined;
+      }
+      const path = join(args.cwd, `overview-${args.binding.runId}.png`);
+      writeFileSync(path, image.png, { mode: 0o600 });
+      return path;
+    } catch (error) {
+      process.stderr.write(`Turn-start map image skipped: ${error instanceof Error ? error.message : String(error)}\n`);
+      return undefined;
+    }
+  }
 }

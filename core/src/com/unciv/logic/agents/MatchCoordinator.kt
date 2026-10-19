@@ -474,6 +474,12 @@ class MatchCoordinator(
         }
     }
 
+    /** Own-city detail (game.inspect_city); foreign, hidden and nonexistent cities share null. */
+    fun inspectCity(actorCivId: String, cityId: String): CityInspection? {
+        requireController(actorCivId)
+        return buildCityInspection(committedGame, actorCivId, cityId)
+    }
+
     /** Committed position/movement of an own unit without tile detail; null once consumed or destroyed. */
     fun ownUnitState(actorCivId: String, unitId: Int): ObservedUnit? {
         requireController(actorCivId)
@@ -1315,7 +1321,12 @@ class MatchCoordinator(
         val minimum = unit.civ.gameInfo.ruleset.modOptions.constants.minimumCityLocationTileValue
         val ranked = CityLocationTileRanker.getBestTilesToFoundCity(unit, null, minimum)
         val best = ranked.bestTile ?: throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION,
-            "No reachable city site in explored land nearby; explore or move the unit first")
+            "No reachable city site in explored land nearby: " + (if (ranked.tileRankMap.isEmpty())
+                "no known site within search range ranks high enough. "
+            else "${ranked.tileRankMap.size} known site(s) rank high enough but none is reachable. ") +
+                "Order EXPLORE to reveal land, unit.move toward unclaimed land" +
+                (if (unit.civ.tech.unitsCanEmbark) " (it can embark to cross water)" else "") +
+                ", or keep the unit (SLEEP) until borders or exploration change.")
         val here = ranked.tileRankMap[unit.getTile()]
         val site = if (here != null && here >= ranked.bestTileRank - 2) unit.getTile() else best
         if (site != unit.getTile()) unit.movement.headTowards(site)
@@ -1461,7 +1472,8 @@ class MatchCoordinator(
                 val unit = requireOwnUnit(candidateGame, command.actorCivId, command.attackerUnitId)
                 if (!unit.canAttack())
                     throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Unit cannot attack now")
-                val candidate = TargetHelper.getAttackableEnemies(unit, unit.movement.getDistanceToTiles())
+                // The same option legal_actions previews for this target.
+                val candidate = distinctAttackOptions(unit)
                     .firstOrNull { it.tileToAttack.position == targetTile.position }
                     ?: throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "No legal attack on that tile")
                 val attacker = MapUnitCombatant(unit)
@@ -1729,6 +1741,58 @@ class MatchCoordinator(
         return trade
     }
 
+    private fun withTradeReasons(prefix: String, trade: Trade, civ: Civilization, partner: Civilization): String {
+        val reasons = tradeInvalidReasons(trade, civ, partner)
+        return if (reasons.isEmpty()) prefix else "$prefix: " + reasons.joinToString("; ")
+    }
+
+    /**
+     * Why [TradeEvaluation.isTradeValid] refuses [trade] between [civ] (ourOffers) and [partner]
+     * (theirOffers): each item is re-checked alone by the engine validator, and only failing items
+     * are explained. Amounts quoted are those the native trade screen lists for each side.
+     */
+    private fun tradeInvalidReasons(trade: Trade, civ: Civilization, partner: Civilization): List<String> {
+        val evaluation = TradeEvaluation()
+        val reasons = ArrayList<String>()
+        fun lastCityReason(giver: Civilization) = if (giver == civ) "you cannot trade away every city you own"
+            else "${partner.civID} cannot trade away every city it owns"
+        for ((offer, ours) in trade.ourOffers.map { it to true } + trade.theirOffers.map { it to false }) {
+            val single = Trade().apply { (if (ours) ourOffers else theirOffers).add(offer.copy()) }
+            val valid = try { evaluation.isTradeValid(single, civ, partner) } catch (_: Exception) { false }
+            if (valid) continue
+            val giver = if (ours) civ else partner
+            val giverIs = if (ours) "you are" else "${partner.civID} is"
+            val giverHas = if (ours) "you have" else "${partner.civID} has"
+            reasons += when (offer.type) {
+                TradeOfferType.Gold -> "${offer.amount} Gold exceeds the ${giver.gold} Gold $giverHas"
+                TradeOfferType.Gold_Per_Turn ->
+                    "${offer.amount} Gold per turn exceeds the ${giver.stats.statsForNextTurn.gold.toInt()} Gold per turn $giverHas"
+                TradeOfferType.Treaty -> when (offer.name) {
+                    Constants.peaceTreaty -> "Peace Treaty: you are not at war with ${partner.civID} " +
+                        "(status ${civ.getDiplomacyManager(partner)?.diplomaticStatus?.name}); it only ends a war"
+                    Constants.researchAgreement -> "Research Agreement: one is already active with ${partner.civID}"
+                    Constants.defensivePact -> "Defensive Pact: one is already in force with ${partner.civID}"
+                    else -> "${offer.name} is not available now"
+                }
+                TradeOfferType.Luxury_Resource, TradeOfferType.Strategic_Resource, TradeOfferType.Stockpiled_Resource ->
+                    "${offer.amount} ${offer.name} exceeds the ${giver.getCivResourcesByName()[offer.name] ?: 0} $giverHas"
+                TradeOfferType.Introduction -> if (ours) "${partner.civID} already knows ${offer.name}"
+                    else "you already know ${offer.name}"
+                TradeOfferType.WarDeclaration -> "${if (ours) "you" else partner.civID} cannot declare war on ${offer.name} now"
+                TradeOfferType.PeaceProposal -> "$giverIs not at war with ${offer.name}"
+                TradeOfferType.City -> if (giver.cities.any { it.id == offer.name }) lastCityReason(giver)
+                    else "${if (ours) "you do" else "${partner.civID} does"} not own city ${offer.name}"
+                TradeOfferType.Embassy -> "Embassy: an embassy is already established or the giver has no capital"
+                else -> "${offer.name} (${offer.type}) is not tradeable now"
+            }
+        }
+        // Items valid alone can still hand over every city together.
+        for ((giver, offers) in listOf(civ to trade.ourOffers, partner to trade.theirOffers))
+            if (giver.hasEverOwnedOriginalCapital && offers.count { it.type == TradeOfferType.City } == giver.cities.size)
+                reasons += lastCityReason(giver)
+        return reasons.distinct()
+    }
+
     private fun executeProposeTrade(command: ProposeTradeCommand): TradeProposedResult {
         val fingerprint = "diplomacy.proposeTrade|${command.targetCivId}|" +
             command.ourOffers.joinToString(";") { "${it.name}:${it.type}:${it.amount}" } + "|" +
@@ -1752,7 +1816,8 @@ class MatchCoordinator(
                 )
             }
             if (!valid)
-                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Offer is not valid")
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION,
+                    withTradeReasons("Offer is not valid", trade, civ, target))
             // Stored recipient-perspective, mirroring TradeView proposals.
             target.tradeRequests.add(TradeRequest(command.actorCivId, trade.reverse()))
             target.tradeRequests.count { it.requestingCiv == command.actorCivId }.toString()
@@ -1780,7 +1845,8 @@ class MatchCoordinator(
             // game moves (plan §6.1); never apply a stale proposal.
             peaceOfferViolation(candidateGame, request.trade.ourOffers, request.trade.theirOffers)?.let { throw it }
             if (!TradeEvaluation().isTradeValid(request.trade, civ, requester))
-                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "Offer is no longer valid")
+                throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION,
+                    withTradeReasons("Offer is no longer valid", request.trade, civ, requester))
             val logic = TradeLogic(civ, requester)
             logic.currentTrade.set(request.trade)
             logic.acceptTrade()
