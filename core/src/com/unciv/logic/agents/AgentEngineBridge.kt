@@ -25,27 +25,28 @@ class EngineCallException(
 ) : Exception(message)
 
 class AgentEngineBridge(val coordinator: MatchCoordinator) {
-    private val jsonReader = com.badlogic.gdx.utils.JsonReader()
     /**
      * Wire serializer: Gdx prototypes MUST be off. Unciv's shared json()
      * skips default-valued fields (compact saves), which silently drops
      * revision 0, empty lists, and false flags from protocol DTOs.
+     * Gdx [com.badlogic.gdx.utils.Json] keeps its writer in a field, so each
+     * thread gets its own instance (field metadata is cached per instance).
      */
-    private val wireJson = com.badlogic.gdx.utils.Json(
-        com.badlogic.gdx.utils.JsonWriter.OutputType.json
-    ).apply {
-        ignoreUnknownFields = true
-        setUsePrototypes(false)
-        setTypeName(null)
+    private val wireJson = ThreadLocal.withInitial {
+        com.badlogic.gdx.utils.Json(com.badlogic.gdx.utils.JsonWriter.OutputType.json).apply {
+            ignoreUnknownFields = true
+            setUsePrototypes(false)
+            setTypeName(null)
+        }
     }
 
     /**
      * Converts coordinator DTOs to JSON-compatible primitives/maps/lists.
      * Shared [AgentJson] implementation (tests and the desktop host frame
-     * stdio with the same functions).
+     * stdio with the same functions). Safe for concurrent callers.
      */
     fun toJsonMap(value: Any): Any {
-        return AgentJson.parse(wireJson.toJson(value))!!
+        return AgentJson.parse(wireJson.get().toJson(value))!!
     }
 
     private fun requireString(args: Map<String, Any?>, name: String): String =
