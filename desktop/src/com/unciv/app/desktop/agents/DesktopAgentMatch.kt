@@ -1362,6 +1362,7 @@ class DesktopAgentMatch(
                 when (method) {
                     "observe" -> bridge.observe(actor)
                     "inspect" -> bridge.inspect(actor, integer("unitId"))
+                    "inspect_city" -> bridge.inspectCity(actor, string("cityId"))
                     "inspect_tile" -> bridge.inspectTile(actor, params)
                     "map" -> bridge.map(actor, params)
                     "rules" -> bridge.rules(params)

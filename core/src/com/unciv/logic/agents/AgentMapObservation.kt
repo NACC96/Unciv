@@ -108,7 +108,10 @@ class MapPage(
 class MapSummary(
     var observationVersion: Int = AGENT_OBSERVATION_VERSION, var coordinateSystem: String = "UNCIV_HEX",
     var knownTileCount: Int = 0, var visibleTileCount: Int = 0, var worldWrap: Boolean = false,
-    var vision: MatchVision = MatchVision.FOG
+    var vision: MatchVision = MatchVision.FOG,
+    /** World-wrap maps only: the longitudinal wrap radius ([com.unciv.logic.map.TileMap.maxLongitude]) that
+     *  HexMath.getUnwrappedNearestTo uses to unwrap coordinates across the seam; null otherwise. */
+    var maxLongitude: Int? = null
 )
 
 fun normalViewableTiles(civ: Civilization): Set<Tile> = civ.cache.normalViewableTiles()
@@ -149,7 +152,8 @@ fun buildMapSummary(game: GameInfo, match: AgentMatchState, actorCivId: String):
     val civ = game.getCivilizationOrNull(actorCivId) ?: invalidMap("Unknown civilization")
     val visible = observedSight(game, match, civ)
     return MapSummary(knownTileCount = permittedPositions(game, match, civ, visible).size,
-        visibleTileCount = visible.size, worldWrap = game.tileMap.mapParameters.worldWrap, vision = match.vision)
+        visibleTileCount = visible.size, worldWrap = game.tileMap.mapParameters.worldWrap, vision = match.vision,
+        maxLongitude = game.tileMap.maxLongitude.takeIf { game.tileMap.mapParameters.worldWrap })
 }
 
 internal fun permittedPositions(game: GameInfo, match: AgentMatchState, civ: Civilization, visible: Set<Tile>): Set<HexCoord> {

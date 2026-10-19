@@ -2,17 +2,26 @@ package com.unciv.logic.agents
 
 import com.unciv.logic.GameInfo
 import com.unciv.logic.automation.unit.CityLocationTileRanker
+import com.unciv.logic.battle.AttackableTile
+import com.unciv.logic.battle.Battle
+import com.unciv.logic.battle.BattleDamage
+import com.unciv.logic.battle.CityCombatant
+import com.unciv.logic.battle.MapUnitCombatant
 import com.unciv.logic.battle.TargetHelper
 import com.unciv.logic.civilization.Civilization
 import com.unciv.logic.civilization.diplomacy.DiplomacyFlags
 import com.unciv.logic.map.HexCoord
 import com.unciv.logic.map.mapunit.MapUnit
 import com.unciv.logic.city.City
+import com.unciv.models.ruleset.INonPerpetualConstruction
+import com.unciv.models.ruleset.PerpetualConstruction
 import com.unciv.models.ruleset.unique.UniqueTarget
 import com.unciv.logic.trade.TradeOffer
 import com.unciv.logic.trade.TradeOfferType
 import com.unciv.models.ruleset.unique.UniqueType
+import com.unciv.models.stats.Stat
 import com.unciv.ui.screens.victoryscreen.RankingType
+import kotlin.math.ceil
 import kotlin.math.roundToInt
 
 /**
@@ -46,7 +55,13 @@ class ObservedUnit(
     var movementLeft: Float = 0f,
     var action: String? = null,
     /** Own-unit inspection only; foreign units never include tile detail. */
-    var tile: ObservedTile? = null
+    var tile: ObservedTile? = null,
+    /** Own units in game.observe only: distinct targets unit.attack accepts now; null when none. */
+    var attackTargets: Int? = null,
+    /** Own units in game.observe only: true when unit.promote has a choice now; null otherwise. */
+    var canPromote: Boolean? = null,
+    /** Own units in game.observe only: true when unit.upgrade would succeed now, gold included; null otherwise. */
+    var canUpgrade: Boolean? = null
 ) {
     @Suppress("unused")
     constructor() : this(0, "", "", 0, 0, 0, 0f, null)
@@ -68,6 +83,53 @@ class ObservedCity(
     @Suppress("unused")
     constructor() : this("", "", "", 0, 0, 0, 0, false, false, ArrayList())
 }
+
+/** Construction in progress: [progress]/[cost] production, null cost and turns for perpetual ones (Gold, Science...). */
+class CityConstructionProgress(
+    var name: String = "",
+    var progress: Int = 0,
+    var cost: Int? = null,
+    /** -1 when the city makes no production. */
+    var turnsLeft: Int? = null
+)
+
+/** Own-city detail (game.inspect_city), with the numbers the city screen shows. */
+class CityInspection(
+    var cityId: String = "",
+    var name: String = "",
+    var x: Int = 0,
+    var y: Int = 0,
+    var population: Int = 0,
+    var health: Int = 0,
+    var maxHealth: Int = 0,
+    /** Combat strength shown on the city banner. */
+    var defenseStrength: Int = 0,
+    var isCapital: Boolean = false,
+    var isPuppet: Boolean = false,
+    var isBeingRazed: Boolean = false,
+    var foodStored: Int = 0,
+    var foodNeededToGrow: Int = 0,
+    /** Null unless the city is growing. */
+    var turnsToGrowth: Int? = null,
+    /** Null unless the city is starving: turns until it loses a citizen. */
+    var turnsToStarvation: Int? = null,
+    /** Net per-turn Food, Production, Gold, Science, Culture, Faith and Happiness. */
+    var yieldsPerTurn: LinkedHashMap<String, Int> = LinkedHashMap(),
+    /** Null when idle. */
+    var currentConstruction: CityConstructionProgress? = null,
+    /** city.produce queue order; index 0 is [currentConstruction]. */
+    var queue: ArrayList<String> = ArrayList(),
+    var buildings: ArrayList<String> = ArrayList(),
+    var workedTiles: Int = 0,
+    /** Assigned specialists by name; null when there are none. */
+    var specialists: LinkedHashMap<String, Int>? = null,
+    var focus: String = "",
+    /** Bombard is available this turn (unit.attack with attackerCityId). */
+    var canBombard: Boolean = false,
+    var garrisonUnitId: Int? = null,
+    /** Null when borders have stopped growing (no culture or no tile left to claim). */
+    var turnsToBorderExpansion: Int? = null
+)
 
 class EmpireOverview(
     var gold: Int = 0,
@@ -175,14 +237,43 @@ class ObservationDto(
         ArrayList(), ArrayList())
 }
 
+/**
+ * One attackable target tile, with the battle preview a human sees before attacking. Expected
+ * damage is the preview's midpoint (randomness 0 and 1, clamped to remaining health; cities never
+ * drop below 1 HP). Melee captures (civilians, cities already at 1 HP) report zero damage.
+ */
 class AttackOption(
     var targetX: Int = 0,
     var targetY: Int = 0,
-    var targetKind: String = ""
+    var targetKind: String = "",
+    /** Unit type or city name. */
+    var targetName: String = "",
+    var targetOwnerCivId: String = "",
+    /** Unit health (0-100) or current city health. */
+    var targetHealth: Int = 0,
+    /** Tile unit.attack moves to first; null when attacking from the unit's current tile. */
+    var attackFromX: Int? = null,
+    var attackFromY: Int? = null,
+    /** Null when no preview applies (nuclear weapons, air sweeps). */
+    var expectedDamageToTarget: Int? = null,
+    var expectedDamageToAttacker: Int? = null,
+    /** The target is expected to be removed: killed, captured, or (cities) taken by a unit able to capture or destroy it. */
+    var targetDies: Boolean? = null
 ) {
     @Suppress("unused")
     constructor() : this(0, 0, "")
 }
+
+/** A construction city.produce can queue, with the city screen's numbers. */
+class ConstructionOption(
+    var name: String = "",
+    /** Turns to complete at this city's production; -1 when the city makes no production. */
+    var turns: Int = 0,
+    /** Production cost in this city. */
+    var cost: Int = 0,
+    /** Gold price of city.produce PURCHASE here now, ignoring the treasury; null when gold cannot buy it. */
+    var goldCost: Int? = null
+)
 
 /** Gated action families for one entity (game.legal_actions). */
 class LegalActionsDto(
@@ -195,7 +286,7 @@ class LegalActionsDto(
     var foundBlockedReason: String? = null,
     /** Unit responses only: movement points left this turn. */
     var movementLeft: Float = 0f,
-    var constructions: ArrayList<String> = ArrayList(),
+    var constructions: ArrayList<ConstructionOption> = ArrayList(),
     var researchable: ArrayList<String> = ArrayList(),
     var freeTechs: Int = 0,
     var freePolicies: Int = 0,
@@ -282,6 +373,120 @@ private fun City.toObservedForeign(): ObservedCity {
     )
 }
 
+/** City screen yields, in the order agents read them. */
+private val CITY_YIELDS = listOf(Stat.Food, Stat.Production, Stat.Gold, Stat.Science, Stat.Culture, Stat.Faith, Stat.Happiness)
+
+/** City screen turns to finish [name]; -1 instead of the engine's "never" sentinel. */
+private fun turnsToConstruct(city: City, name: String): Int =
+    city.cityConstructions.turnsToConstruction(name).let { if (it == Int.MAX_VALUE || it < 0) -1 else it }
+
+internal fun constructionOption(city: City, construction: INonPerpetualConstruction): ConstructionOption {
+    // Cost 0 skips only the treasury check, so goldCost is exactly what PURCHASE would charge.
+    val goldCost = construction.getStatBuyCost(city, Stat.Gold)?.takeIf {
+        city.cityConstructions.isConstructionPurchaseAllowed(construction, Stat.Gold, 0)
+    }
+    return ConstructionOption(construction.name, turnsToConstruct(city, construction.name),
+        construction.getProductionCost(city.civ, city), goldCost)
+}
+
+/**
+ * Own-city detail with the city screen's numbers. Foreign, hidden and nonexistent cities
+ * share null, so city IDs grant no access to another civilization's internals.
+ */
+fun buildCityInspection(game: GameInfo, actorCivId: String, cityId: String): CityInspection? {
+    val city = game.getCivilizationOrNull(actorCivId)?.cities?.firstOrNull { it.id == cityId } ?: return null
+    val center = city.getCenterTile().position
+    val stats = city.cityStats.currentCityStats
+    val constructions = city.cityConstructions
+    val current = constructions.currentConstructionName()
+        .takeUnless { it.isEmpty() || it == PerpetualConstruction.Idle.name }
+    val culture = stats.culture
+    return CityInspection(
+        city.id, city.name, center.x, center.y, city.population.population,
+        city.health, city.getMaxHealth(), CityCombatant(city).getDefendingStrength(),
+        city.isCapital(), city.isPuppet, city.isBeingRazed,
+        city.population.foodStored, city.population.getFoodToNextPopulation(),
+        city.population.getNumTurnsToNewPopulation(), city.population.getNumTurnsToStarvation(),
+        CITY_YIELDS.associateTo(LinkedHashMap()) { stat ->
+            stat.name to (if (stat == Stat.Happiness) city.cityStats.happinessList.values.sum() else stats[stat]).roundToInt()
+        },
+        current?.let { name ->
+            val construction = constructions.getConstruction(name)
+            if (construction is INonPerpetualConstruction)
+                CityConstructionProgress(name, constructions.getWorkDone(name),
+                    construction.getProductionCost(city.civ, city), turnsToConstruct(city, name))
+            else CityConstructionProgress(name, 0, null, null)
+        },
+        ArrayList(constructions.constructionQueue),
+        constructions.getBuiltBuildings().mapTo(ArrayList()) { it.name },
+        city.workedTiles.size,
+        city.population.getNewSpecialists().filter { it.value > 0 }
+            .takeIf { it.isNotEmpty() }?.let { LinkedHashMap(it) },
+        city.getCityFocus().name,
+        city.canBombard(),
+        city.getGarrison()?.id,
+        // Mirrors the city screen's "turns to expansion" line.
+        if (culture > 0 && city.expansion.getChoosableTiles().any())
+            maxOf(1, ceil((city.expansion.getCultureToNextTile() - city.expansion.cultureStored) / culture).toInt())
+        else null
+    )
+}
+
+/**
+ * One engine attack option per target tile, in enumeration order: the first option for a target
+ * is the one unit.attack executes (fewest movement points spent, so the current tile when it can
+ * attack from there). Empty unless the unit can attack now.
+ */
+internal fun distinctAttackOptions(unit: MapUnit): List<AttackableTile> {
+    if (!unit.hasMovement() || !unit.canAttack()) return emptyList()
+    return TargetHelper.getAttackableEnemies(unit, unit.movement.getDistanceToTiles()).distinctBy { it.tileToAttack }
+}
+
+/** [AttackOption] with the battle table's preview (BattleTable.simulateBattle) for [option]. */
+internal fun attackPreview(unit: MapUnit, option: AttackableTile): AttackOption {
+    val target = option.tileToAttack
+    val from = option.tileToAttackFrom
+    val result = AttackOption(target.position.x, target.position.y, if (target.isCityCenter()) "city" else "unit")
+    if (from != unit.getTile()) {
+        result.attackFromX = from.position.x
+        result.attackFromY = from.position.y
+    }
+    val defender = option.combatant ?: Battle.getMapCombatantOfTile(target) ?: return result
+    result.targetName = defender.getName()
+    result.targetOwnerCivId = defender.getCivInfo().civID
+    result.targetHealth = defender.getHealth()
+    if (unit.isNuclearWeapon() || unit.isPreparingAirSweep()) return result
+    val attacker = MapUnitCombatant(unit)
+    val city = defender as? CityCombatant
+    val civilian = defender is MapUnitCombatant && defender.unit.isCivilian()
+    // A melee capture or city destruction needs a unit allowed to take it (Battle.handleCityDefeated).
+    val canTakeCity = (attacker.isMelee() || unit.hasUnique(UniqueType.CanDestroyCities, checkCivInfoUniques = true))
+        && !unit.hasUnique(UniqueType.CannotCaptureCities, checkCivInfoUniques = true)
+    if (!attacker.isRanged() && (civilian || city?.isDefeated() == true)) {
+        result.expectedDamageToTarget = 0
+        result.expectedDamageToAttacker = 0
+        result.targetDies = civilian || canTakeCity
+        return result
+    }
+    var maxToTarget = BattleDamage.calculateDamageToDefender(attacker, defender, from, 1f)
+    var minToTarget = BattleDamage.calculateDamageToDefender(attacker, defender, from, 0f)
+    if (city == null && attacker.hasUnique(UniqueType.ExtraRangedAttack)) {
+        val (maxExtra, minExtra) = BattleDamage.getExtraRangedAttackBonusDamage(attacker, defender, from)
+        maxToTarget += maxExtra
+        minToTarget += minExtra
+    }
+    val maxToAttacker = BattleDamage.calculateDamageToAttacker(attacker, defender, from, 1f)
+    val minToAttacker = BattleDamage.calculateDamageToAttacker(attacker, defender, from, 0f)
+    // Cities stop at 1 HP (CityCombatant.takeDamage); units at 0.
+    val targetCap = if (city != null) defender.getHealth() - 1 else defender.getHealth()
+    val toTarget = listOf(minOf(maxToTarget, targetCap), minOf(minToTarget, targetCap)).average().roundToInt()
+    result.expectedDamageToTarget = toTarget
+    result.expectedDamageToAttacker = listOf(minOf(maxToAttacker, unit.health), minOf(minToAttacker, unit.health))
+        .average().roundToInt()
+    result.targetDies = if (city != null) canTakeCity && toTarget >= targetCap else toTarget >= defender.getHealth()
+    return result
+}
+
 /**
  * Builds the permitted overview for [actorCivId] from committed game + match
  * state. Pure read path: no mutation, no candidate, no global side effects.
@@ -351,7 +556,13 @@ fun buildObservation(
         game.ruleset.policies.values.filter { civ.policies.isAdoptable(it) }.map { it.name })
 
     for (unit in civ.units.getCivUnits()) {
-        if (!unit.isDestroyed) dto.ownUnits.add(unit.toObserved())
+        if (unit.isDestroyed) continue
+        val observed = unit.toObserved()
+        // Readiness hints (null when not meaningful) spare a legal_actions call per unit.
+        observed.attackTargets = distinctAttackOptions(unit).size.takeIf { it > 0 }
+        if (unit.promotions.canBePromoted()) observed.canPromote = true
+        if (canUpgradeNow(unit)) observed.canUpgrade = true
+        dto.ownUnits.add(observed)
     }
     for (city in civ.cities) dto.ownCities.add(city.toObservedOwn())
 
@@ -410,7 +621,8 @@ internal fun rankCitySites(unit: MapUnit): List<CitySite> {
 /**
  * Gated per-entity actions for [unitId] or [cityId] (exactly one set).
  * Movement targets are adjacent enterable tiles only (no destination oracle);
- * attacks reuse the engine enumeration behind the UI arrows.
+ * attacks reuse the engine enumeration behind the UI arrows, one entry per
+ * target with the battle preview.
  */
 fun buildLegalActions(
     game: GameInfo,
@@ -442,12 +654,7 @@ fun buildLegalActions(
             for (neighbor in unit.getTile().neighbors) {
                 if (unit.movement.canMoveTo(neighbor)) dto.moveTargets.add(neighbor.position)
             }
-            if (unit.canAttack()) {
-                for (option in TargetHelper.getAttackableEnemies(unit, unit.movement.getDistanceToTiles()))
-                    dto.attackTargets.add(AttackOption(
-                        option.tileToAttack.position.x, option.tileToAttack.position.y,
-                        if (option.tileToAttack.isCityCenter()) "city" else "unit"))
-            }
+            for (option in distinctAttackOptions(unit)) dto.attackTargets.add(attackPreview(unit, option))
         }
         if (unit.canFortify() && unit.hasMovement()) dto.orders.add(UnitOrder.FORTIFY)
         if (!unit.isFortifyingUntilHealed() && unit.canHealInCurrentTile()) dto.orders.add(UnitOrder.FORTIFY_UNTIL_HEALED)
@@ -499,14 +706,23 @@ fun buildLegalActions(
     if (city == null || city.civ.civID != actorCivId)
         throw AgentCommandException(AgentCommandError.ILLEGAL_ACTION, "No such city under your control")
     for (name in game.ruleset.buildings.keys + game.ruleset.units.keys) {
-        try {
-            val construction = city.cityConstructions.getConstruction(name)
-            if (city.cityConstructions.canAddToQueue(construction)) dto.constructions.add(name)
+        val construction = try {
+            city.cityConstructions.getConstruction(name)
+                .takeIf { city.cityConstructions.canAddToQueue(it) } as? INonPerpetualConstruction
         } catch (ex: Exception) {
-            // Unknown/unbuildable names are skipped, not errors.
-        }
+            null // Unknown/unbuildable names are skipped, not errors.
+        } ?: continue
+        dto.constructions.add(constructionOption(city, construction))
     }
     return dto
+}
+
+/** The checks unit.upgrade runs (MatchCoordinator.executeUpgrade), gold included. */
+internal fun canUpgradeNow(unit: MapUnit): Boolean {
+    val upgradesTo = unit.baseUnit.upgradesTo
+    if (upgradesTo.isNullOrEmpty()) return false
+    val target = unit.civ.getEquivalentUnit(upgradesTo)
+    return unit.upgrade.canUpgrade(target) && unit.civ.gold >= unit.upgrade.getCostOfUpgrade(target)
 }
 
 internal fun MapUnit.isFoundingUnit() =

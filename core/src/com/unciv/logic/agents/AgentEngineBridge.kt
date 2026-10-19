@@ -494,6 +494,16 @@ class AgentEngineBridge(val coordinator: MatchCoordinator) {
         }
     }
 
+    /** game.inspect_city — own-city detail or null (foreign, hidden and nonexistent share null). */
+    fun inspectCity(actorCivId: String, cityId: String): Any? {
+        try {
+            val city = coordinator.inspectCity(actorCivId, cityId) ?: return null
+            return toJsonMap(city)
+        } catch (ex: AgentCommandException) {
+            throw EngineCallException(ex.code.name, ex.message ?: ex.code.name)
+        }
+    }
+
     private fun readInteger(args: Map<String, Any?>, name: String, default: Int? = null): Int {
         if (!args.containsKey(name)) return default
             ?: throw EngineCallException("INVALID_ARGUMENT", "Missing integer argument $name")

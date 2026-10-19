@@ -53,9 +53,18 @@ private fun requireWorker(context: WorkerBuildContext, requireMovement: Boolean 
     val unit = context.unit
     if (unit.civ.civID != context.actorCivId || unit.civ.gameInfo !== context.game)
         illegalWorker("Unit is not an actor worker")
-    if (unit.civ.isBarbarian || requireMovement && !unit.hasMovement() || unit.isEmbarked()
-        || !unit.getMatchingUniques(UniqueType.BuildImprovements, context.state).any())
-        illegalWorker("Unit cannot work on improvements now")
+    val blocker = when {
+        unit.civ.isBarbarian -> "barbarian units do not build"
+        !unit.getMatchingUniques(UniqueType.BuildImprovements, context.state).any() ->
+            if (unit.hasUnique(UniqueType.CreateWaterImprovements))
+                "${unit.name} has no worker build ability; it creates improvements on water resources " +
+                    "by being consumed, which unit.build does not perform"
+            else "${unit.name} has no improvement-building ability here"
+        unit.isEmbarked() -> "${unit.name} is embarked; it must stand on land"
+        requireMovement && !unit.hasMovement() -> "${unit.name} has no movement left this turn"
+        else -> null
+    }
+    if (blocker != null) illegalWorker("Unit cannot work on improvements now: $blocker")
     if (context.tile.isCityCenter() || context.tile.isMarkedForCreatesOneImprovement())
         illegalWorker("Worker cannot modify this tile")
 }
@@ -70,7 +79,8 @@ private fun builderMatches(context: WorkerBuildContext, improvement: TileImprove
         })
     }
 
-fun requireWorkerBuildAllowed(context: WorkerBuildContext, improvement: TileImprovement) {
+/** @param explain spell out why the build is refused; option discovery skips that work. */
+fun requireWorkerBuildAllowed(context: WorkerBuildContext, improvement: TileImprovement, explain: Boolean = true) {
     requireWorker(context)
     val tile = context.tile
     if (tile.improvementInProgress == improvement.name)
@@ -79,10 +89,38 @@ fun requireWorkerBuildAllowed(context: WorkerBuildContext, improvement: TileImpr
     if (improvement.turnsToBuild < 0 || improvement.name == Constants.cancelImprovementOrder
         || improvement.name == Constants.repair || improvement.isGreatImprovement())
         illegalWorker("This is not a worker build; use its explicit action")
-    if (!builderMatches(context, improvement)) illegalWorker("Unit cannot build this improvement")
-    if (tile.improvementFunctions.getImprovementBuildingProblems(improvement, context.state).any())
-        illegalWorker("Improvement cannot be built on this tile now")
+    if (!builderMatches(context, improvement)) {
+        if (!explain) illegalWorker("Unit cannot build this improvement")
+        val filters = context.unit.getMatchingUniques(UniqueType.BuildImprovements, context.state)
+            .joinToString(" or ") { "[${it.params[0]}]" }
+        illegalWorker("Unit cannot build this improvement: ${context.unit.name} builds only $filters improvements")
+    }
+    val problems = tile.improvementFunctions.getImprovementBuildingProblems(improvement, context.state)
+    if (problems.none()) return
+    if (!explain) illegalWorker("Improvement cannot be built on this tile now")
+    illegalWorker("Improvement cannot be built on this tile now: ${improvement.name} " +
+        problems.distinct().joinToString("; ") { describeBuildingProblem(it, improvement, context) })
 }
+
+/** Plain-language [ImprovementBuildingProblem]s, as checked by the engine for this civilization and tile. */
+private fun describeBuildingProblem(problem: ImprovementBuildingProblem, improvement: TileImprovement, context: WorkerBuildContext) =
+    when (problem) {
+        ImprovementBuildingProblem.Replaced -> "is replaced by your civilization's unique improvement"
+        ImprovementBuildingProblem.WrongCiv -> "is unique to another civilization"
+        ImprovementBuildingProblem.MissingTech -> "requires ${improvement.techRequired}"
+        ImprovementBuildingProblem.Unbuildable -> "cannot be built by workers"
+        ImprovementBuildingProblem.ConditionallyUnbuildable -> "is unavailable under current conditions"
+        ImprovementBuildingProblem.UnmetConditional -> "has unmet conditions"
+        ImprovementBuildingProblem.NotJustOutsideBorders -> "must be just outside your borders"
+        ImprovementBuildingProblem.OutsideBorders ->
+            if (improvement.hasUnique(UniqueType.CanBuildJustOutsideBorders, context.state))
+                "needs a tile inside or adjacent to your territory"
+            else "needs a tile inside your territory (this tile " +
+                (context.tile.getOwner()?.let { "belongs to ${it.civID}" } ?: "is unowned") + ")"
+        ImprovementBuildingProblem.Obsolete -> "is obsolete"
+        ImprovementBuildingProblem.MissingResources -> "needs resources you lack"
+        ImprovementBuildingProblem.Other -> "is not allowed on this tile's terrain, feature or resource"
+    }
 
 /** Return the actual engine repair time; guards are shared by discovery and mutation. */
 fun requireWorkerRepairAllowed(context: WorkerBuildContext): Int {
@@ -129,7 +167,7 @@ fun buildWorkerOptions(game: GameInfo, actorCivId: String, unit: MapUnit): Worke
     result.canCancelWork = try { requireWorkerCancelAllowed(context); true } catch (_: AgentCommandException) { false }
     result.repair = try { RepairOption(requireWorkerRepairAllowed(context)) } catch (_: AgentCommandException) { null }
     for (improvement in game.ruleset.tileImprovements.values.sortedBy { it.name }) {
-        try { requireWorkerBuildAllowed(context, improvement) } catch (_: AgentCommandException) { continue }
+        try { requireWorkerBuildAllowed(context, improvement, explain = false) } catch (_: AgentCommandException) { continue }
         result.improvements.add(WorkerImprovementOption(
             name = improvement.name,
             kind = when {
