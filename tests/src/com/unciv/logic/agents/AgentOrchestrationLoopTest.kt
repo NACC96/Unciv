@@ -220,11 +220,51 @@ class AgentOrchestrationLoopTest {
     }
 
     @Test
+    fun `sessions resume by default and compact after every turn`() {
+        val fixture = MatchFixture(listOf(
+            "Rome" to ControllerKind.EXTERNAL_AGENT,
+            "Greece" to ControllerKind.EXTERNAL_AGENT
+        ))
+        lateinit var desktopMatch: DesktopAgentMatch
+        val supervisor = TestSupervisor { method, params -> desktopMatch.answerEngineRequest(method, params) }
+        desktopMatch = fixture.createMatch(supervisor)
+        val turnLatch = CountDownLatch(4)
+        supervisor.onTurnCompleted = { _ -> turnLatch.countDown() }
+
+        desktopMatch.startAutomaticPlay()
+        Assert.assertTrue("Expected 4 turns to complete within timeout", turnLatch.await(10, TimeUnit.SECONDS))
+        desktopMatch.pause()
+
+        @Suppress("UNCHECKED_CAST")
+        fun turn(index: Int): Triple<Map<String, Any?>, Map<String, Any?>, Map<String, Any?>> = supervisor.controls[index].let {
+            val context = it["context"] as Map<String, Any?>
+            Triple(it["providerConfig"] as Map<String, Any?>, context, context["session"] as Map<String, Any?>)
+        }
+        for (index in 0..1) {
+            val (config, _, session) = turn(index)
+            Assert.assertNull(config["resumeId"])
+            Assert.assertEquals(true, config["compactAfterTurn"])
+            Assert.assertEquals(mapOf("arm" to AgentSessionPolicy.ARM_COMPACT, "age" to 0), session)
+        }
+        for ((index, civ) in listOf(2 to fixture.romeId, 3 to fixture.greeceId)) {
+            val (config, context, session) = turn(index)
+            Assert.assertEquals("session-$civ", config["resumeId"])
+            Assert.assertEquals(true, config["compactAfterTurn"])
+            Assert.assertNull("A resumed session already holds its own summary", context["continuityNote"])
+            Assert.assertEquals(mapOf("arm" to AgentSessionPolicy.ARM_COMPACT, "age" to 1), session)
+        }
+    }
+
+    @Test
     fun `session rotation starts alternate civs fresh with their closing summary and resumes the others`() {
         val fixture = MatchFixture(listOf(
             "Rome" to ControllerKind.EXTERNAL_AGENT,
             "Greece" to ControllerKind.EXTERNAL_AGENT
         ))
+        File(fixture.tempDir, ".agent-data/${AgentSessionPolicy.SETTINGS_FILE}").apply {
+            parentFile.mkdirs()
+            writeText("""{"sessionRotationTurns":1,"sessionAbTest":true}""")
+        }
         lateinit var desktopMatch: DesktopAgentMatch
         val supervisor = TestSupervisor { method, params -> desktopMatch.answerEngineRequest(method, params) }
         desktopMatch = fixture.createMatch(supervisor)
@@ -247,7 +287,7 @@ class AgentOrchestrationLoopTest {
 
         val (greeceFirstResume, _, greeceFirstSession) = turn(1)
         Assert.assertNull(greeceFirstResume)
-        Assert.assertEquals(mapOf("arm" to AgentSessionPolicy.ARM_RESUME, "age" to 0), greeceFirstSession)
+        Assert.assertEquals(mapOf("arm" to AgentSessionPolicy.ARM_COMPACT, "age" to 0), greeceFirstSession)
 
         val (romeSecondResume, romeSecondContext, romeSecondSession) = turn(2)
         Assert.assertNull("The rotating arm starts a fresh session every turn", romeSecondResume)
@@ -258,7 +298,7 @@ class AgentOrchestrationLoopTest {
         val (greeceSecondResume, greeceSecondContext, greeceSecondSession) = turn(3)
         Assert.assertEquals("session-${fixture.greeceId}", greeceSecondResume)
         Assert.assertNull("A resumed session already holds its own summary", greeceSecondContext["continuityNote"])
-        Assert.assertEquals(mapOf("arm" to AgentSessionPolicy.ARM_RESUME, "age" to 1), greeceSecondSession)
+        Assert.assertEquals(mapOf("arm" to AgentSessionPolicy.ARM_COMPACT, "age" to 1), greeceSecondSession)
     }
 
     @Test

@@ -5,8 +5,9 @@
  *   node scripts/session-ab-report.mjs <userdata>/.agent-data/logs/<match-id>
  *
  * Groups engine-confirmed completed Codex turns by the session arm recorded in
- * meta.json ("rotate-N" or "resume"; runs from builds without the policy are
- * "unrecorded") and by session age. Codex reports turn.completed usage as a
+ * meta.json ("rotate-N", "compact" or "resume"; runs from builds without the
+ * policy are "unrecorded") and by session age. A compacted turn's time ends at
+ * its release (turnDurationMs); its tokens include the background compaction. Codex reports turn.completed usage as a
  * running total for the whole session, so each resumed turn's tokens are the
  * difference from the same session's previous attempt, including failed ones.
  * Missing usage/baselines are unknown, not zero; token means show sample counts.
@@ -64,7 +65,8 @@ for (const name of readdirSync(matchDir)) {
   attempts.push({
     civ: meta.civId, turn: meta.turnSerial, session: meta.sessionId, arm: meta.sessionArm ?? "unrecorded",
     age: meta.sessionAge ?? null, startedAt: Date.parse(meta.startedAt), resumed: meta.resumed, completed,
-    seconds: nonnegativeNumber(meta.durationMs) ? meta.durationMs / 1000 : nonnegativeNumber(elapsedSeconds) ? elapsedSeconds : null,
+    seconds: nonnegativeNumber(meta.turnDurationMs) ? meta.turnDurationMs / 1000
+      : nonnegativeNumber(meta.durationMs) ? meta.durationMs / 1000 : nonnegativeNumber(elapsedSeconds) ? elapsedSeconds : null,
     requests, toolCalls, failedCalls, batches, usage,
   });
 }

@@ -15,6 +15,8 @@ export interface MapSummary {
   visibleTileCount: number;
   worldWrap: boolean;
   vision: MatchVision;
+  /** Longitude wrap radius when worldWrap (HexMath.getUnwrappedNearestTo); null otherwise. */
+  maxLongitude?: number | null;
 }
 export interface ObservedTile extends HexPosition {
   visibility: "VISIBLE" | "REMEMBERED" | "REVEALED";

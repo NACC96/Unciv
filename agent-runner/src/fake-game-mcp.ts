@@ -116,6 +116,8 @@ export interface IGameService {
   observe(): Promise<GameObserveResult>;
   messageImage(messageId: string, attachmentId: string): Promise<MessageImageResult | FakeError>;
   inspect(unitId: number): Promise<FakeUnit | ObservedUnit | FakeError | null>;
+  /** Own cities only; foreign, hidden and nonexistent cities share the safe null/rejection. */
+  inspectCity(cityId: string): Promise<ObservedCityDetail | FakeError | null>;
   inspectTile(position: HexPosition): Promise<ObservedTile | FakeError | null>;
   map(query?: MapQuery): Promise<MapPage | FakeError>;
   rules(query?: RulesQuery): Promise<RulesResult | FakeError>;
@@ -131,6 +133,12 @@ export interface IGameService {
   readNotes(): Promise<{ notes: string; notesRevision: number }>;
   updateNotes(notes: string, expectedNotesRevision: number): Promise<{ notesRevision: number } | FakeError>;
   endTurn(): Promise<{ turnEnded: boolean } | FakeError>;
+}
+
+/** Own-city detail from the desktop's inspect_city; transports pass it through. */
+export interface ObservedCityDetail {
+  cityId: string; name: string; x: number; y: number; population: number;
+  [field: string]: unknown;
 }
 
 /** Production desktop DTOs; transports must not assume the fake's field names. */
@@ -315,6 +323,12 @@ export class FakeGameService implements IGameService {
       return { protocolVersion: 1, status: "rejected", code: "ILLEGAL_ACTION", message: "no such visible entity" };
     }
     return { unitId: seen.id, actions: [{ type: "unit.move", costs: { movement: 1 }, targets: "adjacent-explored-tiles" }] };
+  }
+
+  async inspectCity(cityId: string): Promise<ObservedCityDetail | FakeError> {
+    const city = this.cities.find(candidate => candidate.id === cityId);
+    if (!city) return { protocolVersion: 1, status: "rejected", code: "ILLEGAL_ACTION", message: "no such visible entity" };
+    return { cityId: city.id, name: city.id, x: 0, y: 0, population: 1, currentConstruction: null, queue: [...city.constructions] };
   }
 
   async inspect(unitId: number): Promise<FakeUnit | FakeError> {
