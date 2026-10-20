@@ -669,7 +669,9 @@ class AgentMessagesPanel(
             confirmDeleteId -> "Confirm delete"
             else -> "Delete"
         }
-        return WorldScreenStyle.button(text, size = GameUiStyle.ButtonSize.Compact).apply {
+        val button = if (GameUiStyle.isAtlas) WorldScreenStyle.ghostButton(text, GameUiStyle.ButtonSize.Compact)
+            else WorldScreenStyle.button(text, size = GameUiStyle.ButtonSize.Compact)
+        return button.apply {
             name = "MessageDelete"
             if (messageId == confirmDeleteId) label.color = WorldScreenStyle.error
             WorldScreenStyle.setEnabled(this, deletingId == null)
@@ -718,9 +720,12 @@ class AgentMessagesPanel(
         if (GameUiStyle.isAtlas) {
             val availableWidth = (width - padLeft - padRight).coerceAtLeast(1f)
             val chrome = padTop + padBottom + header.prefHeight + identity.prefHeight + 2f + 8f + pickerHeight + 8f + GameUiStyle.Space.m
-            val regions = AgentPanelLayout.calculate(availableWidth, (height - chrome).coerceAtLeast(1f), UncivGame.Current.settings.fontSizeMultiplier)
-            getCell(scroll).height(regions.content.height).minHeight(0f)
-            getCell(composerScroll).height(regions.composer.height).minHeight(0f)
+            val area = (height - chrome).coerceAtLeast(1f)
+            val regions = AgentPanelLayout.calculate(availableWidth, area, UncivGame.Current.settings.fontSizeMultiplier)
+            // The draft grows with an attachment or warning (up to ~42% of the sheet) instead of scrolling it away.
+            val composerHeight = composer.prefHeight.coerceIn(regions.composer.height, maxOf(regions.composer.height, area * 0.42f))
+            getCell(scroll).height((area - composerHeight - regions.footer.height).coerceAtLeast(0f)).minHeight(0f)
+            getCell(composerScroll).height(composerHeight).minHeight(0f)
             getCell(footer).height(regions.footer.height).minHeight(0f)
             val inputWidth = (availableWidth - 16f - (composerScroll.style.vScroll?.minWidth ?: 0f)).coerceAtLeast(1f)
             composer.cells.forEach { it.width(inputWidth) }

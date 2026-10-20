@@ -529,8 +529,28 @@ object GameUiStyle {
     }
 
     private fun scrollStyle(source: ScrollPane.ScrollPaneStyle) = ScrollPane.ScrollPaneStyle(source).apply {
-        hScrollKnob = GameUiStyle.background("Atlas/Scroll/Horizontal", muted)
-        vScrollKnob = GameUiStyle.background("Atlas/Scroll/Vertical", muted)
+        val knob = muted.apply { a = 0.45f }
+        hScrollKnob = ScrollKnob(rounded("Atlas/Scroll/Horizontal", "control-r8", knob), vertical = false)
+        vScrollKnob = ScrollKnob(rounded("Atlas/Scroll/Vertical", "control-r8", knob), vertical = true)
+        hScroll = null; vScroll = null
+    }
+
+    /** A slim capsule centred in a narrow gutter, like overlay scrollbars: the rounded patch
+     * shrinks its corners to the bar's width. Long enough to grab even in very long histories. */
+    private class ScrollKnob(private val bar: Drawable, private val vertical: Boolean) : BaseDrawable() {
+        init {
+            if (vertical) { minWidth = gutter; minHeight = minLength } else { minWidth = minLength; minHeight = gutter }
+        }
+        override fun draw(batch: Batch, x: Float, y: Float, width: Float, height: Float) {
+            if (vertical) bar.draw(batch, x + (width - thickness) / 2f, y + inset, thickness, (height - 2 * inset).coerceAtLeast(thickness))
+            else bar.draw(batch, x + inset, y + (height - thickness) / 2f, (width - 2 * inset).coerceAtLeast(thickness), thickness)
+        }
+        companion object {
+            const val gutter = 10f
+            const val thickness = 4f
+            const val minLength = 28f
+            const val inset = 2f
+        }
     }
 
     private fun selectStyle(source: SelectBox.SelectBoxStyle) = SelectBox.SelectBoxStyle(source).apply {

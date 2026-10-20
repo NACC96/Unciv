@@ -259,8 +259,9 @@ class GlassBackdrop : Disposable {
             }
         """.trimIndent()
 
-        /** Rounded-rectangle mask over the blurred map: a little extra saturation (vibrancy), the
-         *  surface tint, a faint top sheen and dithering so the dark gradients do not band.
+        /** Rounded-rectangle mask over the blurred map, slightly dimmed with a touch of extra
+         *  saturation (vibrancy), then the surface tint, a faint top sheen and dithering so the
+         *  dark gradients do not band.
          *  u_uv maps the quad's texture range back to local surface units for the mask. */
         private val glassFragment = """
             #ifdef GL_ES
@@ -279,9 +280,9 @@ class GlassBackdrop : Disposable {
                 vec2 q = abs(local - 0.5 * u_size) - (0.5 * u_size - u_radius);
                 float edge = length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - u_radius;
                 float mask = 1.0 - smoothstep(-u_aa, u_aa, edge);
-                vec3 back = texture2D(u_texture, v_uv).rgb;
+                vec3 back = texture2D(u_texture, v_uv).rgb * 0.88;
                 float luma = dot(back, vec3(0.299, 0.587, 0.114));
-                back = mix(vec3(luma), back, 1.3);
+                back = mix(vec3(luma), back, 1.12);
                 vec3 c = mix(back, u_tint.rgb, u_tint.a);
                 c += 0.035 * smoothstep(0.55, 1.0, local.y / u_size.y);
                 float noise = fract(sin(dot(gl_FragCoord.xy, vec2(12.9898, 78.233))) * 43758.5453);
