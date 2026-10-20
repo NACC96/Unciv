@@ -320,7 +320,7 @@ object AtlasFixtureCatalog {
                                 .tap(com.badlogic.gdx.scenes.scene2d.InputEvent().apply { listenerActor = actor }, 1f, 1f, 1, 0)
                             fun windowControls(panel: com.badlogic.gdx.scenes.scene2d.ui.Table) =
                                 (panel.children.first() as com.badlogic.gdx.scenes.scene2d.ui.Table).children
-                                    .filterIsInstance<com.badlogic.gdx.scenes.scene2d.ui.Table>().single()
+                                    .filterIsInstance<com.badlogic.gdx.scenes.scene2d.ui.Table>().single { it !is com.badlogic.gdx.scenes.scene2d.ui.Button }
                                     .children.filterIsInstance<com.badlogic.gdx.scenes.scene2d.ui.Button>()
                             game.settings.hudWindows["activity"] = com.unciv.models.metadata.HudWindowLayout().apply {
                                 placed = true; x = 340f; y = 150f; this.width = 380f; this.height = 520f; opacity = 0.3f
