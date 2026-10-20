@@ -118,11 +118,12 @@ fun FxScene.rifles() {
         impact(.31f + .055f)
         return
     }
-    if (!defenderKilled) volley(blow + .1f, true)
+    // A follow-up volley, unless someone is already going down by then.
+    if (!defenderKilled && !attackerKilled) volley(blow + .1f, true)
 
     // The grenade is lobbed from the middle of the squad as it closes and bursts as the blow lands.
     val throwAt = blow - .24f
-    val landX = ox(-6f) + spread(4f); val landY = GROUND + 3f + spread(2f)
+    val landX = ox(-6f) + spread(4f); val landY = oy(-6f) + GROUND + 3f + spread(2f)
     val from = raised(6f + lunge(throwAt, blow), 0f, 8f)
     val flight = FxFlight(from.x, from.y, landX, landY, arc = 26f)
     flying(throwAt, blow - throwAt, flight) {
@@ -131,7 +132,7 @@ fun FxScene.rifles() {
     flying(throwAt, blow - throwAt, flight) {
         shape = FxShape.DISC; layer = FxLayer.BODY; size0 = 4f; size1 = 4f; color0 = FxPalette.DEBRIS; fadeIn = 0f; fadeOut = 0f
     }
-    explosion(blow, landX, landY, scale = if (era <= 5) .6f else .68f, water = targetWater, debris = soil())
+    blast(blow, landX, landY, if (era <= 5) .6f else .68f)
     impact(blow, .5f)
 }
 
@@ -220,14 +221,14 @@ private fun FxScene.shellBurst(at: Float, x: Float, y: Float) {
         size0 = 10f; size1 = 17f; color0 = FxPalette.FIRE; color1 = FxPalette.EMBER; alpha = .8f; fadeOut = .7f
     }
     sparks(at, x, y, count = 3, speed = 170f, color = FxPalette.FIRE_CORE)
-    if (targetWater) splash(at, x, y, .4f)
+    if (targetWater && !onBody(y)) waterJet(at, x, y, 1.5f)
     else {
         bulletHit(at, x, y, 1.3f)
         particle(FxAnchor.TARGET, at + .02f, rand(.4f, .55f)) {
             shape = FxShape.SOFT; layer = FxLayer.SMOKE
             this.x = x; this.y = y + 3f; vx = spread(10f); vy = rand(22f, 36f); drag = 2f
-            size0 = 9f; size1 = rand(20f, 26f); color0 = vary(FxPalette.SMOKE_DARK); color1 = vary(FxPalette.SMOKE)
-            alpha = .7f; fadeIn = .1f; fadeOut = .6f
+            size0 = 8f; size1 = rand(17f, 22f); color0 = vary(FxPalette.SMOKE_DARK); color1 = vary(FxPalette.SMOKE)
+            alpha = .55f; fadeIn = .1f; fadeOut = .65f
         }
     }
 }
@@ -241,14 +242,17 @@ fun FxScene.tank() {
     val fire = blow - travel
     val gun = when { style.heavy -> 1.35f; era <= 5 -> .85f; else -> 1.1f }
     fireAt = fire
-    // The engine coughs exhaust as the tank surges forward; the first tanks far more of it.
-    repeat(if (era <= 5) 4 else 2) { index ->
-        particle(FxAnchor.SOURCE, blow - .2f + index * .04f, rand(.45f, .6f)) {
+    // The engine coughs a plume of exhaust off the rear deck as the tank surges forward, left behind as it goes;
+    // the first tanks far more of it.
+    val landship = era <= 5
+    repeat(if (landship) 4 else 3) { index ->
+        particle(FxAnchor.SOURCE, blow - .22f + index * .035f, rand(.42f, .55f)) {
             shape = FxShape.SOFT; layer = FxLayer.SMOKE
-            x = ox(-14f, -4f) + spread(2f); y = oy(-14f, -4f) + 6f
-            vx = -dir.x * 20f + spread(8f); vy = rand(26f, 40f); drag = 1.5f
-            size0 = 5f; size1 = rand(14f, 19f); color0 = vary(FxPalette.SMOKE_DARK); color1 = FxPalette.SMOKE
-            alpha = if (era <= 5) .6f else .4f; fadeIn = .1f; fadeOut = .6f
+            x = ox(-16f, -3f) + spread(2f); y = oy(-16f, -3f) + 10f
+            vx = -dir.x * 30f + spread(8f); vy = rand(60f, 80f); drag = 1.8f
+            size0 = 7f; size1 = rand(18f, 23f) * if (landship) 1.2f else 1f
+            color0 = vary(FxPalette.SMOKE_DARK, .04f); color1 = vary(FxPalette.SMOKE_DARK, .1f)
+            alpha = if (landship) .92f else .8f; fadeIn = .08f; fadeOut = .55f
         }
     }
     // Tracks churn up dust as it lurches forward.
@@ -292,7 +296,7 @@ private fun FxScene.antiTankGun() {
     val from = raised(muzzle + 2f, 0f, 1f)
     val (toX, toY) = shellEnd(2f)
     tracer(fire, travel, from.x, from.y, toX, toY, color = AP_TRACER, scale = 1.5f, glow = .6f)
-    val armor = defenderBody == BodyKind.VEHICLE && outcome != VisualAttackOutcome.WITHDRAWN && !targetWater
+    val armor = hard(toY)
     if (armor) {
         particle(FxAnchor.TARGET, blow, .07f) {
             shape = FxShape.SOFT; blend = FxBlend.ADD; layer = FxLayer.LIGHT
@@ -301,7 +305,7 @@ private fun FxScene.antiTankGun() {
         sparks(blow, toX, toY, count = 12, speed = 260f, heading = angle, fan = 150f)
         sparks(blow, toX, toY, count = 5, speed = 170f, heading = angle + 180f, fan = 90f, color = FxPalette.FIRE_CORE)
     }
-    explosion(blow, toX, toY, scale = if (armor) .75f else .9f, water = targetWater, debris = soil())
+    blast(blow, toX, toY, if (armor) .75f else .9f)
     impact(blow, 1.2f)
 }
 
@@ -325,11 +329,10 @@ private fun FxScene.gunBlast(fire: Float, muzzle: Float, up: Float, scale: Float
     if (!sourceWater) dust(fire + .01f, ox(muzzle - 10f), oy(muzzle - 10f) + GROUND + 2f, .6f * scale, FxAnchor.SOURCE, puffs = 3)
 }
 
-/** A tank shell striking: an explosion, and white-hot spall when it hits armor. */
+/** A tank shell striking: an explosion, and white-hot spall when it hits armor or a hull. */
 private fun FxScene.shellHit(at: Float, x: Float, y: Float, scale: Float) {
-    explosion(at, x, y, scale = scale, water = targetWater, debris = soil())
-    if (defenderBody == BodyKind.VEHICLE && outcome != VisualAttackOutcome.WITHDRAWN && !targetWater)
-        sparks(at, x, y + 2f, count = 8, speed = 230f, heading = angle, fan = 120f)
+    blast(at, x, y, scale)
+    if (hard(y)) sparks(at, x, y + 2f, count = 8, speed = 230f, heading = angle, fan = 120f)
 }
 
 /** The Giant Death Robot: red light gathers in its emitter, then a searing beam sweeps the target until it blows apart. */
@@ -412,14 +415,15 @@ fun FxScene.laser() {
             shape = FxShape.SOFT; blend = FxBlend.ADD; layer = FxLayer.LIGHT
             x = toX; y = toY; size0 = rand(16f, 22f); size1 = 14f; color0 = LASER_CORE; color1 = FxPalette.FIRE; fadeOut = .3f
         }
+        // Where the beam meets the defender it throws sparks; where it meets bare ground or water, dust or steam.
         when {
+            !withdrawn -> sparks(at, toX, toY, count = 3, speed = 170f, heading = angle + 180f, fan = 140f, color = FxPalette.FIRE_CORE)
             targetWater -> particle(FxAnchor.TARGET, at, rand(.4f, .55f)) {
                 shape = FxShape.SOFT; layer = FxLayer.SMOKE
                 x = toX; y = toY + 2f; vx = spread(10f); vy = rand(36f, 50f); drag = 1.6f
                 size0 = 8f; size1 = 22f; color0 = FxPalette.WATER; alpha = .55f; fadeIn = .1f; fadeOut = .6f
             }
-            withdrawn -> dust(at, toX, toY, .4f, puffs = 1)
-            else -> sparks(at, toX, toY, count = 3, speed = 170f, heading = angle + 180f, fan = 140f, color = FxPalette.FIRE_CORE)
+            else -> dust(at, toX, toY, .4f, puffs = 1)
         }
         // The sweep scores a glowing line into the ground that cools to a scorch.
         if (!targetWater) {
@@ -435,8 +439,13 @@ fun FxScene.laser() {
         }
     }
     impact(blow, 1.5f)
-    // A kill brings its own blast just after, so the beam's is smaller then.
-    explosion(beamEnd, ox(-2f), oy(-2f), scale = if (withdrawn) .8f else if (defenderKilled) .95f else 1.25f, water = targetWater, debris = soil())
+    // A kill brings its own blast just after, so the beam's is smaller then; with the defender gone it bursts in the ground.
+    val blastScale = when {
+        withdrawn -> .8f
+        defenderKilled -> .95f
+        else -> 1.25f
+    }
+    blast(beamEnd, ox(-2f), oy(-2f) + if (withdrawn) GROUND + 2f else 0f, blastScale)
     impact(beamEnd, if (withdrawn) 1.5f else 3f)
 }
 
@@ -479,9 +488,28 @@ private fun FxScene.sideOf(x: Float, y: Float) = x * perp.x + y * perp.y
 /** What a hit throws up: masonry from a city, earth elsewhere. */
 private fun FxScene.soil() = if (targetCity) FxPalette.STONE else FxPalette.EARTH
 
+/** Whether a strike at height [y] lands on the defender rather than on the ground or water around it. */
+private fun FxScene.onBody(y: Float) = y > GROUND + 4f
+
+/** Whether a strike at height [y] meets steel or a hull: armor on land, anything afloat at sea. */
+private fun FxScene.hard(y: Float) = onBody(y) && (targetWater || defenderBody == BodyKind.VEHICLE || defenderBody == BodyKind.SHIP)
+
+/**
+ * A shell bursting at (x, y). In the water it throws up a splash; on a hull at sea it bursts as on land, its
+ * fragments ringing the water below, rather than raising a column of water through the deck.
+ */
+private fun FxScene.blast(at: Float, x: Float, y: Float, scale: Float) {
+    val hull = targetWater && onBody(y)
+    explosion(at, x, y, scale, water = targetWater && !hull, debris = if (hull) FxPalette.DEBRIS else soil())
+    if (hull) particle(FxAnchor.TARGET, at + .05f, .45f) {
+        shape = FxShape.RING; layer = FxLayer.GROUND
+        this.x = x; this.y = GROUND; size0 = 14f * scale; size1 = 56f * scale; color0 = FxPalette.WATER; alpha = .45f; fadeOut = .8f
+    }
+}
+
 /** Where a shell ends: in the defender's hull, or in the ground where it stood once it has slipped away. */
 private fun FxScene.shellEnd(top: Float): Pair<Float, Float> =
-    if (outcome == VisualAttackOutcome.WITHDRAWN) Pair(ox(-4f) + spread(4f), GROUND + 3f + spread(2f))
+    if (outcome == VisualAttackOutcome.WITHDRAWN) Pair(ox(-4f) + spread(4f), oy(-4f) + GROUND + 3f + spread(2f))
     else Pair(spread(4f), rand(-5f, top))
 
 /** Where a round ends: on the defender's body, or in the ground around its feet (always, once it has slipped away). */
@@ -489,40 +517,21 @@ private fun FxScene.bulletEnd(onBody: Boolean, spreadX: Float = 12f): Pair<Float
     if (onBody && outcome != VisualAttackOutcome.WITHDRAWN) Pair(spread(6f), rand(-6f, 5f))
     else Pair(spread(spreadX), GROUND + spread(3f))
 
-/** A bullet striking: a spurt of dirt or masonry thrown up, a jet of water at sea, or a spark off armor. */
+/** A bullet striking: a spurt of dirt or masonry thrown up, a jet of water at sea, or a spark off armor or a hull. */
 private fun FxScene.bulletHit(at: Float, x: Float, y: Float, scale: Float = 1f) {
-    if (targetWater) {
-        particle(FxAnchor.TARGET, at, .22f) {
-            shape = FxShape.RECT; layer = FxLayer.BODY
-            this.x = x; this.y = y + 4f * scale; vy = 50f * scale; drag = 5f
-            size0 = 2.5f * scale; size1 = 3.5f * scale; aspect = 2.8f; color0 = FxPalette.WATER; alpha = .8f; fadeOut = .6f
-        }
-        repeat(2) {
-            particle(FxAnchor.TARGET, at, rand(.22f, .32f)) {
-                shape = FxShape.DISC; layer = FxLayer.BODY
-                this.x = x + spread(1.5f); this.y = y
-                vx = spread(22f); vy = rand(90f, 150f) * scale; ay = -800f
-                size0 = 2.4f * scale; size1 = 1.4f; color0 = FxPalette.WATER; alpha = .9f; fadeOut = .3f
-            }
-        }
-        particle(FxAnchor.TARGET, at, .3f) {
-            shape = FxShape.RING; layer = FxLayer.GROUND
-            this.x = x; this.y = y - 1f; size0 = 3f; size1 = 13f * scale; color0 = FxPalette.WATER; alpha = .55f; fadeOut = .8f
-        }
-        return
-    }
-    val onBody = y > GROUND + 4f
-    if (onBody && defenderBody == BodyKind.VEHICLE) {
+    if (hard(y)) {
         sparks(at, x, y, count = 3, speed = 130f, heading = angle + 180f, fan = 140f)
         return
     }
+    if (targetWater) return waterJet(at, x, y, scale)
+    val ground = !onBody(y)
     val dirt = if (targetCity) FxPalette.STONE else SPURT
     // A brief glint where each round strikes, so a burst reads as hits rather than drifting dust.
     if (outcome != VisualAttackOutcome.WITHDRAWN) particle(FxAnchor.TARGET, at, .05f) {
         shape = FxShape.SOFT; blend = FxBlend.ADD; layer = FxLayer.LIGHT
         this.x = x; this.y = y + 1f; size0 = 9f * scale; size1 = 4f; color0 = FxPalette.FIRE_CORE; fadeOut = .8f
     }
-    if (!onBody) {
+    if (ground) {
         // Into the ground a round throws up a tight jet of dirt that slumps into a wider puff.
         particle(FxAnchor.TARGET, at, .24f) {
             shape = FxShape.SOFT; layer = FxLayer.SMOKE
@@ -544,7 +553,26 @@ private fun FxScene.bulletHit(at: Float, x: Float, y: Float, scale: Float = 1f) 
         vx = spread(10f); vy = rand(20f, 32f) * scale; drag = 3f
         size0 = 5f * scale; size1 = rand(14f, 18f) * scale
         color0 = vary(dirt, .05f); color1 = if (targetCity) FxPalette.STONE else FxPalette.DUST
-        alpha = if (onBody) .5f else .85f; fadeIn = .1f; fadeOut = .7f
+        alpha = if (ground) .85f else .5f; fadeIn = .1f; fadeOut = .7f
+    }
+}
+
+/** A round into the water: a slim soft jet slumping back, a droplet thrown off it and a ring spreading on the surface. */
+private fun FxScene.waterJet(at: Float, x: Float, y: Float, scale: Float) {
+    for (index in 0..1) particle(FxAnchor.TARGET, at, .2f + index * .06f) {
+        shape = FxShape.SOFT; layer = FxLayer.BODY
+        this.x = x; this.y = y + 2f; vy = (55f + index * 55f) * scale; drag = 6f
+        size0 = (7f - index * 2f) * scale; size1 = (9f - index * 4f) * scale; color0 = FxPalette.WATER; alpha = .95f; fadeOut = .6f
+    }
+    particle(FxAnchor.TARGET, at, rand(.22f, .32f)) {
+        shape = FxShape.DISC; layer = FxLayer.BODY
+        this.x = x + spread(1.5f); this.y = y + 2f
+        vx = spread(22f); vy = rand(90f, 150f) * scale; ay = -800f
+        size0 = 2.4f * scale; size1 = 1.4f; color0 = FxPalette.WATER; alpha = .9f; fadeOut = .3f
+    }
+    particle(FxAnchor.TARGET, at, .3f) {
+        shape = FxShape.RING; layer = FxLayer.GROUND
+        this.x = x; this.y = y - 1f; size0 = 3f; size1 = 13f * scale; color0 = FxPalette.WATER; alpha = .55f; fadeOut = .8f
     }
 }
 
