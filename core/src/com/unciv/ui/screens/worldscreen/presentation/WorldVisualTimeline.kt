@@ -3,6 +3,7 @@ package com.unciv.ui.screens.worldscreen.presentation
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.math.Vector2
+import com.unciv.logic.map.HexMath
 import com.unciv.logic.presentation.*
 import com.unciv.models.metadata.BaseRuleset
 import com.unciv.ui.components.extensions.toTextButton
@@ -12,7 +13,9 @@ import com.unciv.ui.images.atlas.*
 import com.unciv.ui.screens.worldscreen.WorldScreen
 import com.unciv.view.VisualEventProjector
 import java.util.ArrayDeque
+import kotlin.math.cos
 import kotlin.math.floor
+import kotlin.math.pow
 import kotlin.math.sin
 
 /** GL-owned, bounded presentation of already-committed facts. No action, engine or save ownership. */
@@ -83,11 +86,22 @@ class WorldVisualTimeline(private val world: WorldScreen) : AutoCloseable {
         val superseded = fresh.flatMap(::unitIds).toSet()
         if (active?.event?.let { unitIds(it).any(superseded::contains) } == true) { active?.close(); active = null }
         queue.removeIf { event -> unitIds(event).any(superseded::contains) }
-        if (queue.size + fresh.size + (if (active == null) 0 else 1) > MAX_QUEUED_EVENTS) { reconcile(); return }
+        if (queue.size + fresh.size + (if (active == null) 0 else 1) > MAX_QUEUED_EVENTS) { catchUp(fresh); return }
         for (event in fresh) queue.addLast(event)
         // A slow screen catches up to the installed state instead of playing seconds of stale history.
-        if (queue.sumOf { duration(it, fast = true).toDouble() } > 2.4) { reconcile(); return }
+        if (queue.sumOf { duration(it, fast = true).toDouble() } > 2.4) { catchUp(emptyList()); return }
         if (queue.isNotEmpty()) { closeIdle(); Gdx.graphics.requestRendering() }
+    }
+
+    /** Skips stale history to the installed state, except nuclear strikes: those are too rare and too big to miss. */
+    private fun catchUp(pending: List<VisualEvent>) {
+        val strikes = (queue + pending).filterIsInstance<VisualEvent.NuclearStrike>()
+        val playing = active?.takeIf { it.event is VisualEvent.NuclearStrike }
+        if (playing != null) active = null
+        reconcile()
+        active = playing
+        for (strike in strikes) queue.addLast(strike)
+        if (active != null || queue.isNotEmpty()) Gdx.graphics.requestRendering()
     }
 
     private fun coalesceMoves(events: List<VisualEvent>): List<VisualEvent> {
@@ -110,10 +124,25 @@ class WorldVisualTimeline(private val world: WorldScreen) : AutoCloseable {
         is VisualEvent.RemoveUnit -> listOf(event.unit.unitId)
         is VisualEvent.Attack -> listOfNotNull((event.attacker as? VisualUnitDescriptor)?.unitId,
             (event.defender as? VisualUnitDescriptor)?.unitId)
+        // Only the weapon: a unit caught in the blast acting later must not cancel the whole strike.
+        is VisualEvent.NuclearStrike -> listOfNotNull((event.weapon as? VisualUnitDescriptor)?.unitId)
         else -> emptyList()
     }
 
+    private fun partPosition(part: VisualEvent): VisualPosition? = when (part) {
+        is VisualEvent.Attack -> part.target
+        is VisualEvent.RemoveUnit -> part.position
+        is VisualEvent.CaptureCity -> part.position
+        is VisualEvent.ChangeImprovement -> part.after.position
+        else -> null
+    }
+
     private fun duration(event: VisualEvent, fast: Boolean): Float {
+        if (event is VisualEvent.NuclearStrike) return when {
+            mode == Mode.Reduced -> .6f
+            fast -> 1.2f
+            else -> 2.5f
+        }
         if (mode == Mode.Reduced) return .28f
         return when (event) {
             is VisualEvent.Move -> if (event.kind in listOf(VisualMoveKind.TELEPORT, VisualMoveKind.PARADROP, VisualMoveKind.AIR_REBASE))
@@ -233,7 +262,11 @@ class WorldVisualTimeline(private val world: WorldScreen) : AutoCloseable {
         override fun close() { mask?.close(); mask = null; actor.close() }
     }
 
-    private inner class Playback(val event: VisualEvent, fast: Boolean) : AutoCloseable {
+    /** Strike feedback that waits for the shockwave to reach its tile. */
+    private class StrikeMark(val position: VisualPosition, val start: Float,
+                             val effect: VisualEffects? = null, val ghost: Ghost? = null, val removed: Boolean = false)
+
+    private inner class Playback(val event: VisualEvent, private val fast: Boolean) : AutoCloseable {
         private val reduced = mode == Mode.Reduced
         private val duration = duration(event, fast)
         private var elapsed = 0f
@@ -246,6 +279,10 @@ class WorldVisualTimeline(private val world: WorldScreen) : AutoCloseable {
         private var moveGhost: Ghost? = null
         private var attackerGhost: Ghost? = null
         private var defenderGhost: Ghost? = null
+        private var blast: NuclearBlast? = null
+        /** The strike's flight is drawn only over a corridor of seen tiles, as for any projectile. */
+        private var strikeFlight = false
+        private val strikeMarks = ArrayList<StrikeMark>()
         private val focus: VisualPosition? = when (event) {
             is VisualEvent.Move -> event.path.lastOrNull()
             is VisualEvent.Attack -> event.target ?: event.source
@@ -253,6 +290,7 @@ class WorldVisualTimeline(private val world: WorldScreen) : AutoCloseable {
             is VisualEvent.FoundCity -> event.position
             is VisualEvent.ChangeImprovement -> event.after.position
             is VisualEvent.CaptureCity -> event.position
+            is VisualEvent.NuclearStrike -> event.target ?: event.source ?: event.parts.firstNotNullOfOrNull(::partPosition)
         }
 
         init {
@@ -300,7 +338,96 @@ class WorldVisualTimeline(private val world: WorldScreen) : AutoCloseable {
                     if (event.after.pillaged == true || event.after.roadPillaged == true) "Pillaged" else "Improved")
                 is VisualEvent.CaptureCity -> effect(event.position, VisualEffects.Kind.CAPTURE,
                     if (event.destroyed) "City lost" else "City captured")
+                is VisualEvent.NuclearStrike -> setUpStrike(event, ::addGhost, ::effect)
             }
+        }
+
+        private fun setUpStrike(
+            event: VisualEvent.NuclearStrike,
+            addGhost: (VisualDescriptor?, UnitVisualState, VisualPosition?, VisualPosition?) -> Ghost?,
+            effect: (VisualPosition?, VisualEffects.Kind, String?, Color) -> Unit
+        ) {
+            val damageTint = Color(0xffbd91ff.toInt())
+            val target = event.target
+            attackerGhost = addGhost(event.weapon, UnitVisualState.ATTACK, event.source, target)
+            if (event.intercepted) effect(event.source, VisualEffects.Kind.HIT, "Intercepted", damageTint)
+            if (target != null) {
+                strikeFlight = !reduced && event.source != null && map.canDrawVisualProjectile(event.source, target)
+                blast = NuclearBlast(event.blastRadius, reduced, dropIn = !strikeFlight).also(map::addVisualActor)
+            }
+            fun mark(position: VisualPosition, kind: VisualEffects.Kind, text: String?, start: Float) {
+                if (!map.isVisualTileVisible(position)) return
+                val feedback = VisualEffects(kind, text, damageTint, reduced).also { it.isVisible = false; map.addVisualActor(it) }
+                strikeMarks += StrikeMark(position, start, effect = feedback)
+            }
+            fun ghostMark(unit: VisualDescriptor?, state: UnitVisualState, position: VisualPosition, start: Float, removed: Boolean) {
+                if (reduced || unit !is VisualUnitDescriptor) return
+                val ghost = ghost(unit, state, position, HexFacing.E)?.also { ghosts += it } ?: return
+                strikeMarks += StrikeMark(position, start, ghost = ghost, removed = removed)
+            }
+            val weaponId = (event.weapon as? VisualUnitDescriptor)?.unitId
+            val destroyed = event.parts.filterIsInstance<VisualEvent.RemoveUnit>().map { it.unit.unitId }.toSet()
+            for (part in event.parts) {
+                val position = partPosition(part) ?: continue
+                // Each tile reacts as the shockwave reaches it; reduced motion shows every outcome at once.
+                val start = if (reduced) 0f else blast?.arrival(target?.let {
+                    HexMath.getDistance(it.x, it.y, position.x, position.y) } ?: 0) ?: NuclearBlast.DETONATION
+                when (part) {
+                    is VisualEvent.Attack -> {
+                        val defender = part.defender
+                        if (defender !is VisualUnitDescriptor || defender.unitId !in destroyed)
+                            ghostMark(defender, UnitVisualState.HIT, position, start, removed = false)
+                        mark(position, VisualEffects.Kind.HIT, part.damageToDefender?.takeIf { it > 0 }?.let { "−$it" }, start)
+                    }
+                    is VisualEvent.RemoveUnit -> if (part.unit.unitId != weaponId) {
+                        ghostMark(part.unit, UnitVisualState.DEFEAT, position, start, removed = true)
+                        mark(position, VisualEffects.Kind.DEFEAT, null, start)
+                    }
+                    is VisualEvent.CaptureCity -> mark(position, VisualEffects.Kind.CAPTURE,
+                        if (part.destroyed) "City lost" else "City captured", start)
+                    else -> Unit // Pillage and fallout show on the map itself once the strike settles.
+                }
+            }
+        }
+
+        private fun advanceStrike(event: VisualEvent.NuclearStrike, progress: Float) {
+            val source = event.source?.let(map::visualPoint)
+            val target = event.target?.let { map.visualPoint(it, source) }
+            // The weapon launches from its base and is gone by the moment of detonation.
+            if (source != null) {
+                attackerGhost?.actor?.opacity = 1f - (progress / NuclearBlast.DETONATION).coerceIn(0f, 1f)
+                attackerGhost?.update(elapsed, source)
+            } else attackerGhost?.close()
+            blast?.let {
+                it.isVisible = target != null
+                if (target != null) it.update(progress, target, source?.takeIf { strikeFlight })
+            }
+            shake(event, progress)
+            for (mark in strikeMarks) {
+                val point = map.visualPoint(mark.position, target ?: source)
+                val started = progress >= mark.start
+                val local = ((progress - mark.start) / (1f - mark.start)).coerceIn(0f, 1f)
+                mark.effect?.let {
+                    it.isVisible = point != null && started
+                    if (point != null) it.update(local, point)
+                }
+                val ghost = mark.ghost ?: continue
+                if (point == null) continue
+                if (mark.removed) ghost.actor.opacity = if (started) 1f - local else 1f
+                else ghost.actor.hitAmount = if (started) sin(local * Math.PI).toFloat().coerceAtLeast(0f) else 0f
+                ghost.update((elapsed - mark.start * duration).coerceAtLeast(0f), point)
+            }
+        }
+
+        /** A short drawing-only jolt of the map at detonation, never in reduced motion. */
+        private fun shake(event: VisualEvent.NuclearStrike, progress: Float) {
+            val since = (progress - NuclearBlast.DETONATION) * duration
+            val window = if (fast) .45f else .7f
+            if (reduced || blast == null || since < 0f || since > window || event.target?.let(map::isVisualOnScreen) != true) {
+                map.visualShake.setZero(); return
+            }
+            val amplitude = (if (fast) 3f else 6f) * (1f - since / window).pow(2)
+            map.visualShake.set(sin(since * 61f) * amplitude, cos(since * 47f) * amplitude * .6f)
         }
 
         fun advance(delta: Float) {
@@ -357,10 +484,15 @@ class WorldVisualTimeline(private val world: WorldScreen) : AutoCloseable {
                     moveGhost?.actor?.opacity = 1f - progress
                     map.visualPoint(event.position)?.let { moveGhost?.update(elapsed, it) }
                 }
+                is VisualEvent.NuclearStrike -> advanceStrike(event, progress)
                 else -> Unit
             }
         }
 
-        override fun close() { ghosts.forEach { it.close() }; effects.forEach { it.second.close() }; projectile?.close() }
+        override fun close() {
+            ghosts.forEach { it.close() }; effects.forEach { it.second.close() }; projectile?.close()
+            strikeMarks.forEach { it.effect?.close() }; blast?.close()
+            if (blast != null) map.visualShake.setZero()
+        }
     }
 }

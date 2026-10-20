@@ -2,7 +2,6 @@ package com.unciv.logic.battle
 
 import com.unciv.logic.presentation.VisualCapture
 import com.unciv.logic.presentation.VisualAttackKind
-import com.unciv.logic.presentation.VisualAttackOutcome
 
 import com.unciv.logic.city.City
 import com.unciv.logic.civilization.*
@@ -70,10 +69,10 @@ object Nuke {
         val nukeStrength = attacker.unit.getMatchingUniques(UniqueType.NuclearWeapon)
             .firstOrNull()?.params?.get(0)?.toInt() ?: return
 
-        val visualScope = attackingCiv.gameInfo.visualCaptureSink
-        val visualBefore = visualScope?.beforeAttack(attacker, null, targetTile, VisualAttackKind.NUCLEAR)
         val blastRadius = attacker.unit.getMatchingUniques(UniqueType.BlastRadius)
             .firstOrNull()?.params?.get(0)?.toInt() ?: 2
+        val visualScope = attackingCiv.gameInfo.visualCaptureSink
+        val visualStrike = visualScope?.beginNuclearStrike(attacker, targetTile, blastRadius)
 
         val hitTiles = targetTile.getTilesInDistance(blastRadius)
 
@@ -83,7 +82,7 @@ object Nuke {
         addNukeNotifications(targetTile, attacker, notifyDeclaredWarCivs, attackingCiv, hitCivsTerritory)
 
         if (attacker.isDefeated()) {
-            visualScope?.afterAttack(visualBefore, attacker, null, targetTile, VisualAttackOutcome.INTERCEPTED)
+            visualScope?.endNuclearStrike(visualStrike, attacker, targetTile, intercepted = true)
             return
         }
 
@@ -107,7 +106,7 @@ object Nuke {
         if (!attacker.isDefeated()) {
             attacker.unit.attacksThisTurn += 1
         }
-        visualScope?.afterAttack(visualBefore, attacker, null, targetTile)
+        visualScope?.endNuclearStrike(visualStrike, attacker, targetTile, intercepted = false)
     }
 
     private fun addNukeNotifications(

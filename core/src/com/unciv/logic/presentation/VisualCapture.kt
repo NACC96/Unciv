@@ -109,6 +109,9 @@ class CaptureScope internal constructor(
     private var published = false
     private var movementKind: VisualMoveKind? = null
     private val removed = LinkedHashSet<String>()
+    /** Events recorded while a nuclear strike is open, keyed by a sequence local to that strike. */
+    private class StrikeParts { val events = TreeMap<Long, VisualEvent>(); var nextSequence = 1L }
+    private var strikeParts: StrikeParts? = null
     private val view get() = session!!.view
 
     private fun <T> safely(block: () -> T): T? {
@@ -131,6 +134,8 @@ class CaptureScope internal constructor(
     }
 
     private fun reserveId(): VisualEventId? = safely {
+        // Strike parts never take journal sequence numbers, so the journal sees no gap where they were.
+        strikeParts?.let { return@safely VisualEventId(session!!.journal.gameId, session.journal.timelineId, it.nextSequence++) }
         if (nextSequence == Long.MAX_VALUE) {
             failed = true
             events.clear()
@@ -143,8 +148,9 @@ class CaptureScope internal constructor(
         safely {
             val identity = id ?: reserveId() ?: return@safely
             val event = make(identity)
-            events[identity.sequence] = event
-            while (events.size > VisualJournal.MAX_EVENTS) events.pollFirstEntry()
+            val target = strikeParts?.events ?: events
+            target[identity.sequence] = event
+            while (target.size > VisualJournal.MAX_EVENTS) target.pollFirstEntry()
         }
     }
 
@@ -281,6 +287,39 @@ class CaptureScope internal constructor(
         }
     }
 
+    class StrikeBefore internal constructor(
+        val weapon: VisualCombatantSample?, val target: VisualPosition?, val blastRadius: Int)
+
+    /** Opens a nuclear strike: until [endNuclearStrike], every recorded event becomes one of its parts. */
+    fun beginNuclearStrike(weapon: ICombatant, target: Tile, blastRadius: Int): StrikeBefore? = safely {
+        if (strikeParts != null) return@safely null
+        val before = StrikeBefore(combatant(weapon), position(target), blastRadius)
+        strikeParts = StrikeParts()
+        before
+    }
+
+    fun endNuclearStrike(before: StrikeBefore?, weapon: ICombatant, target: Tile, intercepted: Boolean) {
+        if (before == null) return
+        safely {
+            val parts = strikeParts ?: return@safely
+            val afterWeapon = combatant(weapon)
+            (afterWeapon?.descriptor as? VisualUnitDescriptor)?.let {
+                removeUnit(VisualUnitSample(it, afterWeapon.position, afterWeapon.removed))
+            }
+            strikeParts = null
+            // As with any attack, only a viewer who saw the weapon before and after learns of its interception.
+            val shownIntercepted = intercepted && before.weapon != null && afterWeapon != null
+            // An intercepted weapon never detonates, so ground zero shows nothing.
+            val groundZero = if (intercepted) null else before.target ?: position(target)
+            // A hit on an unseen tile has nothing to show; keeping it would only count what is out of sight.
+            val shown = parts.events.values.filter { it !is VisualEvent.Attack || it.target != null }
+            if (intercepted && !shownIntercepted && shown.isEmpty()) return@safely
+            if (before.weapon == null && groundZero == null && shown.isEmpty()) return@safely
+            emit { VisualEvent.NuclearStrike(it, view, provenance, before.weapon?.position, groundZero,
+                before.weapon?.descriptor, before.blastRadius, shownIntercepted, shown) }
+        }
+    }
+
     fun cityFounded(city: City) {
         safely {
             val sample = this.city(city) ?: return@safely
@@ -338,6 +377,7 @@ class CaptureScope internal constructor(
             events.clear()
             finished = null
             removed.clear()
+            strikeParts = null
         } finally {
             closed = true
             session?.release()

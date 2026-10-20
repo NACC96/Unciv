@@ -127,6 +127,26 @@ sealed class VisualEvent {
         val position: VisualPosition,
         val destroyed: Boolean = false
     ) : VisualEvent()
+
+    /**
+     * One nuclear weapon's detonation or interception, holding the hits, removals and city losses it caused
+     * in recorded order, so the screen presents one moment instead of a queue of separate strikes.
+     */
+    class NuclearStrike(
+        override val id: VisualEventId,
+        override val view: VisualViewKey,
+        override val provenance: VisualProvenance,
+        val source: VisualPosition?,
+        /** Ground zero. Null when it was out of sight or the weapon never detonated. */
+        val target: VisualPosition?,
+        val weapon: VisualDescriptor?,
+        val blastRadius: Int,
+        val intercepted: Boolean,
+        parts: List<VisualEvent>
+    ) : VisualEvent() {
+        /** Part ids are local to this strike; only the strike itself takes a place in the journal. */
+        val parts: List<VisualEvent> = immutableVisualList(parts)
+    }
 }
 
 class VisualBatch(
@@ -149,6 +169,8 @@ internal fun VisualEvent.withProvenance(provenance: VisualProvenance): VisualEve
     is VisualEvent.FoundCity -> copy(provenance = provenance)
     is VisualEvent.ChangeImprovement -> copy(provenance = provenance)
     is VisualEvent.CaptureCity -> copy(provenance = provenance)
+    is VisualEvent.NuclearStrike -> VisualEvent.NuclearStrike(id, view, provenance, source, target, weapon,
+        blastRadius, intercepted, parts.map { it.withProvenance(provenance) })
 }
 
 /** Only the ordinary committed-turn handoff may rebind already-permitted facts to a new screen epoch. */
@@ -159,4 +181,6 @@ internal fun VisualEvent.withView(view: VisualViewKey): VisualEvent = when (this
     is VisualEvent.FoundCity -> copy(view = view)
     is VisualEvent.ChangeImprovement -> copy(view = view)
     is VisualEvent.CaptureCity -> copy(view = view)
+    is VisualEvent.NuclearStrike -> VisualEvent.NuclearStrike(id, view, provenance, source, target, weapon,
+        blastRadius, intercepted, parts.map { it.withView(view) })
 }
