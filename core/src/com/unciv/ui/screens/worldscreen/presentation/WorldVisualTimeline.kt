@@ -258,7 +258,8 @@ class WorldVisualTimeline(private val world: WorldScreen) : AutoCloseable {
         if (active == null && queue.isNotEmpty()) {
             closeIdle()
             val next = queue.removeFirst()
-            val deaths = if (next is VisualEvent.Attack) takeDeaths(next) else emptyList()
+            // Reduced motion draws no blow to fold a death into, so deaths keep their own feedback.
+            val deaths = if (next is VisualEvent.Attack && mode != Mode.Reduced) takeDeaths(next) else emptyList()
             val hurry = hurryThrough > 0
             hurryThrough = (hurryThrough - 1 - deaths.size).coerceAtLeast(0)
             active = Playback(next, mode == Mode.Fast || hurry || queue.size >= 4, deaths)
