@@ -70,7 +70,7 @@ object AtlasFixtureCatalog {
     const val SEED = 20261012
     val nations = listOf("America", "Arabia", "Germany", "China", "Russia", "The Ottomans",
         "Persia", "England", "France", "Rome", "Korea", "Babylon", "Polynesia", "Mongolia", "Egypt")
-    private val registered = linkedSetOf("world", "world-selection", "world-activity", "world-map", "world-legacy", "world-fortified", "world-siege", "world-promote", "world-exhausted", "world-research", "world-notifications", "world-control", "world-map-roundtrip", "world-atlas-art", "world-idle", "activity", "messages", "overview", "nation-control",
+    private val registered = linkedSetOf("world", "world-selection", "world-activity", "world-map", "world-legacy", "world-fortified", "world-siege", "world-promote", "world-exhausted", "world-research", "world-notifications", "world-control", "world-map-roundtrip", "world-atlas-art", "world-idle", "world-windows", "activity", "messages", "overview", "nation-control",
         "terrain", "units", "city", "research", "policies", "religion", "promotions", "diplomacy",
         "setup", "menu", "supporting", "supporting-atlas", "supporting-atlas-end", "supporting-atlas-states")
     private val scopes = IdentityHashMap<BaseScreen, AtlasDataScope>()
@@ -311,6 +311,30 @@ object AtlasFixtureCatalog {
                                 com.badlogic.gdx.scenes.scene2d.InputEvent().apply { listenerActor = layers }, 1f, 1f, 1, 0)
                             check(screen.stage.root.atlasDescendants().any { it.name == "AtlasMinimapLayers" }) { "Layers menu did not open" }
                             check(minimap.buttons.all { button -> button.stage != null }) { "Layer toggles are not in the open menu" }
+                        }
+                        if (id == "world-windows") {
+                            // Arranged windows: Activity moved, resized and faded, with its options menu open;
+                            // Messages minimized to its pill; the top bar's era tooltip showing.
+                            fun tap(actor: com.badlogic.gdx.scenes.scene2d.Actor) = actor.listeners
+                                .filterIsInstance<com.unciv.ui.components.input.ActivationListener>().single()
+                                .tap(com.badlogic.gdx.scenes.scene2d.InputEvent().apply { listenerActor = actor }, 1f, 1f, 1, 0)
+                            fun windowControls(panel: com.badlogic.gdx.scenes.scene2d.ui.Table) =
+                                (panel.children.first() as com.badlogic.gdx.scenes.scene2d.ui.Table).children
+                                    .filterIsInstance<com.badlogic.gdx.scenes.scene2d.ui.Table>().single()
+                                    .children.filterIsInstance<com.badlogic.gdx.scenes.scene2d.ui.Button>()
+                            game.settings.hudWindows["activity"] = com.unciv.models.metadata.HudWindowLayout().apply {
+                                placed = true; x = 340f; y = 150f; width = 380f; height = 520f; opacity = 0.3f
+                            }
+                            val feed = screen.stage.root.children.filterIsInstance<AgentActivityFeed>().single()
+                            feed.show(); feed.refresh(); hud.layout()
+                            val messages = screen.stage.root.children.filterIsInstance<AgentMessagesPanel>().single()
+                            messages.toggle()
+                            tap(windowControls(messages)[1])
+                            check(screen.stage.root.children.any { it.name == "HudWindowPill/messages" }) { "Messages did not minimize" }
+                            tap(windowControls(feed)[0])
+                            check(screen.stage.root.children.any { it.name == "HudWindowMenu/activity" }) { "Window menu did not open" }
+                            val tipped = bar.atlasDescendants().first { actor -> actor.listeners.any { it is com.unciv.ui.components.UncivTooltip<*> } }
+                            tipped.listeners.filterIsInstance<com.unciv.ui.components.UncivTooltip<*>>().first().show(immediate = true)
                         }
                         val section = when (id) { "world-selection", "world-fortified", "world-siege", "world-promote", "world-exhausted" -> "Selection"; "world-research" -> "Research"; "world-activity" -> "Activity"; "world-map", "world-map-roundtrip" -> "Map"; else -> null }
                         if (width < 960 && section != null) {

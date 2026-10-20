@@ -365,7 +365,9 @@ object GameUiStyle {
         TextButton.TextButtonStyle(source).apply {
             val primary = emphasis == Emphasis.Primary || emphasis == Emphasis.Accent
             font = Fonts.font
-            disabled = outlinedBackground("WorldScreen/Controls/Disabled", surface, if (isAtlas) muted else hover)
+            // Atlas: a faded fill with a faint rim; a bright outline made unavailable actions look like inputs.
+            disabled = if (isAtlas) control("WorldScreen/Controls/Disabled", surface.lerp(raised, 0.4f), ink.apply { a = 0.1f })
+                else outlinedBackground("WorldScreen/Controls/Disabled", surface, hover)
             disabledFontColor = muted
             if (primary) {
                 // A filled accent action, so the primary choice never reads as a pressed secondary.
