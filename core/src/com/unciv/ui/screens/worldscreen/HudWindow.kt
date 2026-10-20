@@ -20,6 +20,7 @@ import com.unciv.models.UncivSound
 import com.unciv.models.metadata.HudWindowLayout
 import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.UncivTooltip.Companion.addTooltip
+import com.unciv.ui.components.extensions.setFontSize
 import com.unciv.ui.components.extensions.toLabel
 import com.unciv.ui.components.input.onChange
 import com.unciv.ui.components.input.onClick
@@ -415,9 +416,9 @@ class HudWindow(
         touchable = Touchable.enabled
         pad(GameUiStyle.Space.s, GameUiStyle.Space.l, GameUiStyle.Space.s, GameUiStyle.Space.s)
         add(title.toLabel(GameUiStyle.ink, GameUiStyle.Type.label)).padRight(GameUiStyle.Space.m)
-        val restore = iconButton(ImageGetter.getImage("OtherIcons/Increase").apply { color = GameUiStyle.muted }, "Restore")
+        val restore = iconButton(ImageGetter.getImage("OtherIcons/Increase").apply { color = GameUiStyle.muted }, "Restore", 11f)
         restore.onClick { restore() }
-        val close = iconButton(ImageGetter.getImage("OtherIcons/Close").apply { color = GameUiStyle.muted }, "Close")
+        val close = iconButton(ImageGetter.getImage("OtherIcons/Close").apply { color = GameUiStyle.muted }, "Close", 10f)
         close.onClick { isMinimized = false; saved?.minimized = false; settings.save(); remove() }
         add(restore).size(controlSize)
         add(close).size(controlSize).padLeft(GameUiStyle.Space.xs)
@@ -472,6 +473,7 @@ class HudWindow(
             val glass = CheckBox(" Frosted glass", BaseScreen.skin).apply {
                 isChecked = settings.frostedGlass
                 GameUiStyle.applyWidget(this)
+                label.setFontSize(GameUiStyle.Type.small)
                 onChange { settings.frostedGlass = isChecked; Gdx.graphics.requestRendering() }
             }
             add(glass).padBottom(GameUiStyle.Space.s).row()
@@ -501,10 +503,11 @@ class HudWindow(
         Gdx.graphics.requestRendering()
     }
 
-    private fun iconButton(icon: Actor, tooltip: String) = Button(BaseScreen.skin).apply {
+    private fun iconButton(icon: Actor, tooltip: String, iconSize: Float? = null) = Button(BaseScreen.skin).apply {
         GameUiStyle.apply(this, GameUiStyle.Emphasis.Ghost, GameUiStyle.ButtonSize.Icon)
         pad(0f)
-        add(icon).center()
+        val cell = add(icon).center()
+        if (iconSize != null) cell.size(iconSize)
         addTooltip(tooltip, always = true)
     }
 

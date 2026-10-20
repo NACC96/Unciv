@@ -16,6 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.List
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane
 import com.badlogic.gdx.scenes.scene2d.ui.SelectBox
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
+import com.badlogic.gdx.scenes.scene2d.ui.Slider
 import com.badlogic.gdx.scenes.scene2d.ui.TextField
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton
@@ -484,6 +485,19 @@ object GameUiStyle {
         skin.add("default", selectStyle(skin.get(SelectBox.SelectBoxStyle::class.java)), SelectBox.SelectBoxStyle::class.java)
         skin.add("default", listStyle(skin.get(List.ListStyle::class.java)), List.ListStyle::class.java)
         skin.add("default", scrollStyle(skin.get(ScrollPane.ScrollPaneStyle::class.java)), ScrollPane.ScrollPaneStyle::class.java)
+        skin.add("default-horizontal", sliderStyle(), Slider.SliderStyle::class.java)
+    }
+
+    /** A thin rounded track filled in brass up to a round ink knob (brass while hovered or dragged). */
+    private fun sliderStyle() = Slider.SliderStyle().apply {
+        fun track(path: String, color: Color) = rounded(path, "control-r8", color).apply { minHeight = 4f; minWidth = 8f }
+        fun knob(color: Color, size: Float) = ImageGetter.getCircleDrawable().tint(color).apply { minWidth = size; minHeight = size }
+        background = track("Atlas/Slider/Track", raised.lerp(hover, 0.5f))
+        knobBefore = track("Atlas/Slider/Fill", accent)
+        knob = knob(ink, 14f)
+        knobOver = knob(accent, 16f)
+        knobDown = knobOver
+        disabledKnob = knob(muted, 14f)
     }
 
     private fun checkBoxStyle(source: CheckBox.CheckBoxStyle, preserveImages: Boolean = false) = CheckBox.CheckBoxStyle(source).apply {
