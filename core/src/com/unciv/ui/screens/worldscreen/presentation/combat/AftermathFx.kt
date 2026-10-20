@@ -33,11 +33,10 @@ private val CITY_FIRES = listOf(-13f to 4f, 12f to 8f, 2f to -7f)
 /** A unit destroyed at [anchor]'s tile, starting at [at]. */
 fun FxScene.death(body: BodyKind?, anchor: FxAnchor, at: Float) {
     if (anchor == FxAnchor.SOURCE && family in AIRCRAFT) {
-        // A plane that dies on its attack goes down in flames in its own script, where the viewer last saw it.
-        if (outcome == VisualAttackOutcome.INTERCEPTED) return
-        if (body == BodyKind.AIRCRAFT && targetSeen && family != WeaponFamily.GUNSHIP) return
         // Gunships are land units, so their body says nothing of the helicopter.
-        if (family == WeaponFamily.GUNSHIP) return rotorcraftDeath(anchor, at, sourceWater)
+        if (family == WeaponFamily.GUNSHIP && outcome != VisualAttackOutcome.INTERCEPTED) return rotorcraftDeath(anchor, at, sourceWater)
+        // A plane that dies on its attack goes down in flames in its own script, where the viewer last saw it.
+        return
     }
     val water = if (anchor == FxAnchor.TARGET) targetWater else sourceWater
     // The fallen go down away from the other side of the fight.

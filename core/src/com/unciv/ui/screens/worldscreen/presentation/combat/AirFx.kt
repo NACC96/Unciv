@@ -45,7 +45,8 @@ fun FxScene.strafe() {
     val gunAt = when { biplane -> 6f; jet -> 8f; else -> 2f }
     val lead = if (jet) 58f else 50f
     val travel = .06f
-    val interval = when { biplane -> .036f; jet -> .026f; else -> .03f }
+    // Rounds strike about 14 px apart, so each kick stands on its own and the burst reads as a line.
+    val interval = when { biplane -> .045f; jet -> .03f; else -> .04f }
     val rakeFrom = if (jet) -16f else -42f
     val rakeTo = 30f
     var shot = (rakeFrom - lead + approach) / speed
@@ -54,15 +55,16 @@ fun FxScene.strafe() {
     var onTarget: Float? = null
     var round = 0
     while (shot <= lastShot) {
-        val planeAlong = -approach + speed * shot
-        for (wing in guns) {
-            val along = planeAlong + lead + spread(4f)
-            val side = wing * .5f + spread(3f)
+        guns.forEachIndexed { gun, wing ->
+            // The guns fire in turn, so the two lines of strikes stitch along rather than land in pairs.
+            val at = shot + gun * interval / 2
+            val along = -approach + speed * at + lead + spread(3f)
+            val side = wing * .8f + spread(2f)
             val x = ox(along, side); val y = oy(along, side)
-            tracer(shot, run.pointX(shot, gunAt, wing), run.pointY(shot, gunAt, wing), x, y, travel)
+            tracer(at, run.pointX(at, gunAt, wing), run.pointY(at, gunAt, wing), x, y, travel)
             val onUnit = abs(along) < 12f && abs(side) < 10f
-            if (onUnit && onTarget == null) onTarget = shot + travel
-            bulletHit(shot + travel, x, y, onUnit, if (jet) 1.3f else if (biplane) .85f else 1f, mark = round % 2 == 0)
+            if (onUnit && onTarget == null) onTarget = at + travel
+            bulletHit(at + travel, x, y, onUnit, if (jet) 1.3f else if (biplane) .85f else 1f, mark = round % 2 == 0)
         }
         // The guns' flash rides with the plane.
         particle(FxAnchor.TARGET, shot, .035f) {
@@ -83,11 +85,15 @@ fun FxScene.strafe() {
 fun FxScene.gunship() {
     val blow = .31f
     val rocketTravel = .13f
+    // A defender that slipped away leaves the rockets and the gun churning up the ground where it stood, beside it.
+    val withdrawn = outcome == VisualAttackOutcome.WITHDRAWN
+    fun missX(side: Float) = if (withdrawn) ox(-16f, side * 18f) else 0f
+    fun missY(side: Float) = if (withdrawn) oy(-16f, side * 18f) - 4f else 0f
     // Rotor wash blows a ring of dust (or spray) out along the ground under the helicopter as it closes in.
     val washX = ox(lunge(.2f, blow)); val washY = oy(lunge(.2f, blow)) - 14f
     particle(FxAnchor.SOURCE, .04f, .5f) {
         shape = FxShape.RING; layer = FxLayer.GROUND
-        x = washX; y = washY; size0 = 16f; size1 = 54f; aspect = .5f
+        x = washX; y = washY; size0 = 16f; size1 = 54f
         color0 = if (sourceWater) FxPalette.WATER else FxPalette.DUST; alpha = .6f; fadeIn = .15f; fadeOut = .6f
     }
     if (!sourceWater) repeat(4) { index ->
@@ -102,7 +108,7 @@ fun FxScene.gunship() {
     listOf(7f, -7f).forEachIndexed { index, side ->
         val launch = blow - rocketTravel + index * .05f
         val along = 8f + lunge(launch, blow)
-        val toX = spread(5f); val toY = spread(4f)
+        val toX = missX(side / 7f) + spread(5f); val toY = missY(side / 7f) + spread(4f)
         // The pods hang from stub wings at the helicopter's middle.
         val fromX = ox(along, side * .4f); val fromY = oy(along, side * .4f) - 4f
         // Ignition at the pod, with a puff of backblast behind it.
@@ -126,7 +132,7 @@ fun FxScene.gunship() {
     repeat(8) { index ->
         val at = burst + index * interval
         val along = 13f + lunge(at, blow)
-        val toX = spread(12f); val toY = -3f + spread(7f)
+        val toX = missX(1f) + spread(12f); val toY = missY(1f) - 3f + spread(7f)
         flying(at, travel, FxFlight(ox(along), oy(along) - 6f, toX, toY)) {
             shape = FxShape.RECT; blend = FxBlend.ADD; layer = FxLayer.LIGHT
             size0 = 5f; size1 = 5f; aspect = .45f; stretch = .014f; alignToMotion = true
@@ -145,7 +151,8 @@ fun FxScene.gunship() {
 fun FxScene.bombs() {
     val frame = bomber()
     val count = when (frame) { Airframe.HEAVY -> 6; Airframe.STEALTH -> 3; else -> 4 }
-    val spacing = when (frame) { Airframe.HEAVY -> 15f; Airframe.STEALTH -> 22f; else -> 18f }
+    // Far enough apart that each blast of the stick shows on its own before they merge into one cloud.
+    val spacing = when (frame) { Airframe.HEAVY -> 16f; Airframe.STEALTH -> 26f; else -> 22f }
     val blast = when (frame) { Airframe.HEAVY -> 1f; Airframe.STEALTH -> 1.3f; else -> .9f }
     val over = .46f
     val height = if (frame == Airframe.STEALTH) 58f else 52f
@@ -158,6 +165,8 @@ fun FxScene.bombs() {
     val gravity = 2f * drop / (fall * fall)
     var last = 0f
     repeat(count) { index ->
+        // The stick walks across the defender's tile; the bomb nearest the middle falls on the defender itself.
+        val center = index == count / 2
         val along = (index - (count - 1) / 2f) * spacing + spread(2f)
         val side = spread(4f)
         val land = over + along / speed
@@ -170,9 +179,8 @@ fun FxScene.bombs() {
             size0 = if (frame == Airframe.STEALTH) 9f else 7.5f; size1 = size0; aspect = .42f; alignToMotion = true
             color0 = BOMB; fadeIn = .12f; fadeOut = 0f
         }
-        val center = abs(along) <= spacing / 2
-        // A heavy stick's outer bombs are kept a little smaller, so six blasts stay within budget and the middle stands out.
-        val size = blast * when { center -> 1.15f; frame == Airframe.HEAVY -> .82f; else -> .9f }
+        // The outer bombs are smaller, so the blast on the defender stands out and the overlapping flashes don't wash out.
+        val size = blast * when { center -> 1.15f; frame == Airframe.HEAVY -> .72f; else -> .8f }
         blast(FxAnchor.TARGET, land, ox(along, side), oy(along, side), size, targetWater, smoke = center || index == 0)
         if (!targetWater && (center || index == 0)) plume(land, ox(along, side), oy(along, side), blast)
         val shake = when (frame) { Airframe.HEAVY -> if (center) 3.5f else 2.5f; Airframe.STEALTH -> if (center) 4f else 3f; else -> if (center) 3f else 2f }
@@ -199,7 +207,7 @@ fun FxScene.interception() {
     val from = caught - speed * hit
     val run = AirRun(anchor, 0f, ox(from), oy(from), angle, speed, height)
     fly(frame, run, until = hit, fadeOut = 0f)
-    fireAt = .05f
+    // The defense does the firing here, so the attacker at its base never kicks back.
     // Bursts bracket the plane, mostly ahead of it, closing in.
     repeat(if (missile) 3 else 6) { index ->
         val at = .07f + index * .04f + spread(.01f)
@@ -230,6 +238,7 @@ fun FxScene.interception() {
  */
 private fun FxScene.finishRun(frame: Airframe, run: AirRun, leave: Float) {
     if (!attackerKilled) return fly(frame, run, until = .95f)
+    if (!targetSeen) return lostBeyondBase(frame)
     fly(frame, run, until = leave, fadeOut = 0f)
     // Fire climbing from the defender's guns finds it.
     repeat(4) { index ->
@@ -241,6 +250,20 @@ private fun FxScene.finishRun(frame: Airframe, run: AirRun, leave: Float) {
     flak(FxAnchor.TARGET, leave - .01f, x + spread(3f), y + spread(3f), big = true)
     sparks(leave, x, y, count = 6, speed = 150f, heading = angle, fan = 300f)
     fallInFlames(frame, run, leave)
+}
+
+/**
+ * A plane lost on an attack the viewer can't see: it climbs away from its base and is caught just beyond it, so the
+ * fireball doesn't look like a hit on the base itself.
+ */
+private fun FxScene.lostBeyondBase(frame: Airframe) {
+    val hit = .42f
+    val run = AirRun(FxAnchor.SOURCE, 0f, 0f, 0f, angle, 220f, 26f, climb = 30f)
+    fly(frame, run, until = hit, fadeOut = 0f)
+    val x = run.pointX(hit); val y = run.pointY(hit)
+    flak(FxAnchor.SOURCE, hit - .01f, x + spread(3f), y + spread(3f), big = true)
+    sparks(hit, x, y, count = 6, speed = 150f, heading = angle, fan = 300f, anchor = FxAnchor.SOURCE)
+    fallInFlames(frame, run, hit)
 }
 
 private val BOMB = Color(.17f, .17f, .16f, 1f)
@@ -485,37 +508,38 @@ private fun FxScene.bulletHit(at: Float, x: Float, y: Float, onUnit: Boolean, sc
         sparks(at, x, y + 3f, count = 3, speed = 130f)
         return
     }
+    // Thin jets thrown straight up: a streak while fast, shrinking to a speck as they slow, which reads at any zoom.
+    fun jets(color: Color, count: Int, speed: Float) = repeat(count) {
+        particle(FxAnchor.TARGET, at, rand(.2f, .26f)) {
+            shape = FxShape.RECT; layer = FxLayer.BODY
+            this.x = x + spread(1.5f); this.y = y + 1f; vx = spread(22f); vy = rand(.8f, 1.1f) * speed * scale; ay = -700f
+            size0 = 2.6f * scale; size1 = 2.2f * scale; stretch = .07f; alignToMotion = true
+            color0 = vary(color, .04f); alpha = .95f; fadeOut = .45f
+        }
+    }
     if (targetWater) {
-        particle(FxAnchor.TARGET, at, .3f) {
-            shape = FxShape.SOFT; layer = FxLayer.BODY
-            this.x = x; this.y = y + 2f; vy = rand(100f, 130f) * scale; ay = -450f; drag = 2f
-            size0 = 7f * scale; size1 = 15f * scale; color0 = FxPalette.WATER; alpha = .9f; fadeOut = .5f
-        }
-        particle(FxAnchor.TARGET, at, .24f) {
-            shape = FxShape.DISC; layer = FxLayer.BODY
-            this.x = x; this.y = y + 2f; vx = spread(40f); vy = rand(100f, 140f) * scale; ay = -700f
-            size0 = 2.4f; size1 = 2f; color0 = FxPalette.WATER; fadeOut = .3f
-        }
+        jets(FxPalette.WATER, 2, 165f)
         particle(FxAnchor.TARGET, at, .36f) {
             shape = FxShape.RING; layer = FxLayer.GROUND
-            this.x = x; this.y = y; size0 = 4f; size1 = 18f * scale; color0 = FxPalette.WATER; alpha = .65f; fadeOut = .8f
+            this.x = x; this.y = y; size0 = 4f; size1 = 18f * scale; color0 = FxPalette.WATER; alpha = .75f; fadeOut = .8f
+        }
+        particle(FxAnchor.TARGET, at + .02f, .3f) {
+            shape = FxShape.SOFT; layer = FxLayer.SMOKE
+            this.x = x; this.y = y + 4f; vy = 12f; drag = 2f
+            size0 = 5f * scale; size1 = 13f * scale; color0 = FxPalette.WATER; alpha = .5f; fadeIn = .1f; fadeOut = .7f
         }
     } else {
         val dirt = if (targetCity) FxPalette.STONE else FxPalette.EARTH
         val dust = if (targetCity) FxPalette.STONE else SPURT
-        particle(FxAnchor.TARGET, at, .05f) {
+        particle(FxAnchor.TARGET, at, .06f) {
             shape = FxShape.SOFT; blend = FxBlend.ADD; layer = FxLayer.LIGHT
-            this.x = x; this.y = y + 1f; size0 = 10f * scale; size1 = 3f; color0 = FxPalette.FIRE_CORE; alpha = .9f; fadeOut = .7f
+            this.x = x; this.y = y + 1f; size0 = 9f * scale; size1 = 3f; color0 = FxPalette.FIRE_CORE; alpha = .95f; fadeOut = .7f
         }
-        particle(FxAnchor.TARGET, at, .3f) {
-            shape = FxShape.SOFT; layer = FxLayer.BODY
-            this.x = x; this.y = y + 1f; vy = rand(120f, 150f) * scale; ay = -450f; drag = 2f
-            size0 = 8f * scale; size1 = 18f * scale; color0 = vary(dust, .04f); alpha = .9f; fadeOut = .55f
-        }
-        particle(FxAnchor.TARGET, at + .02f, rand(.4f, .48f)) {
+        jets(dust, 2, 150f)
+        particle(FxAnchor.TARGET, at + .02f, rand(.34f, .42f)) {
             shape = FxShape.SOFT; layer = FxLayer.SMOKE
-            this.x = x + spread(2f); this.y = y + 3f; vx = spread(8f); vy = rand(10f, 18f) * scale; drag = 2.5f
-            size0 = 10f * scale; size1 = rand(24f, 28f) * scale; color0 = vary(dust, .05f); alpha = .5f; fadeIn = .1f; fadeOut = .7f
+            this.x = x + spread(1.5f); this.y = y + 3f; vx = spread(6f); vy = rand(10f, 18f) * scale; drag = 2.5f
+            size0 = 6f * scale; size1 = rand(14f, 17f) * scale; color0 = vary(dust, .05f); alpha = .55f; fadeIn = .1f; fadeOut = .7f
         }
         particle(FxAnchor.TARGET, at, .24f) {
             shape = FxShape.DISC; layer = FxLayer.BODY
