@@ -16,6 +16,7 @@ import com.unciv.models.metadata.HudWindowLayout
 import com.unciv.models.skins.SkinCache
 import com.unciv.testing.GdxTestRunner
 import com.unciv.testing.TestGame
+import com.unciv.ui.components.UncivTooltip.Companion.addTooltip
 import com.unciv.ui.components.extensions.toLabel
 import com.unciv.ui.components.fonts.Fonts
 import com.unciv.ui.components.widgets.ReadingScrollPane
@@ -222,6 +223,27 @@ class HudWindowTest {
         HudWindow.resetAll()
         assertFalse(window.isPlaced)
         assertEquals(20f, panel.x, 0.01f)
+    }
+
+    @Test fun `atlas tooltips are readable chips below their control and stay on screen`() {
+        val f = Fixture(width = 400f, height = 300f)
+        val target = Table().apply { setBounds(330f, 260f, 60f, 30f) }
+        f.root.addActor(target)
+        target.addTooltip("Modern era", always = true)
+        val tip = target.listeners.filterIsInstance<UncivTooltip<*>>().single()
+        tip.show(immediate = true)
+        val chip = f.root.children.last() as com.badlogic.gdx.scenes.scene2d.ui.Container<*>
+        // The tooltip's own holder wraps the chip, which wraps the label.
+        val label = (chip.actor as com.badlogic.gdx.scenes.scene2d.ui.Container<*>).actor as com.badlogic.gdx.scenes.scene2d.ui.Label
+        assertEquals("Light text, never the skin's dark base color", GameUiStyle.ink, label.style.fontColor)
+        assertTrue("Below the control, not over it", chip.y + chip.height <= target.y + 0.01f)
+        assertTrue("Clamped inside the window", chip.x >= 0f && chip.x + chip.width <= f.width + 0.01f)
+        tip.hide(immediate = true)
+        assertNull(chip.parent)
+        // Near the bottom edge the tip flips above its control.
+        target.setPosition(20f, 4f)
+        tip.show(immediate = true)
+        assertTrue(chip.y >= target.y + target.height - 0.01f)
     }
 
     @Test fun `wheel notches move a few lines whatever the history length`() {
