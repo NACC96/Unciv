@@ -9,6 +9,7 @@ import com.unciv.models.metadata.GameSettings.ScreenSize
 import com.unciv.models.skins.SkinCache
 import com.unciv.models.tilesets.TileSetCache
 import com.unciv.models.translations.tr
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.extensions.brighten
 import com.unciv.ui.components.extensions.toTextButton
 import com.unciv.ui.components.input.onClick
@@ -94,6 +95,15 @@ internal class DisplayTab(
         )
         continuousRenderingLabel.wrap = true
         add(continuousRenderingLabel).colspan(2).padTop(10f).row()
+
+        addHeader("World screen windows")
+
+        addCheckbox("Frosted glass panels", settings::frostedGlass) { Gdx.graphics.requestRendering() }
+        // Activity, Messages, agent Settings and Civilizations return to their default spots and opacity.
+        val resetLayout = "Reset window layout".toTextButton()
+        resetLayout.onClick { com.unciv.ui.screens.worldscreen.HudWindow.resetAll() }
+        GameUiStyle.applyWidget(resetLayout)
+        add(resetLayout).colspan(2).padTop(8f).row()
 
         addHeader("Experimental")
 

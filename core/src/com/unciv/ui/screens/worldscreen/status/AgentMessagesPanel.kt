@@ -100,7 +100,8 @@ class AgentMessagesPanel(
     }
     private val send = WorldScreenStyle.button("Send", primary = true).apply { name = "MessageSend" }
     private val paste = WorldScreenStyle.button("Paste image").apply { name = "MessagePasteImage"; label.setFontSize(11) }
-    private val removeImage = WorldScreenStyle.button("Remove image").apply { name = "MessageRemoveImage"; label.setFontSize(11) }
+    private val removeImage = (if (GameUiStyle.isAtlas) WorldScreenStyle.quietButton("Remove image", GameUiStyle.ButtonSize.Compact)
+        else WorldScreenStyle.button("Remove image").apply { label.setFontSize(11) }).apply { name = "MessageRemoveImage" }
     private val imagePreview = Table(skin)
     private val visionWarning = "".toLabel(WorldScreenStyle.warning, 11).apply { name = "MessageVisionWarning"; wrap = true }
     private var imageDraft: MessageImageDraft? = null

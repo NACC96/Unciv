@@ -507,11 +507,12 @@ object GameUiStyle {
         }
     }
 
+    /** Filled inputs with a hairline rim (a brass rim while focused), rather than bright outlines. */
     private fun fieldStyle(source: TextField.TextFieldStyle) = TextField.TextFieldStyle(source).apply {
         fontColor = ink; disabledFontColor = muted; messageFontColor = muted
-        background = outlinedBackground("Atlas/Field/Up", inset, muted)
-        focusedBackground = outlinedBackground("Atlas/Field/Focus", inset, accent)
-        disabledBackground = outlinedBackground("Atlas/Field/Disabled", surface, muted)
+        background = control("Atlas/Field/Up", inset.lerp(raised, 0.35f), ink.apply { a = 0.16f })
+        focusedBackground = control("Atlas/Field/Focus", inset.lerp(raised, 0.35f), accent)
+        disabledBackground = control("Atlas/Field/Disabled", surface, ink.apply { a = 0.08f })
         cursor = BaseScreen.skinStrings.getUiBackground("Atlas/Field/Cursor", tintColor = ink)
         selection = GameUiStyle.background("Atlas/Field/Selection", hover)
         for (drawable in listOf(background, focusedBackground, disabledBackground))
@@ -522,8 +523,8 @@ object GameUiStyle {
     }
 
     private fun listStyle(source: List.ListStyle) = List.ListStyle(source).apply {
-        fontColorSelected = ink; fontColorUnselected = ink
-        selection = outlinedBackground("Atlas/List/Selected", pressed, accent)
+        fontColorSelected = accent; fontColorUnselected = ink
+        selection = control("Atlas/List/Selected", surface.lerp(accent, 0.2f))
         background = panelBackground("Atlas/List/Background", 1f)
         (selection as? BaseDrawable)?.minHeight = standardControlHeight
     }
@@ -555,10 +556,10 @@ object GameUiStyle {
 
     private fun selectStyle(source: SelectBox.SelectBoxStyle) = SelectBox.SelectBoxStyle(source).apply {
         fontColor = ink; disabledFontColor = muted
-        background = outlinedBackground("Atlas/Select/Up", raised, muted)
-        backgroundOver = outlinedBackground("Atlas/Select/Over", hover, muted)
-        backgroundOpen = outlinedBackground("Atlas/Select/Open", inset, accent)
-        backgroundDisabled = outlinedBackground("Atlas/Select/Disabled", surface, muted)
+        background = control("Atlas/Select/Up", raised, ink.apply { a = 0.12f })
+        backgroundOver = control("Atlas/Select/Over", hover, ink.apply { a = 0.18f })
+        backgroundOpen = control("Atlas/Select/Open", inset, accent)
+        backgroundDisabled = control("Atlas/Select/Disabled", surface, ink.apply { a = 0.08f })
         for (drawable in listOf(background, backgroundOver, backgroundOpen, backgroundDisabled))
             if (drawable is BaseDrawable) {
                 drawable.minHeight = standardControlHeight

@@ -157,7 +157,9 @@ class TechButton(
             BaseScreen.skinStrings.roundedEdgeRectangleSmallShape,
             tintColor = ImageGetter.CHARCOAL.cpy().apply { a = 0.7f }
         )
-        techEnabledIcons.pad(2f, 10f, 2f, 0f)
+        // The world research card is already a frosted card; a second dark plate inside it reads as a hole.
+        if (atlasTracker) techEnabledIcons.background = null
+        techEnabledIcons.pad(2f, if (atlasTracker) 0f else 10f, 2f, 0f)
         techEnabledIcons.defaults().padRight(5f)
 
         val civ = techManager.civInfo

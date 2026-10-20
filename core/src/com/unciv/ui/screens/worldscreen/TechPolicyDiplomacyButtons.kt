@@ -80,26 +80,26 @@ class TechPolicyDiplomacyButtons(val worldScreen: WorldScreen) : Table(BaseScree
             game.pushScreen{ TechPickerScreen(viewingCiv.getCiv()) }
         }
 
-        WorldScreenStyle.apply(undoButton)
+        hudIconButton(undoButton)
         undoButton.add(ImageGetter.getImage("OtherIcons/Undo")).size(20f).pad(2f)
         undoButton.onActivation(binding = KeyboardBinding.Undo) {
             handleUndo()
         }
 
-        WorldScreenStyle.apply(policyScreenButton)
+        hudIconButton(policyScreenButton)
         policyScreenButton.add(ImageGetter.getImage("OtherIcons/Policies")).size(20f).pad(2f)
         policyButtonHolder.onActivation(binding = KeyboardBinding.SocialPolicies) {
             game.pushScreen{ PolicyPickerScreen(worldScreen.selectedCiv, worldScreen.canChangeState) }
         }
 
-        WorldScreenStyle.apply(diplomacyButton)
+        hudIconButton(diplomacyButton)
         diplomacyButton.add(ImageGetter.getImage("OtherIcons/DiplomacyW")).size(20f).pad(2f)
         diplomacyButtonHolder.onActivation(binding = KeyboardBinding.Diplomacy) {
             game.pushScreen{ DiplomacyScreen(worldScreen.selectedGameView.civView) }
         }
 
         if (game.gameInfo!!.isEspionageEnabled()) {
-            WorldScreenStyle.apply(espionageButton)
+            hudIconButton(espionageButton)
             espionageButton.add(ImageGetter.getImage("OtherIcons/Espionage")).size(20f).pad(2f)
             espionageButtonHolder.onActivation(binding = KeyboardBinding.Espionage) {
                 // We want to make sure to deselect a spy in the case that the player wants to cancel moving
@@ -111,6 +111,11 @@ class TechPolicyDiplomacyButtons(val worldScreen: WorldScreen) : Table(BaseScree
             }
         }
     }
+
+    /** Atlas: a quiet rounded icon control, like the HUD's other secondary actions. */
+    private fun hudIconButton(button: Button) =
+        if (GameUiStyle.isAtlas) WorldScreenStyle.apply(button, GameUiStyle.Emphasis.Quiet, GameUiStyle.ButtonSize.Icon)
+        else WorldScreenStyle.apply(button)
 
     fun update(): Boolean {
         updateFogOfWarButton()

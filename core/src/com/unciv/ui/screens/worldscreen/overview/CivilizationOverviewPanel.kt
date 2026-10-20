@@ -90,7 +90,9 @@ class CivilizationOverviewPanel(private val screen: WorldScreen) : Table(BaseScr
         add(header).growX().row()
         add(status).growX().left().padTop(3f).padBottom(12f).row()
         for (option in Filter.entries) {
-            val button = WorldScreenStyle.button(option.title)
+            // Atlas: a row of quiet segment chips; the brass checked state marks the filter.
+            val button = if (GameUiStyle.isAtlas) WorldScreenStyle.quietButton(option.title, GameUiStyle.ButtonSize.Compact)
+                else WorldScreenStyle.button(option.title)
             button.onClick { filter = option; rebuild() }
             filterButtons.add(button).padRight(4f)
         }
@@ -207,7 +209,8 @@ class CivilizationOverviewPanel(private val screen: WorldScreen) : Table(BaseScr
                 else -> Fonts.sortDownArrow.toString()
             }
             val arrow = label(arrowText, WorldScreenStyle.selection, GameUiStyle.Type.caption)
-            val heading = WorldScreenStyle.button(column.title, size = GameUiStyle.ButtonSize.Compact)
+            val heading = if (GameUiStyle.isAtlas) WorldScreenStyle.ghostButton(column.title, GameUiStyle.ButtonSize.Compact)
+                else WorldScreenStyle.button(column.title, size = GameUiStyle.ButtonSize.Compact)
             heading.isChecked = sort == column
             // A fixed arrow slot keeps widths stable; titles share the values' right edge.
             heading.clearChildren()
@@ -221,7 +224,9 @@ class CivilizationOverviewPanel(private val screen: WorldScreen) : Table(BaseScr
         rows.add(headings).width(tableWidth).row()
         for (civ in visible) {
             val button = Button(skin).apply {
-                WorldScreenStyle.apply(this)
+                // Atlas rows are quiet list items: no outline, a hover fill and a brass selected tint.
+                if (GameUiStyle.isAtlas) WorldScreenStyle.apply(this, GameUiStyle.Emphasis.Ghost, GameUiStyle.ButtonSize.Regular)
+                else WorldScreenStyle.apply(this)
                 isChecked = civ.id == selectedId
                 pad(6f, 0f, 6f, 0f)
                 onClick { selectedId = civ.id; detailScroll.scrollY = 0f; rebuild() }
@@ -247,7 +252,7 @@ class CivilizationOverviewPanel(private val screen: WorldScreen) : Table(BaseScr
                 button.add(label(sortValue(civ, column), color).apply { setAlignment(Align.right) })
                     .width(metricWidth - METRIC_RIGHT_PAD).padRight(METRIC_RIGHT_PAD)
             }
-            rows.add(button).width(tableWidth).padTop(3f).row()
+            rows.add(button).width(tableWidth).padTop(if (GameUiStyle.isAtlas) 1f else 3f).row()
         }
         if (visible.isEmpty()) rows.add(label("No civilizations match this filter.", WorldScreenStyle.muted)).width(tableWidth).padTop(18f)
         rebuildDetails(visible.firstOrNull { it.id == selectedId })
