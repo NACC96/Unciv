@@ -18,7 +18,8 @@ class VisualEffects(
     private val reduced: Boolean = false,
     private val projectileStyle: Projectile = Projectile.ARROW
 ) : Group(), AutoCloseable {
-    enum class Kind { MOVE, HIT, DEFEAT, FOUND, WORK, CAPTURE, NUCLEAR, PROJECTILE }
+    /** LABEL is text alone, for combat whose blows are drawn by its weapon's own effect. */
+    enum class Kind { MOVE, HIT, DEFEAT, FOUND, WORK, CAPTURE, NUCLEAR, PROJECTILE, LABEL }
     enum class Projectile { ARROW, SHOT, SHELL, TORPEDO, AIR }
     private val marks = ArrayList<Image>()
     private val label = text?.let { ShadowedLabel(it, 17, Color.WHITE, Color(0x101b2bff)) }
@@ -41,7 +42,7 @@ class VisualEffects(
             }
             marks += mark; addActor(mark)
         } else {
-            val count = when (kind) { Kind.HIT, Kind.WORK -> 4; Kind.NUCLEAR -> 8; else -> 6 }
+            val count = when (kind) { Kind.HIT, Kind.WORK -> 4; Kind.NUCLEAR -> 8; Kind.LABEL -> 0; else -> 6 }
             repeat(count) {
                 val mark = ImageGetter.getDot(tint)
                 mark.setSize(if (kind == Kind.WORK) 3f else 7f, 2f)
