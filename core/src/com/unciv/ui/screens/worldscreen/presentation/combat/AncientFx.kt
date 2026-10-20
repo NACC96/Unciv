@@ -20,8 +20,8 @@ private val LIGHT_STONE: Color = FxPalette.STONE.cpy().lerp(Color.WHITE, .35f)
 fun FxScene.arrows() {
     val variant = style.variant
     val d = distanceInTiles.coerceIn(1, 4)
-    // Galleys and dromons loose fire-tipped bolts from the deck.
-    val burning = sourceWater && variant == "bolts"
+    // Galleys and dromons loose fire-tipped bolts from the deck, even moored in a harbor city.
+    val burning = variant == "bolts" && (sourceWater || attackerBody == BodyKind.SHIP)
     val era = style.era.coerceIn(0, 3)
     val count = when (variant) {
         "stones" -> 4; "javelins" -> 3; "bolts" -> if (burning) 4 else 5; "repeating" -> 8; "city" -> 8 + era; else -> 5 + era
@@ -45,14 +45,15 @@ fun FxScene.arrows() {
             FxAnchor.SOURCE, PALE_WOOD, .75f)
     }
 
-    var firstLanding = Float.MAX_VALUE
-    val landings = ArrayList<Float>()
+    // A repeating crossbow's stream lands a second blow partway through.
+    val secondBlow = if (variant == "repeating") count / 2 + 1 else -1
     repeat(count) { index ->
         val launch = release + index * stagger + (if (variant == "city" && index >= count / 2) .05f else 0f) + spread(.006f)
         val fromAlong = if (variant == "city") rand(-12f, 10f) else 6f
         val fromSide = if (variant == "city") spread(20f)
             else (index - (count - 1) / 2f) * when { flat -> 2.5f; variant == "javelins" -> 8f; else -> 4f }
-        val hit = !missed && chance(if (variant == "city") .45f else .55f)
+        // The missiles that land the blows always strike, so the damage shows as one visibly hits; the rest are a coin flip.
+        val hit = !missed && (index == 0 || index == secondBlow || chance(if (variant == "city") .45f else .55f))
         val toX: Float; val toY: Float
         if (hit) { toX = spread(6f); toY = rand(-6f, 9f) }
         else { toX = spread(19f); toY = -15f + spread(6f) }
@@ -67,36 +68,34 @@ fun FxScene.arrows() {
             shape = FxShape.RECT; alignToMotion = true; size0 = shaft; size1 = shaft; aspect = thickness / shaft
             color0 = PALE_WOOD; fadeIn = 0f; fadeOut = 0f
         }
-        // A faint streak a beat behind each missile shows its path at a glance.
+        // A faint streak a beat behind each missile shows its path at a glance; pale like the shaft, not gunfire yellow.
         flying(launch + .018f, travel, flight) {
             shape = FxShape.RECT; blend = FxBlend.ADD; layer = FxLayer.LIGHT; alignToMotion = true
             size0 = 3f; size1 = 3f; aspect = .5f; stretch = if (variant == "stones") .028f else .034f
-            color0 = if (burning) FxPalette.FIRE else FxPalette.TRACER; alpha = if (burning) .75f else .5f; fadeIn = .15f; fadeOut = .2f
+            color0 = if (burning) FxPalette.FIRE else PALE_WOOD; alpha = if (burning) .75f else .5f; fadeIn = .15f; fadeOut = .2f
         }
         if (burning) flying(launch, travel, flight) {
             shape = FxShape.SOFT; blend = FxBlend.ADD; layer = FxLayer.LIGHT
             size0 = 9f; size1 = 8f; color0 = FxPalette.FIRE_CORE; color1 = FxPalette.FIRE; alpha = .85f; fadeIn = 0f; fadeOut = 0f
         }
         val landing = launch + travel
-        landings += landing
-        firstLanding = minOf(firstLanding, landing)
+        if (index == 0 || index == secondBlow) impact(landing)
         when {
             hit && targetCity -> {
                 chunks(landing, toX, toY, 2, LIGHT_STONE, speed = 90f, size = 2.4f)
                 puffs(landing, toX, toY - 2f, 1, .4f, LIGHT_STONE)
             }
+            // Stones thud and shatter, on a shield or a hull alike.
+            hit && variant == "stones" -> thud(landing, toX, toY)
             // Into a ship's side: splinters off the hull.
             hit && targetWater -> {
                 glint(landing, toX, toY, 8f)
                 chunks(landing, toX, toY, 2, PALE_WOOD, speed = 100f, size = 2.4f)
             }
+            // Steel heads bite into shields and mail with a glint.
             hit -> {
-                // Steel heads bite into shields and mail with a glint; stones thud.
-                if (variant == "stones") puffs(landing, toX, toY, 1, .45f)
-                else {
-                    glint(landing, toX, toY, 10f)
-                    sparkle(landing, toX, toY, 2, speed = 120f)
-                }
+                glint(landing, toX, toY, 10f)
+                sparkle(landing, toX, toY, 2, speed = 120f)
             }
             targetWater -> ripple(landing, toX, toY, if (variant == "javelins") 1.2f else .9f)
             else -> {
@@ -105,14 +104,15 @@ fun FxScene.arrows() {
                 else stuck(landing, toX, toY, shaft * .62f, descent(reach, arc), thickness)
             }
         }
-        // The first fire bolts to strike catch; those falling short hiss out in the sea.
+        // The first fire bolts to strike catch; those falling short hiss out in the sea or smoulder where they stuck.
         if (burning && index < 2) {
-            if (hit) fire(landing, toX, toY - 4f, life = .3f, scale = .45f) else if (targetWater) steam(landing, toX, toY)
+            if (hit) fireHit(landing, toX, toY) else if (targetWater) steam(landing, toX, toY)
+        }
+        if (burning && !hit && !targetWater) particle(FxAnchor.TARGET, landing, .3f) {
+            shape = FxShape.SOFT; blend = FxBlend.ADD; layer = FxLayer.LIGHT
+            x = toX; y = toY; size0 = 8f; size1 = 3f; color0 = FxPalette.FIRE; alpha = .8f; fadeOut = .7f
         }
     }
-    impact(firstLanding)
-    // A repeating crossbow's stream lands as a second blow.
-    if (variant == "repeating") impact(landings.sorted()[count / 2 + 1])
 }
 
 /** A siege engine's throw: the arm whips over, a tumbling stone arcs high over its shadow, and lands in a burst of earth or masonry. */
@@ -202,21 +202,23 @@ private fun FxScene.ballista() {
 
     val travel = .16f + d * .035f
     val arc = 4f + d * 3f
-    val toX = ox(-4f); val toY = oy(-4f) + 2f
+    // A bolt that finds no one flies on into the ground (or the sea) beyond where the defender stood.
+    val toX = ox(if (missed) 10f else -4f)
+    val toY = if (missed) oy(10f) - (if (targetWater) 10f else 14f) else oy(-4f) + 2f
     val flight = FxFlight(ox(12f), oy(12f) + 4f, toX, toY, arc)
     flying(release, travel, flight) {
         shape = FxShape.RECT; alignToMotion = true; size0 = 22f; size1 = 22f; aspect = .12f; color0 = PALE_WOOD; fadeIn = 0f; fadeOut = 0f
     }
     flying(release + .014f, travel, flight) {
         shape = FxShape.RECT; blend = FxBlend.ADD; layer = FxLayer.LIGHT; alignToMotion = true
-        size0 = 6f; size1 = 6f; aspect = .45f; stretch = .04f; color0 = FxPalette.TRACER; alpha = .55f; fadeIn = .1f; fadeOut = .15f
+        size0 = 6f; size1 = 6f; aspect = .45f; stretch = .04f; color0 = PALE_WOOD; alpha = .55f; fadeIn = .1f; fadeOut = .15f
     }
     val landing = release + travel
     when {
-        missed && targetWater -> ripple(landing, ox(10f), oy(10f) - 10f, 1.3f)
+        missed && targetWater -> ripple(landing, toX, toY, 1.3f)
         missed -> {
-            puffs(landing, ox(10f), oy(10f) - 14f, 3, .6f)
-            stuck(landing, ox(10f), oy(10f) - 14f, 13f, angle - facing * 25f, 2.6f)
+            puffs(landing, toX, toY, 3, .6f)
+            stuck(landing, toX, toY, 13f, angle - facing * 25f, 2.6f)
         }
         else -> {
             glint(landing, toX, toY, 20f)
@@ -227,6 +229,7 @@ private fun FxScene.ballista() {
                 targetWater -> ripple(landing + .03f, ox(12f), oy(12f) - 10f, 1f)
                 targetCity -> {
                     puffs(landing, toX, toY - 8f, 3, .6f, LIGHT_STONE)
+                    chunks(landing, toX, toY, 3, FxPalette.STONE, speed = 140f, heading = angle + 180f, fan = 120f, size = 3f)
                     stuck(landing, ox(-8f), oy(-8f), 12f, angle, 2.6f)
                 }
                 else -> {
@@ -272,9 +275,11 @@ fun FxScene.blades() {
     else puffs(blow + .01f, feetX, feetY, 3, .6f, if (targetCity) LIGHT_STONE else LIGHT_DUST)
     impact(blow)
 
-    // The second exchange: the defender's riposte when it struck back, otherwise the attacker's backhand.
-    val second = blow + .13f
-    if ((damageToAttacker ?: 0) > 0) {
+    // The second exchange: the defender's riposte when it struck back and still stands, otherwise the attacker's backhand.
+    // The fallen go down .08 s after the last impact, so a riposte that kills the attacker lands just before that.
+    val riposte = (damageToAttacker ?: 0) > 0 && !defenderKilled
+    val second = blow + if (riposte && attackerKilled) .06f else .13f
+    if (riposte) {
         swoosh(second - .04f, ox(-20f), oy(-20f) + 2f, 13f, angle + 180f - facing * 70f, facing * 140f, 2.8f, .045f, color = steel)
         clang(second, ox(-31f), oy(-31f) + 3f, 13f + era, 3 + era, steel)
     } else {
@@ -403,9 +408,11 @@ fun FxScene.charge() {
     }
     impact(blow, if (heavy) .5f else 0f)
 
-    // The melee that follows: the defender's counter when it struck back, otherwise the rider's follow-up cut.
-    val second = blow + .15f
-    if ((damageToAttacker ?: 0) > 0) {
+    // The melee that follows: the defender's counter when it struck back and still stands, otherwise the rider's
+    // follow-up cut. As with blades, a counter that unhorses the rider lands before it falls.
+    val counter = (damageToAttacker ?: 0) > 0 && !defenderKilled
+    val second = blow + if (counter && attackerKilled) .06f else .15f
+    if (counter) {
         particle(FxAnchor.TARGET, second - .05f, .09f) {
             shape = FxShape.RECT; blend = FxBlend.ADD; layer = FxLayer.LIGHT
             x = ox(-12f); y = oy(-12f) + 6f; vx = -dir.x * 200f; vy = -dir.y * 200f
@@ -415,6 +422,7 @@ fun FxScene.charge() {
     } else {
         swoosh(second - .045f, ox(-24f), oy(-24f) + 4f, 14f, angle - facing * 70f, facing * 140f, 2.8f, .045f)
         clang(second, ox(-12f), oy(-12f) + 2f, 15f, 4, FxPalette.STEEL)
+        impact(second)
     }
 }
 
@@ -551,6 +559,30 @@ private fun FxScene.ripple(at: Float, x: Float, y: Float, scale: Float = 1f) {
             size0 = 2.6f; size1 = 1.8f; color0 = FxPalette.WATER; alpha = .9f; fadeOut = .3f
         }
     }
+}
+
+/** A sling stone striking home: a dull flash, a puff of grit and the stone breaking back off the shield. */
+private fun FxScene.thud(at: Float, x: Float, y: Float) {
+    particle(FxAnchor.TARGET, at, .08f) {
+        shape = FxShape.SOFT; blend = FxBlend.ADD; layer = FxLayer.LIGHT
+        this.x = x; this.y = y; size0 = 16f; size1 = 7f; color0 = FxPalette.FLASH; alpha = .6f; fadeOut = .9f
+    }
+    // A brief puff: a lasting cloud would hang over the defender after every stone.
+    particle(FxAnchor.TARGET, at, .22f) {
+        shape = FxShape.SOFT; layer = FxLayer.SMOKE
+        this.x = x; this.y = y; vy = 20f; drag = 3f; size0 = 8f; size1 = 18f; color0 = vary(LIGHT_DUST); alpha = .7f; fadeOut = .8f
+    }
+    chunks(at, x, y, 3, LIGHT_STONE, speed = 110f, heading = angle + 180f, fan = 150f, size = 2.6f)
+}
+
+/** A fire bolt striking home: a flare of burning pitch, a spit of embers, and flames catching where it bit. */
+private fun FxScene.fireHit(at: Float, x: Float, y: Float) {
+    particle(FxAnchor.TARGET, at, .12f) {
+        shape = FxShape.SOFT; blend = FxBlend.ADD; layer = FxLayer.LIGHT
+        this.x = x; this.y = y; size0 = 22f; size1 = 10f; color0 = FxPalette.FIRE_CORE; color1 = FxPalette.FIRE; fadeOut = .8f
+    }
+    sparkle(at, x, y, 3, speed = 140f, color = FxPalette.FIRE_CORE)
+    fire(at + .02f, x, y - 3f, life = .4f, scale = .75f)
 }
 
 /** A hiss of steam where a burning bolt drops into the sea. */
