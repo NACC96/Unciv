@@ -105,7 +105,9 @@ class AgentMatchControlTable(
         val viewer = screen.viewingCiv
         val permitted = timing?.takeIf { viewer.isSpectator() || it.civId == viewer.civID }
         val visible = permitted != null
-        val caption = permitted?.let { "Elapsed ${formatAgentRunDuration(it.elapsedMillis)} · ${it.civId}" } ?: "Elapsed 00:00"
+        // Atlas: the status beside it already names the nation, so the clock alone fits the row.
+        val caption = permitted?.let { if (atlas) formatAgentRunDuration(it.elapsedMillis)
+            else "Elapsed ${formatAgentRunDuration(it.elapsedMillis)} · ${it.civId}" } ?: "Elapsed 00:00"
         val changed = elapsed.isVisible != visible || elapsed.text.toString() != caption
         if (changed) {
             if (elapsed.isVisible != visible) { elapsed.isVisible = visible; elapsed.invalidateHierarchy() }

@@ -31,7 +31,9 @@ import com.unciv.ui.screens.worldscreen.UndoHandler.Companion.restoreUndoCheckpo
 /** A holder for Tech, Policies and Diplomacy buttons going in the top left of the WorldScreen just under WorldScreenTopBar */
 class TechPolicyDiplomacyButtons(val worldScreen: WorldScreen) : Table(BaseScreen.skin) {
     private val fogOfWarButtonHolder = Container<Button?>()
-    private val fogOfWarButton = WorldScreenStyle.button("Fog of War")
+    // Atlas: a quiet chip whose brass checked state shows fog is on, not an outlined form button.
+    private val fogOfWarButton = if (GameUiStyle.isAtlas) WorldScreenStyle.quietButton("Fog of War", GameUiStyle.ButtonSize.Compact)
+        else WorldScreenStyle.button("Fog of War")
 
     private val techButtonHolder = Container<Table?>()
     private val pickTechButton = Table(skin)
@@ -59,8 +61,10 @@ class TechPolicyDiplomacyButtons(val worldScreen: WorldScreen) : Table(BaseScree
         add(undoButtonHolder).padTop(10f).padRight(10f)
         add().growX()  // Allows Policy and Diplo buttons to keep to the left
 
-        fogOfWarButton.label.setFontSize(14)
-        fogOfWarButton.labelCell.pad(0f)
+        if (!GameUiStyle.isAtlas) {
+            fogOfWarButton.label.setFontSize(14)
+            fogOfWarButton.labelCell.pad(0f)
+        }
         fogOfWarButton.pack()
         fogOfWarButtonHolder.onActivation(UncivSound.Paper) {
             if (!worldScreen.hasSpectatorVision()) return@onActivation

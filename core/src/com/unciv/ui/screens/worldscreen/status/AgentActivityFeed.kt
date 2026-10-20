@@ -2,6 +2,8 @@ package com.unciv.ui.screens.worldscreen.status
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.g2d.Batch
+import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.InputEvent
@@ -9,11 +11,13 @@ import com.badlogic.gdx.scenes.scene2d.InputListener
 import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.ui.Button
 import com.badlogic.gdx.scenes.scene2d.ui.Container
+import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Stack
 import com.badlogic.gdx.scenes.scene2d.ui.List as GdxList
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane
 import com.badlogic.gdx.scenes.scene2d.ui.SelectBox
 import com.badlogic.gdx.scenes.scene2d.ui.Table
+import com.badlogic.gdx.scenes.scene2d.utils.BaseDrawable
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Array as GdxArray
@@ -29,24 +33,24 @@ import com.unciv.ui.components.extensions.setFontSize
 import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.extensions.toLabel
 import com.unciv.ui.components.input.onClick
-import com.unciv.ui.components.widgets.AutoScrollPane
+import com.unciv.ui.components.widgets.ReadingScrollPane
 import com.unciv.ui.images.ImageGetter
 import com.unciv.ui.screens.basescreen.BaseScreen
+import com.unciv.ui.screens.worldscreen.HudWindow
 import com.unciv.ui.screens.worldscreen.WorldScreen
 import com.unciv.ui.screens.worldscreen.WorldScreenStyle
 import java.io.File
 
-/** Floating transcript: compact tools, readable agent identity, and live following. */
+/** Floating transcript, read like a chat: a header per agent turn, the agent's messages as cards,
+ *  thinking as a quieter block (collapsed to its headline once a newer thought arrives), runs of
+ *  tool calls collapsed to the latest call, and live following that resumes at the bottom. */
 class AgentActivityFeed(private val screen: WorldScreen, private val session: AgentMatchSession,
-                        private val controlsAnchor: Actor? = null) : Table(BaseScreen.skin), Disposable {
+                        private val controlsAnchor: Actor? = null) : Table(BaseScreen.skin), Disposable, AgentReadingText.Reader {
     private val atlas = GameUiStyle.isAtlas
     private val muted = WorldScreenStyle.muted
     private val ink = WorldScreenStyle.ink
     private val entriesTable = Table(skin)
-    private val scroll = object : AutoScrollPane(entriesTable, skin) {
-        // Gdx's default step depends on pane/content height and can skip whole paragraphs.
-        override fun getMouseWheelY() = 24f
-    }
+    private val scroll = ReadingScrollPane(entriesTable, skin)
     private val stateLabel = "".toLabel(muted, 12).apply { name = "ActivityState" }
     private val identityLabel = "".toLabel(ink, GameUiStyle.Type.label).apply { name = "ActivityIdentity"; wrap = true }
     private val elapsedLabel = "".toLabel(muted, GameUiStyle.Type.caption).apply { name = "ActivityElapsed" }
@@ -63,10 +67,10 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
     private var lastActiveAgentCivId: String? = null
     private var effectiveFilterKey: String? = null
     private var deliberateFilterSwitch = false
-    // Atlas: Earlier is a quiet row atop the entries, Live a floating "↓ N new" chip, Logs a header link.
-    private val liveLink = if (atlas) WorldScreenStyle.quietButton("Live", GameUiStyle.ButtonSize.Compact).apply {
+    // Atlas: Earlier is a quiet row atop the entries, Live a floating "↓ N new" chip, Logs in the window menu.
+    private val liveLink = if (atlas) WorldScreenStyle.accentButton("Live", GameUiStyle.ButtonSize.Compact).apply {
         val arrow = ImageGetter.getImage("OtherIcons/ArrowRight").apply {
-            color = ink; setSize(10f, 10f); setOrigin(Align.center); rotation = -90f
+            color = WorldScreenStyle.surface; setSize(10f, 10f); setOrigin(Align.center); rotation = -90f
         }
         clearChildren()
         add(arrow).size(10f).padRight(GameUiStyle.Space.s)
@@ -75,13 +79,15 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
     } else WorldScreenStyle.button("Live").apply { label.setFontSize(11) }
     private val earlier = if (atlas) WorldScreenStyle.quietButton("Earlier", GameUiStyle.ButtonSize.Compact)
         else WorldScreenStyle.button("Earlier").apply { label.setFontSize(11) }
-    private val logsLink = if (atlas) WorldScreenStyle.ghostButton("Logs", GameUiStyle.ButtonSize.Compact)
-        else WorldScreenStyle.button("Logs").apply { label.setFontSize(11) }
+    private val logsLink = WorldScreenStyle.button("Logs").apply { label.setFontSize(11) }
     /** Atlas: one muted line, shown only while the filter shows a nation other than the active one. */
     private val contextLabel = "".toLabel(muted, GameUiStyle.Type.caption).apply { name = "ActivityContext"; setEllipsis(true); isVisible = false }
     private var contextCell: com.badlogic.gdx.scenes.scene2d.ui.Cell<*>? = null
     private val expanded = HashSet<String>()
     private val expandedRuns = HashSet<String>()
+    /** Thinking the reader opened (expanded) or folded (collapsed) by hand, overriding the default. */
+    private val thinkingOpened = HashSet<String>()
+    private val thinkingFolded = HashSet<String>()
     private val bodies = HashMap<String, Pair<String, String>>()
     private val rowAnchors = LinkedHashMap<String, Actor>()
     private var shownEntries = emptyList<AgentActivityEntry>()
@@ -90,9 +96,28 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
     private var viewerId: String? = null
     private var unreadCount = 0
     private var followLive = true
+    /** A wheel or trackpad scroll happened since following stopped: reaching the bottom resumes it. */
+    private var resumeAtBottom = false
     private var panelWidth = 0f
     private var panelHeight = 0f
     private var disposed = false
+
+    private val window = HudWindow(this, "activity", "Activity", Vector2(260f, 220f),
+        defaultBounds = ::defaultBounds,
+        show = { setShown(true) }, hide = { setShown(false) },
+        onResized = { panelWidth = width; panelHeight = height; rebuild(); if (followLive) jumpToLive() },
+        onArranged = { if (atlas) screen.relayoutHud() },
+        menuExtras = {
+            AgentReadingText.menuRow(this, stage)
+            if (session.getActivityDirectory() != null) {
+                val logs = WorldScreenStyle.quietButton("Open logs folder", GameUiStyle.ButtonSize.Compact)
+                logs.onClick { openLogs() }
+                add(logs).padTop(GameUiStyle.Space.m).row()
+            }
+        })
+
+    /** The user left the feed in its default left-hand column (the HUD flows around it there). */
+    val isDocked get() = !window.isPlaced
 
     private sealed interface FeedRow {
         data class Event(val entry: AgentActivityEntry) : FeedRow
@@ -114,12 +139,13 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
         touchable = Touchable.enabled
         if (atlas) pad(GameUiStyle.Space.l) else pad(12f, 14f, 12f, 14f)
         val close = AgentPanelLayout.closeButton { setShown(false) }
-        if (!atlas) {
-            val header = Table(skin)
-            header.add("Agent activity".toLabel(ink, 17)).left().expandX()
-            header.add(close).size(24f).padLeft(8f)
-            add(header).growX().row()
-        }
+        val header = Table(skin)
+        header.add((if (atlas) "Activity" else "Agent activity").toLabel(ink, if (atlas) GameUiStyle.Type.label + 1 else 17))
+            .left().expandX()
+        header.add(window.controls())
+        header.add(close).size(if (atlas) 28f else 24f).padLeft(if (atlas) GameUiStyle.Space.xs else 8f)
+        window.attachHeader(header)
+        add(header).growX().row()
         nationPicker.style = SelectBox.SelectBoxStyle(nationPicker.style).apply {
             background = if (atlas) chip("WorldScreen/AgentActivityFeed/Filter", WorldScreenStyle.raised)
                 else WorldScreenStyle.background("WorldScreen/AgentActivityFeed/Filter", WorldScreenStyle.raised)
@@ -155,16 +181,12 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
             onClick { nationPicker.showScrollPane() }
         }
         if (atlas) {
-            // One header row: nation chip, Logs and close. The card owns state and the timer.
+            // The nation chip sits under the title; the card owns state and the timer.
             nationPicker.fontSize = GameUiStyle.Type.caption
             val chipHeight = 28f * UncivGame.Current.settings.fontSizeMultiplier
             val arrowHost = Container(filterArrow).apply { right().padRight(GameUiStyle.Space.l); touchable = Touchable.childrenOnly }
-            val header = Table(skin)
             // SelectBox otherwise takes the longest nation's name as its minimum width.
-            header.add(Stack(nationPicker, arrowHost)).minWidth(0f).growX().height(chipHeight)
-            header.add(logsLink).padLeft(GameUiStyle.Space.s)
-            header.add(close).size(28f).padLeft(GameUiStyle.Space.xs)
-            add(header).minWidth(0f).growX().row()
+            add(Stack(nationPicker, arrowHost)).minWidth(0f).growX().height(chipHeight).padTop(GameUiStyle.Space.s).row()
             contextCell = add(contextLabel).minWidth(0f).growX().left().height(0f)
             row()
             entriesTable.top().left()
@@ -185,6 +207,7 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
         scroll.setOverscroll(false, false)
         scroll.setSmoothScrolling(false)
         scroll.setFlingTime(0.2f)
+        scroll.onUserScroll = { resumeAtBottom = true }
         scroll.addCaptureListener(object : InputListener() {
             override fun scrolled(event: InputEvent, x: Float, y: Float, amountX: Float, amountY: Float): Boolean {
                 holdPosition()
@@ -205,7 +228,7 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
             followLive = true; unreadCount = 0; historyTailOffset = 0; visibleLimit = 120
             rebuild(); refresh(); jumpToLive(); updateFooter()
         }
-        logsLink.onClick { session.getActivityDirectory()?.let { Gdx.net.openURI(File(it).toURI().toString()) } }
+        logsLink.onClick { openLogs() }
         if (atlas) {
             // Floats over the bottom of the transcript; positioned in layout(), never a cell.
             liveLink.isVisible = false
@@ -219,12 +242,17 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
         }
         screen.stage.addActor(this)
         refresh()
+        window.restoreMinimizedState()
         Timer.schedule(refreshTask, 0.35f, 0.35f)
+    }
+
+    private fun openLogs() {
+        session.getActivityDirectory()?.let { Gdx.net.openURI(File(it).toURI().toString()) }
     }
 
     /** A compact pill whose right inset leaves room for the dropdown arrow drawn over it. */
     private fun chip(path: String, color: Color) = WorldScreenStyle.pill(path, color).also {
-        if (it is com.badlogic.gdx.scenes.scene2d.utils.BaseDrawable) it.rightWidth = 30f
+        if (it is BaseDrawable) it.rightWidth = 30f
     }
 
     override fun layout() {
@@ -232,11 +260,19 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
         if (!atlas) return
         liveLink.pack()
         liveLink.setPosition(((width - liveLink.width) / 2f).coerceAtLeast(0f), padBottom + GameUiStyle.Space.m)
+        liveLink.toFront()
     }
 
     override fun act(delta: Float) {
         super.act(delta)
-        if (isVisible && followLive) {
+        if (!isVisible) return
+        // Scrolling back down to the newest entry resumes following, as in chat apps.
+        if (!followLive && resumeAtBottom && historyTailOffset == 0 && !scroll.isDragging &&
+            scroll.scrollY >= scroll.maxY - 1f) {
+            followLive = true; resumeAtBottom = false; unreadCount = 0
+            updateFooter()
+        }
+        if (followLive) {
             // Layout/streaming growth must never leave Live accumulating a scroll backlog.
             validate()
             scroll.validate()
@@ -245,13 +281,13 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
         }
     }
 
-    private var atlasViewport: com.badlogic.gdx.math.Rectangle? = null
+    private var atlasViewport: Rectangle? = null
     private var atlasTabVisible = true
     private var atlasUserVisible = true
 
     /** A collapsed viewport keeps filter, reading position and the user's visibility preference. */
-    fun setAtlasViewport(bounds: com.badlogic.gdx.math.Rectangle, shown: Boolean) {
-        atlasViewport = com.badlogic.gdx.math.Rectangle(bounds)
+    fun setAtlasViewport(bounds: Rectangle, shown: Boolean) {
+        atlasViewport = Rectangle(bounds)
         atlasTabVisible = shown
         isVisible = atlasUserVisible && shown
         if (isVisible) refresh()
@@ -269,7 +305,8 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
         atlasUserVisible = shown
         isVisible = shown && (atlasViewport == null || atlasTabVisible)
         if (!shown && screen.stage.scrollFocus?.isDescendantOf(this) == true) screen.stage.scrollFocus = screen.mapHolder
-        if (shown) { toFront(); refresh(); if (followLive) jumpToLive() }
+        if (shown) { window.onShown(); toFront(); refresh(); if (followLive) jumpToLive() }
+        else window.onHidden()
         // The left column and the selection band reflow around the sheet.
         if (atlas && !disposed && wasVisible != isVisible) screen.relayoutHud()
         Gdx.graphics.requestRendering()
@@ -277,9 +314,25 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
 
     private fun holdPosition() {
         followLive = false
+        resumeAtBottom = false
         scroll.velocityY = 0f
         updateFooter()
     }
+
+    /** The default spot: the HUD's left column on Atlas, else below the tech buttons on the left. */
+    private fun defaultBounds(): Rectangle {
+        atlasViewport?.let { return Rectangle(it) }
+        val width = minOf(300f, maxOf(230f, screen.stage.width * 0.26f), screen.stage.width - 20f)
+        val controls = controlsAnchor?.takeIf { it.stage != null && it.height > 0f }
+        val controlsBottom = controls?.localToStageCoordinates(Vector2())
+        val overlapsControls = controls != null && controlsBottom != null && controlsBottom.x < 10f + width && controlsBottom.x + controls.width > 10f
+        val top = minOf(screen.techPolicyAndDiplomacy.y - 8f,
+            if (overlapsControls) controlsBottom.y - 8f else Float.MAX_VALUE)
+        val height = (top - 16f).coerceAtLeast(160f).coerceAtMost(screen.stage.height - 32f)
+        return Rectangle(10f, (top - height).coerceAtLeast(8f), width, height)
+    }
+
+    override fun onReadingSizeChanged() { if (!disposed) { rebuild(); if (followLive) jumpToLive() } }
 
     fun refresh() {
         if (disposed) return
@@ -288,6 +341,7 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
             // Authority changes discard every cached private actor before the new view draws.
             viewerId = viewer.civID
             bodies.clear(); expanded.clear(); expandedRuns.clear(); rowAnchors.clear()
+            thinkingOpened.clear(); thinkingFolded.clear()
             entriesTable.clearChildren(); shownEntries = emptyList()
             effectiveFilterKey = null; effectiveCivId = null; lastActiveAgentCivId = null
             historyTailOffset = 0; visibleLimit = 120; unreadCount = 0
@@ -295,16 +349,10 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
             nationPicker.hideScrollPane()
             selectedFilter = activeFilter
         }
-        val width = atlasViewport?.width ?: minOf(300f, maxOf(230f, screen.stage.width * 0.26f), screen.stage.width - 20f)
-        val controls = controlsAnchor?.takeIf { it.stage != null && it.height > 0f }
-        val controlsBottom = controls?.localToStageCoordinates(Vector2())
-        val overlapsControls = controls != null && controlsBottom != null && controlsBottom.x < 10f + width && controlsBottom.x + controls.width > 10f
-        val top = minOf(screen.techPolicyAndDiplomacy.y - 8f,
-            if (overlapsControls) controlsBottom.y - 8f else Float.MAX_VALUE)
-        val height = atlasViewport?.height ?: (top - 16f).coerceAtLeast(160f).coerceAtMost(screen.stage.height - 32f)
-        val resized = width != panelWidth || height != panelHeight
-        if (resized) { panelWidth = width; panelHeight = height; setSize(width, height) }
-        setPosition(atlasViewport?.x ?: 10f, atlasViewport?.y ?: (top - height).coerceAtLeast(8f))
+        val bounds = window.bounds()
+        val resized = bounds.width != panelWidth || bounds.height != panelHeight
+        if (resized) { panelWidth = bounds.width; panelHeight = bounds.height }
+        window.place()
         val spectator = viewer.isSpectator()
         val active = session.getActiveCivId()?.takeIf { spectator || it == viewer.civID }
         if (active != null && session.getAgentProfile(active) != null) lastActiveAgentCivId = active
@@ -426,11 +474,33 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
         return session.getActivityDetails(entry.id).also { bodies[entry.id] = entry.timestamp to it }
     }
 
-    private fun text(value: String, color: Color, size: Int) = value.replace(Regex("\\*\\*(.*?)\\*\\*"), "$1")
-        .toLabel(color, size, hideIcons = true).apply { wrap = true; setAlignment(Align.topLeft) }
+    private fun size(base: Int) = AgentReadingText.size(base)
+
+    /** A wrapped label already [width] wide, so its first measured height is its real one. */
+    private fun text(value: String, color: Color, size: Int, width: Float? = null) = plain(value)
+        .toLabel(color, size, hideIcons = true).apply {
+            wrap = true; setAlignment(Align.topLeft)
+            if (width != null) { this.width = width; invalidate() }
+        }
 
     // Translation normalizes numeric tokens (01:05 -> 1:5); journal durations are fixed-format text.
-    private fun runText(value: String, color: Color, size: Int) = text(value, color, size).apply { setText(value.replace(Regex("\\*\\*(.*?)\\*\\*"), "$1")) }
+    private fun runText(value: String, color: Color, size: Int, width: Float? = null) =
+        text(value, color, size, width).apply { setText(plain(value)) }
+
+    /** Markdown emphasis markers read as noise in a plain label. */
+    private fun plain(value: String) = value.replace(Regex("\\*\\*(.*?)\\*\\*"), "$1")
+
+    /** Blank-line paragraphs, with "- " bullets drawn as "•". */
+    private fun paragraphs(body: String): List<String> = body.trim().split(Regex("\\n\\s*\\n"))
+        .map { paragraph -> paragraph.lines().joinToString("\n") { it.replace(Regex("^(\\s*)[-*] "), "$1• ") }.trim() }
+        .filter { it.isNotEmpty() }
+
+    /** A first paragraph that is entirely **bold** is the thought's headline. */
+    private fun headline(paragraphs: List<String>): Pair<String?, List<String>> {
+        val first = paragraphs.firstOrNull() ?: return null to paragraphs
+        val match = Regex("^\\*\\*(.+?)\\*\\*$").matchEntire(first.trim()) ?: return null to paragraphs
+        return match.groupValues[1] to paragraphs.drop(1)
+    }
 
     /** A message, error, turn boundary or different agent ends a run of tool calls. */
     private fun groupTools(entries: List<AgentActivityEntry>): List<FeedRow> {
@@ -482,21 +552,18 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
         bodies.keys.retainAll(ids)
         expanded.retainAll(ids)
         expandedRuns.retainAll(ids)
+        thinkingOpened.retainAll(ids)
+        thinkingFolded.retainAll(ids)
         val names = entries.map { it.civId }.distinct().associateWith(::agentName)
+        // The newest thought of each agent stays open while it is being written.
+        val liveThinking = entries.filter { it.kind == "reasoning" }.groupBy { it.civId }.values.map { it.last().id }.toSet()
         var previousTurn = ""
         for (row in groupTools(entries)) {
             val entry = when (row) { is FeedRow.Event -> row.entry; is FeedRow.Tools -> row.entries.first() }
             val turn = "${entry.civId}/${entry.turnSerial}"
             if (turn != previousTurn) {
-                val color = AgentActivityAppearance.color(screen.gameInfo, entry.civId)
-                val heading = Table()
-                val civ = screen.gameInfo.civilizations.firstOrNull { it.civID == entry.civId }
-                if (civ != null) heading.add(ImageGetter.getNationPortrait(civ.nation, 20f)).size(20f).padRight(8f).top()
-                val identity = Table()
-                identity.add(text(names[entry.civId] ?: entry.civId, color, 14)).growX().left().row()
-                identity.add(text("${entry.civId} · Turn ${entry.turnSerial}", muted, 11)).growX().left().padTop(3f)
-                heading.add(identity).growX()
-                addRow(heading, "turn/$turn", rowWidth, top = if (previousTurn.isEmpty()) 4f else 18f, bottom = 10f)
+                addRow(turnHeading(entry, names[entry.civId] ?: entry.civId, rowWidth, first = previousTurn.isEmpty()),
+                    "turn/$turn", rowWidth, top = if (previousTurn.isEmpty()) 2f else 14f, bottom = 10f)
                 previousTurn = turn
             }
             when (row) {
@@ -507,11 +574,11 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
                 is FeedRow.Event -> when (entry.kind) {
                     "message" -> {
                         addSpeaker(entry, null, rowWidth)
-                        addRow(text(body(entry), ink, 14), entry.id, rowWidth, bottom = 14f)
+                        addRow(messageCard(entry, rowWidth), entry.id, rowWidth, bottom = 12f)
                     }
                     "reasoning" -> {
                         addSpeaker(entry, "Thinking", rowWidth)
-                        addRow(text(body(entry), muted, GameUiStyle.Type.body), entry.id, rowWidth, bottom = 12f)
+                        addRow(thinkingBlock(entry, rowWidth, entry.id in liveThinking), entry.id, rowWidth, bottom = 12f)
                     }
                     "run" -> {
                         val failed = entry.status == "failed"
@@ -525,9 +592,9 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
                         }
                         addSpeaker(entry, caption, rowWidth)
                         val color = if (failed) WorldScreenStyle.error else AgentActivityAppearance.color(screen.gameInfo, entry.civId)
-                        addRow(runText(entry.title, color, 12), entry.id, rowWidth, bottom = 4f)
+                        addRow(runText(entry.title, color, size(12), rowWidth), entry.id, rowWidth, bottom = 4f)
                         if (entry.summary.isNotBlank())
-                            addRow(runText(entry.summary, color, 11), "summary/${entry.id}", rowWidth, bottom = 12f)
+                            addRow(runText(entry.summary, color, size(11), rowWidth), "summary/${entry.id}", rowWidth, bottom = 12f)
                     }
                     else -> {
                         addSpeaker(entry, if (entry.kind == "error" || entry.status == "failed") "Error" else "Tools", rowWidth)
@@ -536,7 +603,7 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
                 }
             }
         }
-        if (entries.isEmpty()) addRow(text("Waiting for the agent…", muted, 13), "empty", rowWidth)
+        if (entries.isEmpty()) addRow(text("Waiting for the agent…", muted, size(13), rowWidth), "empty", rowWidth, top = 8f)
         updateFooter()
         invalidateHierarchy()
         validate()
@@ -546,14 +613,96 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
         scroll.updateVisualScroll()
     }
 
+    /** Portrait, agent name and "Rome · Turn 12", with a hairline above every turn but the first. */
+    private fun turnHeading(entry: AgentActivityEntry, name: String, width: Float, first: Boolean): Table {
+        val color = AgentActivityAppearance.color(screen.gameInfo, entry.civId)
+        val heading = Table()
+        if (!first) heading.add(Table().apply { background = hairline() }).colspan(2).growX().height(1f).padBottom(12f).row()
+        val civ = screen.gameInfo.civilizations.firstOrNull { it.civID == entry.civId }
+        val portrait = 24f
+        if (civ != null) heading.add(ImageGetter.getNationPortrait(civ.nation, portrait)).size(portrait).padRight(8f).top()
+        val textWidth = width - if (civ != null) portrait + 8f else 0f
+        val identity = Table()
+        identity.add(text(name, color, size(14), textWidth)).width(textWidth).left().row()
+        identity.add(text("${entry.civId} · Turn ${entry.turnSerial}", muted, size(11), textWidth)).width(textWidth).left().padTop(2f)
+        heading.add(identity).width(textWidth).left()
+        return heading
+    }
+
+    private fun hairline() = ImageGetter.getWhiteDotDrawable().tint(Color(ink).apply { a = 0.12f })
+
+    /** The agent's own words: the brightest text, on a quiet card, one label per paragraph. */
+    private fun messageCard(entry: AgentActivityEntry, width: Float): Table {
+        val card = Table()
+        card.background = WorldScreenStyle.control("WorldScreen/AgentActivityFeed/Message", Color(WorldScreenStyle.raised).apply { a = 0.5f })
+        val padX = 12f
+        card.pad(10f, padX, 11f, padX)
+        val inner = width - 2 * padX
+        val paragraphs = paragraphs(body(entry)).ifEmpty { listOf("") }
+        for ((index, paragraph) in paragraphs.withIndex()) {
+            val heading = Regex("^\\*\\*(.+?)\\*\\*$").matchEntire(paragraph)?.groupValues?.get(1)
+            val label = if (heading != null) text(heading, ink, size(15), inner) else text(paragraph, ink, size(14), inner)
+            card.add(label).width(inner).left().padTop(if (index == 0) 0f else 7f).row()
+        }
+        return card
+    }
+
+    /** Provider reasoning: a muted block behind a thin rule. Older thoughts fold to their headline
+     *  and a short preview; a click opens or folds any of them. */
+    private fun thinkingBlock(entry: AgentActivityEntry, width: Float, live: Boolean): Table {
+        val (title, rest) = headline(paragraphs(body(entry)))
+        val open = entry.id in thinkingOpened || (live && entry.id !in thinkingFolded)
+        val block = Table()
+        block.background = LeftRule(Color(muted).apply { a = 0.35f })
+        val inset = 12f
+        block.pad(1f, inset, 1f, 0f)
+        val inner = width - inset
+        if (title != null) block.add(text(title, ink, size(14), inner)).width(inner).left().padBottom(if (rest.isEmpty()) 0f else 4f).row()
+        val shown = if (open) rest else rest.take(1).map { preview(it) }
+        for ((index, paragraph) in shown.withIndex())
+            block.add(text(paragraph, muted, size(13), inner)).width(inner).left().padTop(if (index == 0) 0f else 6f).row()
+        val foldable = rest.size > 1 || rest.firstOrNull()?.let { preview(it) != it } == true
+        if (foldable) {
+            val toggle = (if (open) "Show less" else "Show more").toLabel(WorldScreenStyle.accent, size(11), hideIcons = true)
+            block.add(toggle).left().padTop(4f).row()
+        }
+        if (foldable) {
+            block.touchable = Touchable.enabled
+            block.onClick {
+                holdPosition()
+                if (open) { thinkingOpened.remove(entry.id); thinkingFolded.add(entry.id) }
+                else { thinkingFolded.remove(entry.id); thinkingOpened.add(entry.id) }
+                rebuild()
+            }
+        }
+        return block
+    }
+
+    private fun preview(paragraph: String): String {
+        if (paragraph.length <= previewChars) return paragraph
+        val cut = paragraph.lastIndexOf(' ', previewChars).takeIf { it > previewChars / 2 } ?: previewChars
+        return paragraph.substring(0, cut).trimEnd(',', ';', ':', ' ') + "…"
+    }
+
+    /** A thin vertical rule along the left edge, marking quoted or secondary text. */
+    private class LeftRule(private val color: Color) : BaseDrawable() {
+        private val dot = ImageGetter.getWhiteDotDrawable()
+        override fun draw(batch: Batch, x: Float, y: Float, width: Float, height: Float) {
+            val prior = batch.color.cpy()
+            batch.setColor(color.r, color.g, color.b, color.a * prior.a)
+            dot.draw(batch, x, y, 2f, height)
+            batch.color = prior
+        }
+    }
+
     private fun addSpeaker(entry: AgentActivityEntry, kind: String?, width: Float) {
         // Atlas, one nation shown: the turn heading names the speaker once; blocks keep a kind caption.
         if (atlas && selectedFilter.mode != FilterMode.ALL) {
-            if (kind != null) addRow(text(kind, muted, GameUiStyle.Type.caption), "speaker/${entry.id}", width, bottom = 4f)
+            if (kind != null) addRow(text(kind, muted, size(GameUiStyle.Type.caption), width), "speaker/${entry.id}", width, bottom = 4f)
             return
         }
         val label = agentName(entry.civId) + if (kind == null) "" else " · $kind"
-        addRow(text(label, AgentActivityAppearance.color(screen.gameInfo, entry.civId), if (kind == null) 13 else 12),
+        addRow(text(label, AgentActivityAppearance.color(screen.gameInfo, entry.civId), size(if (kind == null) 13 else 12), width),
             "speaker/${entry.id}", width, bottom = 5f)
     }
 
@@ -562,14 +711,14 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
         val color = if (failed) WorldScreenStyle.error else muted
         val button = Button(BaseScreen.skin).apply {
             style = Button.ButtonStyle().apply {
-                over = WorldScreenStyle.background("WorldScreen/AgentActivityFeed/ToolHover", WorldScreenStyle.raised)
-                down = WorldScreenStyle.background("WorldScreen/AgentActivityFeed/ToolDown", WorldScreenStyle.pressed)
-                checked = WorldScreenStyle.background("WorldScreen/AgentActivityFeed/ToolOpen", WorldScreenStyle.raised)
+                over = WorldScreenStyle.control("WorldScreen/AgentActivityFeed/ToolHover", WorldScreenStyle.raised)
+                down = WorldScreenStyle.control("WorldScreen/AgentActivityFeed/ToolDown", WorldScreenStyle.pressed)
+                checked = WorldScreenStyle.control("WorldScreen/AgentActivityFeed/ToolOpen", Color(WorldScreenStyle.raised).apply { a = 0.7f })
                 focused = GameUiStyle.outlinedBackground("WorldScreen/AgentActivityFeed/ToolFocused",
                     WorldScreenStyle.raised, WorldScreenStyle.accent)
             }
             isChecked = opened
-            pad(5f, 0f, 5f, 2f)
+            pad(5f, 4f, 5f, 6f)
         }
         val icon = when {
             failed -> "OtherIcons/ExclamationMark"
@@ -577,7 +726,8 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
             else -> "OtherIcons/Checkmark"
         }
         button.add(ImageGetter.getImage(icon).apply { this.color = color }).size(12f).padRight(7f)
-        button.add(title.toLabel(color, 12, hideIcons = true).apply { setEllipsis(true) }).minWidth(0f).growX().left()
+        button.add(title.toLabel(if (failed) color else ink.cpy().lerp(muted, 0.35f), size(12), hideIcons = true).apply { setEllipsis(true) })
+            .minWidth(0f).growX().left()
         button.add(ImageGetter.getImage("OtherIcons/ArrowRight").apply {
             this.color = muted; setSize(9f, 9f); setOrigin(Align.center); rotation = if (opened) -90f else 0f
         }).size(9f).padLeft(6f)
@@ -602,11 +752,11 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
         } else {
             val running = run.count { it.status == "running" }
             val count = "${run.size} tool calls · " + if (running > 0) "$running running" else "Expand"
-            val countLabel = text(count, muted, 11).apply {
+            val countLabel = text(count, muted, size(11)).apply {
                 touchable = Touchable.enabled
                 onClick { holdPosition(); toggleRun(); rebuild() }
             }
-            addRow(countLabel, "count/${run.first().id}", width, bottom = 8f, inset = 19f)
+            addRow(countLabel, "count/${run.first().id}", width, bottom = 8f, inset = 23f)
         }
     }
 
@@ -617,13 +767,19 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
         }, entry.id, width, inset = inset)
         if (entry.summary.isNotBlank()) {
             val color = if (entry.status == "failed" || entry.kind == "error") WorldScreenStyle.error else muted
-            addRow(text(entry.summary, color, 11), "summary/${entry.id}", width, bottom = 6f, inset = inset + 19f)
+            addRow(text(entry.summary, color, size(11), width - inset - 23f), "summary/${entry.id}", width, bottom = 6f, inset = inset + 23f)
         }
         if (opened) {
-            addRow(text(body(entry), ink, 11), "details/${entry.id}", width, bottom = 6f, inset = inset)
-            val copy = WorldScreenStyle.button("Copy details").apply { label.setFontSize(11) }
+            val details = Table().apply {
+                background = WorldScreenStyle.control("WorldScreen/AgentActivityFeed/Details", Color(WorldScreenStyle.inset).apply { a = 0.75f })
+                pad(8f, 10f, 8f, 10f)
+            }
+            val inner = width - inset - 20f
+            details.add(text(body(entry), ink, size(11), inner)).width(inner).left().row()
+            val copy = WorldScreenStyle.quietButton("Copy details", GameUiStyle.ButtonSize.Compact)
             copy.onClick { Gdx.app.clipboard.contents = body(entry) }
-            entriesTable.add(copy).left().padLeft(inset).padBottom(8f).row()
+            details.add(copy).left().padTop(6f)
+            addRow(details, "details/${entry.id}", width, top = 2f, bottom = 8f, inset = inset)
         }
     }
 
@@ -639,6 +795,12 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
         disposed = true
         refreshTask.cancel()
         setShown(false)
+        window.dispose()
         remove()
+    }
+
+    private companion object {
+        /** Characters of a folded thought's first paragraph. */
+        const val previewChars = 180
     }
 }

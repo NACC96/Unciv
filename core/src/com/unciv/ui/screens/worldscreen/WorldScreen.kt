@@ -532,6 +532,9 @@ class WorldScreen(
 
     //endregion
 
+    /** Blurred copy of the map for frosted HUD surfaces; captures only while one is on screen. */
+    internal val glassBackdrop = com.unciv.ui.components.glass.GlassBackdrop()
+
     val mapHolder = WorldMapHolder(this, gameInfo.tileMap)
 
     internal var waitingForAutosave = false
@@ -670,6 +673,7 @@ class WorldScreen(
         events.stopReceiving()
         statusButtons.dispose()
         civilizationOverview?.dispose()
+        glassBackdrop.dispose()
         super.dispose()
     }
 
@@ -1307,7 +1311,9 @@ class WorldScreen(
         }
 
         visualTimeline.advance(delta)
-        super.render(delta)
+        // Only surfaces drawn by this screen may sample its backdrop.
+        com.unciv.ui.components.glass.GlassBackdrop.active = glassBackdrop
+        try { super.render(delta) } finally { com.unciv.ui.components.glass.GlassBackdrop.active = null }
     }
 
 

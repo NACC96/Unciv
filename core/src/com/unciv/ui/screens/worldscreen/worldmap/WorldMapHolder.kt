@@ -934,7 +934,13 @@ class WorldMapHolder(
     private val unshakenTransform = Matrix4()
 
     override fun draw(batch: Batch?, parentAlpha: Float) {
-        if (batch == null || visualShake.isZero) return super.draw(batch, parentAlpha)
+        if (batch == null) return super.draw(batch, parentAlpha)
+        // Frosted HUD surfaces sample a blurred copy of exactly this map drawing.
+        worldScreen.glassBackdrop.drawCaptured(batch) { drawShaken(batch, parentAlpha) }
+    }
+
+    private fun drawShaken(batch: Batch, parentAlpha: Float) {
+        if (visualShake.isZero) return super.draw(batch, parentAlpha)
         unshakenTransform.set(batch.transformMatrix)
         batch.transformMatrix = shakenTransform.set(unshakenTransform).translate(visualShake.x, visualShake.y, 0f)
         try { super.draw(batch, parentAlpha) } finally { batch.transformMatrix = unshakenTransform }

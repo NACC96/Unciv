@@ -63,7 +63,9 @@ class CivilizationOverviewPanel(private val screen: WorldScreen) : Table(BaseScr
     private var selectedId: String? = null
     private var data: CivilizationOverviewData? = null
     private var viewerId: String? = null
-    private var initializedPosition = false
+    private val window = com.unciv.ui.screens.worldscreen.HudWindow(this, "overview", "Civilizations",
+        com.badlogic.gdx.math.Vector2(300f, 260f), defaultBounds = ::defaultBounds,
+        show = { setShown(true) }, hide = { setShown(false) }, onResized = { compact = width < 520f; rebuild() })
     private var disposed = false
     private var compact = false
     private val refreshTask = object : Timer.Task() {
@@ -80,31 +82,11 @@ class CivilizationOverviewPanel(private val screen: WorldScreen) : Table(BaseScr
         touchable = Touchable.enabled
         pad(14f)
         val header = Table(skin).apply { touchable = Touchable.enabled }
-        header.add("Civilizations".toLabel(WorldScreenStyle.ink, 17)).left().expandX()
-        header.add(WorldScreenStyle.dragGrip()).padRight(12f)
-        val close = Button(skin).apply {
-            WorldScreenStyle.apply(this)
-            pad(4f)
-            add(ImageGetter.getImage("OtherIcons/Close")).size(12f)
-            onClick { setShown(false) }
-        }
-        header.add(close).size(26f)
-        header.addListener(object : InputListener() {
-            private val origin = Vector2()
-            private val pointerStart = Vector2()
-            override fun touchDown(event: InputEvent, x: Float, y: Float, pointer: Int, button: Int): Boolean {
-                if (event.target.isDescendantOf(close)) return false
-                origin.set(this@CivilizationOverviewPanel.x, this@CivilizationOverviewPanel.y)
-                pointerStart.set(event.stageX, event.stageY)
-                toFront()
-                return true
-            }
-            override fun touchDragged(event: InputEvent, x: Float, y: Float, pointer: Int) {
-                setPosition(origin.x + event.stageX - pointerStart.x, origin.y + event.stageY - pointerStart.y)
-                clampPosition()
-                Gdx.graphics.requestRendering()
-            }
-        })
+        header.add("Civilizations".toLabel(WorldScreenStyle.ink, if (GameUiStyle.isAtlas) GameUiStyle.Type.label + 1 else 17)).left().expandX()
+        header.add(window.controls())
+        val close = com.unciv.ui.screens.worldscreen.status.AgentPanelLayout.closeButton { setShown(false) }
+        header.add(close).size(if (GameUiStyle.isAtlas) 28f else 26f).padLeft(GameUiStyle.Space.xs)
+        window.attachHeader(header)
         add(header).growX().row()
         add(status).growX().left().padTop(3f).padBottom(12f).row()
         for (option in Filter.entries) {
@@ -139,6 +121,7 @@ class CivilizationOverviewPanel(private val screen: WorldScreen) : Table(BaseScr
 
     private fun setShown(shown: Boolean) {
         isVisible = shown
+        if (shown) window.onShown() else window.onHidden()
         if (shown) { toFront(); refresh() }
         else {
             if (screen.stage.scrollFocus?.isDescendantOf(this) == true) screen.stage.scrollFocus = screen.mapHolder
@@ -156,19 +139,10 @@ class CivilizationOverviewPanel(private val screen: WorldScreen) : Table(BaseScr
             data = null; rows.clearChildren(); details.clearChildren()
             rowScroll.scrollY = 0f; detailScroll.scrollY = 0f
         }
-        val panelWidth = minOf(660f, screen.stage.width * 0.68f).coerceAtLeast(300f).coerceAtMost(screen.stage.width - 16f)
-        val panelHeight = minOf(620f, screen.stage.height - if (GameUiStyle.isAtlas) 24f else 140f).coerceAtLeast(260f).coerceAtMost(screen.stage.height - 16f)
-        val resized = width != panelWidth || height != panelHeight
-        compact = panelWidth < 520f
-        setSize(panelWidth, panelHeight)
-        if (!initializedPosition) {
-            // Atlas opens below the actual world header; other skins keep their offset.
-            val top = if (GameUiStyle.isAtlas) com.unciv.ui.screens.worldscreen.status.AgentPanelLayout.headerBottom(screen.stage) - 8f
-                else screen.stage.height - 122f
-            setPosition(screen.stage.width - width - 8f, top - height)
-            initializedPosition = true
-        }
-        clampPosition()
+        val bounds = window.bounds()
+        val resized = width != bounds.width || height != bounds.height
+        compact = bounds.width < 520f
+        window.place()
         getCell(rowScroll).height((height * 0.34f).coerceAtLeast(86f))
         val latest = CivilizationOverviewData.read(screen.gameInfo, screen.viewingCiv, screen.agentSession)
         if (latest != data || resized) {
@@ -180,9 +154,15 @@ class CivilizationOverviewPanel(private val screen: WorldScreen) : Table(BaseScr
         }
     }
 
-    private fun clampPosition() {
-        setPosition(x.coerceIn(8f, maxOf(8f, screen.stage.width - width - 8f)),
-            y.coerceIn(8f, maxOf(8f, screen.stage.height - height - 8f)))
+    /** At the right, below the world header (Atlas) or the legacy top bar. */
+    private fun defaultBounds(): com.badlogic.gdx.math.Rectangle {
+        val panelWidth = minOf(660f, screen.stage.width * 0.68f).coerceAtLeast(300f).coerceAtMost(screen.stage.width - 16f)
+        val panelHeight = minOf(620f, screen.stage.height - if (GameUiStyle.isAtlas) 24f else 140f).coerceAtLeast(260f).coerceAtMost(screen.stage.height - 16f)
+        val top = if (GameUiStyle.isAtlas) com.unciv.ui.screens.worldscreen.status.AgentPanelLayout.headerBottom(screen.stage) - 8f
+            else screen.stage.height - 122f
+        val x = (screen.stage.width - panelWidth - 8f).coerceIn(8f, maxOf(8f, screen.stage.width - panelWidth - 8f))
+        val y = (top - panelHeight).coerceIn(8f, maxOf(8f, screen.stage.height - panelHeight - 8f))
+        return com.badlogic.gdx.math.Rectangle(x, y, panelWidth, panelHeight)
     }
 
     private fun filtered(): List<CivilizationSummary> {
@@ -348,6 +328,7 @@ class CivilizationOverviewPanel(private val screen: WorldScreen) : Table(BaseScr
         if (disposed) return
         disposed = true
         refreshTask.cancel()
+        window.dispose()
         remove()
     }
 

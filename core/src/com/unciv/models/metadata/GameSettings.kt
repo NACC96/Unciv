@@ -88,6 +88,8 @@ class GameSettings {
 
     //// Performance
     var continuousRendering = false
+    /** Atlas world panels blur the map behind them; off draws the plain translucent fill. */
+    var frostedGlass = true
 
     //// Experimental
     var unitMovementButtonAnimation = false
@@ -172,6 +174,11 @@ class GameSettings {
 
     // Controlled by dragging the minimap
     var minimapSize = 6    // default corresponds to 15% screen space
+
+    /** Floating world-screen windows the user moved, resized, minimized or faded, by window id. */
+    var hudWindows = HashMap<String, HudWindowLayout>()
+    /** Reading size of the agent Activity and Messages text, set from their A−/A+ controls. */
+    var hudTextScale = 1f
 
     // This was a checkbox setting long ago
     val showPixelUnits get() = unitSet != null

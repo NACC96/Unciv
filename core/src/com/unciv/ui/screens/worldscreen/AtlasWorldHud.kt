@@ -139,7 +139,8 @@ class AtlasWorldHud(
         regions = WorldHudLayout.calculate(stageWidth, stageHeight, fontScale, HudContent(
             tracker = if (tracker.hasVisibleContent()) trackerContent.prefSize() else null,
             selection = if (selection) unitContent.cardSize() else null,
-            activityOpen = feed?.isVisible == true,
+            // A feed the user moved elsewhere floats over the map; only the docked one takes the column.
+            activityOpen = feed?.isVisible == true && feed.isDocked,
             turnAction = turnContent.cardSize(),
             minimap = minimap.prefSize().takeIf { !minimap.isMaximized },
             tileInfo = if (showTileInfo) tileInfoContent.cardSize() else null,

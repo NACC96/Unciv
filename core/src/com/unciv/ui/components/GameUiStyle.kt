@@ -26,6 +26,7 @@ import com.unciv.ui.components.UncivTooltip.Companion.addTooltip
 import com.unciv.ui.components.extensions.setFontSize
 import com.unciv.ui.components.extensions.toTextButton
 import com.unciv.ui.components.fonts.Fonts
+import com.unciv.ui.components.glass.GlassSurface
 import com.unciv.ui.components.widgets.ExpanderTab
 import com.unciv.ui.images.ImageGetter
 import com.unciv.ui.screens.basescreen.BaseScreen
@@ -194,9 +195,24 @@ object GameUiStyle {
     fun surface(path: String, opacity: Float = 0.90f, elevated: Boolean = true): Drawable {
         if (!isAtlas) return panelBackground(path, opacity)
         val fill = rounded(path, "surface", surface.apply { a = opacity.coerceIn(0f, 1f) })
-        val rim = rounded("$path/Rim", "surface-rim", ink.apply { a = 0.09f })
+        val rim = rounded("$path/Rim", "surface-rim", ink.apply { a = 0.12f })
         val shadow = if (elevated) rounded("Atlas/Surface/Shadow", "surface-shadow", Color(0f, 0f, 0f, 0.35f)) else null
         return SurfaceDrawable(fill, rim, shadow).apply { inset(Space.m, Space.m, 2 * Radius.panel) }
+    }
+
+    /** Frosted glass mapping of a window's opacity (0..1, see HudWindowLayout.opacity). */
+    object Glass {
+        /** Opacity of world cards nobody has faded: mostly tint, with the map showing through. */
+        const val defaultOpacity = 0.55f
+        /** How much surface color covers the blurred map. */
+        fun tint(opacity: Float) = 0.3f + 0.7f * opacity.coerceIn(0f, 1f)
+        /** Fill alpha when glass is off or unavailable. */
+        fun fallbackAlpha(opacity: Float) = (0.45f + 0.85f * opacity.coerceIn(0f, 1f)).coerceAtMost(1f)
+    }
+
+    /** Sets the user's opacity on a [surface] drawable (other drawables are left as they are). */
+    fun setSurfaceOpacity(drawable: Drawable?, opacity: Float?) {
+        (drawable as? SurfaceDrawable)?.userOpacity = opacity
     }
 
     /** A fully rounded chip at any height, optionally with a hairline [rim]. */
@@ -213,6 +229,16 @@ object GameUiStyle {
         val fill = rounded(path, "control-r8", color)
         val drawable = if (rim == null) fill else Outlined(fill, rounded("$path/Rim", "control-r8-rim", rim))
         return drawable.apply { inset(Space.s, Space.s, 2 * Radius.control) }
+    }
+
+    /** A tooltip chip: an opaque raised fill, lighter than the panels it floats over, with a
+     * hairline rim. Its own path: the skin's "General/Tooltip" variant is the near-black panel
+     * that, under the dark base text color, drew tips as unreadable black bars. */
+    fun tooltipBackground(): Drawable {
+        if (!isAtlas) return background("Atlas/Tooltip", raised)
+        return Outlined(rounded("Atlas/Tooltip", "control-r8", raised.lerp(hover, 0.35f).apply { a = 1f }),
+            rounded("Atlas/Tooltip/Rim", "control-r8-rim", ink.apply { a = 0.18f }))
+            .apply { inset(Space.s, Space.xs, 2 * Radius.control) }
     }
 
     /** A round status mark, e.g. [info] running, [warning] paused, [error] failed, [muted] idle. */
@@ -265,8 +291,15 @@ object GameUiStyle {
     /** The halo is generated for a [Radius.panel] footprint with its downward offset baked in.
      * Its corners exceed that radius by the margin it is drawn outside the panel, and its
      * knocked-out interior leaves a translucent fill translucent. */
+    /** With frosted glass on (and a captured backdrop this frame) the fill is the blurred map
+     * under the card, tinted with the surface color; otherwise the translucent [fill]. */
     private class SurfaceDrawable(private val fill: RoundedPatch, private val rim: RoundedPatch,
         private val shadow: RoundedPatch?) : BaseDrawable() {
+        private val tint = Color(fill.patch.color).apply { a = 1f }
+        private val baseAlpha = fill.patch.color.a
+        /** A window's user opacity; null keeps the card defaults. */
+        var userOpacity: Float? = null
+
         override fun draw(batch: Batch, x: Float, y: Float, width: Float, height: Float) {
             if (width <= 0f || height <= 0f) return
             if (shadow != null) {
@@ -274,7 +307,11 @@ object GameUiStyle {
                 val margin = (shadow.patch.leftWidth - Radius.panel).coerceAtLeast(0f) * scale
                 shadow.draw(batch, x - margin, y - margin, width + 2 * margin, height + 2 * margin)
             }
-            fill.draw(batch, x, y, width, height)
+            val opacity = userOpacity
+            if (!GlassSurface.draw(batch, x, y, width, height, Radius.panel, tint, Glass.tint(opacity ?: Glass.defaultOpacity))) {
+                fill.patch.color.a = opacity?.let { Glass.fallbackAlpha(it) } ?: baseAlpha
+                fill.draw(batch, x, y, width, height)
+            }
             rim.draw(batch, x, y, width, height)
         }
     }
