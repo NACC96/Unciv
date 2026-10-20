@@ -1,0 +1,16 @@
+{
+  "facings": {
+    "E": {
+      "rawFile": "e-motion-v1.png",
+      "promptPath": "art/atlas/units/worker/prompts/e-v1.txt"
+    },
+    "NE": {
+      "rawFile": "ne-motion-v1.png",
+      "promptPath": "art/atlas/units/worker/prompts/ne-v1.txt"
+    },
+    "SE": {
+      "rawFile": "se-motion-v1.png",
+      "promptPath": "art/atlas/units/worker/prompts/se-v1.txt"
+    }
+  }
+}

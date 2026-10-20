@@ -225,25 +225,41 @@ class AgentTurnSpeedTest {
     }
 
     @Test
-    fun `session settings parse leniently and alternate civs between arms`() {
+    fun `session settings default to resumed sessions compacted after every turn`() {
         val defaults = AgentSessionPolicy.parseSettings(null)
-        Assert.assertEquals(1, defaults.sessionRotationTurns)
-        Assert.assertTrue(defaults.sessionAbTest)
-        Assert.assertEquals(1, AgentSessionPolicy.parseSettings("not json").sessionRotationTurns)
-        Assert.assertEquals(1, AgentSessionPolicy.parseSettings("""{"sessionRotationTurns":-3}""").sessionRotationTurns)
+        Assert.assertEquals(0, defaults.sessionRotationTurns)
+        Assert.assertFalse(defaults.sessionAbTest)
+        Assert.assertTrue(defaults.postTurnCompaction)
+        Assert.assertEquals(0, AgentSessionPolicy.parseSettings("not json").sessionRotationTurns)
+        Assert.assertEquals(0, AgentSessionPolicy.parseSettings("""{"sessionRotationTurns":-3}""").sessionRotationTurns)
 
         val civs = listOf("Rome", "Greece", "China")
-        Assert.assertEquals("rotate-1", AgentSessionPolicy.armFor("Rome", civs, defaults))
-        Assert.assertEquals(AgentSessionPolicy.ARM_RESUME, AgentSessionPolicy.armFor("Greece", civs, defaults))
-        Assert.assertEquals("rotate-1", AgentSessionPolicy.armFor("China", civs, defaults))
+        for (civ in civs) Assert.assertEquals(AgentSessionPolicy.ARM_COMPACT, AgentSessionPolicy.armFor(civ, civs, defaults))
+        Assert.assertTrue(AgentSessionPolicy.shouldResume(AgentSessionPolicy.ARM_COMPACT, 50, defaults))
+        Assert.assertTrue(AgentSessionPolicy.compactAfterTurn(AgentSessionPolicy.ARM_COMPACT, 1, defaults))
+
+        val plainResume = AgentSessionPolicy.parseSettings("""{"postTurnCompaction":false}""")
+        Assert.assertEquals(AgentSessionPolicy.ARM_RESUME, AgentSessionPolicy.armFor("Rome", civs, plainResume))
+        Assert.assertTrue(AgentSessionPolicy.shouldResume(AgentSessionPolicy.ARM_RESUME, 50, plainResume))
+        Assert.assertFalse(AgentSessionPolicy.compactAfterTurn(AgentSessionPolicy.ARM_RESUME, 1, plainResume))
+    }
+
+    @Test
+    fun `session settings alternate civs between arms and compact only sessions that will resume`() {
+        val civs = listOf("Rome", "Greece", "China")
+        val abTest = AgentSessionPolicy.parseSettings("""{"sessionRotationTurns":1,"sessionAbTest":true}""")
+        Assert.assertEquals("rotate-1", AgentSessionPolicy.armFor("Rome", civs, abTest))
+        Assert.assertEquals(AgentSessionPolicy.ARM_COMPACT, AgentSessionPolicy.armFor("Greece", civs, abTest))
+        Assert.assertEquals("rotate-1", AgentSessionPolicy.armFor("China", civs, abTest))
+        Assert.assertFalse("A session rotated out next turn is not worth compacting",
+            AgentSessionPolicy.compactAfterTurn("rotate-1", 1, abTest))
+        Assert.assertTrue(AgentSessionPolicy.compactAfterTurn(AgentSessionPolicy.ARM_COMPACT, 1, abTest))
 
         val everyThird = AgentSessionPolicy.parseSettings("""{"sessionRotationTurns":3,"sessionAbTest":false}""")
         Assert.assertEquals("rotate-3", AgentSessionPolicy.armFor("Greece", civs, everyThird))
         Assert.assertTrue(AgentSessionPolicy.shouldResume("rotate-3", 2, everyThird))
         Assert.assertFalse(AgentSessionPolicy.shouldResume("rotate-3", 3, everyThird))
-
-        val never = AgentSessionPolicy.parseSettings("""{"sessionRotationTurns":0}""")
-        Assert.assertEquals(AgentSessionPolicy.ARM_RESUME, AgentSessionPolicy.armFor("Rome", civs, never))
-        Assert.assertTrue(AgentSessionPolicy.shouldResume(AgentSessionPolicy.ARM_RESUME, 50, never))
+        Assert.assertTrue(AgentSessionPolicy.compactAfterTurn("rotate-3", 2, everyThird))
+        Assert.assertFalse(AgentSessionPolicy.compactAfterTurn("rotate-3", 3, everyThird))
     }
 }

@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup
 import com.badlogic.gdx.utils.Align
 import com.unciv.logic.civilization.Civilization
 import com.unciv.models.translations.tr
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.extensions.toLabel
 import com.unciv.ui.components.fonts.Fonts
 import com.unciv.ui.images.ImageGetter
@@ -28,13 +29,13 @@ class LineChart(
 ) : WidgetGroup() {
 
     private val axisLineWidth = 2f
-    private val axisColor = Color.WHITE
-    private val axisLabelColor = axisColor
+    private val axisColor get() = if (GameUiStyle.isAtlas) GameUiStyle.ink else Color.WHITE
+    private val axisLabelColor get() = axisColor
     private val axisLabelStyle by lazy { Label.LabelStyle(Fonts.font, axisLabelColor) } // lazy due to unit tests instantiating this without initializing font or skin
     private val axisToLabelPadding = 5f
     private val chartLineWidth = 3f
     private val orientationLineWidth = 1f
-    private val orientationLineColor = Color.LIGHT_GRAY
+    private val orientationLineColor get() = if (GameUiStyle.isAtlas) GameUiStyle.hover else Color.LIGHT_GRAY
 
     /** This should not be changed lightly. There's code (e.g. for generating the labels) that
      * assumes multiples of 10. Also please note, that the real number of labels is `maxLabels + 1`
@@ -259,10 +260,13 @@ class LineChart(
                     )
                 }
             }
-            val civLineColor = if (useActualColor(civ)) civ.nation.getOuterColor() else Color.DARK_GRAY
+            val civLineColor = if (useActualColor(civ)) civ.nation.getOuterColor()
+                else if (GameUiStyle.isAtlas) GameUiStyle.muted else Color.DARK_GRAY
             for (i in 1 until simplifiedScaledPoints.size) {
                 val a = simplifiedScaledPoints[i - 1]
                 val b = simplifiedScaledPoints[i]
+                if (GameUiStyle.isAtlas)
+                    drawLine(a.x, a.y, b.x, b.y, GameUiStyle.ink, chartLineWidth + 2f)
                 drawLine(a.x, a.y, b.x, b.y, civLineColor, chartLineWidth)
 
                 // Draw the selected Civ icon on its last datapoint

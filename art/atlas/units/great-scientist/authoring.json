@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "unitName": "Great Scientist",
+  "assetId": "great-scientist",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": null,
+  "uniqueTo": null,
+  "replaces": null,
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Great Scientist",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "HIT",
+    "DEFEAT",
+    "WORK"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "HIT": 4,
+    "DEFEAT": 8,
+    "WORK": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/great-scientist/e-motion-v1.png",
+      "rawHash": "512bdfb22d96e95930829a92388a3a0b10f61403d706c7bc942e67c5c5f52621",
+      "promptPath": "art/atlas/units/great-scientist/prompts/e-v1.txt",
+      "promptHash": "1566dc077dfa1166a354ec2761db4032a9030c988360d5a097d25f12d2d0c4c6",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/great-scientist/ne-motion-v1.png",
+      "rawHash": "e817eebb832ccf716f780142e9cacb5b0d690e1e8f7dbddc9b7f39d6c10cfa95",
+      "promptPath": "art/atlas/units/great-scientist/prompts/ne-v1.txt",
+      "promptHash": "8ccadd75761dde8efa63236d1fa391e86d49153fa8590c739af04d32c28f60bd",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/great-scientist/se-motion-v1.png",
+      "rawHash": "470e404329499f81d4fa54b4a2bb5397bf09203cd7dc69063340e62985ae795d",
+      "promptPath": "art/atlas/units/great-scientist/prompts/se-v1.txt",
+      "promptHash": "df879bd277152c955444ca90eebcffdde6b4040e8c52a87290db7a2e1d533ad6",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
+}

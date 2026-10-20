@@ -1,0 +1,24 @@
+{
+  "facings": {
+    "E": {
+      "rawFile": "e-motion-v2.png",
+      "promptPath": "art/atlas/units/great-war-bomber/prompts/e-v2.txt"
+    },
+    "NE": {
+      "rawFile": "ne-motion-v2.png",
+      "promptPath": "art/atlas/units/great-war-bomber/prompts/ne-v2.txt",
+      "identityReference": {
+        "path": "/Users/noahkenny/.codex/generated_images/01a1321a-8142-7533-ae7a-eb89a5433c70/exec-d1fb677e-08f2-4605-8ef8-20ea61c9d7d9.png",
+        "sha256": "0b77dd1b8d2833614f8ecc95c4923a809411800fb5299c41abd40b2f210e755e"
+      }
+    },
+    "SE": {
+      "rawFile": "se-motion-v2.png",
+      "promptPath": "art/atlas/units/great-war-bomber/prompts/se-v2.txt",
+      "identityReference": {
+        "path": "/Users/noahkenny/.codex/generated_images/01a1321a-8142-7533-ae7a-eb89a5433c70/exec-d1fb677e-08f2-4605-8ef8-20ea61c9d7d9.png",
+        "sha256": "0b77dd1b8d2833614f8ecc95c4923a809411800fb5299c41abd40b2f210e755e"
+      }
+    }
+  }
+}

@@ -53,6 +53,7 @@ class SaveGameScreen(private val gameInfo: GameInfo) : LoadOrSaveScreen("Current
         }
         rightSideButton.keyShortcuts.add(KeyCharAndCode.RETURN)
         rightSideButton.enable()
+        finishAtlasSaveLayout(saveButtonText)
     }
 
     private fun Table.initRightSideTable() {

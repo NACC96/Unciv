@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "unitName": "B17",
+  "assetId": "b17",
+  "creator": "OpenAI image generation",
+  "tool": "image_gen.imagegen (built-in)",
+  "rights": "original-generated",
+  "styleReference": {
+    "path": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/concept/unit-art-direction-v1.png",
+    "sha256": "ceb7c639185d98cb53535f21eb0966b1bec01bb782c80de2fdd972d2858ce641",
+    "role": "approved style only"
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/b17/e-motion-v2.png",
+      "rawHash": "70d9b81f73837e0ee9983d44b43af7fa8471adeec50b31666e88cf43115137e6",
+      "promptPath": "art/atlas/units/b17/prompts/e-v2.txt",
+      "promptHash": "a75835e771bec2260126450241213c9ae13eab32ca18d7366710269e30a2c333",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/b17/ne-motion-v2.png",
+      "rawHash": "35dda31362d22c3ab98b84f70903bf8364bf91e5e983f5c6e6b3138b623793c2",
+      "promptPath": "art/atlas/units/b17/prompts/ne-v2.txt",
+      "promptHash": "9df3c61d2afc037f6eb30db22ea43c278f3333fcf83d7a2c7de8b84fd69f3211",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ],
+      "identityReference": {
+        "path": "/Users/noahkenny/.codex/generated_images/01a1321a-8142-7533-ae7a-eb89a5433c70/exec-9b9d80c7-ebe4-48df-934e-3831bf93de32.png",
+        "sha256": "70d9b81f73837e0ee9983d44b43af7fa8471adeec50b31666e88cf43115137e6"
+      }
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/b17/se-motion-v2.png",
+      "rawHash": "69b2c101870d5f7c657093636de2a4d7e9c8be3930a849d6c0617e5b223f3652",
+      "promptPath": "art/atlas/units/b17/prompts/se-v2.txt",
+      "promptHash": "cbc964bdeb2e11db90d21320c913c178d3669bc2da100067af6ad0763ef9c2df",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ],
+      "identityReference": {
+        "path": "/Users/noahkenny/.codex/generated_images/01a1321a-8142-7533-ae7a-eb89a5433c70/exec-9b9d80c7-ebe4-48df-934e-3831bf93de32.png",
+        "sha256": "70d9b81f73837e0ee9983d44b43af7fa8471adeec50b31666e88cf43115137e6"
+      }
+    }
+  ],
+  "processing": {
+    "script": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/normalize_motion-v3.py",
+    "sha256": "d63316a6cedfaafcf546ecbd87f0163d3d13d0363c473cd389b2dd60c2113bf8",
+    "operations": [
+      "uniform cell cutting",
+      "constant sheet scale and root alignment",
+      "alpha-preserving resize",
+      "royal-blue nation mask extraction",
+      "violet ground-shadow extraction"
+    ],
+    "poseSynthesis": false,
+    "clonedStaticFrames": false
+  },
+  "reviewState": "candidate",
+  "formalArtReview": "deferred"
+}

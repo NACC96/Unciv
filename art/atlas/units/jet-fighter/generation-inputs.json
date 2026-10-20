@@ -1,0 +1,24 @@
+{
+  "facings": {
+    "E": {
+      "rawFile": "e-motion-v2.png",
+      "promptPath": "art/atlas/units/jet-fighter/prompts/e-v2.txt"
+    },
+    "SE": {
+      "rawFile": "se-motion-v2.png",
+      "promptPath": "art/atlas/units/jet-fighter/prompts/se-v2.txt",
+      "identityReference": {
+        "path": "/Users/noahkenny/.codex/generated_images/01a1321a-8142-7533-ae7a-eb89a5433c70/exec-5d93d541-ec46-47a7-a239-e5c6fc2c0eb2.png",
+        "sha256": "95233a0049cd1f59de570eaef64686b1360c5dc929f22a758744ca26771cb437"
+      }
+    },
+    "NE": {
+      "rawFile": "ne-motion-v2.png",
+      "promptPath": "art/atlas/units/jet-fighter/prompts/ne-v2.txt",
+      "identityReference": {
+        "path": "/Users/noahkenny/.codex/generated_images/01a1321a-8142-7533-ae7a-eb89a5433c70/exec-5d93d541-ec46-47a7-a239-e5c6fc2c0eb2.png",
+        "sha256": "95233a0049cd1f59de570eaef64686b1360c5dc929f22a758744ca26771cb437"
+      }
+    }
+  }
+}

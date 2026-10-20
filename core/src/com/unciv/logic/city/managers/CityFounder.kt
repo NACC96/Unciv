@@ -1,5 +1,6 @@
 package com.unciv.logic.city.managers
 
+import com.unciv.logic.presentation.VisualCapture
 import com.unciv.Constants
 import com.unciv.logic.StartingBonusApplicator
 import com.unciv.logic.city.City
@@ -17,7 +18,12 @@ import com.unciv.utils.withItem
 import yairm210.purity.annotations.Readonly
 
 class CityFounder {
-    fun foundCity(civInfo: Civilization, cityLocation: HexCoord, unit: MapUnit? = null): City {
+    fun foundCity(civInfo: Civilization, cityLocation: HexCoord, unit: MapUnit? = null): City =
+        VisualCapture.mutate(civInfo.gameInfo) {
+            foundCityInternal(civInfo, cityLocation, unit).also { civInfo.gameInfo.visualCaptureSink?.cityFounded(it) }
+        }
+
+    private fun foundCityInternal(civInfo: Civilization, cityLocation: HexCoord, unit: MapUnit?): City {
         val city = City()
 
         city.foundingCivObject = civInfo

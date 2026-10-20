@@ -1,0 +1,7 @@
+Use the reference sheet only for the exact character model, painting, colors and 8x4 cell layout. Create a new authored motion sheet for Great General, all32 poses now face NE/upper-right, diagonally away from camera. Show back-right three-quarter view consistently; this is not the E/right-facing side view. Keep the a distinguished early-industrial military commander on foot, navy bicorne hat, gold epaulettes, cream breeches and brown riding boots, royal-blue sash, leather map case and rolled parchment; no weapon. Same cell scale/pivot and complete model, transparent PNG.
+EXACT 8columns x4rows =32 sprites, no gutters/borders/text/matte. Each cell has fixed ground pivot 50%width/78%height. Elevated miniature map projection, warm light from upper left.
+Row1: four different idle breath/cloth poses, then four hit flinch/stagger/recovery poses.
+Row2: eight genuine alternating walking phases oriented NE, not standing clones.
+Row3: eight work phases oriented NE: unrolls a campaign map, points, signals, and rolls it closed.
+Row4: eight defeat stages stagger/buckle/kneel/tip/fall/contact/settle/prone, whole body inside each cell.
+Royal-blue cloth #2166B4 is tint material only, no blue skin/metal. A soft violet ground-shadow ellipse #A04FA0 only beneath each pose. Surrounding alpha transparent, no paper or checkerboard. All four rows and eight columns complete; root fixed. Do not rotate the whole raster sheet; author each pose at the new NE facing.

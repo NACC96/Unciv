@@ -1,5 +1,6 @@
 /** Additive observation v2 contract; mutations retain protocol version 1. */
 export interface HexPosition { x: number; y: number }
+export type MatchVision = "FOG" | "MAP" | "FULL";
 export interface MapQuery {
   mode?: "KNOWN" | "VISIBLE";
   center?: HexPosition;
@@ -13,9 +14,12 @@ export interface MapSummary {
   knownTileCount: number;
   visibleTileCount: number;
   worldWrap: boolean;
+  vision: MatchVision;
+  /** Longitude wrap radius when worldWrap (HexMath.getUnwrappedNearestTo); null otherwise. */
+  maxLongitude?: number | null;
 }
 export interface ObservedTile extends HexPosition {
-  visibility: "VISIBLE" | "REMEMBERED";
+  visibility: "VISIBLE" | "REMEMBERED" | "REVEALED";
   detailsKnown: boolean;
   lastSeenTurn: number | null;
   lastSeenRevision: number | null;
@@ -56,6 +60,8 @@ export interface WorkerImprovementOption {
   replacesImprovement: string | null;
   connectsResource: boolean;
   yieldDelta: { context: "actor-own-city-tile"; yields: Record<string, number> } | null;
+  /** Built at once and uses up the unit (Work Boats on a water resource); omitted otherwise. */
+  consumesUnit?: boolean;
 }
 export interface WorkInProgress { name: string; turnsRemaining: number }
 export interface RuleEntry {

@@ -52,6 +52,12 @@ class TileLayerTerrain(tileGroup: TileGroup, size: Float) : TileLayer(tileGroup,
 
         val shownImprovement = if (!UncivGame.Current.settings.showPixelImprovements) null
             else tileView.getShownImprovement()
+        // Damage is presentation of a currently visible city. Remembered terrain never reads
+        // fresh health, and the existing visibility/view authority remains the boundary.
+        val damagedCity = strings.tileSetName == "AtlasTerrain" && shownImprovement == "City center" &&
+            isViewable(viewingCiv) && tileView.isCityCenter() && tileView.owningCity()?.let {
+                it.getHealth() < it.getMaxHealth()
+            } == true
 
         val viewableResource = if (!UncivGame.Current.settings.showPixelImprovements) null
             else tileView.getViewableResource(if (isForceVisible) null else viewingCiv)
@@ -63,7 +69,7 @@ class TileLayerTerrain(tileGroup: TileGroup, size: Float) : TileLayer(tileGroup,
             if (shownImprovement != null) {
                 if (usePillagedImprovementImage(tileView))
                     yield("$shownImprovement-Pillaged")
-                else yield(shownImprovement)
+                else yield(if (damagedCity) "City center-Damaged" else shownImprovement)
             }
         }
 
@@ -99,7 +105,11 @@ class TileLayerTerrain(tileGroup: TileGroup, size: Float) : TileLayer(tileGroup,
                 add(allTogetherLocation)
                 addAll(edgeImages)
             }
-            tileView.naturalWonder != null -> getNaturalWonderBackupImage(baseHexagon) + edgeImages
+            tileView.naturalWonder != null -> getNaturalWonderBackupImage(baseHexagon.apply {
+                // Atlas wonders are transparent illustrated landmarks over their actual base.
+                if (strings.tileSetName == "AtlasTerrain")
+                    addAll(getTerrainImageLocations(sequenceOf(tileView.baseTerrain)))
+            }) + edgeImages
             else -> baseHexagon.apply {
                 addAll(getTerrainImageLocations(terrainImages))
                 addAll(edgeImages)
@@ -154,11 +164,20 @@ class TileLayerTerrain(tileGroup: TileGroup, size: Float) : TileLayer(tileGroup,
 
         // Chain the filter{} and map{} with sequences to avoid creating intermediate list,
         //  but then resolve it to a proper list.
-        val cachedSequence = possibleEdgeImages.asSequence().filter {
+        val matchingEdges = possibleEdgeImages.asSequence().filter {
             if (!matchesFilterMinimal(tileView, it.originTileFilter)) return@filter false
             if (!matchesFilterMinimal(neighborEdgeData.neighbor, it.destinationTileFilter)) return@filter false
             return@filter true
-        }.map { it.fileName }.toList()
+        }.toList()
+        val cachedSequence = if (strings.tileSetName == "AtlasTerrain") {
+            // Exact base-terrain material takes precedence over its Land/Water aliases.
+            // Otherwise the same generated boundary crop would be blended repeatedly for
+            // one visible neighbor. The neighbor still comes only from getVisibleNeighbors.
+            matchingEdges.maxByOrNull {
+                (if (it.originTileFilter == tileView.baseTerrain) 4 else if (it.originTileFilter in listOf("Land", "Water")) 0 else 1) +
+                    (if (it.destinationTileFilter == neighborEdgeData.neighbor.baseTerrain) 4 else if (it.destinationTileFilter in listOf("Land", "Water")) 0 else 1)
+            }?.let { listOf(it.fileName) } ?: emptyList()
+        } else matchingEdges.map { it.fileName }
 
         neighborEdgeData.ourTerrains = tileView.getCachedTerrainNameSet()
         neighborEdgeData.neighborTerrains = neighborEdgeData.neighbor.getCachedTerrainNameSet()

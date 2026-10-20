@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "unitName": "Pictish Warrior",
+  "assetId": "pictish-warrior",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": "Pictish Warrior",
+  "uniqueTo": "Celts",
+  "replaces": "Spearman",
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Pictish Warrior",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/pictish-warrior/e-motion-v1.png",
+      "rawHash": "a649bc03bb07abd426afcf1f78364cd358d50ebcc4c54c80e63fc750a0fb44ef",
+      "promptPath": "art/atlas/units/pictish-warrior/prompts/e-v1.txt",
+      "promptHash": "e6c4e028f6fdeb6d3f099baf38b501290cafe0a898cf3a1fa7c65ea670780028",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/pictish-warrior/ne-motion-v1.png",
+      "rawHash": "4d1d9cc26cf8d1ed2bfe178745712dd2fbc20273af8857a4fd12bef5b957dcdb",
+      "promptPath": "art/atlas/units/pictish-warrior/prompts/ne-v1.txt",
+      "promptHash": "c4de956424919542bbc4fdff6e7b4ac3ccda44813d604da33a61485e704a595f",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/pictish-warrior/se-motion-v1.png",
+      "rawHash": "c7c395f374bd9cb6620f3ed03c35a29aec9159536a161a4597b418595b5c027b",
+      "promptPath": "art/atlas/units/pictish-warrior/prompts/se-v1.txt",
+      "promptHash": "ca99592b3e086fa57cc7d7782fb5aff6495c29fec28b341f2d5ea9486fb38db6",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
+}

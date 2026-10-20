@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "unitName": "Sipahi",
+  "assetId": "sipahi",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": "Sipahi",
+  "uniqueTo": "The Ottomans",
+  "replaces": "Lancer",
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Sipahi",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/sipahi/e-motion-v1.png",
+      "rawHash": "82fb69d11f20a635f6d9166604e961ce23ebf14b678432337bc640670bc06177",
+      "promptPath": "art/atlas/units/sipahi/prompts/e-v1.txt",
+      "promptHash": "63fff0f358da32dc5d460b477596ee0e5a0f2b10f79ee522e70161857e720492",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/sipahi/ne-motion-v1.png",
+      "rawHash": "4300f4ee8f4792d80354d84e986533e2c4be1649cbf8b506b35f5fe96f571a11",
+      "promptPath": "art/atlas/units/sipahi/prompts/ne-v1.txt",
+      "promptHash": "3261df56aac40253a0ab7a9e9c161ecd305abb8a01e9eacbcb1dca3e836390e9",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/sipahi/se-motion-v1.png",
+      "rawHash": "edbaec537172e8bb9fe4fe3979b9053909e7cea069fee6109444a1abaece3fd3",
+      "promptPath": "art/atlas/units/sipahi/prompts/se-v1.txt",
+      "promptHash": "853cb99d3ccdd592caa3afb91803f4015914c52712906c05b6dbb323fee1cc8e",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
+}

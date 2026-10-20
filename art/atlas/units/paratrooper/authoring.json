@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "unitName": "Paratrooper",
+  "assetId": "paratrooper",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": null,
+  "uniqueTo": null,
+  "replaces": null,
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Paratrooper",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/paratrooper/e-motion-v1.png",
+      "rawHash": "94332e27a008061c6211f0b2a148e968429b691a35dab2cc635620489bb6e93b",
+      "promptPath": "art/atlas/units/paratrooper/prompts/e-v1.txt",
+      "promptHash": "8bee9918c0823dcade4860b451acef02c64569d1328b9c85430f7b887ae3c42b",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/paratrooper/ne-motion-v1.png",
+      "rawHash": "6c405ce86e1215d5f1e65118b972c1f208ed41657ac075654e8bd8df9ceecd36",
+      "promptPath": "art/atlas/units/paratrooper/prompts/ne-v1.txt",
+      "promptHash": "9ea5d59b75fb967b1d00931ec6fa4dfcdb145c83331225da169afb8926b45c4a",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/paratrooper/se-motion-v1.png",
+      "rawHash": "e8df8fe00c63b5a68719d52db03465e1fa9f111ca9298b4db2ecfe35bf784e9d",
+      "promptPath": "art/atlas/units/paratrooper/prompts/se-v1.txt",
+      "promptHash": "c5b98ce7d8798253a326d6ccf4ac001c560795b065c1da68e34d429ad90270ee",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
+}

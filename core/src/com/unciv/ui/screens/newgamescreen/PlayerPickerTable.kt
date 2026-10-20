@@ -101,7 +101,11 @@ class PlayerPickerTable(
         shuffle.label.wrap = true
         shuffle.labelCell.growX()
         add(shuffle).width(civBlocksWidth - 16f).padTop(2f).padBottom(8f).row()
-        add(ScrollPane(playerListTable).apply { setOverscroll(false, false) }).width(civBlocksWidth)
+        val listCell = add(ScrollPane(playerListTable).apply {
+            setOverscroll(false, false)
+            if (GameUiStyle.isAtlas) GameUiStyle.applyWidget(this)
+        }).width(civBlocksWidth)
+        if (GameUiStyle.isAtlas) listCell.growY().minHeight(0f)
         update()
         background = GameUiStyle.background("NewGameScreen/PlayerPickerTable")
     }
@@ -300,7 +304,9 @@ class PlayerPickerTable(
         playerTable.name = "SetupNation-${player.chosenCiv}"
         playerTable.pad(12f)
         // Sits between the picker surface and the raised buttons, so card actions keep visible edges.
-        playerTable.background = GameUiStyle.background("NewGameScreen/PlayerPickerTable/PlayerTable",
+        playerTable.background = if (GameUiStyle.isAtlas)
+            GameUiStyle.panelBackground("Atlas/Setup/NationCard", 1f)
+        else GameUiStyle.background("NewGameScreen/PlayerPickerTable/PlayerTable",
             GameUiStyle.surface.cpy().lerp(GameUiStyle.raised, 0.5f))
         val contentWidth = (civBlocksWidth - 24f).coerceAtLeast(100f)
 

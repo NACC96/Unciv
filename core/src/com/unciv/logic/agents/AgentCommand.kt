@@ -238,7 +238,10 @@ class UnitOrderResult(
     val receipt: ActionReceipt,
     /** Unit action after the command, null when woken or disbanded. */
     val action: String?,
-    val disbanded: Boolean
+    /** The unit no longer exists: disbanded, or consumed founding [foundedCityId]. */
+    val disbanded: Boolean,
+    /** AUTOMATE founded this city with the unit. */
+    val foundedCityId: String? = null
 ) : CommandResult
 
 /**
@@ -422,7 +425,10 @@ class TileBoughtResult(
     val tilePos: HexCoord
 ) : CommandResult
 
-/** Worker improvement construction (game.act type `unit.build`). Multi-turn progress runs through endTurn. */
+/**
+ * Worker improvement construction (game.act type `unit.build`). Multi-turn progress runs through endTurn;
+ * units that create water-resource improvements (Work Boats) build them at once and are used up.
+ */
 class BuildImprovementCommand(
     override val actorCivId: String,
     val actionId: String,
@@ -449,7 +455,7 @@ class WorkerImprovementsQueuedResult(
 class ImprovementStartedResult(
     override val actorCivId: String,
     val receipt: ActionReceipt,
-    /** Turns the improvement will take. */
+    /** Turns the improvement will take; 0 when it was created at once by using up the unit. */
     val turnsToBuild: Int
 ) : CommandResult
 

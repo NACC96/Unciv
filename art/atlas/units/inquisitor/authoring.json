@@ -1,0 +1,93 @@
+{
+  "schemaVersion": 1,
+  "unitName": "Inquisitor",
+  "assetId": "inquisitor",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": null,
+  "uniqueTo": null,
+  "replaces": null,
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Inquisitor",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/inquisitor/e-motion-v1.png",
+      "rawHash": "7073f1fc4d9e2b1c04ddef7f2adfbd90bc9a75da08a9d56b9eee6cebab78271c",
+      "promptPath": "art/atlas/units/inquisitor/prompts/e-v1.txt",
+      "promptHash": "94ee6775869618f74c7407f26fdceb9f5193d3e958bbb81fba75c076b69b280c",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/inquisitor/ne-motion-v1.png",
+      "rawHash": "1e4f57c696e7b106b4f6237ce42d6f91e533389c05e5f359f3241d458230f022",
+      "promptPath": "art/atlas/units/inquisitor/prompts/ne-v1.txt",
+      "promptHash": "56ac0a2f45a0b1dca3674874b38db81204f371803fbf408c5312fe483d3921a9",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/inquisitor/se-motion-v1.png",
+      "rawHash": "a878ef8dd1ff9523444f135fd57c1dfb069432cf7c46ce90a0fb4a8a2c6f4bbe",
+      "promptPath": "art/atlas/units/inquisitor/prompts/se-v1.txt",
+      "promptHash": "b1aeb5de7d8176d77161b826a3e9afee9e82e236d05721039981f815546560b6",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
+}

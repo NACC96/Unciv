@@ -1,4 +1,4 @@
-import type { HexPosition, MapQuery, MapPage, MapSummary, ObservedTile, RulesQuery, RulesResult, WorkerImprovementOption, WorkInProgress } from "./map-types.js";
+import type { HexPosition, MatchVision, MapQuery, MapPage, MapSummary, ObservedTile, RulesQuery, RulesResult, WorkerImprovementOption, WorkInProgress } from "./map-types.js";
 
 /**
  * Engine-service seam (AI_AGENT_PLAN.md §3.1, §7).
@@ -116,6 +116,8 @@ export interface IGameService {
   observe(): Promise<GameObserveResult>;
   messageImage(messageId: string, attachmentId: string): Promise<MessageImageResult | FakeError>;
   inspect(unitId: number): Promise<FakeUnit | ObservedUnit | FakeError | null>;
+  /** Own cities only; foreign, hidden and nonexistent cities share the safe null/rejection. */
+  inspectCity(cityId: string): Promise<ObservedCityDetail | FakeError | null>;
   inspectTile(position: HexPosition): Promise<ObservedTile | FakeError | null>;
   map(query?: MapQuery): Promise<MapPage | FakeError>;
   rules(query?: RulesQuery): Promise<RulesResult | FakeError>;
@@ -131,6 +133,12 @@ export interface IGameService {
   readNotes(): Promise<{ notes: string; notesRevision: number }>;
   updateNotes(notes: string, expectedNotesRevision: number): Promise<{ notesRevision: number } | FakeError>;
   endTurn(): Promise<{ turnEnded: boolean } | FakeError>;
+}
+
+/** Own-city detail from the desktop's inspect_city; transports pass it through. */
+export interface ObservedCityDetail {
+  cityId: string; name: string; x: number; y: number; population: number;
+  [field: string]: unknown;
 }
 
 /** Production desktop DTOs; transports must not assume the fake's field names. */
@@ -188,6 +196,7 @@ export interface FakeError {
 
 export class FakeGameService implements IGameService {
   revision = 42;
+  vision: MatchVision = "FOG";
   /** actionId -> {requestFingerprint, receipt} for idempotency tests. */
   private receipts = new Map<string, { fingerprint: string; receipt: FakeReceipt }>();
   /** Logical single-mutation slot (plan §5.1): true while a mutation is in flight. */
@@ -211,7 +220,7 @@ export class FakeGameService implements IGameService {
     return {
       observationVersion: 2,
       mapSummary: { observationVersion: 2, coordinateSystem: "UNCIV_HEX", knownTileCount: this.tiles.length,
-        visibleTileCount: this.tiles.filter(t => t.visibility === "VISIBLE").length, worldWrap: false },
+        visibleTileCount: this.tiles.filter(t => t.visibility === "VISIBLE").length, worldWrap: false, vision: this.vision },
       revision: this.revision,
       activeTurn: !this.turnEnded,
       turnEnded: this.turnEnded,
@@ -256,7 +265,7 @@ export class FakeGameService implements IGameService {
         ((query.center === undefined) !== (query.radius === undefined)) ||
         (query.center !== undefined && (!Number.isInteger(query.center.x) || !Number.isInteger(query.center.y))))
       return { protocolVersion: 1, status: "rejected", code: "INVALID_ARGUMENT", message: "invalid map query" };
-    const key = JSON.stringify([query.mode ?? "KNOWN", query.center ?? null, query.radius ?? null, limit]);
+    const key = JSON.stringify([this.vision, query.mode ?? "KNOWN", query.center ?? null, query.radius ?? null, limit]);
     let offset = 0;
     if (query.cursor !== undefined) {
       try {
@@ -314,6 +323,12 @@ export class FakeGameService implements IGameService {
       return { protocolVersion: 1, status: "rejected", code: "ILLEGAL_ACTION", message: "no such visible entity" };
     }
     return { unitId: seen.id, actions: [{ type: "unit.move", costs: { movement: 1 }, targets: "adjacent-explored-tiles" }] };
+  }
+
+  async inspectCity(cityId: string): Promise<ObservedCityDetail | FakeError> {
+    const city = this.cities.find(candidate => candidate.id === cityId);
+    if (!city) return { protocolVersion: 1, status: "rejected", code: "ILLEGAL_ACTION", message: "no such visible entity" };
+    return { cityId: city.id, name: city.id, x: 0, y: 0, population: 1, currentConstruction: null, queue: [...city.constructions] };
   }
 
   async inspect(unitId: number): Promise<FakeUnit | FakeError> {

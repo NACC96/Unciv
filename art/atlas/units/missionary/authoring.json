@@ -1,0 +1,93 @@
+{
+  "schemaVersion": 1,
+  "unitName": "Missionary",
+  "assetId": "missionary",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": null,
+  "uniqueTo": null,
+  "replaces": null,
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Missionary",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/missionary/e-motion-v1.png",
+      "rawHash": "35177aaf03ad146d1f7a1f3d1bd6a89d2840d1582c5b69db30880b80fbf2fbbb",
+      "promptPath": "art/atlas/units/missionary/prompts/e-v1.txt",
+      "promptHash": "c27daeed564999d556f22a72b03daa85da535da30ff62b72a4fa39b704d0f075",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/missionary/ne-motion-v1.png",
+      "rawHash": "c28ae0e3f1b07fadbdbbe5544a4501e71fc3a5a6e5f9c5db81ebd1c48e12513f",
+      "promptPath": "art/atlas/units/missionary/prompts/ne-v1.txt",
+      "promptHash": "3107d5c556fb389efd1843ed73df95c9322abc971ad185734d10e75ee61bb8e8",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/missionary/se-motion-v1.png",
+      "rawHash": "7339535c2c49e949ef6b848e4890269892aba61982fdacb590199f4112376557",
+      "promptPath": "art/atlas/units/missionary/prompts/se-v1.txt",
+      "promptHash": "0d0495c13fae82ba87c24938e1ddc33c1a877c728e3668031bfe617f07dae94d",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
+}

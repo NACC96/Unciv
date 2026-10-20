@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "unitName": "Anti-Tank Gun",
+  "assetId": "anti-tank-gun",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": null,
+  "uniqueTo": null,
+  "replaces": null,
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Anti-Tank Gun",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/anti-tank-gun/e-motion-v1.png",
+      "rawHash": "5c29737721c6abd436ecb3d43c5f042b72e079ed0bdbfdace0f67e1050d4d140",
+      "promptPath": "art/atlas/units/anti-tank-gun/prompts/e-v1.txt",
+      "promptHash": "cb6f41aa747944953b93b8d29aed377755861ef5262dadb51913ab34acb2b47b",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/anti-tank-gun/ne-motion-v1.png",
+      "rawHash": "d0a315607ee0c8c5f5b8b4f06e861cc25742e1b1bbc193d3b43a467a2ff995e8",
+      "promptPath": "art/atlas/units/anti-tank-gun/prompts/ne-v1.txt",
+      "promptHash": "9b30f7334b5e52cf4188767d249b8511f9ef56cff2d1f7a59e24e2bccdf9e03d",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/anti-tank-gun/se-motion-v1.png",
+      "rawHash": "a061e86cf4c3f59bce58cb5df0f89219decc5c7a7dfb048aa55d3c3f2682e8c5",
+      "promptPath": "art/atlas/units/anti-tank-gun/prompts/se-v1.txt",
+      "promptHash": "8891be6c1803a932490c8d8b6c53a4571804fe02a4db803a308c9ecb5bdbf14d",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
+}

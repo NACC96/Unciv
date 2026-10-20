@@ -83,6 +83,10 @@ class UnitTable(val worldScreen: WorldScreen) : Table() {
     val selectedCity: ForeignCityView?
         get() = (presenter as? CityPresenter)?.selectedCity
 
+    /** A unit, city or spy is shown; the idle-units summary alone is not a selection. */
+    val hasSelection: Boolean
+        get() = presenter !== summaryPresenter
+
     val selectedSpy: Spy?
         get() = (presenter as? SpyPresenter)?.selectedSpy
 
@@ -110,6 +114,13 @@ class UnitTable(val worldScreen: WorldScreen) : Table() {
         background = BaseScreen.skinStrings.getUiBackground(
             "WorldScreen/UnitTable", BaseScreen.skinStrings.roundedEdgeRectangleMidShape
         )
+        if (com.unciv.ui.components.GameUiStyle.isAtlas) {
+            // The single selection card: its host leaves room for the surface halo.
+            background = com.unciv.ui.screens.worldscreen.WorldScreenStyle.surface("Atlas/World/Unit")
+            pad(10f)
+            bg.isVisible = false
+            unitNameLabel.color = com.unciv.ui.components.GameUiStyle.ink
+        }
         addActor(bg)
 
         promotionsTable.touchable = Touchable.enabled

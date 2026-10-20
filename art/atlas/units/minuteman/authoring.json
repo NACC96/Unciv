@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "unitName": "Minuteman",
+  "assetId": "minuteman",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": "Minuteman",
+  "uniqueTo": "America",
+  "replaces": "Musketman",
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Minuteman",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/minuteman/e-motion-v1.png",
+      "rawHash": "a88547c895056b595253191d924d2c255c2219db62c20b085095f99c30463f14",
+      "promptPath": "art/atlas/units/minuteman/prompts/e-v1.txt",
+      "promptHash": "be5ae5d8645820cd5fceffbb7db58b9547486532383aa8124999bd3cb99bacb2",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/minuteman/ne-motion-v1.png",
+      "rawHash": "f7161ee60d3f6edf37ca4b58ded9ba15d7eafee2b54c8d5b6a293472f2c0618b",
+      "promptPath": "art/atlas/units/minuteman/prompts/ne-v1.txt",
+      "promptHash": "063bd5848b8b420d53f0a652a058777805b820727fdc50551ce363f33a4a9bd2",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/minuteman/se-motion-v1.png",
+      "rawHash": "ece069a17cfc1d4fe20240cbfab22198d69cd90d38f8727c22ccebf0228f5420",
+      "promptPath": "art/atlas/units/minuteman/prompts/se-v1.txt",
+      "promptHash": "681dff1bf78cc63111b1c274983b7f2177897b08a0873bbbb7863563af82a8ed",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
+}

@@ -1,5 +1,6 @@
 package com.unciv.ui.screens.mapeditorscreen.tabs
 
+import com.unciv.ui.components.GameUiStyle
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.ui.ButtonGroup
 import com.badlogic.gdx.scenes.scene2d.ui.CheckBox
@@ -47,6 +48,7 @@ class MapEditorEditTerrainTab(
         add(
             MarkupRenderer.render(
             getTerrains(),
+            labelWidth = editTab.brushListWidth,
             iconDisplay = FormattedLine.IconDisplay.NoLink
         ) {
             editTab.setBrush(it, "Terrain/$it") { tile ->
@@ -60,7 +62,7 @@ class MapEditorEditTerrainTab(
         .filter { it.type.isBaseTerrain }
         .filterNot { it.hasUnique(UniqueType.ExcludedFromMapEditor, GameContext.IgnoreConditionals) }
     private fun getTerrains() = allTerrains()
-        .map { FormattedLine(it.name, it.name, "Terrain/${it.name}", size = 32) }
+        .map { FormattedLine(it.name, it.name, "Terrain/${it.name}", size = if (GameUiStyle.isAtlas) GameUiStyle.Type.title else 32) }
         .asIterable()
 
     override fun isDisabled() = false // allTerrains().none() // wanna see _that_ mod...
@@ -80,8 +82,8 @@ class MapEditorEditFeaturesTab(
 
     private fun addFeatures(firstFeature: Terrain) {
         val eraserIcon = "Terrain/${firstFeature.name}"
-        val eraser = FormattedLine("Remove features", icon = eraserIcon, size = 32, iconCrossed = true)
-        add(eraser.render(0f).apply { onClick {
+        val eraser = FormattedLine("Remove features", icon = eraserIcon, size = if (GameUiStyle.isAtlas) GameUiStyle.Type.title else 32, iconCrossed = true)
+        add(eraser.render(editTab.brushListWidth).apply { onClick {
             editTab.setBrush("Remove features", eraserIcon, pediaLink = "", isRemove = true) { tile ->
                 tile.removeTerrainFeatures()
             }
@@ -89,6 +91,7 @@ class MapEditorEditFeaturesTab(
         add(
             MarkupRenderer.render(
             getFeatures(),
+            labelWidth = editTab.brushListWidth,
             iconDisplay = FormattedLine.IconDisplay.NoLink
         ) {
             editTab.setBrush(it, "Terrain/$it") { tile ->
@@ -102,7 +105,7 @@ class MapEditorEditFeaturesTab(
         .filter { it.type == TerrainType.TerrainFeature }
         .filterNot { it.hasUnique(UniqueType.ExcludedFromMapEditor, GameContext.IgnoreConditionals) }
     private fun getFeatures() = allowedFeatures()
-        .map { FormattedLine(it.name, it.name, "Terrain/${it.name}", size = 32) }
+        .map { FormattedLine(it.name, it.name, "Terrain/${it.name}", size = if (GameUiStyle.isAtlas) GameUiStyle.Type.title else 32) }
         .asIterable()
 
     override fun isDisabled() = allowedFeatures().none()
@@ -120,6 +123,7 @@ class MapEditorEditWondersTab(
         add(
             MarkupRenderer.render(
             getWonders(),
+            labelWidth = editTab.brushListWidth,
             iconDisplay = FormattedLine.IconDisplay.NoLink
         ) {
             editTab.setBrush(it, "Terrain/$it") { tile ->
@@ -136,7 +140,7 @@ class MapEditorEditWondersTab(
         .filter { it.type == TerrainType.NaturalWonder }
         .filterNot { it.hasUnique(UniqueType.ExcludedFromMapEditor, GameContext.IgnoreConditionals) }
     private fun getWonders() = allowedWonders()
-        .map { FormattedLine(it.name, it.name, "Terrain/${it.name}", size = 32) }
+        .map { FormattedLine(it.name, it.name, "Terrain/${it.name}", size = if (GameUiStyle.isAtlas) GameUiStyle.Type.title else 32) }
         .asIterable()
 
     override fun isDisabled() = allowedWonders().none()
@@ -156,8 +160,8 @@ class MapEditorEditResourcesTab(
 
     private fun addResources(firstResource: TileResource) {
         val eraserIcon = "Resource/${firstResource.name}"
-        val eraser = FormattedLine("Remove resource", icon = eraserIcon, size = 32, iconCrossed = true)
-        add(eraser.render(0f).apply { onClick {
+        val eraser = FormattedLine("Remove resource", icon = eraserIcon, size = if (GameUiStyle.isAtlas) GameUiStyle.Type.title else 32, iconCrossed = true)
+        add(eraser.render(editTab.brushListWidth).apply { onClick {
             editTab.setBrush("Remove resource", eraserIcon, pediaLink = "", isRemove = true) { tile ->
                 tile.tileResource = null
                 tile.resourceAmount = 0
@@ -166,6 +170,7 @@ class MapEditorEditResourcesTab(
         add(
             MarkupRenderer.render(
             getResources(),
+            labelWidth = editTab.brushListWidth,
             iconDisplay = FormattedLine.IconDisplay.NoLink
         ) { resourceName ->
             val resource = ruleset.tileResources[resourceName]!!
@@ -189,7 +194,7 @@ class MapEditorEditResourcesTab(
                 lastGroup = resource.resourceType
                 yield(FormattedLine(separator = true, color = "#888"))
             }
-            yield (FormattedLine(name, name, "Resource/$name", size = 32))
+            yield (FormattedLine(name, name, "Resource/$name", size = if (GameUiStyle.isAtlas) GameUiStyle.Type.title else 32))
         }
     }.asIterable()
 
@@ -210,8 +215,8 @@ class MapEditorEditImprovementsTab(
 
     private fun addImprovements(firstImprovement: TileImprovement) {
         val eraserIcon = "Improvement/${firstImprovement.name}"
-        val eraser = FormattedLine("Remove improvement", icon = eraserIcon, size = 32, iconCrossed = true)
-        add(eraser.render(0f).apply { onClick {
+        val eraser = FormattedLine("Remove improvement", icon = eraserIcon, size = if (GameUiStyle.isAtlas) GameUiStyle.Type.title else 32, iconCrossed = true)
+        add(eraser.render(editTab.brushListWidth).apply { onClick {
             editTab.setBrush("Remove improvement", eraserIcon, pediaLink = "", isRemove = true) { tile ->
                 tile.removeImprovement()
                 tile.removeRoad()
@@ -220,6 +225,7 @@ class MapEditorEditImprovementsTab(
         add(
             MarkupRenderer.render(
             getImprovements(),
+            labelWidth = editTab.brushListWidth,
             iconDisplay = FormattedLine.IconDisplay.NoLink
         ) {
             val road = RoadStatus.entries.firstOrNull { r -> r.name == it }
@@ -245,7 +251,7 @@ class MapEditorEditImprovementsTab(
                 lastGroup = group
                 yield(FormattedLine(separator = true, color = "#888"))
             }
-            yield (FormattedLine(name, name, "Improvement/$name", size = 32))
+            yield (FormattedLine(name, name, "Improvement/$name", size = if (GameUiStyle.isAtlas) GameUiStyle.Type.title else 32))
         }
     }.asIterable()
 
@@ -282,7 +288,7 @@ class MapEditorEditStartsTab(
     private fun addNations(firstNation: Nation) {
         val eraserIcon = "Nation/${firstNation.name}"
         val eraser = FormattedLine("Remove starting locations", icon = eraserIcon, size = 24, iconCrossed = true)
-        add(eraser.render(0f).apply { onClick {
+        add(eraser.render(editTab.brushListWidth).apply { onClick {
             editTab.setBrush("Remove", eraserIcon, handlerType = BrushHandlerType.Direct, pediaLink = "", isRemove = true) { tile ->
                 tile.tileMap.removeStartingLocations(tile.position)
             }
@@ -295,7 +301,8 @@ class MapEditorEditStartsTab(
         add(
             MarkupRenderer.render(
                 getNations(),
-                iconDisplay = FormattedLine.IconDisplay.NoLink
+                labelWidth = editTab.brushListWidth,
+            iconDisplay = FormattedLine.IconDisplay.NoLink
             ) {
                 UncivGame.Current.musicController.chooseTrack(it, MusicMood.Theme, MusicTrackChooserFlags.setSpecific)
                 val icon = "Nation/$it"
@@ -327,11 +334,14 @@ class MapEditorEditStartsTab(
     private fun addUsage() {
         val table = Table()
         table.defaults().pad(5f)
-        table.add("Use for new game \"Select players\" button:".toLabel()).colspan(3).row()
+        if (GameUiStyle.isAtlas) table.defaults().width(editTab.brushListWidth - 20f).growX().minWidth(0f)
+        table.add("Use for new game \"Select players\" button:".toLabel().apply { wrap = true }).colspan(if (GameUiStyle.isAtlas) 1 else 3).row()
         val defaultUsage = TileMap.StartingLocation.Usage.default
         for (usage in TileMap.StartingLocation.Usage.entries) {
             val checkBox = CheckBox(usage.label.tr(), skin)
+            if (GameUiStyle.isAtlas) { checkBox.label.wrap = true; checkBox.labelCell.growX().minWidth(0f) }
             table.add(checkBox)
+            if (GameUiStyle.isAtlas) table.row()
             usageOptionGroup.add(checkBox)
             checkBox.isChecked = usage == defaultUsage
         }
@@ -362,7 +372,7 @@ class MapEditorEditRiversTab(
         defaults().pad(10f).left()
         val removeLine = Table().apply {
             add(getRemoveRiverIcon()).padRight(10f)
-            add("Remove rivers".toLabel(fontSize = 32))
+            add("Remove rivers".toLabel(fontSize = if (GameUiStyle.isAtlas) GameUiStyle.Type.title else 32).apply { wrap = true })
             onClick {
                 editTab.setBrush(BrushHandlerType.River,"Remove rivers", getRemoveRiverIcon(), pediaLink) { tile ->
                     tile.hasBottomLeftRiver = false
@@ -381,7 +391,7 @@ class MapEditorEditRiversTab(
 
         val leftRiverLine = Table().apply {
             add(getRiverIcon(RiverEdge.Left)).padRight(10f)
-            add("Bottom left river".toLabel(fontSize = 32))
+            add("Bottom left river".toLabel(fontSize = if (GameUiStyle.isAtlas) GameUiStyle.Type.title else 32).apply { wrap = true })
             onClick {
                 editTab.setBrush(BrushHandlerType.Direct,"Bottom left river", getTileGroupWithRivers(
                     RiverEdge.Left
@@ -394,7 +404,7 @@ class MapEditorEditRiversTab(
 
         val bottomRiverLine = Table().apply {
             add(getRiverIcon(RiverEdge.Bottom)).padRight(10f)
-            add("Bottom river".toLabel(fontSize = 32))
+            add("Bottom river".toLabel(fontSize = if (GameUiStyle.isAtlas) GameUiStyle.Type.title else 32).apply { wrap = true })
             onClick {
                 editTab.setBrush(BrushHandlerType.Direct,"Bottom river", getTileGroupWithRivers(
                     RiverEdge.Bottom
@@ -407,7 +417,7 @@ class MapEditorEditRiversTab(
 
         val rightRiverLine = Table().apply {
             add(getRiverIcon(RiverEdge.Right)).padRight(10f)
-            add("Bottom right river".toLabel(fontSize = 32))
+            add("Bottom right river".toLabel(fontSize = if (GameUiStyle.isAtlas) GameUiStyle.Type.title else 32).apply { wrap = true })
             onClick {
                 editTab.setBrush(BrushHandlerType.Direct,"Bottom right river", getTileGroupWithRivers(
                     RiverEdge.Right
@@ -421,7 +431,7 @@ class MapEditorEditRiversTab(
         //todo this needs a better icon
         val spawnRiverLine = Table().apply {
             add(getRiverIcon(RiverEdge.All)).padRight(10f)
-            add("Spawn river from/to".toLabel(fontSize = 32))
+            add("Spawn river from/to".toLabel(fontSize = if (GameUiStyle.isAtlas) GameUiStyle.Type.title else 32).apply { wrap = true })
             onClick {
                 editTab.setBrush(
                     BrushHandlerType.RiverFromTo,

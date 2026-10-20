@@ -17,6 +17,7 @@ import type {
   GameObserveResult,
   IGameService,
   MessageImageResult,
+  ObservedCityDetail,
 } from "./fake-game-mcp.js";
 
 import type { HexPosition, MapQuery, MapPage, ObservedTile, RulesQuery, RulesResult } from "./map-types.js";
@@ -27,6 +28,13 @@ export class EngineDisconnected extends Error {
     this.name = "EngineDisconnected";
   }
 }
+
+/**
+ * Ending a turn also runs the other nations' turns up to this leader's next
+ * one; a match log showed it exceeding 30 s, after which the leader retried a
+ * turn the engine had already committed.
+ */
+export const END_TURN_TIMEOUT_MS = 180_000;
 
 export class StdioEngineBackend implements IGameService {
   private seq = 0;
@@ -99,7 +107,7 @@ export class StdioEngineBackend implements IGameService {
       const timer = setTimeout(() => {
         this.pending.delete(id);
         reject(new Error(`engine call ${method} timed out`));
-      }, this.callTimeoutMs);
+      }, method === "end_turn" ? Math.max(this.callTimeoutMs, END_TURN_TIMEOUT_MS) : this.callTimeoutMs);
       timer.unref?.();
       this.pending.set(id, {
         resolve: (frame) => {
@@ -133,6 +141,10 @@ export class StdioEngineBackend implements IGameService {
 
   async inspect(unitId: number): Promise<FakeUnit | ObservedUnit | FakeError | null> {
     return this.call("inspect", { civId: this.actorCivId(), unitId });
+  }
+
+  async inspectCity(cityId: string): Promise<ObservedCityDetail | FakeError | null> {
+    return this.call("inspect_city", { civId: this.actorCivId(), cityId });
   }
 
   async inspectTile(position: HexPosition): Promise<ObservedTile | FakeError | null> {

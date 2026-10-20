@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "unitName": "Mandekalu Cavalry",
+  "assetId": "mandekalu-cavalry",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": "Mandekalu Cavalry",
+  "uniqueTo": "Songhai",
+  "replaces": "Knight",
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Mandekalu Cavalry",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/mandekalu-cavalry/e-motion-v1.png",
+      "rawHash": "c05a8e41fa6073c8c676612ae4b14d392af0a524f59c35d6b405786424327243",
+      "promptPath": "art/atlas/units/mandekalu-cavalry/prompts/e-v1.txt",
+      "promptHash": "d1f7c64580db36b74f587c954471e2500ccb64ffe5fc8f0efa1e7fa79f1ed7a1",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/mandekalu-cavalry/ne-motion-v1.png",
+      "rawHash": "3b3506d8515b61a2d9ad8c0a3a647788189d6d19524c3aac3975d49a6d167a7f",
+      "promptPath": "art/atlas/units/mandekalu-cavalry/prompts/ne-v1.txt",
+      "promptHash": "ff0575e8663f546fab17e06b020a22fd9828980f51552cedf704aa472c0f4d99",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/mandekalu-cavalry/se-motion-v1.png",
+      "rawHash": "5c9e3b4f331eaeb4c5567bd2556437333a6f664268485a98b93e2b53a871f81b",
+      "promptPath": "art/atlas/units/mandekalu-cavalry/prompts/se-v1.txt",
+      "promptHash": "ab240cce4b32a0c433f1546247d6ec96ae77ab7a8361f5616acdf235e86941a1",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
+}

@@ -6,6 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.unciv.Constants
 import com.unciv.UncivGame
 import com.unciv.models.metadata.LocaleCode
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.extensions.darken
 import com.unciv.ui.components.extensions.toLabel
 import com.unciv.ui.components.input.KeyCharAndCode
@@ -27,6 +28,8 @@ import com.unciv.ui.screens.civilopediascreen.MarkupRenderer
 internal class LanguageTable(val language: String, val percentComplete: Int) : Table() {
     private val baseColor = BaseScreen.skinStrings.skinConfig.baseColor
     private val darkBaseColor = baseColor.darken(0.5f)
+    private val languageCaption = "${language.replace("_", " ")} ($percentComplete%)"
+    private val languageLabel = languageCaption.toLabel()
 
     init{
         pad(10f)
@@ -35,8 +38,11 @@ internal class LanguageTable(val language: String, val percentComplete: Int) : T
         if(ImageGetter.imageExists("FlagIcons/$language"))
             add(ImageGetter.getImage("FlagIcons/$language")).size(40f)
 
-        val spaceSplitLang = language.replace("_"," ")
-        add("$spaceSplitLang ($percentComplete%)".toLabel())
+        if (GameUiStyle.isAtlas) {
+            languageLabel.wrap = true
+            GameUiStyle.applyWidget(languageLabel)
+            add(languageLabel).minWidth(0f).growX()
+        } else add(languageLabel)
         update("")
         touchable =
             Touchable.enabled // so click listener is activated when any part is clicked, not only children
@@ -44,6 +50,13 @@ internal class LanguageTable(val language: String, val percentComplete: Int) : T
     }
 
     fun update(chosenLanguage: String) {
+        if (GameUiStyle.isAtlas) {
+            val selected = chosenLanguage == language
+            languageLabel.setText(if (selected) "✓ $languageCaption" else languageCaption)
+            background = GameUiStyle.outlinedBackground("Atlas/Language/Row", GameUiStyle.raised,
+                if (selected) GameUiStyle.accent else GameUiStyle.hover, if (selected) 2f else 1f)
+            return
+        }
         background = BaseScreen.skinStrings.getUiBackground(
             "LanguagePickerScreen/LanguageTable",
             tintColor = if (chosenLanguage == language) baseColor else darkBaseColor
@@ -65,7 +78,8 @@ internal class LanguageTable(val language: String, val percentComplete: Int) : T
             add(MarkupRenderer.render(listOf(translationDisclaimer),expectedWidth)).pad(5f).row()
 
             val tableLanguages = Table()
-            tableLanguages.defaults().uniformX().fillX().pad(10.0f)
+            tableLanguages.defaults().uniformX().fillX().pad(if (GameUiStyle.isAtlas) 4f else 10f)
+            if (GameUiStyle.isAtlas) tableLanguages.defaults().width(expectedWidth - 16f).minWidth(0f)
 
             val systemLanguage = LocaleCode.getSystemLanguage()
 

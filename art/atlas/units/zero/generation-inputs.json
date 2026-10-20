@@ -1,0 +1,24 @@
+{
+  "facings": {
+    "E": {
+      "rawFile": "e-motion-v2.png",
+      "promptPath": "art/atlas/units/zero/prompts/e-v2.txt"
+    },
+    "NE": {
+      "rawFile": "ne-motion-v2.png",
+      "promptPath": "art/atlas/units/zero/prompts/ne-v2.txt",
+      "identityReference": {
+        "path": "/Users/noahkenny/.codex/generated_images/01a1321a-8142-7533-ae7a-eb89a5433c70/exec-9c236ce0-594a-492c-b504-7483d1537b68.png",
+        "sha256": "c732adb5285a72f3396693fd7dd8a92d6ac16a7cbfc1cbddefb1b3adbd599e9d"
+      }
+    },
+    "SE": {
+      "rawFile": "se-motion-v2.png",
+      "promptPath": "art/atlas/units/zero/prompts/se-v2.txt",
+      "identityReference": {
+        "path": "/Users/noahkenny/.codex/generated_images/01a1321a-8142-7533-ae7a-eb89a5433c70/exec-9c236ce0-594a-492c-b504-7483d1537b68.png",
+        "sha256": "c732adb5285a72f3396693fd7dd8a92d6ac16a7cbfc1cbddefb1b3adbd599e9d"
+      }
+    }
+  }
+}

@@ -1,0 +1,8 @@
+Use case: stylized-concept. Original production 2D raster strategy-map Bomber animation. Create ONE transparent landscape PNG at2:1 aspect with EXACT8 columns x4 rows,32 fully visible airplane sprites, NO empty cells, NO overlaps. Make each plane compact with a12% transparent margin on all sides of its square cell.
+Identity: Twin-engine medium bomber with glazed nose, broad tapering wings, twin vertical tail fins, matte olive-gray metal and cobalt blank central fuselage panel, small neutral gray propellers.
+All32 nose points RIGHT/EAST in same elevated map camera, same scale and root. Illustrated painterly miniature with warm steel, olive-gray metal, ivory highlights, crisp dark outlines, top-left light. Blue #2166B4 nation band only; violet #A04FA0 ellipse shadow below every plane.
+Row1: FOUR complete IDLE sprites across first FOUR cells (propeller phase changes), then FOUR complete HIT sprites across last FOUR cells (bank/jolt/sparks).
+Row2: EIGHT MOVE sprites (propeller/wing-bank phases).
+Row3: EIGHT ATTACK sprites (bomb bay opening, dropping bombs, close, recover).
+Row4: EIGHT DEFEAT sprites (progressive engine smoke, wing failure, descent, wreck; final wreck visible).
+Count32 body/wreck silhouettes, eight per row. Every idle cell has a COMPLETE plane including nose, fuselage, wings and tail. Root x50%,y75% percell. Pure alpha outside sprites. No text, numbers, emblems, panels, background, scenery, grids, placeholders, or copied game art.

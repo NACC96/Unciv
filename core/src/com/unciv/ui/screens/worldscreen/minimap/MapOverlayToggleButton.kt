@@ -6,6 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Button
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.utils.Align
 import com.unciv.GUI
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.UncivTooltip
 import com.unciv.ui.components.extensions.toLabel
 import com.unciv.ui.components.input.onClick
@@ -31,7 +32,9 @@ class MapOverlayToggleButton(
     private val icon = ImageGetter.getImage(iconPath)
     private var layerTooltip: UncivTooltip<Table>? = null
     init {
-        WorldScreenStyle.apply(this)
+        // Atlas: a filled quiet control with a brass tint while on, listed in the minimap's Layers menu.
+        if (GameUiStyle.isAtlas) WorldScreenStyle.apply(this, GameUiStyle.Emphasis.Quiet, GameUiStyle.ButtonSize.Icon)
+        else WorldScreenStyle.apply(this)
         pad(6f)
         add(icon).size(iconSize)
         onClick(::toggle)

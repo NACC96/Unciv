@@ -4,6 +4,8 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.ui.Table
+import com.unciv.ui.components.AtlasWidgets
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.logic.MissingModsException
 import com.unciv.logic.UncivShowableException
 import com.unciv.logic.files.MapSaver
@@ -44,17 +46,29 @@ class MapEditorLoadTab(
     private var chosenMap: FileHandle? = null
 
     init {
+        if (GameUiStyle.isAtlas) {
+            top()
+            pad(8f)
+            defaults().growX().minWidth(0f)
+        }
         val buttonTable = Table(skin)
-        buttonTable.defaults().pad(10f).fillX()
+        buttonTable.defaults().pad(if (GameUiStyle.isAtlas) 4f else 10f).growX().minWidth(0f)
         loadButton.onActivation { chosenMap?.let { loadHandler(it) } }
         loadButton.keyShortcuts.add(KeyCharAndCode.RETURN)
         buttonTable.add(loadButton)
+        if (GameUiStyle.isAtlas) { GameUiStyle.apply(loadButton, primary = true); loadButton.label.wrap = true }
         deleteButton.onActivation { deleteHandler() }
         deleteButton.keyShortcuts.add(KeyCharAndCode.DEL)
         buttonTable.add(deleteButton)
+        if (GameUiStyle.isAtlas) {
+            deleteButton.style = BaseScreen.skin.get("negative", com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle::class.java)
+            GameUiStyle.applyWidget(deleteButton)
+            deleteButton.label.wrap = true
+        }
         buttonTable.pack()
 
-        val fileTableHeight = editorScreen.stage.height - headerHeight - buttonTable.height - 2f
+        val fileTableHeight = (editorScreen.getToolsHeight() - headerHeight - buttonTable.height -
+            if (GameUiStyle.isAtlas) 26f else 2f).coerceAtLeast(60f)
         add(mapFiles).size(editorScreen.getToolsWidth() - 20f, fileTableHeight).padTop(10f).row()
         add(buttonTable).row()
     }
@@ -93,7 +107,7 @@ class MapEditorLoadTab(
         chosenMap = file
         loadButton.isEnabled = (file != null)
         deleteButton.isEnabled = (file != null)
-        deleteButton.color = if (file != null) Color.SCARLET else Color.BROWN
+        deleteButton.color = if (GameUiStyle.isAtlas) Color.WHITE else if (file != null) Color.SCARLET else Color.BROWN
     }
 
     private fun CoroutineScope.loaderThread(mapFile: FileHandle) {

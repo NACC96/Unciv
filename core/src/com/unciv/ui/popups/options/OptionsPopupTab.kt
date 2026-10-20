@@ -1,6 +1,7 @@
 package com.unciv.ui.popups.options
 
 import com.badlogic.gdx.scenes.scene2d.ui.Table
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.widgets.TabbedPager
 import com.unciv.ui.screens.basescreen.BaseScreen.Companion.skin
 
@@ -17,6 +18,7 @@ internal abstract class OptionsPopupTab(
     internal val optionsPopup: OptionsPopup,
 ) : Table(skin), TabbedPager.IPageExtensions, OptionsPopupHelpers {
     override val rightWidgetMinWidth by optionsPopup::rightWidgetMinWidth
+    override val stackedOptionRows by optionsPopup::stackedOptionRows
     override val activePage get() = OptionsPopupPages[optionsPopup.tabs.activePage]
 
     val settings by optionsPopup::settings
@@ -35,6 +37,15 @@ internal abstract class OptionsPopupTab(
 
     open fun lateInitialize() {
         isInitialized = true
+        prepareAtlasPage()
+    }
+
+    /** Late-created and detached pages receive the same controls once their content exists. */
+    protected fun prepareAtlasPage() {
+        if (!GameUiStyle.isAtlas) return
+        top()
+        background = GameUiStyle.background("Atlas/Options/Page", GameUiStyle.inset)
+        GameUiStyle.applyWidget(this)
     }
 
     override fun activated(index: Int, caption: String, pager: TabbedPager) {

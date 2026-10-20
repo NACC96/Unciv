@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "unitName": "Missile Cruiser",
+  "assetId": "missile-cruiser",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": null,
+  "uniqueTo": null,
+  "replaces": null,
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Missile Cruiser",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/missile-cruiser/e-motion-v2.png",
+      "rawHash": "3181b55786599ca5933b27e08b6a29f6e1890560ddea6a87d888960d3421d1c7",
+      "promptPath": "art/atlas/units/missile-cruiser/prompts/e-v2.txt",
+      "promptHash": "acd705f220f3881e0ed43e3d967031d15b5911c37c15cec118d979c51c97ca54",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/missile-cruiser/ne-motion-v2.png",
+      "rawHash": "dcd30902fa5e1e8930cc8b98604c570a514422b215e9c7c87745b5014ee0cb47",
+      "promptPath": "art/atlas/units/missile-cruiser/prompts/ne-v2.txt",
+      "promptHash": "fa089bac49b87f9f1127b17274715dddf75dd76afca0a3f369af60c1ace4509b",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/missile-cruiser/se-motion-v2.png",
+      "rawHash": "8837842784e1c0b77999f6cbdcdf843c5cfba33cc2a39b881e62d646db2df8fa",
+      "promptPath": "art/atlas/units/missile-cruiser/prompts/se-v2.txt",
+      "promptHash": "4d46ed4b76fb2d74a2557997525265fd9f690eef6bd962f356d322fc62b905c2",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
+}

@@ -1,5 +1,9 @@
 package com.unciv.logic.battle
 
+import com.unciv.logic.presentation.VisualCapture
+import com.unciv.logic.presentation.VisualAttackKind
+import com.unciv.logic.presentation.VisualAttackOutcome
+import com.unciv.logic.presentation.VisualMoveKind
 import com.unciv.Constants
 import com.unciv.UncivGame
 import com.unciv.logic.automation.civilization.NextTurnAutomation
@@ -35,7 +39,11 @@ object Battle {
      *
      * Currently not used by UI, only by automation via [BattleHelper.tryAttackNearbyEnemy][com.unciv.logic.automation.unit.BattleHelper.tryAttackNearbyEnemy]
      */
-    fun moveAndAttack(attacker: MapUnitCombatant, attackableTile: AttackableTile) {
+    fun moveAndAttack(attacker: MapUnitCombatant, attackableTile: AttackableTile): Unit = VisualCapture.mutate(attacker.getCivInfo().gameInfo) {
+        moveAndAttackInternal(attacker, attackableTile)
+    }
+
+    private fun moveAndAttackInternal(attacker: MapUnitCombatant, attackableTile: AttackableTile) {
         if (!movePreparingAttack(attacker, attackableTile, true)) return
         attackOrNuke(attacker, attackableTile)
     }
@@ -101,9 +109,21 @@ object Battle {
         }
     }
 
-    fun attack(attacker: ICombatant, defender: ICombatant): DamageDealt {
+    fun attack(attacker: ICombatant, defender: ICombatant): DamageDealt = VisualCapture.mutate(attacker.getCivInfo().gameInfo) {
+        attackInternal(attacker, defender)
+    }
+
+    private fun attackInternal(attacker: ICombatant, defender: ICombatant): DamageDealt {
         debug("%s %s attacked %s %s", attacker.getCivInfo().civID, attacker.getName(), defender.getCivInfo().civID, defender.getName())
         val attackedTile = defender.getTile()
+        val visualScope = attacker.getCivInfo().gameInfo.visualCaptureSink
+        val visualBefore = visualScope?.beforeAttack(attacker, defender, attackedTile, when {
+            attacker is CityCombatant -> VisualAttackKind.CITY
+            attacker.isAirUnit() -> VisualAttackKind.AIR
+            attacker.isRanged() -> VisualAttackKind.RANGED
+            else -> VisualAttackKind.MELEE
+        })
+        val occupants = if (visualScope != null) attackedTile.getUnits().toList() else emptyList()
         if (attacker is MapUnitCombatant) {
             attacker.unit.attacksSinceTurnStart.add(attackedTile.position)
         } else {
@@ -117,10 +137,17 @@ object Battle {
         val interceptDamage: DamageDealt
         if (attacker is MapUnitCombatant && attacker.unit.baseUnit.isAirUnit()) {
             interceptDamage = AirInterception.tryInterceptAirAttack(attacker, attackedTile, defender.getCivInfo(), defender)
-            if (attacker.isDefeated()) return interceptDamage
+            if (attacker.isDefeated()) {
+                visualScope?.afterAttack(visualBefore, attacker, defender, attackedTile, VisualAttackOutcome.INTERCEPTED,
+                    interceptDamage.defenderDealt, interceptDamage.attackerDealt)
+                return interceptDamage
+            }
         } else interceptDamage = DamageDealt.None
 
-        if (hasWithdrawnFromMelee(attacker, defender, attackedTile)) return DamageDealt.None
+        if (hasWithdrawnFromMelee(attacker, defender, attackedTile)) {
+            visualScope?.afterAttack(visualBefore, attacker, defender, attackedTile, VisualAttackOutcome.WITHDRAWN, 0, 0)
+            return DamageDealt.None
+        }
 
         val isAlreadyDefeatedCity = defender is CityCombatant && defender.isDefeated()
 
@@ -179,7 +206,12 @@ object Battle {
             attacker.getCivInfo().notifications.remove(cityCanBombardNotification)
         }
 
-        return damageDealt + interceptDamage
+        val totalDamage = damageDealt + interceptDamage
+        visualScope?.afterAttack(visualBefore, attacker, defender, attackedTile,
+            if (captureMilitaryUnitSuccess) VisualAttackOutcome.CAPTURED else VisualAttackOutcome.RESOLVED,
+            totalDamage.defenderDealt, totalDamage.attackerDealt)
+        for (unit in occupants) visualScope?.removeUnit(visualScope.unit(unit))
+        return totalDamage
     }
 
     private fun triggerPostKillingUniques(
@@ -813,8 +845,11 @@ object Battle {
         }
         // Withdraw success: Do it - move defender to toTile for no cost
         // NOT defender.unit.movement.moveToTile(toTile) - we want a free teleport
+        val visualScope = defender.getCivInfo().gameInfo.visualCaptureSink
+        val visualBefore = visualScope?.unit(defender.unit)
         defender.unit.removeFromTile()
         defender.unit.putInTile(toTile)
+        visualScope?.displaced(visualBefore, defender.unit, VisualMoveKind.RETREAT)
         defender.unit.mostRecentMoveType = UnitMovementMemoryType.UnitWithdrew
         // and count 1 attack for attacker but leave it in place
         reduceAttackerMovementPointsAndAttacks(attacker, defender, fromTile)

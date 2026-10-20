@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.utils.Align
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.widgets.UnitIconGroup
 import com.unciv.ui.components.input.onClick
 import com.unciv.ui.components.extensions.toLabel
@@ -20,16 +21,17 @@ class CityScreenCityPickerTable(private val cityScreen: CityScreen) : Table() {
         val cityView = cityScreen.cityView
         val civView = cityView.owningCiv()
         background = BaseScreen.skinStrings.getUiBackground("CityScreen/CityPickerTable", BaseScreen.skinStrings.roundedEdgeRectangleShape, civView.getOuterColor())
+        if (GameUiStyle.isAtlas) background = null
         clear()
 
         if (cityScreen.viewableCities.size > 1) {
             val prevCityButton = Table() // so we get a wider clickable area than just the image itself
             val image = ImageGetter.getImage("OtherIcons/BackArrow")
-            image.color = civView.getInnerColor()
+            image.color = if (GameUiStyle.isAtlas) GameUiStyle.accent else civView.getInnerColor()
             prevCityButton.add(image).size(25f).pad(10f)
             prevCityButton.touchable = Touchable.enabled
             prevCityButton.onClick { cityScreen.page(-1) }
-            add(prevCityButton).pad(10f)
+            add(prevCityButton).pad(if (GameUiStyle.isAtlas) 0f else 10f)
         } else add()
 
         val cityNameTable = Table()
@@ -55,22 +57,22 @@ class CityScreenCityPickerTable(private val cityScreen: CityScreen) : Table() {
         }
 
         val currentCityLabel = cityView.name
-            .toLabel(fontSize = 30, fontColor = civView.getInnerColor(), hideIcons = true)
+            .toLabel(fontSize = if (GameUiStyle.isAtlas) GameUiStyle.Type.display else 30, fontColor = if (GameUiStyle.isAtlas) GameUiStyle.ink else civView.getInnerColor(), hideIcons = true)
         if (cityScreen.canChangeState) currentCityLabel.onClick {
             CityRenamePopup(
                 screen = cityScreen,
                 cityView = cityView,
                 actionOnClose = {
-                    cityScreen.game.replaceCurrentScreen{ CityScreen(cityScreen.cityView) }
+                    cityScreen.game.replaceCurrentScreen { cityScreen.recreate() }
                 }
             )
         }
 
         currentCityLabel.setEllipsis(true)
-        cityNameTable.add(currentCityLabel).minWidth(0f).padTopDescent()
+        cityNameTable.add(currentCityLabel).growX().minWidth(0f).padTopDescent()
 
         val currentCityPop = " (${cityView.getPopulationCount()})"
-            .toLabel(fontSize = 30, fontColor = civView.getInnerColor(), hideIcons = true)
+            .toLabel(fontSize = if (GameUiStyle.isAtlas) GameUiStyle.Type.display else 30, fontColor = if (GameUiStyle.isAtlas) GameUiStyle.ink else civView.getInnerColor(), hideIcons = true)
         cityNameTable.add(currentCityPop).padTopDescent()
 
         val garrison = cityView.getGarrison()
@@ -78,8 +80,11 @@ class CityScreenCityPickerTable(private val cityScreen: CityScreen) : Table() {
             cityNameTable.add(UnitIconGroup(garrison, 30f)).padLeft(5f)
         }
 
-        val width = if (cityScreen.isCrampedPortrait()) stage.width / 3 else stage.width / 4
-        add(cityNameTable).width(width)
+        if (GameUiStyle.isAtlas) add(cityNameTable).growX().minWidth(0f)
+        else {
+            val width = if (cityScreen.isCrampedPortrait()) stage.width / 3 else stage.width / 4
+            add(cityNameTable).width(width)
+        }
 
         if (cityScreen.viewableCities.size > 1) {
             val nextCityButton = Table() // so we gt a wider clickable area than just the image itself
@@ -87,11 +92,11 @@ class CityScreenCityPickerTable(private val cityScreen: CityScreen) : Table() {
             image.setSize(25f, 25f)
             image.setOrigin(Align.center)
             image.rotation = 180f
-            image.color = civView.getInnerColor()
+            image.color = if (GameUiStyle.isAtlas) GameUiStyle.accent else civView.getInnerColor()
             nextCityButton.add(image).size(25f).pad(10f)
             nextCityButton.touchable = Touchable.enabled
             nextCityButton.onClick { cityScreen.page(1) }
-            add(nextCityButton).pad(10f)
+            add(nextCityButton).pad(if (GameUiStyle.isAtlas) 0f else 10f)
         } else add()
 
         pack()

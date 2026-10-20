@@ -16,6 +16,7 @@ import com.unciv.models.ruleset.validation.RulesetErrorList
 import com.unciv.models.ruleset.validation.RulesetErrorSeverity
 import com.unciv.models.ruleset.validation.UniqueAutoUpdater
 import com.unciv.models.translations.tr
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.UncivTooltip.Companion.addTooltip
 import com.unciv.ui.components.extensions.setSize
 import com.unciv.ui.components.extensions.surroundWithCircle
@@ -109,6 +110,8 @@ internal class ModCheckTab(
     override fun getFixedContent() = fixedContent
 
     override fun activated(index: Int, caption: String, pager: TabbedPager) {
+        super.activated(index, caption, pager)
+        GameUiStyle.applyWidget(fixedContent)
         runAction()
     }
 
@@ -245,6 +248,7 @@ internal class ModCheckTab(
 
     private fun addResultCommon(mod: Ruleset, table: Table) {
         table.name = mod.name // used when searching
+        GameUiStyle.applyWidget(table)
 
         synchronized(modCheckResultTable) {
             modResultTables.add(table)
@@ -281,8 +285,16 @@ internal class ModCheckTab(
                         .onClick { autoUpdateUniques(game.screen!!, mod, replaceableUniques) }).row()
             }
             for (line in modLinks) {
-                val label = Label(line.text, BaseScreen.skin)
-                    .apply { color = line.errorSeverityToReport.color }
+                val label = Label(line.text, BaseScreen.skin).apply {
+                    color = if (GameUiStyle.isAtlas) Color.WHITE else line.errorSeverityToReport.color
+                    if (GameUiStyle.isAtlas) style = Label.LabelStyle(style).apply {
+                        fontColor = when (line.errorSeverityToReport) {
+                            RulesetErrorSeverity.OK -> GameUiStyle.ink
+                            RulesetErrorSeverity.Warning -> GameUiStyle.warning
+                            else -> GameUiStyle.error
+                        }
+                    }
+                }
                 label.wrap = true
                 it.add(label).width(stage.width / 2).row()
             }
@@ -300,7 +312,8 @@ internal class ModCheckTab(
         if (stage == null) return
         val table = Table(BaseScreen.skin).apply {
             defaults().pad(8f)
-            background = BaseScreen.skinStrings.getUiBackground("General/DisabledBox", tintColor = Color.DARK_GRAY)
+            background = if (GameUiStyle.isAtlas) GameUiStyle.background("Atlas/Options/Disabled", GameUiStyle.surface)
+                else BaseScreen.skinStrings.getUiBackground("General/DisabledBox", tintColor = Color.DARK_GRAY)
             add(ImageGetter.getImage("OtherIcons/Question").apply { setSize(33f) }).padRight(10f).growY()
             add(mod.name.toLabel(Color.LIGHT_GRAY, Constants.headingFontSize, alignment = Align.left)).left().grow()
             addTooltip("Requirements could not be determined.\nChoose a base to check this Mod.", 16f, targetAlign = Align.top)

@@ -17,6 +17,7 @@ import com.unciv.logic.civilization.Civilization
 import com.unciv.models.ruleset.MilestoneType
 import com.unciv.models.ruleset.Victory
 import com.unciv.models.translations.tr
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.extensions.toLabel
 import com.unciv.ui.components.input.KeyCharAndCode
 import com.unciv.ui.components.widgets.TabbedPager
@@ -71,6 +72,7 @@ class VictoryScreenIllustrations(
     }
 
     private val game = worldScreen.gameInfo
+    private val parentScreen = parent
     private val selectedCiv = worldScreen.selectedCiv
     private val victories = worldScreen.selectedGameView.civView.getVictoriesShownInVictoryScreen()
         .filter { it.hasIllustrations() }
@@ -98,6 +100,7 @@ class VictoryScreenIllustrations(
         }
 
         tabs.selectPage(selectedVictory)
+        GameUiStyle.applyWidget(tabs)
         add(tabs).top().grow()
     }
 
@@ -108,7 +111,9 @@ class VictoryScreenIllustrations(
         val victory = victories.firstOrNull { it.name == selectedVictory } ?: return
         tabs.onSelection(null)  // Prevent recursion from replacePage
         // todo measure: 265f = PickerPane.bottomTable.height + SplitPane.handle.height + 2* TabbedPager.header.height + separator.height
-        val maxHeight = stage.height - 265f
+        val maxHeight = if (GameUiStyle.isAtlas)
+            (stage.height - parentScreen.bottomTable.height - 2 * tabs.headerScroll.height - 80f).coerceAtLeast(80f)
+        else stage.height - 265f
         val fadeAction = FadeTo(holder, getImages(victory), maxHeight)  // side effect: adds images to holder and packs it
         tabs.replacePage(tabs.activePage, holder)  // Force TabbedPager to measure content
         holder.addAction(fadeAction)
@@ -279,10 +284,11 @@ class VictoryScreenIllustrations(
         game.victoryData?.run {
             if (victory.name == victoryType && selectedCiv.civID == winningCiv) {
                 val image = getImageOrNull(victory, "Won")
-                return getWonOrLostStack(image, victory.victoryString, Color.GOLD)
+                return getWonOrLostStack(image, victory.victoryString, if (GameUiStyle.isAtlas) GameUiStyle.accent else Color.GOLD)
             }
             val image = getImageOrNull(victory, "Lost")
-            return getWonOrLostStack(image, victory.defeatString.takeIf { victory.name == victoryType }, Color.MAROON)
+            return getWonOrLostStack(image, victory.defeatString.takeIf { victory.name == victoryType },
+                if (GameUiStyle.isAtlas) GameUiStyle.error else Color.MAROON)
         }
 
         val result = mutableListOf<Actor>()

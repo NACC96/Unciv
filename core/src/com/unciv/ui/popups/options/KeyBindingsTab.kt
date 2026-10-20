@@ -119,6 +119,7 @@ internal class KeyBindingsTab(
     override fun activated(index: Int, caption: String, pager: TabbedPager) {
         super.activated(index, caption, pager)
         update()
+        prepareAtlasPage()
     }
     override fun deactivated(index: Int, caption: String, pager: TabbedPager) {
         save()

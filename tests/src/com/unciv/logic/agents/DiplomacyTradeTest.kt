@@ -192,6 +192,24 @@ class DiplomacyTradeTest {
     }
 
     @Test
+    fun `invalid offers name each failing item once`() {
+        val f = Fixture()
+        // At peace already, and Rome holds only 200 Gold.
+        val error = rejectedWithoutMutation(f, ProposeTradeCommand(f.romeId, "peace-at-peace", f.rev(), f.greeceId,
+            listOf(f.peaceTreaty(), f.goldGift(2000)), listOf(f.peaceTreaty())), AgentCommandError.ILLEGAL_ACTION)
+        val message = error.message!!
+        Assert.assertTrue(message, message.startsWith("Offer is not valid: "))
+        Assert.assertTrue(message, message.contains("Peace Treaty: you are not at war with ${f.greeceId} (status Peace)"))
+        Assert.assertEquals(message, 1, Regex("Peace Treaty:").findAll(message).count())
+        Assert.assertTrue(message, message.contains("2000 Gold exceeds the 200 Gold you have"))
+        Assert.assertTrue(f.coordinator.getIncomingTradeRequests(f.greeceId).isEmpty())
+
+        val theirs = rejectedWithoutMutation(f, ProposeTradeCommand(f.romeId, "ask-gold", f.rev(), f.greeceId,
+            emptyList(), listOf(f.goldGift(5000))), AgentCommandError.ILLEGAL_ACTION).message!!
+        Assert.assertTrue(theirs, theirs.contains("5000 Gold exceeds the ${f.snapshot().getCivilization(f.greeceId).gold} Gold ${f.greeceId} has"))
+    }
+
+    @Test
     fun `third party peace offers cannot impose peace on an unconsenting major`() {
         for (onOurSide in listOf(true, false)) {
             val f = Fixture()

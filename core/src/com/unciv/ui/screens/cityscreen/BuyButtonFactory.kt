@@ -16,6 +16,7 @@ import com.unciv.models.ruleset.unique.UniqueType
 import com.unciv.models.stats.Stat
 import com.unciv.models.translations.tr
 import com.unciv.ui.audio.SoundPlayer
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.InputDisabling
 import com.unciv.ui.components.UncivTooltip.Companion.addTooltip
 import com.unciv.ui.components.extensions.disable
@@ -82,6 +83,7 @@ class BuyButtonFactory(val cityScreen: CityScreen) {
 
         button.labelCell.pad(5f)
 
+        if (GameUiStyle.isAtlas) GameUiStyle.applyWidget(button)
         return button
     }
 
@@ -108,7 +110,7 @@ class BuyButtonFactory(val cityScreen: CityScreen) {
         stat: Stat = preferredBuyStat,
         tile: TileView? = null
     ) {
-        if (!isConstructionPurchaseShown(construction, stat)) return
+        if (!cityScreen.canChangeState || !isConstructionPurchaseShown(construction, stat)) return
         val cityView = cityScreen.cityView
         val constructionStatBuyCost = cityView.constructions.getStatBuyCost(construction, stat)!!
         if (!cityView.constructions.isConstructionPurchaseAllowed(construction, stat, constructionStatBuyCost)) return
@@ -152,6 +154,10 @@ class BuyButtonFactory(val cityScreen: CityScreen) {
                 purchaseConstruction(construction, stat, tile)
             }
             equalizeLastTwoButtonWidths()
+            if (GameUiStyle.isAtlas) {
+                innerTable.background = GameUiStyle.panelBackground("Atlas/City/Purchase", 1f)
+                GameUiStyle.applyWidget(innerTable)
+            }
             open(true)
         }
     }
@@ -169,7 +175,12 @@ class BuyButtonFactory(val cityScreen: CityScreen) {
         stat: Stat = Stat.Gold,
         tile: TileView? = null
     ) {
+        if (!cityScreen.canChangeState) return
         val cityView = cityScreen.cityView
+        val current: INonPerpetualConstruction = cityView.getRuleset().buildings[construction.name]
+            ?: cityView.getRuleset().units[construction.name] ?: return
+        val cost = cityView.constructions.getStatBuyCost(current, stat) ?: return
+        if (!cityView.constructions.isConstructionPurchaseAllowed(current, stat, cost)) return
         val queueIndex = cityScreen.selectedQueueEntry
         val tilePosition = tile?.position()
         // Agent matches route purchases through the coordinator (§3.2).
@@ -192,7 +203,7 @@ class BuyButtonFactory(val cityScreen: CityScreen) {
 
         val inputProcessor = InputDisabling.disableInput()
         Concurrency.run {
-            val purchased = cityView.constructions.purchaseConstruction(construction, cityScreen.selectedQueueEntry, stat, tile)
+            val purchased = cityView.constructions.purchaseConstruction(current, queueIndex, stat, tile)
             Concurrency.runOnGLThread {
                 InputDisabling.setInputProcessor(inputProcessor)
                 if (!purchased) {

@@ -188,6 +188,12 @@ class GameInfo : IsPartOfGameInfoSerialization, HasGameInfoSerializationVersion 
     @Transient
     var agentNormalVisibility = false
 
+    /** Local opt-in presentation configuration and active capture; never cloned or serialized. */
+    @Transient @Volatile
+    internal var visualCaptureSession: com.unciv.logic.presentation.VisualCapture.Session? = null
+    @Transient @Volatile
+    internal var visualCaptureSink: com.unciv.logic.presentation.CaptureScope? = null
+
     /** Unpublished action collector only; never copied or serialized. */
     @Transient
     var agentMapSightings: com.unciv.logic.agents.AgentMapSightings? = null
@@ -397,7 +403,10 @@ class GameInfo : IsPartOfGameInfoSerialization, HasGameInfoSerializationVersion 
      *  @param progressBar Optional reference to UI widget either provided by [WorldScreen.nextTurn][com.unciv.ui.screens.worldscreen.WorldScreen.nextTurn] or `null` when simulating
      *  @param shouldGainTime on a multiplayer game, if true, makes the player whose turn is ended recover time to play before risking getting forced to resign, 'false' by default 
      */
-    fun nextTurn(progressBar: NextTurnProgress? = null, shouldGainTime: Boolean = false): Unit = timeThis("GameInfo.nextTurn") {
+    fun nextTurn(progressBar: NextTurnProgress? = null, shouldGainTime: Boolean = false): Unit =
+        com.unciv.logic.presentation.VisualCapture.mutate(this) { nextTurnInternal(progressBar, shouldGainTime) }
+
+    private fun nextTurnInternal(progressBar: NextTurnProgress?, shouldGainTime: Boolean): Unit = timeThis("GameInfo.nextTurn") {
         var player = currentPlayerCiv
         var playerIndex = civilizations.indexOf(player)
 

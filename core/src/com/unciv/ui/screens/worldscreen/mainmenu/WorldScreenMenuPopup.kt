@@ -4,6 +4,9 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.ui.Cell
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton
+import com.unciv.ui.components.AtlasWidgets
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.input.KeyboardBinding
 import com.unciv.ui.components.input.onLongPress
 import com.unciv.ui.popups.Popup
@@ -22,6 +25,11 @@ class WorldScreenMenuPopup(
 ) : Popup(worldScreen, scrollable = Scrollability.All) {
     private val singleColumn: Boolean
     private fun <T: Actor?> Cell<T>.nextColumn() {
+        if (GameUiStyle.isAtlas) {
+            (actor as? TextButton)?.label?.wrap = true
+            minWidth(0f).width(if (singleColumn) (maxPopupWidth - 56f).coerceAtMost(420f)
+                else ((maxPopupWidth - 72f) / 2f).coerceAtMost(280f)).minHeight(44f).growX().pad(4f)
+        }
         if (!singleColumn && column == 0) return
         row()
     }
@@ -29,6 +37,10 @@ class WorldScreenMenuPopup(
     init {
         worldScreen.autoPlay.stopAutoPlay()
         defaults().fillX()
+        if (GameUiStyle.isAtlas) {
+            innerTable.background = GameUiStyle.panelBackground("WorldScreen/Menu", 1f)
+            add(AtlasWidgets.header("Menu")).colspan(2).growX().row()
+        }
 
         val showSave = !worldScreen.gameInfo.gameParameters.isOnlineMultiplayer
         val showMusic = worldScreen.game.musicController.isMusicAvailable()
@@ -39,7 +51,7 @@ class WorldScreenMenuPopup(
         val firstCell = addButton("Main menu") {
             worldScreen.game.goToMainMenu()
         }
-        singleColumn = worldScreen.isCrampedPortrait() ||
+        singleColumn = if (GameUiStyle.isAtlas) worldScreen.stage.width < 760f else worldScreen.isCrampedPortrait() ||
             2 * prefWidth > maxPopupWidth ||  // Very coarse: Assume width of translated "Main menu" is representative
             buttonCount * (prefHeight - emptyPrefHeight) + emptyPrefHeight < maxPopupHeight
         firstCell.nextColumn()
@@ -92,7 +104,14 @@ class WorldScreenMenuPopup(
         }.apply { actor.style = BaseScreen.skin.get("negative", TextButtonStyle::class.java) }
             .nextColumn()
 
-        addCloseButton().run { colspan(if (singleColumn || column == 1) 1 else 2) }
+        addCloseButton().run {
+            colspan(if (singleColumn || column == 1) 1 else 2)
+            if (GameUiStyle.isAtlas) {
+                actor.label.wrap = true
+                GameUiStyle.apply(actor, primary = true)
+                minWidth(0f).growX().minHeight(44f)
+            }
+        }
         pack()
 
         open(force = true)

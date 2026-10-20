@@ -81,6 +81,10 @@ class GameSettings {
     var showResourcesAndImprovements = true
     var showPixelImprovements = true
     var unitIconOpacity = 1f // default corresponds to fully opaque
+    /** Local display preferences only; unknown animation values fall back to Normal. */
+    var unitAnimationMode: String = "Normal"
+    var followVisibleActions: Boolean = false
+    var appearanceVersion: Int = 0
 
     //// Performance
     var continuousRendering = false
@@ -157,7 +161,7 @@ class GameSettings {
     var multiTapInterval = 0.25f
 
     /** Maximum zoom-out of the map - performance heavy */
-    var maxWorldZoomOut = 2f
+    var maxWorldZoomOut = 4f
     var enableEasterEggs = true
     /** If on, selected notifications are drawn enlarged with wider padding */
     var enlargeSelectedNotification = true

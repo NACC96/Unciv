@@ -22,6 +22,11 @@ import com.unciv.models.ruleset.Policy.PolicyBranchType
 import com.unciv.models.ruleset.PolicyBranch
 import com.unciv.models.ruleset.unique.UniqueType
 import com.unciv.models.translations.tr
+import com.unciv.ui.components.AtlasWidgets
+import com.unciv.ui.components.GameUiStyle
+import com.unciv.ui.components.atlas.AtlasChoiceCard
+import com.unciv.ui.components.atlas.AtlasChoiceState
+import com.unciv.models.ruleset.unique.GameContext
 import com.unciv.ui.components.InputDisabling
 import com.unciv.ui.components.extensions.addSeparator
 import com.unciv.ui.components.extensions.center
@@ -91,6 +96,27 @@ private fun Policy.isPickable(viewingCiv: Civilization, canChangeState: Boolean)
         && viewingCiv.policies.isAdoptable(this)
         && viewingCiv.policies.canAdoptPolicy()
 
+private fun policyChoiceDetail(policy: Policy, civ: Civilization, canChangeState: Boolean): String {
+    val lines = mutableListOf<String>()
+    val manager = civ.policies
+    if (policy.policyBranchType == PolicyBranchType.BranchComplete)
+        lines += "On completion".tr()
+    else if (!manager.isAdopted(policy.name))
+        lines += if (manager.freePolicies > 0) "Adopt free policy".tr()
+            else "${manager.storedCulture}/${manager.getCultureNeededForNextPolicy()} ${"Culture".tr()}"
+    if (civ.gameInfo.ruleset.eras[policy.branch.era]!!.eraNumber > civ.getEraNumber())
+        lines += "{Unlocked at} {${policy.branch.era}}".tr()
+    val missing = policy.requires.orEmpty().filterNot { manager.isAdopted(it) }
+    if (missing.isNotEmpty()) lines += "${"Requires".tr()}: ${missing.joinToString(", ") { it.tr() }}"
+    if (!canChangeState || !civ.isCurrentPlayer() || civ.isDefeated()) lines += "Unavailable".tr()
+    policy.getMatchingUniques(UniqueType.OnlyAvailable, GameContext.IgnoreConditionals)
+        .filter { !it.conditionalsApply(civ.state) }.forEach { lines += it.getDisplayText().tr() }
+    policy.getMatchingUniques(UniqueType.Unavailable, civ.state)
+        .forEach { lines += it.getDisplayText().tr() }
+    lines += policy.getDescription()
+    return lines.joinToString("\n")
+}
+
 private class PolicyButton(viewingCiv: Civilization, canChangeState: Boolean, val policy: Policy, size: Float = 30f) : BorderedTable(
     path = "PolicyScreen/PolicyButton",
     defaultBgBorder = BaseScreen.skinStrings.roundedEdgeRectangleSmallShape,
@@ -101,6 +127,12 @@ private class PolicyButton(viewingCiv: Civilization, canChangeState: Boolean, va
 
     private val isPickable = policy.isPickable(viewingCiv, canChangeState)
     private val isAdopted = viewingCiv.policies.isAdopted(policy.name)
+    private val card = if (GameUiStyle.isAtlas) AtlasChoiceCard(policy.name,
+        policyChoiceDetail(policy, viewingCiv, canChangeState), when {
+            isAdopted -> AtlasChoiceState.COMPLETED
+            isPickable -> AtlasChoiceState.AVAILABLE
+            else -> AtlasChoiceState.LOCKED
+        }) {}.withIcon(icon) else null
 
     var isSelected = false
         set(value) {
@@ -109,18 +141,24 @@ private class PolicyButton(viewingCiv: Civilization, canChangeState: Boolean, va
         }
 
     init {
-        borderSize = 2f
-        icon.setSize(size*0.7f, size*0.7f)
+        borderSize = if (GameUiStyle.isAtlas) 0f else 2f
+        if (card != null) {
+            add(card).growX().minWidth(0f)
+            touchable = Touchable.enabled
+            updateState()
+        } else {
+            icon.setSize(size*0.7f, size*0.7f)
 
-        addActor(icon)
+            addActor(icon)
 
-        updateState()
-        pack()
-        width = size
-        height = size
+            updateState()
+            pack()
+            width = size
+            height = size
 
-        icon.toFront()
-        icon.center(this)
+            icon.toFront()
+            icon.center(this)
+        }
     }
 
     fun onClick(function: () -> Unit): PolicyButton {
@@ -132,6 +170,12 @@ private class PolicyButton(viewingCiv: Civilization, canChangeState: Boolean, va
     }
 
     private fun updateState() {
+        if (card != null) {
+            card.setSelected(isSelected)
+            bgColor = GameUiStyle.inset
+            bgBorderColor = if (isSelected) GameUiStyle.selection else GameUiStyle.muted
+            return
+        }
         val colors = when {
             isSelected && isPickable ->
                 PolicyColors.ButtonBGPickableSelected to PolicyColors.ButtonIconPickableSelected
@@ -208,6 +252,10 @@ class PolicyPickerScreen(
         if (!canChangeState)
             rightSideButton.disable()
 
+        setChoiceHeader("Policies", viewingCiv.civName)
+        if (GameUiStyle.isAtlas) {
+            buildAtlasPolicies(select)
+        } else {
         topTable.row()
 
         val branches = viewingCiv.gameInfo.ruleset.policyBranches
@@ -270,6 +318,33 @@ class PolicyPickerScreen(
             in branches -> branchToGroup[select]?.toggle()
             in policyNameToButton -> pickPolicy(policyNameToButton[select]!!)
         }
+        }
+    }
+
+    private fun buildAtlasPolicies(select: String?) {
+        val branches = viewingCiv.gameInfo.ruleset.policyBranches.values
+        val columns = ((stage.width - 32f) / 340f).toInt().coerceAtLeast(1)
+        val cardWidth = ((stage.width - 32f) / columns - 16f).coerceAtLeast(120f)
+        topTable.top().pad(GameUiStyle.Space.m)
+        for ((index, branch) in branches.withIndex()) {
+            val group = Table().apply {
+                name = "AtlasPolicyBranch:${branch.name}"
+                background = GameUiStyle.panelBackground("Atlas/Policy/Branch", 1f)
+                pad(GameUiStyle.Space.m)
+                add(AtlasWidgets.header(branch.name, "{Unlocked at} {${branch.era}}"))
+                    .growX().minWidth(0f).row()
+            }
+            for (policy in listOf<Policy>(branch) + branch.policies) {
+                val button = getPolicyButton(policy)
+                policyNameToButton[policy.name] = button
+                group.add(button).growX().minWidth(0f).padBottom(GameUiStyle.Space.m).row()
+            }
+            topTable.add(group).width(cardWidth).top().pad(GameUiStyle.Space.m)
+            if ((index + 1) % columns == 0) topTable.row()
+        }
+        select?.let { policyNameToButton[it]?.let(::pickPolicy) }
+        pickerPane.validate()
+        scrollPane.layout()
     }
 
     override fun getCivilopediaRuleset() = viewingCiv.gameInfo.ruleset
@@ -288,8 +363,11 @@ class PolicyPickerScreen(
         selectedPolicyButton?.isSelected = false
         selectedPolicyButton = button
         selectedPolicyButton?.isSelected = true
+        if (GameUiStyle.isAtlas) stage.keyboardFocus = button
 
-        descriptionLabel.setText(policy.getDescription())
+        descriptionLabel.setText(if (GameUiStyle.isAtlas)
+            "${policy.name.tr()}\n${policyChoiceDetail(policy, viewingCiv, canChangeState)}"
+            else policy.getDescription())
         descriptionLabel.clearListeners()
         descriptionLabel.onActivation {
             openCivilopedia(policy.makeLink())
@@ -694,7 +772,19 @@ class PolicyPickerScreen(
     }
 
     private fun confirmAction() {
-        val policy = selectedPolicyButton!!.policy
+        val policy = selectedPolicyButton?.policy ?: return
+
+        if (GameUiStyle.isAtlas && policy is PolicyBranch) {
+            if (!policy.isPickable(viewingCiv, canChangeState)) return
+            ConfirmPopup(this, "Are you sure you want to adopt [${policy.name}]?", "Adopt", true, action = action@{
+                if (UncivGame.Current.worldScreen?.routeThroughAgentSession {
+                        listOf({ r: Int -> AdoptPolicyCommand(viewingCiv.civID, "ui-${System.nanoTime()}", r, policy.name) })
+                    } == true) return@action
+                viewingCiv.policies.adopt(policy, false)
+                game.replaceCurrentScreen { recreate() }
+            }).open(force = true)
+            return
+        }
 
         // Evil people clicking on buttons too fast to confuse the screen - #4977
         if (!policy.isPickable(viewingCiv, canChangeState)) return

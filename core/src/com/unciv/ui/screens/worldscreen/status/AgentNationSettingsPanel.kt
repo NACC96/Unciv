@@ -17,6 +17,8 @@ import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.Timer
 import com.unciv.logic.agents.*
 import com.unciv.ui.components.extensions.toLabel
+import com.unciv.ui.components.GameUiStyle
+import com.unciv.UncivGame
 import com.unciv.ui.components.input.onChange
 import com.unciv.ui.components.input.onClick
 import com.unciv.ui.components.widgets.AutoScrollPane
@@ -32,13 +34,19 @@ class AgentNationSettingsPanel(private val screen: WorldScreen, private val sess
         override fun toString() = if (customEntry) "Custom model…" else spec.label
     }
     private data class EffortChoice(val wireValue: String?, val label: String) { override fun toString() = label }
+    private data class VisionChoice(val vision: MatchVision) { override fun toString() = vision.label }
     private val nation = AgentNationSelectBox<NationChoice>().apply { name = "NationPicker" }
     private val provider = AgentNationSelectBox<String>().apply { name = "NationProvider" }
     private val model = AgentNationSelectBox<ModelChoice>().apply { name = "NationModel" }
     private val reasoning = AgentNationSelectBox<EffortChoice>().apply { name = "NationReasoning" }
+    private val vision = AgentNationSelectBox<VisionChoice>().apply { name = "MatchVision" }
+    private var changingVision = false
     private val displayName = TextField("", skin).apply { name = "NationDisplayName"; maxLength = 256 }
     private val customModel = TextField("", skin).apply { name = "NationCustomModel"; maxLength = 256 }
     private val personality = TextArea("", skin).apply { name = "NationPersonality"; maxLength = 16 * 1024 }
+    private val controller = "".toLabel(WorldScreenStyle.ink, GameUiStyle.Type.body).apply { name = "NationController"; wrap = true }
+    private var previousPending: String? = null
+    private val actionFooter = Table(skin).apply { name = "NationActionFooter" }
     private val identity = "".toLabel(WorldScreenStyle.muted, 11).apply { wrap = true }
     private val status = "".toLabel(WorldScreenStyle.muted, 12).apply { name = "NationStatus"; wrap = true }
     private val form = Table(skin).apply { top().left(); defaults().growX().minWidth(0f) }
@@ -63,13 +71,16 @@ class AgentNationSettingsPanel(private val screen: WorldScreen, private val sess
 
     init {
         name = "AgentNationSettingsPanel"
-        background = WorldScreenStyle.panelBackground("WorldScreen/NationSettings")
+        background = if (GameUiStyle.isAtlas) WorldScreenStyle.surface("WorldScreen/NationSettings", 0.94f)
+            else WorldScreenStyle.panelBackground("WorldScreen/NationSettings")
         touchable = Touchable.enabled; pad(14f)
-        val close = WorldScreenStyle.button("Close").apply { onClick { hide() } }
+        // Atlas sheets share the Messages X; other skins keep their text button.
+        val close = if (GameUiStyle.isAtlas) AgentPanelLayout.closeButton { hide() }
+            else WorldScreenStyle.button("Close").apply { onClick { hide() } }
         val header = Table(skin)
         header.add("Nation settings".toLabel(WorldScreenStyle.ink, 17)).minWidth(0f).growX().left()
         header.add(WorldScreenStyle.dragGrip()).padRight(8f)
-        header.add(close)
+        if (GameUiStyle.isAtlas) header.add(close).size(28f) else header.add(close)
         header.addListener(object : InputListener() {
             val origin = Vector2(); val pointerOrigin = Vector2()
             override fun touchDown(event: InputEvent, x: Float, y: Float, pointer: Int, button: Int): Boolean {
@@ -85,7 +96,19 @@ class AgentNationSettingsPanel(private val screen: WorldScreen, private val sess
         })
         add(header).growX().row()
         add(identity).growX().left().padTop(6f).padBottom(8f).row()
+        val visionField = Table(skin).apply {
+            name = "MatchVisionField"
+            if (GameUiStyle.isAtlas) {
+                background = WorldScreenStyle.background("WorldScreen/NationSettings/Vision", WorldScreenStyle.inset)
+                pad(GameUiStyle.Space.m)
+            }
+            add("Map vision · all players".toLabel(WorldScreenStyle.muted, GameUiStyle.Type.caption))
+                .minWidth(0f).growX().left().padBottom(GameUiStyle.Space.s).row()
+            add(vision).minWidth(0f).growX().minHeight(if (GameUiStyle.isAtlas) GameUiStyle.standardControlHeight else 32f).row()
+        }
+        add(visionField).minWidth(0f).growX().padBottom(GameUiStyle.Space.m).row()
         add(nation).minWidth(0f).growX().height(32f).row()
+        add(controller).minWidth(0f).growX().left().padTop(6f).row()
         add(status).minWidth(0f).growX().left().padTop(6f).padBottom(6f).row()
         scroll.setScrollingDisabled(true, false); scroll.setFadeScrollBars(false); scroll.setOverscroll(false, false)
         add(scroll).grow().row()
@@ -100,13 +123,25 @@ class AgentNationSettingsPanel(private val screen: WorldScreen, private val sess
         form.add(customModel).height(32f).row()
         field("Thinking level / reasoning effort", reasoning)
         field("Personality instructions", personality, 86f)
-        form.add(save).height(34f).padTop(16f).row()
+        if (GameUiStyle.isAtlas) {
+            actionFooter.add(save).minWidth(0f).growX().minHeight(GameUiStyle.standardControlHeight)
+            add(actionFooter).growX().padTop(8f).row()
+        } else form.add(save).height(34f).padTop(16f).row()
         form.add(play).height(34f).padTop(6f).row()
         form.add(handback).height(34f).padTop(6f).row()
         form.add(spectate).height(34f).padTop(6f).row()
-        form.add("Spectate changes your view. Human nations wait for you until explicitly handed to an agent."
-            .toLabel(WorldScreenStyle.muted, 11).apply { wrap = true }).padTop(10f).padBottom(8f).row()
-        for (picker in listOf(nation, provider, model, reasoning)) stylePicker(picker)
+        form.add(("Play as takes over immediately, keeping moves already made. Hand to agent returns control immediately. " +
+            "Spectate changes your view; human nations wait for you until explicitly handed to an agent. " +
+            "Map vision applies to every player; agents use it from their next observation.")
+            .toLabel(WorldScreenStyle.muted, GameUiStyle.Type.caption).apply { wrap = true })
+            .padTop(10f).padBottom(8f).row()
+        for (picker in listOf(vision, nation, provider, model, reasoning)) stylePicker(picker)
+        // Programmatic selection fires change events; only the user's pick may commit.
+        updating = true
+        vision.setItems(GdxArray(MatchVision.entries.map { VisionChoice(it) }.toTypedArray()))
+        vision.selected = vision.items.firstOrNull { it.vision == session.getVision() }
+        updating = false
+        vision.onChange { if (!updating) vision.selected?.let { changeVision(it.vision) } }
         for (editor in listOf(displayName, customModel, personality)) {
             editor.style = TextField.TextFieldStyle(editor.style).apply {
                 background = WorldScreenStyle.background("WorldScreen/NationSettings/Field", WorldScreenStyle.raised)
@@ -121,16 +156,20 @@ class AgentNationSettingsPanel(private val screen: WorldScreen, private val sess
         nation.onChange { if (!updating && !requesting) loadDraft(nation.selected?.id) }
         provider.onChange {
             if (!updating) currentDraft()?.let {
+                val oldProvider = it.provider; val oldModel = it.modelId
                 it.provider = provider.selected
                 val spec = AgentModelCatalog.getDefaultModel(it.provider)
                 it.modelId = spec.id; it.reasoning = spec.defaultThinkingLevel.wireValue; populateModels(it)
+                syncDisplayName(it, oldProvider, oldModel)
             }
         }
         model.onChange {
             if (!updating) currentDraft()?.let {
                 val choice = model.selected ?: return@let
+                val oldModel = it.modelId
                 it.modelId = if (choice.customEntry) customModel.text.trim() else choice.spec.id
                 showCustom(choice.customEntry || choice.spec.isCustom); populateReasoning(it)
+                syncDisplayName(it, it.provider, oldModel)
             }
         }
         reasoning.onChange { if (!updating) currentDraft()?.reasoning = reasoning.selected?.wireValue }
@@ -138,8 +177,10 @@ class AgentNationSettingsPanel(private val screen: WorldScreen, private val sess
         personality.onChange { if (!updating) currentDraft()?.personality = personality.text }
         customModel.onChange {
             if (!updating && model.selected?.customEntry == true) currentDraft()?.let {
+                val oldModel = it.modelId
                 it.modelId = customModel.text.trim()
                 populateReasoning(it)
+                syncDisplayName(it, it.provider, oldModel)
             }
         }
         save.onClick { request(NationControlChange.SAVE_AGENT_SETTINGS) }
@@ -152,6 +193,10 @@ class AgentNationSettingsPanel(private val screen: WorldScreen, private val sess
 
     private fun stylePicker(picker: SelectBox<*>) {
         picker.setMaxListCount(7)
+        if (GameUiStyle.isAtlas) {
+            GameUiStyle.applyWidget(picker)
+            return
+        }
         picker.style = SelectBox.SelectBoxStyle(picker.style).apply {
             fontColor = WorldScreenStyle.ink
             background = WorldScreenStyle.background("WorldScreen/NationSettings/Select", WorldScreenStyle.raised)
@@ -166,6 +211,15 @@ class AgentNationSettingsPanel(private val screen: WorldScreen, private val sess
         }
     }
     private fun currentDraft() = selectedId?.let { drafts[it] }
+    /** A default display name follows the model; a custom one is kept. */
+    private fun syncDisplayName(draft: AgentProfile, oldProvider: String, oldModelId: String) {
+        val civ = settings.firstOrNull { it.civId == selectedId }?.nationName ?: selectedId.orEmpty()
+        val name = AgentSlotLogic.displayNameAfterModelChange(draft.displayName, civ, oldProvider, oldModelId, draft.provider, draft.modelId)
+        if (name == draft.displayName) return
+        draft.displayName = name
+        val wasUpdating = updating; updating = true
+        try { displayName.text = name } finally { updating = wasUpdating }
+    }
     private fun loadDraft(id: String?) {
         selectedId = id
         val setting = settings.firstOrNull { it.civId == id }
@@ -180,7 +234,7 @@ class AgentNationSettingsPanel(private val screen: WorldScreen, private val sess
                 populateModels(draft)
             } else { displayName.text = ""; personality.text = "" }
         } finally { updating = false }
-        scroll.scrollY = 0f; scroll.updateVisualScroll(); updateEnabled()
+        scroll.scrollY = 0f; scroll.updateVisualScroll(); updateController(); updateEnabled()
     }
     private fun populateModels(draft: AgentProfile) {
         val wasUpdating = updating; updating = true
@@ -222,7 +276,7 @@ class AgentNationSettingsPanel(private val screen: WorldScreen, private val sess
     } }
     fun hide() {
         isVisible = false
-        for (picker in listOf(nation, provider, model, reasoning)) picker.hideList()
+        for (picker in listOf(vision, nation, provider, model, reasoning)) picker.hideScrollPane()
         if (screen.stage.scrollFocus?.isDescendantOf(this) == true) screen.stage.scrollFocus = null
         if (screen.stage.keyboardFocus?.isDescendantOf(this) == true) screen.stage.keyboardFocus = null
         Gdx.graphics.requestRendering()
@@ -240,22 +294,47 @@ class AgentNationSettingsPanel(private val screen: WorldScreen, private val sess
             updating = false
             if (nation.selected?.id != selectedId) loadDraft(nation.selected?.id)
         }
-        identity.setText("Viewing ${screen.viewingCiv.civID} · changes apply after the current agent finishes")
-        session.getPendingNationChange()?.let { status.setText(it); status.color = WorldScreenStyle.warning }
+        identity.setText("Viewing ${screen.viewingCiv.civID} · changes apply immediately")
+        updateController()
+        if (!changingVision && vision.selected?.vision != session.getVision()) {
+            updating = true
+            vision.selected = vision.items.firstOrNull { it.vision == session.getVision() }
+            updating = false
+        }
+        val pending = session.getPendingNationChange()
+        if (pending != null) { status.setText(pending); status.color = WorldScreenStyle.warning }
+        else if (previousPending != null) { status.setText(""); status.color = WorldScreenStyle.muted }
+        previousPending = pending
         val w = minOf(480f, screen.stage.width - 16f).coerceAtLeast(1f)
         val anchorTop = if (isVisible) controlsAnchor?.localToStageCoordinates(Vector2())?.y?.minus(8f) else null
-        val h = minOf(650f, screen.stage.height - 130f, anchorTop?.minus(8f) ?: Float.MAX_VALUE).coerceAtLeast(1f)
+        // Atlas without an anchor: the same right-side sheet as Messages, below the header.
+        val sheet = if (GameUiStyle.isAtlas && controlsAnchor == null) AgentPanelLayout.rightSheet(screen.stage, w,
+            400f * UncivGame.Current.settings.fontSizeMultiplier, 650f) else null
+        val h = sheet?.height ?: minOf(650f, screen.stage.height - if (GameUiStyle.isAtlas) 24f else 130f, anchorTop?.minus(8f) ?: Float.MAX_VALUE).coerceAtLeast(1f)
         setSize(w, h)
         // Controls are not mounted/laid out during hidden construction. Follow their real stage
         // bottom only after showing; an explicit drag preserves the user's placement on resize.
-        if (isVisible && (!positioned || controlsAnchor != null && !userDragged)) {
+        if (isVisible && sheet != null && !userDragged) {
+            setPosition(sheet.x, sheet.y)
+            positioned = true
+        } else if (isVisible && (!positioned || controlsAnchor != null && !userDragged)) {
             setPosition(screen.stage.width - width - 8f, (anchorTop ?: (screen.stage.height - 116f)) - height)
             positioned = true
         }
         // Bound wrapped labels to the scroll pane; long identities must never drive its preferred width.
         val contentWidth = (w - 46f).coerceAtLeast(1f)
         form.cells.forEach { it.width(contentWidth) }
+        if (GameUiStyle.isAtlas) {
+            // The form scrolls independently; the save action remains reachable at every size.
+            getCell(actionFooter).height(48f * UncivGame.Current.settings.fontSizeMultiplier)
+        }
         clampPosition(); updateEnabled(); invalidateHierarchy(); Gdx.graphics.requestRendering()
+    }
+    private fun updateController() {
+        val selected = settings.firstOrNull { it.civId == selectedId }
+        controller.setText(selected?.let {
+            "Controller: ${if (it.kind == ControllerKind.HUMAN) "Human" else "Agent"} · ${it.nationName}${if (it.isActive) " · Current turn" else ""}"
+        } ?: "No nation selected")
     }
     private fun clampPosition() {
         setPosition(x.coerceIn(0f, maxOf(0f, screen.stage.width - width)), y.coerceIn(0f, maxOf(0f, screen.stage.height - height)))
@@ -264,6 +343,7 @@ class AgentNationSettingsPanel(private val screen: WorldScreen, private val sess
         val busy = requesting || session.getPendingNationChange() != null
         val eligible = selectedId != null
         nation.isDisabled = busy || choices.isEmpty()
+        vision.isDisabled = changingVision
         provider.isDisabled = busy || !eligible; model.isDisabled = busy || !eligible; reasoning.isDisabled = busy || !eligible
         displayName.isDisabled = busy || !eligible; customModel.isDisabled = busy || !eligible; personality.isDisabled = busy || !eligible
         for (button in listOf(save, play, handback)) WorldScreenStyle.setEnabled(button, !busy && eligible)
@@ -279,11 +359,26 @@ class AgentNationSettingsPanel(private val screen: WorldScreen, private val sess
             val error = AgentModelCatalog.validateProfile(profile).joinToString("\n")
             if (error.isNotEmpty()) { status.setText(error); status.color = WorldScreenStyle.error; return }
         }
-        requesting = true; status.setText("Waiting for the current agent turn…"); status.color = WorldScreenStyle.warning; updateEnabled()
+        // Play as cuts off an active agent; settings for one finish its current turn unchanged.
+        val agentMidTurn = change != NationControlChange.PLAY_AS &&
+            settings.any { it.civId == id && it.isActive && it.kind == ControllerKind.EXTERNAL_AGENT }
+        requesting = true; status.setText("Applying…"); status.color = WorldScreenStyle.warning; updateEnabled()
         session.requestNationChange(id, change, profile) { error ->
             if (!disposed) {
-                requesting = false
-                status.setText(error ?: "Applied. The match is paused.")
+                requesting = false; previousPending = null
+                status.setText(error ?: if (agentMidTurn) "Saved. The agent finishes this turn with its previous settings." else "Applied.")
+                status.color = if (error == null) WorldScreenStyle.accent else WorldScreenStyle.error
+                refresh()
+            }
+        }
+    }
+    private fun changeVision(choice: MatchVision) {
+        if (disposed || changingVision || choice == session.getVision()) return
+        changingVision = true; status.setText("Applying…"); status.color = WorldScreenStyle.warning; updateEnabled()
+        session.setVision(choice) { error ->
+            if (!disposed) {
+                changingVision = false
+                status.setText(error ?: "Map vision: ${choice.label}. Agents see it from their next observation.")
                 status.color = if (error == null) WorldScreenStyle.accent else WorldScreenStyle.error
                 refresh()
             }

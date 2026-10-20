@@ -63,7 +63,9 @@ it("China can inspect worker geography, preserve ongoing work and re-query after
     expect(await tool("game.act", { actionId: "China-t9-scout-1", expectedRevision: scoutOptions.revision, type: "unit.move", args: { unitId: scout.unitId, destination: scoutOptions.moveTargets[0] } })).toMatchObject({ status: "applied", revision: 43 });
     expect(await tool("game.map", { limit: 1, cursor: oldPage.nextCursor })).toMatchObject({ code: "STALE_STATE" });
     expect(await tool("game.observe")).toMatchObject({ revision: 43, mapSummary: { knownTileCount: 4 } });
-    expect(await tool("game.tile", { x: 50, y: -33 })).toMatchObject({ visibility: "VISIBLE", hill: true, lastSeenRevision: 43, resource: null });
+    const scouted = await tool("game.tile", { x: 50, y: -33 });
+    expect(scouted).toMatchObject({ visibility: "VISIBLE", hill: true, lastSeenRevision: 43 });
+    expect(scouted).not.toHaveProperty("resource"); // An absent field means null.
     expect((await tool("game.inspect", { unitId: 49 })).tile.ownWork).toEqual(worker.tile.ownWork);
     expect(frames.filter(f => ["observe", "inspect", "inspect_tile", "map", "legal_actions"].includes(f.method)).every(f => f.params.civId === "China")).toBe(true);
     expect(frames.filter(f => f.method === "act")).toHaveLength(1); // Existing worker progress was left intact.

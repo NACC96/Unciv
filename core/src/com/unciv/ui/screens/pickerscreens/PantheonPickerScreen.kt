@@ -6,6 +6,8 @@ import com.unciv.models.ruleset.BeliefType
 import com.unciv.models.ruleset.unique.GameContext
 import com.unciv.models.ruleset.unique.UniqueType
 import com.unciv.models.translations.tr
+import com.unciv.ui.components.GameUiStyle
+import com.unciv.ui.components.atlas.AtlasChoiceState
 
 class PantheonPickerScreen(
     choosingCiv: Civilization
@@ -14,6 +16,7 @@ class PantheonPickerScreen(
     private val selection = Selection()
 
     init {
+        setChoiceHeader("Choose a pantheon", choosingCiv.civName)
         topTable.defaults().pad(10f).fillX()
 
         for (belief in ruleset.beliefs.values) {
@@ -25,9 +28,18 @@ class PantheonPickerScreen(
                     pick("Follow [${belief.name}]".tr())
                 }
             } else {
+                val owner = choosingCiv.religionManager.getReligionWithBelief(belief)
+                beliefButton.setBeliefState(AtlasChoiceState.LOCKED,
+                    if (owner != null) "${"Unavailable".tr()}: ${owner.getReligionDisplayName().tr()}"
+                    else belief.uniqueObjects.filter {
+                        it.type == UniqueType.OnlyAvailable && !it.conditionalsApply(choosingCiv.state) ||
+                            it.type == UniqueType.Unavailable && it.conditionalsApply(choosingCiv.state)
+                    }.joinToString("\n") { it.getDisplayText().tr() })
                 beliefButton.disable(redDisableColor)
             }
-            topTable.add(beliefButton).row()
+            if (GameUiStyle.isAtlas)
+                topTable.add(beliefButton).width((stage.width - 40f).coerceAtMost(760f)).minWidth(0f).row()
+            else topTable.add(beliefButton).row()
         }
 
         setOKAction("Choose a pantheon") {

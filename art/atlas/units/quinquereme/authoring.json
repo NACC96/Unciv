@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "unitName": "Quinquereme",
+  "assetId": "quinquereme",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": "Quinquereme",
+  "uniqueTo": "Carthage",
+  "replaces": "Trireme",
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Quinquereme",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/quinquereme/e-motion-v2.png",
+      "rawHash": "d343f0f9108238e37cbb8fbdc820ae4fe7188ebfda0b6436f5d96432c8a450fa",
+      "promptPath": "art/atlas/units/quinquereme/prompts/e-v2.txt",
+      "promptHash": "86f7f020d8e289e844c07edd7b0c02e161ca76c3586e48d92c23cb6486f3c6ea",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/quinquereme/ne-motion-v2.png",
+      "rawHash": "6daeaa0637e7de7f25ce2fe2680235fdc51db2ac9b45b2c1e6058b870f81d611",
+      "promptPath": "art/atlas/units/quinquereme/prompts/ne-v2.txt",
+      "promptHash": "cfa7d61c3fd36d2bdc004c5f094db4b978ad766b26528d954fc6cc83e17209da",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/quinquereme/se-motion-v2.png",
+      "rawHash": "0ea7e7ff60598ce55766a1bcc724adbee36b800277b18ddb2a5f0a100eb8874a",
+      "promptPath": "art/atlas/units/quinquereme/prompts/se-v2.txt",
+      "promptHash": "b6c0730fc3b853c3ff64606215238733e279f2fe53207bdf66639866e17e5c50",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
+}

@@ -1,0 +1,305 @@
+{
+  "schemaVersion": 1,
+  "batchId": "pillaged-1",
+  "tool": "built-in image_gen",
+  "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/terrain-authoring/raw/pillaged-1.png",
+  "rawSha256": "319746176c8375ad4c00d7f60177c6f30fd2121b12fd08d4d40e9b52a00d849d",
+  "rawDimensions": [
+    1261,
+    1247
+  ],
+  "promptPath": "art/atlas/terrain/pillaged-1-prompt.txt",
+  "promptSha256": "911ba43aeedb724e35f6bd452bd743d42e1ab922e9b835fe18b30f39c5c0ae44",
+  "reviewState": "candidate",
+  "formalAcceptance": "deferred by user",
+  "cells": [
+    {
+      "item": "Customs house-Pillaged",
+      "cell": 0,
+      "cropBox": [
+        0,
+        0,
+        315,
+        312
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Customs house-Pillaged.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "improvement",
+      "sha256": "c288852631410a600ce4bf05231ef22da03265beb527f4cad15429a6fe1815f1",
+      "clippingMargin": 0
+    },
+    {
+      "item": "Farm-Pillaged",
+      "cell": 1,
+      "cropBox": [
+        315,
+        0,
+        630,
+        312
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Farm-Pillaged.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "improvement",
+      "sha256": "0e7b05af75f9479ad0f29ad55e44524381ddb364ecd485449d69ca7ed6ecaa16",
+      "clippingMargin": 0
+    },
+    {
+      "item": "Fishing Boats-Pillaged",
+      "cell": 2,
+      "cropBox": [
+        630,
+        0,
+        946,
+        312
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Fishing Boats-Pillaged.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "improvement",
+      "sha256": "ab0d5503a71567d1176ecbad5e2252497e9d70f05aa0a70a62a192b2c96376a8",
+      "clippingMargin": 0
+    },
+    {
+      "item": "Fort-Pillaged",
+      "cell": 3,
+      "cropBox": [
+        946,
+        0,
+        1261,
+        312
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Fort-Pillaged.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "improvement",
+      "sha256": "9560505bbac187815d66630b62d451cbf8f9985c426b9442e8b464a4dcd2377e",
+      "clippingMargin": 0
+    },
+    {
+      "item": "Holy site-Pillaged",
+      "cell": 4,
+      "cropBox": [
+        0,
+        312,
+        315,
+        624
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Holy site-Pillaged.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "improvement",
+      "sha256": "f53ba6765a2faa47098c4a1b1c19760e5f4dc53615e99cb251197760d5fd88cb",
+      "clippingMargin": 0
+    },
+    {
+      "item": "Landmark-Pillaged",
+      "cell": 5,
+      "cropBox": [
+        315,
+        312,
+        630,
+        624
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Landmark-Pillaged.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "improvement",
+      "sha256": "04cd2538ec2d7b3163f907c536d32db9a382f49388ff45d7e2de4f0705dc3439",
+      "clippingMargin": 0
+    },
+    {
+      "item": "Lumber mill-Pillaged",
+      "cell": 6,
+      "cropBox": [
+        630,
+        312,
+        946,
+        624
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Lumber mill-Pillaged.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "improvement",
+      "sha256": "8059bd7c946745ed6e96032db5e3961947d1d9582a04aae18c1e4c6967b7e00d",
+      "clippingMargin": 0
+    },
+    {
+      "item": "Manufactory-Pillaged",
+      "cell": 7,
+      "cropBox": [
+        946,
+        312,
+        1261,
+        624
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Manufactory-Pillaged.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "improvement",
+      "sha256": "1f35b5e348107be33c5d9bc76cf6e76e545b93c6b0e08d272d7df736d0d2c4af",
+      "clippingMargin": 0
+    },
+    {
+      "item": "Mine-Pillaged",
+      "cell": 8,
+      "cropBox": [
+        0,
+        624,
+        315,
+        935
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Mine-Pillaged.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "improvement",
+      "sha256": "030fe9c2c9cb34f8bf370517d854de235ebc12511ea7c127ef9fdb8262c3a3a3",
+      "clippingMargin": 0
+    },
+    {
+      "item": "Moai-Pillaged",
+      "cell": 9,
+      "cropBox": [
+        315,
+        624,
+        630,
+        935
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Moai-Pillaged.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "improvement",
+      "sha256": "54b3140cdad816fc8e109adc9a1890e7faa41f1aa4844e568893e461caba0610",
+      "clippingMargin": 0
+    },
+    {
+      "item": "Offshore Platform-Pillaged",
+      "cell": 10,
+      "cropBox": [
+        630,
+        624,
+        946,
+        935
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Offshore Platform-Pillaged.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "improvement",
+      "sha256": "f3afd8c827e0a76f483dc01b977a9c9c7b3fea8f50331f362444a6cf43bfc519",
+      "clippingMargin": 0
+    },
+    {
+      "item": "Oil well-Pillaged",
+      "cell": 11,
+      "cropBox": [
+        946,
+        624,
+        1261,
+        935
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Oil well-Pillaged.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "improvement",
+      "sha256": "8462f19fef6582b4b9edb351e832b7e51f5b7fbefc55ee2063c07bf7fd182565",
+      "clippingMargin": 0
+    },
+    {
+      "item": "Pasture-Pillaged",
+      "cell": 12,
+      "cropBox": [
+        0,
+        935,
+        315,
+        1247
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Pasture-Pillaged.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "improvement",
+      "sha256": "4d1250e7978a6aa6a20b9425fb289b8b16746718d08e8a7b49fc612fc198192f",
+      "clippingMargin": 0
+    },
+    {
+      "item": "Plantation-Pillaged",
+      "cell": 13,
+      "cropBox": [
+        315,
+        935,
+        630,
+        1247
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Plantation-Pillaged.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "improvement",
+      "sha256": "840904809750ffc93c3024d5efea7a394e0be1b921b98a69376e50b7c37c7131",
+      "clippingMargin": 0
+    },
+    {
+      "item": "Polder-Pillaged",
+      "cell": 14,
+      "cropBox": [
+        630,
+        935,
+        946,
+        1247
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Polder-Pillaged.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "improvement",
+      "sha256": "01e1fe4bfc345180b1655b16a2c6a8a1b0e17c7316b49903c8d6239c4cf950f4",
+      "clippingMargin": 0
+    },
+    {
+      "item": "Quarry-Pillaged",
+      "cell": 15,
+      "cropBox": [
+        946,
+        935,
+        1261,
+        1247
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Quarry-Pillaged.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "improvement",
+      "sha256": "3d883eaa82c61d49bc4de6bde3ee414bdb6d6783b722a5fa92814950559a9b62",
+      "clippingMargin": 0
+    }
+  ]
+}

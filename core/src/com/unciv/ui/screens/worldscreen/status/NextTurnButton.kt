@@ -7,6 +7,7 @@ import com.unciv.models.translations.tr
 import com.unciv.ui.components.UncivTooltip.Companion.addTooltip
 import com.unciv.ui.components.UncivTooltip.Companion.removeTooltips
 import com.unciv.ui.components.extensions.setSize
+import com.unciv.ui.components.extensions.setFontColor
 import com.unciv.ui.components.input.KeyboardBinding
 import com.unciv.ui.components.input.keyShortcuts
 import com.unciv.ui.components.input.onActivation
@@ -24,11 +25,14 @@ class NextTurnButton(
     private val worldScreen: WorldScreen
 ) : IconTextButton("", null, 16) {
     private var nextTurnAction = Default
+    private var atlasIconUsesAuthoredColors = false
     private val unitsDueLabel = Label("", BaseScreen.skin)
     private val unitsDueCell: Cell<Label>
 
     init {
-        WorldScreenStyle.apply(this)
+        // Atlas: the world HUD's rounded brass primary; other skins keep their own button.
+        if (com.unciv.ui.components.GameUiStyle.isAtlas) WorldScreenStyle.apply(this, com.unciv.ui.components.GameUiStyle.Emphasis.Accent)
+        else WorldScreenStyle.apply(this)
         onActivation { nextTurnAction.action(worldScreen) }
         addContextMenu { NextTurnMenu(stage, this, worldScreen) }
         keyShortcuts.add(KeyboardBinding.NextTurn)
@@ -73,20 +77,53 @@ class NextTurnButton(
     internal fun updateButton(nextTurnAction: NextTurnAction) {
         label.setText(nextTurnAction.getText(worldScreen).tr())
         label.color = nextTurnAction.color
-        if (nextTurnAction.icon != null && ImageGetter.imageExists(nextTurnAction.icon!!))
-            iconCell.setActor(ImageGetter.getImage(nextTurnAction.icon).apply {
+        var iconName = nextTurnAction.icon
+        val isAtlas = com.unciv.ui.components.GameUiStyle.isAtlas
+        fun isBaseIcon(name: String) = ImageGetter.getDrawable(name).region === ImageGetter.getSpecificAtlas("Icons")?.findRegion(name)
+        // The built-in construction badge is a low-contrast colored circle. Atlas uses
+        // the existing monochrome gear; an authored mod replacement keeps its artwork.
+        if (isAtlas && nextTurnAction == NextTurnAction.PickConstruction && iconName != null && ImageGetter.imageExists(iconName) && isBaseIcon(iconName))
+            iconName = "OtherIcons/Settings"
+        if (iconName != null && ImageGetter.imageExists(iconName)) {
+            atlasIconUsesAuthoredColors = isAtlas && (!isBaseIcon(iconName) || when (nextTurnAction) {
+                NextTurnAction.PickTech, NextTurnAction.PickPolicy, NextTurnAction.FoundPantheon,
+                NextTurnAction.FoundReligion, NextTurnAction.EnhanceReligion, NextTurnAction.ReformReligion -> true
+                else -> false
+            })
+            iconCell.setActor(ImageGetter.getImage(iconName).apply {
+                name = iconName
                 setSize(20f)
                 color = nextTurnAction.color
             })
-        else
+            // A spanning idle-unit subtext row can otherwise collapse this column.
+            if (isAtlas) iconCell.size(20f)
+        } else {
             iconCell.clearActor()
+            if (isAtlas) iconCell.size(0f)
+        }
 
         nextTurnAction.getSubText(worldScreen)?.let {
             unitsDueLabel.setText(it.tr())
             unitsDueCell.setActor(unitsDueLabel)
         } ?: unitsDueCell.clearActor()
 
+        updateAtlasForeground()
         pack()
+    }
+
+    override fun setDisabled(disabled: Boolean) {
+        super.setDisabled(disabled)
+        updateAtlasForeground()
+    }
+
+    // IconTextButton owns plain Labels, so ButtonStyle.fontColor cannot color its children.
+    // Update on state publication, never in draw/act.
+    private fun updateAtlasForeground() {
+        if (!com.unciv.ui.components.GameUiStyle.isAtlas) return
+        val foreground = if (isDisabled) WorldScreenStyle.muted else WorldScreenStyle.surface
+        label?.let { it.color = com.badlogic.gdx.graphics.Color.WHITE; if (it.style.fontColor != foreground) it.setFontColor(foreground) }
+        unitsDueLabel?.let { it.color = com.badlogic.gdx.graphics.Color.WHITE; if (it.style.fontColor != foreground) it.setFontColor(foreground) }
+        iconCell?.actor?.color = if (atlasIconUsesAuthoredColors) com.badlogic.gdx.graphics.Color.WHITE else foreground
     }
 
     private fun getNextTurnAction(worldScreen: WorldScreen): NextTurnAction {

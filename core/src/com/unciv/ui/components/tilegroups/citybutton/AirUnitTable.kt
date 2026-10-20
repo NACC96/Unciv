@@ -1,7 +1,10 @@
 package com.unciv.ui.components.tilegroups.citybutton
 
+import com.badlogic.gdx.graphics.g2d.Batch
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable
 import com.unciv.logic.city.City
 import com.unciv.models.translations.tr
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.extensions.toLabel
 import com.unciv.ui.components.widgets.BorderedTable
 import com.unciv.ui.images.ImageGetter
@@ -21,8 +24,14 @@ internal class AirUnitTable(
     defaultBgShape = BaseScreen.skinStrings.roundedEdgeRectangleSmallShape,
     defaultBgBorder = BaseScreen.skinStrings.roundedEdgeRectangleSmallShape
 ) {
+    private var chip: Drawable? = null
+
     init {
         pad(2f, 10f, 2f, 10f)
+        if (GameUiStyle.isAtlas) {
+            pad(1f, 6f, 1f, 6f)
+            chip = cityChip("WorldScreen/CityButton/AirUnitChip", WorldScreenStyle.muted.cpy().apply { a = 0.5f })
+        }
 
         val nation = city.civ.nation
         val textColor = WorldScreenStyle.ink
@@ -34,7 +43,11 @@ internal class AirUnitTable(
         aircraftImage.color = WorldScreenStyle.accent
         aircraftImage.setSize(size, size)
 
-        add(aircraftImage).size(size).padRight(4f)
+        add(aircraftImage).size(size).padRight(if (chip != null) 2f else 4f)
         add(numberOfUnits.tr().toLabel(textColor, size.toInt()))
+    }
+
+    override fun drawBackground(batch: Batch, parentAlpha: Float, x: Float, y: Float) {
+        chip?.let { drawChip(it, batch, parentAlpha, x, y) } ?: super.drawBackground(batch, parentAlpha, x, y)
     }
 }

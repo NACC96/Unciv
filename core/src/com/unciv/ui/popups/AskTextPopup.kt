@@ -9,6 +9,8 @@ import com.unciv.ui.screens.basescreen.BaseScreen
 import com.unciv.ui.components.widgets.UncivTextField
 import com.unciv.ui.components.extensions.surroundWithCircle
 import com.unciv.ui.components.extensions.toLabel
+import com.unciv.ui.components.GameUiStyle
+import com.unciv.ui.components.input.onChange
 
 /** Simple class for showing a prompt for a string to the user
  * @param screen The previous screen the user was on
@@ -37,32 +39,38 @@ class AskTextPopup(
     init {
         val wrapper = Table()
         wrapper.add(icon).padRight(10f)
-        wrapper.add(label.toLabel())
-        add(wrapper).colspan(2).row()
+        wrapper.add(label.toLabel().apply { wrap = GameUiStyle.isAtlas }).growX().minWidth(0f)
+        if (GameUiStyle.isAtlas) innerTable.background = GameUiStyle.panelBackground("AskTextPopup/Panel", 1f)
+        add(wrapper).colspan(2).apply { if (GameUiStyle.isAtlas) width((maxPopupWidth - 64f).coerceAtMost(540f)) }.row()
 
         val nameField = UncivTextField(label, defaultText)
         nameField.textFieldFilter = TextField.TextFieldFilter { _, char -> char !in illegalChars}
         nameField.maxLength = maxLength
 
-        add(nameField).growX().colspan(2).row()
+        add(nameField).growX().minWidth(0f).minHeight(GameUiStyle.standardControlHeight).colspan(2).row()
 
         val errorLabel = errorText.toLabel()
-        errorLabel.color = Color.RED
+        errorLabel.color = if (GameUiStyle.isAtlas) GameUiStyle.error else Color.RED
+        errorLabel.wrap = true
+        errorLabel.isVisible = false
+        add(errorLabel).colspan(2).width((maxPopupWidth - 64f).coerceAtMost(540f)).row()
+        nameField.onChange { errorLabel.isVisible = false }
 
         addCloseButton()
         addOKButton(
             validate = {
                 val errorFound = !validate(nameField.text)
-                if (errorFound) {
-                    row()
-                    add(errorLabel).colspan(2).center()
-                }
+                errorLabel.isVisible = errorFound
                 !errorFound
             }
         ) {
             actionOnOk(nameField.text)
         }
         equalizeLastTwoButtonWidths()
+        if (GameUiStyle.isAtlas) for (cell in bottomTable.cells) {
+            (cell.actor as? com.badlogic.gdx.scenes.scene2d.ui.TextButton)?.label?.wrap = true
+            cell.minWidth(0f).growX().width(((maxPopupWidth - 64f) / 2).coerceAtMost(270f)).minHeight(44f)
+        }
         keyboardFocus = nameField
     }
 }

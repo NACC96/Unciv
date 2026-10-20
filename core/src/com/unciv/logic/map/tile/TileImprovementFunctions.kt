@@ -1,5 +1,6 @@
 package com.unciv.logic.map.tile
 
+import com.unciv.logic.presentation.VisualCapture
 import com.unciv.Constants
 import com.unciv.logic.civilization.Civilization
 import com.unciv.logic.civilization.LocationAction
@@ -196,6 +197,18 @@ class TileImprovementFunctions(val tile: Tile) {
         civToActivateBroaderEffects: Civilization? = null,
         unit: MapUnit? = null
     ) {
+        // Stat previews clone a Tile but retain its TileMap. Never animate those simulations.
+        val game = if (tile.tileMap.hasGameInfo() &&
+            tile.tileMap.getIfTileExistsOrNull(tile.position.x, tile.position.y) === tile) tile.tileMap.gameInfo else null
+        VisualCapture.mutate(game) {
+            val scope = game?.visualCaptureSink
+            val before = scope?.improvement(tile)
+            setImprovementInternal(improvement, civToActivateBroaderEffects, unit)
+            scope?.improvementChanged(before, tile)
+        }
+    }
+
+    private fun setImprovementInternal(improvement: TileImprovement?, civToActivateBroaderEffects: Civilization?, unit: MapUnit?) {
         fun updateVisibility() {
             if (!tile.tileMap.hasGameInfo()) return
             // Update the separately-kept "what a civ sees" - unless in map editor where there are no civs

@@ -10,6 +10,8 @@ import com.unciv.models.metadata.GameSettings
 import com.unciv.models.metadata.GameSettings.ScreenSize
 import com.unciv.ui.audio.MusicController
 import com.unciv.ui.components.extensions.MusicControls
+import com.unciv.ui.components.AtlasWidgets
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.extensions.setSize
 import com.unciv.ui.components.fonts.Fonts
 import com.unciv.ui.components.input.onClick
@@ -45,6 +47,10 @@ class WorldScreenMusicPopup(
 
         getScrollPane()!!.setScrollingDisabled(true, false)
         defaults().fillX()
+        if (GameUiStyle.isAtlas) {
+            innerTable.background = GameUiStyle.panelBackground("WorldScreen/Music", 1f)
+            add(AtlasWidgets.header("Music")).colspan(2).growX().row()
+        }
 
         val sk = BaseScreen.skinStrings
 
@@ -58,6 +64,14 @@ class WorldScreenMusicPopup(
         trackStyle.over = over
         trackStyle.disabled = up
         trackStyle.disabledFontColor = Color.LIGHT_GRAY
+        if (GameUiStyle.isAtlas) {
+            trackStyle.up = GameUiStyle.background("Music/Track", GameUiStyle.inset)
+            trackStyle.down = GameUiStyle.background("Music/Track/Pressed", GameUiStyle.pressed)
+            trackStyle.over = GameUiStyle.background("Music/Track/Hover", GameUiStyle.hover)
+            trackStyle.fontColor = GameUiStyle.ink
+            trackStyle.disabled = trackStyle.up
+            trackStyle.disabledFontColor = GameUiStyle.muted
+        }
 
         addMusicMods(settings)
         historyExpander = addHistory()
@@ -75,6 +89,7 @@ class WorldScreenMusicPopup(
             label.setFontScale(14 / Fonts.ORIGINAL_FONT_SIZE)
             label.setAlignment(if (rightSide) Align.right else Align.left)
             labelCell.pad(5f)
+            if (GameUiStyle.isAtlas) { label.wrap = true; labelCell.minWidth(0f).growX(); pad(4f) }
             isDisabled = rightSide
         }
 
@@ -114,8 +129,13 @@ class WorldScreenMusicPopup(
         for (entry in tracks) {
             val trackLabel = entry.track.toSmallUntranslatedButton()
             trackLabel.onClick { musicController.startTrack(entry) }
-            add(trackLabel).fillX()
-            add(entry.type.toSmallUntranslatedButton(true)).right().row()
+            if (GameUiStyle.isAtlas) {
+                add(trackLabel).width((maxPopupWidth - 80f).coerceAtMost(640f)).growX().minWidth(0f).minHeight(40f).row()
+                add(entry.type.toSmallUntranslatedButton(true)).growX().minWidth(0f).padBottom(8f).row()
+            } else {
+                add(trackLabel).fillX()
+                add(entry.type.toSmallUntranslatedButton(true)).right().row()
+            }
             // Note - displaying the file extension is meant as modder help, and could possibly
             // be extended to a modder tool - maybe display eligibility for known triggers?
             // Might also be gated by a setting so casual users won't see it?

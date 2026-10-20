@@ -1,0 +1,24 @@
+{
+  "facings": {
+    "E": {
+      "rawFile": "e-motion-v2.png",
+      "promptPath": "art/atlas/units/helicopter-gunship/prompts/e-v2.txt"
+    },
+    "NE": {
+      "rawFile": "ne-motion-v2.png",
+      "promptPath": "art/atlas/units/helicopter-gunship/prompts/ne-v2.txt",
+      "identityReference": {
+        "path": "/Users/noahkenny/.codex/generated_images/01a1321a-8142-7533-ae7a-eb89a5433c70/exec-2e55f41c-69ea-4f60-9f65-76b86dc3a5aa.png",
+        "sha256": "b3890d02e029911e4f586c3d51ad710267f25ee9cbade7ef155dc26595231a0a"
+      }
+    },
+    "SE": {
+      "rawFile": "se-motion-v2.png",
+      "promptPath": "art/atlas/units/helicopter-gunship/prompts/se-v2.txt",
+      "identityReference": {
+        "path": "/Users/noahkenny/.codex/generated_images/01a1321a-8142-7533-ae7a-eb89a5433c70/exec-2e55f41c-69ea-4f60-9f65-76b86dc3a5aa.png",
+        "sha256": "b3890d02e029911e4f586c3d51ad710267f25ee9cbade7ef155dc26595231a0a"
+      }
+    }
+  }
+}

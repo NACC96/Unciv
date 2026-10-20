@@ -1,6 +1,9 @@
 package com.unciv.ui.screens.overviewscreen
 
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.scenes.scene2d.ui.Table
+import com.unciv.ui.components.AtlasWidgets
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.Constants
 import com.unciv.GUI
 import com.unciv.logic.civilization.Notification
@@ -20,9 +23,12 @@ class EmpireOverviewScreen(
 ) : BaseScreen(), RecreateOnResize {
     // 50 normal button height + 2*10 topTable padding + 2 Separator + 2*5 centerTable padding
     // Since a resize recreates this screen this should be fine as a val
-    internal val centerAreaHeight = stage.height - 82f
+    internal val centerAreaHeight = stage.height - if (GameUiStyle.isAtlas) 160f else 82f
 
     private val tabbedPager: TabbedPager
+    private val pageCategories = HashMap<Int, EmpireOverviewCategories>()
+    internal fun categoryForPage(index: Int) = pageCategories[index]
+
     private val pageObjects = HashMap<EmpireOverviewCategories, EmpireOverviewTab>()
 
     internal val persistState by game.settings::overview
@@ -50,6 +56,7 @@ class EmpireOverviewScreen(
             val icon = if (category.iconName.isEmpty()) null else ImageGetter.getImage(category.iconName)
             val pageObject = category.createTab(viewingPlayer, this, persistState[category])
             pageObject.pad(10f, 0f, 10f, 0f)
+            pageObject.applyAtlasPresentation()
             pageObjects[category] = pageObject
             val index = tabbedPager.addPage(
                 caption = category.name,
@@ -59,6 +66,7 @@ class EmpireOverviewScreen(
                 shortcutKey = category.shortcutKey,
                 scrollAlign = category.scrollAlign
             )
+            pageCategories[index] = category
             if (category == selectCategory) {
                 tabbedPager.selectPage(index)
                 select(pageObject, selection)
@@ -67,10 +75,24 @@ class EmpireOverviewScreen(
         persistState.update(pageObjects)
 
         val closeButton = getCloseButton { game.popScreen() }
-        tabbedPager.decorateHeader(closeButton)
-
-        tabbedPager.setFillParent(true)
-        stage.addActor(tabbedPager)
+        if (GameUiStyle.isAtlas) {
+            val layout = Table().apply {
+                setFillParent(true)
+                background = GameUiStyle.background("Atlas/Empire/Screen", GameUiStyle.surface)
+                add(AtlasWidgets.header("Empire Overview", viewingPlayer.civName)).growX().minWidth(0f).row()
+                add(tabbedPager).grow().minWidth(0f).minHeight(0f).row()
+                add(Table().apply {
+                    background = GameUiStyle.panelBackground("Atlas/Empire/Footer", 1f)
+                    add(closeButton).size(GameUiStyle.standardControlHeight).pad(GameUiStyle.Space.m).right().expandX()
+                }).growX()
+            }
+            stage.addActor(layout)
+            GameUiStyle.applyWidget(tabbedPager)
+        } else {
+            tabbedPager.decorateHeader(closeButton)
+            tabbedPager.setFillParent(true)
+            stage.addActor(tabbedPager)
+        }
 
         globalShortcuts.add(KeyboardBinding.Civilopedia) { openCivilopedia() }
    }
@@ -82,6 +104,7 @@ class EmpireOverviewScreen(
 
     fun resizePage(tab: EmpireOverviewTab) {
         val category = (pageObjects.entries.find { it.value == tab } ?: return).key
+        tab.applyAtlasPresentation()
         tabbedPager.replacePage(category.name, tab)
     }
 
@@ -110,7 +133,7 @@ class EmpireOverviewScreen(
         // This is called by UncivGame.popScreen - e.g. after City Tab opened a City and the user closes that CityScreen...
         // Notify the current tab via its IPageExtensions.activated entry point so it can refresh if needed
         val index = tabbedPager.activePage
-        val category = EmpireOverviewCategories.entries.getOrNull(index) ?: return
+        val category = categoryForPage(index) ?: return
         pageObjects[category]?.activated(index, "", tabbedPager) // Fake caption marks this as popScreen-triggered
     }
 }

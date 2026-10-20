@@ -19,6 +19,7 @@ import com.unciv.models.UnitActionType
 import com.unciv.models.UpgradeUnitAction
 import com.unciv.ui.components.extensions.brighten
 import com.unciv.ui.components.extensions.disable
+import com.unciv.ui.components.extensions.setFontColor
 import com.unciv.ui.components.input.keyShortcuts
 import com.unciv.ui.components.input.onActivation
 import com.unciv.ui.images.IconTextButton
@@ -131,7 +132,12 @@ class UnitActionsTable(val worldScreen: WorldScreen) : Table() {
                     }
                 }
             }
-            add(button).colspan(2).row()
+            if (com.unciv.ui.components.GameUiStyle.isAtlas) {
+                add(button).padRight(4f)
+                // At phone widths long current-state captions need the full column.
+                val columns = if (worldScreen.stage.width < 600f) 1 else 2
+                if (children.size % columns == 0) row()
+            } else add(button).colspan(2).row()
         }
 
         // show page navigation
@@ -167,6 +173,10 @@ class UnitActionsTable(val worldScreen: WorldScreen) : Table() {
     }
 
     private fun updateButtonsPerPage(button: Button) {
+        if (com.unciv.ui.components.GameUiStyle.isAtlas) {
+            buttonsPerPage = maxButtonsPerPage
+            return
+        }
         val upperLimit = worldScreen.techPolicyAndDiplomacy.y
         val lowerLimit = this.y
         val availableHeight = upperLimit - lowerLimit - padBetweenButtons
@@ -186,6 +196,12 @@ class UnitActionsTable(val worldScreen: WorldScreen) : Table() {
         if (unitAction.type == UnitActionType.Promote && unitAction.action != null)
             actionButton.color = Color.GREEN.brighten(0.5f)
 
+        if (com.unciv.ui.components.GameUiStyle.isAtlas) {
+            // Actions float beside the selection card, so they use quiet rounded chips rather than outlines.
+            com.unciv.ui.components.GameUiStyle.apply(actionButton,
+                if (unitAction.isCurrentAction) com.unciv.ui.components.GameUiStyle.Emphasis.Accent
+                else com.unciv.ui.components.GameUiStyle.Emphasis.Quiet)
+        }
         actionButton.pack()
 
         if (unitAction.action == null) {
@@ -194,6 +210,17 @@ class UnitActionsTable(val worldScreen: WorldScreen) : Table() {
             actionButton.onActivation(unitAction.uncivSound, binding) {
                 activateAction(unitAction, unit)
             }
+        }
+
+        if (com.unciv.ui.components.GameUiStyle.isAtlas) {
+            // disable() replaces the background; IconTextButton's plain Label needs the
+            // corresponding final foreground, independently of the ButtonStyle.
+            actionButton.label.color = Color.WHITE
+            actionButton.label.setFontColor(when {
+                actionButton.isDisabled -> com.unciv.ui.components.GameUiStyle.muted
+                unitAction.isCurrentAction -> com.unciv.ui.components.GameUiStyle.surface
+                else -> com.unciv.ui.components.GameUiStyle.ink
+            })
         }
 
         return actionButton

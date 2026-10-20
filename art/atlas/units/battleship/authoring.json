@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "unitName": "Battleship",
+  "assetId": "battleship",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": null,
+  "uniqueTo": null,
+  "replaces": null,
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Battleship",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/battleship/e-motion-v2.png",
+      "rawHash": "ffae404ffd900299facf2aa10de2e8fe4649d9a352df3964f3ca8dfb3cb1ad8f",
+      "promptPath": "art/atlas/units/battleship/prompts/e-v2.txt",
+      "promptHash": "422b8feed3bf5e96785402fffc5f9c9b68d4492b1664e460f12e6db6f652353c",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/battleship/ne-motion-v2.png",
+      "rawHash": "69d426a0ac42cc6375e014d7998d39b0df6b8ef6a551f810a287f9f13ba93160",
+      "promptPath": "art/atlas/units/battleship/prompts/ne-v2.txt",
+      "promptHash": "388a6a96840b7b86c1e5e990f82bb851c82ff3e2d906a868f7d9a400df1a11fc",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/battleship/se-motion-v2.png",
+      "rawHash": "22e5c00e7ffe2e0ce359828f7acd25e93a84660744da8c4341312199f72a9760",
+      "promptPath": "art/atlas/units/battleship/prompts/se-v2.txt",
+      "promptHash": "677b932deaa8f6629ef5af911702bddb1ef7e24b7b25ceb8a5d03c3133aa594b",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
+}

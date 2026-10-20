@@ -39,9 +39,11 @@ object AgentJson {
         else -> stringify(value.toString())
     }
 
-    private val reader = JsonReader()
-
-    fun parse(text: String): Any? = convert(reader.parse(text))
+    /**
+     * Thread-safe: Gdx [JsonReader] keeps per-parse state in fields, and the supervisor reader thread,
+     * journals and the bridge parse concurrently, so every call gets its own (cheap) reader.
+     */
+    fun parse(text: String): Any? = convert(JsonReader().parse(text))
 
     private fun convert(node: JsonValue): Any? = when {
         node.isObject() -> LinkedHashMap<String, Any?>().also { map ->

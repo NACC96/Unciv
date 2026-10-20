@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "unitName": "Hoplite",
+  "assetId": "hoplite",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": "Hoplite",
+  "uniqueTo": "Greece",
+  "replaces": "Spearman",
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Hoplite",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/hoplite/e-motion-v1.png",
+      "rawHash": "525647067f3a3b03e6341f59bdf4148e6ddaf754b915ff202dfab0724a78809d",
+      "promptPath": "art/atlas/units/hoplite/prompts/e-v1.txt",
+      "promptHash": "37438c3cefee9d22d31345791fbcbcbb386961852e9aeff9ba2378e82f9c2044",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/hoplite/ne-motion-v1.png",
+      "rawHash": "db0904939c5f047462f3a08f4d753115a2504958b3726c53046e36bf46d87bcf",
+      "promptPath": "art/atlas/units/hoplite/prompts/ne-v1.txt",
+      "promptHash": "97029b548158c82c09b116eb4e56c047588acc95ab98c48c177e5b336ad05acc",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/hoplite/se-motion-v1.png",
+      "rawHash": "80a047437704e53787e987c02af215e423707dfbc48143d16e7912c98c8288ec",
+      "promptPath": "art/atlas/units/hoplite/prompts/se-v1.txt",
+      "promptHash": "7abe04842d9a03d6bceb15e3b599d9a1900a9f5c8235c381f7b8bde410f2cbbe",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
+}

@@ -33,6 +33,7 @@ import com.unciv.logic.agents.MessageImageDraft
 import com.unciv.logic.agents.DiplomaticMessageLimits
 import com.unciv.ui.components.extensions.setFontSize
 import com.unciv.ui.components.GameUiStyle
+import com.unciv.UncivGame
 import com.unciv.ui.components.extensions.toLabel
 import com.unciv.ui.components.input.onClick
 import com.unciv.ui.components.widgets.AutoScrollPane
@@ -56,7 +57,11 @@ class AgentMessagesPanel(
                             val images: List<Attachment>)
     private data class Attachment(val id: String, val mimeType: String, val width: Int, val height: Int, val bytes: Int)
     private val history = Table(skin).apply { top().left() }
-    private val scroll = AutoScrollPane(history, skin)
+    private val scroll = AutoScrollPane(history, skin).apply { name = "MessageReadingPane" }
+    private val composer = Table(skin).apply { name = "MessageComposer"; top().left() }
+    private val composerScroll = AutoScrollPane(composer, skin).apply { name = "MessageComposerPane" }
+    private val footer = Table(skin).apply { name = "MessageFooter"; top().left() }
+    private val header = Table(skin).apply { touchable = Touchable.enabled }
     private val recipient = AgentNationSelectBox<NationOption>().apply { name = "MessageRecipient" }
     private val conversation = AgentNationSelectBox<NationOption>().apply { name = "MessageConversation" }
     private val body = TextArea("", skin).apply {
@@ -98,7 +103,8 @@ class AgentMessagesPanel(
     private var clipboardPending = false
     private var clipboardGeneration = 0
     private var historyGeneration = 0
-    private data class ScrollAnchor(val position: Float, val atEnd: Boolean)
+    private data class ScrollAnchor(val position: Float, val atEnd: Boolean, val id: String? = null, val offset: Float = 0f)
+    private val historyAnchors = LinkedHashMap<String, Actor>()
     private var pendingScrollAnchor: ScrollAnchor? = null
     private var imagesHidden = true
     private val status = "".toLabel(WorldScreenStyle.muted, 11).apply { wrap = true }
@@ -111,27 +117,32 @@ class AgentMessagesPanel(
     private var sending = false
     private var disposed = false
     private var initializedPosition = false
+    private var userDragged = false
+    /** The size the user dragged the Atlas sheet to; null keeps the default tall sheet. */
+    private var userSize: Vector2? = null
+    private val resizeGrip = WorldScreenStyle.dragGrip("Drag to resize").apply { name = "MessageResize" }
+    private val pickerHeight get() = if (GameUiStyle.isAtlas) 28f * UncivGame.Current.settings.fontSizeMultiplier else 30f
     private var viewerId: String? = null
+    /** A queued message awaiting the second click that deletes it, and the one being deleted. */
+    private var confirmDeleteId: String? = null
+    private var deletingId: String? = null
     private var generation = 0
     private var visibleLimit = 100
+    private var historyTailOffset = 0
     private val task = object : Timer.Task() {
         override fun run() { if (disposed) cancel() else if (isVisible) refresh() }
     }
 
     init {
         name = "AgentMessagesPanel"
-        background = WorldScreenStyle.panelBackground("WorldScreen/Messages")
+        background = if (GameUiStyle.isAtlas) WorldScreenStyle.surface("WorldScreen/Messages", 0.94f)
+            else WorldScreenStyle.panelBackground("WorldScreen/Messages")
         touchable = Touchable.enabled
         pad(14f)
-        val close = Button(skin).apply {
-            WorldScreenStyle.apply(this); pad(4f)
-            add(ImageGetter.getImage("OtherIcons/Close")).size(12f)
-            onClick { setShown(false) }
-        }
-        val header = Table(skin).apply { touchable = Touchable.enabled }
+        val close = AgentPanelLayout.closeButton { setShown(false) }
         header.add("Messages".toLabel(WorldScreenStyle.ink, 17)).expandX().left()
         header.add(WorldScreenStyle.dragGrip()).padRight(8f)
-        header.add(close).size(26f)
+        header.add(close).size(if (GameUiStyle.isAtlas) 28f else 26f)
         header.addListener(object : InputListener() {
             private val origin = Vector2()
             private val pointerOrigin = Vector2()
@@ -143,6 +154,7 @@ class AgentMessagesPanel(
                 return true
             }
             override fun touchDragged(event: InputEvent, x: Float, y: Float, pointer: Int) {
+                userDragged = true
                 setPosition(origin.x + event.stageX - pointerOrigin.x, origin.y + event.stageY - pointerOrigin.y)
                 clampPosition(); Gdx.graphics.requestRendering()
             }
@@ -164,26 +176,76 @@ class AgentMessagesPanel(
                 scrollStyle = ScrollPane.ScrollPaneStyle(scrollStyle).apply { background = listStyle.background }
             }
             picker.setMaxListCount(7)
+            if (GameUiStyle.isAtlas) picker.fontSize = GameUiStyle.Type.label
         }
-        add(conversation).minWidth(0f).growX().height(30f).padBottom(8f).row()
+        add(conversation).minWidth(0f).growX().height(pickerHeight).padBottom(8f).row()
         scroll.setScrollingDisabled(true, false)
         scroll.setFadeScrollBars(false)
         scroll.setOverscroll(false, false)
         add(scroll).grow().row()
-        add("To".toLabel(WorldScreenStyle.muted, 11)).left().padTop(12f).row()
-        add(recipient).minWidth(0f).growX().height(32f).padTop(4f).padBottom(6f).row()
-        add(body).growX().height(82f).row()
-        val footer = Table(skin)
-        footer.add(count).left().expandX()
-        footer.add(paste).right().padRight(8f)
-        footer.add(send).right()
-        add(imagePreview).growX().row()
-        add(visionWarning).growX().left().row()
-        add(footer).growX().padTop(6f).row()
-        add(status).growX().left().padTop(5f).row()
+        if (GameUiStyle.isAtlas) {
+            composer.background = WorldScreenStyle.background("WorldScreen/Messages/Draft", WorldScreenStyle.inset)
+            composer.pad(8f)
+            composer.add("To".toLabel(WorldScreenStyle.muted, GameUiStyle.Type.caption)).left().row()
+            composer.add(recipient).minWidth(0f).growX().height(pickerHeight).padTop(4f).padBottom(6f).row()
+            composer.add(body).growX().height(82f).row()
+            composer.add(count).minWidth(0f).growX().left().padTop(4f).row()
+            composer.add(imagePreview).growX().row()
+            composer.add(visionWarning).growX().left().row()
+            composerScroll.setScrollingDisabled(true, false)
+            composerScroll.setFadeScrollBars(false); composerScroll.setOverscroll(false, false)
+            add(composerScroll).growX().row()
+            footer.add(paste).minWidth(0f).growX().padRight(8f)
+            footer.add(send).minWidth(0f).growX().row()
+            val statusPane = AutoScrollPane(status, skin).apply {
+                setScrollingDisabled(true, false); setOverscroll(false, false); setFadeScrollBars(false)
+            }
+            footer.add(statusPane).colspan(2).minWidth(0f).growX().height(28f * UncivGame.Current.settings.fontSizeMultiplier).padTop(4f).row()
+            add(footer).growX().row()
+            // Bottom-left corner grip: drags that corner while the top-right corner stays put.
+            addActor(resizeGrip)
+            resizeGrip.addListener(object : InputListener() {
+                private var right = 0f
+                private var top = 0f
+                private val startSize = Vector2()
+                private val pointerOrigin = Vector2()
+                override fun touchDown(event: InputEvent, x: Float, y: Float, pointer: Int, button: Int): Boolean {
+                    right = this@AgentMessagesPanel.x + width; top = this@AgentMessagesPanel.y + height
+                    startSize.set(width, height)
+                    pointerOrigin.set(event.stageX, event.stageY)
+                    toFront(); event.stop()
+                    return true
+                }
+                override fun touchDragged(event: InputEvent, x: Float, y: Float, pointer: Int) {
+                    val stage = screen.stage
+                    val w = (startSize.x + pointerOrigin.x - event.stageX)
+                        .coerceIn(minOf(320f, stage.width - 16f), (right - 8f).coerceAtLeast(1f))
+                    val h = (startSize.y + pointerOrigin.y - event.stageY)
+                        .coerceIn(minOf(360f * UncivGame.Current.settings.fontSizeMultiplier, stage.height - 16f), (top - 8f).coerceAtLeast(1f))
+                    userSize = Vector2(w, h); userDragged = true
+                    rememberScrollPosition(); setSize(w, h); setPosition(right - w, top - h)
+                    invalidateHierarchy(); Gdx.graphics.requestRendering()
+                }
+                // Message rows wrap to the content width, so rebuild them once at the final size.
+                override fun touchUp(event: InputEvent, x: Float, y: Float, pointer: Int, button: Int) {
+                    rememberScrollPosition(); rebuildHistory()
+                }
+            })
+        } else {
+            add("To".toLabel(WorldScreenStyle.muted, 11)).left().padTop(12f).row()
+            add(recipient).minWidth(0f).growX().height(32f).padTop(4f).padBottom(6f).row()
+            add(body).growX().height(82f).row()
+            footer.add(count).left().expandX()
+            footer.add(paste).right().padRight(8f)
+            footer.add(send).right()
+            add(imagePreview).growX().row()
+            add(visionWarning).growX().left().row()
+            add(footer).growX().padTop(6f).row()
+            add(status).growX().left().padTop(5f).row()
+        }
         conversation.addListener(object : ChangeListener() {
             override fun changed(event: ChangeEvent, actor: Actor) {
-                if (!updating) { visibleLimit = 100; rebuildHistory(jump = true) }
+                if (!updating) { visibleLimit = 100; historyTailOffset = 0; rebuildHistory(jump = true) }
             }
         })
         body.addListener(object : ChangeListener() {
@@ -222,7 +284,7 @@ class AgentMessagesPanel(
             imagesHidden = true; clipboardGeneration++
             if (clipboardPending) { clipboardPending = false; setStatus("") }
             releaseDraftTexture(); releaseHistoryTextures(); imagePreview.clearChildren()
-            recipient.hideList(); conversation.hideList()
+            recipient.hideScrollPane(); conversation.hideScrollPane()
             if (screen.stage.scrollFocus?.isDescendantOf(this) == true) screen.stage.scrollFocus = null
             if (screen.stage.keyboardFocus?.isDescendantOf(this) == true) screen.stage.keyboardFocus = null
             pendingScrollAnchor = null
@@ -236,12 +298,13 @@ class AgentMessagesPanel(
         if (viewerId != id) {
             pendingScrollAnchor = null
             viewerId = id; generation++; sending = false
+            confirmDeleteId = null; deletingId = null
             clipboardGeneration++; clipboardPending = false; imageDraft = null; releaseDraftTexture(); imagePreview.clearChildren()
             releaseHistoryTextures()
             body.text = ""; setStatus(""); options = emptyList(); mail = emptyList()
-            history.clearChildren()
+            history.clearChildren(); historyAnchors.clear()
             recipient.setItems(GdxArray<NationOption>())
-            visibleLimit = 100
+            visibleLimit = 100; historyTailOffset = 0
             updating = true; conversation.setItems(GdxArray(arrayOf(allConversations))); updating = false
             pendingScrollAnchor = ScrollAnchor(0f, true)
         }
@@ -259,12 +322,16 @@ class AgentMessagesPanel(
             options.firstOrNull { it.id == selected }?.let { recipient.selected = it }
             updating = false
         }
-        val w = minOf(480f, screen.stage.width - 16f).coerceAtLeast(1f)
-        val h = minOf(650f, screen.stage.height - 130f).coerceAtLeast(1f)
+        val maxW = (screen.stage.width - 16f).coerceAtLeast(1f)
+        val w = userSize?.x?.coerceAtMost(maxW) ?: minOf(if (GameUiStyle.isAtlas) 420f else 480f, maxW)
+        // Atlas: a tall, narrow reading sheet beside the right-hand HUD column; the user may resize it.
+        val sheet = if (GameUiStyle.isAtlas) AgentPanelLayout.tallSheet(screen.stage, w) else null
+        val h = userSize?.y?.coerceAtMost((screen.stage.height - 16f).coerceAtLeast(1f))
+            ?: sheet?.height ?: minOf(650f, screen.stage.height - 130f).coerceAtLeast(1f)
         val resized = w != width || h != height
         if (resized) { rememberScrollPosition(); setSize(w, h) }
-        getCell(body).height(if (h < 500f) 54f else 82f)
-        val latest = orderedDiplomaticMessages(session.getMessages()).map { Mail(it.messageId, it.senderCivId, it.targetCivId, it.text,
+        (if (GameUiStyle.isAtlas) composer.getCell(body) else getCell(body)).height(if (GameUiStyle.isAtlas || h < 500f) 54f else 82f)
+        val latest = orderedDiplomaticMessages(session.getMessages()).filter { spectator || it.senderCivId == id || it.targetCivId == id }.map { Mail(it.messageId, it.senderCivId, it.targetCivId, it.text,
             it.sentTurnSerial, it.deliveredTurnSerial, it.origin,
             it.acknowledgedTurnSerial, it.acknowledgementText, it.acknowledgedRevision,
             it.attachments.map { attachment -> Attachment(attachment.attachmentId, attachment.mimeType,
@@ -280,10 +347,11 @@ class AgentMessagesPanel(
             updating = false
             rebuildHistory()
         } else if (history.children.size == 0 || resized) rebuildHistory()
-        if (!initializedPosition) {
+        if (sheet != null && !userDragged) setPosition(sheet.x, sheet.y)
+        else if (!initializedPosition) {
             setPosition(screen.stage.width - width - 8f, screen.stage.height - height - 116f)
-            initializedPosition = true
         }
+        initializedPosition = true
         clampPosition()
         updateSendState()
         invalidateHierarchy()
@@ -414,16 +482,16 @@ class AgentMessagesPanel(
         }
         imagePreview.add(Image(draftTexture).apply { name = "MessageImagePreview"; setScaling(Scaling.fit) })
             .size(96f, 64f).left().padTop(6f)
-        imagePreview.add("${draft.width} × ${draft.height}".toLabel(WorldScreenStyle.muted, 11))
+        imagePreview.add("${draft.width} × ${draft.height}".toLabel(WorldScreenStyle.muted, 11).apply { setEllipsis(true) })
             .minWidth(0f).expandX().left().padLeft(8f)
         imagePreview.add(removeImage).right().padLeft(8f)
         invalidateHierarchy()
     }
 
-    private fun addHistoryImage(message: Mail, attachment: Attachment, contentWidth: Float, preload: Boolean) {
+    private fun addHistoryImage(message: Mail, attachment: Attachment, contentWidth: Float, preload: Boolean, parent: Table = history) {
         val container = Table(skin)
         val loading = "Loading image…".toLabel(WorldScreenStyle.muted, 11).apply { wrap = true }
-        history.add(container).width(contentWidth).left().padTop(4f).padBottom(8f).row()
+        parent.add(container).width(contentWidth).left().padTop(4f).padBottom(8f).row()
         if (imagesHidden || disposed) {
             container.add("Image · ${attachment.width} × ${attachment.height}".toLabel(WorldScreenStyle.muted, 11))
                 .width(contentWidth).left()
@@ -488,25 +556,33 @@ class AgentMessagesPanel(
     private fun rebuildHistory(jump: Boolean = false) {
         rememberScrollPosition(forceEnd = jump)
         releaseHistoryTextures()
-        history.clearChildren()
+        history.clearChildren(); historyAnchors.clear()
         val selected = conversation.selected?.id
         val filtered = mail.filter { selected == null || it.sender == selected || it.target == selected }
         val contentWidth = (width - 40f).coerceAtLeast(80f)
         if (filtered.isEmpty()) history.add("No messages yet. Replies arrive on the recipient’s next turn."
             .toLabel(WorldScreenStyle.muted, 12).apply { wrap = true }).width(contentWidth).left().row()
-        if (filtered.size > visibleLimit) {
+        if (filtered.size > visibleLimit + historyTailOffset) {
             val earlier = WorldScreenStyle.button("Earlier messages").apply { label.setFontSize(11) }
-            earlier.onClick { visibleLimit += 100; rebuildHistory() }
+            earlier.onClick {
+                if (visibleLimit < 600) visibleLimit += 100 else historyTailOffset = minOf(historyTailOffset + 100, (filtered.size - visibleLimit).coerceAtLeast(0))
+                rebuildHistory()
+            }
             history.add(earlier).left().padBottom(10f).row()
         }
-        val shown = filtered.takeLast(visibleLimit)
+        val shown = filtered.dropLast(historyTailOffset.coerceAtMost(filtered.size)).takeLast(visibleLimit)
         // Bound automatic byte reads and GPU uploads even after "Earlier messages" grows the history.
         val recentImages = shown.flatMap { message -> message.images.map { message.id to it.id } }.takeLast(4).toSet()
         for (message in shown) {
+            val card = Table(skin).apply { name = "MessageRow/${message.id}"; top().left() }
+            if (GameUiStyle.isAtlas) { card.background = WorldScreenStyle.background("WorldScreen/Messages/Dispatch", WorldScreenStyle.inset); card.pad(10f) }
+            val messageWidth = contentWidth - if (GameUiStyle.isAtlas) 20f else 0f
+            historyAnchors[message.id] = card
+            history.add(card).width(contentWidth).left().padBottom(10f).row()
             val sender = if (message.origin == "SPECTATOR") "Spectator" else message.sender
             val senderColor = AgentActivityAppearance.color(screen.gameInfo, message.sender)
-            history.add("$sender → ${message.target}".toLabel(senderColor, 13, hideIcons = true).apply { wrap = true })
-                .width(contentWidth).left().row()
+            card.add("$sender → ${message.target}".toLabel(senderColor, 13, hideIcons = true).apply { wrap = true })
+                .width(messageWidth).left().row()
             val state = message.acknowledged?.let { "Acknowledged · turn $it" }
                 ?: message.delivered?.let { "Delivered · turn $it" } ?: "Queued · next turn"
             // Receipt colours read as progress; amber stays reserved for real problems.
@@ -516,34 +592,75 @@ class AgentMessagesPanel(
                 else -> WorldScreenStyle.muted
             }
             val receipt = Table(skin)
-            receipt.add("Sent turn ${message.sent}".toLabel(WorldScreenStyle.muted, GameUiStyle.Type.caption)).left().expandX()
-            receipt.add(state.toLabel(stateColor, 11)).right().padLeft(8f)
-            history.add(receipt).width(contentWidth).left().padTop(3f).row()
+            receipt.add("Sent turn ${message.sent}".toLabel(WorldScreenStyle.muted, GameUiStyle.Type.caption)).minWidth(0f).left().expandX()
+            if (GameUiStyle.isAtlas && width < 440f) receipt.row()
+            receipt.add(state.toLabel(stateColor, 11).apply { wrap = true }).minWidth(0f).growX().right().padLeft(8f)
+            if (message.delivered == null && message.sender == viewerId)
+                receipt.add(deleteButton(message.id)).minHeight(GameUiStyle.compactControlHeight).right().padLeft(8f)
+            card.add(receipt).width(messageWidth).left().padTop(3f).row()
             val text = Label(message.text, Label.LabelStyle(BaseScreen.skin.get(Label.LabelStyle::class.java))).apply {
                 setFontSize(13); color = WorldScreenStyle.ink; wrap = true
             }
-            history.add(text).width(contentWidth).left().padTop(5f)
+            card.add(text).width(messageWidth).left().padTop(5f)
                 .padBottom(if (message.acknowledged == null) 16f else 8f).row()
-            for (attachment in message.images) addHistoryImage(message, attachment, contentWidth,
-                (message.id to attachment.id) in recentImages)
+            for (attachment in message.images) addHistoryImage(message, attachment, messageWidth,
+                (message.id to attachment.id) in recentImages, card)
             if (message.acknowledged != null) {
-                history.add("${message.target} acknowledged receipt".toLabel(
+                card.add("${message.target} acknowledged receipt".toLabel(
                     AgentActivityAppearance.color(screen.gameInfo, message.target), 11, hideIcons = true).apply { wrap = true })
-                    .width(contentWidth).left().row()
+                    .width(messageWidth).left().row()
                 val acknowledgement = Label(message.acknowledgementText.orEmpty(),
                     Label.LabelStyle(BaseScreen.skin.get(Label.LabelStyle::class.java))).apply {
                     setFontSize(12); color = WorldScreenStyle.ink; wrap = true
                 }
-                history.add(acknowledgement).width(contentWidth).left().padTop(3f).padBottom(16f).row()
+                card.add(acknowledgement).width(messageWidth).left().padTop(3f).padBottom(16f).row()
             }
         }
         history.invalidateHierarchy(); scroll.invalidate()
     }
 
+    /** Only the sender's still-queued mail is deletable; the second click confirms. */
+    private fun deleteButton(messageId: String): Button {
+        val text = when (messageId) {
+            deletingId -> "Deleting…"
+            confirmDeleteId -> "Confirm delete"
+            else -> "Delete"
+        }
+        return WorldScreenStyle.button(text, size = GameUiStyle.ButtonSize.Compact).apply {
+            name = "MessageDelete"
+            if (messageId == confirmDeleteId) label.color = WorldScreenStyle.error
+            WorldScreenStyle.setEnabled(this, deletingId == null)
+            onClick { requestDelete(messageId) }
+        }
+    }
+
+    private fun requestDelete(messageId: String) {
+        if (deletingId != null) return
+        if (confirmDeleteId != messageId) {
+            confirmDeleteId = messageId
+            rebuildHistory()
+            return
+        }
+        confirmDeleteId = null; deletingId = messageId
+        val requestGeneration = generation
+        rebuildHistory()
+        session.deleteMessage(messageId) { error ->
+            if (disposed || requestGeneration != generation) return@deleteMessage
+            deletingId = null
+            if (error == null) { status.color = WorldScreenStyle.muted; setStatus("Message deleted.") }
+            else { status.color = WorldScreenStyle.error; setStatus(error) }
+            refresh()
+            rebuildHistory()
+        }
+    }
+
     private fun rememberScrollPosition(forceEnd: Boolean = false) {
         // Keep the position from the first mutation; later callbacks may see intermediate bounds.
-        if (forceEnd || pendingScrollAnchor == null)
-            pendingScrollAnchor = ScrollAnchor(scroll.scrollY, forceEnd || scroll.maxY - scroll.scrollY < 24f)
+        if (forceEnd || pendingScrollAnchor == null) {
+            val mark = historyAnchors.entries.firstOrNull { (_, actor) -> rowTop(actor) + actor.height > scroll.scrollY }
+            pendingScrollAnchor = ScrollAnchor(scroll.scrollY, forceEnd || scroll.maxY - scroll.scrollY < 24f,
+                mark?.key, mark?.value?.let { scroll.scrollY - rowTop(it) } ?: 0f)
+        }
     }
 
     private fun setStatus(text: String) {
@@ -552,13 +669,29 @@ class AgentMessagesPanel(
         status.setText(text)
     }
 
+    private fun rowTop(actor: Actor) = history.height - actor.localToAscendantCoordinates(history, Vector2()).y - actor.height
+
     override fun layout() {
+        if (GameUiStyle.isAtlas) {
+            val availableWidth = (width - padLeft - padRight).coerceAtLeast(1f)
+            val chrome = padTop + padBottom + header.prefHeight + identity.prefHeight + 4f + 10f + pickerHeight + 8f
+            val regions = AgentPanelLayout.calculate(availableWidth, (height - chrome).coerceAtLeast(1f), UncivGame.Current.settings.fontSizeMultiplier)
+            getCell(scroll).height(regions.content.height).minHeight(0f)
+            getCell(composerScroll).height(regions.composer.height).minHeight(0f)
+            getCell(footer).height(regions.footer.height).minHeight(0f)
+            val inputWidth = (availableWidth - 16f - (composerScroll.style.vScroll?.minWidth ?: 0f)).coerceAtLeast(1f)
+            composer.cells.forEach { it.width(inputWidth) }
+        }
         super.layout()
+        if (resizeGrip.parent === this) { resizeGrip.pack(); resizeGrip.setPosition(4f, 4f) }
         // Parent bounds and wrapped labels must settle before calculating the final scroll range.
         scroll.validate()
-        val anchor = pendingScrollAnchor ?: return
+        val anchor = pendingScrollAnchor
         pendingScrollAnchor = null
-        scroll.scrollY = if (anchor.atEnd) scroll.maxY else anchor.position.coerceAtMost(scroll.maxY)
+        if (anchor != null) scroll.scrollY = if (anchor.atEnd) scroll.maxY else
+            (anchor.id?.let { historyAnchors[it] }?.let { rowTop(it) + anchor.offset } ?: anchor.position).coerceIn(0f, scroll.maxY)
+        // Wrapped rows may require a second layout pass after the anchor was consumed.
+        // ScrollPane clamps its target then, but retains the old visual offset until explicitly synced.
         scroll.updateVisualScroll()
     }
 
@@ -573,7 +706,7 @@ class AgentMessagesPanel(
         disposed = true; generation++; clipboardGeneration++; clipboardPending = false
         releaseDraftTexture(); releaseHistoryTextures(); imageDraft = null
         imagePreview.clearChildren(); history.clearChildren()
-        task.cancel(); recipient.hideList(); conversation.hideList()
+        task.cancel(); recipient.hideScrollPane(); conversation.hideScrollPane()
         if (screen.stage.scrollFocus?.isDescendantOf(this) == true) screen.stage.scrollFocus = null
         if (screen.stage.keyboardFocus?.isDescendantOf(this) == true) screen.stage.keyboardFocus = null
         remove()

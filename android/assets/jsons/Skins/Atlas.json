@@ -1,0 +1,9 @@
+{
+  "baseColor": {"r": 0.0627451, "g": 0.1372549, "b": 0.1843137, "a": 0.94},
+  "clearColor": {"r": 0.0431373, "g": 0.0941176, "b": 0.1294118, "a": 1},
+  "fallbackSkin": "Minimal",
+  "skinVariants": {
+    "General/ExpanderTab": {"image": "panel", "tint": {"r": 0.0627451, "g": 0.1372549, "b": 0.1843137, "a": 1}},
+    "General/Tooltip": {"image": "panel", "tint": {"r": 0.0431373, "g": 0.0941176, "b": 0.1294118, "a": 1}}
+  }
+}

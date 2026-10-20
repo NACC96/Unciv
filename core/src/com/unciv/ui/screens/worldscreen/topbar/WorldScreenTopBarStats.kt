@@ -44,6 +44,9 @@ internal class WorldScreenTopBarStats(private val topbar: WorldScreenTopBar) : S
     private val happinessImage = ImageGetter.getStatIcon("Happiness")
 
     private val worldScreen = topbar.worldScreen
+    private val atlas = com.unciv.ui.components.GameUiStyle.isAtlas
+    /** Atlas only: culture turns and the golden age text; dropped first when the bar is narrow. */
+    var showSuffixes = true
 
 
     companion object {
@@ -129,7 +132,7 @@ internal class WorldScreenTopBarStats(private val topbar: WorldScreenTopBar) : S
         goldPerTurnLabel.setText(rateLabel(nextTurnStats.gold))
         goldPerTurnLabel.setFontColor(rateColor(nextTurnStats.gold))
 
-        scienceLabel.setText(rateLabel(nextTurnStats.science))
+        scienceLabel.setText(valueLabel(nextTurnStats.science))
 
         happinessLabel.setText(getHappinessText(civInfo))
 
@@ -149,16 +152,25 @@ internal class WorldScreenTopBarStats(private val topbar: WorldScreenTopBar) : S
         faithPerTurnLabel.setText(rateLabel(nextTurnStats.faith))
         faithPerTurnLabel.setFontColor(rateColor(nextTurnStats.faith))
 
-        scaleTo(worldScreen.stage.width)
+        if (!com.unciv.ui.components.GameUiStyle.isAtlas) scaleTo(worldScreen.stage.width)
     }
 
     /** Positive rates stay quiet; a deficit is the value the player must notice. */
     private fun rateColor(rate: Float) = if (rate.roundToInt() < 0) WorldScreenStyle.error else WorldScreenStyle.muted
 
     private fun getCultureText(civInfo: Civilization, nextTurnStats: Stats): String {
-        var cultureString = rateLabel(nextTurnStats.culture)
+        var cultureString = valueLabel(nextTurnStats.culture)
         // kotlin Float division by Zero produces `Float.POSITIVE_INFINITY`, not an exception
         val turnsToNextPolicy = (civInfo.policies.getCultureNeededForNextPolicy() - civInfo.policies.storedCulture) / nextTurnStats.culture
+        if (atlas) {
+            // Only a finite, actionable suffix: never "(∞)".
+            if (!showSuffixes) return cultureString
+            return cultureString + when {
+                turnsToNextPolicy <= 0f -> "\u2004(!)"
+                nextTurnStats.culture <= 0 -> ""
+                else -> "\u2004(" + Fonts.turn + "\u2009" + ceil(turnsToNextPolicy).toInt().tr() + ")"
+            }
+        }
         cultureString += when {
             turnsToNextPolicy <= 0f -> "\u2004(!)" // Can choose policy right now
             nextTurnStats.culture <= 0 -> "\u2004(${Fonts.infinity})" // when you start the game, you're not producing any culture
@@ -170,6 +182,9 @@ internal class WorldScreenTopBarStats(private val topbar: WorldScreenTopBar) : S
     private fun getHappinessText(civInfo: Civilization): String {
         var happinessText = civInfo.getHappiness().tr()
         val goldenAges = civInfo.goldenAges
+        // Atlas drops the "(stored/required)" progress; an active golden age stays visible.
+        if (atlas) return if (showSuffixes && goldenAges.isGoldenAge())
+            happinessText + "    {GOLDEN AGE}(${goldenAges.turnsLeftForCurrentGoldenAge})".tr() else happinessText
         happinessText +=
             if (goldenAges.isGoldenAge())
                 "    {GOLDEN AGE}(${goldenAges.turnsLeftForCurrentGoldenAge})".tr()
@@ -178,7 +193,13 @@ internal class WorldScreenTopBarStats(private val topbar: WorldScreenTopBar) : S
         return happinessText
     }
 
+    /** Per-turn suffix after a stored amount: Atlas hides a zero rate entirely. */
     private fun rateLabel(value: Float): String {
-        return if (value.roundToInt() == 0) "±0" else value.roundToInt().toStringSigned()
+        if (value.roundToInt() == 0) return if (atlas) "" else "±0"
+        return value.roundToInt().toStringSigned()
     }
+
+    /** A rate shown as the stat's own value (science, culture): Atlas shows a plain "0". */
+    private fun valueLabel(value: Float): String =
+        if (atlas && value.roundToInt() == 0) "0" else rateLabel(value)
 }

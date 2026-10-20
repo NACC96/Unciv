@@ -61,4 +61,9 @@ open class PickerScreen(disableScroll: Boolean = false) : BaseScreen() {
     fun pick(rightButtonText: String) {
         pickerPane.pick(rightButtonText)
     }
+
+    /** Atlas heading is outside the tree/list scroll and shares the existing confirm/back actors. */
+    protected fun setChoiceHeader(title: String, subtitle: String? = null) {
+        pickerPane.setHeader(title, subtitle)
+    }
 }

@@ -9,6 +9,8 @@ import com.unciv.logic.multiplayer.MultiplayerGamePreview
 import com.unciv.logic.multiplayer.storage.MultiplayerAuthException
 import com.unciv.models.ruleset.RulesetCache
 import com.unciv.models.translations.tr
+import com.unciv.ui.components.GameUiStyle
+import com.unciv.ui.components.atlas.AtlasTwoPane
 import com.unciv.ui.components.widgets.UncivTextField
 import com.unciv.ui.components.extensions.disable
 import com.unciv.ui.components.extensions.enable
@@ -51,11 +53,20 @@ class MultiplayerScreen : PickerScreen() {
     val gameList = GameList(::selectGame)
 
     init {
+        setChoiceHeader("Multiplayer")
         setDefaultCloseAction()
 
         scrollPane.setScrollingDisabled(false, true)
 
-        topTable.add(createMainContent()).row()
+        if (GameUiStyle.isAtlas) {
+            scrollPane.setScrollingDisabled(true, true)
+            topTable.add(AtlasTwoPane(gameList, Table().apply {
+                top()
+                add(getGeneralActionsTable()).growX().minWidth(0f).row()
+                add(getGameSpecificActionsTable()).growX().minWidth(0f)
+            }, game.settings.fontSizeMultiplier)).grow().minWidth(0f).minHeight(0f)
+            GameUiStyle.applyWidget(topTable)
+        } else topTable.add(createMainContent()).row()
 
         setupHelpButton()
         setupRightSideButton()
@@ -64,8 +75,10 @@ class MultiplayerScreen : PickerScreen() {
             game.onlineMultiplayer.requestUpdate()
         }
 
-        pickerPane.bottomTable.background = skinStrings.getUiBackground("MultiplayerScreen/BottomTable", tintColor = skinStrings.skinConfig.clearColor)
-        pickerPane.topTable.background = skinStrings.getUiBackground("MultiplayerScreen/TopTable", tintColor = skinStrings.skinConfig.clearColor)
+        if (!GameUiStyle.isAtlas) {
+            pickerPane.bottomTable.background = skinStrings.getUiBackground("MultiplayerScreen/BottomTable", tintColor = skinStrings.skinConfig.clearColor)
+            pickerPane.topTable.background = skinStrings.getUiBackground("MultiplayerScreen/TopTable", tintColor = skinStrings.skinConfig.clearColor)
+        }
     }
 
     private fun onGameDeleted(gameName:String){
@@ -99,22 +112,30 @@ class MultiplayerScreen : PickerScreen() {
     }
 
     private fun getGeneralActionsTable(): Table {
-        val generalActions = Table().apply { defaults().pad(10f) }
+        val generalActions = Table().apply {
+            defaults().pad(10f)
+            if (GameUiStyle.isAtlas) defaults().minWidth(0f).growX()
+        }
         generalActions.add(copyUserIdButton).row()
         generalActions.add(addGameButton).row()
         generalActions.add(friendsListButton).row()
         generalActions.add(refreshButton).row()
+        if (GameUiStyle.isAtlas) generalActions.children.filterIsInstance<TextButton>().forEach { it.label.wrap = true }
         return generalActions
     }
 
     private fun getGameSpecificActionsTable(): Table {
-        val gameSpecificActions = Table().apply { defaults().pad(10f) }
+        val gameSpecificActions = Table().apply {
+            defaults().pad(10f)
+            if (GameUiStyle.isAtlas) defaults().minWidth(0f).growX()
+        }
         gameSpecificActions.add(copyGameIdButton).row()
         gameSpecificActions.add(renameButton).row()
         gameSpecificActions.add(skipTurnButton).row()
         gameSpecificActions.add(resignButton).row()
         gameSpecificActions.add(forceResignButton).row()
         gameSpecificActions.add(deleteButton).row()
+        if (GameUiStyle.isAtlas) gameSpecificActions.children.filterIsInstance<TextButton>().forEach { it.label.wrap = true }
         return gameSpecificActions
     }
 
@@ -397,7 +418,10 @@ class MultiplayerScreen : PickerScreen() {
         tab.x = (stage.width - helpButton.width)
         tab.y = (stage.height - helpButton.height)
 
-        stage.addActor(tab)
+        if (GameUiStyle.isAtlas) {
+            GameUiStyle.apply(helpButton)
+            rightSideGroup.addActor(helpButton)
+        } else stage.addActor(tab)
     }
 
     private fun unselectGame() {

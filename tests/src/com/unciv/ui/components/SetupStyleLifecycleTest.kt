@@ -17,6 +17,7 @@ import com.unciv.ui.components.extensions.toCheckBox
 import com.unciv.ui.components.extensions.toLabel
 import com.unciv.ui.components.input.ActivationListener
 import com.unciv.ui.components.input.onChange
+import com.unciv.ui.components.fonts.FontRulesetIcons
 import com.unciv.ui.components.widgets.ExpanderTab
 import com.unciv.ui.components.widgets.TranslatedSelectBox
 import com.unciv.ui.components.widgets.UncivTextField
@@ -105,6 +106,42 @@ class SetupStyleLifecycleTest {
         field.text = "5678"
         assertEquals(1, checkboxChanges)
         assertEquals(1, fieldChanges)
+    }
+
+    @Test fun themeReloadRetainsControlState() {
+        val fixture = SetupLayoutFixture(800f, 500f)
+        val field = UncivTextField("Message", "draft")
+        field.onChange { error("Theme application must not emit changes") }
+        val disabledButton = TextButton("Unavailable", BaseScreen.skin).apply { isDisabled = true }
+        val red = "✘ Invalid".toLabel(Color.RED)
+        val nation = "Rome".toLabel(Color.PURPLE)
+        val glyph = "Wheat".toLabel()
+        val text = glyph.text.toString()
+        assertTrue(text.contains(FontRulesetIcons.rulesetObjectNameToChar.getValue("Wheat")))
+        val expander = ExpanderTab("Details", startsOutOpened = false) {
+            it.add(field).row(); it.add(disabledButton).row()
+            it.add(red).row(); it.add(nation).row(); it.add(glyph).row()
+        }
+        fixture.root.addActor(expander)
+        val oldListeners = field.listeners.toList()
+        val oldButtonListeners = disabledButton.listeners.toList()
+        for (skin in listOf("Atlas", "Minimal", "Atlas")) {
+            UncivGame.Current.settings.skin = skin
+            BaseScreen.setSkin()
+            GameUiStyle.applyWidget(expander)
+            assertEquals(oldListeners, field.listeners.toList())
+            assertEquals("draft", field.text)
+            assertTrue(disabledButton.isDisabled)
+            assertEquals(oldButtonListeners, disabledButton.listeners.toList())
+            assertEquals(Color.RED, red.style.fontColor)
+            assertEquals(Color.PURPLE, nation.style.fontColor)
+            assertEquals(text, glyph.text.toString())
+            assertNull(expander.innerTable.parent)
+        }
+        assertEquals(GameUiStyle.ink, field.style.fontColor)
+        val style = field.style
+        expander.isOpen = true
+        assertSame(style, field.style)
     }
 
     @Test fun `an internal game option callback keeps replacement controls styled and selected`() {

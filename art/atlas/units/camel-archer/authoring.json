@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "unitName": "Camel Archer",
+  "assetId": "camel-archer",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": "Camel Archer",
+  "uniqueTo": "Arabia",
+  "replaces": "Knight",
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Camel Archer",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/camel-archer/e-motion-v1.png",
+      "rawHash": "5715257ebb7d534cd861eb9ced4e7389356d89e0030e020ee2e05ebd594d957c",
+      "promptPath": "art/atlas/units/camel-archer/prompts/e-v1.txt",
+      "promptHash": "bd35323cf9488c041a2dbc0c9e43bc58b9a722ff9a4b33f37e78f8cb51d8f03b",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/camel-archer/ne-motion-v1.png",
+      "rawHash": "3449cfe979ee7504aee89d55064d67e7b718684837255de6e596342aa2199a49",
+      "promptPath": "art/atlas/units/camel-archer/prompts/ne-v1.txt",
+      "promptHash": "c2d846c0a69a76557f84596052c10beb0b59a709648fa9b4820bdeab19012df5",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/camel-archer/se-motion-v1.png",
+      "rawHash": "f05c724c908ba8a15f7207c0fee3570723759dcfd6eaeb05430d7aac4dd488a7",
+      "promptPath": "art/atlas/units/camel-archer/prompts/se-v1.txt",
+      "promptHash": "be8cc16d47406d2258f1fe791de023625f392edd26027028ec7209db176d4c9c",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
+}

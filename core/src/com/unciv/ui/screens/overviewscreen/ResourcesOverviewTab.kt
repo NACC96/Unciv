@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.utils.Align
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.UncivGame
 import com.unciv.logic.city.City
 import com.unciv.logic.map.tile.Tile
@@ -98,7 +99,9 @@ class ResourcesOverviewTab(
         = getLabel(resource, total, sumBy(resource))
 
     private fun ResourceSupplyList.getLabel(resource: TileResource, origin: String, amount: Int): Label {
-        val color = if (isDeficit(resource, origin, amount)) Color.RED else Color.WHITE
+        val color = if (GameUiStyle.isAtlas)
+            (if (isDeficit(resource, origin, amount)) GameUiStyle.error else GameUiStyle.ink)
+            else if (isDeficit(resource, origin, amount)) Color.RED else Color.WHITE
         val text = (if (resource.isStockpiled && amount >= 0 && origin != ExtraInfoOrigin.Stockpile.name) "+" else "") + amount.toString()
         return text.toLabel(color)
     }
@@ -176,6 +179,10 @@ class ResourcesOverviewTab(
         fixedContent.clear()
         if (persistableData.vertical) updateVertical()
         else updateHorizontal()
+        if (GameUiStyle.isAtlas) {
+            AtlasEmpireUi.panel(fixedContent, "ResourceOrigins")
+            applyAtlasPresentation()
+        }
     }
 
     private fun updateHorizontal() {

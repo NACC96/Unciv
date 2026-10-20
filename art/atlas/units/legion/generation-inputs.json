@@ -1,0 +1,16 @@
+{
+  "facings": {
+    "E": {
+      "rawFile": "e-motion-v1.png",
+      "promptPath": "art/atlas/units/legion/prompts/e-v1.txt"
+    },
+    "NE": {
+      "rawFile": "ne-motion-v1.png",
+      "promptPath": "art/atlas/units/legion/prompts/ne-v1.txt"
+    },
+    "SE": {
+      "rawFile": "se-motion-v1.png",
+      "promptPath": "art/atlas/units/legion/prompts/se-v1.txt"
+    }
+  }
+}

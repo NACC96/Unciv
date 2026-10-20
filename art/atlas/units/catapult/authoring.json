@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "unitName": "Catapult",
+  "assetId": "catapult",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": null,
+  "uniqueTo": null,
+  "replaces": null,
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Catapult",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/catapult/e-motion-v1.png",
+      "rawHash": "7063cd954eac68a5a90b87062745236bf49ee3583fe8bbe11df95030fc764282",
+      "promptPath": "art/atlas/units/catapult/prompts/e-v1.txt",
+      "promptHash": "806f0239232cbf56357259c44a8d334257baf330e78f7e4fbb1191e77c3e7c05",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/catapult/ne-motion-v1.png",
+      "rawHash": "25ce24e80c729da343bc245a1cda4fe13867168f16688d5ac203259afc9fc496",
+      "promptPath": "art/atlas/units/catapult/prompts/ne-v1.txt",
+      "promptHash": "63ab8f08a992104ccd26b9213a0d0d420719c5ed68efebaf1dbd7df80814dd75",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/catapult/se-motion-v1.png",
+      "rawHash": "47c9ad56a67c7b923db29de2e43381f23b5a5e84b075720c037832b72c211f34",
+      "promptPath": "art/atlas/units/catapult/prompts/se-v1.txt",
+      "promptHash": "f76d4ac292bb9de8c2f39b977d762a35ed51d31f98f93feadf1819430151a695",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
+}

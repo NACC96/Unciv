@@ -158,7 +158,9 @@ class AgentMatchState(
     /** Actual saved presentation identity, independent of management origin and active turn. */
     var localViewingCivId: String? = null,
     /** Last external personality/configuration survives explicit Human assignment. */
-    var retainedAgentProfiles: HashMap<String, AgentProfile> = HashMap()
+    var retainedAgentProfiles: HashMap<String, AgentProfile> = HashMap(),
+    /** Fog for saves made before this setting existed; new matches start with [MatchVision.FULL]. */
+    var vision: MatchVision = MatchVision.FOG
 ) : IsPartOfGameInfoSerialization {
     @Suppress("unused") // used by json serialization
     constructor() : this(
@@ -191,6 +193,7 @@ class AgentMatchState(
         mapKnowledge.deepCopy(),
         localControlCivId,
         localViewingCivId,
-        HashMap(retainedAgentProfiles.mapValues { it.value.copy() })
+        HashMap(retainedAgentProfiles.mapValues { it.value.copy() }),
+        vision
     )
 }

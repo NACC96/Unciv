@@ -6,6 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.utils.Align
 import com.unciv.Constants
 import com.unciv.models.translations.tr
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.SmallButtonStyle
 import com.unciv.ui.components.UncivTooltip.Companion.addTooltip
 import com.unciv.ui.components.extensions.addSeparatorVertical
@@ -33,12 +34,14 @@ class SpecialistAllocationTable(private val cityScreen: CityScreen) : Table(Base
             val toggleButton = if (cityView.manualSpecialists) {
                 "Manual Specialists".toTextButton(smallButtonStyle)
                    .onActivation {
+                       if (!cityScreen.canCityBeChanged()) return@onActivation
                        cityView.tryDisableManualSpecialists()
                        cityScreen.updateAsync()
                    }
             } else {
                 "Auto Specialists".toTextButton(smallButtonStyle)
                     .onActivation {
+                        if (!cityScreen.canCityBeChanged()) return@onActivation
                         cityView.tryEnableManualSpecialists()
                         update()
                     }
@@ -57,10 +60,17 @@ class SpecialistAllocationTable(private val cityScreen: CityScreen) : Table(Base
             add(getAllocationTable(assignedSpecialists, maxSpecialists, specialistName)).pad(10f)
             if (cityScreen.canChangeState) add(getAssignButton(assignedSpecialists, maxSpecialists, specialistName))
 
-            addSeparatorVertical().pad(10f)
-            add(getSpecialistStatsTable(specialistName)).row()
+            if (GameUiStyle.isAtlas) {
+                row()
+                add(specialistName.toLabel(GameUiStyle.muted, GameUiStyle.Type.body)).colspan(3).row()
+                add(getSpecialistStatsTable(specialistName)).colspan(3).padBottom(12f).row()
+            } else {
+                addSeparatorVertical().pad(10f)
+                add(getSpecialistStatsTable(specialistName)).row()
+            }
         }
 
+        if (GameUiStyle.isAtlas) GameUiStyle.applyWidget(this)
         pack()
     }
 
@@ -73,7 +83,7 @@ class SpecialistAllocationTable(private val cityScreen: CityScreen) : Table(Base
             else Color.GRAY // unassigned
             val icon = ImageGetter.getSpecialistIcon(color)
             specialistIconTable.add(icon).size(30f)
-            if (i % 5 == 0) specialistIconTable.row()
+            if (i % (if (GameUiStyle.isAtlas) 4 else 5) == 0) specialistIconTable.row()
         }
         specialistIconTable.addTooltip(specialistName, 24f)
         return specialistIconTable
@@ -84,8 +94,9 @@ class SpecialistAllocationTable(private val cityScreen: CityScreen) : Table(Base
         if (assignedSpecialists >= maxSpecialists || cityView.isPuppet()) return Table()
         val assignButton = "+".toLabel(ImageGetter.CHARCOAL, Constants.headingFontSize)
             .apply { this.setAlignment(Align.center) }
-            .surroundWithCircle(30f).apply { circle.color = Color.GREEN.darken(0.2f) }
+            .surroundWithCircle(if (GameUiStyle.isAtlas) 40f else 30f).apply { circle.color = if (GameUiStyle.isAtlas) GameUiStyle.positive else Color.GREEN.darken(0.2f) }
         assignButton.onClick {
+            if (!cityScreen.canCityBeChanged()) return@onClick
             cityView.tryAssignSpecialist(specialistName)
             cityScreen.updateAsync()
         }
@@ -97,8 +108,9 @@ class SpecialistAllocationTable(private val cityScreen: CityScreen) : Table(Base
     private fun getUnassignButton(assignedSpecialists: Int, specialistName: String): Actor {
         val unassignButton = "-".toLabel(ImageGetter.CHARCOAL, Constants.headingFontSize)
             .apply { this.setAlignment(Align.center) }
-            .surroundWithCircle(30f).apply { circle.color = Color.RED.darken(0.1f) }
+            .surroundWithCircle(if (GameUiStyle.isAtlas) 40f else 30f).apply { circle.color = if (GameUiStyle.isAtlas) GameUiStyle.error else Color.RED.darken(0.1f) }
         unassignButton.onClick {
+            if (!cityScreen.canCityBeChanged()) return@onClick
             cityView.tryUnassignSpecialist(specialistName)
             cityScreen.updateAsync()
         }
@@ -113,7 +125,7 @@ class SpecialistAllocationTable(private val cityScreen: CityScreen) : Table(Base
         val specialistStatTable = Table().apply { defaults().padBottom(5f).padTop(5f) }
         val specialistStats = cityView.getStatsOfSpecialist(specialistName)
         val specialist = cityView.getRuleset().specialists[specialistName]!!
-        val maxStat = specialistStats.maxOf { it.value }
+        val maxStat = specialistStats.maxOfOrNull { it.value }
         val lightGreen = Color(0x7fff7fff)
         var itemsInRow = 0
 

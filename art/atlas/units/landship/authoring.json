@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "unitName": "Landship",
+  "assetId": "landship",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": null,
+  "uniqueTo": null,
+  "replaces": null,
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Landship",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/landship/e-motion-v1.png",
+      "rawHash": "c870da40245b5cb9480d7831998b41223c04daef9656ae21c4270667ef945094",
+      "promptPath": "art/atlas/units/landship/prompts/e-v1.txt",
+      "promptHash": "68da472b34cb5181d00398ba1b80ae6d2904dac25efd9eb8128e490b56e5da48",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/landship/ne-motion-v1.png",
+      "rawHash": "3234938e294f0e939ae54185a2e352b58a31e92cb25a989a7672e29ccaf209e9",
+      "promptPath": "art/atlas/units/landship/prompts/ne-v1.txt",
+      "promptHash": "d3bfd895bf40bfcd53b0708b9a7da8c25ab1863675e5fa21259b9cbaf8540ac0",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/landship/se-motion-v1.png",
+      "rawHash": "e3a8037346a6ec3242fe8734673b595044c388f32ae1aa3ea6634b74c8b819ae",
+      "promptPath": "art/atlas/units/landship/prompts/se-v1.txt",
+      "promptHash": "68d4bf70667b65cb8a533c427b4e42e113031dad746a856b3f30f961f4fa9a5e",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
+}

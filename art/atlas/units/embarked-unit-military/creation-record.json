@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "assetId": "embarked-unit-military",
+  "spriteName": "EmbarkedUnit-Military",
+  "creator": "OpenAI image generation",
+  "tool": "image_gen.imagegen (built-in)",
+  "rights": "original-generated",
+  "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/embarked-unit-military/static-v1.png",
+  "rawHash": "24b9ba5434993b7a344047be8518f4240a3df968e16bbba1b18629b418c28989",
+  "promptPath": "art/atlas/units/embarked-unit-military/prompts/static-v1.txt",
+  "promptHash": "75ae71360b5d6ac79cd40d709cf0a5964dc606de790c4ae1ef8a39b542de063a",
+  "processing": {
+    "script": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/normalize_motion.py",
+    "scriptHash": "8702a1202c3a74035fca6b0cbee4dd8e301d00256f61c035c8d170e64f8d3a01",
+    "operations": [
+      "uniform alpha-preserving resize",
+      "constant root alignment",
+      "royal-blue nation mask extraction",
+      "violet shadow extraction"
+    ]
+  },
+  "reviewState": "candidate",
+  "formalArtReview": "deferred"
+}

@@ -8,7 +8,8 @@ import com.unciv.ui.popups.Popup
 
 class NationSettingsPopup(private val table: PlayerPickerTable, private val player: Player) : Popup(table.previousScreen.stage, Scrollability.WithoutButtons, 0.85f) {
     init {
-        innerTable.background = GameUiStyle.background("NewGameScreen/NationSettingsPopup")
+        innerTable.background = if (GameUiStyle.isAtlas) GameUiStyle.panelBackground("Atlas/Setup/NationSettings", 1f)
+            else GameUiStyle.background("NewGameScreen/NationSettingsPopup")
         val width = minOf(500f, stageToShowOn.width * 0.85f - 56f).coerceAtLeast(120f)
         addGoodSizedLabel("Edit nation: ${player.chosenCiv}", 22, color = GameUiStyle.ink).width(width).row()
         val error = "".toLabel(GameUiStyle.error, 14).apply { wrap = true }

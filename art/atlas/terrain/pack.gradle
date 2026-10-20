@@ -1,0 +1,39 @@
+// Production pack for only the new static tileset. No mod scan, app launcher or default change.
+gradle.projectsEvaluated {
+    rootProject.tasks.register('packAtlasTerrain') {
+        doLast {
+            def loader = rootProject.buildscript.classLoader
+            def packer = loader.loadClass('com.badlogic.gdx.tools.texturepacker.TexturePacker')
+            def settingsType = loader.loadClass('com.badlogic.gdx.tools.texturepacker.TexturePacker$Settings')
+            def jsonType = loader.loadClass('com.badlogic.gdx.utils.Json')
+            def settings = jsonType.getDeclaredConstructor().newInstance().fromJson(settingsType,
+                new File(rootProject.rootDir, 'android/Images.AtlasTerrain/TexturePacker.settings').text)
+            // Retain canvas/anchors, rotated roads/borders, and every exact transition alias.
+            settings.stripWhitespaceX = false
+            settings.stripWhitespaceY = false
+            settings.rotation = false
+            settings.alias = true
+            settings.ignoreBlankImages = false
+            def evidence = new File('/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/terrain-authoring/packed')
+            def source = new File(evidence, 'sources')
+            def output = new File(evidence, 'assets')
+            rootProject.sync {
+                from new File(rootProject.rootDir, 'android/Images.AtlasTerrain')
+                into source
+                exclude '**/._*', '**/.gitkeep', '**/README.md'
+            }
+            // exFAT writes fresh AppleDouble files while copying from APFS. These are
+            // metadata of our disposable packing copies, never authored PNG inputs.
+            source.eachFileRecurse { if (it.isFile() && it.name.startsWith('._')) it.delete() }
+            output.mkdirs()
+            packer.getMethod('process', settingsType, String, String, String).invoke(null,
+                settings, source.path, output.path, 'AtlasTerrain')
+            rootProject.copy {
+                from output
+                include 'AtlasTerrain.atlas', 'AtlasTerrain*.png'
+                into new File(rootProject.rootDir, 'android/assets')
+            }
+            println('Packed only AtlasTerrain static sources; all art remains candidate production work.')
+        }
+    }
+}

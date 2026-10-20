@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "unitName": "Giant Death Robot",
+  "assetId": "giant-death-robot",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": null,
+  "uniqueTo": null,
+  "replaces": null,
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Giant Death Robot",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/giant-death-robot/e-motion-v1.png",
+      "rawHash": "b3a04c93f0f88a7947d6f5ac862c30ce701926dba06d3ac8f7be6b3f4dcb7857",
+      "promptPath": "art/atlas/units/giant-death-robot/prompts/e-v1.txt",
+      "promptHash": "58406e8c8fb4f889dcf2aff629ae2fd8f2344f9b27d7fabec3fbb1810384628e",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/giant-death-robot/ne-motion-v1.png",
+      "rawHash": "4ed8c640d3c395dc08d07ff2b1e6b793adf23946b44160f5f45aeb60121c52e6",
+      "promptPath": "art/atlas/units/giant-death-robot/prompts/ne-v1.txt",
+      "promptHash": "3e0e6cce669adb34fcfe303b5f068cccacd9e298a6a6e1cc0977a692aec54be0",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/giant-death-robot/se-motion-v1.png",
+      "rawHash": "358a5cdfb1d265ceb8cb9fc29b496b10860752b6f3ee8aadabdaeaa92141c600",
+      "promptPath": "art/atlas/units/giant-death-robot/prompts/se-v1.txt",
+      "promptHash": "faae4dbbc3f62f4b43edc35cb25c9a301b2e6bb39dea79ad59d33367abfa24d9",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
+}

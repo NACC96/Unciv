@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "unitName": "Panzer",
+  "assetId": "panzer",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": "Panzer",
+  "uniqueTo": "Germany",
+  "replaces": "Tank",
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Panzer",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/panzer/e-motion-v1.png",
+      "rawHash": "2f9ffe79afac6cebadcd31247145babb89cb4d2fb6f51e2f30bd9bfd50a1f041",
+      "promptPath": "art/atlas/units/panzer/prompts/e-v1.txt",
+      "promptHash": "5902fc603ae59fb0980d539703cfb7d8b21351c5c9842cb284a0eaec24d99583",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/panzer/ne-motion-v1.png",
+      "rawHash": "39e93bd92e0ab7d5f5cc5b6dceb355daa073b19c2c5dc5232fba2c057981092f",
+      "promptPath": "art/atlas/units/panzer/prompts/ne-v1.txt",
+      "promptHash": "d9b6ed05a6b281db3c03641c970f49a491fadae28b893ac5a2ad9b5a9f7d43b1",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/panzer/se-motion-v1.png",
+      "rawHash": "69c7fcd94907ce73e904c6df7208dc245dc98317dc6504f4dba7ec769a3e0f45",
+      "promptPath": "art/atlas/units/panzer/prompts/se-v1.txt",
+      "promptHash": "17935f2bb8c59aeb142bc5d9be3cab3d444b1fc9f44886caa4d75dbde7ff10bb",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
+}

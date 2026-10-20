@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "unitName": "Horse Archer",
+  "assetId": "horse-archer",
+  "creator": "OpenAI image generation",
+  "tool": "image_gen.imagegen (built-in)",
+  "rights": "original-generated",
+  "styleReference": {
+    "path": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/concept/unit-art-direction-v1.png",
+    "sha256": "ceb7c639185d98cb53535f21eb0966b1bec01bb782c80de2fdd972d2858ce641",
+    "role": "approved style only"
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/horse-archer/e-motion-v1.png",
+      "rawHash": "2b741278f0019c10c9bb1ad3fa4d50bf1b522717e0b33aef5d63795b56062217",
+      "promptPath": "art/atlas/units/horse-archer/prompts/e-v1.txt",
+      "promptHash": "f7b27b90cfec756658db775177b605bf68bdd8d235538ed8a095572d6dd84050",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/horse-archer/ne-motion-v1.png",
+      "rawHash": "d33f7d1c4db9ba787a27359071ad3e7d812ab7c7ac9eea9c286d0da65295ffc7",
+      "promptPath": "art/atlas/units/horse-archer/prompts/ne-v1.txt",
+      "promptHash": "c2057da3f023cd35759985fd78c0338490bd203ecaf5295789ff01fd2499d4e1",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/horse-archer/se-motion-v1.png",
+      "rawHash": "29accf65b9337f8699582bc439e98d116ee9e05f4baf67d336a2dcc8822439bc",
+      "promptPath": "art/atlas/units/horse-archer/prompts/se-v1.txt",
+      "promptHash": "e8d8e39cc8141159c1047c8811775023f0d2f93d4fa05ca31cccb045bd409bcd",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "processing": {
+    "script": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/normalize_motion.py",
+    "sha256": "8702a1202c3a74035fca6b0cbee4dd8e301d00256f61c035c8d170e64f8d3a01",
+    "operations": [
+      "uniform cell cutting",
+      "constant sheet scale and root alignment",
+      "alpha-preserving resize",
+      "royal-blue nation mask extraction",
+      "violet ground-shadow extraction"
+    ],
+    "poseSynthesis": false,
+    "clonedStaticFrames": false
+  },
+  "reviewState": "candidate",
+  "formalArtReview": "deferred"
+}

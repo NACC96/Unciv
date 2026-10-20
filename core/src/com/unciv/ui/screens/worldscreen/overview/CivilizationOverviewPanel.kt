@@ -15,9 +15,9 @@ import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.Timer
 import com.unciv.models.translations.tr
-import com.unciv.logic.agents.AgentRunState
 import com.unciv.ui.components.extensions.toLabel
 import com.unciv.ui.components.GameUiStyle
+import com.unciv.ui.components.AtlasWidgets
 import com.unciv.ui.components.fonts.Fonts
 import com.unciv.ui.components.input.onClick
 import com.unciv.ui.components.widgets.AutoScrollPane
@@ -62,6 +62,7 @@ class CivilizationOverviewPanel(private val screen: WorldScreen) : Table(BaseScr
     private var ascending = false
     private var selectedId: String? = null
     private var data: CivilizationOverviewData? = null
+    private var viewerId: String? = null
     private var initializedPosition = false
     private var disposed = false
     private var compact = false
@@ -73,7 +74,9 @@ class CivilizationOverviewPanel(private val screen: WorldScreen) : Table(BaseScr
     }
 
     init {
-        background = WorldScreenStyle.panelBackground("WorldScreen/Overview")
+        name = "CivilizationOverviewPanel"
+        background = if (GameUiStyle.isAtlas) WorldScreenStyle.surface("WorldScreen/Overview", 0.94f)
+            else WorldScreenStyle.panelBackground("WorldScreen/Overview")
         touchable = Touchable.enabled
         pad(14f)
         val header = Table(skin).apply { touchable = Touchable.enabled }
@@ -111,6 +114,9 @@ class CivilizationOverviewPanel(private val screen: WorldScreen) : Table(BaseScr
         }
         add(filterButtons).growX().left().row()
         add(search).growX().height(32f).padTop(8f).padBottom(10f).row()
+        search.addListener(object : InputListener() {
+            override fun keyDown(event: InputEvent, keycode: Int): Boolean { event.stop(); return false }
+        })
         search.addListener(object : ChangeListener() {
             override fun changed(event: ChangeEvent, actor: com.badlogic.gdx.scenes.scene2d.Actor) { rebuild() }
         })
@@ -143,13 +149,23 @@ class CivilizationOverviewPanel(private val screen: WorldScreen) : Table(BaseScr
 
     /** Uses the GL-thread publication, never the coordinator's mutable engine state. */
     fun refresh() {
+        if (disposed) return
+        if (viewerId != screen.viewingCiv.civID) {
+            viewerId = screen.viewingCiv.civID
+            // Drop the previous spectator/private detail actors before installing this viewer's DTOs.
+            data = null; rows.clearChildren(); details.clearChildren()
+            rowScroll.scrollY = 0f; detailScroll.scrollY = 0f
+        }
         val panelWidth = minOf(660f, screen.stage.width * 0.68f).coerceAtLeast(300f).coerceAtMost(screen.stage.width - 16f)
-        val panelHeight = minOf(580f, screen.stage.height - 140f).coerceAtLeast(260f).coerceAtMost(screen.stage.height - 16f)
+        val panelHeight = minOf(620f, screen.stage.height - if (GameUiStyle.isAtlas) 24f else 140f).coerceAtLeast(260f).coerceAtMost(screen.stage.height - 16f)
         val resized = width != panelWidth || height != panelHeight
         compact = panelWidth < 520f
         setSize(panelWidth, panelHeight)
         if (!initializedPosition) {
-            setPosition(screen.stage.width - width - 8f, screen.stage.height - height - 122f)
+            // Atlas opens below the actual world header; other skins keep their offset.
+            val top = if (GameUiStyle.isAtlas) com.unciv.ui.screens.worldscreen.status.AgentPanelLayout.headerBottom(screen.stage) - 8f
+                else screen.stage.height - 122f
+            setPosition(screen.stage.width - width - 8f, top - height)
             initializedPosition = true
         }
         clampPosition()
@@ -288,9 +304,12 @@ class CivilizationOverviewPanel(private val screen: WorldScreen) : Table(BaseScr
             "Happiness" to "${civ.happiness}", "Faith" to "${civ.faith}/turn")
         val count = if (compact) 2 else 3
         for ((index, metric) in values.withIndex()) {
-            val cell = Table(skin)
-            cell.add(label(metric.first, WorldScreenStyle.muted, GameUiStyle.Type.caption)).left().row()
-            cell.add(label(metric.second, WorldScreenStyle.ink, 13)).left().padTop(2f)
+            val cell = if (GameUiStyle.isAtlas) AtlasWidgets.stat(metric.first, metric.second).apply {
+                background = WorldScreenStyle.background("WorldScreen/Overview/Metric", WorldScreenStyle.inset)
+            } else Table(skin).apply {
+                add(label(metric.first, WorldScreenStyle.muted, GameUiStyle.Type.caption)).left().row()
+                add(label(metric.second, WorldScreenStyle.ink, 13)).left().padTop(2f)
+            }
             metrics.add(cell).width(w / count).left().padTop(10f)
             if ((index + 1) % count == 0) metrics.row()
         }
@@ -323,16 +342,7 @@ class CivilizationOverviewPanel(private val screen: WorldScreen) : Table(BaseScr
 
     private fun signed(value: Int?) = if (value != null && value > 0) "+$value" else "$value"
 
-    private fun stateName() = when (data?.runState) {
-        AgentRunState.AGENT_DECIDING -> "Thinking"
-        AgentRunState.PAUSED -> "Paused"
-        AgentRunState.PAUSING -> "Pausing…"
-        AgentRunState.NEEDS_ATTENTION -> "Needs attention"
-        AgentRunState.FINISHED -> "Finished"
-        AgentRunState.STARTING -> "Starting"
-        null -> "Current turn"
-        else -> "Playing"
-    }
+    private fun stateName() = com.unciv.ui.screens.worldscreen.status.AgentStatusFormat.label(data?.runState)
 
     override fun dispose() {
         if (disposed) return

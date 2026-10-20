@@ -10,6 +10,8 @@ import com.unciv.models.ruleset.RulesetCache
 import com.unciv.ui.components.widgets.TabbedPager
 import com.unciv.ui.components.widgets.TranslatedSelectBox
 import com.unciv.ui.components.UncivTooltip.Companion.addTooltip
+import com.unciv.ui.components.AtlasWidgets
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.extensions.isEnabled
 import com.unciv.ui.components.extensions.toLabel
 import com.unciv.ui.components.extensions.toTextButton
@@ -50,14 +52,16 @@ class MapEditorModsTab(
         top()
         pad(5f)
 
-        add(Table().apply {
+        if (GameUiStyle.isAtlas) defaults().growX().minWidth(0f).width(editorScreen.getToolsWidth() - 24f)
+        add(if (GameUiStyle.isAtlas) AtlasWidgets.field("Base Ruleset", baseRulesetSelectBox) else Table().apply {
             add("{Base Ruleset}:".toLabel())
             add(baseRulesetSelectBox).fillX()
         }).fillX().padBottom(10f).row()
 
         add(Table().apply {
-            add(applyButton).padRight(10f)
-            add(revertButton)
+            add(applyButton).growX().minWidth(0f).padRight(if (GameUiStyle.isAtlas) 0f else 10f)
+            if (GameUiStyle.isAtlas) row()
+            add(revertButton).growX().minWidth(0f).padTop(if (GameUiStyle.isAtlas) 8f else 0f)
         }).fillX().pad(10f).row()
 
         modsTableCell = add(modsTable)
@@ -68,6 +72,11 @@ class MapEditorModsTab(
 
         revertButton.onClick(this::revertControls)
         revertButton.addTooltip("Reset the controls to reflect the current map ruleset", 21f, targetAlign = Align.bottom)
+        if (GameUiStyle.isAtlas) {
+            GameUiStyle.apply(applyButton, primary = true)
+            applyButton.label.wrap = true
+            revertButton.label.wrap = true
+        }
     }
 
     private fun enableApplyButton() {
@@ -130,10 +139,10 @@ class MapEditorModsTab(
         init {
             val incompatibilityTable = Table().apply {
                 for (inc in incompatibilities)
-                    add(inc.toLabel()).row()
+                    add(inc.toLabel().apply { wrap = true }).width((stageToShowOn.width * .8f - 32f).coerceAtMost(620f)).row()
             }
             add(ScrollPane(incompatibilityTable)).colspan(2)
-                .maxHeight(stageToShowOn.height * 0.8f).row()
+                .maxHeight(stageToShowOn.height * 0.5f).row()
             addGoodSizedLabel("Change map to fit selected ruleset?", 24).colspan(2).row()
             addButton(Constants.yes, 'y') {
                 onOK()

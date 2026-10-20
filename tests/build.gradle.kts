@@ -24,6 +24,14 @@ dependencies {
 }
 
 tasks {
+    register("writeAtlasRuntimeClasspath") {
+        dependsOn("testClasses")
+        doLast {
+            val scratch = System.getenv("UNCIV_ATLAS_BUILD_ROOT")
+                ?: error("Run through scripts/atlas/check.sh or set UNCIV_ATLAS_BUILD_ROOT")
+            file("$scratch/atlas-runtime-classpath.txt").writeText(sourceSets.test.get().runtimeClasspath.asPath)
+        }
+    }
     test {
         workingDir = file("../android/assets")
         testLogging.lifecycle {

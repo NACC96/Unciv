@@ -1,0 +1,233 @@
+{
+  "schemaVersion": 1,
+  "batchId": "features",
+  "tool": "built-in image_gen",
+  "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/terrain-authoring/raw/features.png",
+  "rawSha256": "2e8c296b8b5723ba0c6965839a1c24646de331cdca35fe57ee20e297df83d67f",
+  "rawDimensions": [
+    1086,
+    1448
+  ],
+  "promptPath": "art/atlas/terrain/features-prompt.txt",
+  "promptSha256": "4523f05e804c0b24860f9aafa449c620423cd177aa8a63801568e26954e43d46",
+  "reviewState": "candidate",
+  "formalAcceptance": "deferred by user",
+  "cells": [
+    {
+      "item": "Atoll",
+      "cell": 0,
+      "cropBox": [
+        0,
+        0,
+        362,
+        362
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Atoll.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "terrain-feature",
+      "sha256": "6659c25c1b8266d18365006696f9938964797ac41010848dd139d7919b30917d",
+      "clippingMargin": 0
+    },
+    {
+      "item": "Fallout",
+      "cell": 1,
+      "cropBox": [
+        362,
+        0,
+        724,
+        362
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Fallout.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "terrain-feature",
+      "sha256": "e0614d5f1664ae0247dd09096a735eac06d67067603295b19a3afa2ebc96f859",
+      "clippingMargin": 0
+    },
+    {
+      "item": "Flood plains",
+      "cell": 2,
+      "cropBox": [
+        724,
+        0,
+        1086,
+        362
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Flood plains.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "terrain-feature",
+      "sha256": "2bb8e09430b74a63481e7febb6ae05d2529dda03021ac3fa578afe60a74df3b2",
+      "clippingMargin": 0
+    },
+    {
+      "item": "Forest",
+      "cell": 3,
+      "cropBox": [
+        0,
+        362,
+        362,
+        724
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Forest.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "terrain-feature",
+      "sha256": "340125f281071e379caeae0d131e4e6ae3f5c61ebc0debe3ab9a47e5bdb866b2",
+      "clippingMargin": 0
+    },
+    {
+      "item": "Hill",
+      "cell": 4,
+      "cropBox": [
+        362,
+        362,
+        724,
+        724
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Hill.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "terrain-feature",
+      "sha256": "c4047de8da5a734ffdc6698cab90330d80efaeda654e08dbccce4366ca7b51db",
+      "clippingMargin": 0
+    },
+    {
+      "item": "Ice",
+      "cell": 5,
+      "cropBox": [
+        724,
+        362,
+        1086,
+        724
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Ice.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "terrain-feature",
+      "sha256": "350650f47277f8851eb9feb4a6e9cf0557215e24e731b945731a57b7ad115687",
+      "clippingMargin": 0
+    },
+    {
+      "item": "Jungle",
+      "cell": 6,
+      "cropBox": [
+        0,
+        724,
+        362,
+        1086
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Jungle.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "terrain-feature",
+      "sha256": "016a975b3973ee55eb3d0622ec4d6383198a3ae18f9c8f4cadd1e84fcac4b38a",
+      "clippingMargin": 0
+    },
+    {
+      "item": "Marsh",
+      "cell": 7,
+      "cropBox": [
+        362,
+        724,
+        724,
+        1086
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Marsh.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "terrain-feature",
+      "sha256": "c391ae3a529a6f3743f7569689204550be92125ef050942a8a8276329828b639",
+      "clippingMargin": 0
+    },
+    {
+      "item": "Oasis",
+      "cell": 8,
+      "cropBox": [
+        724,
+        724,
+        1086,
+        1086
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/Oasis.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "terrain-feature",
+      "sha256": "898cca2012ce7739fd4b67f11566f3676145f56c018d5f3025b503d42c9ea949",
+      "clippingMargin": 0
+    },
+    {
+      "item": "River",
+      "cell": 9,
+      "cropBox": [
+        0,
+        1086,
+        362,
+        1448
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Tiles/River.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "terrain-feature",
+      "sha256": "d4485541090b3ef8cea2236ae3d343acc5760f76f09ec58e4ba1397645b56bdb",
+      "clippingMargin": 0
+    },
+    {
+      "item": "@Hexagon",
+      "cell": 10,
+      "cropBox": [
+        362,
+        1086,
+        724,
+        1448
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Hexagon.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "hex",
+      "sha256": "39c1af45767dd5bf8a0d1813c936e060f59ec8aedc1c11ad245b9c620c2a5a20",
+      "clippingMargin": 0
+    },
+    {
+      "item": "@UnexploredTile",
+      "cell": 11,
+      "cropBox": [
+        724,
+        1086,
+        1086,
+        1448
+      ],
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/UnexploredTile.png",
+      "canvas": [
+        128,
+        112
+      ],
+      "normalization": "hex",
+      "sha256": "5212894aaef81fd2253337c806bab5cc014581d0f011fcf9aec02f5b90f09811",
+      "clippingMargin": 0
+    }
+  ]
+}

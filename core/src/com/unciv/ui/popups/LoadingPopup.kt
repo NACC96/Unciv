@@ -1,6 +1,8 @@
 package com.unciv.ui.popups
 
 import com.unciv.Constants
+import com.unciv.ui.components.AtlasWidgets
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.screens.LoadingScreen
 import com.unciv.ui.screens.basescreen.BaseScreen
 
@@ -13,7 +15,10 @@ import com.unciv.ui.screens.basescreen.BaseScreen
  */
 class LoadingPopup(screen: BaseScreen) : Popup(screen, Scrollability.None) {
     init {
-        addGoodSizedLabel(Constants.loading)
+        if (GameUiStyle.isAtlas) {
+            innerTable.background = GameUiStyle.panelBackground("LoadingPopup/Panel", 1f)
+            add(AtlasWidgets.header(Constants.loading)).width((maxPopupWidth - 40f).coerceAtMost(360f)).row()
+        } else addGoodSizedLabel(Constants.loading)
         open(true)
     }
 }

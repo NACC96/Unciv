@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "unitName": "Great Engineer",
+  "assetId": "great-engineer",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": null,
+  "uniqueTo": null,
+  "replaces": null,
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Great Engineer",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "HIT",
+    "DEFEAT",
+    "WORK"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "HIT": 4,
+    "DEFEAT": 8,
+    "WORK": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/great-engineer/e-motion-v1.png",
+      "rawHash": "083885adf14a07baa0f71458669e2d29be9fe32cf09c750c592f34d0bfbd5ea7",
+      "promptPath": "art/atlas/units/great-engineer/prompts/e-v1.txt",
+      "promptHash": "fd0e30e86512b6bd5e01dbae8c2208f1459b62ee871e7c2fd48b28ee716591a2",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/great-engineer/ne-motion-v1.png",
+      "rawHash": "a2f2120c8a0b10758ef9d358edfcf6dd876713e6f066141a4b792cd2646874a2",
+      "promptPath": "art/atlas/units/great-engineer/prompts/ne-v1.txt",
+      "promptHash": "165e62b9027cb6c991c8011d949386c1336d804d5bb720f880d6f8586b378e53",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/great-engineer/se-motion-v1.png",
+      "rawHash": "98051214639304e828459741b49187bc47629bac8c1c586d43661cef5bc392e3",
+      "promptPath": "art/atlas/units/great-engineer/prompts/se-v1.txt",
+      "promptHash": "cabc6a4500c92008588ac63f8eab9913797bd6a17d84eb3cc006ff30e4069d1e",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
+}

@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { readFileSync } from "node:fs";
 import { FakeGameService } from "../src/fake-game-mcp.js";
 import { startGameMcpServer, type StartedGameMcpServer } from "../src/game-mcp-server.js";
+import { compactInspection, compactLegalActions, compactMapPage, compactTile } from "../src/compact-results.js";
 import { StdioEngineBackend } from "../src/stdio-engine.js";
 
 let server: StartedGameMcpServer | undefined;
@@ -83,9 +84,10 @@ describe("game MCP transport guards (plan §7.3)", () => {
       const body = response.json?.["result"] as { isError?: boolean; content: { text: string }[] };
       return { isError: body.isError ?? false, value: JSON.parse(body.content[0].text) };
     };
-    expect(await tool("game.inspect", { unitId: 17 })).toEqual({ isError: false, value: unit });
-    expect(await tool("game.legal_actions", { unitId: 17 })).toEqual({ isError: false, value: legal });
-    expect(await tool("game.legal_actions", { cityId: "city-1" })).toEqual({ isError: false, value: legal });
+    // Model-facing reads drop null/false/empty fields and the actor's own owner ID.
+    expect(await tool("game.inspect", { unitId: 17 })).toEqual({ isError: false, value: compactInspection(unit, "Rome") });
+    expect(await tool("game.legal_actions", { unitId: 17 })).toEqual({ isError: false, value: compactLegalActions(legal) });
+    expect(await tool("game.legal_actions", { cityId: "city-1" })).toEqual({ isError: false, value: compactLegalActions(legal) });
     expect(requests.at(-1)).toMatchObject({ method: "legal_actions", params: { civId: "Rome", cityId: "city-1" } });
     expect(await tool("game.inspect", { unitId: 999 })).toMatchObject({ isError: true, value: { code: "ILLEGAL_ACTION" } });
     const count = requests.length;
@@ -125,7 +127,7 @@ describe("game MCP transport guards (plan §7.3)", () => {
     expect([413, 400]).toContain(big.status);
   });
 
-  it("exposes exactly the 12 game tools and round-trips observe/act", async () => {
+  it("exposes exactly the 13 game tools and round-trips observe/act", async () => {
     server = await startGameMcpServer(new FakeGameService(), {
       matchId: "m", timelineId: "t", civId: "civ", runId: "r", authorityEpoch: 1,
     });
@@ -134,7 +136,7 @@ describe("game MCP transport guards (plan §7.3)", () => {
     const names = ((list.json?.["result"] as { tools: { name: string }[] }).tools).map((t) => t.name).sort();
     expect(names).toEqual([
       "game.act", "game.act_batch", "game.action_result", "game.end_turn", "game.inspect",
-      "game.legal_actions", "game.map", "game.message_image", "game.notes", "game.observe", "game.rules", "game.tile",
+      "game.legal_actions", "game.map", "game.map_image", "game.message_image", "game.notes", "game.observe", "game.rules", "game.tile",
     ]);
     const obs = await rpc(server.url, server.bearer, call("tools/call", { name: "game.observe", arguments: {} }));
     const obsText = (obs.json?.["result"] as { content: { text: string }[] }).content[0].text;
@@ -166,9 +168,9 @@ it("round-trips complete map and rules DTOs, validates radius pairs and does not
     const result = response.json?.["result"] as { isError?: boolean; content: { text: string }[] };
     return { isError: result.isError ?? false, value: JSON.parse(result.content[0].text) };
   };
-  expect(await tool("game.tile", { x: 0, y: 0, civId: "Greece" })).toEqual({ isError: false, value: tile });
+  expect(await tool("game.tile", { x: 0, y: 0, civId: "Greece" })).toEqual({ isError: false, value: compactTile(tile as unknown as Record<string, unknown>) });
   expect(requests.at(-1)).toMatchObject({ method: "inspect_tile", params: { x: 0, y: 0, civId: "Rome" } });
-  expect(await tool("game.map", { mode: "VISIBLE", center: { x: 48, y: -33 }, radius: 0, limit: 128, civId: "Greece" })).toEqual({ isError: false, value: page });
+  expect(await tool("game.map", { mode: "VISIBLE", center: { x: 48, y: -33 }, radius: 0, limit: 128, civId: "Greece" })).toEqual({ isError: false, value: compactMapPage(page) });
   expect(requests.at(-1)).toMatchObject({ method: "map", params: { mode: "VISIBLE", center: { x: 48, y: -33 }, radius: 0, limit: 128, civId: "Rome" } });
   expect(await tool("game.rules", { section: "improvements", name: "Farm", limit: 1, cursor: "opaque" })).toEqual({ isError: false, value: catalog });
   expect(requests.at(-1)).toMatchObject({ method: "rules", params: { section: "improvements", name: "Farm", limit: 1, cursor: "opaque" } });
@@ -305,7 +307,7 @@ it("passes actor-bound city legal choices through real stdio and treats hidden/m
     return { isError: result.isError ?? false, value: JSON.parse(result.content[0].text) };
   };
   try {
-    expect(await query("owned-city")).toEqual({ isError: false, value: choices });
+    expect(await query("owned-city")).toEqual({ isError: false, value: compactLegalActions(choices) });
     expect(requests[0]).toMatchObject({ method: "legal_actions", params: { civId: "Rome", cityId: "owned-city" } });
     expect(requests[0].params).not.toHaveProperty("unitId");
     const hidden = await query("hidden-city"); const missing = await query("missing-city");

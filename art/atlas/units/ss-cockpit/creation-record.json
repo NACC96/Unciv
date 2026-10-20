@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "unitName": "SS Cockpit",
+  "assetId": "ss-cockpit",
+  "creator": "OpenAI image generation",
+  "tool": "image_gen.imagegen (built-in)",
+  "rights": "original-generated",
+  "styleReference": {
+    "path": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/concept/unit-art-direction-v1.png",
+    "sha256": "ceb7c639185d98cb53535f21eb0966b1bec01bb782c80de2fdd972d2858ce641",
+    "role": "approved style only"
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/ss-cockpit/e-motion-v2.png",
+      "rawHash": "e7f852972116c4b8ef803c079c25e63f045cdac22bca74b94443181cee0f4ea1",
+      "promptPath": "art/atlas/units/ss-cockpit/prompts/e-v2.txt",
+      "promptHash": "51f5d7a11b1e516a8711f319a0faec60fa59cc14923491fac706d3f03d68387f",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/ss-cockpit/ne-motion-v2.png",
+      "rawHash": "72e5386b510bc4c99839ae045b22881e78655971aef09c14443a36a6fe212e20",
+      "promptPath": "art/atlas/units/ss-cockpit/prompts/ne-v2.txt",
+      "promptHash": "88cb6ff0e6133aa97114422014647fa43d939fc7431f130f25821c3080f2fe89",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ],
+      "identityReference": {
+        "path": "/Users/noahkenny/.codex/generated_images/01a1321a-8142-7533-ae7a-eb89a5433c70/exec-d9197c33-c226-4fcc-9669-126196887766.png",
+        "sha256": "e7f852972116c4b8ef803c079c25e63f045cdac22bca74b94443181cee0f4ea1"
+      }
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/ss-cockpit/se-motion-v2.png",
+      "rawHash": "73c173c80d84e47598ab32b24edf5f13a5eafbf365c20b25760eb9544d5f1628",
+      "promptPath": "art/atlas/units/ss-cockpit/prompts/se-v2.txt",
+      "promptHash": "659f07770cf9fa92d65e34605d6564d97d62746b2023fb57b1164d81e87a5dd3",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ],
+      "identityReference": {
+        "path": "/Users/noahkenny/.codex/generated_images/01a1321a-8142-7533-ae7a-eb89a5433c70/exec-d9197c33-c226-4fcc-9669-126196887766.png",
+        "sha256": "e7f852972116c4b8ef803c079c25e63f045cdac22bca74b94443181cee0f4ea1"
+      }
+    }
+  ],
+  "processing": {
+    "script": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/normalize_motion-v3.py",
+    "sha256": "d63316a6cedfaafcf546ecbd87f0163d3d13d0363c473cd389b2dd60c2113bf8",
+    "operations": [
+      "uniform cell cutting",
+      "constant sheet scale and root alignment",
+      "alpha-preserving resize",
+      "royal-blue nation mask extraction",
+      "violet ground-shadow extraction"
+    ],
+    "poseSynthesis": false,
+    "clonedStaticFrames": false
+  },
+  "reviewState": "candidate",
+  "formalArtReview": "deferred"
+}

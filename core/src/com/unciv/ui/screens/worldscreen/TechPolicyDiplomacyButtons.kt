@@ -9,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Container
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.unciv.models.UncivSound
 import com.unciv.models.translations.tr
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.extensions.disable
 import com.unciv.ui.components.extensions.setFontSize
 import com.unciv.ui.components.extensions.toLabel
@@ -62,12 +63,11 @@ class TechPolicyDiplomacyButtons(val worldScreen: WorldScreen) : Table(BaseScree
         fogOfWarButton.labelCell.pad(0f)
         fogOfWarButton.pack()
         fogOfWarButtonHolder.onActivation(UncivSound.Paper) {
-            if (!worldScreen.viewingCiv.isSpectator()) return@onActivation
+            if (!worldScreen.hasSpectatorVision()) return@onActivation
             worldScreen.fogOfWar = !worldScreen.fogOfWar
             worldScreen.shouldUpdate = true
         }
-        // Spectators can select a nation's tech view; T still belongs to their fog toggle.
-        fogOfWarButtonHolder.keyShortcuts.add(KeyboardBinding.TechnologyTree, priority = 2)
+        // Spectators can select a nation's tech view; T still belongs to their fog toggle (see updateFogOfWarButton).
 
         pickTechButton.background = WorldScreenStyle.background("WorldScreen/PickTechButton")
         pickTechButton.defaults().pad(10f)
@@ -117,14 +117,20 @@ class TechPolicyDiplomacyButtons(val worldScreen: WorldScreen) : Table(BaseScree
         if (game.gameInfo!!.isEspionageEnabled())
             updateEspionageButton()
         pack()
-        setPosition(10f, worldScreen.topBar.y - height - 10f)
+        // In Atlas the tracker pane's table places this actor; an absolute position would fight it.
+        if (!GameUiStyle.isAtlas) setPosition(10f, worldScreen.topBar.y - height - 10f)
         return result
     }
 
     private fun updateFogOfWarButton() {
         // Actor shortcuts ignore Touchable.disabled. Hide the holder to leave T for technology.
-        fogOfWarButtonHolder.isVisible = worldScreen.viewingCiv.isSpectator()
-        if (worldScreen.viewingCiv.isSpectator()) {
+        val canToggle = worldScreen.hasSpectatorVision()
+        fogOfWarButtonHolder.isVisible = canToggle
+        // A spectator playing a nation they took over keeps T for that nation's technology.
+        fogOfWarButtonHolder.keyShortcuts.clear()
+        if (worldScreen.viewingCiv.isSpectator())
+            fogOfWarButtonHolder.keyShortcuts.add(KeyboardBinding.TechnologyTree, priority = 2)
+        if (canToggle) {
             fogOfWarButton.isChecked = worldScreen.fogOfWar
             fogOfWarButtonHolder.actor = fogOfWarButton
             fogOfWarButtonHolder.touchable = Touchable.enabled

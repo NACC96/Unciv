@@ -8,6 +8,7 @@ import com.unciv.app.desktop.agents.DesktopAgentMatch
 import com.unciv.app.desktop.agents.SupervisorProcess
 import com.unciv.app.desktop.agents.SupervisorRunner
 import com.unciv.logic.GameInfo
+import com.unciv.logic.presentation.VisualViewKey
 import com.unciv.models.metadata.BaseRuleset
 import com.unciv.testing.BaseTestRunner
 import com.unciv.testing.TestGame
@@ -89,10 +90,12 @@ class DesktopRecoveryLifecycleTest {
             val screen = Mockito.mock(WorldScreen::class.java) { invocation ->
                 if (invocation.method.name == "installAgentSnapshot") {
                     published.add(invocation.getArgument(0))
-                    null
+                    true
                 } else Answers.RETURNS_DEFAULTS.answer(invocation)
             }
             Mockito.`when`(screen.currentViewerCivId()).thenReturn(Constants.spectator)
+            Mockito.`when`(screen.currentVisualViewKey()).thenReturn(VisualViewKey(Constants.spectator, true, 1L))
+            Mockito.`when`(screen.fogOfWar).thenReturn(true)
             val supervisor = object : SupervisorRunner {
                 override fun isAlive() = shutdownFinished.count > 0
 
@@ -150,6 +153,7 @@ class DesktopRecoveryLifecycleTest {
             }
             host = DesktopAgentMatch(game.gameInfo, match, AgentMatchSetup(), directory,
                 worldScreen = screen, supervisorFactory = { supervisor })
+            Mockito.`when`(screen.agentSession).thenReturn(host)
             fixtures.add(this)
         }
 

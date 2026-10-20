@@ -169,6 +169,26 @@ class AgentMessagesPanelTest {
         }
     }
 
+    @Test fun refreshRetainsComposerAndSelection() {
+        val f = Fixture(); f.contacts += MessageContact("Rome", "Caesar", true)
+        val panel = AgentMessagesPanel(f.screen, f.session)
+        try {
+            panel.toggle()
+            val composer = panel.descendants().filterIsInstance<TextArea>().single()
+            val recipient = panel.descendants().single { it.name == "MessageRecipient" } as com.badlogic.gdx.scenes.scene2d.ui.SelectBox<*>
+            @Suppress("UNCHECKED_CAST") val choices = recipient as com.badlogic.gdx.scenes.scene2d.ui.SelectBox<Any>
+            choices.selected = choices.items.last()
+            composer.text = "A persistent draft for our neighbour"; composer.setSelection(2, 9)
+            val draftBefore = composer.text; val caretBefore = composer.cursorPosition; val selectionBefore = composer.selection
+            val recipientBefore = choices.selected
+            f.width = 420f; f.height = 600f
+            f.messages = listOf(DiplomaticMessage("new", "Greece", Constants.spectator, "A new dispatch", 4, null))
+            panel.refresh(); panel.validate()
+            assertEquals(draftBefore, composer.text); assertEquals(caretBefore, composer.cursorPosition)
+            assertEquals(selectionBefore, composer.selection); assertEquals(recipientBefore, choices.selected)
+        } finally { panel.dispose() }
+    }
+
     @Test fun `composer typing does not activate world or actor shortcuts`() = withComposer { stage, _, editor ->
         var globalOpens = 0
         var actorOpens = 0
@@ -346,6 +366,39 @@ class AgentMessagesPanelTest {
             assertTrue("Rome acknowledged receipt" in panel.labels())
             assertTrue("Message received, acknowledged." in panel.labels())
             assertFalse("Delivered · turn 2" in panel.labels())
+        } finally { controls.dispose() }
+    }
+
+    @Test fun `only the viewer's own queued mail offers a confirmed delete`() {
+        val f = Fixture()
+        val deletes = ArrayList<String>()
+        var deleteCompletion: ((String?) -> Unit)? = null
+        Mockito.doAnswer { deletes.add(it.getArgument(0)); deleteCompletion = it.getArgument(1); null }
+            .`when`(f.session).deleteMessage(Mockito.anyString(), Mockito.any<(String?) -> Unit>() ?: {})
+        val own = DiplomaticMessage("own-queued", f.spectator.civID, "Rome", "Scout north", 1, null, "SPECTATOR")
+        val delivered = DiplomaticMessage("own-delivered", f.spectator.civID, "Rome", "Old note", 1, 2, "SPECTATOR")
+        val foreign = DiplomaticMessage("rome-queued", "Rome", "Greece", "Hello", 1, null, "NATION")
+        f.messages = listOf(own, delivered, foreign)
+        val controls = AgentMatchControlTable(f.session, f.screen)
+        try {
+            val panel = controls.openPanel(f)
+            fun deleteButtons() = panel.descendants().filterIsInstance<TextButton>().filter { it.name == "MessageDelete" }.toList()
+            assertEquals("Delivered and other senders' mail cannot be deleted", 1, deleteButtons().size)
+            deleteButtons().single().press()
+            assertTrue("The first click only asks for confirmation", deletes.isEmpty())
+            assertEquals("Confirm delete", deleteButtons().single().text.toString())
+            deleteButtons().single().press()
+            assertEquals(listOf("own-queued"), deletes)
+            assertEquals("Deleting…", deleteButtons().single().text.toString())
+            deleteCompletion!!("This message was already delivered and can no longer be deleted")
+            assertTrue(panel.labels().any { it.startsWith("This message was already delivered") })
+            assertEquals("Delete", deleteButtons().single().text.toString())
+            deleteButtons().single().press(); deleteButtons().single().press()
+            f.messages = listOf(delivered, foreign)
+            deleteCompletion!!(null)
+            assertTrue(deleteButtons().isEmpty())
+            assertTrue("Message deleted." in panel.labels())
+            assertFalse("Scout north" in panel.labels())
         } finally { controls.dispose() }
     }
 

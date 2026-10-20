@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "unitName": "Atomic Bomb",
+  "assetId": "atomic-bomb",
+  "creator": "OpenAI image generation",
+  "tool": "image_gen.imagegen (built-in)",
+  "rights": "original-generated",
+  "styleReference": {
+    "path": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/concept/unit-art-direction-v1.png",
+    "sha256": "ceb7c639185d98cb53535f21eb0966b1bec01bb782c80de2fdd972d2858ce641",
+    "role": "approved style only"
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/atomic-bomb/e-motion-v2.png",
+      "rawHash": "063a3be8898797fe56c6287408abc71016774788402af4c2f3e8393803269df6",
+      "promptPath": "art/atlas/units/atomic-bomb/prompts/e-v2.txt",
+      "promptHash": "65e077766d72b084e6bede311cfd8b36309105dbb12c8239988e665c31f97f1a",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/atomic-bomb/ne-motion-v2.png",
+      "rawHash": "2da7691263ffc51a5a74fac7a211e5c7d8ab0bd0fa73bc4e26b73be91e904742",
+      "promptPath": "art/atlas/units/atomic-bomb/prompts/ne-v2.txt",
+      "promptHash": "1ad339e8b05d59d555c18e7d93cae5960506be9e0f012f3d8142375d99864772",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ],
+      "identityReference": {
+        "path": "/Users/noahkenny/.codex/generated_images/01a1321a-8142-7533-ae7a-eb89a5433c70/exec-e45ebc30-6e0e-4a86-9e17-5f94b22c1a98.png",
+        "sha256": "063a3be8898797fe56c6287408abc71016774788402af4c2f3e8393803269df6"
+      }
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/atomic-bomb/se-motion-v2.png",
+      "rawHash": "228ee72e209d7fb427067bb75c8fdeb70f13a4ef488b6361401a0eda3bb6f057",
+      "promptPath": "art/atlas/units/atomic-bomb/prompts/se-v2.txt",
+      "promptHash": "0ee4d6af0cc58838f508af03af396ceddae1f48af5ec50adbfbc0e0a31e64cd8",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ],
+      "identityReference": {
+        "path": "/Users/noahkenny/.codex/generated_images/01a1321a-8142-7533-ae7a-eb89a5433c70/exec-e45ebc30-6e0e-4a86-9e17-5f94b22c1a98.png",
+        "sha256": "063a3be8898797fe56c6287408abc71016774788402af4c2f3e8393803269df6"
+      }
+    }
+  ],
+  "processing": {
+    "script": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/normalize_motion-v3.py",
+    "sha256": "d63316a6cedfaafcf546ecbd87f0163d3d13d0363c473cd389b2dd60c2113bf8",
+    "operations": [
+      "uniform cell cutting",
+      "constant sheet scale and root alignment",
+      "alpha-preserving resize",
+      "royal-blue nation mask extraction",
+      "violet ground-shadow extraction"
+    ],
+    "poseSynthesis": false,
+    "clonedStaticFrames": false
+  },
+  "reviewState": "candidate",
+  "formalArtReview": "deferred"
+}

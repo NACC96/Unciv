@@ -23,6 +23,7 @@ import com.unciv.models.metadata.GameSetupInfo
 import com.unciv.models.ruleset.Ruleset
 import com.unciv.models.ruleset.RulesetCache
 import com.unciv.ui.components.InputDisabling
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.widgets.UncivTextField
 import com.unciv.ui.components.input.KeyCharAndCode
 import com.unciv.ui.components.input.KeyShortcutDispatcherVeto
@@ -115,7 +116,7 @@ class MapEditorScreen(map: TileMap? = null) : BaseScreen(), RecreateOnResize {
         descriptionTextField.onChange { isDirty = true }
 
         tabs = MapEditorMainTabs(this)
-        MapEditorToolsDrawer(tabs, stage, mapHolder)
+        MapEditorToolsDrawer(tabs, stage, this)
 
         // The top level pager assigns its own key bindings, but making nested TabbedPagers bind keys
         // so all levels select to show the tab in question is too complex. Sub-Tabs need to maintain
@@ -169,7 +170,12 @@ class MapEditorScreen(map: TileMap? = null) : BaseScreen(), RecreateOnResize {
         }
     }
 
-    fun getToolsWidth() = stage.width * 0.4f
+    fun getToolsWidth() = if (GameUiStyle.isAtlas)
+        (stage.width * .4f).coerceAtLeast(360f).coerceAtMost(520f).coerceAtMost(stage.width - 40f)
+        else stage.width * .4f
+
+    /** Space for the persistent editor title and actions, separate from scrolling tool content. */
+    fun getToolsHeight() = if (GameUiStyle.isAtlas) (stage.height - 116f).coerceAtLeast(120f) else stage.height
 
     fun setWorldWrap(newValue: Boolean) {
         if (newValue == tileMap.mapParameters.worldWrap) return
@@ -251,7 +257,17 @@ class MapEditorScreen(map: TileMap? = null) : BaseScreen(), RecreateOnResize {
     }
 
     // We contain a map...
-    override fun getShortcutDispatcherVetoer() = KeyShortcutDispatcherVeto.createTileGroupMapDispatcherVetoer()
+    override fun getShortcutDispatcherVetoer(): com.unciv.ui.components.input.DispatcherVetoer {
+        val focused = stage.keyboardFocus
+        if (focused is com.badlogic.gdx.scenes.scene2d.ui.TextField) return { actor ->
+            when {
+                actor == focused -> KeyShortcutDispatcherVeto.DispatcherVetoResult.Accept
+                actor != null && focused.isDescendantOf(actor) -> KeyShortcutDispatcherVeto.DispatcherVetoResult.Skip
+                else -> KeyShortcutDispatcherVeto.DispatcherVetoResult.SkipWithChildren
+            }
+        }
+        return KeyShortcutDispatcherVeto.createTileGroupMapDispatcherVetoer()
+    }
 
     fun loadMap(map: TileMap, newRuleset: Ruleset? = null, selectPage: Int = 0) {
         clearOverlayImages()

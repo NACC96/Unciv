@@ -12,6 +12,7 @@ import com.unciv.models.ruleset.PerpetualConstruction
 import com.unciv.models.ruleset.PerpetualConstruction.StatConversion
 import com.unciv.models.ruleset.unit.BaseUnit
 import com.unciv.models.translations.tr
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.extensions.darken
 import com.unciv.ui.components.extensions.disable
 import com.unciv.ui.components.extensions.getTurnsToConstructionString
@@ -53,7 +54,11 @@ class ConstructionInfoTable(val cityScreen: CityScreen) : Table() {
         isVisible = true
 
         updateSelectedConstructionTable(selectedConstruction)
-
+        if (GameUiStyle.isAtlas) {
+            background = null
+            selectedConstructionTable.background = GameUiStyle.panelBackground("Atlas/City/ConstructionDetails", 1f)
+            GameUiStyle.applyWidget(this)
+        }
         pack()
     }
 
@@ -79,7 +84,9 @@ class ConstructionInfoTable(val cityScreen: CityScreen) : Table() {
             buildingText += specialConstruction?.let { cityView.getProductionTooltip(it) }
                     ?: cityConstructions.getTurnsToConstructionString(construction)
 
-            add(Label(buildingText, BaseScreen.skin)).expandX().row()  // already translated
+            add(Label(buildingText, BaseScreen.skin).apply { wrap = GameUiStyle.isAtlas })
+                .apply { if (GameUiStyle.isAtlas) width((cityScreen.atlasContentWidth - 90f).coerceAtLeast(40f)) }
+                .expandX().row()  // already translated
 
             val description = when (construction) {
                 is BaseUnit -> cityView.getUnitDescription(construction)
@@ -91,7 +98,7 @@ class ConstructionInfoTable(val cityScreen: CityScreen) : Table() {
 
             val descriptionLabel = Label(description, BaseScreen.skin)  // already translated
             descriptionLabel.wrap = true
-            add(descriptionLabel).colspan(2).width(cityScreen.stage.width / if(cityScreen.isCrampedPortrait()) 3 else 4)
+            add(descriptionLabel).colspan(2).width(if (GameUiStyle.isAtlas) (cityScreen.atlasContentWidth - 24f).coerceAtLeast(40f) else cityScreen.stage.width / if(cityScreen.isCrampedPortrait()) 3 else 4)
 
             if (cityConstructions.isBuilt(construction.name)) {
                 showSellButton(construction)
@@ -108,8 +115,8 @@ class ConstructionInfoTable(val cityScreen: CityScreen) : Table() {
                 if (buildUnitWithPromotions != null) {
                     row()
                     add("Use default promotions".toCheckBox(buildUnitWithPromotions) {
-                        cityView.trySetUnitShouldUseSavedPromotion(baseUnit, it)
-                    }).colspan(2).center()
+                        if (cityScreen.canCityBeChanged()) cityView.trySetUnitShouldUseSavedPromotion(baseUnit, it)
+                    }.apply { isDisabled = !cityScreen.canCityBeChanged() }).colspan(2).center()
                 }
             }
         }
@@ -163,6 +170,7 @@ class ConstructionInfoTable(val cityScreen: CityScreen) : Table() {
     }
 
     private fun sellBuildingConfirmed(construction: Building) {
+        if (!cityScreen.canCityBeChanged()) return
         cityView.trySellBuilding(construction)
         cityScreen.clearSelection()
         cityScreen.updateAsync()

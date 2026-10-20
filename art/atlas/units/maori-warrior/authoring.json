@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "unitName": "Maori Warrior",
+  "assetId": "maori-warrior",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": "Maori Warrior",
+  "uniqueTo": "Polynesia",
+  "replaces": "Warrior",
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Maori Warrior",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/maori-warrior/e-motion-v1.png",
+      "rawHash": "2877ae7eeebe47aa28db411c21559c8055a6bea15afbc5d3565c9cd668a6f22b",
+      "promptPath": "art/atlas/units/maori-warrior/prompts/e-v1.txt",
+      "promptHash": "2b5c67c8b001b797af3f28b05d3daf5615f24809f210a3048636fde4e8d135c3",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/maori-warrior/ne-motion-v1.png",
+      "rawHash": "568fd3b7132df8796a14b51d448eaad8ed661374c1bff9b64d2acac2c41a24fc",
+      "promptPath": "art/atlas/units/maori-warrior/prompts/ne-v1.txt",
+      "promptHash": "39b282df29189380d84308a5b8ccb91edc19997ca1f982a54335fa68a192f8a6",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/maori-warrior/se-motion-v1.png",
+      "rawHash": "6cafa93ff5458e73d3972f8f7c77de58b9bf957303c54c5fd6316ab6702cb7e5",
+      "promptPath": "art/atlas/units/maori-warrior/prompts/se-v1.txt",
+      "promptHash": "c1773f28ced023c82229fd1faf646972014a7113bfa1261944c23fa0fddc2960",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
+}

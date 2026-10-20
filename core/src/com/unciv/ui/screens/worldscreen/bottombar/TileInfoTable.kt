@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.utils.Align
 import com.unciv.ui.objectdescriptions.TileDescription
 import com.unciv.models.translations.tr
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.extensions.addBorderAllowOpacity
 import com.unciv.ui.components.extensions.darken
 import com.unciv.ui.components.extensions.toLabel
@@ -16,15 +17,20 @@ import com.unciv.ui.screens.basescreen.BaseScreen
 import com.unciv.ui.screens.civilopediascreen.FormattedLine.IconDisplay
 import com.unciv.ui.screens.civilopediascreen.MarkupRenderer
 import com.unciv.ui.screens.worldscreen.WorldScreen
+import com.unciv.ui.screens.worldscreen.WorldScreenStyle
 import com.unciv.utils.DebugUtils
 import com.unciv.view.CivView
 import com.unciv.view.TileView
 
 class TileInfoTable(private val worldScreen: WorldScreen) : Table(BaseScreen.skin) {
     var civView: CivView = worldScreen.selectedGameView.civView
+    /** Whether the last [updateTileTable] produced rows; an empty Atlas card is hidden, not drawn. */
+    var hasContent = false
+        private set
 
     init {
-        background = BaseScreen.skinStrings.getUiBackground(
+        background = if (GameUiStyle.isAtlas) WorldScreenStyle.surface("Atlas/World/TileInfo")
+        else BaseScreen.skinStrings.getUiBackground(
             "WorldScreen/TileInfoTable",
             tintColor = BaseScreen.skinStrings.skinConfig.baseColor.darken(0.5f)
         )
@@ -32,11 +38,12 @@ class TileInfoTable(private val worldScreen: WorldScreen) : Table(BaseScreen.ski
 
     internal fun updateTileTable(selectedTileView: TileView?) {
         clearChildren()
-        pad(5f)
+        pad(if (GameUiStyle.isAtlas) 10f else 5f)
+        hasContent = false
 
         // A retained selection may still carry the previous spectator or civilization perspective.
         val tileView = selectedTileView?.let { civView.gameView.getTile(it) }
-        if (tileView != null && (DebugUtils.VISIBLE_MAP || civView.hasExplored(tileView))) {
+        if (tileView != null && (tileView.isForceVisible() || civView.hasExplored(tileView))) {
             add(getStatsTable(tileView)).left().row()
             add(MarkupRenderer.render(TileDescription.toMarkup(tileView, civView), padding = 0f, iconDisplay = IconDisplay.None) {
                 worldScreen.openCivilopedia(it)
@@ -46,11 +53,12 @@ class TileInfoTable(private val worldScreen: WorldScreen) : Table(BaseScreen.ski
                 val imagesString = "Images: " + worldScreen.mapHolder.tileGroups[tileView]!!.layerTerrain.tileBaseImages.joinToString{"\n"+it.name}
                 add(imagesString.toLabel())
             }
-            
+            hasContent = true
         }
 
         pack()
-        addBorderAllowOpacity(1f, Color.WHITE)
+        // The Atlas card has its own hairline rim.
+        if (!GameUiStyle.isAtlas) addBorderAllowOpacity(1f, Color.WHITE)
     }
 
     private fun getStatsTable(tileView: TileView): Table {

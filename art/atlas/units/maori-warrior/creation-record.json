@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "unitName": "Maori Warrior",
+  "assetId": "maori-warrior",
+  "creator": "OpenAI image generation",
+  "tool": "image_gen.imagegen (built-in)",
+  "rights": "original-generated",
+  "styleReference": {
+    "path": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/concept/unit-art-direction-v1.png",
+    "sha256": "ceb7c639185d98cb53535f21eb0966b1bec01bb782c80de2fdd972d2858ce641",
+    "role": "approved style only"
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/maori-warrior/e-motion-v1.png",
+      "rawHash": "2877ae7eeebe47aa28db411c21559c8055a6bea15afbc5d3565c9cd668a6f22b",
+      "promptPath": "art/atlas/units/maori-warrior/prompts/e-v1.txt",
+      "promptHash": "2b5c67c8b001b797af3f28b05d3daf5615f24809f210a3048636fde4e8d135c3",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/maori-warrior/ne-motion-v1.png",
+      "rawHash": "568fd3b7132df8796a14b51d448eaad8ed661374c1bff9b64d2acac2c41a24fc",
+      "promptPath": "art/atlas/units/maori-warrior/prompts/ne-v1.txt",
+      "promptHash": "39b282df29189380d84308a5b8ccb91edc19997ca1f982a54335fa68a192f8a6",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/maori-warrior/se-motion-v1.png",
+      "rawHash": "6cafa93ff5458e73d3972f8f7c77de58b9bf957303c54c5fd6316ab6702cb7e5",
+      "promptPath": "art/atlas/units/maori-warrior/prompts/se-v1.txt",
+      "promptHash": "c1773f28ced023c82229fd1faf646972014a7113bfa1261944c23fa0fddc2960",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "processing": {
+    "script": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/normalize_motion.py",
+    "sha256": "8702a1202c3a74035fca6b0cbee4dd8e301d00256f61c035c8d170e64f8d3a01",
+    "operations": [
+      "uniform cell cutting",
+      "constant sheet scale and root alignment",
+      "alpha-preserving resize",
+      "royal-blue nation mask extraction",
+      "violet ground-shadow extraction"
+    ],
+    "poseSynthesis": false,
+    "clonedStaticFrames": false
+  },
+  "reviewState": "candidate",
+  "formalArtReview": "deferred"
+}

@@ -3,6 +3,7 @@ package com.unciv.ui.screens.diplomacyscreen
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.utils.Align
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.Constants
 import com.unciv.UncivGame
 import com.unciv.logic.trade.TradeOffer
@@ -99,8 +100,13 @@ class OffersListScroll(
                 val tradeButton = IconTextButton(tradeLabel, tradeIcon).apply {
                     if (tradeIcon != null)
                         iconCell.size(30f)
-                    label.setAlignment(Align.center)
-                    labelCell.pad(5f).grow()
+                    label.setAlignment(if (GameUiStyle.isAtlas) Align.left else Align.center)
+                    if (GameUiStyle.isAtlas) label.wrap = true
+                    labelCell.pad(5f).grow().minWidth(0f)
+                    if (GameUiStyle.isAtlas) {
+                        GameUiStyle.apply(this)
+                        name = "AtlasTradeTerm:${offer.type}:${offer.name}"
+                    }
                 }
 
                 val amountPerClick =
@@ -118,7 +124,8 @@ class OffersListScroll(
                     // highlight unique suggestions
                     if (offerType in listOf(Luxury_Resource, Strategic_Resource)
                             && otherSideOffers.all { it.type != offer.type || it.name != offer.name || it.amount < 0}) // we can 'have' negative amounts of resources 
-                        tradeButton.color = Color.GREEN
+                        if (GameUiStyle.isAtlas) tradeButton.label.color = GameUiStyle.positive
+                        else tradeButton.color = Color.GREEN
 
                     tradeButton.onClick {
                         val amountTransferred = min(amountPerClick, offer.amount)
@@ -129,10 +136,15 @@ class OffersListScroll(
 
 
                 if (expanderTabs.containsKey(offerType))
-                    expanderTabs[offerType]!!.innerTable.add(tradeButton).row()
+                    expanderTabs[offerType]!!.innerTable.add(tradeButton).growX().minWidth(0f).row()
                 else
-                    table.add(tradeButton).row()
+                    table.add(tradeButton).growX().minWidth(0f).row()
             }
+        }
+        if (GameUiStyle.isAtlas) {
+            setScrollingDisabled(true, false)
+            table.background = GameUiStyle.background("Atlas/Trade/Terms", GameUiStyle.inset)
+            GameUiStyle.applyWidget(table)
         }
         actor = table
     }

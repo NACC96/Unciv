@@ -1,0 +1,108 @@
+{
+  "schemaVersion": 1,
+  "batchId": "borders",
+  "tool": "art/atlas/terrain/gen_borders.py",
+  "toolSha256": "3f7704f51673f473569f005bcd7ae011dcf968ab9b952125a6dcbe8c6ef8d642",
+  "geometry": {
+    "canvas": [
+      128,
+      24
+    ],
+    "supersample": 4,
+    "pixelsPerWorldUnit": 1.5802,
+    "edgeY": 0.6843,
+    "edgeX": [
+      32.3951,
+      95.6049
+    ],
+    "lineHeight": 3.1605,
+    "tintDepth": 15.0,
+    "tintAlpha": 0.38,
+    "miterSlope": "tan(30deg)",
+    "nameOrder": "first word = PNG right (+x) end"
+  },
+  "reviewState": "candidate",
+  "formalAcceptance": "deferred by user",
+  "cells": [
+    {
+      "item": "@Borders/ConcaveInner",
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Borders/ConcaveInner.png",
+      "canvas": [
+        128,
+        24
+      ],
+      "normalization": "procedural",
+      "sha256": "b51a0c48b0eac091379fc35045eb164fdcd3b32c06351211bcbea4ee5b342c2e"
+    },
+    {
+      "item": "@Borders/ConcaveOuter",
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Borders/ConcaveOuter.png",
+      "canvas": [
+        128,
+        24
+      ],
+      "normalization": "procedural",
+      "sha256": "0197dbef9b18e0af0515a086a01535bd5392c6f1241778cadc0715f494aacebe"
+    },
+    {
+      "item": "@Borders/ConvexInner",
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Borders/ConvexInner.png",
+      "canvas": [
+        128,
+        24
+      ],
+      "normalization": "procedural",
+      "sha256": "0bc404269e4683e1183688f274bc08bfdc0d626477b87411b1017b64bcc5267c"
+    },
+    {
+      "item": "@Borders/ConvexOuter",
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Borders/ConvexOuter.png",
+      "canvas": [
+        128,
+        24
+      ],
+      "normalization": "procedural",
+      "sha256": "12ad60e054434e9befb69bafb569f4b5943948aca5c34a8775626958330035bb"
+    },
+    {
+      "item": "@Borders/ConcaveConvexInner",
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Borders/ConcaveConvexInner.png",
+      "canvas": [
+        128,
+        24
+      ],
+      "normalization": "procedural",
+      "sha256": "fe413bba1a49c0f8d606644350614334b7a1d6fd8cdc7aad276ef30d06e0b8fa"
+    },
+    {
+      "item": "@Borders/ConcaveConvexOuter",
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Borders/ConcaveConvexOuter.png",
+      "canvas": [
+        128,
+        24
+      ],
+      "normalization": "procedural",
+      "sha256": "5e9b4bc2f53f309c3311da44641b67049c684b6795ca635ec9a0b18c349abd37"
+    },
+    {
+      "item": "@Borders/ConvexConcaveInner",
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Borders/ConvexConcaveInner.png",
+      "canvas": [
+        128,
+        24
+      ],
+      "normalization": "procedural",
+      "sha256": "393d2341cd084a28673097aae390ff7b35dde509671c9db523f86ef713836c3b"
+    },
+    {
+      "item": "@Borders/ConvexConcaveOuter",
+      "sourcePath": "android/Images.AtlasTerrain/TileSets/AtlasTerrain/Borders/ConvexConcaveOuter.png",
+      "canvas": [
+        128,
+        24
+      ],
+      "normalization": "procedural",
+      "sha256": "f6a73f6f7d36f35f7d4a57b318642b65d611c6cb57ace0f83727c17c47200353"
+    }
+  ]
+}

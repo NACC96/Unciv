@@ -13,6 +13,8 @@ import com.unciv.GUI
 import com.unciv.logic.civilization.Civilization
 import com.unciv.logic.map.mapunit.MapUnit
 import com.unciv.ui.components.extensions.*
+import com.unciv.ui.components.AtlasWidgets
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.widgets.UncivTextField
 import com.unciv.ui.components.input.KeyCharAndCode
 import com.unciv.ui.components.input.keyShortcuts
@@ -35,7 +37,7 @@ class DevConsolePopup(val screen: WorldScreen) : Popup(screen, Scrollability.Dev
     private var currentHistoryEntry = history.size
 
     internal val textField = UncivTextField("") // always has focus, so a hint won't show
-    private val responseLabel = "".toLabel(Color.RED).apply { wrap = true }
+    private val responseLabel = "".toLabel(if (GameUiStyle.isAtlas) GameUiStyle.error else Color.RED).apply { wrap = true }
     private val inputWrapper = Table()
 
     private val commandRoot = ConsoleCommandRoot()
@@ -45,21 +47,39 @@ class DevConsolePopup(val screen: WorldScreen) : Popup(screen, Scrollability.Dev
         // Use untranslated text here! The entire console, including messages, should stay English.
         // But "Developer Console" *has* a translation from KeyboardBinding.DeveloperConsole.
         // The extensions still help, even with a "don't translate" kludge
-        add("Developer Console {}".toLabel(fontSize = Constants.headingFontSize)).growX()
+        if (GameUiStyle.isAtlas) {
+            innerTable.background = GameUiStyle.panelBackground("DevConsole/Panel", 1f)
+            innerTable.pad(12f)
+            add(AtlasWidgets.header("Developer Console {}", "Tab: autocomplete · ↑ / ↓: command history {}"))
+                .colspan(2).width((stageToShowOn.width - 56f).coerceAtMost(760f)).growX().row()
+        } else add("Developer Console {}".toLabel(fontSize = Constants.headingFontSize)).growX()
         add("Keep open {}".toCheckBox(keepOpen) { keepOpen = it }).right().row()
 
         textField.maxLength = 1000
         inputWrapper.defaults().space(5f)
-        if (!GUI.keyboardAvailable) inputWrapper.add(getAutocompleteButton())
-        inputWrapper.add(textField).growX()
-        if (!GUI.keyboardAvailable) inputWrapper.add(getHistoryButtons())
+        if (!GUI.keyboardAvailable && !GameUiStyle.isAtlas) inputWrapper.add(getAutocompleteButton())
+        inputWrapper.add(textField).growX().minWidth(0f).minHeight(GameUiStyle.standardControlHeight)
+        if (!GUI.keyboardAvailable && !GameUiStyle.isAtlas) inputWrapper.add(getHistoryButtons())
 
-        add(inputWrapper).minWidth(stageToShowOn.width / 2).growX().colspan(2).row()
+        add(inputWrapper).minWidth(if (GameUiStyle.isAtlas) 0f else stageToShowOn.width / 2)
+            .width((stageToShowOn.width - 56f).coerceAtMost(760f)).growX().colspan(2).row()
+        if (GameUiStyle.isAtlas) {
+            val controls = Table().apply {
+                defaults().growX().minWidth(0f).pad(3f)
+                add(GameUiStyle.button("Autocomplete {}").apply { label.wrap = true; onClick(::onAutocomplete) })
+                add(GameUiStyle.button("History {}").apply { onClick(::showHistory) })
+                row()
+                add(GameUiStyle.button("Close").apply { onClick { close() } })
+                add(GameUiStyle.button("Run {}", primary = true).apply { onClick(::onEnter) })
+            }
+            add(controls).growX().colspan(2).row()
+        }
 
         // Without this, console popup will always contain the key used to open it - won't work perfectly if it's configured to a "dead key"
         textField.addAction(Actions.delay(0.05f, Actions.run { textField.text = "" }))
 
-        add(responseLabel).colspan(2).minWidth(innerTable.prefWidth).maxWidth(stageToShowOn.width * 0.8f)
+        add(responseLabel).colspan(2).minWidth(if (GameUiStyle.isAtlas) 0f else innerTable.prefWidth)
+            .width((stageToShowOn.width - 56f).coerceAtMost(760f)).maxWidth(stageToShowOn.width * 0.8f)
 
         keyShortcuts.add(KeyCharAndCode.BACK) { close() }
 
@@ -169,13 +189,13 @@ class DevConsolePopup(val screen: WorldScreen) : Popup(screen, Scrollability.Dev
         val popup = object : Popup(stageToShowOn) {
             init {
                 for ((index, entry) in history.withIndex()) {
-                    val label = Label(entry, skin)
+                    val label = Label(entry, skin).apply { wrap = true }
                     label.onClick {
                         currentHistoryEntry = index
                         navigateHistory(0)
                         close()
                     }
-                    add(label).row()
+                    add(label).width((stageToShowOn.width * .8f - 40f).coerceAtMost(720f)).minHeight(40f).row()
                 }
                 clickBehindToClose = true
                 if (screen.game.settings.forbidPopupClickBehindToClose) addCloseButton()
@@ -213,7 +233,7 @@ class DevConsolePopup(val screen: WorldScreen) : Popup(screen, Scrollability.Dev
 
     internal fun showResponse(message: String?, color: Color) {
         responseLabel.setText(message)
-        responseLabel.style.fontColor = color
+        responseLabel.style.fontColor = if (GameUiStyle.isAtlas && color == Color.RED) GameUiStyle.error else color
         innerTable.validate()
         val newHeight = innerTable.prefHeight.coerceIn(120f, maxPopupHeight)
         getCell(getScrollPane()).height(newHeight)  // Gdx quirks: Or else the ScrollPane's new prefHeight won't be respected

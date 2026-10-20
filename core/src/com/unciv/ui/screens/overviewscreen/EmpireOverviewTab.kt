@@ -4,6 +4,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.unciv.ui.components.widgets.TabbedPager
 import com.unciv.ui.screens.basescreen.BaseScreen
 import com.unciv.view.CivView
+import com.unciv.ui.components.GameUiStyle
 
 abstract class EmpireOverviewTab (
     val viewingPlayer: CivView,
@@ -23,7 +24,8 @@ abstract class EmpireOverviewTab (
 
     override fun activated(index: Int, caption: String, pager: TabbedPager) {
         if (caption.isEmpty()) return // called from EmpireOverviewScreen.resume()
-        overviewScreen.persistState.last = EmpireOverviewCategories.entries.toTypedArray()[index]  // Change this if categories are ever reordered or filtered
+        overviewScreen.categoryForPage(index)?.let { overviewScreen.persistState.last = it }
+        applyAtlasPresentation()
     }
 
     /** Override if the tab can _select_ something specific.
@@ -32,4 +34,11 @@ abstract class EmpireOverviewTab (
     open fun select(selection: String): Float? = null
 
     val gameInfo = viewingPlayer.getCiv().gameInfo
+
+    internal fun applyAtlasPresentation() {
+        if (!GameUiStyle.isAtlas) return
+        background = GameUiStyle.background("Atlas/Empire/Body", GameUiStyle.surface)
+        AtlasEmpireUi.prepare(this)
+        getFixedContent()?.let { AtlasEmpireUi.prepare(it) }
+    }
 }

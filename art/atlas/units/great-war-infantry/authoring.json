@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "unitName": "Great War Infantry",
+  "assetId": "great-war-infantry",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": null,
+  "uniqueTo": null,
+  "replaces": null,
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Great War Infantry",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/great-war-infantry/e-motion-v1.png",
+      "rawHash": "14f134d01e0adccb1420332b846ce6bf0de1895ab90f171ae65b2bf05f3220b1",
+      "promptPath": "art/atlas/units/great-war-infantry/prompts/e-v1.txt",
+      "promptHash": "e65819f14cdea7799d3ebaa64f3f4bd7241f918ceff0ab8691fe3c943f47d315",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/great-war-infantry/ne-motion-v1.png",
+      "rawHash": "db06b93d7c015a32cebe40ac31e4179a2e6824ea6118bf3347bf993700cc979f",
+      "promptPath": "art/atlas/units/great-war-infantry/prompts/ne-v1.txt",
+      "promptHash": "707f8a4800e33aca500b02465a60671c498330b1745247534a547b75cb49062a",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/great-war-infantry/se-motion-v1.png",
+      "rawHash": "f08f5e71bcf9ca1df07f883279a603a1aa219d807d96ad22c4d3f4d54e9eae30",
+      "promptPath": "art/atlas/units/great-war-infantry/prompts/se-v1.txt",
+      "promptHash": "fdb6d53ab6e0f72e339f3c0eb0f37bcd5f6abf02de18727f6cbf0d2cbbfdad83",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
+}

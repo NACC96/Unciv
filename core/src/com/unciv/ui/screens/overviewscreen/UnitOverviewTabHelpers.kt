@@ -3,6 +3,7 @@ package com.unciv.ui.screens.overviewscreen
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.utils.Align
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.GUI
 import com.unciv.logic.map.HexCoord
 import com.unciv.models.UnitActionType
@@ -78,6 +79,7 @@ open class UnitOverviewTabHelpers {
             upgradeIcon.addTooltip(unitToUpgradeTo.name, 24f, tipAlign = Align.bottomLeft)
             table.add(upgradeIcon).size(28f)
         }
+        if (GameUiStyle.isAtlas) AtlasEmpireUi.panel(table, "UnitUpgrades")
         return table
     }
 
@@ -113,6 +115,7 @@ open class UnitOverviewTabHelpers {
             }
         }
         promotionsTable.onClick(::onPromotionsTableClick)
+        if (GameUiStyle.isAtlas) AtlasEmpireUi.panel(promotionsTable, "UnitPromotions")
         return promotionsTable
     }
 

@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "unitName": "Swordsman",
+  "assetId": "swordsman",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": null,
+  "uniqueTo": null,
+  "replaces": null,
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Swordsman",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/swordsman/e-motion-v1.png",
+      "rawHash": "9a38fe7ccf450dff942717bbb9e5a467110791ea588d012cfe99ab829e8761df",
+      "promptPath": "art/atlas/units/swordsman/prompts/e-v1.txt",
+      "promptHash": "785f9890c90effc081bc612f05aab49188f60f5fb30b49169b8ea98f5630d7d1",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/swordsman/ne-motion-v1.png",
+      "rawHash": "15eed384495ef922db54c64da8fd5a53832371f1e38b887b0608d4cb373ed4b2",
+      "promptPath": "art/atlas/units/swordsman/prompts/ne-v1.txt",
+      "promptHash": "b868ab18c9b9d5203389df8d5db4f0ccffd6cfcae0900ca2657d11f54f20f2f6",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/swordsman/se-motion-v1.png",
+      "rawHash": "a6157eb92bb6976f8995fd7de5ca0746b64ce8d1bc7df09442acb039531ab1cb",
+      "promptPath": "art/atlas/units/swordsman/prompts/se-v1.txt",
+      "promptHash": "7502f0874e51664c5591333b5b7759e17ec8b8eac284e34b20ceaa992bd09b61",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
+}

@@ -19,6 +19,11 @@ import java.nio.file.attribute.BasicFileAttributes
  * [TexturePacker] documentation is [here](https://github.com/libgdx/libgdx/wiki/Texture-packer)
  */
 object AndroidImagePacker {
+    /** Explicit opt-in output; clips never participate in the ordinary eager atlas scan. */
+    fun packAtlasAnimation(repoPath: String, requireComplete: Boolean = false) {
+        AtlasAssetPacker.execute(repoPath, "pack", requireComplete)
+    }
+
     private fun getDefaultSettings() = TexturePacker.Settings().apply {
         // Apparently some chipsets, like NVIDIA Tegra 3 graphics chipset (used in Asus TF700T tablet),
         // don't support non-power-of-two texture sizes - kudos @yuroller!
@@ -126,6 +131,12 @@ object AndroidImagePacker {
         for (folder in parent.listFiles()!!) {
             if (!folder.isDirectory) continue
             if (folder.nameWithoutExtension != "Images") continue
+            // Animation sources/output are deliberately outside this naming convention.
+            require(folder.name != "Images.AtlasAnimation") {
+                "Use art/atlas/units/*/frames and packAtlasAnimation for lazy animation pages"
+            }
+            if (folder.extension in listOf("AtlasTerrain", "AtlasUnits") &&
+                folder.walkTopDown().none { it.isFile && it.extension in listOf("png", "jpg", "jpeg") }) continue
             val atlasName = if (folder.name == "Images") "game" else folder.extension
             yield(ImageFolderResult(folder.path, atlasName))
         }

@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "unitName": "Berserker",
+  "assetId": "berserker",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": "Berserker",
+  "uniqueTo": "Denmark",
+  "replaces": "Longswordsman",
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Berserker",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/berserker/e-motion-v1.png",
+      "rawHash": "a23646c524a8bd6f31ca768781f13fea7c450af3693a769aebc2cd63e17f3fda",
+      "promptPath": "art/atlas/units/berserker/prompts/e-v1.txt",
+      "promptHash": "4829f7c9283dee125730995724c2237c351dfda2ffa8662f6382a7e8481129e8",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/berserker/ne-motion-v1.png",
+      "rawHash": "01d196871605eb65f69c3faa6c028152cc821a13f30e6d699f39de0538be3de2",
+      "promptPath": "art/atlas/units/berserker/prompts/ne-v1.txt",
+      "promptHash": "520a2bcf0a9a7ec3dd22100bad0977af06ebbf639bc50df8acf221ee6850a1cf",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/berserker/se-motion-v1.png",
+      "rawHash": "b48caec7420dc8fa4294b20d9bd81a3abf80df77907cd05601847a6dd676e648",
+      "promptPath": "art/atlas/units/berserker/prompts/se-v1.txt",
+      "promptHash": "2f7086123f51af8eafcf6e5833ed5db70e6ea497dc6cfdf90e83883ee673fc9d",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
+}

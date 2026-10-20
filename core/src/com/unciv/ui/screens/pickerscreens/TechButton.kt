@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.utils.Align
 import com.unciv.logic.civilization.managers.TechManager
+import com.unciv.models.translations.tr
 import com.unciv.ui.objectdescriptions.TechnologyDescriptions
 import com.unciv.ui.images.ImageGetter
 import com.unciv.ui.screens.basescreen.BaseScreen
@@ -17,6 +18,8 @@ import com.unciv.ui.components.extensions.centerY
 import com.unciv.ui.components.extensions.darken
 import com.unciv.ui.components.extensions.setFontSize
 import com.unciv.ui.components.extensions.toLabel
+import com.unciv.ui.components.GameUiStyle
+import com.unciv.ui.components.atlas.AtlasChoiceState
 
 class TechButton(
     techName: String,
@@ -37,6 +40,8 @@ class TechButton(
     }
 
     private val backgroundImage: Image  // Table.background is the border
+    private val choiceStatus = "".toLabel(GameUiStyle.muted, GameUiStyle.Type.small)
+    private val atlasNode = GameUiStyle.isAtlas && !isWorldScreen
 
     init {
         touchable = Touchable.enabled
@@ -77,6 +82,16 @@ class TechButton(
         rightSide.add(turns).width(40f).top().left().padRight(10f).row()
 
         addTechEnabledIcons(techName, rightSide)
+        if (atlasNode) {
+            text.wrap = true
+            text.setEllipsis(false)
+            text.color = GameUiStyle.ink
+            turns.color = GameUiStyle.muted
+            rightSide.add(choiceStatus).colspan(2).growX().left().padTop(GameUiStyle.Space.s).row()
+            rightSide.add("${techManager.researchOfTech(techName)}/${techManager.costOfTech(techName)}".toLabel(
+                GameUiStyle.muted, GameUiStyle.Type.small)).colspan(2).left().row()
+            backgroundImage.isVisible = false
+        }
 
         rightSide.centerY(this)
         add(rightSide).expandX().left()
@@ -94,8 +109,25 @@ class TechButton(
     }
 
     fun setButtonColor(color: Color) {
+        if (atlasNode) return
         backgroundImage.color = color
         pack()
+    }
+
+    internal fun setChoiceState(state: AtlasChoiceState, selected: Boolean, queued: Boolean) {
+        if (!atlasNode) return
+        val rim = when (state) {
+            AtlasChoiceState.LOCKED -> GameUiStyle.muted
+            AtlasChoiceState.AVAILABLE -> GameUiStyle.info
+            AtlasChoiceState.CURRENT -> GameUiStyle.accent
+            AtlasChoiceState.COMPLETED -> GameUiStyle.positive
+        }
+        choiceStatus.setText("${state.marker} ${state.caption.tr()}" + if (queued) " · ${"Queued".tr()}" else "")
+        choiceStatus.color = rim
+        text.color = GameUiStyle.ink
+        background = GameUiStyle.outlinedBackground("Atlas/Technology/${state.name}",
+            if (selected) GameUiStyle.pressed else GameUiStyle.inset,
+            if (selected) GameUiStyle.selection else rim, if (selected) 2.5f else 1.5f)
     }
 
     private fun addTechEnabledIcons(techName: String, rightSide: Table) {

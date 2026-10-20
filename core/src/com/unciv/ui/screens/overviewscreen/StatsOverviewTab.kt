@@ -2,6 +2,7 @@ package com.unciv.ui.screens.overviewscreen
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.ui.Table
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.Constants
 import com.unciv.GUI
 import com.unciv.models.ruleset.unique.Unique
@@ -39,7 +40,7 @@ class StatsOverviewTab(
     }
 
     init {
-        val tablePadding = 30f  // Padding around each of the stat tables
+        val tablePadding = if (GameUiStyle.isAtlas) GameUiStyle.Space.l else 30f  // Padding around each of the stat tables
         defaults().pad(tablePadding).top()
 
         happinessTable.defaults().pad(5f)
@@ -87,7 +88,8 @@ class StatsOverviewTab(
 
         for (entry in allStatTables.withIndex()) {
             if (entry.index % optimumColumns == 0) row()
-            add(entry.value)
+            if (GameUiStyle.isAtlas) AtlasEmpireUi.panel(entry.value, "StatsBreakdown")
+            add(entry.value).minWidth(0f)
         }
     }
 
@@ -100,6 +102,11 @@ class StatsOverviewTab(
         if (isReligionEnabled) faithTable.updateStatTable(Stat.Faith, statMap)
         updateGreatPeopleTable()
         updateScoreTable()
+        if (GameUiStyle.isAtlas) {
+            listOf(happinessTable, unhappinessTable, goldAndSliderTable, scienceTable, cultureTable,
+                faithTable, greatPeopleTable, scoreTable).forEach { AtlasEmpireUi.panel(it, "StatsBreakdown") }
+            applyAtlasPresentation()
+        }
     }
 
     private fun Table.addHeading(label: String) {

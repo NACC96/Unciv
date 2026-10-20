@@ -33,6 +33,12 @@ export interface TurnPromptInput {
    * grows resumed session history.
    */
   includeStaticInstructions?: boolean;
+  /**
+   * The turn's opening game.observe result (compact JSON, without the events,
+   * decisions and mail stated elsewhere in the prompt), so the leader starts
+   * playing without spending its first round trip on an observation.
+   */
+  openingObservation?: string;
 }
 
 const MAX_NOTES_CHARS = 16 * 1024;
@@ -80,7 +86,10 @@ export function buildTurnPrompt(input: TurnPromptInput): string {
     history.length ? `Recent private diplomatic correspondence (at most ${MAX_PROMPT_CORRESPONDENCE}, newest response/message first, long text clipped; own sent mail and delivered incoming mail only; game.observe diplomaticHistory has the full records):\n` +
       `Stored acknowledgementText is the recipient's reply on the original message. History is context, not a new acknowledgement requirement.\n` +
       history.map(message => JSON.stringify(message)).join("\n") : "",
-    "Begin with game.observe, inspect terrain before settling/building, preserve current worker progress, resolve decisions explicitly, batch independent commands with game.act_batch, play this turn, save concise notes, then commit game.end_turn.",
+    input.openingObservation ? `Opening observation (game.observe at revision ${input.stateRevision}; absent fields are null, false, zero or empty):\n${input.openingObservation}` : "",
+    input.openingObservation
+      ? "Start from the opening observation above instead of calling game.observe (observe again only for state your own actions changed), weigh the balance of power against your rivals, inspect terrain before settling/building, keep every settler and scout acting, preserve current worker progress, resolve decisions explicitly, batch independent commands with game.act_batch, play this turn, save concise notes, then commit game.end_turn."
+      : "Begin with game.observe, weigh the balance of power against your rivals, inspect terrain before settling/building, keep every settler and scout acting, preserve current worker progress, resolve decisions explicitly, batch independent commands with game.act_batch, play this turn, save concise notes, then commit game.end_turn.",
   ];
   return lines.filter(Boolean).join("\n\n");
 }

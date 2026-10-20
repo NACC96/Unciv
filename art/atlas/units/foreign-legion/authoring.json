@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "unitName": "Foreign Legion",
+  "assetId": "foreign-legion",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": "Foreign Legion",
+  "uniqueTo": "France",
+  "replaces": "Great War Infantry",
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Foreign Legion",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/foreign-legion/e-motion-v1.png",
+      "rawHash": "9ae07a783668cd5cf3b7ce598f003b2e59bd7bf0e6dc976c2f4697464b8219a5",
+      "promptPath": "art/atlas/units/foreign-legion/prompts/e-v1.txt",
+      "promptHash": "ac04326366a2bacf7cbab228fc2b8dbc8bb85370403265356fa836232eb3e2a5",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/foreign-legion/ne-motion-v1.png",
+      "rawHash": "64c345bc8f25198e5dd407763dca31d228e95c49ef661c4d889869d2d5784fa0",
+      "promptPath": "art/atlas/units/foreign-legion/prompts/ne-v1.txt",
+      "promptHash": "ae147baa2d79b911113343dce59b4182294dac4bdd178b169ad1af3964eb9431",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-industrial/raw/foreign-legion/se-motion-v1.png",
+      "rawHash": "691981afed889e90815e83211ce06a95c9d6d05389c468df2a9d46e640bde702",
+      "promptPath": "art/atlas/units/foreign-legion/prompts/se-v1.txt",
+      "promptHash": "bb2b402645a10f285228bc425f656de950de6c2122007a150ea89925dbeae4a8",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
+}

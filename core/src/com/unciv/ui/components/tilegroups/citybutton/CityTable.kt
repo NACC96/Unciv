@@ -1,15 +1,20 @@
 package com.unciv.ui.components.tilegroups.citybutton
 
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.scenes.scene2d.Touchable
+import com.badlogic.gdx.scenes.scene2d.ui.Cell
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Table
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable
 import com.badlogic.gdx.utils.Align
 import com.unciv.GUI
 import com.unciv.logic.civilization.NotificationIcon
 import com.unciv.models.ruleset.INonPerpetualConstruction
 import com.unciv.models.ruleset.PerpetualConstruction
 import com.unciv.models.translations.tr
+import com.unciv.ui.components.GameUiStyle
+import com.unciv.ui.components.UncivTooltip.Companion.addTooltip
 import com.unciv.ui.components.extensions.darken
 import com.unciv.ui.components.extensions.surroundWithCircle
 import com.unciv.ui.components.extensions.surroundWithThinCircle
@@ -27,6 +32,8 @@ import com.unciv.view.CityView
 /**
  *  This is the main "button" inside [CityButton], the one with a rounded edge look,
  *  excluding the air units / defence badges above and influence / status indicators below.
+ *  On the Atlas skin the map variant is a compact one-row pill (see [addBanner]); the popup
+ *  variant ([forPopup]) and other skins keep the full plaque.
  *
  *  It's the only touchable component of `CityButton`.
  *
@@ -49,9 +56,18 @@ internal class CityTable(
     defaultBgShape = BaseScreen.skinStrings.roundedEdgeRectangleMidShape,
     defaultBgBorder = BaseScreen.skinStrings.roundedEdgeRectangleMidBorderShape
 ) {
+    /** Atlas map banner: one compact pill. The popup and other skins keep the full plaque. */
+    private val compact = GameUiStyle.isAtlas && !forPopup
+    private var bannerFill: Drawable? = null
+    private var bannerRim: Drawable? = null
+
     init {
         isTransform = false
         touchable = Touchable.enabled
+        if (compact) addBanner(city) else addPlaque(city, forPopup)
+    }
+
+    private fun addPlaque(city: CityView, forPopup: Boolean) {
         pad(0f, 4f, 0f, 4f) // outer pad left and right
 
         val selectedCiv = GUI.getSelectedPlayer()
@@ -97,6 +113,142 @@ internal class CityTable(
 
         if (!city.belongsTo(viewingCiv))
             addCivIcon(city)
+    }
+
+    /**
+     *  One row, [BANNER_HEIGHT] tall: pop · capital · name · religion · construction + turns · nation disc.
+     *  Growth and production are thin bars along the bottom inner edge.
+     */
+    private fun addBanner(city: CityView) {
+        val selectedCiv = GUI.getSelectedPlayer()
+        val viewingCiv = city.getViewingCiv()
+        val isOwn = city.belongsTo(selectedCiv)
+        val isAtWar = !isOwn && city.isAtWarWith(selectedCiv)
+        // A 2-unit rim marks own and hostile cities; neutral rims stay a quiet hairline.
+        borderOnTop = isOwn
+        borderSize = if (isOwn || isAtWar) 2f else 1f
+        bgBorderColor = when {
+            isOwn -> WorldScreenStyle.ownership
+            isAtWar -> WorldScreenStyle.error
+            else -> WorldScreenStyle.muted.cpy().apply { a = 0.4f }
+        }
+        bgColor = WorldScreenStyle.surface.cpy().apply { a = 0.88f }
+        bannerFill = WorldScreenStyle.pill("WorldScreen/CityButton/Banner", bgColor)
+        bannerRim = WorldScreenStyle.pill("WorldScreen/CityButton/BannerRim", Color.CLEAR, bgBorderColor)
+        pad(0f, 8f, 0f, 4f)
+
+        val ink = WorldScreenStyle.ink
+        if (isAtWar)
+            add(ImageGetter.getImage(NotificationIcon.War).apply { color = WorldScreenStyle.error })
+                .size(12f).padRight(4f)
+
+        val popCell = add(city.getPopulationCount().tr().toLabel(ink, 14, Align.center))
+            .minWidth(10f).height(BANNER_HEIGHT)
+
+        if (city.isCapital()) {
+            val capitalIcon = if (city.isCityState()) ImageGetter.getNationIcon("CityState").apply { color = ink }
+                else ImageGetter.getImage("OtherIcons/Capital")
+            add(capitalIcon).size(12f).padLeft(4f)
+        }
+
+        val cityName = city.name.toLabel(fontColor = ink, fontSize = 15, hideIcons = true)
+        val nameWidth = cityName.prefWidth.coerceAtMost(BANNER_NAME_WIDTH)
+        if (cityName.prefWidth > nameWidth) {
+            cityName.clampToLines(nameWidth, 1)
+            addTooltip(city.name, 20f, hideIcons = true)
+        }
+        var textEnd: Cell<*> = add(cityName).width(nameWidth).padTopDescent().padLeft(4f).padRight(2f)
+
+        val cityReligion = city.getMajorityReligion()
+        if (cityReligion != null) {
+            val religionImage = ImageGetter.getReligionIcon(cityReligion.getIconName())
+                .apply { color = ink }.toGroup(14f)
+            textEnd = add(religionImage).size(14f).padLeft(4f)
+        }
+
+        val isShowDetailedInfo = DebugUtils.VISIBLE_MAP || isOwn || viewingCiv.isSpectator()
+        val constructionCell = if (isShowDetailedInfo) addBannerConstruction(city) else null
+
+        if (!city.belongsTo(viewingCiv)) {
+            val icon = if (city.isMajorCiv()) ImageGetter.getNationIcon(city.getNationName())
+                else ImageGetter.getImage("CityStateIcons/" + city.getCityStateTypeName())
+            icon.color = city.getCivInnerColor().cpy()
+            val disc = icon.surroundWithCircle(16f, color = city.getNationOuterColor().cpy())
+                .surroundWithThinCircle(WorldScreenStyle.muted)
+            add(disc).padLeft(6f)
+        } else padRight(10f)
+
+        pack()
+        if (!isShowDetailedInfo) return
+        bannerBar(popCell.actorX - 2f, textEnd.actorX + textEnd.actorWidth, growthProgress(city))
+        if (constructionCell != null)
+            bannerBar(constructionCell.actorX, constructionCell.actorX + constructionCell.actorWidth, constructionProgress(city))
+    }
+
+    private fun addBannerConstruction(city: CityView): Cell<Table> {
+        val constructions = city.constructions
+        val current = constructions.getCurrentConstruction()
+        val group = Table()
+        if (constructions.currentConstructionName().isNotEmpty())
+            group.add(ImageGetter.getConstructionPortrait(current.name, 16f)).size(16f)
+        group.add(constructionProgress(city).turns.toLabel(WorldScreenStyle.muted, 11)).padLeft(2f).bottom()
+        return add(group).padLeft(6f)
+    }
+
+    /** A 2-unit progress bar along the bottom inner edge, clear of the rounded ends. */
+    private fun bannerBar(from: Float, to: Float, progress: BannerProgress) {
+        val inset = 6f
+        val left = from.coerceAtLeast(inset)
+        val right = to.coerceAtMost(width - inset)
+        if (right - left < 4f) return
+        val bar = ImageGetter.ProgressBar(right - left, 2f, false)
+            .setBackground(ImageGetter.CHARCOAL.cpy().apply { a = 0.7f })
+            .setProgress(progress.color, progress.percentage)
+        if (progress.nextTurnPercentage > progress.percentage)
+            bar.setSemiProgress(progress.color.cpy().darken(0.4f), progress.nextTurnPercentage)
+        bar.touchable = Touchable.disabled
+        bar.setPosition(left, 2f) // just inside the rim, below text descenders
+        addActor(bar)
+    }
+
+    private class BannerProgress(val color: Color, val percentage: Float, val nextTurnPercentage: Float, val turns: String)
+
+    private fun growthProgress(city: CityView): BannerProgress {
+        fun percentage(food: Int) = (food.toFloat() / city.getFoodToNextPopulation()).coerceIn(0f, 1f)
+        return when {
+            city.isStarving() -> BannerProgress(Color.RED, 1f, 1f, "")
+            city.isGrowing() -> BannerProgress(CityButton.ColorGrowth, percentage(city.getFoodStored()),
+                percentage(city.foodForNextTurn() + city.getFoodStored()), "")
+            else -> BannerProgress(CityButton.ColorGrowth, percentage(city.getFoodStored()), 0f, "")
+        }
+    }
+
+    private fun constructionProgress(city: CityView): BannerProgress {
+        val constructions = city.constructions
+        return when (val current = constructions.getCurrentConstruction()) {
+            PerpetualConstruction.Idle -> BannerProgress(CityButton.ColorConstruction, 0f, 0f, "-")
+            is PerpetualConstruction -> BannerProgress(CityButton.ColorConstruction, 0f, 0f, Fonts.infinity.toString())
+            else -> {
+                current as INonPerpetualConstruction
+                val turns = constructions.turnsToConstruction(current.name)
+                val workDone = constructions.getWorkDone(current.name).toFloat()
+                val cost = city.getConstructionProductionCost(current)
+                fun percentage(done: Float) = (done / cost).coerceIn(0f, 1f)
+                BannerProgress(CityButton.ColorConstruction, percentage(workDone),
+                    percentage(workDone + city.getCurrentCityStats().production),
+                    if (turns < 100) turns.tr() else "-")
+            }
+        }
+    }
+
+    override fun drawBackground(batch: Batch, parentAlpha: Float, x: Float, y: Float) {
+        val fill = bannerFill ?: return super.drawBackground(batch, parentAlpha, x, y)
+        batch.setColor(color.r, color.g, color.b, color.a * parentAlpha)
+        fill.draw(batch, x, y, width, height)
+        val rim = bannerRim ?: return
+        rim.draw(batch, x, y, width, height)
+        // The generated ring is a hairline; a second, inset pass makes the 2-unit rim.
+        if (borderSize >= 2f) rim.draw(batch, x + .8f, y + .8f, width - 1.6f, height - 1.6f)
     }
 
     private fun addCityPopNumber(city: CityView) {
@@ -241,6 +393,8 @@ internal class CityTable(
     companion object {
         private const val MAX_NAME_WIDTH = 220f
         private const val MAX_NAME_LINES = 2
+        private const val BANNER_HEIGHT = 24f
+        private const val BANNER_NAME_WIDTH = 150f
     }
 }
 
@@ -267,3 +421,13 @@ internal fun Label.clampToLines(maxWidth: Float, maxLines: Int) {
     val wordEnd = full.take(low).lastIndexOf(' ')
     setText(truncated(if (wordEnd > low * 0.8f) wordEnd else low))
 }
+
+/** Atlas map chips draw a rounded pill instead of [BorderedTable]'s plaque shapes. */
+internal fun Table.drawChip(chip: Drawable, batch: Batch, parentAlpha: Float, x: Float, y: Float) {
+    batch.setColor(color.r, color.g, color.b, color.a * parentAlpha)
+    chip.draw(batch, x, y, width, height)
+}
+
+/** A small Atlas chip fill on busy terrain, with an optional hairline [rim]. */
+internal fun cityChip(path: String, rim: Color? = null): Drawable =
+    WorldScreenStyle.pill(path, WorldScreenStyle.surface.cpy().apply { a = 0.92f }, rim)

@@ -21,6 +21,7 @@ import com.unciv.ui.components.input.onActivation
 import com.unciv.ui.components.input.onClick
 import com.unciv.ui.components.widgets.AutoScrollPane
 import com.unciv.ui.components.widgets.ExpanderTab
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.UncivTooltip.Companion.addTooltip
 import com.unciv.ui.images.ImageGetter
 import com.unciv.ui.screens.basescreen.BaseScreen
@@ -36,6 +37,7 @@ class CityStatsTable(private val cityScreen: CityScreen) : Table() {
     private val lowerTable = Table() // table that will be in the ScrollPane
     private val lowerPane = AutoScrollPane(lowerTable)
     private var lowerCell: Cell<AutoScrollPane>? = null
+    private var hasContent = false
 
     private val detailedStatsButton = "Stats".toTextButton().apply {
         labelCell.pad(10f)
@@ -81,10 +83,24 @@ class CityStatsTable(private val cityScreen: CityScreen) : Table() {
         lowerPane.setScrollingDisabled(x = true, y = false)
         lowerTable.defaults().space(4f)
 
-        add(expander).growX()
+        if (GameUiStyle.isAtlas) {
+            background = null
+            add(lowerPane).grow().minSize(0f, 0f)
+        } else add(expander).growX()
+    }
+
+    internal fun rememberDisplayState() {
+        if (hasContent) cityScreen.displayState.cityScroll = lowerPane.scrollY
+    }
+
+    internal fun restoreDisplayState() {
+        lowerPane.layout()
+        lowerPane.scrollY = cityScreen.displayState.cityScroll
+        lowerPane.updateVisualScroll()
     }
 
     fun update(height: Float) {
+        rememberDisplayState()
         miniStatsTable.update()
 
         lowerTable.clear()
@@ -103,6 +119,16 @@ class CityStatsTable(private val cityScreen: CityScreen) : Table() {
 
         addBuildingsInfo()
 
+        if (GameUiStyle.isAtlas) {
+            GameUiStyle.applyWidget(lowerTable)
+            lowerTable.width = cityScreen.atlasContentWidth
+            lowerTable.invalidateHierarchy()
+            lowerPane.layout()
+            lowerPane.scrollY = cityScreen.displayState.cityScroll
+            lowerPane.updateVisualScroll()
+            hasContent = true
+            return
+        }
         lowerTable.pack()
         lowerPane.layout()
         lowerPane.updateVisualScroll()
@@ -113,6 +139,7 @@ class CityStatsTable(private val cityScreen: CityScreen) : Table() {
     }
 
     private fun onContentResize() {
+        if (GameUiStyle.isAtlas) { invalidateHierarchy(); return }
         pack()
         setPosition(
             stage.width - CityScreen.posFromEdge,
@@ -125,8 +152,9 @@ class CityStatsTable(private val cityScreen: CityScreen) : Table() {
         val unassignedPopString = "{Unassigned population}: ".tr() +
                 cityView.getFreePopulation().tr() + "/" + cityView.getPopulationCount().tr()
         val unassignedPopLabel = unassignedPopString.toLabel()
-        if (cityScreen.canChangeState)
-            unassignedPopLabel.onClick { 
+        if (cityScreen.canCityBeChanged())
+            unassignedPopLabel.onClick {
+                if (!cityScreen.canCityBeChanged()) return@onClick
                 cityView.tryReassignPopulation()
                 cityScreen.updateAsync()
             }
@@ -153,9 +181,12 @@ class CityStatsTable(private val cityScreen: CityScreen) : Table() {
                 }.tr()
         turnsToPopString += " (${cityView.getFoodStored()}${Fonts.food}/${cityView.getFoodToNextPopulation()}${Fonts.food})"
 
-        lowerTable.add(unassignedPopLabel).row()
-        lowerTable.add(turnsToExpansionString.toLabel()).row()
-        lowerTable.add(turnsToPopString.toLabel()).row()
+        for (label in listOf(unassignedPopLabel, turnsToExpansionString.toLabel(), turnsToPopString.toLabel())) {
+            if (GameUiStyle.isAtlas) {
+                label.wrap = true
+                lowerTable.add(label).width(cityScreen.atlasContentWidth - 16f).growX().row()
+            } else lowerTable.add(label).row()
+        }
 
         val tableWithIcons = Table() // Each row has a SINGLE actor
         tableWithIcons.defaults().pad(2f)
@@ -296,7 +327,10 @@ class CityStatsTable(private val cityScreen: CityScreen) : Table() {
         val isFree = cityScreen.hasFreeBuilding(building)
         val displayName = if (isFree) "{${building.name}} ({Free})" else building.name
 
-        info.add(displayName.toLabel(fontSize = Constants.defaultFontSize, hideIcons = true)).padBottom(5f).right().row()
+        val name = displayName.toLabel(fontSize = if (GameUiStyle.isAtlas) GameUiStyle.Type.body else Constants.defaultFontSize, hideIcons = true)
+        name.wrap = GameUiStyle.isAtlas
+        info.add(name).apply { if (GameUiStyle.isAtlas) width(cityScreen.atlasContentWidth - 80f) }
+            .padBottom(5f).right().row()
 
         val stats = cityView.getBuildingStats(building).joinToString(separator = " ") {
             "" + it.value.toInt() + it.key.character
@@ -380,7 +414,7 @@ class CityStatsTable(private val cityScreen: CityScreen) : Table() {
 
             val percent = gppCurrent / gppNeeded.toFloat()
 
-            val progressBar = ImageGetter.ProgressBar(300f, 25f, false)
+            val progressBar = ImageGetter.ProgressBar(if (GameUiStyle.isAtlas) (cityScreen.atlasContentWidth - 76f).coerceAtLeast(80f) else 300f, 25f, false)
             progressBar.setBackground(ImageGetter.CHARCOAL.cpy().apply { a = 0.8f })
             progressBar.setProgress(Color.ORANGE, percent)
             progressBar.apply {
@@ -434,6 +468,7 @@ class CityStatsTable(private val cityScreen: CityScreen) : Table() {
                 }
                 if (cityScreen.canCityBeChanged()) {
                     icon.onActivation(binding = toggledFocus.binding) {
+                        if (!cityScreen.canCityBeChanged()) return@onActivation
                         cityView.trySetCityFocus(toggledFocus)
                         cityScreen.updateAsync()
                     }

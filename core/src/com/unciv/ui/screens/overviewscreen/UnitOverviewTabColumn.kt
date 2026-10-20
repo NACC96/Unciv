@@ -3,6 +3,7 @@ package com.unciv.ui.screens.overviewscreen
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.utils.Align
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.models.translations.tr
 import com.unciv.ui.components.ISortableGridContentProvider
 import com.unciv.ui.components.ISortableGridContentProvider.Companion.toCenteredLabel
@@ -38,6 +39,11 @@ enum class UnitOverviewTabColumn(
                 UnitIconGroup(item, 20f).apply { if (!item.isIdle()) color.a = 0.5f },
                 fontColor = if (item.isIdle()) Color.WHITE else Color.LIGHT_GRAY
             )
+            if (GameUiStyle.isAtlas) {
+                GameUiStyle.apply(button)
+                button.label.wrap = true
+                button.labelCell.minWidth(0f).prefWidth(180f).maxWidth(260f)
+            }
             button.name = "unit-${item.id}"  // Marker to find a unit in select()
             button.onClick {
                 showWorldScreenAt(item)

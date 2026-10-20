@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "unitName": "Privateer",
+  "assetId": "privateer",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": null,
+  "uniqueTo": null,
+  "replaces": null,
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Privateer",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/privateer/e-motion-v2.png",
+      "rawHash": "c521ad3c29f14876c851998fdf826f0e8c58f7334b3b9ab2441150011cc409af",
+      "promptPath": "art/atlas/units/privateer/prompts/e-v2.txt",
+      "promptHash": "5a7fb901f93f4d99fa1e0e4f3a6cd2141d9fcf60c80e42943eaf7823ca35c1d9",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/privateer/ne-motion-v2.png",
+      "rawHash": "29d77234c7638f107873282aeb1db2167e796a234575b3f0f9e3498f1e1db886",
+      "promptPath": "art/atlas/units/privateer/prompts/ne-v2.txt",
+      "promptHash": "2dbd70c75303fe2c8c7efee1e19818f02f8514648564b924b094a7610c950e9c",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/privateer/se-motion-v2.png",
+      "rawHash": "96161e82ee22292a35f5a3c21e01d6ccf73455ae71356416c29727a1e92b2743",
+      "promptPath": "art/atlas/units/privateer/prompts/se-v2.txt",
+      "promptHash": "f2cd5ee46c69b832122b9826e0d3396c35394e21be81d5ec310ffb6c8294271d",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
+}

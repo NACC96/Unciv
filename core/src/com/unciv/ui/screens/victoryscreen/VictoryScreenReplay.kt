@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Timer
 import com.unciv.models.UncivSound
 import com.unciv.models.translations.tr
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.YearTextUtil
 import com.unciv.ui.components.extensions.setSize
 import com.unciv.ui.components.extensions.toLabel
@@ -73,6 +74,14 @@ class VictoryScreenReplay(
         header.add(yearLabel).minWidth(80f).right()
         header.add(slider).width(sliderWidth)
         header.add(playPauseButton).minWidth(80f)
+        if (GameUiStyle.isAtlas) {
+            header.background = GameUiStyle.panelBackground("Atlas/Victory/ReplayControls", 1f)
+            header.pad(12f)
+            playPauseButton.setBackground(GameUiStyle.background("Atlas/Victory/ReplayAction", GameUiStyle.raised))
+            playPauseButton.setSize(40f, 40f)
+            header.getCell(playPauseButton).minHeight(40f)
+            GameUiStyle.applyWidget(header)
+        }
 
         add(replayMap).pad(10f)
     }

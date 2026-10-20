@@ -1,0 +1,103 @@
+{
+  "schemaVersion": 1,
+  "unitName": "Stealth Bomber",
+  "assetId": "stealth-bomber",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": null,
+  "uniqueTo": null,
+  "replaces": null,
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Stealth Bomber",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/stealth-bomber/e-motion-v2.png",
+      "rawHash": "d162b1fe09ea2ea591a5d6826de3b9eaa4f29b2eac42e5eb334bf6d05f42652b",
+      "promptPath": "art/atlas/units/stealth-bomber/prompts/e-v2.txt",
+      "promptHash": "683d2da99ff713ebc962503be217820f5b3a7eba64acada4b17b571c7522646b",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/stealth-bomber/ne-motion-v2.png",
+      "rawHash": "37175f0de2443787d81fbc0db123f367002776eb961d2064169ed145e13260aa",
+      "promptPath": "art/atlas/units/stealth-bomber/prompts/ne-v2.txt",
+      "promptHash": "d2e4ab4ca574080f39d7010c22eb12d5e44e0fcb819d144c3f870bcab863b03f",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ],
+      "identityReference": {
+        "path": "/Users/noahkenny/.codex/generated_images/01a1321a-8142-7533-ae7a-eb89a5433c70/exec-f90f166d-2860-4a6b-bf02-4f5c60ab14d6.png",
+        "sha256": "d162b1fe09ea2ea591a5d6826de3b9eaa4f29b2eac42e5eb334bf6d05f42652b"
+      }
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/stealth-bomber/se-motion-v2.png",
+      "rawHash": "9fa52da57e9d29ace55aff14e90d72612fabb5b1605cde16ee36ffeb5903b9f0",
+      "promptPath": "art/atlas/units/stealth-bomber/prompts/se-v2.txt",
+      "promptHash": "cfa541467e8bc9327cc7c9226d1214654963b2b054aad9549e6e0f9af76e1d89",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ],
+      "identityReference": {
+        "path": "/Users/noahkenny/.codex/generated_images/01a1321a-8142-7533-ae7a-eb89a5433c70/exec-f90f166d-2860-4a6b-bf02-4f5c60ab14d6.png",
+        "sha256": "d162b1fe09ea2ea591a5d6826de3b9eaa4f29b2eac42e5eb334bf6d05f42652b"
+      }
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
+}

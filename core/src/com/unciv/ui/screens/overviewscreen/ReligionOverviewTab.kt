@@ -5,6 +5,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Button
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.utils.Align
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.Constants
 import com.unciv.models.Religion
 import com.unciv.models.ruleset.Belief
@@ -62,7 +63,13 @@ class ReligionOverviewTab(
         beliefsTable.defaults().padBottom(20f)
         loadReligion(persistableData.selectedReligion)
         add(statsTable).row()
-        add(beliefsTable).pad(20f)
+        add(beliefsTable).pad(if (GameUiStyle.isAtlas) GameUiStyle.Space.m else 20f).minWidth(0f)
+        if (GameUiStyle.isAtlas) {
+            AtlasEmpireUi.panel(statsTable, "ReligionStatistics")
+            AtlasEmpireUi.panel(headerTable, "ReligionSelection")
+            religionButtonLabel.wrap = true
+            applyAtlasPresentation()
+        }
     }
 
     private fun Table.addCivSpecificStats() {
@@ -143,7 +150,7 @@ class ReligionOverviewTab(
         beliefsTable.clear()
         religionButtonLabel.setText(religion.getReligionDisplayName().tr())
         religionButtonLabel.setFontSize(Constants.headingFontSize)
-        religionButtonLabel.color = Color.CORAL
+        religionButtonLabel.color = if (GameUiStyle.isAtlas) GameUiStyle.accent else Color.CORAL
 
         for (belief in religion.getAllBeliefsOrdered()) {
             beliefsTable.add(createBeliefDescription(belief)).row()
@@ -174,8 +181,14 @@ class ReligionOverviewTab(
         statsTable.add("Followers of this religion:".toLabel())
         statsTable.add(manager.numberOfFollowersFollowingThisReligion("in all cities").toLabel()).right().row()
 
-        val minWidth = max(statsTable.minWidth, beliefsTable.minWidth) + 5
+        val minWidth = if (GameUiStyle.isAtlas) (overviewScreen.stage.width - 40f).coerceAtMost(800f)
+            else max(statsTable.minWidth, beliefsTable.minWidth) + 5
 
+        if (GameUiStyle.isAtlas) {
+            AtlasEmpireUi.panel(statsTable, "ReligionStatistics")
+            AtlasEmpireUi.prepare(beliefsTable)
+            applyAtlasPresentation()
+        }
         statsTable.width = minWidth
         for (cell in beliefsTable.cells) {
             cell.minWidth(minWidth)
@@ -191,11 +204,13 @@ class ReligionOverviewTab(
 
     private fun createBeliefDescription(belief: Belief) =
         MarkupRenderer.render(
-            belief.getCivilopediaTextLines(withHeader = true)
+            belief.getCivilopediaTextLines(withHeader = true),
+            labelWidth = if (GameUiStyle.isAtlas) (overviewScreen.stage.width - 72f).coerceAtMost(760f) else 0f
         ) {
             overviewScreen.openCivilopedia(it)
         }.apply {
-            background = BaseScreen.skinStrings.getUiBackground(
+            if (GameUiStyle.isAtlas) AtlasEmpireUi.panel(this, "Belief")
+            else background = BaseScreen.skinStrings.getUiBackground(
                 "OverviewScreen/ReligionOverviewTab/BeliefDescription",
                 tintColor = BaseScreen.skinStrings.skinConfig.baseColor
             )

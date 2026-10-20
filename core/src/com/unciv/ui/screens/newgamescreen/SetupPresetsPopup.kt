@@ -19,7 +19,8 @@ class SetupPresetsPopup(private val screen: NewGameScreen) : Popup(screen, Scrol
     private val contentWidth = minOf(480f, stageToShowOn.width * 0.85f - 56f).coerceAtLeast(120f)
 
     init {
-        innerTable.background = GameUiStyle.background("NewGameScreen/SetupPresetsPopup")
+        innerTable.background = if (GameUiStyle.isAtlas) GameUiStyle.panelBackground("Atlas/Setup/Presets", 1f)
+            else GameUiStyle.background("NewGameScreen/SetupPresetsPopup")
         addGoodSizedLabel("Setup presets", 22, color = GameUiStyle.ink).width(contentWidth).row()
         addGoodSizedLabel("Save the nations, agent profiles, starting bonuses, map and game options. Saving an existing name updates that preset.", 14, color = GameUiStyle.muted).width(contentWidth).row()
         add(names).width(contentWidth).padTop(12f).row()

@@ -15,7 +15,8 @@ const val AGENT_OBSERVATION_VERSION = 2
 const val AGENT_READ_BYTE_BUDGET = 96 * 1024
 
 enum class MapQueryMode { KNOWN, VISIBLE }
-enum class TileKnowledgeVisibility { VISIBLE, REMEMBERED }
+/** REVEALED: current tile facts under [MatchVision.MAP], outside real sight, so units there stay unseen. */
+enum class TileKnowledgeVisibility { VISIBLE, REMEMBERED, REVEALED }
 enum class ResourceKnowledgeSource { SIGHTING, TECHNOLOGY }
 enum class TileYieldContext { ACTOR_CITY, ACTOR_GENERAL }
 
@@ -106,10 +107,18 @@ class MapPage(
 
 class MapSummary(
     var observationVersion: Int = AGENT_OBSERVATION_VERSION, var coordinateSystem: String = "UNCIV_HEX",
-    var knownTileCount: Int = 0, var visibleTileCount: Int = 0, var worldWrap: Boolean = false
+    var knownTileCount: Int = 0, var visibleTileCount: Int = 0, var worldWrap: Boolean = false,
+    var vision: MatchVision = MatchVision.FOG,
+    /** World-wrap maps only: the longitudinal wrap radius ([com.unciv.logic.map.TileMap.maxLongitude]) that
+     *  HexMath.getUnwrappedNearestTo uses to unwrap coordinates across the seam; null otherwise. */
+    var maxLongitude: Int? = null
 )
 
 fun normalViewableTiles(civ: Civilization): Set<Tile> = civ.cache.normalViewableTiles()
+
+/** Tiles observed live with their units: real sight, or the whole map under [MatchVision.FULL]. */
+internal fun observedSight(game: GameInfo, match: AgentMatchState, civ: Civilization): Set<Tile> =
+    if (match.vision == MatchVision.FULL) game.tileMap.values.toSet() else normalViewableTiles(civ)
 
 /** Caller establishes normal sight. Hidden resources are removed even from yield filter contexts. */
 internal fun exportVisibleTile(game: GameInfo, civ: Civilization, tile: Tile, revision: Int): ObservedTile {
@@ -141,12 +150,14 @@ internal fun exportVisibleTile(game: GameInfo, civ: Civilization, tile: Tile, re
 
 fun buildMapSummary(game: GameInfo, match: AgentMatchState, actorCivId: String): MapSummary {
     val civ = game.getCivilizationOrNull(actorCivId) ?: invalidMap("Unknown civilization")
-    val visible = normalViewableTiles(civ)
+    val visible = observedSight(game, match, civ)
     return MapSummary(knownTileCount = permittedPositions(game, match, civ, visible).size,
-        visibleTileCount = visible.size, worldWrap = game.tileMap.mapParameters.worldWrap)
+        visibleTileCount = visible.size, worldWrap = game.tileMap.mapParameters.worldWrap, vision = match.vision,
+        maxLongitude = game.tileMap.maxLongitude.takeIf { game.tileMap.mapParameters.worldWrap })
 }
 
 internal fun permittedPositions(game: GameInfo, match: AgentMatchState, civ: Civilization, visible: Set<Tile>): Set<HexCoord> {
+    if (match.vision != MatchVision.FOG) return game.tileMap.values.mapTo(HashSet()) { it.position }
     val positions = HashSet<HexCoord>()
     positions.addAll(visible.map { it.position })
     positions.addAll(game.tileMap.values.asSequence().filter { it.isExploredNormally(civ) }.map { it.position })
@@ -158,26 +169,26 @@ private fun invalidMap(message: String): Nothing = throw AgentCommandException(A
 private fun digest(text: String) = MessageDigest.getInstance("SHA-256").digest(text.toByteArray(Charsets.UTF_8))
     .joinToString("") { "%02x".format(it) }
 
-/** Stable canonical ordering; cursor binds actor, timeline, revision and every query argument. */
+/** Stable canonical ordering; cursor binds actor, timeline, revision, vision and every query argument. */
 fun buildMapPage(game: GameInfo, match: AgentMatchState, actorCivId: String, query: MapQuery): MapPage {
     if (query.limit !in 1..128 || query.radius?.let { it !in 0..8 } == true)
         invalidMap("Map limit must be 1..128 and radius 0..8")
     if ((query.center == null) != (query.radius == null)) invalidMap("center and radius must be supplied together")
     val civ = game.getCivilizationOrNull(actorCivId) ?: invalidMap("Unknown civilization")
     val binding = digest(AgentJson.stringify(listOf(match.matchId, match.timelineId, actorCivId,
-        query.mode.name, query.center?.x, query.center?.y, query.radius, query.limit)))
+        match.vision.name, query.mode.name, query.center?.x, query.center?.y, query.radius, query.limit)))
     var start = 0
     query.cursor?.let { cursor ->
         if (cursor.length > 512) invalidMap("Invalid map cursor")
         val parts = try { String(Base64.getUrlDecoder().decode(cursor), Charsets.UTF_8).split(':') }
             catch (ex: IllegalArgumentException) { invalidMap("Invalid map cursor") }
-        if (parts.size != 3 || parts[0] != binding) invalidMap("Cursor does not belong to this actor, timeline or query")
+        if (parts.size != 3 || parts[0] != binding) invalidMap("Cursor does not belong to this actor, timeline, vision or query; start a new map query")
         val revision = parts[1].toIntOrNull() ?: invalidMap("Invalid map cursor")
         if (revision != match.stateRevision) throw AgentCommandException(AgentCommandError.STALE_STATE,
             "Map cursor revision is stale", match.stateRevision)
         start = parts[2].toIntOrNull()?.takeIf { it >= 0 } ?: invalidMap("Invalid map cursor")
     }
-    val visible = normalViewableTiles(civ)
+    val visible = observedSight(game, match, civ)
     val positions = if (query.mode == MapQueryMode.VISIBLE) visible.map { it.position }.toSet()
         else permittedPositions(game, match, civ, visible)
     val center = query.center?.let { position ->

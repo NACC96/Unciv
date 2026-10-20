@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "unitName": "Chariot Archer",
+  "assetId": "chariot-archer",
+  "reviewState": "candidate",
+  "canvasWidth": 128,
+  "canvasHeight": 128,
+  "anchorX": 64,
+  "anchorY": 96,
+  "clippingMargin": 2,
+  "uniqueUnitIdentity": null,
+  "uniqueTo": null,
+  "replaces": null,
+  "staticFallbackKey": "TileSets/AtlasUnits/Units/Chariot Archer",
+  "framesDirectory": "frames/",
+  "applicableStates": [
+    "IDLE",
+    "MOVE",
+    "ATTACK",
+    "HIT",
+    "DEFEAT"
+  ],
+  "facings": [
+    "E",
+    "NE",
+    "NW",
+    "W",
+    "SW",
+    "SE"
+  ],
+  "minimumFrames": {
+    "IDLE": 4,
+    "MOVE": 8,
+    "ATTACK": 8,
+    "HIT": 4,
+    "DEFEAT": 8
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/chariot-archer/e-motion-v1.png",
+      "rawHash": "941fe9479abdeb4a0b18b398f6655b0d5b0461d4fcd43bba0a2ac6e1658b9991",
+      "promptPath": "art/atlas/units/chariot-archer/prompts/e-v1.txt",
+      "promptHash": "c52d3dbf94202118f7e0398b076644fddc8cf227734eda9a8dd3c9be2ab691d6",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/chariot-archer/ne-motion-v1.png",
+      "rawHash": "3160f1abfe2616230831999e464c5a2c2d7138824364bb222d21a96b2bf1444b",
+      "promptPath": "art/atlas/units/chariot-archer/prompts/ne-v1.txt",
+      "promptHash": "f728af36ec4efae6222fd310aedb0e90a13f1cafd4a8188b39f4548a519ca4c5",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring/raw/chariot-archer/se-motion-v1.png",
+      "rawHash": "7c6529b73dd63181b4ea77de00518faff33080166e586d471681b38aa1c75244",
+      "promptPath": "art/atlas/units/chariot-archer/prompts/se-v1.txt",
+      "promptHash": "ddf5efd3c1fc132f89100aba6304250ae48f078453d72596df7ca2f973825655",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    }
+  ],
+  "maskIds": [
+    "nation"
+  ],
+  "hasShadow": true,
+  "mirroredFacings": {
+    "W": "E",
+    "NW": "NE",
+    "SW": "SE"
+  },
+  "formalArtReview": "deferred"
+}

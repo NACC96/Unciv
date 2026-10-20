@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "unitName": "SS Stasis Chamber",
+  "assetId": "ss-stasis-chamber",
+  "creator": "OpenAI image generation",
+  "tool": "image_gen.imagegen (built-in)",
+  "rights": "original-generated",
+  "styleReference": {
+    "path": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/concept/unit-art-direction-v1.png",
+    "sha256": "ceb7c639185d98cb53535f21eb0966b1bec01bb782c80de2fdd972d2858ce641",
+    "role": "approved style only"
+  },
+  "sourceGenerations": [
+    {
+      "facing": "E",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/ss-stasis-chamber/e-motion-v2.png",
+      "rawHash": "5985eba281cfef49ffd53d6f92e2a872fe871b8eae7321d934a58f096ee18d61",
+      "promptPath": "art/atlas/units/ss-stasis-chamber/prompts/e-v2.txt",
+      "promptHash": "27646f064f43be56d9c2f67b688e382cd8ea01eea1a50bd186d5247594652a3c",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "facing": "NE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/ss-stasis-chamber/ne-motion-v2.png",
+      "rawHash": "ee380c003c06622f2c6a388ba06fbd50d889c254a2628b4bb7ba5a592ae09b3b",
+      "promptPath": "art/atlas/units/ss-stasis-chamber/prompts/ne-v2.txt",
+      "promptHash": "90364fdfc67e4efb22ee8018e338530e9aec59c0bf8b40f097c1fb5948429244",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ],
+      "identityReference": {
+        "path": "/Users/noahkenny/.codex/generated_images/01a1321a-8142-7533-ae7a-eb89a5433c70/exec-d5d1f715-559b-4b8c-859e-770f677ba151.png",
+        "sha256": "5985eba281cfef49ffd53d6f92e2a872fe871b8eae7321d934a58f096ee18d61"
+      }
+    },
+    {
+      "facing": "SE",
+      "rawPath": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/raw/ss-stasis-chamber/se-motion-v2.png",
+      "rawHash": "c8e4312993703db6466fe72dc471b9acd51a3a1986a56875cb97d4586f44a703",
+      "promptPath": "art/atlas/units/ss-stasis-chamber/prompts/se-v2.txt",
+      "promptHash": "b961cff2a3961e029b1e9ef8f51e5ec1f04077bbd2f24a8465beff247bba39ef",
+      "cells": {
+        "columns": 8,
+        "rows": 4
+      },
+      "rawDimensions": [
+        1774,
+        887
+      ],
+      "identityReference": {
+        "path": "/Users/noahkenny/.codex/generated_images/01a1321a-8142-7533-ae7a-eb89a5433c70/exec-d5d1f715-559b-4b8c-859e-770f677ba151.png",
+        "sha256": "5985eba281cfef49ffd53d6f92e2a872fe871b8eae7321d934a58f096ee18d61"
+      }
+    }
+  ],
+  "processing": {
+    "script": "/Volumes/Lexar/Unciv/.superpowers/civ6-atlas/unit-authoring-naval-air/normalize_motion-v3.py",
+    "sha256": "d63316a6cedfaafcf546ecbd87f0163d3d13d0363c473cd389b2dd60c2113bf8",
+    "operations": [
+      "uniform cell cutting",
+      "constant sheet scale and root alignment",
+      "alpha-preserving resize",
+      "royal-blue nation mask extraction",
+      "violet ground-shadow extraction"
+    ],
+    "poseSynthesis": false,
+    "clonedStaticFrames": false
+  },
+  "reviewState": "candidate",
+  "formalArtReview": "deferred"
+}

@@ -1,0 +1,7 @@
+{
+  "facings": {
+    "E": {"rawFile": "e-motion-v2.png", "promptPath": "art/atlas/units/warrior/prompts/e-v2.txt"},
+    "NE": {"rawFile": "ne-motion-v2.png", "promptPath": "art/atlas/units/warrior/prompts/ne-v2.txt"},
+    "SE": {"rawFile": "se-motion-v2.png", "promptPath": "art/atlas/units/warrior/prompts/se-v2.txt"}
+  }
+}

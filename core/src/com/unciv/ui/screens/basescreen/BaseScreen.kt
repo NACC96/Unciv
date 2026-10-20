@@ -167,7 +167,8 @@ abstract class BaseScreen : Screen {
                 font = Fonts.font
                 listStyle.font = Fonts.font
             }
-            clearColor = skinStrings.skinConfig.clearColor
+            com.unciv.ui.components.GameUiStyle.initializeSkin(skin)
+            clearColor = skinStrings.skinConfig.clearColor.cpy()
         }
     }
 

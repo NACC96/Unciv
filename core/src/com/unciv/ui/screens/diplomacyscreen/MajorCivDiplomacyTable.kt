@@ -7,6 +7,7 @@ import com.unciv.logic.agents.FriendshipCommand
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.Constants
 import com.unciv.UncivGame
 import com.unciv.logic.civilization.AlertType
@@ -34,6 +35,7 @@ class MajorCivDiplomacyTable(private val diplomacyScreen: DiplomacyScreen) {
         val otherCivDiplomacyManager = otherCiv.getDiplomacyManager(viewingCiv)!!
 
         val diplomacyTable = Table()
+        var primaryAction: TextButton? = null
         diplomacyTable.defaults().pad(10f)
 
         val helloText: String
@@ -55,7 +57,8 @@ class MajorCivDiplomacyTable(private val diplomacyScreen: DiplomacyScreen) {
         val diplomacyManager = viewingCiv.getDiplomacyManager(otherCiv)!!
 
         if (!viewingCiv.isAtWarWith(otherCiv)) {
-            diplomacyTable.add(getTradeButton(otherCiv)).row()
+            primaryAction = getTradeButton(otherCiv)
+            diplomacyTable.add(primaryAction).row()
 
 
             if (!diplomacyManager.hasFlag(DiplomacyFlags.DeclarationOfFriendship))
@@ -72,14 +75,14 @@ class MajorCivDiplomacyTable(private val diplomacyScreen: DiplomacyScreen) {
             val negotiatePeaceButton =
                 getNegotiatePeaceMajorCivButton(otherCiv, otherCivDiplomacyManager)
 
+            primaryAction = negotiatePeaceButton
             diplomacyTable.add(negotiatePeaceButton).row()
         }
 
 
         val demandsButton = "Demands".toTextButton()
         demandsButton.onClick {
-            diplomacyScreen.rightSideTable.clear()
-            diplomacyScreen.rightSideTable.add(getDemandsTable(viewingCiv, otherCiv))
+            diplomacyScreen.showConversation(getDemandsTable(viewingCiv, otherCiv))
         }
         diplomacyTable.add(demandsButton).row()
         if (diplomacyScreen.isNotPlayersTurn()) demandsButton.disable()
@@ -99,7 +102,7 @@ class MajorCivDiplomacyTable(private val diplomacyScreen: DiplomacyScreen) {
         // Starting playback here assumes the MajorCivDiplomacyTable is shown immediately
         UncivGame.Current.musicController.playVoice(helloVoice)
 
-        return diplomacyTable
+        return AtlasDiplomacyLayout.panel(diplomacyTable, primaryAction, diplomacyScreen.rightSideLabelWidth())
     }
 
 
@@ -234,6 +237,7 @@ class MajorCivDiplomacyTable(private val diplomacyScreen: DiplomacyScreen) {
             val color = if (modifier.value < 0) Color.RED else Color.GREEN
             diplomacyModifiersTable.add(text.toLabel(color)).row()
         }
+        AtlasDiplomacyLayout.prepare(diplomacyModifiersTable, diplomacyScreen.rightSideLabelWidth())
         return diplomacyModifiersTable
     }
 
@@ -272,6 +276,7 @@ class MajorCivDiplomacyTable(private val diplomacyScreen: DiplomacyScreen) {
         }
 
         demandsTable.add(Constants.close.toTextButton().onClick { diplomacyScreen.updateRightSide(otherCiv) })
+        AtlasDiplomacyLayout.prepare(demandsTable, diplomacyScreen.rightSideLabelWidth())
         return demandsTable
     }
 }

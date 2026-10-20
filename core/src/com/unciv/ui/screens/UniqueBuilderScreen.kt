@@ -16,6 +16,8 @@ import com.unciv.models.ruleset.validation.UniqueValidator
 import com.unciv.models.translations.fillPlaceholders
 import com.unciv.models.translations.getPlaceholderParameters
 import com.unciv.ui.components.extensions.*
+import com.unciv.ui.components.AtlasWidgets
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.input.onChange
 import com.unciv.ui.components.input.onClick
 import com.unciv.ui.components.widgets.LanguageTable
@@ -25,10 +27,7 @@ import com.unciv.ui.popups.options.OptionsPopup
 import com.unciv.ui.screens.basescreen.BaseScreen
 import com.unciv.ui.screens.pickerscreens.PickerScreen
 
-/** A [PickerScreen] to select a language, used once on the initial run after a fresh install.
- *  After that, [OptionsPopup] provides the functionality.
- *  Reusable code is in [LanguageTable] and [addLanguageTables].
- */
+/** Composes ruleset unique strings without applying them to the running game. */
 class UniqueBuilderScreen(ruleset: Ruleset) : PickerScreen() {
 
     private val mainUniqueTable = UniqueTable(true, ruleset, stage) { updateCurrentUniqueText() }
@@ -41,6 +40,10 @@ class UniqueBuilderScreen(ruleset: Ruleset) : PickerScreen() {
         rightSideButton.setText("Copy to clipboard")
         rightSideButton.onClick { Gdx.app.clipboard.contents = currentUniqueText }
         topTable.defaults().pad(5f)
+        if (GameUiStyle.isAtlas) {
+            topTable.add(AtlasWidgets.header("Unique builder")).growX().row()
+            topTable.defaults().growX().minWidth(0f).width((stage.width - 48f).coerceAtMost(980f))
+        }
 
         mainUniqueTable.initialize()
         topTable.add(mainUniqueTable).row()
@@ -52,7 +55,18 @@ class UniqueBuilderScreen(ruleset: Ruleset) : PickerScreen() {
         addModifierButton.onClick {
             val modifierTable = UniqueTable(false, ruleset, stage){ updateCurrentUniqueText() }
             modifierTables.add(modifierTable)
-            modifierTableHolder.add(modifierTable).row()
+            val wrapper = Table()
+            wrapper.add(modifierTable).growX().minWidth(0f).row()
+            val remove = GameUiStyle.button("Remove").apply {
+                onClick {
+                    modifierTables.remove(modifierTable)
+                    wrapper.remove()
+                    modifierTableHolder.invalidateHierarchy()
+                    updateCurrentUniqueText()
+                }
+            }
+            wrapper.add(remove).right().padBottom(8f).row()
+            modifierTableHolder.add(wrapper).growX().minWidth(0f).row()
             modifierTable.initialize()
         }
         topTable.add(addModifierButton)
@@ -82,6 +96,7 @@ class UniqueTable(
     private val documentationCell: Cell<Actor?>
     private val parameterSelectBoxTable = Table().apply { defaults().pad(5f) }
     private val uniqueErrorTable = Table().apply { defaults().pad(5f) }
+    private val contentWidth = if (GameUiStyle.isAtlas) (stage.width - 88f).coerceAtMost(920f) else stage.width * .9f
 
     init {
         this.stage = stage // required for width
@@ -94,16 +109,26 @@ class UniqueTable(
 
         defaults().pad(10f)
         background = ImageGetter.getWhiteDotDrawable().tint(ImageGetter.CHARCOAL.cpy().apply { a=0.3f })
+        if (GameUiStyle.isAtlas) {
+            background = GameUiStyle.panelBackground("UniqueBuilder/Unique", 1f)
+            pad(8f)
+            defaults().growX().minWidth(0f).width(contentWidth).pad(5f)
+        }
         val uniqueTargetSelectBoxTable = Table().apply { defaults().pad(5f) }
         uniqueTargetsSelectBox = SelectBox<UniqueTarget>(BaseScreen.skin)
         uniqueTargetsSelectBox.setItems(uniqueTargets)
         uniqueTargetsSelectBox.selected = UniqueTarget.Global
-        uniqueTargetSelectBoxTable.add(uniqueTargetsSelectBox)
-
-        uniqueTargetSelectBoxTable.add(uniqueSelectBox).width(stage.width * 0.5f).row()
-        // Row 2
-        uniqueTargetSelectBoxTable.add() // shift search to below uniques selectbox
-        uniqueTargetSelectBoxTable.add(uniqueSearchTextField).center().row()
+        if (GameUiStyle.isAtlas) {
+            uniqueTargetSelectBoxTable.defaults().growX().minWidth(0f).width(contentWidth - 10f)
+            uniqueTargetSelectBoxTable.add(AtlasWidgets.field("Type", uniqueTargetsSelectBox)).row()
+            uniqueTargetSelectBoxTable.add(AtlasWidgets.field("Search", uniqueSearchTextField)).row()
+            uniqueTargetSelectBoxTable.add(uniqueSelectBox).minHeight(GameUiStyle.standardControlHeight).row()
+        } else {
+            uniqueTargetSelectBoxTable.add(uniqueTargetsSelectBox)
+            uniqueTargetSelectBoxTable.add(uniqueSelectBox).width(stage.width * 0.5f).row()
+            uniqueTargetSelectBoxTable.add()
+            uniqueTargetSelectBoxTable.add(uniqueSearchTextField).center().row()
+        }
         add(uniqueTargetSelectBoxTable).row()
 
         uniqueTargetsSelectBox.onChange {
@@ -122,14 +147,15 @@ class UniqueTable(
         uniqueTextField.onChange {
             updateUnique()
         }
-        add(uniqueTextField).width(stage.width * 0.9f).row()
+        add(uniqueTextField).width(contentWidth).minHeight(GameUiStyle.standardControlHeight).row()
 
-        documentationCell = add().width(stage.width * 0.9f).pad(0f)
+        documentationCell = add().width(contentWidth).pad(0f)
         row()
         add(parameterSelectBoxTable).row()
 
         uniqueErrorTable.defaults().pad(5f)
-        uniqueErrorTable.background = ImageGetter.getWhiteDotDrawable().tint(Color.DARK_GRAY)
+        uniqueErrorTable.background = if (GameUiStyle.isAtlas) GameUiStyle.background("UniqueBuilder/Validation", GameUiStyle.inset)
+            else ImageGetter.getWhiteDotDrawable().tint(Color.DARK_GRAY)
         add(uniqueErrorTable).row()
     }
 
@@ -157,15 +183,17 @@ class UniqueTable(
             documentationCell.setActor(null).pad(0f)
         } else {
             documentationLabel.setText(uniqueType.docDescription)
-            documentationLabel.optimizePrefWidth()
+            if (!GameUiStyle.isAtlas) documentationLabel.optimizePrefWidth()
             documentationCell.setActor(documentationLabel).pad(10f)
         }
 
         parameterSelectBoxTable.clear()
         for ((index, parameter) in uniqueType.text.getPlaceholderParameters().withIndex()) {
             val paramTable = Table().apply { defaults().pad(10f) }
-            paramTable.background = ImageGetter.getWhiteDotDrawable().tint(Color.DARK_GRAY)
-            paramTable.add("Parameter ${index+1}: $parameter".toLabel()).row()
+            paramTable.background = if (GameUiStyle.isAtlas) GameUiStyle.background("UniqueBuilder/Parameter", GameUiStyle.inset)
+                else ImageGetter.getWhiteDotDrawable().tint(Color.DARK_GRAY)
+            if (GameUiStyle.isAtlas) paramTable.defaults().growX().minWidth(0f).width(contentWidth - 36f).pad(6f)
+            paramTable.add("Parameter ${index+1}: $parameter".toLabel().apply { wrap = true }).row()
             val knownParamValues = uniqueType.parameterTypeMap[index]
                 .flatMap { it.getKnownValuesForAutocomplete(ruleset) }.toSet()
 
@@ -190,6 +218,7 @@ class UniqueTable(
             } else paramTable.add("No known values".toLabel())
 
             parameterSelectBoxTable.add(paramTable).fillY()
+            if (GameUiStyle.isAtlas) parameterSelectBoxTable.row()
         }
     }
 
@@ -200,7 +229,8 @@ class UniqueTable(
         val uniqueErrors = UniqueValidator(ruleset, tryFixUnknownUniques = true)
             .checkUnique(Unique(uniqueTextField.text), null)
         for (error in uniqueErrors)
-            uniqueErrorTable.add(error.text.toLabel().apply { wrap = true }).width(stage.width/2).row()
+            uniqueErrorTable.add(error.text.toLabel(if (GameUiStyle.isAtlas) GameUiStyle.error else Color.WHITE).apply { wrap = true })
+                .width(if (GameUiStyle.isAtlas) contentWidth - 24f else stage.width / 2).row()
         if (uniqueErrors.isEmpty())
             uniqueErrorTable.add("No errors!".toLabel())
 

@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "status": "candidate production packaging inventory; no visual acceptance",
+  "atlasKeyCount": 2678,
+  "mandatoryMapKeyCount": 2666,
+  "missingPackedMandatoryKeys": [],
+  "sourcePngCount": 2678,
+  "pages": [
+    {
+      "path": "android/assets/AtlasTerrain.png",
+      "size": [
+        2048,
+        2048
+      ],
+      "sha256": "33f750640b8d55b2760748c32b1d4c250faedc04185fd2757daf76c8be1b6846",
+      "compressedBytes": 5844849
+    },
+    {
+      "path": "android/assets/AtlasTerrain2.png",
+      "size": [
+        2048,
+        256
+      ],
+      "sha256": "e29e0b8c2c42b5f221a3317b5c783393fc2c1cc6e9a17a6e1f1d3a7e4ea0a38f",
+      "compressedBytes": 414912
+    }
+  ],
+  "atlasSha256": "457ba66aa0ca01e7a0cda27d42bbb15aa52f58c7cfb6bc24233d5ae008fe7530",
+  "settings": {
+    "maxWidth": 2048,
+    "maxHeight": 2048,
+    "filterMin": "MipMapLinearLinear",
+    "filterMag": "Linear",
+    "alias": true,
+    "stripWhitespaceX": false,
+    "stripWhitespaceY": false,
+    "rotation": false
+  },
+  "deferred": [
+    "art review",
+    "seams and bleed",
+    "contrast",
+    "three zoom levels",
+    "hidden-neighbor/render tests",
+    "wrap/culling tests",
+    "performance",
+    "native acceptance"
+  ]
+}

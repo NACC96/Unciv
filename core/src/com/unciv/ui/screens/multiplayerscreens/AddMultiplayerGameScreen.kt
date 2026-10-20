@@ -5,6 +5,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.unciv.Constants
 import com.unciv.logic.IdChecker
 import com.unciv.models.translations.tr
+import com.unciv.ui.components.GameUiStyle
 import com.unciv.ui.components.extensions.enable
 import com.unciv.ui.components.extensions.toLabel
 import com.unciv.ui.components.extensions.toTextButton
@@ -23,6 +24,8 @@ import com.unciv.utils.launchOnGLThread
 
 class AddMultiplayerGameScreen(multiplayerScreen: MultiplayerScreen) : PickerScreen() {
     init {
+        setChoiceHeader("Add multiplayer game")
+        val formWidth = if (GameUiStyle.isAtlas) minOf(520f, stage.width - 48f) else stage.width / 2f
         val gameNameTextField = UncivTextField("Game name")
         val gameIDTextField = UncivTextField("GameID")
         val pasteGameIDButton = "Paste gameID from clipboard".toTextButton()
@@ -32,12 +35,21 @@ class AddMultiplayerGameScreen(multiplayerScreen: MultiplayerScreen) : PickerScr
 
         topTable.add("GameID".toLabel()).row()
         val gameIDTable = Table()
-        gameIDTable.add(gameIDTextField).pad(10f).width(2 * stage.width / 3 - pasteGameIDButton.width)
-        gameIDTable.add(pasteGameIDButton)
+        if (GameUiStyle.isAtlas) {
+            gameIDTable.add(gameIDTextField).width(formWidth).padBottom(8f).row()
+            gameIDTable.add(pasteGameIDButton).minWidth(0f).growX().row()
+            pasteGameIDButton.label.wrap = true
+            GameUiStyle.applyWidget(gameIDTable)
+        } else {
+            gameIDTable.add(gameIDTextField).pad(10f).width(2 * stage.width / 3 - pasteGameIDButton.width)
+            gameIDTable.add(pasteGameIDButton)
+        }
         topTable.add(gameIDTable).padBottom(30f).row()
 
         topTable.add("Game name".toLabel()).row()
-        topTable.add(gameNameTextField).pad(10f).padBottom(30f).width(stage.width / 2).row()
+        topTable.add(gameNameTextField).pad(10f).padBottom(30f).width(formWidth).row()
+
+        GameUiStyle.applyWidget(topTable)
 
         //CloseButton Setup
         closeButton.setText("Back".tr())
