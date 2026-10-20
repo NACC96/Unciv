@@ -323,7 +323,7 @@ object AtlasFixtureCatalog {
                                     .filterIsInstance<com.badlogic.gdx.scenes.scene2d.ui.Table>().single()
                                     .children.filterIsInstance<com.badlogic.gdx.scenes.scene2d.ui.Button>()
                             game.settings.hudWindows["activity"] = com.unciv.models.metadata.HudWindowLayout().apply {
-                                placed = true; x = 340f; y = 150f; width = 380f; height = 520f; opacity = 0.3f
+                                placed = true; x = 340f; y = 150f; this.width = 380f; this.height = 520f; opacity = 0.3f
                             }
                             val feed = screen.stage.root.children.filterIsInstance<AgentActivityFeed>().single()
                             feed.show(); feed.refresh(); hud.layout()
