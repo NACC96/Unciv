@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.math.Interpolation
+import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Rectangle
 import com.unciv.logic.presentation.VisualPosition
@@ -927,8 +928,17 @@ class WorldMapHolder(
         return result
     }
 
-    // For debugging purposes
-    override fun draw(batch: Batch?, parentAlpha: Float) = super.draw(batch, parentAlpha)
+    /** Drawing-only map offset for presentation effects; scroll, culling, selection and input never see it. */
+    val visualShake = Vector2()
+    private val shakenTransform = Matrix4()
+    private val unshakenTransform = Matrix4()
+
+    override fun draw(batch: Batch?, parentAlpha: Float) {
+        if (batch == null || visualShake.isZero) return super.draw(batch, parentAlpha)
+        unshakenTransform.set(batch.transformMatrix)
+        batch.transformMatrix = shakenTransform.set(unshakenTransform).translate(visualShake.x, visualShake.y, 0f)
+        try { super.draw(batch, parentAlpha) } finally { batch.transformMatrix = unshakenTransform }
+    }
     override fun act(delta: Float) = super.act(delta)
     override fun clear() = super.clear()
 }
