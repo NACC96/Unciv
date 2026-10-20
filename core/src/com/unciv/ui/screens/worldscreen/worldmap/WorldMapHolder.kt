@@ -933,10 +933,13 @@ class WorldMapHolder(
     private val shakenTransform = Matrix4()
     private val unshakenTransform = Matrix4()
 
+    /** Blurred copy of this map for frosted HUD surfaces; captures only while one is on screen. */
+    val glassBackdrop = com.unciv.ui.components.glass.GlassBackdrop()
+
     override fun draw(batch: Batch?, parentAlpha: Float) {
         if (batch == null) return super.draw(batch, parentAlpha)
         // Frosted HUD surfaces sample a blurred copy of exactly this map drawing.
-        worldScreen.glassBackdrop.drawCaptured(batch) { drawShaken(batch, parentAlpha) }
+        glassBackdrop.drawCaptured(batch) { drawShaken(batch, parentAlpha) }
     }
 
     private fun drawShaken(batch: Batch, parentAlpha: Float) {
