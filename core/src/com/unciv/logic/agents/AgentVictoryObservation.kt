@@ -82,14 +82,11 @@ fun buildVictoryObservation(game: GameInfo, match: AgentMatchState, civ: Civiliz
     for (victory in available.take(VICTORY_DETAIL_LIMIT)) {
         val milestones = victory.milestoneObjects
         val states = milestones.map { if (it.type == null) null else it.hasBeenCompletedBy(civ) }
-        val known = milestones.all { it.type != null }
-        val next = if (known) civ.victoryManager.getNextMilestone(victory)?.let { milestones.indexOf(it) }
-            else states.indexOfFirst { it != true }.takeIf { it >= 0 }
+        val next = states.indexOfFirst { it != true }.takeIf { it >= 0 }
         context.available.add(ObservedVictoryRoute(
             name = victory.name,
-            completed = if (known) next == null else if (states.any { it == false }) false else null,
-            completedMilestones = if (known) civ.victoryManager.amountMilestonesCompleted(victory)
-                else states.takeWhile { it == true }.size,
+            completed = if (states.any { it == false }) false else if (states.any { it == null }) null else true,
+            completedMilestones = states.takeWhile { it == true }.size,
             nextMilestone = next,
             milestones = milestones.take(VICTORY_DETAIL_LIMIT).mapIndexedTo(ArrayList()) { index, milestone ->
                 observeMilestone(civ, victory, milestone, states[index], hideCount)
@@ -170,6 +167,7 @@ private fun buildDomination(
     for (city in game.getCities()) {
         val tile = city.getCenterTile()
         if (tile !in visible && match.vision != MatchVision.MAP) continue
+        if (!city.isOriginalCapital) continue
         val observed = buildPermittedTile(game, match, civ.civID, HexCoord(tile.position.x, tile.position.y), visible) ?: continue
         add(observed, if (tile in visible) "CURRENT" else "REVEALED")
     }

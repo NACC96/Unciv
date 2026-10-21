@@ -748,8 +748,6 @@ class AgentMessagesPanel(
     override fun layout() {
         val fontScale = UncivGame.Current.settings.fontSizeMultiplier
         val availableWidth = (width - padLeft - padRight).coerceAtLeast(1f)
-        // Active feedback belongs to the mailbox, including while its draft is collapsed.
-        // Empty feedback has no layout reservation; long errors remain scrollable in two lines.
         val statusHeight = if (status.text.length == 0) 0f else 28f * fontScale
         val statusGap = if (statusHeight == 0f) 0f else 4f
         statusPane.isVisible = statusHeight > 0f
