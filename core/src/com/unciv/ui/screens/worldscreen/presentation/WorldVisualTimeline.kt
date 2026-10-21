@@ -17,6 +17,7 @@ import com.unciv.ui.screens.worldscreen.presentation.combat.CombatFx
 import com.unciv.ui.screens.worldscreen.presentation.combat.CombatScripts
 import com.unciv.ui.screens.worldscreen.presentation.combat.CombatStyles
 import com.unciv.ui.screens.worldscreen.presentation.combat.FxScene
+import com.unciv.ui.screens.worldscreen.presentation.combat.WeaponFamily
 import com.unciv.view.VisualEventProjector
 import java.util.ArrayDeque
 import kotlin.math.cos
@@ -628,7 +629,8 @@ class WorldVisualTimeline(private val world: WorldScreen) : AutoCloseable {
                     sourceWater = water(event.source), targetWater = water(event.target),
                     outcome = event.outcome, damageToDefender = event.damageToDefender, damageToAttacker = event.damageToAttacker,
                     defenderKilled = defenderKilled, attackerKilled = attackerKilled,
-                    seed = event.id.sequence * 1_000_003L + event.id.timelineId.hashCode())
+                    seed = event.id.sequence * 1_000_003L + event.id.timelineId.hashCode(),
+                    melee = event.kind == VisualAttackKind.MELEE)
                 CombatScripts.build(scene)
                 fx = CombatFx(scene.particles)
                 firstImpact = scene.impacts.minOf { it.at }
@@ -649,10 +651,15 @@ class WorldVisualTimeline(private val world: WorldScreen) : AutoCloseable {
                 when (event.outcome) {
                     VisualAttackOutcome.WITHDRAWN -> label(event.target, "Withdrew")
                     VisualAttackOutcome.CAPTURED -> label(event.target, "Captured")
-                    VisualAttackOutcome.INTERCEPTED -> label(event.source ?: event.target, "Intercepted")
+                    // Where the attack was headed: the defense brings it down on its way there.
+                    VisualAttackOutcome.INTERCEPTED -> label(event.target ?: event.source, "Intercepted")
                     VisualAttackOutcome.RESOLVED -> Unit
                 }
-                for (death in deaths) addGhost(death.unit, UnitVisualState.DEFEAT, death.position, null)?.let { deathGhosts += it to death.position }
+                for (death in deaths) {
+                    // A spent missile is gone in its own blast, not shot down at its launcher.
+                    if (spent && death.unit.stableId == event.attacker?.stableId) continue
+                    addGhost(death.unit, UnitVisualState.DEFEAT, death.position, null)?.let { deathGhosts += it to death.position }
+                }
                 map.addVisualActor(fx)
             }
 
@@ -667,6 +674,8 @@ class WorldVisualTimeline(private val world: WorldScreen) : AutoCloseable {
                 if (source != null && !(gone && scene.attackerKilled)) {
                     val point = source.cpy()
                     if (target != null) point.add(scratch.set(target).sub(source).nor().scl(attackerOffset(time)))
+                    // A missile spent on its target leaves the launcher as it fires; its own clip would blow it up on the pad.
+                    if (spent) attackerGhost?.actor?.opacity = 1f - ((time - (scene.fireAt ?: 0f)) / .08f).coerceIn(0f, 1f)
                     attackerGhost?.update(elapsed, point)
                 } else attackerGhost?.close()
                 if (target != null && !(gone && scene.defenderKilled)) {
@@ -693,27 +702,19 @@ class WorldVisualTimeline(private val world: WorldScreen) : AutoCloseable {
 
             /** Melee attackers lunge into the first blow and back; ranged ones kick back as they fire. */
             private fun attackerOffset(time: Float): Float {
-                if (event.kind == VisualAttackKind.MELEE) {
-                    val reach = (scene.length * .3f).coerceAtMost(20f)
-                    val since = time - firstImpact
-                    return reach * when {
-                        since < -.22f -> 0f
-                        since < 0f -> smooth(1f + since / .22f)
-                        since < .25f -> 1f - smooth(since / .25f)
-                        else -> 0f
-                    }
-                }
+                if (scene.melee) return scene.lunge(time, firstImpact)
                 val since = time - (scene.fireAt ?: return 0f)
                 return if (since < 0f || since > .2f) 0f else -3f * (1f - since / .2f)
             }
 
-            /** How hard the defender is reeling from the latest blow, from 1 as it lands to 0. */
-            private fun flinch(time: Float): Float = scene.impacts.maxOf { impact ->
+            private val spent = scene.family == WeaponFamily.MISSILE && scene.attackerKilled &&
+                event.outcome != VisualAttackOutcome.INTERCEPTED
+
+            /** How hard the defender is reeling from the latest blow, from 1 as it lands to 0; nothing reaches it past an interception. */
+            private fun flinch(time: Float): Float = if (event.outcome == VisualAttackOutcome.INTERCEPTED) 0f else scene.impacts.maxOf { impact ->
                 val since = time - impact.at
                 if (since < 0f || since > .25f) 0f else 1f - since / .25f
             }
-
-            private fun smooth(t: Float): Float { val x = t.coerceIn(0f, 1f); return x * x * (3 - 2 * x) }
 
             /** Heavy blows jolt the map a little, only while their tile is on screen. */
             private fun shake(time: Float) {

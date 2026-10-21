@@ -37,7 +37,9 @@ class FxScene(
     val damageToAttacker: Int?,
     val defenderKilled: Boolean,
     val attackerKilled: Boolean,
-    seed: Long
+    seed: Long,
+    /** The attacker closes in to strike, so its unit lunges into the first blow; otherwise it fires from where it stands. */
+    val melee: Boolean = false
 ) {
     val family: WeaponFamily get() = style.family
     val targetCity: Boolean get() = defenderBody == BodyKind.CITY
@@ -64,6 +66,22 @@ class FxScene(
     fun oy(along: Float, side: Float = 0f): Float = dir.y * along + perp.y * side
 
     fun impact(at: Float, shake: Float = 0f) { impacts += FxImpact(at, shake) }
+
+    /**
+     * How far a melee attacker has moved toward the defender at [time] when its first blow lands at [blow]: it closes
+     * over 0.22 s, strikes, and falls back over 0.25 s. The timeline moves the attacker's unit by exactly this, so
+     * guns fired and dust thrown on the way can leave from where the unit is. Always 0 for ranged attacks.
+     */
+    fun lunge(time: Float, blow: Float): Float {
+        if (!melee) return 0f
+        val since = time - blow
+        val reach = (length * .3f).coerceAtMost(20f)
+        return reach * when {
+            since < -.22f || since >= .25f -> 0f
+            since < 0f -> FxEase.SMOOTH.apply(1f + since / .22f)
+            else -> 1f - FxEase.SMOOTH.apply(since / .25f)
+        }
+    }
 
     /** A particle at [anchor]'s tile. Its life is cut to end with the attack. */
     fun particle(anchor: FxAnchor, start: Float, life: Float, init: FxParticle.() -> Unit): FxParticle =

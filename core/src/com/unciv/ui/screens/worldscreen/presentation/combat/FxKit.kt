@@ -105,19 +105,25 @@ fun FxScene.explosion(
             color0 = vary(FxPalette.SMOKE_DARK); color1 = vary(FxPalette.SMOKE); alpha = .68f; fadeIn = .12f; fadeOut = .6f
         }
     }
+    // Effects draw over the units, so the scorch lies flat at their feet rather than darkening them.
     if (!water) particle(anchor, at + .02f, end - at - .02f) {
         shape = FxShape.SOFT; layer = FxLayer.GROUND
-        this.x = x; this.y = y - 4f; size0 = 14f * scale; size1 = 30f * scale; sizeEase = FxEase.OUT
-        color0 = FxPalette.SCORCH; alpha = .4f; fadeIn = .1f; fadeOut = .35f
+        this.x = x; this.y = y - 9f; size0 = 16f * scale; size1 = 34f * scale; sizeEase = FxEase.OUT; aspect = .45f
+        color0 = FxPalette.SCORCH; alpha = .32f; fadeIn = .1f; fadeOut = .45f
     }
 }
 
 /** Water thrown up by a hit or a miss at sea: a white column, droplets, foam and a spreading ripple. */
 fun FxScene.splash(at: Float, x: Float = 0f, y: Float = 0f, scale: Float = 1f, anchor: FxAnchor = FxAnchor.TARGET) {
-    particle(anchor, at, .45f) {
-        shape = FxShape.RECT; layer = FxLayer.BODY
-        this.x = x; this.y = y + 6f * scale; vy = 70f * scale; drag = 3f
-        size0 = 7f * scale; size1 = 11f * scale; aspect = 2.4f; color0 = FxPalette.WATER; alpha = .75f; fadeOut = .6f
+    // The column is soft spray that slows, spreads and falls away; a solid bar would show hard edges over a ship.
+    repeat(if (scale < .7f) 2 else 3) { index ->
+        particle(anchor, at + index * .015f, rand(.4f, .5f)) {
+            shape = FxShape.SOFT; layer = FxLayer.BODY
+            this.x = x + spread(2f * scale); this.y = y + 3f * scale
+            vx = spread(8f * scale); vy = (90f + index * 70f) * scale; ay = -120f * scale; drag = 4.5f
+            size0 = (13f - index * 2f) * scale; size1 = (24f - index * 4f) * scale; aspect = 1.25f
+            color0 = FxPalette.WATER; alpha = .85f; fadeOut = .6f
+        }
     }
     repeat((10 * scale).toInt().coerceAtLeast(5)) {
         particle(anchor, at, rand(.35f, .5f)) {

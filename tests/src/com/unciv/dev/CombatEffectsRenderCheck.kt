@@ -28,6 +28,11 @@ import com.unciv.models.tilesets.TileSetCache
 import com.unciv.testing.TestGame
 import com.unciv.ui.components.fonts.Fonts
 import com.unciv.ui.images.ImageGetter
+import com.unciv.ui.images.atlas.AtlasArtManifest
+import com.unciv.ui.images.atlas.AtlasClipCache
+import com.unciv.ui.images.atlas.ClipKey
+import com.unciv.ui.images.atlas.HexFacing
+import com.unciv.ui.images.atlas.UnitVisualState
 import com.unciv.ui.screens.basescreen.BaseScreen
 import com.unciv.ui.screens.basescreen.UncivStage
 import com.unciv.ui.screens.worldscreen.WorldScreen
@@ -87,6 +92,8 @@ object CombatEffectsRenderCheck {
     private val diagonal = (-2 to -2) to (0 to 0)
     private val far = (-3 to 0) to (0 to 0)
     private val air = (-4 to -1) to (0 to 0)
+    /** Land under every attacker's tile on the west of a sea map, for shots from the shore. */
+    private val COASTAL = listOf(-2 to 0, -3 to 0, -2 to -1, -3 to -1, -1 to 0, -2 to 1, -4 to -1, -4 to -2, -3 to -2, -5 to -1)
 
     val scenarios = listOf(
         // Ancient and medieval land
@@ -96,11 +103,14 @@ object CombatEffectsRenderCheck {
         Scenario("arrows-bolts", "Crossbowman", "Pikeman", ranged.first, ranged.second, VisualAttackKind.RANGED),
         Scenario("arrows-repeating", "Chu-Ko-Nu", "Swordsman", ranged.first, ranged.second, VisualAttackKind.RANGED, kill = true),
         Scenario("arrows-city", null, "Swordsman", ranged.first, ranged.second, VisualAttackKind.CITY, cityAttacker = true),
+        Scenario("arrows-dromon", "Dromon", "Trireme", ranged.first, ranged.second, VisualAttackKind.RANGED, sea = true),
+        Scenario("arrows-at-ship", "Archer", "Galley", ranged.first, ranged.second, VisualAttackKind.RANGED, sea = true, land = COASTAL),
         Scenario("catapult", "Catapult", "Spearman", ranged.first, ranged.second, VisualAttackKind.RANGED),
         Scenario("catapult-bolt", "Ballista", "Horseman", ranged.first, ranged.second, VisualAttackKind.RANGED),
         Scenario("catapult-heavy", "Trebuchet", null, ranged.first, ranged.second, VisualAttackKind.RANGED, cityTarget = true),
         Scenario("blades", "Swordsman", "Spearman", melee.first, melee.second, VisualAttackKind.MELEE, counterDamage = 12),
         Scenario("blades-kill", "Legion", "Warrior", melee.first, melee.second, VisualAttackKind.MELEE, kill = true, counterDamage = 6),
+        Scenario("blades-city", "Swordsman", null, melee.first, melee.second, VisualAttackKind.MELEE, cityTarget = true, counterDamage = 9),
         Scenario("blades-ram", "Battering Ram", null, melee.first, melee.second, VisualAttackKind.MELEE, cityTarget = true),
         Scenario("charge", "Knight", "Pikeman", melee.first, melee.second, VisualAttackKind.MELEE, counterDamage = 18),
         Scenario("charge-kill", "Horseman", "Archer", melee.first, melee.second, VisualAttackKind.MELEE, kill = true),
@@ -110,13 +120,16 @@ object CombatEffectsRenderCheck {
         Scenario("rifles", "Infantry", "Rifleman", melee.first, melee.second, VisualAttackKind.MELEE, counterDamage = 8),
         Scenario("rifles-kill", "Great War Infantry", "Rifleman", melee.first, melee.second, VisualAttackKind.MELEE, kill = true),
         Scenario("machine-gun", "Machine Gun", "Infantry", melee.first, melee.second, VisualAttackKind.RANGED),
+        Scenario("machine-gun-gatling", "Gatling Gun", "Rifleman", melee.first, melee.second, VisualAttackKind.RANGED, kill = true),
         Scenario("machine-gun-flak", "Anti-Aircraft Gun", "Infantry", melee.first, melee.second, VisualAttackKind.MELEE),
         Scenario("tank", "Tank", "Infantry", melee.first, melee.second, VisualAttackKind.MELEE, counterDamage = 9),
         Scenario("tank-kill", "Modern Armor", "Tank", melee.first, melee.second, VisualAttackKind.MELEE, kill = true),
+        Scenario("tank-landship", "Landship", "Great War Infantry", melee.first, melee.second, VisualAttackKind.MELEE, counterDamage = 6),
         Scenario("tank-gun", "Anti-Tank Gun", "Tank", melee.first, melee.second, VisualAttackKind.MELEE),
         Scenario("laser", "Giant Death Robot", "Modern Armor", melee.first, melee.second, VisualAttackKind.MELEE, kill = true),
         // Artillery and missiles
         Scenario("cannon", "Cannon", "Musketman", ranged.first, ranged.second, VisualAttackKind.RANGED),
+        Scenario("cannon-ship", "Cannon", "Frigate", ranged.first, ranged.second, VisualAttackKind.RANGED, sea = true, land = COASTAL),
         Scenario("cannon-city", null, "Musketman", ranged.first, ranged.second, VisualAttackKind.CITY, cityAttacker = true, era = "Gunpowder"),
         Scenario("artillery", "Artillery", "Infantry", far.first, far.second, VisualAttackKind.RANGED),
         Scenario("artillery-city", null, "Infantry", ranged.first, ranged.second, VisualAttackKind.CITY, cityAttacker = true, era = "Radio"),
@@ -139,6 +152,7 @@ object CombatEffectsRenderCheck {
         Scenario("torpedo", "Submarine", "Destroyer", ranged.first, ranged.second, VisualAttackKind.RANGED, sea = true, kill = true),
         // Air, and what follows a blow
         Scenario("strafe", "Fighter", "Infantry", air.first, air.second, VisualAttackKind.AIR),
+        Scenario("strafe-ship", "Fighter", "Destroyer", air.first, air.second, VisualAttackKind.AIR, sea = true, land = COASTAL),
         Scenario("strafe-jet", "Jet Fighter", "Tank", air.first, air.second, VisualAttackKind.AIR),
         Scenario("strafe-biplane", "Triplane", "Rifleman", air.first, air.second, VisualAttackKind.AIR),
         Scenario("gunship", "Helicopter Gunship", "Tank", melee.first, melee.second, VisualAttackKind.MELEE, kill = true),
@@ -310,6 +324,15 @@ object CombatEffectsRenderCheck {
             world.rome.viewableTiles = game.tileMap.values.toSet()
             val center = ((fromX + toX) / 2) to ((fromY + toY) / 2)
             world.showMap(center)
+            warmClips(events.flatMap { event ->
+                when (event) {
+                    is VisualEvent.Attack -> listOfNotNull(
+                        (event.attacker as? VisualUnitDescriptor)?.let { it.artName to UnitVisualState.ATTACK },
+                        (event.defender as? VisualUnitDescriptor)?.let { it.artName to UnitVisualState.HIT })
+                    is VisualEvent.RemoveUnit -> listOf(event.unit.artName to UnitVisualState.DEFEAT)
+                    else -> emptyList()
+                }
+            })
             world.nextBatch = VisualBatch(world.view, events, events.last().id.sequence, 0L)
 
             val step = 1 / 60f
@@ -349,6 +372,32 @@ object CombatEffectsRenderCheck {
         return "${style.family}${style.variant?.let { " ($it)" } ?: ""}${if (style.heavy) " heavy" else ""}, era ${style.era}"
     }
 
+    /**
+     * Loads the unit animations playback will ask for before it starts. The clip cache decodes in the background and
+     * uploads through the app's runnable queue, which never runs while this check holds the GL thread, so it is
+     * pumped here as the app's loop would between frames.
+     */
+    private fun warmClips(wanted: List<Pair<String, UnitVisualState>>) {
+        val cache = ImageGetter.getAtlasClipCache()
+        val deadline = System.nanoTime() + 5_000_000_000L
+        while (!cache.metrics().manifestReady && System.nanoTime() < deadline) { cache.request(ClipKey("Warrior", UnitVisualState.IDLE, HexFacing.E))?.close(); pumpGl(); Thread.sleep(5) }
+        val manifest = AtlasClipCache::class.java.getDeclaredField("metadata").apply { isAccessible = true }.get(cache) as? AtlasArtManifest ?: return
+        val keys = wanted.distinct().flatMap { (unit, state) -> HexFacing.entries.map { ClipKey(unit, state, it) } }
+            .filter { manifest.findClip(it) != null }.toMutableList()
+        while (keys.isNotEmpty() && System.nanoTime() < deadline) {
+            keys.removeAll { key -> cache.request(key)?.also { it.close() } != null }
+            pumpGl(); Thread.sleep(5)
+        }
+    }
+
+    private fun pumpGl() {
+        val app = Gdx.app
+        @Suppress("UNCHECKED_CAST")
+        val queue = app.javaClass.getDeclaredField("runnables").apply { isAccessible = true }.get(app) as com.badlogic.gdx.utils.Array<Runnable>
+        val pending = synchronized(queue) { queue.toList().also { queue.clear() } }
+        for (runnable in pending) runnable.run()
+    }
+
     /** Draws the stage and keeps the middle of the frame, where the camera centers the attack. */
     private fun capture(stage: UncivStage, frame: FrameBuffer): Pixmap {
         frame.begin()
@@ -358,9 +407,12 @@ object CombatEffectsRenderCheck {
             stage.root.act(0f)
             stage.camera.update()
             stage.batch.projectionMatrix = stage.camera.combined
+            // Keep the frame opaque, as a window is: blending translucent smoke would otherwise lower the stored alpha
+            // and darken the sheet where frames are laid over black.
+            Gdx.gl.glColorMask(true, true, true, false)
             stage.batch.begin()
             try { stage.root.draw(stage.batch, 1f) }
-            finally { stage.batch.end() }
+            finally { stage.batch.end(); Gdx.gl.glColorMask(true, true, true, true) }
             check(Gdx.gl.glGetError() == GL20.GL_NO_ERROR) { "Capture leaked a GL error" }
             val whole = Pixmap.createFromFrameBuffer(0, 0, WIDTH, HEIGHT)
             try {
@@ -379,6 +431,7 @@ object CombatEffectsRenderCheck {
         val sheet = Pixmap(COLUMNS * CROP_WIDTH + (COLUMNS - 1) * gap, rows * CROP_HEIGHT + (rows - 1) * gap, Pixmap.Format.RGBA8888)
         try {
             sheet.setColor(0f, 0f, 0f, 1f); sheet.fill()
+            sheet.blending = Pixmap.Blending.None
             frames.forEachIndexed { index, crop ->
                 val column = index % COLUMNS
                 val row = rows - 1 - index / COLUMNS

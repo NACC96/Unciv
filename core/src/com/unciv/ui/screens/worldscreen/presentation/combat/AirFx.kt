@@ -605,20 +605,6 @@ private fun FxScene.rocketFlight(at: Float, travel: Float, flight: FxFlight) {
 
 private val ROCKET = Color(.82f, .82f, .78f, 1f)
 
-/**
- * How far a melee attacker has lunged toward the defender at [time] for a first blow at [blow]; the timeline moves
- * the attacker's unit this way, and weapons fired from it must leave from where it is.
- */
-private fun FxScene.lunge(time: Float, blow: Float): Float {
-    val since = time - blow
-    val t = when {
-        since < -.22f -> 0f
-        since < 0f -> 1f + since / .22f
-        since < .25f -> 1f - since / .25f
-        else -> 0f
-    }
-    return (length * .3f).coerceAtMost(20f) * t * t * (3 - 2 * t)
-}
 
 /** A column of earth (or masonry) thrown straight up by a bomb, so each blast of a stick stands apart. */
 private fun FxScene.plume(at: Float, x: Float, y: Float, scale: Float) {

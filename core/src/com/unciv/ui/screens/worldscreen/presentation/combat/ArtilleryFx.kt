@@ -294,37 +294,10 @@ private val FxScene.rubble: Color get() = if (targetCity) FxPalette.STONE else F
 /** Whether the blow lands on a ship, rather than on open water or a ship that slipped away. */
 private val FxScene.hullHit: Boolean get() = defenderBody == BodyKind.SHIP && outcome != VisualAttackOutcome.WITHDRAWN
 
-/** The kit's blast, at sea throwing up soft spray. */
+/** The kit's blast, throwing up spray at sea and rubble ashore. */
 private fun FxScene.blast(at: Float, x: Float, y: Float, scale: Float, smoke: Boolean = false) =
-    softWater(at, x, y, scale * .9f) { explosion(at, x, y, scale, water = targetWater, smoke = smoke, debris = rubble) }
+    explosion(at, x, y, scale, water = targetWater, smoke = smoke, debris = rubble)
 
-/** The kit's splash with a soft column. */
-private fun FxScene.seaSplash(at: Float, x: Float, y: Float, scale: Float) = softWater(at, x, y, scale) { splash(at, x, y, scale) }
-
-/**
- * Runs a kit effect and swaps the water column it throws up, a solid bar whose hard edges show over a ship,
- * for a [waterColumn] of soft spray.
- */
-private inline fun FxScene.softWater(at: Float, x: Float, y: Float, scale: Float, effect: () -> Unit) {
-    val from = particles.size
-    effect()
-    val bars = particles.subList(from, particles.size)
-        .removeAll { it.shape == FxShape.RECT && it.layer == FxLayer.BODY && it.color0 === FxPalette.WATER }
-    if (bars) waterColumn(at, x, y, scale)
-}
-
-/** White water thrown up in a column of soft spray that slows, spreads and falls away. */
-private fun FxScene.waterColumn(at: Float, x: Float, y: Float, scale: Float) {
-    repeat(if (scale < .7f) 2 else 3) { index ->
-        particle(FxAnchor.TARGET, at + index * .015f, rand(.4f, .5f)) {
-            shape = FxShape.SOFT; layer = FxLayer.BODY
-            this.x = x + spread(2f * scale); this.y = y + 3f * scale
-            vx = spread(8f * scale); vy = (90f + index * 70f) * scale; ay = -120f * scale; drag = 4.5f
-            size0 = (13f - index * 2f) * scale; size1 = (24f - index * 4f) * scale
-            color0 = FxPalette.WATER; alpha = .85f; fadeOut = .6f
-        }
-    }
-}
 
 /** Pale stone dust, which shows against grass where plain masonry grey would not. */
 private val MASONRY_DUST = Color(FxPalette.STONE).lerp(FxPalette.GUN_SMOKE, .45f)
@@ -406,7 +379,7 @@ private fun FxScene.groundShadow(launch: Float, travel: Float, fromAlong: Float,
 private fun FxScene.solidShot(at: Float, x: Float, y: Float, light: Boolean) {
     val hull = hullHit
     if (targetWater && !hull) {
-        seaSplash(at, x, y, .75f)
+        splash(at, x, y, .75f)
         ricochet(at, x, y)
         return
     }
@@ -442,7 +415,7 @@ private fun FxScene.solidShot(at: Float, x: Float, y: Float, light: Boolean) {
                 alpha = .85f; fadeOut = .65f
             }
         }
-        seaSplash(at + .02f, x + dir.x * 6f, y - 6f, .6f)
+        splash(at + .02f, x + dir.x * 6f, y - 6f, .6f)
         return
     }
     val cloud = if (targetCity) MASONRY_DUST else THROWN_DUST
@@ -494,7 +467,7 @@ private fun FxScene.ricochet(at: Float, x: Float, y: Float) {
     }
     val downX = x + dir.x * reach; val downY = y + dir.y * reach
     if (targetWater) {
-        seaSplash(at + hop, downX, downY, .4f)
+        splash(at + hop, downX, downY, .4f)
         return
     }
     dust(at + hop, downX, downY, .5f, puffs = 2)
@@ -750,7 +723,7 @@ private fun FxScene.airburst(at: Float, x: Float, y: Float, height: Float) {
             color0 = FxPalette.STEEL; color1 = FxPalette.FIRE; fadeOut = .5f
         }
     }
-    if (targetWater) seaSplash(at + .05f, x, y - height, .45f)
+    if (targetWater) splash(at + .05f, x, y - height, .45f)
     else dust(at + .05f, x, y - height, .7f, color = if (targetCity) MASONRY_DUST else FxPalette.DUST, puffs = 4)
 }
 

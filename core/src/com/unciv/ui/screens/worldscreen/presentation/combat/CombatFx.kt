@@ -80,7 +80,7 @@ class FxParticle {
     var size0 = 8f
     var size1 = 8f
     var sizeEase = FxEase.OUT
-    /** Height as a fraction of width, for RECT streaks, shards and blades. */
+    /** Height as a fraction of width: thin for RECT streaks, shards and blades, flattened for ellipses on the ground. */
     var aspect = 1f
     /** A RECT lengthens with its speed by this many pixels per pixel-per-playback, for tracers and sparks. */
     var stretch = 0f
@@ -164,7 +164,7 @@ class CombatFx(particles: List<FxParticle>) : Actor(), AutoCloseable {
             val size = MathUtils.lerp(p.size0, p.size1, p.sizeEase.apply(u))
             val speed = velocity.len()
             val width = (size + if (p.shape == FxShape.RECT) speed * p.stretch else 0f).coerceAtLeast(0f)
-            val height = if (p.shape == FxShape.RECT) (size * p.aspect).coerceAtLeast(.5f) else width
+            val height = if (p.shape == FxShape.RECT) (size * p.aspect).coerceAtLeast(.5f) else width * p.aspect
             val fadeIn = if (p.fadeIn > 0f) (u / p.fadeIn).coerceAtMost(1f) else 1f
             val fadeOut = if (p.fadeOut > 0f) ((1f - u) / p.fadeOut).coerceAtMost(1f) else 1f
             val alpha = (p.alpha * fadeIn * fadeOut).coerceIn(0f, 1f)

@@ -38,22 +38,6 @@ private val FxScene.facing get() = if (dir.x >= 0f) 1f else -1f
 private fun FxScene.alongOf(x: Float, y: Float) = x * dir.x + y * dir.y
 private fun FxScene.sideOf(x: Float, y: Float) = x * perp.x + y * perp.y
 
-/**
- * How far a melee ship has surged toward the defender at [time]. It mirrors the timeline's lunge into the first
- * blow at [blow], so guns fired and foam thrown on the way stay with the moving hull.
- */
-private fun FxScene.surge(time: Float, blow: Float): Float {
-    if (distanceInTiles > 1) return 0f
-    val reach = (length * .3f).coerceAtMost(20f)
-    val since = time - blow
-    fun smooth(t: Float) = t.coerceIn(0f, 1f).let { it * it * (3 - 2 * it) }
-    return reach * when {
-        since < -.22f -> 0f
-        since < 0f -> smooth(1f + since / .22f)
-        since < .25f -> 1f - smooth(since / .25f)
-        else -> 0f
-    }
-}
 
 /** Where a shot strikes the defender: its flank facing the attacker on a ship, anywhere on a city's walls. */
 private fun FxScene.strikePoint(width: Float = 10f): Pair<Float, Float> = when {
@@ -102,7 +86,7 @@ private fun FxScene.bowWave(blow: Float, scale: Float) {
     if (!sourceWater) return
     var at = blow - .21f
     while (at < blow + .01f) {
-        val forward = surge(at, blow)
+        val forward = lunge(at, blow)
         val bx = dir.x * (12f + forward); val by = WATERLINE + 2f + dir.y * (3f + forward)
         for (arm in listOf(-1f, 1f)) {
             particle(FxAnchor.SOURCE, at, .42f) {
@@ -124,7 +108,7 @@ private fun FxScene.bowWave(blow: Float, scale: Float) {
     // Spray thrown off the bow in the last strokes before the ram strikes.
     repeat(6) {
         val at2 = blow - rand(.02f, .1f)
-        val forward = surge(at2, blow)
+        val forward = lunge(at2, blow)
         val arm = if (it % 2 == 0) 1f else -1f
         particle(FxAnchor.SOURCE, at2, rand(.22f, .3f)) {
             shape = FxShape.DISC; layer = FxLayer.BODY
@@ -209,14 +193,14 @@ fun FxScene.broadside() {
     val travel = .15f + distanceInTiles * .045f
     val arc = 4f + distanceInTiles * 3f
     // Only a melee ship takes return fire. It fires as it closes, so its first ball lands as its lunge peaks.
-    val closing = distanceInTiles <= 1 && (damageToAttacker ?: 0) > 0
+    val closing = melee
     val fire = if (closing) .32f - travel else .05f
     fireAt = fire
     var hits = 0
     for (gun in 0 until perDeck) for (deck in 0 until decks) {
         val index = gun * decks + deck
         val at = fire + index * ripple + spread(.004f)
-        val forward = if (closing) surge(at, fire + travel) else 0f
+        val forward = if (closing) lunge(at, fire + travel) else 0f
         // Gun ports along the hull from the end nearest the defender, the lower deck a little below the upper.
         val gx = facing * (13f - 27f * gun / (perDeck - 1)) + deck * 2f + dir.x * (5f + forward)
         val gy = -2f - deck * 3f + dir.y * (4f + forward)
@@ -241,7 +225,7 @@ private fun FxScene.lightBroadside() {
     repeat(guns) { index ->
         val landing = blow + index * .05f
         val at = landing - travel
-        val forward = surge(at, blow)
+        val forward = lunge(at, blow)
         val gx = facing * (10f - index * 9f) + dir.x * (6f + forward); val gy = -2f + dir.y * (4f + forward)
         powderBlast(at, gx, gy, .85f)
         val (toX, toY) = if (slippedAway) nearMiss(22f) else strikePoint()
@@ -315,7 +299,6 @@ fun FxScene.navalGuns() {
     // Later destroyers carry heavier, faster-firing guns.
     val power = 1f + (style.era - 5).coerceIn(0, 2) * .12f
     val shots = if (modern) 4 else 2
-    val melee = distanceInTiles <= 1
     val travel = if (melee) .12f else .1f + distanceInTiles * .045f
     val first = if (melee) .34f else .06f + travel
     fireAt = first - travel
@@ -324,7 +307,7 @@ fun FxScene.navalGuns() {
         val landing = first + if (modern) index / 2 * .14f + index % 2 * .04f else index * .15f
         val at = landing - travel
         val turret = if (modern) index / 2 else index
-        val forward = surge(at, first)
+        val forward = lunge(at, first)
         val gx = facing * (if (turret == 0) 9f else -7f) + dir.x * (9f + forward)
         val gy = 2f + dir.y * (4f + forward)
         muzzleFlash(at, alongOf(gx, gy), sideOf(gx, gy), if (modern) 1.25f * power else 1.4f)

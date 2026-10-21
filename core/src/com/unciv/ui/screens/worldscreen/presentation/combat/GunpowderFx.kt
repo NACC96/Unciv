@@ -26,7 +26,7 @@ private val SPURT = Color(.46f, .38f, .27f, 1f)
  */
 fun FxScene.muskets() {
     val smoothbore = style.era <= 3
-    val charge = distanceInTiles <= 1
+    val charge = melee
     val volley = .05f
     val blow = .38f
     val muskets = if (smoothbore) 4 else 3
@@ -106,7 +106,7 @@ fun FxScene.rifles() {
         bulletHit(first + .055f, toX, toY)
     }
     // Rounds fired as the squad closes pin the defenders down, kicking up the ground around them; the grenade is the blow.
-    val ranged = distanceInTiles > 1
+    val ranged = !melee
     fireAt = .07f
     volley(.07f, ranged)
     if (!automatic) volley(.19f, ranged)
@@ -463,20 +463,6 @@ private fun FxScene.smallFlash(at: Float, along: Float, side: Float, up: Float, 
     }
 }
 
-/**
- * How far a melee attacker has lunged toward the defender at [time] when its blow lands at [blow]. It mirrors the
- * timeline's lunge, so a gun fired mid-charge flashes at the unit rather than where it set out from.
- */
-private fun FxScene.lunge(time: Float, blow: Float): Float {
-    if (distanceInTiles > 1) return 0f
-    val since = time - blow
-    val reach = (length * .3f).coerceAtMost(20f)
-    return reach * when {
-        since < -.22f || since >= .25f -> 0f
-        since < 0f -> FxEase.SMOOTH.apply(1f + since / .22f)
-        else -> 1f - FxEase.SMOOTH.apply(since / .25f)
-    }
-}
 
 /** A point [along] toward the defender, [side] to its left and [up] pixels higher on screen. */
 private fun FxScene.raised(along: Float, side: Float, up: Float) = Vector2(ox(along, side), oy(along, side) + up)

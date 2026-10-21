@@ -99,7 +99,7 @@ object CombatStyles {
     fun body(unit: BaseUnit?): BodyKind {
         if (unit == null) return BodyKind.INFANTRY
         if (unit.isCivilian()) return BodyKind.CIVILIAN
-        if (unit.isAirUnit()) return BodyKind.AIRCRAFT
+        if (unit.isAirUnit() || unit.unitType == "Helicopter") return BodyKind.AIRCRAFT
         if (unit.isWaterUnit) return BodyKind.SHIP
         return when (unit.unitType) {
             "Armored" -> BodyKind.VEHICLE
