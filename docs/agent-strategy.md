@@ -1,14 +1,30 @@
 # Agent strategy and intelligence
 
-Every leader receives the same strategic doctrine in its shared instructions (`agent-runner/src/game-instructions.ts`, `STRATEGY_INSTRUCTIONS`). A nation's personality text still applies on top of it and can be stricter.
+Every invocation receives the versioned policy in `agent-runner/src/strategy-policy.ts`, including resumed sessions. Saved personalities remain in effect. The organizing objective is a victory the saved match can award to that civilization.
 
-## Doctrine: brutal realpolitik
+## Objectives and commitments
 
-- **Aim**: win. Other nations are rivals; each decision is judged by whether it improves the leader's relative position in cities, land, production, technology and military power.
-- **Expansion**: found cities early and keep founding while reachable land remains and happiness stays non-negative. Settlers never sit idle. With no free land left, expansion continues by conquest.
-- **War**: a normal instrument of policy. With a clear military edge over a neighbor, especially when no free land remains, leaders prepare, declare war and take cities, then make peace once the war stops paying. Large armies are not left idle.
-- **Agreements**: instruments, not obligations. Leaders keep pacts while they serve them and break them when the gain outweighs the lost trust.
-- **Diplomacy**: used every turn as a weapon: alliances of convenience, isolating targets, turning rivals against each other, extracting concessions. Leaders may posture and bluff, but never misreport game facts or engine results to the spectator. Nuclear weapons remain a last resort.
+`game.observe.victory` distinguishes saved enabled victory types, routes available to this civilization, canonical milestone completion and missing agent commands. The adapter reads engine predicates; it does not award victory or advance the game. Scientific spaceship assembly currently has no agent action and is labeled unsupported when still required. This does not disable Scientific victory in the saved rules.
+
+The leader chooses the most achievable supported enabled route. A Domination-only game therefore targets original capitals, not a space victory, score growth or city-state conquest. Known original capitals include their founding civilization and knowledge state: `CURRENT`, `REVEALED` under map vision, stale `REMEMBERED`, or `UNKNOWN` with no hidden location. Replacement administrative capitals do not count as new original capitals.
+
+Private notes remain the same string and revision API, with a small JSON `strategy` section (`version:1`) and short `memory`. The commitment records the canonical victory, one milestone, `expectedGameTurn`, readiness, assigned unit/city IDs, `lastReviewedGameTurn`, last observed progress, next action, fallback condition and blocker/recheck conditions. Old free text remains readable; malformed or incomplete strategy notes request a refresh and never reject a gameplay turn. Notes remain limited to 16 KiB.
+
+## Progress and reassessment
+
+`gameTurn` is the actual engine round. `turnSerial` remains protocol identity and must not be divided by civilization count to estimate rounds.
+
+`strategicProgress` includes current numeric research/production work, incoming changes since the leader's previous turn end, and up to three completed own-turn summaries. Start-turn completions and intervening unit/city losses appear before the next prompt. Each completed summary combines incoming and action-turn changes, plus diagnostic applied-command counts. Event details and production rows are bounded with explicit counts/truncation. Old saves start with incomplete history; three quiet turns are never invented from missing records. The state is civilization-scoped, deep-copied and saved with the coordinator transaction.
+
+A missed deadline or three own turns without progress on the chosen milestone requires a concrete reassessment. Useful travel, healing, production or research may justify continuation with evidence. The runner detects an entirely quiet complete window as a conservative reminder; the leader must still judge relevance when unrelated events changed. Ordinary gold/culture accrual alone is not proof of milestone progress, although a resource-saving milestone may justify continuation using those numeric facts. No quota forces attacks, outgoing mail or a route switch, and reassessment adds no end-turn gate.
+
+## Campaigns, diplomacy and blocked work
+
+A campaign needs a reachable approach, local battle previews, ranged/siege support, healthy capture units, a launch round and a fallback. The official `militaryStrength` ranking includes nuclear and treasury effects. `military.own` separates conventional force, nuclear weapons and unit roles; foreign `VISIBLE_ONLY` composition describes sightings rather than an enemy total. Waiting or defending can be correct when readiness is not yet sufficient, but preparation needs measurable work.
+
+Outgoing diplomacy serves a specific proposal, transaction, changed threat or operational need. Zero outgoing messages is valid. Required delivered incoming acknowledgements remain concise visible replies with attachment review and confirmed receipts; they do not require an additional outgoing message. Deals require their legal engine actions.
+
+For a blocked unit, retain its reason, relevant `recheckOn` condition and bounded `reviewGameTurn`. Recheck after that condition changes, a new threat or the review round, rather than every unrelated revision. Keep existing sleeping/fortifying orders and ongoing worker or movement progress. Mail volume, repeated orders and rewritten notes are diagnostic activity, not success.
 
 ## What leaders can read
 
@@ -28,6 +44,6 @@ Rejections explain their cause: an invalid trade names each failing item (for ex
 
 ## Settlers and scouts
 
-`EXPLORE` explores immediately with the unit's remaining movement. `AUTOMATE` on a city-founding unit runs Unciv's settler choice immediately: it settles in place when that is nearly as good as the best ranked reachable site, otherwise heads there and founds on arrival, returning `foundedCityId` when a city is founded. Agent nations' standing automation is cleared at each turn start, so both orders last one turn; the doctrine tells leaders to repeat them, and to automate a settler that has no reachable site or has gone two turns without founding. When `AUTOMATE` is rejected because no reachable site exists, leaders stop retrying it each turn and explore, move or embark the settler instead; in one logged match a settler repeated a rejected `AUTOMATE` for more than 20 turns.
+`EXPLORE` explores immediately with remaining movement. `AUTOMATE` on a city-founding unit runs Unciv's settler choice immediately, settling or moving toward a ranked reachable site. Agent nations' standing automation is cleared at turn start, so those two orders last one turn and may be renewed when useful. A blocked settler can wait safely for a relevant access, technology, land or threat change; it need not be inspected or reordered every turn. Found the opening city promptly when legal and preserve useful exploration.
 
 Work Boats create sea-resource improvements the way the in-game "Create [Fishing Boats]" button does: on a water tile whose resource the civilization can see, `legal_actions` lists the resource's first buildable improvement with `consumesUnit:true` and `turnsToBuild:0`, and `unit.build` with that name builds it at once and uses up the boat. The checks are the engine's own (technology, borders, terrain), and a rejection names the failing one, including standing on the wrong tile or naming an improvement that does not improve the resource. Before this, agents had no way to improve sea resources: `unit.build` rejected Work Boats, and the in-game action was not exposed to them.

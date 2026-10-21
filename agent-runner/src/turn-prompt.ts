@@ -1,5 +1,8 @@
 import { GAME_INSTRUCTIONS } from "./game-instructions.js";
 import { messageMetadata, privateCorrespondence, type DiplomaticMessage } from "./fake-game-mcp.js";
+import { CURRENT_STRATEGY_POLICY, strategyCheckpoint } from "./strategy-policy.js";
+import type { ObservedVictoryContext } from "./map-types.js";
+import type { StrategicProgress } from "./strategy-types.js";
 
 /**
  * Turn-prompt assembly (AI_AGENT_PLAN.md §8.1).
@@ -17,6 +20,9 @@ export interface TurnPromptInput {
   protocolVersion: number;
   civId: string;
   turnSerial: number;
+  gameTurn?: number;
+  victory?: ObservedVictoryContext;
+  strategicProgress?: StrategicProgress;
   stateRevision: number;
   notes: string;
   recentEvents: string[];
@@ -64,13 +70,14 @@ export function buildTurnPrompt(input: TurnPromptInput): string {
     .map(message => ({ ...message, text: clip(message.text) ?? "", acknowledgementText: clip(message.acknowledgementText) }));
   const includeStatic = input.includeStaticInstructions ?? true;
   const lines = [
-    includeStatic ? GAME_INSTRUCTIONS : "",
+    includeStatic ? GAME_INSTRUCTIONS : CURRENT_STRATEGY_POLICY,
     `You are ${input.displayName}, leader of civilization ${input.civId} in a game of Civilization V (ruleset: ${input.rulesetName || "Civ V - Vanilla"}, agent protocol v${input.protocolVersion}).`,
     input.personality ? `Personality: ${input.personality}` : "",
     `Turn serial ${input.turnSerial}, state revision ${input.stateRevision}. ` +
       `Act only for ${input.civId}; use only the game.* tools; never invent hidden information.`,
     input.continuityNote ? `Continuity: ${input.continuityNote}` : "",
     `Private strategy notes (${input.notesRevision !== undefined ? `notesRevision ${input.notesRevision}; ` : ""}your beliefs, not ground truth):\n${input.notes || "(none)"}`,
+    `Strategic checkpoint: ${JSON.stringify(strategyCheckpoint(input))}`,
     `Visible recent events:\n${input.recentEvents.length ? input.recentEvents.map((e) => `- ${e}`).join("\n") : "(none)"}`,
     `Pending decisions (mandatory ones block end of turn):\n${
       input.pendingDecisions.length
@@ -88,8 +95,8 @@ export function buildTurnPrompt(input: TurnPromptInput): string {
       history.map(message => JSON.stringify(message)).join("\n") : "",
     input.openingObservation ? `Opening observation (game.observe at revision ${input.stateRevision}; absent fields are null, false, zero or empty):\n${input.openingObservation}` : "",
     input.openingObservation
-      ? "Start from the opening observation above instead of calling game.observe (observe again only for state your own actions changed), weigh the balance of power against your rivals, inspect terrain before settling/building, keep every settler and scout acting, preserve current worker progress, resolve decisions explicitly, batch independent commands with game.act_batch, play this turn, save concise notes, then commit game.end_turn."
-      : "Begin with game.observe, weigh the balance of power against your rivals, inspect terrain before settling/building, keep every settler and scout acting, preserve current worker progress, resolve decisions explicitly, batch independent commands with game.act_batch, play this turn, save concise notes, then commit game.end_turn.",
+      ? "Start from the opening observation above instead of calling game.observe (observe again only for changed state you need). Reconcile your victory commitment with the strategic checkpoint and factual progress; choose useful actions, preserve ongoing work, resolve decisions and required mail, batch independent commands, save concise strategy notes, then commit game.end_turn."
+      : "Begin with game.observe. Reconcile your victory commitment with the strategic checkpoint and factual progress; choose useful actions, preserve ongoing work, resolve decisions and required mail, batch independent commands, save concise strategy notes, then commit game.end_turn.",
   ];
   return lines.filter(Boolean).join("\n\n");
 }

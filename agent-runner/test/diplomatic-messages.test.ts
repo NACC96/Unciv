@@ -102,7 +102,7 @@ it("summarizes a queued message without exposing its body or calling an unconfir
 });
 
 const assertPurposefulOutreach = (prompt: string) => {
-  for (const instruction of ["Review game.observe.messageContacts each turn", "use it every turn to improve your position", "alliances of convenience against stronger rivals",
+  for (const instruction of ["game.observe.messageContacts", "Zero outgoing messages is valid", "alliances of convenience against stronger rivals",
     "isolate your next target", "shared objective", "specific asks", "each recipient's role", "threats work best when your observed strength can back them",
     "ten messages per turn", "Every message should serve your position", "Nuclear weapons invite retaliation", "keep them a last resort",
     "inbox and private correspondence", "separate tailored", "one recipient per call", "fresh actionId", "current expectedRevision"])
