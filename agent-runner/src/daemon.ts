@@ -129,7 +129,6 @@ export function buildSpawnForProvider(
  * Codex (developer_instructions) and Claude (--append-system-prompt) receive
  * GAME_INSTRUCTIONS on every invocation, so their turn prompt omits the copy.
  * OpenCode has no system-prompt flag here: a fresh session needs it in the prompt.
- * The versioned strategy update is always carried by buildTurnPrompt, including resumes.
  */
 export function promptCarriesStaticInstructions(provider: RunTurnControl["provider"], resumeId: string | undefined): boolean {
   if (provider === "codex" || provider === "claude") return false;

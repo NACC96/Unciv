@@ -40,7 +40,6 @@ function readStrategy(notes: string): { state: "missing" | "legacy" | "invalid" 
   return { state: "active", plan: plan as unknown as StrategyNote };
 }
 
-/** Ordinary accrual and selection changes alone cannot show progress on an unstated milestone. */
 const incidentalChanges = new Set(["goldChanged", "storedCultureChanged", "researchSelectionChanged", "productionSelectionChanged"]);
 
 export function strategyCheckpoint(input: { notes: string; gameTurn?: number; victory?: ObservedVictoryContext; strategicProgress?: StrategicProgress }) {

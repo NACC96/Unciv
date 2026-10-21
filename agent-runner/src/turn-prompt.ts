@@ -94,9 +94,10 @@ export function buildTurnPrompt(input: TurnPromptInput): string {
       `Stored acknowledgementText is the recipient's reply on the original message. History is context, not a new acknowledgement requirement.\n` +
       history.map(message => JSON.stringify(message)).join("\n") : "",
     input.openingObservation ? `Opening observation (game.observe at revision ${input.stateRevision}; absent fields are null, false, zero or empty):\n${input.openingObservation}` : "",
-    input.openingObservation
-      ? "Start from the opening observation above instead of calling game.observe (observe again only for changed state you need). Reconcile your victory commitment with the strategic checkpoint and factual progress; choose useful actions, preserve ongoing work, resolve decisions and required mail, batch independent commands, save concise strategy notes, then commit game.end_turn."
-      : "Begin with game.observe. Reconcile your victory commitment with the strategic checkpoint and factual progress; choose useful actions, preserve ongoing work, resolve decisions and required mail, batch independent commands, save concise strategy notes, then commit game.end_turn.",
+    (input.openingObservation
+      ? "Start from the opening observation above instead of calling game.observe (observe again only for changed state you need). "
+      : "Begin with game.observe. ") +
+      "Reconcile your victory commitment with the strategic checkpoint and factual progress; choose useful actions, preserve ongoing work, resolve decisions and required mail, batch independent commands, save concise strategy notes, then commit game.end_turn.",
   ];
   return lines.filter(Boolean).join("\n\n");
 }
