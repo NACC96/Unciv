@@ -1,5 +1,7 @@
 # Agent Match — Release Acceptance Evidence (plan §13)
 
+Current strategy/composer evidence is in the [October 20 acceptance record](agent-victory-evaluation.md), including matched model runs, unchanged baseline failures, package identity and the installed-app boundary. The sections below retain historical acceptance results and do not supersede that record.
+
 Status as of CP-034 on `agent-match-foundation`. Commands run with the
 standing environment (`JAVA_HOME=/opt/homebrew/opt/openjdk@21`,
 `GRADLE_USER_HOME=/Users/noahkenny/.gradle-unciv`, `COPYFILE_DISABLE=1`,
@@ -34,7 +36,7 @@ present and current, so a plain test/build re-run is equivalent evidence.
 | Authority/lifecycle | AgentRunControlsTest (pause/step/takeover/stop state machine); AgentOrchestrationLoopTest (scripted-supervisor full loop: sequential rotation, single-invocation invariant, pause-drain, resume without duplicates, failure→retry, human handoff); supervisorFactory injection + run-state observers on DesktopAgentMatch; daemon shutdown/EOF drain; SetControllerCommand rev discipline |
 | Storage | FileCheckpointStoreTest on the actual ExFAT volume: atomic move, interrupted-write recovery, corruption fallback, missing-volume error surfaced |
 | UI (automated part) | Session gating: `canChangeState` degrades all compliant surfaces to read-only; popup block now requires `canChangeState` (CP-030); DevConsole forbidden; AutoPlay gated (audit doc). Interactive GL-thread checks remain manual (see below) |
-| Victories | EndgameDynamicsTest: **all five** live — Domination (capital capture), Time (max turns), Scientific (Apollo + all parts in capital), Cultural (5 branches + Utopia Project), Diplomatic (UN + won vote). No further agent work after COMPLETED phase |
+| Victories | Historical EndgameDynamicsTest fixtures recognize all five engine victory outcomes from prepared state. They do not prove complete agent command routes, particularly spaceship assembly, which remains unsupported. AgentVictoryCommandFlowTest now separately proves the Domination command route; see [current action coverage](agent-action-coverage.md). No further agent work after COMPLETED phase; victory claims additionally require engine `victoryData`. |
 | Compatibility | Old saves without runner: legacy `nextTurn` path untouched when no session; unsupported-format refusals in AgentMatchSetup/Session attach (logged, session stays null) |
 
 ## 13.3 Deliberate manual acceptance — needs a human (checklist below)

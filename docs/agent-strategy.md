@@ -2,6 +2,8 @@
 
 Every invocation receives the versioned policy in `agent-runner/src/strategy-policy.ts`, including resumed sessions. Saved personalities remain in effect. The organizing objective is a victory the saved match can award to that civilization.
 
+See the [strategy/composer acceptance record](agent-victory-evaluation.md) for matched behavior results, missed or unmeasurable targets, and the separate installed-app verification boundary.
+
 ## Objectives and commitments
 
 `game.observe.victory` distinguishes saved enabled victory types, routes available to this civilization, canonical milestone completion and missing agent commands. The adapter reads engine predicates; it does not award victory or advance the game. Scientific spaceship assembly currently has no agent action and is labeled unsupported when still required. This does not disable Scientific victory in the saved rules.

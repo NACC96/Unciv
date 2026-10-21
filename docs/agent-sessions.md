@@ -28,6 +28,8 @@ Each run's `meta.json` and lifecycle activity entries record `strategyPolicyVers
 
 Source changes and prompt tests alone do not establish that an already-running desktop daemon uses the update. Verify the packaged runner and the first normal post-update run's policy metadata before treating an active match as updated.
 
+The [strategy/composer acceptance record](agent-victory-evaluation.md) separates adapter tests, isolated real-provider samples, packaged artifacts and installed-app verification. Its fresh-session/no-compaction evaluation settings are confined to the harness and do not change this production session policy.
+
 ## Post-turn compaction
 
 Codex supports compaction after a turn (`model_post_turn_compact_threshold_percent`). When the desktop sends `compactAfterTurn`, the supervisor asks Codex to compact once the turn's closing message is written. The supervisor does not wait for it:
@@ -42,7 +44,7 @@ The run log keeps the turn's own duration as its run-end entry; the compaction i
 ## Fewer round trips, smaller context
 
 - **Opening observation in the prompt.** The supervisor already observes before each turn, so the turn prompt carries that observation (without the events, decisions and mail stated elsewhere in the prompt). Leaders observe again only for state their own actions changed.
-- **Compact results.** Model-facing reads omit null, false, zero and empty fields. `game.observe` returns `diplomaticHistory` only with `includeHistory:true`, because the turn prompt already lists recent correspondence; in the match above that history was 17% of all tool output.
+- **Compact results.** Model-facing entity reads omit redundant empty/default fields; ordinary numeric zero values remain, while zero tile yields and resource amounts are omitted. Original-capital false/null metadata stays explicit, and the victory, military and strategic-progress blocks remain intact. `game.observe` returns `diplomaticHistory` only with `includeHistory:true`, because the turn prompt already lists recent correspondence; in the match above that history was 17% of all tool output.
 - **Map pictures.** `game.map_image` and the turn-start picture (Codex) replace most `game.map` paging; see [map pictures](agent-map-tools.md#map-pictures).
 - **Long moves.** `unit.move` accepts any known destination and continues on later turns; in the match above 65% of moves stepped a unit one tile per call.
 - **Fewer per-unit checks.** `game.observe` flags units with attack targets, promotions or upgrades available, and attack targets carry the engine's battle preview, so leaders query `game.legal_actions` only for units that need it.
