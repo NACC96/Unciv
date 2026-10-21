@@ -24,10 +24,15 @@ function lines(path, errors) {
 // Ignore only transport clocks/revisions; returned health, position, orders, path options,
 // visible threats and decisions remain significant. No semantic claim is made from args alone.
 const volatile = new Set(["revision", "stateRevision", "turnSerial", "gameRound", "generatedAt", "protocolVersion"]);
-function stable(value, omitVolatile = false) {
+const sightingClocks = new Set(["lastSeenTurn", "lastSeenRevision"]);
+const resourceClocks = new Set(["updatedTurn", "updatedRevision"]);
+function stable(value, omitVolatile = false, liveResource = false) {
   if (Array.isArray(value)) return value.map((v) => stable(v, omitVolatile));
   if (!object(value)) return value;
-  return Object.fromEntries(Object.keys(value).sort().filter((k) => !omitVolatile || !volatile.has(k)).map((k) => [k, stable(value[k], omitVolatile)]));
+  const liveTile = ["VISIBLE", "REVEALED"].includes(value.visibility);
+  return Object.fromEntries(Object.keys(value).sort().filter((k) => !omitVolatile ||
+    !(volatile.has(k) || liveTile && sightingClocks.has(k) || liveResource && resourceClocks.has(k)))
+    .map((k) => [k, stable(value[k], omitVolatile, liveTile && k === "resource")]));
 }
 const fingerprint = (value) => JSON.stringify(stable(value, true));
 
@@ -35,45 +40,82 @@ function providers(directory, errors) {
   const root = existsSync(join(directory, "providers")) ? join(directory, "providers") : directory;
   return readdirSync(root, { withFileTypes: true }).filter((d) => d.isDirectory()).flatMap((d) => {
     const path = join(root, d.name), meta = json(join(path, "meta.json"));
-    return meta ? [{ path, meta, events: lines(join(path, "events.jsonl"), errors) }] : [];
+    if (!meta) return [];
+    const malformed = [], events = lines(join(path, "events.jsonl"), malformed);
+    errors.push(...malformed);
+    return [{ path, meta, events, malformed }];
   }).sort((a, b) => Date.parse(a.meta.startedAt ?? 0) - Date.parse(b.meta.startedAt ?? 0));
 }
 
 function legacyCalls(attempts) {
-  const calls = [], seen = new Set();
-  for (const { path, meta, events } of attempts) for (const event of events) {
-    // Deliberately limited to complete, nontruncated Codex MCP results. Other formats are unknown.
-    const item = event.item;
-    if (event.type !== "item.completed" || item?.type !== "mcp_tool_call" || !item.id) continue;
-    const key = `${path}/${item.id}`;
-    if (seen.has(key)) continue;
-    seen.add(key);
-    let result = item.result?.structuredContent;
-    if (!result) for (const content of item.result?.content ?? []) {
-      if (content.type !== "text") continue;
-      try { result = JSON.parse(content.text); break; } catch { /* Truncated/unknown result is not a receipt. */ }
+  const calls = [], seen = new Set(), incompleteAttempts = [];
+  for (const { path, meta, events, malformed } of attempts) {
+    const reasons = new Set(), started = new Set(), completed = new Set();
+    if (meta.provider !== "codex") reasons.add("unsupported provider");
+    if (malformed.length) reasons.add("malformed stream records");
+    for (const event of events) {
+      // Deliberately limited to complete, nontruncated Codex MCP results. Other formats are unknown.
+      const item = event.item;
+      if (item?.type !== "mcp_tool_call") continue;
+      if (!item.id) { reasons.add("tool call without identity"); continue; }
+      if (event.type === "item.started") started.add(item.id);
+      if (event.type !== "item.completed") continue;
+      completed.add(item.id);
+      const key = `${path}/${item.id}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      let result = item.result?.structuredContent;
+      if (!result) for (const content of item.result?.content ?? []) {
+        if (content.type !== "text") continue;
+        try { result = JSON.parse(content.text); break; } catch { /* Truncated/unknown result is not a receipt. */ }
+      }
+      let args = item.arguments ?? {};
+      if (typeof args === "string") { try { args = JSON.parse(args); } catch { args = {}; reasons.add("undecodable tool arguments"); } }
+      if (!object(args)) { args = {}; reasons.add("invalid tool arguments"); }
+      const method = String(item.tool ?? "").replace(/^game\./, "");
+      if (result == null) reasons.add("undecodable tool result");
+      const base = { event: "engine_call_completed", runId: meta.runId ?? path, actor: meta.civId,
+        timelineId: meta.timelineId ?? "legacy-unknown", method, ok: !item.error && !item.result?.isError,
+        params: args, callId: key, result };
+      if (method === "act_batch") {
+        // The outer batch is never an action. Match receipt slots to input command slots.
+        const receipts = result?.results ?? result?.receipts;
+        const commands = args.actions ?? args.commands;
+        if (!Array.isArray(receipts)) { reasons.add("undecodable batch receipts"); continue; }
+        const mapped = Array.isArray(commands) && commands.length > 0 && commands.every(command =>
+          object(command) && typeof command.type === "string" && typeof command.actionId === "string") &&
+          receipts.every((receipt, index) => object(receipt) && receipt.actionId === commands[index]?.actionId && receipt.status === "applied");
+        const complete = mapped && result.status === "applied" && receipts.length === commands.length;
+        const partial = mapped && result.status === "partial" && result.rejected?.index === receipts.length &&
+          typeof result.rejected.code === "string" && result.rejected.code !== "INTERNAL_ERROR" &&
+          Array.isArray(result.skipped) && receipts.length + 1 + result.skipped.length === commands.length &&
+          result.skipped.every((id, index) => id === commands[receipts.length + 1 + index]?.actionId);
+        if (!complete && !partial || !base.ok) reasons.add("incomplete batch command mapping or outcome");
+        for (const [index, receipt] of receipts.entries()) calls.push({ ...base, callId: `${key}/${index}`, method: "act",
+          params: commands?.[index] ?? { type: receipt?.type }, result: receipt });
+      } else {
+        if (method === "act" && (!base.ok || !object(result) || !["applied", "rejected", "skipped"].includes(result.status) ||
+            typeof args.type !== "string" || typeof result.actionId !== "string")) reasons.add("incomplete action outcome");
+        calls.push(base);
+      }
     }
-    let args = item.arguments ?? {};
-    if (typeof args === "string") { try { args = JSON.parse(args); } catch { args = {}; } }
-    const method = String(item.tool ?? "").replace(/^game\./, "");
-    const base = { event: "engine_call_completed", runId: meta.runId ?? path, actor: meta.civId,
-      timelineId: meta.timelineId ?? "legacy-unknown", method, ok: !item.error && !item.result?.isError,
-      params: args, callId: key, result };
-    if (method === "act_batch") {
-      // The outer batch is never an action. Match receipt slots to input command slots.
-      const receipts = result?.results ?? result?.receipts ?? [];
-      for (const [index, receipt] of receipts.entries()) calls.push({ ...base, callId: `${key}/${index}`, method: "act",
-        params: args.actions?.[index] ?? args.commands?.[index] ?? { type: receipt.type }, result: receipt });
-    } else calls.push(base);
+    if (!completed.size) reasons.add("no completed tool evidence");
+    if ([...started].some(id => !completed.has(id))) reasons.add("unfinished tool calls");
+    if (reasons.size) incompleteAttempts.push({ runId: meta.runId ?? path, reasons: [...reasons] });
   }
-  return calls;
+  return { calls, incompleteAttempts };
 }
 
 function report(directory) {
   const malformed = [], events = lines(join(directory, "host-events.jsonl"), malformed);
+  const hostMalformed = malformed.length;
   const attempts = providers(directory, malformed);
   const hostCalls = events.filter((e) => e.event === "engine_call_completed");
-  const calls = hostCalls.length ? hostCalls : legacyCalls(attempts);
+  const legacy = hostCalls.length ? { calls: [], incompleteAttempts: [] } : legacyCalls(attempts);
+  const calls = hostCalls.length ? hostCalls : legacy.calls;
+  const completedHostCalls = new Set(hostCalls.map(call => `${call.runId}/${call.callId}`));
+  const incompleteHostCalls = events.filter(event => event.event === "engine_call_started" &&
+    !completedHostCalls.has(`${event.runId}/${event.callId}`)).length;
   const hostTurns = events.filter((e) => e.event === "turn_completed");
   const turns = [...new Map(hostTurns.map((e) => [e.runId, e])).values()];
   const completed = turns.filter((e) => e.status === "completed_turn" && e.endTurnsCommittedDelta > 0);
@@ -96,7 +138,9 @@ function report(directory) {
     tokens: { completedTurns: {} },
     outcome: { winner: null, victoryType: null, victoryTurn: null, winRateVerdict: "inconclusive", originalCapitalOwnershipChanges: [], snapshots: 0 },
     exclusions: { duplicateCalls: 0, replayedReceipts: 0, failedCalls: 0, nonAppliedReceipts: 0, unknownReceipts: 0, malformedLines: malformed },
-    coverage: { unsupportedLegacyAttempts, completeCommandCoverage: hostCalls.length > 0 || unsupportedLegacyAttempts === 0 },
+    coverage: { unsupportedLegacyAttempts, incompleteLegacyAttempts: legacy.incompleteAttempts, incompleteHostCalls,
+      completeCommandCoverage: hostCalls.length ? hostMalformed === 0 && incompleteHostCalls === 0 :
+        attempts.length > 0 && legacy.incompleteAttempts.length === 0 },
     countedEvents: { applied: [], unchangedReads: [], unchangedOrders: [], turns: completed.map((t) => t.runId) },
     limitations: ["Diplomacy counts distinguish new messages from required acknowledgements; useful coordination and milestone quality require human assessment.",
       "Repeated-state counts are conservative equality checks, not a judgment that an action was strategically unnecessary.",
@@ -179,6 +223,7 @@ function report(directory) {
         winRateVerdict: "engine-recorded victory; one scenario is not a full-match win-rate estimate" });
     }
   }
+  if (result.exclusions.unknownReceipts) result.coverage.completeCommandCoverage = false;
   result.commands.outgoingMessagesPerCompletedTurn = result.turns.completed && result.coverage.completeCommandCoverage
     ? completedTurnOutgoingMessages / result.turns.completed : null;
   return result;
@@ -193,11 +238,13 @@ if (!candidatePath || !existsSync(candidatePath)) {
   if (baselinePath) {
     const baseline = report(resolve(baselinePath));
     const reduction = (before, after) => number(before) && before > 0 && number(after) ? (before - after) / before : null;
+    const completeCommands = baseline.coverage.completeCommandCoverage && candidate.coverage.completeCommandCoverage;
     candidate.comparison = {
       baselineDirectory: baseline.directory,
       fixtureHashesMatch: candidate.manifest?.inputSha256 && baseline.manifest?.inputSha256 ? candidate.manifest.inputSha256 === baseline.manifest.inputSha256 : null,
-      unchangedReadsReduction: reduction(baseline.repetition.unchangedReads, candidate.repetition.unchangedReads),
-      unchangedOrdersReduction: reduction(baseline.repetition.unchangedOrders, candidate.repetition.unchangedOrders),
+      unchangedReadsReduction: completeCommands ? reduction(baseline.repetition.unchangedReads, candidate.repetition.unchangedReads) : null,
+      unchangedOrdersReduction: completeCommands && !baseline.repetition.unknownOrderState && !candidate.repetition.unknownOrderState
+        ? reduction(baseline.repetition.unchangedOrders, candidate.repetition.unchangedOrders) : null,
       outgoingMessagesPerTurnReduction: reduction(baseline.commands.outgoingMessagesPerCompletedTurn, candidate.commands.outgoingMessagesPerCompletedTurn),
       medianTimeToCommitReduction: reduction(baseline.timing.medianTimeToCommitMs, candidate.timing.medianTimeToCommitMs),
       interpretation: "Descriptive comparison. Verify identical input, provider/model/reasoning/vision and own-turn budgets, then inspect milestone quality and repeat samples before judging targets.",

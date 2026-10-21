@@ -19,7 +19,7 @@ function fixture(events: unknown[] = []) {
       writeFileSync(join(path, "meta.json"), JSON.stringify(meta));
       writeFileSync(join(path, "events.jsonl"), events.map((event) => JSON.stringify(event)).join("\n"));
     },
-    report: () => JSON.parse(execFileSync(process.execPath, [script, directory], { encoding: "utf8" })),
+    report: (baseline?: string) => JSON.parse(execFileSync(process.execPath, [script, directory, ...baseline ? [baseline] : []], { encoding: "utf8" })),
   };
 }
 const call = (callId: string, type: string, actionId: string, extra: object = {}) => ({
@@ -63,6 +63,89 @@ describe("strategy evaluation report", () => {
     expect(report.repetition.unchangedReads).toBe(1);
     expect(report.repetition.unchangedOrders).toBe(1);
     expect(report.repetition.unknownOrderState).toBe(0);
+  });
+
+  it("ignores fresh live sighting clocks while preserving real facts and remembered freshness", () => {
+    const state = (revision: number, visibility = "VISIBLE") => ({
+      unitId: 7, name: "Worker", health: 100, movementLeft: 2, action: "Sleep", x: 1, y: 0,
+      tile: { x: 1, y: 0, visibility, detailsKnown: true, lastSeenTurn: revision, lastSeenRevision: revision,
+        terrain: "Grassland", features: [], ownerCivId: "Rome", improvement: "Plantation",
+        resource: { name: "Silk", amount: 1, updatedTurn: revision, updatedRevision: revision, source: "SIGHTING" },
+        city: null, improvementPillaged: false, road: "None", roadPillaged: false,
+        yields: { context: "ACTOR_CITY", cityId: "Rome", values: { Food: 2, Gold: 3 } }, ownWork: null,
+        land: true, water: false, hill: false, coast: false, freshwater: false,
+        riverEdges: { bottomRight: false, bottom: false, bottomLeft: false } },
+    });
+    const inspect = (id: string, result: object) => ({ event: "engine_call_completed", callId: id, runId: "r1", actor: "Rome",
+      method: "inspect", ok: true, params: { unitId: 7 }, result });
+    const order = (id: string, relevantState: object) => call(id, "unit.order", id, {
+      params: { type: "unit.order", args: { unitId: 7, order: "SLEEP" } }, relevantState,
+    });
+    for (const visibility of ["VISIBLE", "REVEALED"]) {
+      const first = state(1, visibility), next = state(2, visibility);
+      const report = fixture([inspect("1", first), inspect("2", next), order("3", first), order("4", next)]).report();
+      expect(report.repetition.unchangedReads).toBe(1);
+      expect(report.repetition.unchangedOrders).toBe(1);
+    }
+    const remembered = state(2, "REMEMBERED");
+    const hurt = state(3); hurt.health = 80;
+    const terrain = state(4); terrain.tile.terrain = "Plains";
+    for (const changed of [remembered, hurt, terrain])
+      expect(fixture([inspect("1", state(1)), inspect("2", changed)]).report().repetition.unchangedReads).toBe(0);
+    expect(fixture([inspect("1", state(1, "REMEMBERED")), inspect("2", remembered)]).report().repetition.unchangedReads).toBe(0);
+  });
+
+  it("does not score missing order evidence as a reduction", () => {
+    const order = (id: string, extra: object = {}) => call(id, "unit.order", id, {
+      params: { type: "unit.order", args: { unitId: 7, order: "SLEEP" } }, ...extra,
+    });
+    const baseline = fixture([order("1", { relevantState: { health: 100 } }), order("2", { relevantState: { health: 100 } })]);
+    const unknown = fixture([order("1"), order("2")]).report(baseline.directory);
+    expect(unknown.repetition.unknownOrderState).toBe(2);
+    expect(unknown.comparison.unchangedOrdersReduction).toBeNull();
+    expect(fixture([order("1", { relevantState: { health: 100 } }), order("2", { relevantState: { health: 80 } })])
+      .report(baseline.directory).comparison.unchangedOrdersReduction).toBe(1);
+  });
+
+  it.each(["truncated batch", "unknown command mapping", "unfinished tool", "malformed stream"])(
+    "keeps incomplete legacy command evidence unknown: %s", failure => {
+      const baseline = fixture([call("1", "diplomacy.message", "mail"),
+        { event: "turn_completed", runId: "r1", status: "completed_turn", endTurnsCommittedDelta: 1 }]);
+      const candidate = fixture();
+      const item = { id: "batch", type: "mcp_tool_call", tool: "game.act_batch",
+        arguments: { actions: [{ actionId: "mail", type: "diplomacy.message", args: { targetCivId: "Greece", text: "Offer" } }] },
+        result: { content: [{ type: "text", text: failure === "truncated batch" ? '{"receipts":[' :
+          JSON.stringify({ status: "applied", receipts: [{ actionId: "mail", status: "applied" }] }) }] } };
+      if (failure === "unknown command mapping") item.arguments.actions = [];
+      const events = [{ type: "item.started", item }, ...failure === "unfinished tool" ? [] : [{ type: "item.completed", item }]];
+      candidate.provider("run", { runId: "r1", provider: "codex", civId: "Rome", turnOutcome: "completed_turn",
+        startedAt: "2026-01-01T00:00:00Z", endedAt: "2026-01-01T00:00:10Z" }, [
+          { type: "item.completed", item: { id: "observe", type: "mcp_tool_call", tool: "game.observe", arguments: {},
+            result: { structuredContent: { revision: 0 } } } }, ...events,
+        ]);
+      if (failure === "malformed stream") writeFileSync(join(candidate.directory, "providers/run/events.jsonl"),
+        events.map(event => JSON.stringify(event)).join("\n") + '\n{"type":"item.completed"');
+      const report = candidate.report(baseline.directory);
+      expect(report.coverage.completeCommandCoverage).toBe(false);
+      expect(report.commands.outgoingMessagesPerCompletedTurn).toBeNull();
+      expect(report.comparison.outgoingMessagesPerTurnReduction).toBeNull();
+    });
+
+  it.each(["applied", "partial"])("retains complete legacy batch evidence after an explicit %s outcome", status => {
+    const candidate = fixture();
+    const actions = [{ actionId: "mail", type: "diplomacy.message", args: { targetCivId: "Greece", text: "Offer" } },
+      { actionId: "order", type: "unit.order", args: { unitId: 7, order: "SLEEP" } }];
+    const receipts = [{ actionId: "mail", status: "applied" }, ...status === "applied" ? [{ actionId: "order", status: "applied" }] : []];
+    candidate.provider("run", { runId: "r1", provider: "codex", civId: "Rome", turnOutcome: "completed_turn",
+      startedAt: "2026-01-01T00:00:00Z", endedAt: "2026-01-01T00:00:10Z" }, [
+      { type: "item.completed", item: { id: "batch", type: "mcp_tool_call", tool: "game.act_batch", arguments: { actions },
+        result: { structuredContent: { status, receipts, ...status === "partial" ?
+          { rejected: { index: 1, code: "ILLEGAL_ACTION" }, skipped: [] } : {} } } } },
+    ]);
+    const report = candidate.report();
+    expect(report.coverage.completeCommandCoverage).toBe(true);
+    expect(report.commands.applied).toBe(status === "applied" ? 2 : 1);
+    expect(report.commands.outgoingMessagesPerCompletedTurn).toBe(1);
   });
 
   it("uses actual checkpoint capital identities and victory data, not captures or completion claims", () => {
