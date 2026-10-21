@@ -104,7 +104,7 @@ it.each([
     expect(final.durationMs).toBeGreaterThanOrEqual(0);
     expect(final.summary).toContain(outcome.detail);
     const identity = { matchId: "m", timelineId: "t", civId: "Rome", turnSerial: 3, gameTurn: 124,
-      strategyPolicyVersion: "victory-progress-v1" };
+      strategyPolicyVersion: "victory-progress-v2" };
     expect(JSON.parse(readFileSync(join(runDir, "meta.json"), "utf8"))).toMatchObject({ ...identity, turnOutcome: fixture.outcome });
     expect(JSON.parse(final.text)).toMatchObject(identity);
     const started = readFileSync(join(runDir, "activity.jsonl"), "utf8").trim().split("\n")

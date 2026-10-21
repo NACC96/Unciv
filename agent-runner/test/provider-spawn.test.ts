@@ -28,7 +28,7 @@ describe("provider executable discovery without provider launches", () => {
       const { spec } = buildSpawnForProvider(provider, prompt, resumeId, "http://127.0.0.1:1234/mcp", "fixture-secret",
         { model: "chosen-model", reasoning: "high" }, cwd);
       expect(spec.argv.at(-1)).toBe(prompt);
-      expect(spec.argv.at(-1)).toContain("victory-progress-v1");
+      expect(spec.argv.at(-1)).toContain("victory-progress-v2");
       expect(spec.argv).toContain("chosen-model");
       expect(spec.argv).toContain(provider === "codex" ? 'model_reasoning_effort="high"' : "high");
       if (resumeId) expect(spec.argv).toContain(resumeId);

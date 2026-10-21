@@ -35,7 +35,7 @@ function progress(counts: Record<string, number> = {}): StrategicProgress {
 }
 
 it("reconciles canonical enabled and available routes with legacy and incompatible private plans", () => {
-  expect(checkpoint()).toMatchObject({ policyVersion: "victory-progress-v1", gameTurn: 104, planState: "active", deadlineState: "future",
+  expect(checkpoint()).toMatchObject({ policyVersion: "victory-progress-v2", gameTurn: 104, planState: "active", deadlineState: "future",
     enabledVictoryTypes: ["Domination"], availableVictoryTypes: ["Domination"], reviewRequired: false });
   expect(checkpoint({ notes: "Primary victory: Scientific. Build spaceship parts." })).toMatchObject({ planState: "legacy", reviewRequired: true });
   expect(checkpoint({ notes: JSON.stringify({ strategy: { ...plan, victory: "Scientific" } }) })).toMatchObject({ planState: "route_unavailable", reviewRequired: true });
@@ -100,6 +100,8 @@ it("treats an older engine or truncated available routes as unknown, not disable
 
 it("removes activity mandates while preserving purposeful messages and changed-condition checks", () => {
   for (const text of [GAME_INSTRUCTIONS, prompt(), prompt({ openingObservation: "{}" })]) {
+    expect(text).toContain("Actively seek useful diplomatic opportunities");
+    expect(text).toContain("Initiate a concrete proposal when it advances your strategy");
     expect(text).not.toContain("use it every turn to improve your position");
     expect(text).not.toContain("Never leave a settler idle");
     expect(text).not.toContain("keep every settler and scout acting");

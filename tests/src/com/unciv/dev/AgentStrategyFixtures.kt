@@ -8,7 +8,7 @@ import com.unciv.testing.TestGame
 /** Small real-engine starting positions, serialized ONCE then shared by both evaluation arms. */
 internal object AgentStrategyFixtures {
     val ids = setOf("stable-border", "stranded-settler", "favorable-assault", "unfavorable-assault",
-        "outdated-science-notes", "near-victory", "scripted-smoke")
+        "outdated-science-notes", "diplomatic-opportunity", "near-victory", "scripted-smoke")
 
     fun bundle(id: String, seed: Long, profile: AgentProfile, vision: MatchVision): String {
         require(id in ids) { "Unknown fixture $id; choose ${ids.joinToString()}" }
@@ -78,12 +78,29 @@ internal object AgentStrategyFixtures {
             for (tile in coast) test.setTileTerrain(tile.position, "Ocean")
             test.addUnit("Settler", rome, test.getTile(-3, 0))
         }
+        if (id == "diplomatic-opportunity") {
+            research(rome, "Calendar")
+            research(greece, "Mining")
+            test.addCity(rome, test.getTile(-4, -3), initialPopulation = 5).id = "fixture-rome-second"
+            test.addCity(greece, test.getTile(3, 3), initialPopulation = 5).id = "fixture-greece-second"
+            for ((city, resource, improvement) in listOf(Triple(home, "Silk", "Plantation"), Triple(target, "Gems", "Mine"))) {
+                val tiles = city.getCenterTile().neighbors.filter { it.getOwner() == city.civ }
+                    .sortedWith(compareBy({ it.position.x }, { it.position.y })).take(2).toList()
+                check(tiles.size == 2)
+                for (tile in tiles) {
+                    tile.setTileResource(resource)
+                    tile.setImprovement(improvement)
+                }
+                city.civ.cache.updateCivResources()
+                check(city.civ.getCivResourcesByName().getValue(resource) == 2)
+            }
+        }
 
         val match = AgentMatchState(matchId = "fixture-$id-$seed", timelineId = "fixture-timeline-$id-$seed",
             turnPhase = TurnPhase.READY_TO_START, vision = vision)
         match.controllers[rome.civID] = CivilizationController(rome.civID, ControllerKind.EXTERNAL_AGENT, profile.copy())
         // Stable diplomacy needs another commandable leader; a builtin-only rival cannot receive agent mail.
-        val diplomatic = id == "stable-border" || id == "outdated-science-notes"
+        val diplomatic = id in setOf("stable-border", "outdated-science-notes", "diplomatic-opportunity")
         match.controllers[greece.civID] = CivilizationController(greece.civID,
             if (diplomatic) ControllerKind.EXTERNAL_AGENT else ControllerKind.BUILTIN_AI,
             if (diplomatic) profile.copy().apply { profileId += "-greece"; displayName += " Greece" } else null)
@@ -92,6 +109,10 @@ internal object AgentStrategyFixtures {
             "Our border remains peaceful. Please confirm receipt of our existing non-aggression arrangement. No new proposal or threat has arisen.", 0))
         if (id == "outdated-science-notes") match.privateNotes[rome.civID] =
             "Primary victory: Scientific. Build Apollo and spaceship parts. Avoid military operations indefinitely while researching towards space."
+        if (id == "diplomatic-opportunity") {
+            match.privateNotes[rome.civID] = "Last observed resources: two connected Silk near Rome; no Gems. Greece has two connected Gems near Athens and no Silk. Two cities are placing pressure on happiness. No proposal or message has been sent."
+            match.privateNotes[greece.civID] = "Last observed resources: two connected Gems near Athens; no Silk. Rome has two connected Silk near Rome and no Gems. Two cities are placing pressure on happiness. No proposal or message has been sent."
+        }
         return MatchCoordinator(game, match, InMemoryCheckpointWriter()).saveToJson()
     }
 }
