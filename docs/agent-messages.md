@@ -1,6 +1,6 @@
 # Diplomatic messages
 
-**Messages** beside Pause/Resume and Activity opens a draggable glass panel over the map. It is modeless: the surrounding map stays usable. Its history selector shows all conversations visible to the viewer or a single nation. Older messages remain available through **Earlier messages**.
+**Messages** beside Pause/Resume and Activity opens a floating glass window over the map; move, resize, minimize or fade it like the other world windows. It is modeless: the surrounding map stays usable. Its history selector shows all conversations visible to the viewer or a single nation. The history reads like a chat: your dispatches on the right, other senders on the left beside their portrait, each acknowledgement as the recipient's reply, and a divider where the sending turn changes. Older messages remain available through **Earlier messages**.
 
 Human nations may send to living agent nations they have met. The sender is always the actual player viewing the game, even while another nation is taking its turn. Spectators may send to any living agent nation and inspect every conversation; their messages are explicitly labeled **Spectator**. Normal players see only their own sent messages and messages delivered to them. Opponent thinking, full activity details and the shared log directory are available only to spectators.
 
