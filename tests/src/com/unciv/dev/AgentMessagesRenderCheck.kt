@@ -67,8 +67,10 @@ object AgentMessagesRenderCheck {
             var frames = 0
             var completed = false
             var captureFramebuffer: FrameBuffer? = null
-            var captureFilter = false
-            var captureRecipient = false
+            var captureState = 0
+            val captureFilter get() = captureState == 5
+            val captureRecipient get() = captureState == 4
+            var collapsedReadingHeight = 0f
             val nations = listOf("America", "Arabia", "Germany", "China", "Russia", "The Ottomans", "Persia", "England", "France")
             val historyCallbacks = ArrayList<() -> Unit>()
             val profiles = nations.associateWith { AgentProfile.defaultFor(it) }.also {
@@ -181,14 +183,6 @@ object AgentMessagesRenderCheck {
                     panel = AgentMessagesPanel(screen, session, clipboard)
                     panel.toggle()
                     historyCallbacks.forEach { it() }; historyCallbacks.clear()
-                    panel.descendants().single { it.name == "MessagePasteImage" }.let { button ->
-                        button.listeners.filterIsInstance<ActivationListener>().single().tap(
-                            InputEvent().apply { listenerActor = button }, 1f, 1f, 1, 0)
-                    }
-                    panel.descendants().filterIsInstance<TextArea>().single().apply {
-                        text = "Please consider a coastal city.\nKeep a defensive unit near the capital."
-                        fire(ChangeListener.ChangeEvent())
-                    }
                     picker = feed.descendants().filterIsInstance<SelectBox<*>>().single()
                     recipientPicker = panel.descendants().filterIsInstance<SelectBox<*>>().single { it.name == "MessageRecipient" }
                     selectOttomans(picker)
@@ -281,51 +275,77 @@ object AgentMessagesRenderCheck {
                     }
                 }
                 panel.validate()
-                for (name in (if (panel.isVisible) listOf("MessageBody", "MessageRecipient", "MessageConversation", "MessageSend", "MessagePasteImage", "MessageImagePreview", "MessageRemoveImage", "MessageVisionWarning") else emptyList())) {
-                    val control = panel.descendants().single { it.name == name }
-                    val point = control.localToStageCoordinates(Vector2())
-                    check(point.x >= panel.x - 0.5f && point.x + control.width <= panel.x + panel.width + 0.5f &&
-                        point.y >= panel.y - 0.5f && point.y + control.height <= panel.y + panel.height + 0.5f) {
-                        "$name falls outside the panel at ${width}x$height"
-                    }
-                }
+                val composerOpen = captureState in listOf(1, 3, 4)
                 if (panel.isVisible) {
+                    val names = mutableListOf("MessageConversation", "MessageReadingPane", "MessageComposerToggle")
+                    if (composerOpen) names += listOf("MessageComposerPane", "MessageFooter", "MessageSend", "MessagePasteImage")
+                    for (name in names) {
+                        val control = panel.descendants().single { it.name == name }
+                        val point = control.localToStageCoordinates(Vector2())
+                        check(point.x >= panel.x - 0.5f && point.x + control.width <= panel.x + panel.width + 0.5f &&
+                            point.y >= panel.y - 0.5f && point.y + control.height <= panel.y + panel.height + 0.5f) {
+                            "$name falls outside the panel at ${width}x$height"
+                        }
+                    }
+                    val reading = panel.descendants().single { it.name == "MessageReadingPane" }
+                    val composer = panel.descendants().single { it.name == "MessageComposerPane" }
+                    if (captureState == 0) collapsedReadingHeight = reading.height
+                    if (composerOpen) check(reading.height < collapsedReadingHeight - 60f) {
+                        "Composer visibility did not change the real reading viewport"
+                    } else check(composer.height == 0f && !composer.isVisible) { "Collapsed composer still occupies space" }
                     check(panel.descendants().any { it.name == "MessageHistoryImage" }) { "History attachment must render through a session preview" }
-                    check(panel.descendants().filterIsInstance<Label>().any { it.text.toString().contains("Image support is unknown") }) {
-                        "Unknown vision warning must remain visible with the attached draft"
+                    if (captureState > 0) {
+                        check(panel.descendants().filterIsInstance<Label>().any { it.text.toString().contains("Image support is unknown") }) {
+                            "Unknown vision warning must remain in the retained attached draft"
+                        }
+                        check(panel.descendants().filterIsInstance<Label>().any { it.name == "MessageDraftIndicator" && it.text.toString() == "Draft" })
                     }
                 }
                 val pixels = Pixmap.createFromFrameBuffer(0, 0,
                     if (synchronous) width else Gdx.graphics.backBufferWidth,
                     if (synchronous) height else Gdx.graphics.backBufferHeight)
-                val kind = when { captureFilter -> "activity-filter"; captureRecipient -> "message-recipient"; else -> "agent-messages" }
+                val kind = listOf("messages-collapsed", "messages-expanded", "messages-collapsed-draft", "messages-reopened", "message-recipient", "activity-filter")[captureState]
                 try {
                     check(Gdx.gl.glGetError() == GL20.GL_NO_ERROR) { "Messages capture readback leaked a GL error" }
                     PixmapIO.writePNG(Gdx.files.absolute("${args[0]}/$kind-$width.png"), pixels, -1, true)
                 } finally { pixels.dispose() }
                 frames = 0
-                if (!captureFilter && !captureRecipient) {
-                    captureRecipient = true
-                    recipientPicker.showList()
-                } else if (captureRecipient) {
-                    recipientPicker.hideList()
-                    captureRecipient = false
-                    panel.toggle()
-                    captureFilter = true
-                    picker.showList()
-                } else {
-                    picker.hideList()
-                    captureFilter = false
-                    if (++sizeIndex == sizes.size) {
-                        println("MESSAGES_RENDER_CHECK_PASSED: real GPU, mail provenance, queued/delivered/acknowledged, image draft/history previews, paste/remove controls, persistent warning, nine default agent identities and a long selected name, filters, resize, glass content, activity and recipient dropdown bounds")
-                        completed = true
-                        if (!synchronous) Gdx.app.exit()
-                    } else {
-                        panel.toggle()
-                        if (synchronous) resizeLogical(sizes[sizeIndex].first, sizes[sizeIndex].second)
-                        else Gdx.graphics.setWindowedMode(sizes[sizeIndex].first, sizes[sizeIndex].second)
+                when (captureState++) {
+                    0 -> {
+                        tap("MessageComposerToggle")
+                        panel.descendants().filterIsInstance<TextArea>().single().apply {
+                            text = "Please consider a coastal city.\nKeep a defensive unit near the capital."
+                            fire(ChangeListener.ChangeEvent())
+                        }
+                        tap("MessagePasteImage")
+                    }
+                    1 -> tap("MessageComposerToggle")
+                    2 -> tap("MessageComposerToggle")
+                    3 -> recipientPicker.showList()
+                    4 -> { recipientPicker.hideList(); panel.hide(); picker.showList() }
+                    else -> {
+                        picker.hideList()
+                        if (++sizeIndex == sizes.size) {
+                            println("MESSAGES_RENDER_CHECK_PASSED: real GPU; collapsed, expanded, collapsed draft and reopened composer; recovered reading height; retained image and warning; activity and recipient dropdown bounds")
+                            completed = true
+                            if (!synchronous) Gdx.app.exit()
+                        } else {
+                            panel.toggle()
+                            tap("MessageRemoveImage")
+                            panel.descendants().filterIsInstance<TextArea>().single().apply { text = ""; fire(ChangeListener.ChangeEvent()) }
+                            tap("MessageComposerToggle")
+                            captureState = 0
+                            if (synchronous) resizeLogical(sizes[sizeIndex].first, sizes[sizeIndex].second)
+                            else Gdx.graphics.setWindowedMode(sizes[sizeIndex].first, sizes[sizeIndex].second)
+                        }
                     }
                 }
+            }
+
+            private fun tap(name: String) {
+                val control = panel.descendants().single { it.name == name }
+                control.listeners.filterIsInstance<ActivationListener>().single().tap(
+                    InputEvent().apply { listenerActor = control }, 1f, 1f, 1, 0)
             }
 
             private fun checkBounds(actor: Actor, description: String) {

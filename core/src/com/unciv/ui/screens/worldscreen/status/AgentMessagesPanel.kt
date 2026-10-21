@@ -68,6 +68,11 @@ class AgentMessagesPanel(
     private val composer = Table(skin).apply { name = "MessageComposer"; top().left() }
     private val composerScroll = AutoScrollPane(composer, skin).apply { name = "MessageComposerPane" }
     private val footer = Table(skin).apply { name = "MessageFooter"; top().left() }
+    private val composerToggle = WorldScreenStyle.quietButton("Write message", GameUiStyle.ButtonSize.Compact)
+        .apply { name = "MessageComposerToggle" }
+    private val draftIndicator = "".toLabel(WorldScreenStyle.muted, GameUiStyle.Type.caption).apply { name = "MessageDraftIndicator" }
+    private val composerControls = Table(skin)
+    private var composerExpanded = false
     private val header = Table(skin).apply { touchable = Touchable.enabled }
     private val recipient = AgentNationSelectBox<NationOption>().apply { name = "MessageRecipient" }
     private val conversation = AgentNationSelectBox<NationOption>().apply { name = "MessageConversation" }
@@ -115,7 +120,11 @@ class AgentMessagesPanel(
     private val historyAnchors = LinkedHashMap<String, Actor>()
     private var pendingScrollAnchor: ScrollAnchor? = null
     private var imagesHidden = true
-    private val status = "".toLabel(WorldScreenStyle.muted, 11).apply { wrap = true }
+    private val status = "".toLabel(WorldScreenStyle.muted, 11).apply { name = "MessageStatus"; wrap = true }
+    private val statusPane = AutoScrollPane(status, skin).apply {
+        name = "MessageStatusPane"
+        setScrollingDisabled(true, false); setOverscroll(false, false); setFadeScrollBars(false)
+    }
     private val identity = "".toLabel(WorldScreenStyle.muted, 11).apply { wrap = true }
     private val count = "".toLabel(WorldScreenStyle.muted, GameUiStyle.Type.caption)
     private val allConversations = NationOption(null, "All conversations")
@@ -180,6 +189,9 @@ class AgentMessagesPanel(
         scroll.setFadeScrollBars(false)
         scroll.setOverscroll(false, false)
         add(scroll).grow().row()
+        composerControls.add(composerToggle).minWidth(0f).left()
+        composerControls.add(draftIndicator).minWidth(0f).expandX().right().padLeft(8f)
+        add(composerControls).growX().padTop(GameUiStyle.Space.xs).row()
         if (GameUiStyle.isAtlas) {
             // A draft card: recipient chip, the text, then its attachments and warnings.
             composer.background = WorldScreenStyle.control("WorldScreen/Messages/Draft",
@@ -193,31 +205,28 @@ class AgentMessagesPanel(
             composer.add(count).minWidth(0f).growX().right().padTop(4f).row()
             composer.add(imagePreview).growX().row()
             composer.add(visionWarning).growX().left().row()
-            composerScroll.setScrollingDisabled(true, false)
-            composerScroll.setFadeScrollBars(false); composerScroll.setOverscroll(false, false)
-            add(composerScroll).growX().padTop(GameUiStyle.Space.m).row()
             WorldScreenStyle.apply(paste, GameUiStyle.Emphasis.Quiet, GameUiStyle.ButtonSize.Compact)
             WorldScreenStyle.apply(send, GameUiStyle.Emphasis.Accent, GameUiStyle.ButtonSize.Compact)
             footer.add(paste).minWidth(0f).left()
             footer.add().growX()
             footer.add(send).minWidth(96f).right().row()
-            val statusPane = AutoScrollPane(status, skin).apply {
-                setScrollingDisabled(true, false); setOverscroll(false, false); setFadeScrollBars(false)
-            }
-            footer.add(statusPane).colspan(3).minWidth(0f).growX().height(28f * UncivGame.Current.settings.fontSizeMultiplier).padTop(4f).row()
-            add(footer).growX().row()
         } else {
-            add("To".toLabel(WorldScreenStyle.muted, 11)).left().padTop(12f).row()
-            add(recipient).minWidth(0f).growX().height(32f).padTop(4f).padBottom(6f).row()
-            add(body).growX().height(82f).row()
+            composer.add("To".toLabel(WorldScreenStyle.muted, 11)).left().row()
+            composer.add(recipient).minWidth(0f).growX().height(32f).padTop(4f).padBottom(6f).row()
+            composer.add(body).growX().height(82f).row()
             footer.add(count).left().expandX()
             footer.add(paste).right().padRight(8f)
             footer.add(send).right()
-            add(imagePreview).growX().row()
-            add(visionWarning).growX().left().row()
-            add(footer).growX().padTop(6f).row()
-            add(status).growX().left().padTop(5f).row()
+            composer.add(imagePreview).growX().row()
+            composer.add(visionWarning).growX().left().row()
         }
+        composerScroll.setScrollingDisabled(true, false)
+        composerScroll.setFadeScrollBars(false); composerScroll.setOverscroll(false, false)
+        add(composerScroll).minHeight(0f).growX().row()
+        add(footer).minHeight(0f).growX().row()
+        add(statusPane).minHeight(0f).growX().row()
+        composerScroll.isVisible = false; footer.isVisible = false
+        composerToggle.onClick { setComposerExpanded(!composerExpanded) }
         conversation.addListener(object : ChangeListener() {
             override fun changed(event: ChangeEvent, actor: Actor) {
                 if (!updating) { visibleLimit = 100; historyTailOffset = 0; rebuildHistory(jump = true) }
@@ -243,6 +252,23 @@ class AgentMessagesPanel(
 
     fun toggle() = setShown(!isVisible)
     fun hide() = setShown(false)
+    private fun setComposerExpanded(expanded: Boolean) {
+        if (composerExpanded == expanded) return
+        rememberScrollPosition()
+        composerExpanded = expanded
+        composerScroll.isVisible = expanded; footer.isVisible = expanded
+        composerToggle.setText(if (expanded) "Hide message box" else "Write message")
+        if (!expanded) {
+            recipient.hideScrollPane()
+            fun belongsToComposer(actor: Actor?) = actor?.let {
+                it.isDescendantOf(composerScroll) || it.isDescendantOf(footer)
+            } == true
+            if (belongsToComposer(screen.stage.keyboardFocus)) screen.stage.keyboardFocus = null
+            if (belongsToComposer(screen.stage.scrollFocus)) screen.stage.scrollFocus = null
+        }
+        invalidateHierarchy()
+        Gdx.graphics.requestRendering()
+    }
     private fun setShown(shown: Boolean) {
         isVisible = shown
         if (shown) {
@@ -303,7 +329,7 @@ class AgentMessagesPanel(
         val resized = bounds.width != width || bounds.height != height
         if (resized && !window.isInteracting) rememberScrollPosition()
         window.place()
-        (if (GameUiStyle.isAtlas) composer.getCell(body) else getCell(body)).height(if (GameUiStyle.isAtlas || height < 500f) 54f else 82f)
+        composer.getCell(body).height(if (GameUiStyle.isAtlas || height < 500f) 54f else 82f)
         val latest = orderedDiplomaticMessages(session.getMessages()).filter { spectator || it.senderCivId == id || it.targetCivId == id }.map { Mail(it.messageId, it.senderCivId, it.targetCivId, it.text,
             it.sentTurnSerial, it.deliveredTurnSerial, it.origin,
             it.acknowledgedTurnSerial, it.acknowledgementText, it.acknowledgedRevision,
@@ -339,6 +365,7 @@ class AgentMessagesPanel(
 
     private fun updateSendState() {
         count.setText("${body.text.length}/${DiplomaticMessageLimits.MAX_BODY_CHARS}")
+        draftIndicator.setText(if (body.text.isNotEmpty() || imageDraft != null) "Draft" else "")
         WorldScreenStyle.setEnabled(send, !sending && !clipboardPending && options.isNotEmpty() && (body.text.isNotBlank() || imageDraft != null))
         recipient.isDisabled = sending || options.isEmpty()
         body.isDisabled = sending || options.isEmpty()
@@ -719,19 +746,28 @@ class AgentMessagesPanel(
     private fun rowTop(actor: Actor) = history.height - actor.localToAscendantCoordinates(history, Vector2()).y - actor.height
 
     override fun layout() {
-        if (GameUiStyle.isAtlas) {
-            val availableWidth = (width - padLeft - padRight).coerceAtLeast(1f)
-            val chrome = padTop + padBottom + header.prefHeight + identity.prefHeight + 2f + 8f + pickerHeight + 8f + GameUiStyle.Space.m
-            val area = (height - chrome).coerceAtLeast(1f)
-            val regions = AgentPanelLayout.calculate(availableWidth, area, UncivGame.Current.settings.fontSizeMultiplier)
-            // The draft grows with an attachment or warning (up to ~42% of the sheet) instead of scrolling it away.
-            val composerHeight = composer.prefHeight.coerceIn(regions.composer.height, maxOf(regions.composer.height, area * 0.42f))
-            getCell(scroll).height((area - composerHeight - regions.footer.height).coerceAtLeast(0f)).minHeight(0f)
-            getCell(composerScroll).height(composerHeight).minHeight(0f)
-            getCell(footer).height(regions.footer.height).minHeight(0f)
-            val inputWidth = (availableWidth - 16f - (composerScroll.style.vScroll?.minWidth ?: 0f)).coerceAtLeast(1f)
-            composer.cells.forEach { it.width(inputWidth) }
-        }
+        val fontScale = UncivGame.Current.settings.fontSizeMultiplier
+        val availableWidth = (width - padLeft - padRight).coerceAtLeast(1f)
+        // Active feedback belongs to the mailbox, including while its draft is collapsed.
+        // Empty feedback has no layout reservation; long errors remain scrollable in two lines.
+        val statusHeight = if (status.text.length == 0) 0f else 28f * fontScale
+        val statusGap = if (statusHeight == 0f) 0f else 4f
+        statusPane.isVisible = statusHeight > 0f
+        getCell(statusPane).height(statusHeight).padTop(statusGap)
+        val composerGap = if (composerExpanded) GameUiStyle.Space.xs else 0f
+        val chrome = padTop + padBottom + header.prefHeight + identity.prefHeight + 2f + 8f +
+            pickerHeight + 8f + composerControls.prefHeight + GameUiStyle.Space.xs + statusHeight + statusGap + composerGap
+        val area = (height - chrome).coerceAtLeast(1f)
+        val regions = AgentPanelLayout.calculate(availableWidth, area, fontScale, composerExpanded)
+        val composerHeight = if (composerExpanded)
+            composer.prefHeight.coerceIn(regions.composer.height, maxOf(regions.composer.height, area * 0.42f)) else 0f
+        val footerHeight = if (composerExpanded) footer.prefHeight.coerceAtMost(area * 0.24f) else 0f
+        getCell(scroll).height((area - composerHeight - footerHeight).coerceAtLeast(0f)).minHeight(0f)
+        getCell(composerScroll).height(composerHeight).padTop(composerGap)
+        getCell(footer).height(footerHeight)
+        val inputWidth = (availableWidth - composer.padLeft - composer.padRight -
+            (composerScroll.style.vScroll?.minWidth ?: 0f)).coerceAtLeast(1f)
+        composer.cells.forEach { it.width(inputWidth) }
         super.layout()
         // Parent bounds and wrapped labels must settle before calculating the final scroll range.
         scroll.validate()

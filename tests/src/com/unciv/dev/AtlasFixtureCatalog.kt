@@ -75,7 +75,13 @@ object AtlasFixtureCatalog {
         "setup", "menu", "supporting", "supporting-atlas", "supporting-atlas-end", "supporting-atlas-states")
     private val scopes = IdentityHashMap<BaseScreen, AtlasDataScope>()
 
-    init { registered.addAll(AtlasTurnFixtures.cases.map { "world-turn-$it" }) }
+    init {
+        registered.addAll(AtlasTurnFixtures.cases.map { "world-turn-$it" })
+        for (skin in listOf("messages", "messages-legacy")) {
+            registered.add(skin)
+            registered.addAll(listOf("expanded", "draft", "reopened").map { "$skin-$it" })
+        }
+    }
 
     fun ids(): Set<String> = registered.toSet()
     fun isolatedData(): AtlasDataScope = AtlasDataScope()
@@ -90,11 +96,12 @@ object AtlasFixtureCatalog {
         require(id in registered) { "Unknown Atlas fixture: $id" }
         require(width > 0 && height > 0 && fontScale > 0f)
         val scope = isolatedData()
+        val messageFixture = id == "messages" || id.startsWith("messages-")
         try {
             val fixture = scope.seedGame(large)
             val game = UncivGame.Current
             game.settings.apply {
-                skin = if ((id.startsWith("world") && id != "world-legacy") || id.startsWith("supporting-atlas") || id in setOf("activity", "messages", "overview", "nation-control")) "Atlas" else "Minimal"
+                skin = if ((id.startsWith("world") && id != "world-legacy") || id.startsWith("supporting-atlas") || (messageFixture && !id.startsWith("messages-legacy")) || id in setOf("activity", "overview", "nation-control")) "Atlas" else "Minimal"
                 fontSizeMultiplier = fontScale
                 showTutorials = false
                 enableEasterEggs = false
@@ -111,7 +118,7 @@ object AtlasFixtureCatalog {
             // A new JVM per matrix cell owns Fonts, atlases and this sole GL context.
             Fonts.fontImplementation = DesktopFont()
             ImageGetter.setNewRuleset(fixture.ruleset)
-            if ((id.startsWith("world") && id != "world-legacy") || id.startsWith("supporting-atlas") || id in setOf("activity", "messages", "overview", "nation-control")) {
+            if ((id.startsWith("world") && id != "world-legacy") || id.startsWith("supporting-atlas") || messageFixture || id in setOf("activity", "overview", "nation-control")) {
                 SkinCache.loadSkinConfigs()
                 BaseScreen.setSkin()
                 FontRulesetIcons.addRulesetImages(fixture.ruleset)
@@ -344,23 +351,35 @@ object AtlasFixtureCatalog {
                                 com.badlogic.gdx.scenes.scene2d.InputEvent().apply { listenerActor = tab }, 1f, 1f, 1, 0)
                         }
                     }
-                    if (id in setOf("activity", "messages", "overview", "nation-control")) preparePanelFixture(scope)
+                    if (messageFixture || id in setOf("activity", "overview", "nation-control")) preparePanelFixture(scope)
                     val panel: Disposable? = when (id) {
                         "activity" -> AgentActivityFeed(facade, scope.session)
-                        "messages" -> AgentMessagesPanel(facade, scope.session, object : MessageImageClipboard {
+                        "messages", "messages-expanded", "messages-draft", "messages-reopened",
+                        "messages-legacy", "messages-legacy-expanded", "messages-legacy-draft", "messages-legacy-reopened" -> AgentMessagesPanel(facade, scope.session, object : MessageImageClipboard {
                             override fun hasImageContents() = true
                             override fun readImage(onComplete: (MessageImageDraft?, String?) -> Unit) {
                                 onComplete(MessageImageDraft(java.util.Base64.getDecoder().decode(
                                     "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVR4nGP4DwQACfsD/fteaysAAAAASUVORK5CYII="), "image/png", 1, 1), null)
                             }
                         }).also {
-                            it.toggle()
-                            val editor = it.atlasDescendants().filterIsInstance<com.badlogic.gdx.scenes.scene2d.ui.TextArea>().single()
-                            editor.text = "Let us keep the river peaceful while our cities grow."
-                            val paste = it.atlasDescendants().filterIsInstance<TextButton>().single { actor -> actor.name == "MessagePasteImage" }
-                            paste.listeners.filterIsInstance<com.unciv.ui.components.input.ActivationListener>().single().tap(
-                                com.badlogic.gdx.scenes.scene2d.InputEvent().apply { listenerActor = paste }, 1f, 1f, 1, 0)
-                            it.refresh()
+                            it.toggle(); it.validate()
+                            val reading = it.atlasDescendants().single { actor -> actor.name == "MessageReadingPane" }
+                            val collapsedHeight = reading.height
+                            check(it.atlasDescendants().single { actor -> actor.name == "MessageComposerPane" }.height == 0f)
+                            if (id.endsWith("expanded") || id.endsWith("draft") || id.endsWith("reopened")) {
+                                fun tap(actor: Actor) = actor.listeners.filterIsInstance<com.unciv.ui.components.input.ActivationListener>().single()
+                                    .tap(com.badlogic.gdx.scenes.scene2d.InputEvent().apply { listenerActor = actor }, 1f, 1f, 1, 0)
+                                val toggle = it.atlasDescendants().single { actor -> actor.name == "MessageComposerToggle" }
+                                tap(toggle); it.validate()
+                                check(reading.height < collapsedHeight - 60f) { "Composer did not release real history space" }
+                                val editor = it.atlasDescendants().filterIsInstance<com.badlogic.gdx.scenes.scene2d.ui.TextArea>().single()
+                                editor.text = "Let us keep the river peaceful while our cities grow."
+                                tap(it.atlasDescendants().single { actor -> actor.name == "MessagePasteImage" })
+                                it.refresh()
+                                if (id.endsWith("draft") || id.endsWith("reopened")) tap(toggle)
+                                if (id.endsWith("reopened")) tap(toggle)
+                                it.validate()
+                            }
                         }
                         "overview" -> CivilizationOverviewPanel(facade)
                         "nation-control" -> AgentNationSettingsPanel(facade, scope.session).also {

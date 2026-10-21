@@ -132,7 +132,7 @@ class AgentMessagesPanelTest {
         .tap(InputEvent().apply { listenerActor = this@press }, 1f, 1f, 1, 0)
     private fun AgentMatchControlTable.openPanel(f: Fixture): AgentMessagesPanel {
         descendants().filterIsInstance<TextButton>().single { it.text.toString() == "Messages" }.press()
-        return f.root.children.filterIsInstance<AgentMessagesPanel>().single()
+        return f.root.children.filterIsInstance<AgentMessagesPanel>().single().also { if (it.isVisible) it.openComposer() }
     }
     private class ImageClipboard : MessageImageClipboard {
         var available = true
@@ -145,6 +145,205 @@ class AgentMessagesPanelTest {
         "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVR4nGP4DwQACfsD/fteaysAAAAASUVORK5CYII="), "image/png", 1, 1)
     private fun Actor.button(label: String) = descendants().filterIsInstance<TextButton>().single { it.text.toString() == label }
     private fun Actor.labels() = descendants().filterIsInstance<Label>().map { it.text.toString() }.toList()
+    private fun Actor.visibleInTree() = generateSequence(this) { it.parent }.all { it.isVisible }
+    private fun AgentMessagesPanel.toggleComposer() {
+        val toggle = descendants().singleOrNull { it.name == "MessageComposerToggle" }
+        assertNotNull("The mailbox needs one discoverable Write message / Hide message box control", toggle)
+        toggle!!.press()
+        validate()
+    }
+
+    @Test fun `mailbox starts collapsed and gives the recovered space to history`() {
+        val f = Fixture(420f, 600f)
+        val panel = AgentMessagesPanel(f.screen, f.session)
+        try {
+            panel.toggle(); panel.validate()
+            val editor = panel.descendants().filterIsInstance<TextArea>().single()
+            assertFalse("Opening Messages should show history without the unused draft form", editor.visibleInTree())
+            val history = panel.descendants().single { it.name == "MessageReadingPane" }
+            val collapsedHeight = history.height
+            val bounds = listOf(panel.x, panel.y, panel.width, panel.height)
+            for (name in listOf("MessageRecipient", "MessageBody", "MessageSend", "MessagePasteImage")) {
+                val control = panel.descendants().single { it.name == name }
+                assertFalse("$name should be hidden with the composer", control.visibleInTree())
+                val point = control.localToAscendantCoordinates(panel, Vector2(control.width / 2f, control.height / 2f))
+                assertFalse("$name must not receive clicks while hidden", panel.hit(point.x, point.y, true)?.isDescendantOf(control) == true)
+            }
+            panel.toggleComposer()
+            assertTrue(editor.visibleInTree())
+            assertTrue("Collapsing must recover real reading height", collapsedHeight > history.height + 60f)
+            assertEquals("Composer toggles must not move or resize the window", bounds, listOf(panel.x, panel.y, panel.width, panel.height))
+            panel.toggleComposer()
+            assertEquals(collapsedHeight, history.height, .5f)
+            panel.hide(); panel.toggle(); panel.validate()
+            assertFalse("Closing and reopening Messages preserves the local choice", editor.visibleInTree())
+        } finally { panel.dispose() }
+    }
+
+    @Test fun `collapsed draft retains text selection recipient image and asynchronous send feedback`() {
+        val f = Fixture(); f.contacts += MessageContact("Rome", "Caesar", true)
+        val clipboard = ImageClipboard()
+        Mockito.mockConstruction(Texture::class.java).use {
+            val panel = AgentMessagesPanel(f.screen, f.session, clipboard)
+            try {
+                panel.toggle(); panel.toggleComposer()
+                val editor = panel.descendants().filterIsInstance<TextArea>().single()
+                @Suppress("UNCHECKED_CAST")
+                val recipient = panel.descendants().single { it.name == "MessageRecipient" } as com.badlogic.gdx.scenes.scene2d.ui.SelectBox<Any>
+                recipient.selected = recipient.items.last()
+                val selected = recipient.selected
+                editor.text = "A persistent strategic dispatch"; editor.setSelection(2, 12)
+                editor.fire(com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent())
+                val caret = editor.cursorPosition; val selection = editor.selection
+                panel.toggleComposer()
+                assertTrue("A hidden text draft should be discoverable", panel.descendants().filterIsInstance<Label>().any { it.visibleInTree() && it.text.contains("Draft") })
+                panel.refresh(); panel.validate(); panel.toggleComposer()
+                assertSame(editor, panel.descendants().filterIsInstance<TextArea>().single())
+                assertEquals("A persistent strategic dispatch", editor.text)
+                assertEquals(caret, editor.cursorPosition); assertEquals(selection, editor.selection)
+                assertEquals(selected, recipient.selected)
+                panel.button("Paste image").press(); panel.toggleComposer()
+                clipboard.completion!!(imageDraft(), null); panel.validate()
+                assertFalse("An image completion must not reopen the composer", editor.visibleInTree())
+                panel.toggleComposer(); panel.button("Send").press(); panel.toggleComposer()
+                f.completion!!("Save failed"); panel.validate()
+                assertFalse(editor.visibleInTree())
+                assertTrue("Send errors remain visible while collapsed", panel.descendants().filterIsInstance<Label>().any { it.visibleInTree() && it.text.toString() == "Save failed" })
+                panel.toggleComposer(); panel.button("Send").press(); panel.toggleComposer()
+                f.completion!!(null); panel.validate()
+                assertFalse("Successful sends preserve the user's collapsed choice", editor.visibleInTree())
+                assertEquals("", editor.text)
+                assertEquals("Each explicit Send produces exactly one request", 2, f.requests.size)
+                assertEquals(listOf("Rome", "Rome"), f.requests.map { it.first })
+                assertArrayEquals(imageDraft().bytes, f.images.last()!!.bytes)
+                assertFalse(panel.descendants().filterIsInstance<Label>().any { it.visibleInTree() && it.text.contains("Draft") })
+            } finally { panel.dispose() }
+        }
+    }
+
+    @Test fun `collapsing composer releases editor focus and restores map shortcuts`() {
+        val f = Fixture()
+        Mockito.mockConstruction(SpriteBatch::class.java).use {
+            val stage = UncivStage(ScreenViewport())
+            stage.viewport.update(960, 600, true)
+            Mockito.`when`(f.screen.stage).thenReturn(stage)
+            val panel = AgentMessagesPanel(f.screen, f.session)
+            try {
+                panel.toggle(); panel.toggleComposer()
+                val editor = panel.descendants().filterIsInstance<TextArea>().single()
+                stage.keyboardFocus = editor
+                var mapShortcutCount = 0
+                stage.installShortcutDispatcher(KeyShortcutDispatcher().apply { add('t') { mapShortcutCount++ } }) { null }
+                panel.toggleComposer()
+                assertNull(stage.keyboardFocus)
+                stage.keyDown(Input.Keys.T); stage.keyTyped('t'); stage.keyUp(Input.Keys.T)
+                assertEquals(1, mapShortcutCount)
+                assertEquals("The hidden editor must not receive typing", "", editor.text)
+            } finally { panel.dispose(); stage.dispose(); stage.batch.dispose() }
+        }
+    }
+
+    @Test fun `attachment only paste completes collapsed without suppressing visible history images`() {
+        val f = Fixture()
+        f.messages = listOf(DiplomaticMessage("coast", "Greece", Constants.spectator, "Coastline", 1, 2).apply {
+            attachments.add(DiplomaticImageAttachment("a".repeat(64), "image/png", 1, 1, 100))
+        })
+        val clipboard = ImageClipboard()
+        Mockito.mockConstruction(Texture::class.java).use {
+            val panel = AgentMessagesPanel(f.screen, f.session, clipboard)
+            try {
+                panel.toggle(); panel.openComposer()
+                val historyCompletion = f.imageReadCompletion!!
+                panel.button("Paste image").press(); panel.toggleComposer()
+                clipboard.completion!!(imageDraft(), null)
+                historyCompletion(imageDraft(), null); panel.validate()
+                assertEquals("", panel.descendants().filterIsInstance<TextArea>().single().text)
+                assertTrue(panel.descendants().single { it.name == "MessageHistoryImage" }.visibleInTree())
+                assertFalse(panel.descendants().single { it.name == "MessageImagePreview" }.visibleInTree())
+                assertTrue(panel.descendants().filterIsInstance<Label>().any { it.visibleInTree() && it.text.toString() == "Draft" })
+                panel.hide(); panel.toggle(); panel.validate()
+                assertFalse(panel.descendants().single { it.name == "MessageBody" }.visibleInTree())
+                panel.toggleComposer(); panel.button("Send").press()
+                assertEquals("", f.requests.single().second)
+                assertArrayEquals(imageDraft().bytes, f.images.single()!!.bytes)
+                val oldSend = f.completion!!
+                panel.toggleComposer(); f.viewer = f.rome; f.messages = emptyList(); panel.refresh()
+                val editor = panel.descendants().filterIsInstance<TextArea>().single()
+                assertEquals("", editor.text)
+                assertFalse(panel.descendants().any { it.name == "MessageImagePreview" || it.name == "MessageHistoryImage" })
+                panel.toggleComposer(); editor.text = "The new viewer's private draft"
+                oldSend(null)
+                assertEquals("A stale send cannot clear the new viewer's draft", "The new viewer's private draft", editor.text)
+            } finally { panel.dispose() }
+        }
+    }
+
+    @Test fun `composer toggles preserve older message anchor and bottom follow through incoming mail`() {
+        val f = Fixture(420f, 600f)
+        f.messages = (1..30).map { DiplomaticMessage("message-$it", "Greece", Constants.spectator,
+            "A diplomatic dispatch with enough text to wrap at narrow reading widths.", it, it) }
+        val panel = AgentMessagesPanel(f.screen, f.session)
+        try {
+            panel.toggle(); panel.validate()
+            val scroll = panel.descendants().single { it.name == "MessageReadingPane" } as AutoScrollPane
+            val history = scroll.actor
+            scroll.scrollY = scroll.maxY / 2f; scroll.updateVisualScroll()
+            fun rowTop(actor: Actor) = history.height - actor.localToAscendantCoordinates(history, Vector2()).y - actor.height
+            val anchor = panel.descendants().first { it.name?.startsWith("MessageRow/") == true && rowTop(it) + it.height > scroll.scrollY }
+            val offset = scroll.scrollY - rowTop(anchor)
+            repeat(3) {
+                panel.toggleComposer()
+                f.messages += DiplomaticMessage("incoming-$it", "Greece", Constants.spectator, "A new dispatch", 31 + it, 31 + it)
+                panel.refresh(); panel.validate()
+                val sameMessage = panel.descendants().single { it.name == anchor.name }
+                assertEquals("Incoming mail and toggles preserve the same message and offset", offset, scroll.scrollY - rowTop(sameMessage), 1f)
+            }
+            scroll.scrollY = scroll.maxY; scroll.updateVisualScroll()
+            repeat(3) {
+                panel.toggleComposer()
+                assertEquals("Reading the newest message keeps end-follow across toggles", scroll.maxY, scroll.scrollY, 1f)
+                assertEquals(scroll.scrollY, scroll.visualScrollY, 1f)
+            }
+        } finally { panel.dispose() }
+    }
+
+    @Test fun `minimize and restore retain draft expansion and outer window bounds`() {
+        val prior = SetupUiStateSnapshot()
+        val f = Fixture()
+        com.unciv.UncivGame.Current.files = com.unciv.logic.files.UncivFiles(Gdx.files,
+            java.nio.file.Files.createTempDirectory("message-composer-window").toString() + "/")
+        try {
+            for (expanded in listOf(false, true)) {
+                val panel = AgentMessagesPanel(f.screen, f.session)
+                try {
+                    panel.toggle(); panel.openComposer()
+                    val editor = panel.descendants().filterIsInstance<TextArea>().single()
+                    editor.text = "Retain my draft while minimized"; editor.setSelection(3, 9)
+                    val selection = editor.selection; val caret = editor.cursorPosition
+                    if (!expanded) panel.toggleComposer()
+                    val bounds = listOf(panel.x, panel.y, panel.width, panel.height)
+                    val header = panel.children.filterIsInstance<com.badlogic.gdx.scenes.scene2d.ui.Table>().first()
+                    val controls = header.children.filterIsInstance<com.badlogic.gdx.scenes.scene2d.ui.Table>()
+                        .single { it !is com.badlogic.gdx.scenes.scene2d.ui.Button }
+                    controls.children.filterIsInstance<com.badlogic.gdx.scenes.scene2d.ui.Button>().last().press()
+                    assertFalse(panel.isVisible)
+                    val pill = f.root.children.single { it.name == "HudWindowPill/messages" } as Group
+                    pill.children.filterIsInstance<com.badlogic.gdx.scenes.scene2d.ui.Button>().first().press()
+                    panel.validate()
+                    assertTrue(panel.isVisible)
+                    assertEquals(expanded, editor.visibleInTree())
+                    assertEquals(bounds, listOf(panel.x, panel.y, panel.width, panel.height))
+                    assertEquals("Retain my draft while minimized", editor.text)
+                    assertEquals(selection, editor.selection); assertEquals(caret, editor.cursorPosition)
+                } finally { panel.dispose() }
+            }
+        } finally { prior.restore() }
+    }
+
+    private fun AgentMessagesPanel.openComposer() {
+        val toggle = descendants().filterIsInstance<TextButton>().single { it.name == "MessageComposerToggle" }
+        if (toggle.text.toString() == "Write message") toggleComposer()
+    }
 
     /** Exercise real Scene2D focus and event bubbling; fixture mocks only game/session state. */
     private fun withComposer(block: (UncivStage, AgentMessagesPanel, TextArea) -> Unit) {
@@ -156,7 +355,7 @@ class AgentMessagesPanelTest {
             Mockito.`when`(f.screen.stage).thenReturn(stage)
             val panel = AgentMessagesPanel(f.screen, f.session)
             try {
-                panel.toggle()
+                panel.toggle(); panel.openComposer()
                 panel.validate()
                 val editor = panel.descendants().filterIsInstance<TextArea>().single()
                 stage.keyboardFocus = editor
@@ -173,7 +372,7 @@ class AgentMessagesPanelTest {
         val f = Fixture(); f.contacts += MessageContact("Rome", "Caesar", true)
         val panel = AgentMessagesPanel(f.screen, f.session)
         try {
-            panel.toggle()
+            panel.toggle(); panel.openComposer()
             val composer = panel.descendants().filterIsInstance<TextArea>().single()
             val recipient = panel.descendants().single { it.name == "MessageRecipient" } as com.badlogic.gdx.scenes.scene2d.ui.SelectBox<*>
             @Suppress("UNCHECKED_CAST") val choices = recipient as com.badlogic.gdx.scenes.scene2d.ui.SelectBox<Any>
@@ -264,6 +463,27 @@ class AgentMessagesPanelTest {
         stage.keyDown(Input.Keys.H)
         assertEquals(1, globalOpens)
         assertEquals(1, actorOpens)
+    }
+
+    @Test fun `collapsing dismisses the recipient popup and only releases composer focus`() = withComposer { stage, panel, _ ->
+        val picker = panel.descendants().single { it.name == "MessageRecipient" } as com.badlogic.gdx.scenes.scene2d.ui.SelectBox<*>
+        picker.showList(); stage.act(.3f)
+        assertNotNull(picker.scrollPane.parent)
+        panel.toggleComposer()
+        assertEquals("The closing recipient list must immediately stop accepting input",
+            com.badlogic.gdx.scenes.scene2d.Touchable.disabled, picker.scrollPane.list.touchable)
+        // SelectBox hides with fadeOut then removeActor. SequenceAction advances one child
+        // per act(), so even a large single delta completes only the fade, not removal.
+        repeat(20) { stage.act(1f / 60f) }
+        assertNull("No orphaned recipient menu may remain over the map", picker.scrollPane.parent)
+        panel.toggleComposer()
+        val elsewhere = Actor(); stage.addActor(elsewhere)
+        stage.keyboardFocus = elsewhere
+        val history = panel.descendants().single { it.name == "MessageReadingPane" }
+        stage.scrollFocus = history
+        panel.toggleComposer()
+        assertSame(elsewhere, stage.keyboardFocus)
+        assertSame(history, stage.scrollFocus)
     }
 
     @Test fun `composer focus still allows an earlier map pan key to be released`() = withComposer { stage, _, editor ->
@@ -476,7 +696,7 @@ class AgentMessagesPanelTest {
             for (width in listOf(960f, 420f, 360f, 960f)) {
                 f.width = width
                 panel.refresh(); panel.validate()
-                val history = panel.descendants().filterIsInstance<AutoScrollPane>().single()
+                val history = panel.descendants().filterIsInstance<AutoScrollPane>().single { it.name == "MessageReadingPane" }
                 assertEquals("Long message identities must wrap rather than create horizontal scrolling", 0f, history.maxX, 0.5f)
                 for (label in history.descendants().filterIsInstance<Label>()) {
                     val point = label.localToAscendantCoordinates(panel, Vector2())
@@ -499,7 +719,7 @@ class AgentMessagesPanelTest {
         Mockito.mockConstruction(Texture::class.java).use {
             val panel = AgentMessagesPanel(f.screen, f.session, clipboard)
             try {
-                panel.toggle()
+                panel.toggle(); panel.openComposer()
                 assertTrue(panel.button("Send").isDisabled)
                 panel.button("Paste image").press()
                 clipboard.completion!!(imageDraft(), null)
@@ -524,7 +744,7 @@ class AgentMessagesPanelTest {
         Mockito.mockConstruction(Texture::class.java).use { textures ->
             val panel = AgentMessagesPanel(f.screen, f.session, clipboard)
             try {
-                panel.toggle(); panel.button("Paste image").press()
+                panel.toggle(); panel.openComposer(); panel.button("Paste image").press()
                 clipboard.completion!!(imageDraft(), null)
                 panel.button("Paste image").press()
                 clipboard.completion!!(null, "Unsupported image")
@@ -544,7 +764,7 @@ class AgentMessagesPanelTest {
             val f = Fixture()
             val clipboard = ImageClipboard()
             val panel = AgentMessagesPanel(f.screen, f.session, clipboard)
-            panel.toggle(); panel.button("Paste image").press()
+            panel.toggle(); panel.openComposer(); panel.button("Paste image").press()
             when (change) {
                 "hide" -> panel.hide()
                 "dispose" -> panel.dispose()
@@ -568,7 +788,7 @@ class AgentMessagesPanelTest {
                 Mockito.`when`(f.screen.stage).thenReturn(stage)
                 val panel = AgentMessagesPanel(f.screen, f.session, clipboard)
                 try {
-                    panel.toggle()
+                    panel.toggle(); panel.openComposer()
                     val editor = panel.descendants().filterIsInstance<TextArea>().single()
                     editor.setClipboard(object : Clipboard {
                         override fun hasContents() = true
@@ -598,7 +818,7 @@ class AgentMessagesPanelTest {
         })
         val panel = AgentMessagesPanel(f.screen, f.session)
         try {
-            panel.toggle()
+            panel.toggle(); panel.openComposer()
             assertTrue(f.imageReads.contains("image" to "a".repeat(64)))
             val callback = f.imageReadCompletion!!
             f.viewer = f.rome; f.messages = emptyList(); panel.refresh()
@@ -615,7 +835,7 @@ class AgentMessagesPanelTest {
         Mockito.mockConstruction(Texture::class.java).use {
             val panel = AgentMessagesPanel(f.screen, f.session, clipboard)
             try {
-                panel.toggle(); panel.button("Paste image").press(); clipboard.completion!!(imageDraft(), null)
+                panel.toggle(); panel.openComposer(); panel.button("Paste image").press(); clipboard.completion!!(imageDraft(), null)
                 assertTrue(panel.labels().any { it.contains("Image support is unknown") })
                 assertFalse(panel.button("Send").isDisabled)
                 panel.button("Send").press(); f.completion!!("Save failed")
@@ -630,10 +850,10 @@ class AgentMessagesPanelTest {
         val clipboard = ImageClipboard()
         Mockito.mockConstruction(Texture::class.java).use { textures ->
             val panel = AgentMessagesPanel(f.screen, f.session, clipboard)
-            panel.toggle(); panel.button("Paste image").press(); clipboard.completion!!(imageDraft(), null)
+            panel.toggle(); panel.openComposer(); panel.button("Paste image").press(); clipboard.completion!!(imageDraft(), null)
             panel.hide()
             Mockito.verify(textures.constructed().single()).dispose()
-            panel.toggle()
+            panel.toggle(); panel.openComposer()
             assertEquals(2, textures.constructed().size)
             assertFalse(panel.button("Send").isDisabled)
             panel.dispose()
@@ -652,7 +872,7 @@ class AgentMessagesPanelTest {
                 val panel = AgentMessagesPanel(f.screen, f.session, clipboard)
                 try {
                     val original = imageDraft()
-                    panel.toggle(); panel.button("Paste image").press(); clipboard.completion!!(original, null)
+                    panel.toggle(); panel.openComposer(); panel.button("Paste image").press(); clipboard.completion!!(original, null)
                     assertTrue(panel.labels().any { it.contains("does not support images") })
                     assertFalse(panel.button("Send").isDisabled)
                     panel.button("Send").press()
@@ -683,7 +903,7 @@ class AgentMessagesPanelTest {
         Mockito.mockConstruction(Texture::class.java).use { textures ->
             val panel = AgentMessagesPanel(f.screen, f.session)
             try {
-                panel.toggle()
+                panel.toggle(); panel.openComposer()
                 repeat(16) {
                     panel.descendants().filterIsInstance<TextButton>().first { it.text.toString() == "View image" }.press()
                 }
@@ -708,7 +928,7 @@ class AgentMessagesPanelTest {
         }
         val panel = AgentMessagesPanel(f.screen, f.session)
         try {
-            panel.toggle()
+            panel.toggle(); panel.openComposer()
             assertEquals(4, f.imageReads.size)
             assertEquals(listOf("image-7", "image-8", "image-9", "image-10"), f.imageReads.map { it.first })
             val view = panel.descendants().filterIsInstance<TextButton>().first { it.text.toString() == "View image" }
@@ -730,7 +950,7 @@ class AgentMessagesPanelTest {
         }.use {
             val panel = AgentMessagesPanel(f.screen, f.session, clipboard)
             try {
-                panel.toggle(); panel.button("Paste image").press(); clipboard.completion!!(original, null)
+                panel.toggle(); panel.openComposer(); panel.button("Paste image").press(); clipboard.completion!!(original, null)
                 assertEquals(listOf(512 to 256), dimensions)
                 panel.button("Send").press()
                 assertEquals(1600, f.images.single()!!.width)
@@ -746,7 +966,7 @@ class AgentMessagesPanelTest {
         Mockito.mockConstruction(Texture::class.java).use {
             val panel = AgentMessagesPanel(f.screen, f.session, clipboard)
             try {
-                panel.toggle()
+                panel.toggle(); panel.openComposer()
                 panel.descendants().filterIsInstance<TextArea>().single().apply {
                     text = "Look at this coast"
                     fire(com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent())
@@ -780,8 +1000,8 @@ class AgentMessagesPanelTest {
         Mockito.mockConstruction(Texture::class.java).use {
             val panel = AgentMessagesPanel(f.screen, f.session, clipboard)
             try {
-                panel.toggle(); panel.validate()
-                val scroll = panel.descendants().filterIsInstance<AutoScrollPane>().single()
+                panel.toggle(); panel.openComposer(); panel.validate()
+                val scroll = panel.descendants().filterIsInstance<AutoScrollPane>().single { it.name == "MessageReadingPane" }
                 assertTrue(scroll.maxY > 100f)
                 scroll.scrollY = scroll.maxY; scroll.updateVisualScroll()
                 panel.button("Paste image").press(); clipboard.completion!!(imageDraft(), null)
