@@ -127,6 +127,11 @@ class MatchCoordinator(
             captureAll(committedGame, committedMatch)
             flushInto(committedMatch, committedMatch.stateRevision)
         }
+        // Historical admitted saves have no progress ledger. Install their current baseline once
+        // without replaying start-turn effects or fabricating earlier quiet turns. Reads stay pure.
+        if (committedMatch.turnPhase == TurnPhase.AWAITING_DECISIONS &&
+            committedGame.currentPlayer in committedMatch.controllers)
+            admitStrategicTurn(committedGame, committedMatch, committedGame.currentPlayer)
         committedMatchJson = AgentOrdinarySave.encode(committedMatch)
         rebuildHotIndex()
     }
@@ -3018,6 +3023,7 @@ class MatchCoordinator(
                 resultJson = ""
             )
             candidateMatch.currentTurnReceipts.add(endReceipt)
+            finishStrategicTurn(candidateGame, candidateMatch, command.actorCivId)
 
             if (candidateGame.victoryData != null) {
                 // Victory achieved: stop scheduling new work, keep the ending
@@ -3126,6 +3132,9 @@ class MatchCoordinator(
         candidateGame.currentTurnStartTime = System.currentTimeMillis()
         candidateMatch.turnPhase = TurnPhase.AWAITING_DECISIONS
         candidateMatch.turnSerial++
+        // Reconcile the previous committed own end with this admitted state, including effects
+        // applied between turns and by startTurn. Publish it before the provider's opening read.
+        admitStrategicTurn(candidateGame, candidateMatch, civId)
         // Delivery is persisted with the turn transition. Reads and provider retries never drain it.
         candidateMatch.diplomaticMessages.filter {
             it.targetCivId == civId && it.deliveredTurnSerial == null &&

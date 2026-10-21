@@ -12,6 +12,7 @@ import { NodeRunner, Supervisor } from "../src/supervisor.js";
 import { MAX_IMAGE_TILES, renderCivMapImage } from "../src/map-overview.js";
 import { hexDistance } from "../src/map-image.js";
 import type { IGameService } from "../src/fake-game-mcp.js";
+import type { MilitaryContext } from "../src/strategy-types.js";
 import { buildTurnPrompt } from "../src/turn-prompt.js";
 import { parseCodexStream } from "../src/provider-events.js";
 import type { ObservedVictoryContext } from "../src/map-types.js";
@@ -100,14 +101,21 @@ describe("game tools", () => {
         completed: false, current: 0, target: 6, status: "unsupported", unsupportedReason: "No assembly command",
         remainingSpaceshipParts: { "SS Booster": 3 }, partsTruncated: false }],
     }], domination: null, availableTruncated: false };
-    fake.observe = async () => ({ ...legacyObservation, gameTurn: 104, turnSerial: 524, victory });
+    const forces = { coverage: "COMPLETE" as const, knownMilitaryUnits: 0, totalMilitaryUnits: 0,
+      conventionalUnits: 0, nuclearWeapons: 0, captureCapableUnits: 0, rangedUnits: 0, siegeUnits: 0,
+      aircraft: 0, interceptors: 0, damagedUnits: 0, conventionalUnitForce: 0 };
+    const military: MilitaryContext = { own: forces, rivals: [{ civId: "Greece", forces: {
+      ...forces, coverage: "VISIBLE_ONLY", totalMilitaryUnits: null, conventionalUnitForce: null,
+    } }] };
+    fake.observe = async () => ({ ...legacyObservation, gameTurn: 104, turnSerial: 524, victory, military });
     server = await startGameMcpServer(fake, { matchId: "m", timelineId: "t", civId: "Rome", runId: "r", authorityEpoch: 1 });
-    expect((await tool(server, "game.observe", {})).value).toMatchObject({ gameTurn: 104, turnSerial: 524, victory });
+    expect((await tool(server, "game.observe", {})).value).toMatchObject({ gameTurn: 104, turnSerial: 524, victory, military });
     fake.observe = async () => legacyObservation;
     const legacy = await tool(server, "game.observe", {});
     expect(legacy.isError).toBe(false);
     expect(legacy.value).not.toHaveProperty("victory");
     expect(legacy.value).not.toHaveProperty("gameTurn");
+    expect(legacy.value).not.toHaveProperty("military");
   });
 
   it("returns compact observations, opt-in history, city inspection and an end-turn signal", async () => {

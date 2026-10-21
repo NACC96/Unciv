@@ -53,6 +53,7 @@ object AgentOrdinarySave {
                 "Notes refer to an unknown civilization"
             }
             require(match.notesRevisions.values.all { it >= 0 }) { "Invalid notes revision" }
+            require(match.strategicProgress.keys.all { it in civs }) { "Strategic progress refers to an unknown civilization" }
             require(match.pendingDecisions.all { it.owningCivId in civs }) { "Invalid decision owner" }
             require(match.guidanceQueue.all { it.targetCivId in civs }) { "Invalid guidance recipient" }
             require(match.currentTurnReceipts.all {

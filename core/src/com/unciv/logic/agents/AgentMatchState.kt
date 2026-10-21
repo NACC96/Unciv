@@ -160,7 +160,9 @@ class AgentMatchState(
     /** Last external personality/configuration survives explicit Human assignment. */
     var retainedAgentProfiles: HashMap<String, AgentProfile> = HashMap(),
     /** Fog for saves made before this setting existed; new matches start with [MatchVision.FULL]. */
-    var vision: MatchVision = MatchVision.FOG
+    var vision: MatchVision = MatchVision.FOG,
+    /** Actor-scoped factual baselines and the last three completed own turns; absent in older saves. */
+    var strategicProgress: HashMap<String, AgentStrategicHistory> = HashMap()
 ) : IsPartOfGameInfoSerialization {
     @Suppress("unused") // used by json serialization
     constructor() : this(
@@ -194,6 +196,7 @@ class AgentMatchState(
         localControlCivId,
         localViewingCivId,
         HashMap(retainedAgentProfiles.mapValues { it.value.copy() }),
-        vision
+        vision,
+        HashMap(strategicProgress.mapValues { it.value.detachedCopy() })
     )
 }

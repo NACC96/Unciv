@@ -1,4 +1,5 @@
 import type { HexPosition, MatchVision, MapQuery, MapPage, MapSummary, ObservedTile, ObservedVictoryContext, RulesQuery, RulesResult, WorkerImprovementOption, WorkInProgress } from "./map-types.js";
+import type { MilitaryContext, StrategicProgress } from "./strategy-types.js";
 
 /**
  * Engine-service seam (AI_AGENT_PLAN.md §3.1, §7).
@@ -95,6 +96,8 @@ export interface GameObserveResult {
   gameTurn?: number;
   turnSerial?: number;
   victory?: ObservedVictoryContext | null;
+  military?: MilitaryContext | null;
+  strategicProgress?: StrategicProgress | null;
   mapSummary?: MapSummary;
   revision: number;
   activeTurn: boolean;
