@@ -16,9 +16,12 @@ class VisualEffects(
     text: String? = null,
     tint: Color = Color(0xe9cf92ff.toInt()),
     private val reduced: Boolean = false,
-    private val projectileStyle: Projectile = Projectile.ARROW
+    private val projectileStyle: Projectile = Projectile.ARROW,
+    /** Raises the text, so several labels on one tile don't overprint. */
+    private val lift: Float = 0f
 ) : Group(), AutoCloseable {
-    enum class Kind { MOVE, HIT, DEFEAT, FOUND, WORK, CAPTURE, NUCLEAR, PROJECTILE }
+    /** LABEL is text alone, for combat whose blows are drawn by its weapon's own effect. */
+    enum class Kind { MOVE, HIT, DEFEAT, FOUND, WORK, CAPTURE, NUCLEAR, PROJECTILE, LABEL }
     enum class Projectile { ARROW, SHOT, SHELL, TORPEDO, AIR }
     private val marks = ArrayList<Image>()
     private val label = text?.let { ShadowedLabel(it, 17, Color.WHITE, Color(0x101b2bff)) }
@@ -41,7 +44,7 @@ class VisualEffects(
             }
             marks += mark; addActor(mark)
         } else {
-            val count = when (kind) { Kind.HIT, Kind.WORK -> 4; Kind.NUCLEAR -> 8; else -> 6 }
+            val count = when (kind) { Kind.HIT, Kind.WORK -> 4; Kind.NUCLEAR -> 8; Kind.LABEL -> 0; else -> 6 }
             repeat(count) {
                 val mark = ImageGetter.getDot(tint)
                 mark.setSize(if (kind == Kind.WORK) 3f else 7f, 2f)
@@ -87,7 +90,7 @@ class VisualEffects(
                 mark.rotation = angle + if (kind == Kind.HIT || kind == Kind.WORK) 0f else 90f
             }
         }
-        label?.setPosition(centerX - label.width / 2, 47f + if (reduced) 0f else p * 10f)
+        label?.setPosition(centerX - label.width / 2, 47f + lift + if (reduced) 0f else p * 10f)
     }
 
     override fun close() { if (!closed) { closed = true; remove(); clearChildren() } }

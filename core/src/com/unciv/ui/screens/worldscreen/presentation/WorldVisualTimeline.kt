@@ -6,11 +6,18 @@ import com.badlogic.gdx.math.Vector2
 import com.unciv.logic.map.HexMath
 import com.unciv.logic.presentation.*
 import com.unciv.models.metadata.BaseRuleset
+import com.unciv.ui.components.tilegroups.TileGroupMap
 import com.unciv.ui.components.extensions.toTextButton
 import com.unciv.ui.components.input.onClick
 import com.unciv.ui.images.ImageGetter
 import com.unciv.ui.images.atlas.*
 import com.unciv.ui.screens.worldscreen.WorldScreen
+import com.unciv.ui.screens.worldscreen.presentation.combat.BodyKind
+import com.unciv.ui.screens.worldscreen.presentation.combat.CombatFx
+import com.unciv.ui.screens.worldscreen.presentation.combat.CombatScripts
+import com.unciv.ui.screens.worldscreen.presentation.combat.CombatStyles
+import com.unciv.ui.screens.worldscreen.presentation.combat.FxScene
+import com.unciv.ui.screens.worldscreen.presentation.combat.WeaponFamily
 import com.unciv.view.VisualEventProjector
 import java.util.ArrayDeque
 import kotlin.math.cos
@@ -23,7 +30,17 @@ class WorldVisualTimeline(private val world: WorldScreen) : AutoCloseable {
     enum class Mode { Normal, Fast, Reduced, Off;
         companion object { fun parse(value: String) = entries.firstOrNull { it.name == value } ?: Normal }
     }
-    companion object { const val MAX_QUEUED_EVENTS = 64 }
+    companion object {
+        const val MAX_QUEUED_EVENTS = 64
+        /** When the screen falls behind, it still plays up to this many of the latest visible attacks. */
+        const val MAX_KEPT_ATTACKS = 12
+        /** Routine history the screen plays before catching up, in seconds at fast speed. */
+        private const val ROUTINE_BUDGET = 2.4
+        /** World tile groups are groupSize + 4 wide, so this is a tile's center from its corner. */
+        private const val TILE_CENTER = TileGroupMap.groupSize / 2f + 2f
+        /** How long a heavy blow's jolt of the map lasts, in nominal seconds. */
+        private const val SHAKE_SPAN = .35f
+    }
     private val map get() = world.mapHolder
     private val queue = ArrayDeque<VisualEvent>()
     private var active: Playback? = null
@@ -40,6 +57,8 @@ class WorldVisualTimeline(private val world: WorldScreen) : AutoCloseable {
     private var selectedUnitSet: String? = null
     private var manualInputSerial = map.visualManualInputSerial
     private var followCooldown = 0f
+    /** Events kept through a catch-up, which all play at fast speed. */
+    private val hurried = HashSet<VisualEventId>()
     private var disposed = false
     val pendingCount: Int get() = queue.size + if (active == null) 0 else 1
 
@@ -84,24 +103,98 @@ class WorldVisualTimeline(private val world: WorldScreen) : AutoCloseable {
         if (mode == Mode.Off || fresh.isEmpty()) return
         // A new committed action for a unit supersedes its old unplayed/part-played presentation.
         val superseded = fresh.flatMap(::unitIds).toSet()
-        if (active?.event?.let { unitIds(it).any(superseded::contains) } == true) { active?.close(); active = null }
+        active?.takeIf { unitIds(it.event).any(superseded::contains) }?.let { cut ->
+            requeue(cut.unplayedDeaths().filter { it.unit.unitId !in superseded })
+            cut.close(); active = null
+        }
         queue.removeIf { event -> unitIds(event).any(superseded::contains) }
         if (queue.size + fresh.size + (if (active == null) 0 else 1) > MAX_QUEUED_EVENTS) { catchUp(fresh); return }
         for (event in fresh) queue.addLast(event)
         // A slow screen catches up to the installed state instead of playing seconds of stale history.
-        if (queue.sumOf { duration(it, fast = true).toDouble() } > 2.4) { catchUp(emptyList()); return }
+        if (behind()) { catchUp(emptyList()); return }
         if (queue.isNotEmpty()) { closeIdle(); Gdx.graphics.requestRendering() }
     }
 
-    /** Skips stale history to the installed state, except nuclear strikes: those are too rare and too big to miss. */
+    /** Too much routine history to play, or more attacks than a catch-up keeps. Kept events never count as routine. */
+    private fun behind(): Boolean {
+        var routine = 0.0
+        var attacks = 0
+        for (event in queue) when (event) {
+            is VisualEvent.Attack -> attacks++
+            is VisualEvent.NuclearStrike, is VisualEvent.RemoveUnit -> Unit
+            else -> routine += duration(event, fast = true)
+        }
+        return routine > ROUTINE_BUDGET || attacks > MAX_KEPT_ATTACKS
+    }
+
+    /**
+     * Skips stale history to the installed state, except nuclear strikes, which are too rare and too big to miss,
+     * and the latest attacks the viewer can see, with the deaths they caused. Those play at fast speed.
+     */
     private fun catchUp(pending: List<VisualEvent>) {
-        val strikes = (queue + pending).filterIsInstance<VisualEvent.NuclearStrike>()
-        val playing = active?.takeIf { it.event is VisualEvent.NuclearStrike }
+        val history = queue + pending
+        val playing = active?.takeIf { it.event is VisualEvent.NuclearStrike || it.event is VisualEvent.Attack }
         if (playing != null) active = null
         reconcile()
         active = playing
-        for (strike in strikes) queue.addLast(strike)
+        for (event in keptThroughCatchUp(history)) queue.addLast(event)
+        hurried.clear(); queue.mapTo(hurried) { it.id }
         if (active != null || queue.isNotEmpty()) Gdx.graphics.requestRendering()
+    }
+
+    private fun keptThroughCatchUp(history: List<VisualEvent>): List<VisualEvent> {
+        // Each kept attack travels with the deaths it caused; a strike stands alone.
+        val groups = ArrayList<MutableList<VisualEvent>>()
+        var attack: VisualEvent.Attack? = null
+        for (event in history) when (event) {
+            is VisualEvent.NuclearStrike -> { groups += mutableListOf<VisualEvent>(event); attack = null }
+            is VisualEvent.Attack -> {
+                attack = event.takeIf(::playable)
+                if (attack != null) groups += mutableListOf<VisualEvent>(event)
+            }
+            is VisualEvent.RemoveUnit -> if (attack != null && causedBy(event, attack)) groups.last() += event
+            // An attacker advancing into the tile it cleared comes between the blow and the death.
+            is VisualEvent.Move -> if (event.unit.stableId != attack?.attacker?.stableId) attack = null
+            else -> attack = null
+        }
+        var surplus = groups.count { it.first() is VisualEvent.Attack } - MAX_KEPT_ATTACKS
+        return groups.filter { group ->
+            val drop = surplus > 0 && group.first() is VisualEvent.Attack
+            if (drop) surplus--
+            !drop
+        }.flatten()
+    }
+
+    /** An attack the screen would actually show: its tile is seen, and on screen unless the camera follows actions. */
+    private fun playable(attack: VisualEvent.Attack): Boolean {
+        val focus = attack.target ?: attack.source ?: return false
+        val follows = world.game.settings.followVisibleActions && mode != Mode.Reduced && followCooldown <= 0f
+        return map.isVisualTileVisible(focus) && (follows || map.isVisualOnScreen(focus))
+    }
+
+    /** A death that is part of an attack's outcome: the attacker, the defender, or a unit on either tile. */
+    private fun causedBy(death: VisualEvent.RemoveUnit, attack: VisualEvent.Attack): Boolean =
+        death.unit.stableId == attack.attacker?.stableId || death.unit.stableId == attack.defender?.stableId ||
+            death.position == attack.target || death.position == attack.source
+
+    /** Puts back deaths taken into an attack that stopped before showing them, so they still get their own feedback. */
+    private fun requeue(deaths: List<VisualEvent.RemoveUnit>) {
+        for (death in deaths.asReversed()) queue.addFirst(death)
+    }
+
+    /** Takes the deaths an attack caused out of the queue, so they play as part of the blow rather than after it. */
+    private fun takeDeaths(attack: VisualEvent.Attack): List<VisualEvent.RemoveUnit> {
+        val deaths = ArrayList<VisualEvent.RemoveUnit>()
+        val iterator = queue.iterator()
+        var looked = 0
+        while (iterator.hasNext() && looked++ < 6) {
+            when (val next = iterator.next()) {
+                is VisualEvent.RemoveUnit -> if (causedBy(next, attack)) { deaths += next; iterator.remove() } else return deaths
+                is VisualEvent.Move -> if (next.unit.stableId != attack.attacker?.stableId) return deaths
+                else -> return deaths
+            }
+        }
+        return deaths
     }
 
     private fun coalesceMoves(events: List<VisualEvent>): List<VisualEvent> {
@@ -148,7 +241,7 @@ class WorldVisualTimeline(private val world: WorldScreen) : AutoCloseable {
             is VisualEvent.Move -> if (event.kind in listOf(VisualMoveKind.TELEPORT, VisualMoveKind.PARADROP, VisualMoveKind.AIR_REBASE))
                 if (fast) .15f else .3f
             else ((event.path.size - 1).coerceAtLeast(1) * if (fast) .07f else .18f).coerceAtMost(if (fast) .3f else .9f)
-            is VisualEvent.Attack -> if (fast) .26f else .65f
+            is VisualEvent.Attack -> if (fast) .45f else 1f
             is VisualEvent.RemoveUnit -> if (fast) .22f else .55f
             else -> if (fast) .3f else .7f
         }
@@ -174,11 +267,19 @@ class WorldVisualTimeline(private val world: WorldScreen) : AutoCloseable {
         if (mode == Mode.Off) { reconcile(); return }
         if (active == null && queue.isNotEmpty()) {
             closeIdle()
-            active = Playback(queue.removeFirst(), mode == Mode.Fast || queue.size >= 4)
+            val next = queue.removeFirst()
+            // Reduced motion draws no blow to fold a death into, so deaths keep their own feedback.
+            val deaths = if (next is VisualEvent.Attack && mode != Mode.Reduced) takeDeaths(next) else emptyList()
+            val hurry = hurried.remove(next.id)
+            for (death in deaths) hurried.remove(death.id)
+            active = Playback(next, mode == Mode.Fast || hurry || queue.size >= 4, deaths)
         }
         active?.let {
             it.advance(delta)
-            if (it.finished) { it.close(); active = null }
+            if (it.finished) {
+                if (it.cancelled) requeue(it.unplayedDeaths())
+                it.close(); active = null
+            }
         }
         if (active == null && queue.isEmpty()) updateIdle(delta)
         skipButton.isVisible = active != null || queue.isNotEmpty()
@@ -217,7 +318,7 @@ class WorldVisualTimeline(private val world: WorldScreen) : AutoCloseable {
 
     /** Idempotent cleanup before map rebind, view changes, cache teardown, skip and screen disposal. */
     fun reconcile() {
-        queue.clear(); active?.close(); active = null; closeIdle(); skipButton.isVisible = false
+        queue.clear(); active?.close(); active = null; closeIdle(); skipButton.isVisible = false; hurried.clear()
         cache?.trim()
     }
 
@@ -266,11 +367,19 @@ class WorldVisualTimeline(private val world: WorldScreen) : AutoCloseable {
     private class StrikeMark(val position: VisualPosition, val start: Float,
                              val effect: VisualEffects? = null, val ghost: Ghost? = null, val removed: Boolean = false)
 
-    private inner class Playback(val event: VisualEvent, private val fast: Boolean) : AutoCloseable {
+    private inner class Playback(
+        val event: VisualEvent,
+        private val fast: Boolean,
+        /** Deaths the attack caused, taken out of the queue to play as part of the blow. */
+        private val deaths: List<VisualEvent.RemoveUnit> = emptyList()
+    ) : AutoCloseable {
         private val reduced = mode == Mode.Reduced
-        private val duration = duration(event, fast)
+        /** The drawn attack: its weapon's particles and the moments its blows land. Never in reduced motion. */
+        private val combat: CombatPlay? = if (event is VisualEvent.Attack && !reduced) CombatPlay(event, deaths) else null
+        private val duration = duration(event, fast) * (combat?.scene?.end ?: 1f)
         private var elapsed = 0f
-        private var cancelled = false
+        var cancelled = false
+            private set
         var followAllowed = world.game.settings.followVisibleActions && !reduced && followCooldown <= 0f
         val finished get() = cancelled || elapsed >= duration
         private val ghosts = ArrayList<Ghost>()
@@ -308,7 +417,16 @@ class WorldVisualTimeline(private val world: WorldScreen) : AutoCloseable {
                     moveGhost = addGhost(event.unit, UnitVisualState.MOVE, start, event.path.getOrNull(1))
                     effect(event.path.lastOrNull(), VisualEffects.Kind.MOVE)
                 }
-                is VisualEvent.Attack -> {
+                is VisualEvent.Attack -> if (combat != null) {
+                    attackerGhost = addGhost(event.attacker, UnitVisualState.ATTACK, event.source, event.target)
+                    // Nothing reaches a defender past an interception, and one that withdrew is never struck.
+                    defenderGhost = when (event.outcome) {
+                        VisualAttackOutcome.INTERCEPTED -> null
+                        VisualAttackOutcome.WITHDRAWN -> addGhost(event.defender, UnitVisualState.IDLE, event.target, event.source)
+                        else -> addGhost(event.defender, UnitVisualState.HIT, event.target, event.source)
+                    }
+                    combat.setUp(::addGhost)
+                } else {
                     attackerGhost = addGhost(event.attacker, UnitVisualState.ATTACK, event.source, event.target)
                     defenderGhost = addGhost(event.defender, UnitVisualState.HIT, event.target, event.source)
                     effect(event.target, if (event.kind == VisualAttackKind.NUCLEAR) VisualEffects.Kind.NUCLEAR else VisualEffects.Kind.HIT,
@@ -459,7 +577,7 @@ class WorldVisualTimeline(private val world: WorldScreen) : AutoCloseable {
                     moveGhost?.actor?.opacity = if (interpolated) 1f else sin(progress * Math.PI).toFloat().coerceAtLeast(0f)
                     moveGhost?.update(elapsed, point)
                 }
-                is VisualEvent.Attack -> {
+                is VisualEvent.Attack -> if (combat != null) combat.advance(progress) else {
                     val source = event.source?.let(map::visualPoint)
                     val target = event.target?.let { map.visualPoint(it, source) }
                     if (source != null) {
@@ -489,7 +607,186 @@ class WorldVisualTimeline(private val world: WorldScreen) : AutoCloseable {
             }
         }
 
+        /** Deaths folded into this attack that it has not shown yet. */
+        fun unplayedDeaths(): List<VisualEvent.RemoveUnit> = combat?.unplayedDeaths() ?: emptyList()
+
+        /** One attack drawn as its weapon: the particles, damage shown as each blow lands, deaths and the map's jolt. */
+        private inner class CombatPlay(private val event: VisualEvent.Attack, private val deaths: List<VisualEvent.RemoveUnit>) : AutoCloseable {
+            val scene: FxScene
+            private val fx: CombatFx
+            private val firstImpact: Float
+            /** When the dead go down: just after the last blow lands. */
+            private val deathAt: Float
+            private val labels = ArrayList<Pair<VisualPosition, VisualEffects>>()
+            private val deathGhosts = ArrayList<Pair<Ghost, VisualPosition>>()
+            private val sourceCenter = Vector2()
+            private val targetCenter = Vector2()
+            private val scratch = Vector2()
+            private var shook = false
+            private var deathsShown = false
+
+            init {
+                val ruleset = world.gameInfo.ruleset
+                fun unit(descriptor: VisualDescriptor?) = (descriptor as? VisualUnitDescriptor)?.let { ruleset.units[it.artName] }
+                fun body(descriptor: VisualDescriptor?): BodyKind? = when (descriptor) {
+                    null -> null
+                    is VisualCityDescriptor -> BodyKind.CITY
+                    is VisualUnitDescriptor -> CombatStyles.body(unit(descriptor))
+                }
+                fun water(position: VisualPosition?) = position?.let { map.visualTile(it)?.tileView?.getTile()?.isWater } == true
+                val attacker = event.attacker
+                val style = if (attacker is VisualCityDescriptor) CombatStyles.forCity(ownerEra(attacker.ownerCivId))
+                    else CombatStyles.forUnit(unit(attacker), event.kind, ruleset)
+                val source = event.source?.let(map::visualPoint)
+                val target = event.target?.let { map.visualPoint(it, source) }
+                val direction = if (source != null && target != null) target.cpy().sub(source) else null
+                val tiles = if (event.source == null || event.target == null) 0 else {
+                    // Aerial distance knows about world wrap, which raw coordinates across the seam do not.
+                    val tileMap = world.gameInfo.tileMap
+                    val from = tileMap.getIfTileExistsOrNull(event.source.x, event.source.y)
+                    val to = tileMap.getIfTileExistsOrNull(event.target.x, event.target.y)
+                    (if (from != null && to != null) from.aerialDistanceTo(to)
+                        else HexMath.getDistance(event.source.x, event.source.y, event.target.x, event.target.y)).coerceIn(0, 10)
+                }
+                // A captured defender changes sides on the spot rather than dying.
+                val defenderKilled = event.defender !is VisualCityDescriptor && event.outcome != VisualAttackOutcome.CAPTURED &&
+                    deaths.any { it.unit.stableId == event.defender?.stableId || it.position == event.target }
+                val attackerKilled = deaths.any { it.unit.stableId == attacker?.stableId }
+                scene = FxScene(style, body(attacker), body(event.defender), direction, direction?.len() ?: 0f, tiles,
+                    sourceSeen = source != null, targetSeen = target != null,
+                    flightSeen = event.source != null && event.target != null && map.canDrawVisualProjectile(event.source, event.target),
+                    sourceWater = water(event.source), targetWater = water(event.target),
+                    outcome = event.outcome, damageToDefender = event.damageToDefender, damageToAttacker = event.damageToAttacker,
+                    defenderKilled = defenderKilled, attackerKilled = attackerKilled,
+                    seed = event.id.sequence * 1_000_003L + event.id.timelineId.hashCode(),
+                    melee = event.kind == VisualAttackKind.MELEE)
+                CombatScripts.build(scene)
+                fx = CombatFx(scene.particles)
+                firstImpact = scene.impacts.minOf { it.at }
+                deathAt = scene.impacts.maxOf { it.at } + .08f
+            }
+
+            private fun ownerEra(civId: String?): Int =
+                world.gameInfo.civilizations.firstOrNull { it.civID == civId }?.getEraNumber() ?: 0
+
+            fun setUp(addGhost: (VisualDescriptor?, UnitVisualState, VisualPosition?, VisualPosition?) -> Ghost?) {
+                val tint = Color(0xffbd91ff.toInt())
+                fun label(position: VisualPosition?, text: String?) {
+                    if (position == null || text == null || !map.isVisualTileVisible(position)) return
+                    // A second text on the same tile, such as "Captured" over the damage, stacks above the first.
+                    val lift = labels.count { it.first == position } * 18f
+                    labels += position to VisualEffects(VisualEffects.Kind.LABEL, text, tint, lift = lift).also { it.isVisible = false; map.addVisualActor(it) }
+                }
+                label(event.target, event.damageToDefender?.takeIf { it > 0 }?.let { "−$it" })
+                label(event.source, event.damageToAttacker?.takeIf { it > 0 }?.let { "−$it" })
+                when (event.outcome) {
+                    VisualAttackOutcome.WITHDRAWN -> label(event.target, "Withdrew")
+                    VisualAttackOutcome.CAPTURED -> label(event.target, "Captured")
+                    // Where the attack was headed: the defense brings it down on its way there.
+                    VisualAttackOutcome.INTERCEPTED -> label(event.target ?: event.source, "Intercepted")
+                    VisualAttackOutcome.RESOLVED -> Unit
+                }
+                for (death in deaths) {
+                    // A spent missile is gone in its own blast, not shot down at its launcher.
+                    if (spent && death.unit.stableId == event.attacker?.stableId) continue
+                    if (event.outcome == VisualAttackOutcome.CAPTURED && death.unit.stableId == event.defender?.stableId) continue
+                    addGhost(death.unit, UnitVisualState.DEFEAT, death.position, null)?.let { deathGhosts += it to death.position }
+                }
+                map.addVisualActor(fx)
+            }
+
+            fun advance(progress: Float) {
+                val time = progress * scene.end
+                val source = event.source?.let(map::visualPoint)
+                val target = event.target?.let { map.visualPoint(it, source) }
+                val flightSeen = source != null && target != null && map.canDrawVisualProjectile(event.source, event.target)
+                fx.update(time, source?.let { sourceCenter.set(it).add(TILE_CENTER, TILE_CENTER) },
+                    target?.let { targetCenter.set(it).add(TILE_CENTER, TILE_CENTER) }, flightSeen)
+                val gone = time >= deathAt
+                if (source != null && !(gone && scene.attackerKilled)) {
+                    val point = source.cpy()
+                    if (target != null) point.add(scratch.set(target).sub(source).nor().scl(attackerOffset(time)))
+                    // A missile spent on its target leaves the launcher as it fires; its own clip would blow it up on the pad.
+                    if (spent) attackerGhost?.actor?.opacity = 1f - ((time - (scene.fireAt ?: 0f)) / .08f).coerceIn(0f, 1f)
+                    attackerGhost?.update(elapsed, point)
+                } else attackerGhost?.close()
+                if (target != null && !(gone && scene.defenderKilled)) {
+                    val flinch = flinch(time)
+                    defenderGhost?.actor?.hitAmount = flinch
+                    val point = target.cpy()
+                    if (source != null) point.add(scratch.set(target).sub(source).nor().scl(flinch * 2.5f))
+                    // The hit reaction plays from the moment the blow lands, holding its first frame until then.
+                    val struck = event.outcome != VisualAttackOutcome.WITHDRAWN
+                    defenderGhost?.update(if (struck) realSince(firstImpact, time) else elapsed, point)
+                } else defenderGhost?.close()
+                if (gone) deathsShown = true
+                val realSinceDeath = realSince(deathAt, time)
+                for ((ghost, position) in deathGhosts) {
+                    if (!gone) continue
+                    val point = map.visualPoint(position, target ?: source) ?: continue
+                    ghost.actor.opacity = 1f - ((time - deathAt) / (scene.end - deathAt)).coerceIn(0f, 1f)
+                    ghost.update(realSinceDeath, point)
+                }
+                for ((position, label) in labels) {
+                    val point = map.visualPoint(position, target ?: source)
+                    label.isVisible = point != null && time >= firstImpact
+                    if (point != null) label.update(((time - firstImpact) / (scene.end - firstImpact)).coerceIn(0f, 1f), point)
+                }
+                shake(time)
+                // Ghosts attach as their clips load; the blow is drawn over the units and the numbers over the blow.
+                fx.toFront()
+                for ((_, label) in labels) label.toFront()
+            }
+
+            /** Real seconds since nominal [moment], or 0 before it. */
+            private fun realSince(moment: Float, time: Float): Float = ((time - moment) / scene.end * duration).coerceAtLeast(0f)
+
+            fun unplayedDeaths(): List<VisualEvent.RemoveUnit> =
+                if (deathsShown) emptyList() else deaths.filterNot { spent && it.unit.stableId == event.attacker?.stableId }
+
+            /** Melee attackers lunge into the first blow and back; ranged ones kick back as they fire. */
+            private fun attackerOffset(time: Float): Float {
+                if (scene.melee) return scene.lunge(time, firstImpact)
+                val since = time - (scene.fireAt ?: return 0f)
+                return if (since < 0f || since > .2f) 0f else -3f * (1f - since / .2f)
+            }
+
+            private val spent = scene.family == WeaponFamily.MISSILE && scene.attackerBody == BodyKind.AIRCRAFT &&
+                scene.attackerKilled && event.outcome != VisualAttackOutcome.INTERCEPTED
+
+            /** How hard the defender is reeling from the latest blow, from 1 as it lands to 0; never past an interception or a withdrawal. */
+            private fun flinch(time: Float): Float = if (event.outcome == VisualAttackOutcome.INTERCEPTED ||
+                event.outcome == VisualAttackOutcome.WITHDRAWN) 0f else scene.impacts.maxOf { impact ->
+                val since = time - impact.at
+                if (since < 0f || since > .25f) 0f else 1f - since / .25f
+            }
+
+            /** Heavy blows jolt the map a little, only while their tile is on screen. */
+            private fun shake(time: Float) {
+                var x = 0f; var y = 0f
+                for (impact in scene.impacts) {
+                    val since = time - impact.at
+                    if (impact.shake <= 0f || since < 0f || since > SHAKE_SPAN) continue
+                    val amplitude = impact.shake * (1f - since / SHAKE_SPAN).pow(2)
+                    x += sin(since * 70f) * amplitude; y += cos(since * 53f) * amplitude * .6f
+                }
+                if (x == 0f && y == 0f || event.target?.let(map::isVisualOnScreen) != true) {
+                    if (shook) map.visualShake.setZero()
+                    return
+                }
+                shook = true
+                map.visualShake.set(x, y)
+            }
+
+            override fun close() {
+                fx.close()
+                labels.forEach { it.second.close() }
+                if (shook) map.visualShake.setZero()
+            }
+        }
+
         override fun close() {
+            combat?.close()
             ghosts.forEach { it.close() }; effects.forEach { it.second.close() }; projectile?.close()
             strikeMarks.forEach { it.effect?.close() }; blast?.close()
             if (blast != null) map.visualShake.setZero()
