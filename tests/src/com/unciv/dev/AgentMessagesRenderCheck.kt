@@ -358,7 +358,7 @@ object AgentMessagesRenderCheck {
             private fun selectOttomans(box: SelectBox<*>) {
                 @Suppress("UNCHECKED_CAST")
                 val selection = box as SelectBox<Any>
-                selection.selected = selection.items.first { it.toString().startsWith("The Ottomans · ") }
+                selection.selected = selection.items.single { it.toString().contains("The Ottomans · ") }
             }
 
             private fun resizeLogical(width: Int, height: Int) {
