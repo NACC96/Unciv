@@ -16,6 +16,23 @@ class AgentMapObservationTest {
         gameInfo.agentNormalVisibility = true
     }
 
+    @Test fun city_sightings_distinguish_original_and_replacement_capitals_and_keep_founding_identity() {
+        val f = fixture()
+        val rome = f.addCiv(f.ruleset.nations["Rome"]!!, isPlayer = true)
+        val greece = f.addCiv(f.ruleset.nations["Greece"]!!, isPlayer = true)
+        val original = f.addCity(greece, f.getTile(0, 0))
+        val replacement = f.addCity(greece, f.getTile(3, 0))
+        original.moveToCiv(rome)
+        assertTrue(replacement.isCapital())
+        val state = AgentMatchState(vision = MatchVision.FULL)
+        fun cityAt(position: HexCoord) = buildPermittedTile(f.gameInfo, state, rome.civID, position)!!.city!!.toWire()
+        assertEquals(true, cityAt(original.location)["isOriginalCapital"])
+        assertEquals(greece.civID, cityAt(original.location)["foundingCivId"])
+        assertEquals(false, cityAt(replacement.location)["isOriginalCapital"])
+        val copy = buildPermittedTile(f.gameInfo, state, rome.civID, original.location)!!.copy()
+        assertEquals(cityAt(original.location), copy.city!!.toWire())
+    }
+
     @Test fun visible_tile_has_actor_permitted_terrain() {
         val f = fixture()
         val civ = f.addCiv(f.ruleset.nations["Rome"]!!, isPlayer = true)
