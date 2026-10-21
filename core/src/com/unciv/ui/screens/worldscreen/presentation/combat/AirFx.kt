@@ -376,6 +376,7 @@ private enum class Airframe(val parts: List<Part>, val wreck: Pair<Float, Float>
 private fun FxScene.fighter() = when {
     style.variant == "biplane" -> Airframe.BIPLANE
     style.variant == "jet" -> Airframe.JET
+    style.variant == "fighter" -> Airframe.FIGHTER
     style.era <= 5 -> Airframe.BIPLANE
     style.era >= 7 -> Airframe.JET
     else -> Airframe.FIGHTER

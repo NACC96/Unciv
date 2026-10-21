@@ -1,5 +1,7 @@
 package com.unciv.ui.screens.worldscreen.presentation.combat
 
+import com.badlogic.gdx.Application
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.Pixmap
@@ -228,9 +230,13 @@ internal object FxTextures {
     private const val CELL = 64
     private var texture: Texture? = null
     private var regions: Array<TextureRegion>? = null
+    private var owner: Application? = null
 
     fun regions(): Array<TextureRegion> {
+        // A relaunched app has a new GL context, and the old texture went with the old one.
+        if (Gdx.app !== owner) regions = null
         regions?.let { return it }
+        owner = Gdx.app
         val pixmap = Pixmap(CELL * 4, CELL, Pixmap.Format.RGBA8888)
         pixmap.blending = Pixmap.Blending.None
         val half = CELL / 2f

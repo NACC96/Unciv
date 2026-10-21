@@ -92,6 +92,28 @@ class CombatStylesTest {
     }
 
     @Test
+    fun `an unseen attacker shows only its blow, never a weapon`() {
+        assertEquals(CombatStyles.unseen, CombatStyles.forUnit(null, VisualAttackKind.UNKNOWN, godsAndKings))
+        val scene = FxScene(CombatStyles.unseen, null, BodyKind.INFANTRY, null, 0f, 0, sourceSeen = false, targetSeen = true,
+            flightSeen = false, sourceWater = false, targetWater = false, outcome = VisualAttackOutcome.RESOLVED,
+            damageToDefender = 30, damageToAttacker = null, defenderKilled = true, attackerKilled = false, seed = 3L)
+        CombatScripts.build(scene)
+        assertTrue(scene.particles.isNotEmpty())
+        assertTrue("Nothing at the attacker's unseen tile", scene.particles.none { it.anchor == FxAnchor.SOURCE || it.flight != null })
+        assertTrue(scene.particles.all { it.end <= scene.end + 1e-4f })
+    }
+
+    @Test
+    fun `units are named into looks the rulesets' eras would get wrong`() {
+        val vanilla = TestGame(baseRuleset = BaseRuleset.Civ_V_Vanilla).ruleset
+        for (ruleset in listOf(godsAndKings, vanilla)) {
+            assertEquals("fighter", family("Fighter", ruleset).variant)
+            ruleset.units["Landship"]?.let { assertEquals("landship", family("Landship", ruleset).variant) }
+            assertEquals(null, family("Tank", ruleset).variant)
+        }
+    }
+
+    @Test
     fun `an intercepted air attack never lands its weapon`() {
         val scene = FxScene(WeaponStyle(WeaponFamily.BOMBS, 5), BodyKind.AIRCRAFT, BodyKind.INFANTRY, Vector2(270f, 60f), 277f, 4,
             sourceSeen = true, targetSeen = true, flightSeen = true, sourceWater = false, targetWater = false,

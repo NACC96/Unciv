@@ -8,7 +8,8 @@ internal val AIRCRAFT = setOf(WeaponFamily.STRAFE, WeaponFamily.GUNSHIP, WeaponF
 /** Builds one attack's particles: the weapon's own script, then hits on cities and any deaths. */
 object CombatScripts {
     fun build(scene: FxScene) {
-        if (scene.outcome == VisualAttackOutcome.INTERCEPTED && scene.family in AIRCRAFT) scene.interception()
+        if (scene.style == CombatStyles.unseen) scene.unseenHit()
+        else if (scene.outcome == VisualAttackOutcome.INTERCEPTED && scene.family in AIRCRAFT) scene.interception()
         else when (scene.family) {
             WeaponFamily.ARROWS -> scene.arrows()
             WeaponFamily.CATAPULT -> scene.catapult()
@@ -36,7 +37,8 @@ object CombatScripts {
         if (scene.targetCity && scene.outcome != VisualAttackOutcome.INTERCEPTED) scene.cityHit(scene.impacts.minOf { it.at })
         if (scene.defenderKilled) scene.death(scene.defenderBody, FxAnchor.TARGET, lastImpact + .08f)
         // A missile spends itself in its own blast; only a weapon brought down by the defense dies on screen.
-        val consumed = scene.family == WeaponFamily.MISSILE && scene.outcome != VisualAttackOutcome.INTERCEPTED
+        val consumed = scene.family == WeaponFamily.MISSILE && scene.attackerBody == BodyKind.AIRCRAFT &&
+            scene.outcome != VisualAttackOutcome.INTERCEPTED
         if (scene.attackerKilled && !consumed) scene.death(scene.attackerBody, FxAnchor.SOURCE, lastImpact + .08f)
     }
 }

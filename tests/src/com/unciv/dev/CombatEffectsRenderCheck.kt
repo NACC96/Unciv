@@ -84,7 +84,9 @@ object CombatEffectsRenderCheck {
         val cityAttacker: Boolean = false,
         val era: String? = null,
         val damage: Int = 24,
-        val counterDamage: Int = 0
+        val counterDamage: Int = 0,
+        /** The viewer never saw the attacker: only its blow on the defender is known. */
+        val unseenAttacker: Boolean = false
     )
 
     private val melee = (-1 to 0) to (0 to 0)
@@ -139,11 +141,15 @@ object CombatEffectsRenderCheck {
         Scenario("missile", "Guided Missile", "Tank", air.first, air.second, VisualAttackKind.AIR, attackerDies = true, kill = true),
         Scenario("missile-cruiser", "Missile Cruiser", "Destroyer", far.first, far.second, VisualAttackKind.RANGED, sea = true),
         Scenario("missile-sam", "Mobile SAM", "Infantry", melee.first, melee.second, VisualAttackKind.MELEE),
+        Scenario("missile-sam-dies", "Mobile SAM", "Infantry", melee.first, melee.second, VisualAttackKind.MELEE,
+            attackerDies = true, counterDamage = 40),
         // Naval
         Scenario("ram-ship", "Trireme", "Galley", melee.first, melee.second, VisualAttackKind.MELEE, sea = true, counterDamage = 8),
         Scenario("ram-ship-kill", "Quinquereme", "Trireme", melee.first, melee.second, VisualAttackKind.MELEE, sea = true, kill = true),
         Scenario("broadside", "Frigate", "Caravel", ranged.first, ranged.second, VisualAttackKind.RANGED, sea = true),
         Scenario("broadside-heavy", "Ship of the Line", "Privateer", ranged.first, ranged.second, VisualAttackKind.RANGED, sea = true, kill = true),
+        Scenario("broadside-captured", "Privateer", "Caravel", melee.first, melee.second, VisualAttackKind.MELEE, sea = true,
+            kill = true, outcome = VisualAttackOutcome.CAPTURED),
         Scenario("broadside-light", "Privateer", "Caravel", melee.first, melee.second, VisualAttackKind.MELEE, sea = true, counterDamage = 10),
         Scenario("naval-guns", "Destroyer", "Ironclad", melee.first, melee.second, VisualAttackKind.MELEE, sea = true, counterDamage = 7),
         Scenario("naval-guns-heavy", "Battleship", "Destroyer", far.first, far.second, VisualAttackKind.RANGED, sea = true, kill = true),
@@ -162,6 +168,9 @@ object CombatEffectsRenderCheck {
             outcome = VisualAttackOutcome.INTERCEPTED, attackerDies = true, damage = 0),
         Scenario("withdrawn", "Swordsman", "Scout", melee.first, melee.second, VisualAttackKind.MELEE,
             outcome = VisualAttackOutcome.WITHDRAWN, damage = 0),
+        Scenario("unseen", "Swordsman", "Spearman", melee.first, melee.second, VisualAttackKind.MELEE, unseenAttacker = true),
+        Scenario("unseen-at-sea", "Frigate", "Caravel", ranged.first, ranged.second, VisualAttackKind.RANGED, sea = true,
+            unseenAttacker = true, kill = true),
     )
 
     @JvmStatic fun main(args: Array<String>) {
@@ -309,7 +318,10 @@ object CombatEffectsRenderCheck {
             val source = VisualPosition(fromX, fromY)
             val target = VisualPosition(toX, toY)
             val events = ArrayList<VisualEvent>()
-            events += VisualEvent.Attack(world.nextId(), world.view, VisualProvenance(), source, target, attacker, defender,
+            // An unseen attacker reaches the screen as the projector reports it: no attacker, no source, no kind.
+            events += if (scenario.unseenAttacker) VisualEvent.Attack(world.nextId(), world.view, VisualProvenance(), null, target,
+                null, defender, null, scenario.damage, VisualAttackKind.UNKNOWN, scenario.outcome)
+            else VisualEvent.Attack(world.nextId(), world.view, VisualProvenance(), source, target, attacker, defender,
                 scenario.counterDamage.takeIf { it > 0 }, scenario.damage.takeIf { it > 0 }, scenario.kind, scenario.outcome)
             // The map already shows the outcome: the dead are gone before their deaths are played.
             if (scenario.kill && defenderUnit != null) {
@@ -356,7 +368,7 @@ object CombatEffectsRenderCheck {
                 check(world.holder.visualShake.isZero) { "${scenario.name}: the map must settle after the attack" }
                 writeSheet(crops, "$output/${scenario.name}.png")
                 File("$output/${scenario.name}.txt").writeText(buildString {
-                    val style = attacker?.let { describe(game, it, scenario) } ?: "unseen"
+                    val style = if (scenario.unseenAttacker) "unseen attacker" else attacker?.let { describe(game, it, scenario) } ?: "unseen"
                     appendLine("${scenario.name}: $style; frames at nominal seconds, left to right, top to bottom:")
                     appendLine(times.joinToString(", ") { "%.2f".format(it) })
                 })
@@ -442,8 +454,10 @@ object CombatEffectsRenderCheck {
     }
 
     /**
-     * A busy turn: far more routine movement than the screen plays, with more attacks than a catch-up keeps.
-     * The screen must drop the moves and keep the latest visible attacks, with the deaths they caused.
+     * A busy turn: far more routine movement than the screen plays, with visible attacks and, last, attacks on a tile
+     * the viewer can't see. The screen must drop the moves and the unseen attacks, keep the visible ones with the death
+     * the last one caused folded into it, and play them at fast speed. Then a batch too long to queue at all must still
+     * keep its attack.
      */
     private fun checkBusyTurn() {
         val scenario = Scenario("busy", "Archer", "Warrior", ranged.first, ranged.second, VisualAttackKind.RANGED)
@@ -454,38 +468,51 @@ object CombatEffectsRenderCheck {
             val doomed = game.addUnit("Spearman", world.greece, game.getTile(0, 1))
             for (civ in listOf(world.rome, world.greece)) civ.cache.updateSightAndResources()
             for (tile in game.tileMap.values) tile.setExplored(world.rome, true)
-            world.rome.viewableTiles = game.tileMap.values.toSet()
+            val hidden = VisualPosition(5, -2)
             val archerSample = VisualEventProjector.unit(game.gameInfo, world.view, archer, archer.currentTile)!!.unit
             val targetSample = VisualEventProjector.unit(game.gameInfo, world.view, target, target.currentTile)!!.unit
             val doomedSample = VisualEventProjector.unit(game.gameInfo, world.view, doomed, doomed.currentTile)!!.unit
             doomed.destroy()
+            world.rome.viewableTiles = game.tileMap.values.filter { it.position.x != hidden.x || it.position.y != hidden.y }.toSet()
             world.showMap(-1 to 0)
             val scout = VisualUnitDescriptor(9999, "Scout", world.rome.civID)
+            fun move() = VisualEvent.Move(world.nextId(), world.view, VisualProvenance(), scout,
+                listOf(VisualPosition(-3, 1), VisualPosition(-2, 1), VisualPosition(-1, 1)))
+            fun attack(to: VisualPosition, defender: VisualUnitDescriptor) = VisualEvent.Attack(world.nextId(), world.view,
+                VisualProvenance(), VisualPosition(-2, 0), to, archerSample, defender, null, 10, VisualAttackKind.RANGED)
+            val visible = 10
             val events = ArrayList<VisualEvent>()
-            repeat(30) {
-                events += VisualEvent.Move(world.nextId(), world.view, VisualProvenance(), scout,
-                    listOf(VisualPosition(-3, 1), VisualPosition(-2, 1), VisualPosition(-1, 1)))
-            }
-            val attacks = MAX_ATTACKS + 3
-            repeat(attacks) { index ->
-                val last = index == attacks - 1
-                events += VisualEvent.Attack(world.nextId(), world.view, VisualProvenance(), VisualPosition(-2, 0),
-                    VisualPosition(0, if (last) 1 else 0), archerSample, if (last) doomedSample else targetSample,
-                    null, 10, VisualAttackKind.RANGED)
+            repeat(30) { events += move() }
+            repeat(visible) { index ->
+                val last = index == visible - 1
+                events += attack(VisualPosition(0, if (last) 1 else 0), if (last) doomedSample else targetSample)
                 if (last) events += VisualEvent.RemoveUnit(world.nextId(), world.view, VisualProvenance(), doomedSample, VisualPosition(0, 1))
-                events += VisualEvent.Move(world.nextId(), world.view, VisualProvenance(), scout,
-                    listOf(VisualPosition(-1, 1), VisualPosition(-2, 1)))
+                events += move()
             }
+            repeat(5) { events += attack(hidden, targetSample) }
             world.nextBatch = VisualBatch(world.view, events, events.last().id.sequence, 0L)
             world.timeline.advance(1 / 60f)
-            // One attack is playing and the rest wait, with the last one's death queued behind it.
-            check(world.timeline.pendingCount == MAX_ATTACKS + 1) {
-                "A busy turn must keep the latest $MAX_ATTACKS visible attacks and drop the moves, kept ${world.timeline.pendingCount}"
+            check(world.timeline.pendingCount == visible + 1) {
+                "A busy turn must keep its $visible visible attacks and the death, dropping moves and unseen attacks; kept ${world.timeline.pendingCount}"
             }
             var time = 0f
-            while (world.timeline.pendingCount > 0 && time < 20f) { world.timeline.advance(1 / 60f); time += 1 / 60f }
+            var framesAtTwo = 0
+            while (world.timeline.pendingCount > 0 && time < 20f) {
+                world.timeline.advance(1 / 60f); time += 1 / 60f
+                if (world.timeline.pendingCount == 2) framesAtTwo++
+            }
             check(world.timeline.pendingCount == 0) { "The kept attacks must all play" }
-            check(time < MAX_ATTACKS * .6f) { "Kept attacks must play at fast speed, took $time s" }
+            // Between attacks the count reads 2 for a frame: the last attack and its death, waiting. Folded, the death
+            // leaves with the attack; played on its own, it would hold the count at 2 for the whole last attack.
+            check(framesAtTwo <= 1) { "The death must play as part of the attack that caused it, but the count stayed at 2 for $framesAtTwo frames" }
+            check(time > visible * .45f * .9f && time < visible * .6f) { "Kept attacks must play at fast speed, took $time s" }
+
+            val flood = ArrayList<VisualEvent>()
+            repeat(WorldVisualTimeline.MAX_QUEUED_EVENTS + 6) { flood += move() }
+            flood += attack(VisualPosition(0, 0), targetSample)
+            world.nextBatch = VisualBatch(world.view, flood, flood.last().id.sequence, 0L)
+            world.timeline.advance(1 / 60f)
+            check(world.timeline.pendingCount == 1) { "A batch too long to queue must still keep its attack, kept ${world.timeline.pendingCount}" }
         }
     }
 

@@ -36,7 +36,7 @@ fun FxScene.cityHit(at: Float) {
 
 /** A unit destroyed at [anchor]'s tile, starting at [at]. */
 fun FxScene.death(body: BodyKind?, anchor: FxAnchor, at: Float) {
-    if (anchor == FxAnchor.SOURCE && family in AIRCRAFT) {
+    if (anchor == FxAnchor.SOURCE && body == BodyKind.AIRCRAFT && family in AIRCRAFT) {
         // A gunship fights over its own tile, so it goes down there rather than on a flight path.
         if (family == WeaponFamily.GUNSHIP && outcome != VisualAttackOutcome.INTERCEPTED) return rotorcraftDeath(anchor, at, sourceWater)
         // A plane that dies on its attack goes down in flames in its own script, where the viewer last saw it.
@@ -47,7 +47,8 @@ fun FxScene.death(body: BodyKind?, anchor: FxAnchor, at: Float) {
     val away = if (anchor == FxAnchor.TARGET) 1f else -1f
     when (body) {
         BodyKind.VEHICLE -> vehicleDeath(anchor, at, water)
-        BodyKind.SHIP -> shipDeath(anchor, at)
+        // A ship sunk in a harbor city burns where it lies.
+        BodyKind.SHIP -> if (water) shipDeath(anchor, at) else vehicleDeath(anchor, at, water = false)
         BodyKind.AIRCRAFT -> aircraftDeath(anchor, at, water)
         BodyKind.MOUNTED -> fall(anchor, at, away, 1.3f, water, weapon = true, twice = true)
         BodyKind.CIVILIAN -> fall(anchor, at, away, .85f, water, weapon = false)
@@ -331,4 +332,18 @@ private fun FxScene.blaze(anchor: FxAnchor, at: Float, x: Float, y: Float, life:
             alpha = .5f; fadeIn = .15f; fadeOut = .65f
         }
     }
+}
+
+/** A blow from an attacker no one saw: only the hit landing on the defender, with nothing to say what made it or from where. */
+fun FxScene.unseenHit() {
+    val blow = .35f
+    val scale = (.6f + (damageToDefender ?: 20) / 100f).coerceAtMost(1.1f)
+    particle(FxAnchor.TARGET, blow, .1f) {
+        shape = FxShape.SOFT; blend = FxBlend.ADD; layer = FxLayer.LIGHT
+        y = 4f; size0 = 26f * scale; size1 = 12f * scale; color0 = FxPalette.FLASH; alpha = .8f; fadeOut = .9f
+    }
+    sparks(blow, 0f, 4f, count = 6, speed = 130f, fan = 360f)
+    if (targetWater) splash(blow, 0f, -4f, .6f * scale)
+    else dust(blow, 0f, -2f, .8f * scale, color = if (targetCity) FxPalette.STONE else FxPalette.DUST, puffs = 4)
+    impact(blow)
 }

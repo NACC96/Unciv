@@ -140,7 +140,7 @@ fun FxScene.rifles() {
 /** Gatling and machine guns: a stream of tracers walking across the defender's tile, kicking up a line of dirt. */
 fun FxScene.machineGun() {
     if (style.variant == "flak") return flak()
-    val gatling = style.era <= 4
+    val gatling = style.variant == "gatling"
     val open = .06f
     val travel = .065f
     val rounds = if (gatling) 13 else 15
@@ -238,7 +238,7 @@ private fun FxScene.shellBurst(at: Float, x: Float, y: Float) {
 fun FxScene.tank() {
     if (style.variant == "gun") return antiTankGun()
     val era = style.era
-    val landship = era <= 5
+    val landship = style.variant == "landship"
     val blow = .34f
     val travel = .05f
     val fire = blow - travel

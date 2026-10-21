@@ -16,7 +16,9 @@ class VisualEffects(
     text: String? = null,
     tint: Color = Color(0xe9cf92ff.toInt()),
     private val reduced: Boolean = false,
-    private val projectileStyle: Projectile = Projectile.ARROW
+    private val projectileStyle: Projectile = Projectile.ARROW,
+    /** Raises the text, so several labels on one tile don't overprint. */
+    private val lift: Float = 0f
 ) : Group(), AutoCloseable {
     /** LABEL is text alone, for combat whose blows are drawn by its weapon's own effect. */
     enum class Kind { MOVE, HIT, DEFEAT, FOUND, WORK, CAPTURE, NUCLEAR, PROJECTILE, LABEL }
@@ -88,7 +90,7 @@ class VisualEffects(
                 mark.rotation = angle + if (kind == Kind.HIT || kind == Kind.WORK) 0f else 90f
             }
         }
-        label?.setPosition(centerX - label.width / 2, 47f + if (reduced) 0f else p * 10f)
+        label?.setPosition(centerX - label.width / 2, 47f + lift + if (reduced) 0f else p * 10f)
     }
 
     override fun close() { if (!closed) { closed = true; remove(); clearChildren() } }

@@ -55,6 +55,11 @@ object CombatStyles {
         "Sea Beggar" to (WeaponFamily.BROADSIDE to "light"),
         "Jet Fighter" to (WeaponFamily.STRAFE to "jet"),
         "Triplane" to (WeaponFamily.STRAFE to "biplane"),
+        // Named rather than left to era thresholds, which differ between the base rulesets' tech trees.
+        "Fighter" to (WeaponFamily.STRAFE to "fighter"),
+        "Zero" to (WeaponFamily.STRAFE to "fighter"),
+        "Landship" to (WeaponFamily.TANK to "landship"),
+        "Gatling Gun" to (WeaponFamily.MACHINE_GUN to "gatling"),
     )
     private val heavyUnits = setOf("Trebuchet", "Artillery", "Rocket Artillery", "Battleship", "Ship of the Line",
         "B17", "Stealth Bomber", "Giant Death Robot", "Modern Armor", "Nuclear Submarine")
@@ -88,6 +93,9 @@ object CombatStyles {
         val variant = if (family == WeaponFamily.ARROWS && unit.unitType == "Ranged Water") "bolts" else null
         return WeaponStyle(family, era, variant, heavy)
     }
+
+    /** The look of an attacker no one saw: only its blow landing on the defender. */
+    val unseen = WeaponStyle(WeaponFamily.BLADES, 0, "unseen")
 
     /** A city's defenses fire arrows, then cannon, then artillery as its owner advances. */
     fun forCity(ownerEra: Int): WeaponStyle = when {
@@ -146,6 +154,7 @@ object CombatStyles {
     }
 
     private fun fallback(kind: VisualAttackKind, era: Int) = when (kind) {
+        VisualAttackKind.UNKNOWN -> unseen
         VisualAttackKind.AIR -> WeaponStyle(WeaponFamily.BOMBS, era)
         VisualAttackKind.RANGED -> WeaponStyle(WeaponFamily.ARROWS, era)
         VisualAttackKind.CITY -> forCity(era)
