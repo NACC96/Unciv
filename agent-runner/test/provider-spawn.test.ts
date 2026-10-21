@@ -5,6 +5,8 @@ import { dirname, join } from "node:path";
 import { claudeSpawn, codexSpawn, opencodeSpawn, resolveProviderExecutable } from "../src/provider-spawn.js";
 import { NodeRunner } from "../src/supervisor.js";
 import { GAME_INSTRUCTIONS } from "../src/game-instructions.js";
+import { buildTurnPrompt } from "../src/turn-prompt.js";
+import { buildSpawnForProvider, promptCarriesStaticInstructions } from "../src/daemon.js";
 
 const roots: string[] = [];
 afterEach(() => { vi.unstubAllEnvs(); for (const root of roots.splice(0)) rmSync(root, { recursive: true }); });
@@ -15,6 +17,27 @@ function executable(path: string) {
 }
 
 describe("provider executable discovery without provider launches", () => {
+  it.each(["codex", "claude", "opencode"] as const)("delivers current strategy policy on fresh and resumed %s invocations", provider => {
+    vi.stubEnv(`UNCIV_${provider.toUpperCase()}_EXECUTABLE`, process.execPath);
+    const cwd = root();
+    for (const resumeId of [undefined, "exact-existing-session"]) {
+      const prompt = buildTurnPrompt({ displayName: "Ada", personality: "", rulesetName: "Vanilla", protocolVersion: 1,
+        civId: "Rome", turnSerial: 204, stateRevision: 81, notes: "Old-session strategy notes.",
+        recentEvents: [], pendingDecisions: [], guidance: [],
+        includeStaticInstructions: promptCarriesStaticInstructions(provider, resumeId) });
+      const { spec } = buildSpawnForProvider(provider, prompt, resumeId, "http://127.0.0.1:1234/mcp", "fixture-secret",
+        { model: "chosen-model", reasoning: "high" }, cwd);
+      expect(spec.argv.at(-1)).toBe(prompt);
+      expect(spec.argv.at(-1)).toContain("victory-progress-v1");
+      expect(spec.argv).toContain("chosen-model");
+      expect(spec.argv).toContain(provider === "codex" ? 'model_reasoning_effort="high"' : "high");
+      if (resumeId) expect(spec.argv).toContain(resumeId);
+      if (provider === "codex") expect(spec.argv).toContain(`developer_instructions=${JSON.stringify(GAME_INSTRUCTIONS)}`);
+      if (provider === "claude") expect(spec.argv).toContain(GAME_INSTRUCTIONS);
+      if (provider === "opencode") expect(prompt.includes(GAME_INSTRUCTIONS)).toBe(!resumeId);
+    }
+  });
+
   it("uses explicit configuration before PATH and per-user installs", () => {
     const home = root(); const configured = executable(join(home, "custom codex"));
     const path = join(home, "path"); executable(join(path, "codex")); executable(join(home, ".local/bin/codex"));

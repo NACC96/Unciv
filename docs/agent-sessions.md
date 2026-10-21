@@ -18,6 +18,16 @@ These are the defaults. Each leader resumes its own provider session every turn,
 
 Missing, malformed or out-of-range values fall back to the defaults. The file is read every turn, so changes apply without restarting the app.
 
+## Strategy updates in ongoing sessions
+
+Every turn prompt carries the current strategy policy (`victory-progress-v1`), including resumed OpenCode sessions whose earlier static prompt remains in history. Codex and Claude continue to receive the full game instructions through their existing developer/system instruction arguments. The supervisor supplies the current engine observation's `gameTurn`, victory routes and strategic progress to the prompt; old private notes remain beliefs that must be reconciled with these facts.
+
+Policy updates take effect at the next normal turn invocation after the updated runner is loaded. They do not require session rotation, compaction changes or clearing saved notes and correspondence. Existing civilization, timeline and exact provider session bindings remain in force.
+
+Each run's `meta.json` and lifecycle activity entries record `strategyPolicyVersion`, the match/timeline/civilization identity and the observed `gameTurn` separately from `turnSerial`. Older engines that omit `gameTurn` leave it absent in metadata; the runner never estimates it from turn serials. These fields persist when a turn is released and its provider finishes compacting in the background. The daemon's `run_started` event also reports the policy version. A completed invocation or compaction is not evidence of an engine victory.
+
+Source changes and prompt tests alone do not establish that an already-running desktop daemon uses the update. Verify the packaged runner and the first normal post-update run's policy metadata before treating an active match as updated.
+
 ## Post-turn compaction
 
 Codex supports compaction after a turn (`model_post_turn_compact_threshold_percent`). When the desktop sends `compactAfterTurn`, the supervisor asks Codex to compact once the turn's closing message is written. The supervisor does not wait for it:

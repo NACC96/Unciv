@@ -36,6 +36,7 @@ export interface SpawnSpec {
   argv: string[];
   cwd: string;
   context?: { matchId: string; civId: string; turnSerial: number; runId: string; provider?: string; model?: string; reasoning?: string;
+    timelineId?: string; gameTurn?: number; strategyPolicyVersion?: string;
     sessionArm?: string; sessionAge?: number; resumed?: boolean };
 }
 

@@ -206,7 +206,7 @@ describe("turn prompt and provider spawn", () => {
       openingObservation: '{"revision":12,"ownUnits":[]}' });
     expect(prompt).toContain('Opening observation (game.observe at revision 12; absent fields are null, false, zero or empty):\n{"revision":12,"ownUnits":[]}');
     expect(prompt).toContain("Start from the opening observation above instead of calling game.observe");
-    expect(prompt).toContain("weigh the balance of power against your rivals");
+    expect(prompt).toContain("Reconcile your victory commitment with the strategic checkpoint and factual progress");
   });
 
   it("asks Codex to compact after the turn and attaches the map image without swallowing positionals", () => {
@@ -265,6 +265,8 @@ describe("post-turn compaction", () => {
 
   it("releases the turn at the closing message, revokes game tools and leaves the provider compacting", async () => {
     const engine = new FakeGameService();
+    const observe = engine.observe.bind(engine);
+    engine.observe = async () => ({ ...await observe(), gameTurn: 77 });
     const logRoot = mkdtempSync(join(tmpdir(), "compaction-logs-"));
     const report = join(logRoot, "report.json");
     const compactMs = 1500;
@@ -283,13 +285,20 @@ describe("post-turn compaction", () => {
     expect(outcome.run.finalText).toBe("Turn committed; the border holds.");
     expect(outcome.run.sessionId).toBe("compacting-session");
     expect(outcome.background).toBeDefined();
+    const runDir = readdirSync(logRoot).find(name => name.startsWith("run-"))!;
+    const releasedMeta = JSON.parse(readFileSync(join(logRoot, runDir, "meta.json"), "utf8"));
     await outcome.background!.done;
     expect(performance.now() - started - releasedAfter).toBeGreaterThan(compactMs - 500);
     expect(JSON.parse(readFileSync(report, "utf8"))).toEqual({ lateCall: "rejected" });
     // The released turn keeps its own run-end entry; the compaction is logged after it.
-    const runDir = readdirSync(logRoot).find(name => name.startsWith("run-"))!;
     const activity = readFileSync(join(logRoot, runDir, "activity.jsonl"), "utf8").trim().split("\n").map(line => JSON.parse(line));
     expect(activity.filter(entry => entry.id === "run-end")).toEqual([expect.objectContaining({ status: "completed_turn" })]);
     expect(activity.at(-1)).toMatchObject({ id: "session-compaction", title: expect.stringMatching(/^Session compacted in /) });
+    const identity = { strategyPolicyVersion: "victory-progress-v1", gameTurn: 77, turnSerial: 1,
+      matchId: "m", timelineId: "t", civId: "civ" };
+    expect(releasedMeta).toMatchObject({ ...identity, turnOutcome: "completed_turn", sessionId: "compacting-session" });
+    expect(JSON.parse(readFileSync(join(logRoot, runDir, "meta.json"), "utf8"))).toMatchObject(identity);
+    for (const entry of activity.filter(entry => ["run-start", "run-end", "session-compaction"].includes(entry.id)))
+      expect(JSON.parse(entry.text)).toMatchObject(identity);
   }, 30000);
 });

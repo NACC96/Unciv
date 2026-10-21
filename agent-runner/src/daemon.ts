@@ -14,6 +14,7 @@
 import { GAME_TOOL_ALLOWLIST, TOOL_TIMEOUT_SEC, codexSpawn, claudeSpawn, opencodeSpawn, type SpawnSpec } from "./provider-spawn.js";
 import { parseClaudeStream, parseCodexStream, parseOpencodeStream, type NormalizedRun } from "./provider-events.js";
 import { Supervisor, type SpawnExtras } from "./supervisor.js";
+import { STRATEGY_POLICY_VERSION } from "./strategy-policy.js";
 import { StdioEngineBackend } from "./stdio-engine.js";
 import { CANCELLED_DETAIL, parseInbound, encodeFrame, type RunTurnControl } from "./engine-protocol.js";
 import { mkdirSync, writeFileSync } from "node:fs";
@@ -128,6 +129,7 @@ export function buildSpawnForProvider(
  * Codex (developer_instructions) and Claude (--append-system-prompt) receive
  * GAME_INSTRUCTIONS on every invocation, so their turn prompt omits the copy.
  * OpenCode has no system-prompt flag here: a fresh session needs it in the prompt.
+ * The versioned strategy update is always carried by buildTurnPrompt, including resumes.
  */
 export function promptCarriesStaticInstructions(provider: RunTurnControl["provider"], resumeId: string | undefined): boolean {
   if (provider === "codex" || provider === "claude") return false;
@@ -326,7 +328,7 @@ export async function main(): Promise<void> {
     const emit = (event: "run_started" | "session_bound" | "tool_activity" | "run_completed" | "run_failed", payload: Record<string, unknown>) => {
       process.stdout.write(encodeFrame({ protocol: 1, kind: "turn_event", runId: control.runId, event, payload }) + "\n");
     };
-    emit("run_started", { provider: control.provider, civ: control.binding.civId });
+    emit("run_started", { provider: control.provider, civ: control.binding.civId, strategyPolicyVersion: STRATEGY_POLICY_VERSION });
     const supervisor = new Supervisor(
       (prompt, resumeId, serverUrl, bearer, extras) => {
         const built = buildSpawnForProvider(control.provider, prompt, resumeId, serverUrl, bearer, control.providerConfig, scratch, extras);

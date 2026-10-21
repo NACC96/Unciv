@@ -160,6 +160,8 @@ describe("supervisor daemon over stdio", () => {
 
     const kinds = collected.events.map((e) => e["event"]);
     expect(kinds).toContain("run_started");
+    expect(collected.events.find(e => e["event"] === "run_started")?.["payload"])
+      .toMatchObject({ provider: "scripted", civ: "civ", strategyPolicyVersion: "victory-progress-v1" });
     expect(kinds).toContain("session_bound");
     const completed = collected.events.find((e) => e["event"] === "run_completed") as
       | { payload?: { status?: string; toolCalls?: string[]; turnEnded?: boolean } }
