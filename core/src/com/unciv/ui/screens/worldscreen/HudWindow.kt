@@ -69,10 +69,13 @@ class HudWindow(
     private val frame = ResizeFrame()
     private var pill: Table? = null
     private var menu: Table? = null
+    private var menuAnchor: Actor? = null
     private val outsideMenuTouch = object : InputListener() {
         override fun touchDown(event: InputEvent, x: Float, y: Float, pointer: Int, button: Int): Boolean {
             val open = menu ?: return false
-            if (event.target?.isDescendantOf(open) != true) closeMenu()
+            val target = event.target
+            // The ⋯ button toggles the menu itself on release; closing here would reopen it.
+            if (target?.isDescendantOf(open) != true && menuAnchor?.let { target?.isDescendantOf(it) } != true) closeMenu()
             return false
         }
     }
@@ -192,14 +195,21 @@ class HudWindow(
         showPill(stage, anchor)
     }
 
-    /** Opens the window minimized when the user left it that way. @return whether it did. */
-    fun restoreMinimizedState(): Boolean {
-        val stage = panel.stage ?: return false
+    /** The user left this window minimized: mark it so (the panel starts hidden) without showing
+     *  the pill yet, since the panel may not know its default spot during construction.
+     *  @return whether it starts minimized. */
+    fun startsMinimized(): Boolean {
         if (saved?.minimized != true) return false
         isMinimized = true
-        hide()
-        showPill(stage, bounds())
         return true
+    }
+
+    /** Shows (or hides) a minimized window's pill, e.g. as a compact HUD tab hides the window's area. */
+    fun setPillShown(shown: Boolean) {
+        val stage = panel.stage ?: return
+        if (!isMinimized) return
+        if (!shown) { pill?.remove(); closeMenu(); return }
+        if (pill?.stage == null) showPill(stage, bounds())
     }
 
     fun restore() {
@@ -308,6 +318,7 @@ class HudWindow(
         private val start = Rectangle()
         private val pointerStart = Vector2()
         private var resizing = false
+        private var resized = false
 
         init {
             touchable = Touchable.enabled
@@ -325,6 +336,7 @@ class HudWindow(
                     start.set(panel.x, panel.y, panel.width, panel.height)
                     pointerStart.set(event.stageX, event.stageY)
                     resizing = true
+                    resized = false
                     isInteracting = true
                     panel.toFront()
                     event.stop()
@@ -338,6 +350,8 @@ class HudWindow(
                     resizing = false
                     isInteracting = false
                     setCursor(zoneAt(x, y))
+                    // A click on an edge that moved nothing leaves the window where (and as docked as) it was.
+                    if (!resized) return
                     remember()
                     onResized()
                 }
@@ -368,12 +382,16 @@ class HudWindow(
             var right = start.x + start.width
             var bottom = start.y
             var top = start.y + start.height
-            val minWidth = minOf(minSize.x, stage.width - 2 * margin)
-            val minHeight = minOf(minSize.y, stage.height - 2 * margin)
-            if (zone and LEFT != 0) left = snapEdge(left + dx, xs).coerceIn(margin, right - minWidth)
-            if (zone and RIGHT != 0) right = snapEdge(right + dx, xs).coerceIn(left + minWidth, stage.width - margin)
-            if (zone and BOTTOM != 0) bottom = snapEdge(bottom + dy, ys).coerceIn(margin, top - minHeight)
-            if (zone and TOP != 0) top = snapEdge(top + dy, ys).coerceIn(bottom + minHeight, stage.height - margin)
+            // A default spot may already be smaller than the minimum (e.g. the docked feed on a small
+            // stage): never require more than the window had, and keep every range non-empty.
+            val minWidth = minOf(minSize.x, start.width, stage.width - 2 * margin).coerceAtLeast(1f)
+            val minHeight = minOf(minSize.y, start.height, stage.height - 2 * margin).coerceAtLeast(1f)
+            fun Float.within(low: Float, high: Float) = coerceIn(low, maxOf(low, high))
+            if (zone and LEFT != 0) left = snapEdge(left + dx, xs).within(minOf(margin, left), right - minWidth)
+            if (zone and RIGHT != 0) right = snapEdge(right + dx, xs).within(left + minWidth, maxOf(stage.width - margin, right))
+            if (zone and BOTTOM != 0) bottom = snapEdge(bottom + dy, ys).within(minOf(margin, bottom), top - minHeight)
+            if (zone and TOP != 0) top = snapEdge(top + dy, ys).within(bottom + minHeight, maxOf(stage.height - margin, top))
+            if (left != panel.x || bottom != panel.y || right - left != panel.width || top - bottom != panel.height) resized = true
             panel.setBounds(left, bottom, right - left, top - bottom)
             panel.invalidateHierarchy()
             Gdx.graphics.requestRendering()
@@ -489,14 +507,16 @@ class HudWindow(
         stage.addActor(content)
         content.toFront()
         menu = content
+        menuAnchor = anchor
         stage.removeCaptureListener(outsideMenuTouch)
         stage.addCaptureListener(outsideMenuTouch)
         Gdx.graphics.requestRendering()
     }
 
-    private fun closeMenu() {
+    fun closeMenu() {
         val open = menu ?: return
         menu = null
+        menuAnchor = null
         open.stage?.removeCaptureListener(outsideMenuTouch)
         open.remove()
         settings.save()

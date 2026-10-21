@@ -25,12 +25,13 @@ internal object AgentReadingText {
     interface Reader { fun onReadingSizeChanged() }
 
     /** "Text size  A− 100% A+" for a window's options menu. */
-    fun menuRow(table: Table, stage: Stage?) {
+    fun menuRow(table: Table) {
         table.add("Text size".toLabel(WorldScreenStyle.muted, GameUiStyle.Type.caption))
             .padTop(GameUiStyle.Space.s).padBottom(GameUiStyle.Space.s).row()
         val row = Table()
         val value = percent().toLabel(WorldScreenStyle.ink, GameUiStyle.Type.small)
         fun button(text: String, delta: Float) = WorldScreenStyle.quietButton(text, GameUiStyle.ButtonSize.Compact).apply {
+            // The menu is on the stage only once shown, so look the stage up when clicked.
             onClick {
                 change(stage, delta)
                 value.setText(percent())

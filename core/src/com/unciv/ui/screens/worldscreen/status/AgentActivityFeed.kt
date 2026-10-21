@@ -96,11 +96,15 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
     private var viewerId: String? = null
     private var unreadCount = 0
     private var followLive = true
-    /** A wheel or trackpad scroll happened since following stopped: reaching the bottom resumes it. */
+    /** The reader scrolled or dragged since following stopped: reaching the bottom resumes it. */
     private var resumeAtBottom = false
     private var panelWidth = 0f
     private var panelHeight = 0f
     private var disposed = false
+    // Declared before init: initializers after it would overwrite what construction sets.
+    private var atlasViewport: Rectangle? = null
+    private var atlasTabVisible = true
+    private var atlasUserVisible = true
 
     private val window = HudWindow(this, "activity", "Activity", Vector2(260f, 220f),
         defaultBounds = ::defaultBounds,
@@ -108,7 +112,7 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
         onResized = { panelWidth = width; panelHeight = height; rebuild(); if (followLive) jumpToLive() },
         onArranged = { if (atlas) screen.relayoutHud() },
         menuExtras = {
-            AgentReadingText.menuRow(this, stage)
+            AgentReadingText.menuRow(this)
             if (session.getActivityDirectory() != null) {
                 val logs = WorldScreenStyle.quietButton("Open logs folder", GameUiStyle.ButtonSize.Compact)
                 logs.onClick { openLogs() }
@@ -207,14 +211,15 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
         scroll.setOverscroll(false, false)
         scroll.setSmoothScrolling(false)
         scroll.setFlingTime(0.2f)
-        scroll.onUserScroll = { resumeAtBottom = true }
         scroll.addCaptureListener(object : InputListener() {
             override fun scrolled(event: InputEvent, x: Float, y: Float, amountX: Float, amountY: Float): Boolean {
-                holdPosition()
+                // A transcript that still fits has nothing to read back to: keep following.
+                if (scroll.maxY > 0f) { holdPosition(); resumeAtBottom = true }
                 return false
             }
             override fun touchDown(event: InputEvent, x: Float, y: Float, pointer: Int, button: Int): Boolean {
-                holdPosition()
+                // Dragging back down resumes following too; expanding an entry (its click holds again) does not.
+                holdPosition(); resumeAtBottom = true
                 return false
             }
         })
@@ -241,8 +246,10 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
             add(footer).growX().padTop(12f)
         }
         screen.stage.addActor(this)
+        // Left minimized last time: start hidden. Its pill appears once the HUD gives the feed its spot.
+        if (window.startsMinimized()) { atlasUserVisible = false; isVisible = false }
         refresh()
-        window.restoreMinimizedState()
+        if (!atlas) window.setPillShown(true)
         Timer.schedule(refreshTask, 0.35f, 0.35f)
     }
 
@@ -281,15 +288,14 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
         }
     }
 
-    private var atlasViewport: Rectangle? = null
-    private var atlasTabVisible = true
-    private var atlasUserVisible = true
-
     /** A collapsed viewport keeps filter, reading position and the user's visibility preference. */
     fun setAtlasViewport(bounds: Rectangle, shown: Boolean) {
         atlasViewport = Rectangle(bounds)
         atlasTabVisible = shown
         isVisible = atlasUserVisible && shown
+        // A compact tab or a hidden HUD hides the pill and the window menu with the feed.
+        window.setPillShown(shown)
+        if (!isVisible) window.closeMenu()
         if (isVisible) refresh()
     }
 

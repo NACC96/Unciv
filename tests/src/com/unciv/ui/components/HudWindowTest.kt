@@ -77,6 +77,7 @@ class HudWindowTest {
             show = { panel.isVisible = true; shown++; window.onShown() },
             hide = { panel.isVisible = false; hidden++; window.onHidden() },
             onResized = { resized++ }, onArranged = { arranged++ })
+        header.add(window.controls())
         window.attachHeader(header)
         window.place()
         panel.validate()
@@ -172,6 +173,54 @@ class HudWindowTest {
         assertEquals(right, panel.x + panel.width, 0.01f)
         assertEquals(top, panel.y + panel.height, 0.01f)
         assertTrue(window.isPlaced)
+    }
+
+    @Test fun `resizing a window that starts below its minimum never crashes`() {
+        // The docked feed on a small stage is narrower than its 260 minimum.
+        val f = Fixture(width = 960f, height = 600f)
+        val (panel, _) = f.window(defaults = Rectangle(8f, 300f, 200f, 150f))
+        val frame = panel.resizeFrame()
+        val listener = frame.listeners.filterIsInstance<InputListener>().single()
+        drag(listener, frame, Vector2(8f, 400f), Vector2(60f, 400f), Vector2(2f, panel.height / 2))
+        assertTrue(panel.width > 0f && panel.x >= 0f)
+        drag(listener, frame, Vector2(100f, 300f), Vector2(100f, 900f), Vector2(panel.width / 2, 2f))
+        assertTrue(panel.height > 0f && panel.y >= 0f)
+        drag(listener, frame, Vector2(8f, 300f), Vector2(-500f, -500f), Vector2(2f, 2f))
+        assertTrue(panel.x >= 0f && panel.y >= 0f)
+    }
+
+    @Test fun `a click on an edge without dragging leaves the window docked`() {
+        val f = Fixture()
+        val (panel, window) = f.window()
+        val frame = panel.resizeFrame()
+        val listener = frame.listeners.filterIsInstance<InputListener>().single()
+        drag(listener, frame, Vector2(20f, 500f), Vector2(20f, 500f), Vector2(2f, panel.height / 2))
+        assertFalse(window.isPlaced)
+        assertEquals(0, f.resized)
+        assertEquals(Rectangle(20f, 300f, 400f, 450f), Rectangle(panel.x, panel.y, panel.width, panel.height))
+    }
+
+    @Test fun `the options button toggles its menu`() {
+        val f = Fixture()
+        val (panel, _) = f.window()
+        val controls = panel.header().children.filterIsInstance<Table>().single { it !is com.badlogic.gdx.scenes.scene2d.ui.Button }
+        val options = controls.children.first()
+        fun tap() = options.listeners.filterIsInstance<com.unciv.ui.components.input.ActivationListener>().single()
+            .tap(InputEvent().apply { listenerActor = options }, 1f, 1f, 1, 0)
+        fun menuOpen() = f.root.children.any { it.name == "HudWindowMenu/test" }
+        tap()
+        assertTrue(menuOpen())
+        // The stage's outside-touch listener sees the press on the button first; it must leave the toggle to the button.
+        val captured = org.mockito.ArgumentCaptor.forClass(com.badlogic.gdx.scenes.scene2d.EventListener::class.java)
+        Mockito.verify(f.stage, Mockito.atLeastOnce()).addCaptureListener(captured.capture())
+        val outside = captured.allValues.filterIsInstance<InputListener>().last()
+        outside.touchDown(InputEvent().apply { target = options }, 0f, 0f, 0, 0)
+        assertTrue(menuOpen())
+        tap()
+        assertFalse(menuOpen())
+        tap()
+        outside.touchDown(InputEvent().apply { target = panel }, 0f, 0f, 0, 0)
+        assertFalse("A press elsewhere closes it", menuOpen())
     }
 
     @Test fun `double clicking the header returns to the default spot`() {

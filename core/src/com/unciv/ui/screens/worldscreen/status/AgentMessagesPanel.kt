@@ -130,7 +130,7 @@ class AgentMessagesPanel(
         show = { setShown(true) }, hide = { setShown(false) },
         // Message rows wrap to the content width, so rebuild them once at the final size.
         onResized = { rememberScrollPosition(); rebuildHistory() },
-        menuExtras = { AgentReadingText.menuRow(this, stage) })
+        menuExtras = { AgentReadingText.menuRow(this) })
     private val pickerHeight get() = if (GameUiStyle.isAtlas) 28f * UncivGame.Current.settings.fontSizeMultiplier else 30f
     private var viewerId: String? = null
     /** A queued message awaiting the second click that deletes it, and the one being deleted. */
