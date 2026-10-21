@@ -8,6 +8,13 @@ import com.unciv.logic.presentation.VisualAttackOutcome
  * What follows a blow: a city taking fire, and each kind of unit going down.
  */
 
+/** How far below a tile's center a unit stands. */
+private const val FEET = -15f
+private val HULL = Color(.24f, .24f, .25f, 1f)
+private val DUST_LIGHT = Color(.88f, .8f, .64f, 1f)
+/** Where fires catch among a city's buildings, as offsets from its center. */
+private val CITY_FIRES = listOf(-13f to 4f, 12f to 8f, 2f to -7f)
+
 /** A city hit by the attack: masonry bursts where the blow lands, then fires catch among its buildings under smoke. */
 fun FxScene.cityHit(at: Float) {
     dust(at, 0f, 0f, 1.2f, color = FxPalette.STONE, puffs = 4)
@@ -26,9 +33,6 @@ fun FxScene.cityHit(at: Float) {
         blaze(FxAnchor.TARGET, start, spot.first + spread(2f), spot.second + spread(2f), end - start - .04f, scale = if (index == 0) 1f else .75f)
     }
 }
-
-/** Where fires catch among a city's buildings, as offsets from its center. */
-private val CITY_FIRES = listOf(-13f to 4f, 12f to 8f, 2f to -7f)
 
 /** A unit destroyed at [anchor]'s tile, starting at [at]. */
 fun FxScene.death(body: BodyKind?, anchor: FxAnchor, at: Float) {
@@ -50,8 +54,6 @@ fun FxScene.death(body: BodyKind?, anchor: FxAnchor, at: Float) {
         else -> fall(anchor, at, away, 1f, water, weapon = body == BodyKind.INFANTRY)
     }
 }
-
-private val AIRCRAFT = setOf(WeaponFamily.STRAFE, WeaponFamily.GUNSHIP, WeaponFamily.BOMBS, WeaponFamily.MISSILE)
 
 /** The hull bursts, the ammunition cooks off and throws the turret clear, and the wreck burns under black smoke. */
 private fun FxScene.vehicleDeath(anchor: FxAnchor, at: Float, water: Boolean) {
@@ -114,8 +116,6 @@ private fun FxScene.shipDeath(anchor: FxAnchor, at: Float) {
         }
     }
 }
-
-private val HULL = Color(.24f, .24f, .25f, 1f)
 
 /**
  * Water thrown up by a blast or a body going in: soft white plumes that rise and fall back, droplets,
@@ -257,11 +257,6 @@ private fun FxScene.fall(anchor: FxAnchor, at: Float, away: Float, scale: Float,
         color0 = FxPalette.SHAFT; fadeIn = 0f; fadeOut = .45f
     }
 }
-
-private val DUST_LIGHT = Color(.88f, .8f, .64f, 1f)
-
-/** How far below a tile's center a unit stands. */
-private const val FEET = -15f
 
 /** A body hitting the ground: a low flat burst of dust, a ring of it along the ground and a few clods. */
 private fun FxScene.thump(anchor: FxAnchor, at: Float, x: Float, y: Float, pushX: Float, pushY: Float, scale: Float) {

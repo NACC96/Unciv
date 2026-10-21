@@ -2,12 +2,30 @@ package com.unciv.ui.screens.worldscreen.presentation.combat
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.math.MathUtils
+import com.unciv.logic.presentation.VisualAttackOutcome
+import kotlin.math.sqrt
 
 /*
  * Building blocks shared by every weapon script. Each takes a time in nominal seconds and an offset from a tile's
  * center, and adds particles to the scene. Scripts combine and tune these rather than drawing from scratch,
  * so a cannon's smoke and a tank's smoke look like the same smoke.
  */
+
+/** The defender slipped away before the blow, so shots go into the ground or water where it stood. */
+val FxScene.withdrawn: Boolean get() = outcome == VisualAttackOutcome.WITHDRAWN
+
+/** +1 when the attack heads right on screen, -1 when it heads left, so swings and gun lines can mirror with it. */
+val FxScene.facing: Float get() = if (dir.x >= 0f) 1f else -1f
+
+/** What a hit throws up: masonry from a city, earth elsewhere. */
+val FxScene.soil: Color get() = if (targetCity) FxPalette.STONE else FxPalette.EARTH
+
+/** How far toward the defender, and how far to its left, a screen offset lies: the inverse of [FxScene.ox] and [FxScene.oy]. */
+fun FxScene.alongOf(x: Float, y: Float): Float = x * dir.x + y * dir.y
+fun FxScene.sideOf(x: Float, y: Float): Float = x * perp.x + y * perp.y
+
+/** Puffs enough for a trail to read as one line: about one every [spacing] pixels of the attack's distance. */
+fun FxScene.trailPuffs(spacing: Float, fewest: Int, most: Int): Int = (length / spacing).toInt().coerceIn(fewest, most)
 
 /** A muzzle flash pointing at the defender: a hot core, a short flame tongue and a few sparks. */
 fun FxScene.muzzleFlash(at: Float, along: Float = 12f, side: Float = 0f, scale: Float = 1f, anchor: FxAnchor = FxAnchor.SOURCE) {
@@ -246,8 +264,8 @@ fun FxScene.trail(
         // Invert the ease so each puff appears as the projectile passes its point.
         val passTime = when (ease) {
             FxEase.LINEAR -> fraction
-            FxEase.IN -> kotlin.math.sqrt(fraction)
-            FxEase.OUT -> 1 - kotlin.math.sqrt(1 - fraction)
+            FxEase.IN -> sqrt(fraction)
+            FxEase.OUT -> 1 - sqrt(1 - fraction)
             FxEase.SMOOTH -> fraction
         }
         flying(at + travel * passTime, life, FxFlight(ox(fromAlong, fromSide), oy(fromAlong, fromSide), toX, toY, arc, ease, ease.apply(passTime))) {

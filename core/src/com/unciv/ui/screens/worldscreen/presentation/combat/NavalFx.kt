@@ -2,7 +2,6 @@ package com.unciv.ui.screens.worldscreen.presentation.combat
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.math.MathUtils
-import com.unciv.logic.presentation.VisualAttackOutcome
 
 /*
  * Ships: rams and boarding, broadsides of sail-era guns, steel-era naval guns and submarines' torpedoes.
@@ -17,27 +16,12 @@ private const val WATERLINE = -7f
 /** How long a [seaColumn] stands: thrown up against drag 5 and pulled down at 9.6/9.1 of its speed, its water is back by then. */
 private const val COLUMN_LIFE = .6f
 
-private object NavalColors {
-    /** Pale timber from inside a split hull, mixed with weathered [FxPalette.WOOD] so splinters read on dark water. */
-    val RAW_WOOD = Color(.8f, .64f, .42f, 1f)
-    val SHOT = Color(.1f, .09f, .08f, 1f)
-    val TIMBER_DUST = Color(.62f, .54f, .42f, 1f)
-    /** Cordite smoke: thinner and greyer than black powder's white. */
-    val CORDITE = Color(.62f, .6f, .56f, 1f)
-}
-
-private val FxScene.slippedAway get() = outcome == VisualAttackOutcome.WITHDRAWN
-
-/** What a hit ashore throws up: masonry from a city, earth elsewhere. */
-private fun FxScene.soil() = if (targetCity) FxPalette.STONE else FxPalette.EARTH
-
-/** The attacker's end of the screen, so guns ripple from the bow nearest the defender. */
-private val FxScene.facing get() = if (dir.x >= 0f) 1f else -1f
-
-/** The along and side of a screen offset, so the kit's muzzle and flight helpers can sit on a level hull. */
-private fun FxScene.alongOf(x: Float, y: Float) = x * dir.x + y * dir.y
-private fun FxScene.sideOf(x: Float, y: Float) = x * perp.x + y * perp.y
-
+/** Pale timber from inside a split hull, mixed with weathered [FxPalette.WOOD] so splinters read on dark water. */
+private val RAW_WOOD = Color(.8f, .64f, .42f, 1f)
+private val SHOT = Color(.1f, .09f, .08f, 1f)
+private val TIMBER_DUST = Color(.62f, .54f, .42f, 1f)
+/** Cordite smoke: thinner and greyer than black powder's white. */
+private val CORDITE = Color(.62f, .6f, .56f, 1f)
 
 /** Where a shot strikes the defender: its flank facing the attacker on a ship, anywhere on a city's walls. */
 private fun FxScene.strikePoint(width: Float = 10f): Pair<Float, Float> = when {
@@ -64,9 +48,9 @@ fun FxScene.ramShip() {
     val cx = -dir.x * if (targetWater) 12f else 18f
     val cy = if (targetWater) WATERLINE + 3f - dir.y * 3f else -4f - dir.y * 12f
     impact(blow, .8f + style.era * .2f)
-    if (targetWater) ramSpray(blow, cx, cy, if (slippedAway) .75f * weight else weight)
+    if (targetWater) ramSpray(blow, cx, cy, if (withdrawn) .75f * weight else weight)
     else dust(blow, cx, cy, 1.2f * weight, color = FxPalette.DUST, puffs = 6)
-    if (slippedAway) return
+    if (withdrawn) return
     particle(FxAnchor.TARGET, blow, .08f) {
         shape = FxShape.SOFT; blend = FxBlend.ADD; layer = FxLayer.LIGHT
         x = cx; y = cy + 5f; size0 = 14f * weight; size1 = 30f * weight; color0 = FxPalette.FLASH; alpha = .55f; fadeOut = 1f
@@ -75,7 +59,7 @@ fun FxScene.ramShip() {
     if (targetWater) {
         timberShards(blow, cx, cy + 6f, (13 * weight).toInt(), angle, 140f, 210f)
         timberDust(blow, cx, cy + 6f, 3)
-    } else rubble(blow, cx, cy + 4f, (13 * weight).toInt(), angle, 190f, soil())
+    } else rubble(blow, cx, cy + 4f, (13 * weight).toInt(), angle, 190f, soil)
     // A bloodied attacker's bow gives way too.
     if ((damageToAttacker ?: 0) > 0) timberShards(blow + .02f, cx, cy + 5f, 5, angle + 180f, 100f, 150f)
     boardingFight(blow + .15f)
@@ -107,10 +91,10 @@ private fun FxScene.bowWave(blow: Float, scale: Float) {
     }
     // Spray thrown off the bow in the last strokes before the ram strikes.
     repeat(6) {
-        val at2 = blow - rand(.02f, .1f)
-        val forward = lunge(at2, blow)
+        val sprayAt = blow - rand(.02f, .1f)
+        val forward = lunge(sprayAt, blow)
         val arm = if (it % 2 == 0) 1f else -1f
-        particle(FxAnchor.SOURCE, at2, rand(.22f, .3f)) {
+        particle(FxAnchor.SOURCE, sprayAt, rand(.22f, .3f)) {
             shape = FxShape.DISC; layer = FxLayer.BODY
             x = dir.x * (12f + forward); y = WATERLINE + 3f + dir.y * (3f + forward)
             vx = perp.x * arm * rand(40f, 80f) + dir.x * 40f; vy = rand(70f, 120f); ay = -700f
@@ -206,7 +190,7 @@ fun FxScene.broadside() {
         val gy = -2f - deck * 3f + dir.y * (4f + forward)
         // Smoke from every port would only thicken the same bank, so bigger batteries put out less per gun.
         powderBlast(at, gx, gy, if (heavy) 1.05f else .95f, puffs = if (heavy || perDeck > 5) 2 else 3)
-        val hit = !slippedAway && (index == 0 || chance(if (heavy) .45f else .4f))
+        val hit = !withdrawn && (index == 0 || chance(if (heavy) .45f else .4f))
         val (toX, toY) = if (hit) strikePoint() else nearMiss(30f)
         val landing = cannonball(at, travel, arc, gx, gy, toX, toY)
         if (hit) roundShotStrike(landing, toX, toY, if (heavy) 1.1f else 1f) else shotMiss(landing, toX, toY, if (heavy) 1.1f else 1f)
@@ -228,12 +212,12 @@ private fun FxScene.lightBroadside() {
         val forward = lunge(at, blow)
         val gx = facing * (10f - index * 9f) + dir.x * (6f + forward); val gy = -2f + dir.y * (4f + forward)
         powderBlast(at, gx, gy, .85f)
-        val (toX, toY) = if (slippedAway) nearMiss(22f) else strikePoint()
+        val (toX, toY) = if (withdrawn) nearMiss(22f) else strikePoint()
         cannonball(at, travel, 2f, gx, gy, toX, toY)
-        if (slippedAway) shotMiss(landing, toX, toY, .9f) else roundShotStrike(landing, toX, toY, .9f)
+        if (withdrawn) shotMiss(landing, toX, toY, .9f) else roundShotStrike(landing, toX, toY, .9f)
     }
     impact(blow, .6f)
-    if (!slippedAway) boardingFight(blow + .15f, pistols = true)
+    if (!withdrawn) boardingFight(blow + .15f, pistols = true)
 }
 
 /** A muzzle-loader firing: flash and flame from the port, then a gout of white powder smoke rolling out toward the enemy. */
@@ -255,10 +239,10 @@ private fun FxScene.powderBlast(at: Float, x: Float, y: Float, scale: Float, puf
 private fun FxScene.cannonball(at: Float, travel: Float, arc: Float, fromX: Float, fromY: Float, toX: Float, toY: Float): Float {
     val along = alongOf(fromX, fromY); val side = sideOf(fromX, fromY)
     projectile(at, travel, arc, along, side, toX, toY) {
-        shape = FxShape.RECT; size0 = 2.4f; size1 = 2.4f; aspect = .9f; stretch = .012f; color0 = NavalColors.SHOT; alpha = .35f
+        shape = FxShape.RECT; size0 = 2.4f; size1 = 2.4f; aspect = .9f; stretch = .012f; color0 = SHOT; alpha = .35f
     }
     return projectile(at, travel, arc, along, side, toX, toY) {
-        shape = FxShape.DISC; size0 = 4f; size1 = 4f; color0 = NavalColors.SHOT
+        shape = FxShape.DISC; size0 = 4f; size1 = 4f; color0 = SHOT
     }
 }
 
@@ -272,7 +256,7 @@ private fun FxScene.roundShotStrike(at: Float, x: Float, y: Float, scale: Float)
         timberShards(at, x, y + 2f, (8 * scale).toInt(), angle, 120f, 170f)
         timberDust(at, x, y + 2f, 2)
     } else {
-        rubble(at, x, y + 2f, (7 * scale).toInt(), 90f, 150f * scale, soil())
+        rubble(at, x, y + 2f, (7 * scale).toInt(), 90f, 150f * scale, soil)
         dust(at, x, y, scale, color = if (targetCity) FxPalette.STONE else FxPalette.DUST, puffs = 4)
     }
 }
@@ -282,7 +266,7 @@ private fun FxScene.shotMiss(at: Float, x: Float, y: Float, scale: Float) {
     if (targetWater) seaColumn(at, x, y, 36f * scale, 10f * scale)
     else {
         dust(at, x, y, .75f * scale, color = if (targetCity) FxPalette.STONE else FxPalette.DUST, puffs = 3)
-        rubble(at, x, y, 3, 90f, 110f * scale, soil())
+        rubble(at, x, y, 3, 90f, 110f * scale, soil)
     }
 }
 
@@ -312,7 +296,7 @@ fun FxScene.navalGuns() {
         val gy = 2f + dir.y * (4f + forward)
         muzzleFlash(at, alongOf(gx, gy), sideOf(gx, gy), if (modern) 1.25f * power else 1.4f)
         steelGunSmoke(at + .01f, gx, gy, if (modern) 1f else 1.2f, blackPowder = !modern)
-        val hit = !slippedAway && (index == 0 || chance(.5f))
+        val hit = !withdrawn && (index == 0 || chance(.5f))
         val (toX, toY) = if (hit) strikePoint() else nearMiss(28f)
         val landed = shell(at, travel, 3f + length * .03f, gx, gy, toX, toY, power)
         if (hit) shellHit(landed, toX, toY, if (modern) .85f * power else 1f, full = hits == 0)
@@ -341,7 +325,7 @@ private fun FxScene.battleshipSalvos() {
             val at = volley + gun * .018f
             val gx = facing * (14f - gun * 13f) + dir.x * 10f; val gy = 3f + dir.y * 6f
             turretBlast(at, gx, gy)
-            val hit = gun == 0 && !slippedAway
+            val hit = gun == 0 && !withdrawn
             // The other shells raise their columns clear either side of the target rather than out of the hit.
             val straddle = if ((gun + salvo) % 2 == 0) 1f else -1f
             val (toX, toY) = if (hit) strikePoint(8f) else straddle * rand(24f, 34f) to WATERLINE + rand(-8f, 6f)
@@ -361,7 +345,7 @@ private fun FxScene.steelGunSmoke(at: Float, x: Float, y: Float, scale: Float, b
             this.x = x + dir.x * index * 4f + spread(3f); this.y = y + dir.y * index * 4f + spread(3f)
             vx = dir.x * push + spread(12f); vy = dir.y * push + rand(12f, 24f); drag = 3.5f
             size0 = 9f * scale; size1 = rand(24f, 32f) * scale
-            color0 = vary(if (blackPowder) FxPalette.GUN_SMOKE else NavalColors.CORDITE, .04f)
+            color0 = vary(if (blackPowder) FxPalette.GUN_SMOKE else CORDITE, .04f)
             color1 = if (blackPowder) null else FxPalette.GUN_SMOKE
             alpha = if (blackPowder) .8f else .65f; fadeIn = .06f; fadeOut = .75f
         }
@@ -390,7 +374,7 @@ private fun FxScene.turretBlast(at: Float, x: Float, y: Float) {
             this.x = x + spread(3f); this.y = y + spread(3f)
             vx = dir.x * push + perp.x * spread(20f); vy = dir.y * push + perp.y * spread(20f) + 16f; drag = 3.5f
             size0 = 14f; size1 = rand(34f, 44f)
-            color0 = vary(NavalColors.CORDITE, .04f); color1 = FxPalette.GUN_SMOKE; alpha = .65f; fadeIn = .08f; fadeOut = .7f
+            color0 = vary(CORDITE, .04f); color1 = FxPalette.GUN_SMOKE; alpha = .65f; fadeIn = .08f; fadeOut = .7f
         }
     }
 }
@@ -410,7 +394,7 @@ private fun FxScene.shell(at: Float, travel: Float, arc: Float, fromX: Float, fr
 
 /** A shell striking home: a blast on a ship's hull, or masonry or earth thrown up ashore. Only a [full] hit sets fires. */
 private fun FxScene.shellHit(at: Float, x: Float, y: Float, scale: Float, full: Boolean = true) =
-    if (targetWater) hullBlast(at, x, y, scale, full) else explosion(at, x, y, if (full) scale else .75f * scale, smoke = full, debris = soil())
+    if (targetWater) hullBlast(at, x, y, scale, full) else explosion(at, x, y, if (full) scale else .75f * scale, smoke = full, debris = soil)
 
 /** A shell that misses: a column of white water, or a burst of earth (or masonry) ashore. */
 private fun FxScene.shellMiss(at: Float, x: Float, y: Float, scale: Float) {
@@ -420,8 +404,8 @@ private fun FxScene.shellMiss(at: Float, x: Float, y: Float, scale: Float) {
             shape = FxShape.SOFT; blend = FxBlend.ADD; layer = FxLayer.LIGHT
             this.x = x; this.y = y; size0 = 14f * scale; size1 = 26f * scale; color0 = FxPalette.FLASH; fadeOut = .9f
         }
-        dust(at, x, y, .75f * scale, color = if (targetCity) FxPalette.STONE else FxPalette.EARTH, puffs = 3)
-        rubble(at, x, y, 4, 90f, 130f * scale, soil())
+        dust(at, x, y, .75f * scale, color = soil, puffs = 3)
+        rubble(at, x, y, 4, 90f, 130f * scale, soil)
     }
 }
 
@@ -430,7 +414,7 @@ private fun FxScene.shellMiss(at: Float, x: Float, y: Float, scale: Float) {
  * then black smoke and, for a [full] hit, fire on deck; later hits of the same attack add less to the burning hull.
  * The kit's blast would leave a scorch mark on the water, so this is drawn here.
  */
-private fun FxScene.hullBlast(at: Float, x: Float, y: Float, scale: Float, full: Boolean = true) {
+private fun FxScene.hullBlast(at: Float, x: Float, y: Float, scale: Float, full: Boolean) {
     particle(FxAnchor.TARGET, at, .1f) {
         shape = FxShape.SOFT; blend = FxBlend.ADD; layer = FxLayer.LIGHT
         this.x = x; this.y = y; size0 = 18f * scale; size1 = 56f * scale; color0 = FxPalette.FLASH; fadeOut = .9f
@@ -501,7 +485,7 @@ fun FxScene.torpedo() {
         if (sourceWater) torpedoLaunch(at, fromX, fromY)
         val hitAt = torpedoRun(at, travel, fromX, fromY, toX, toY)
         torpedoBlast(hitAt, toX, toY, if (heavy) 1.12f else 1f, full = index == 0)
-        impact(hitAt, if (index > 0) 2.5f else if (heavy) 3.5f else 3f)
+        impact(hitAt, when { index > 0 -> 2.5f; heavy -> 3.5f; else -> 3f })
     }
 }
 
@@ -536,7 +520,7 @@ private fun FxScene.torpedoRun(at: Float, travel: Float, fromX: Float, fromY: Fl
         shape = FxShape.DISC; layer = FxLayer.BODY; size0 = 4.5f; size1 = 4.5f
         color0 = FxPalette.WATER; fadeIn = .1f; fadeOut = 0f
     }
-    val count = (length / 6f).toInt().coerceIn(10, 30)
+    val count = trailPuffs(6f, 10, 30)
     repeat(count) { index ->
         val fraction = (index + .5f) / count
         val passing = at + travel * fraction
@@ -568,7 +552,7 @@ private fun FxScene.torpedoRun(at: Float, travel: Float, fromX: Float, fromY: Fl
  */
 private fun FxScene.torpedoBlast(at: Float, x: Float, y: Float, scale: Float, full: Boolean) {
     if (!targetWater) {
-        explosion(at, x, y, 1.3f * scale, smoke = full, debris = soil())
+        explosion(at, x, y, 1.3f * scale, smoke = full, debris = soil)
         return
     }
     particle(FxAnchor.TARGET, at, .14f) {
@@ -580,7 +564,7 @@ private fun FxScene.torpedoBlast(at: Float, x: Float, y: Float, scale: Float, fu
         this.x = x; this.y = y; size0 = 14f * scale; size1 = 110f * scale; color0 = FxPalette.WATER; alpha = .7f; fadeOut = .9f
     }
     seaColumn(at + .02f, x, y, 74f * scale, 18f * scale)
-    if (slippedAway) return
+    if (withdrawn) return
     repeat(2) {
         particle(FxAnchor.TARGET, at + .02f, rand(.18f, .24f)) {
             shape = FxShape.SOFT; blend = FxBlend.ADD; layer = FxLayer.LIGHT
@@ -661,12 +645,12 @@ private fun FxScene.seaColumn(at: Float, x: Float, y: Float, height: Float, widt
 }
 
 /** A ring of foam spreading from (x, y) over a pale patch of churned water. */
-private fun FxScene.foam(at: Float, x: Float, y: Float, from: Float, to: Float, life: Float = .55f) {
-    particle(FxAnchor.TARGET, at, life) {
+private fun FxScene.foam(at: Float, x: Float, y: Float, from: Float, to: Float) {
+    particle(FxAnchor.TARGET, at, .55f) {
         shape = FxShape.RING; layer = FxLayer.GROUND
         this.x = x; this.y = y; size0 = from; size1 = to; color0 = FxPalette.WATER; alpha = .4f; fadeOut = .8f
     }
-    particle(FxAnchor.TARGET, at + .01f, life) {
+    particle(FxAnchor.TARGET, at + .01f, .55f) {
         shape = FxShape.SOFT; layer = FxLayer.GROUND
         this.x = x; this.y = y; size0 = from * 1.2f; size1 = to * .7f; color0 = FxPalette.WATER; alpha = .4f; fadeIn = .1f; fadeOut = .7f
     }
@@ -684,7 +668,7 @@ private fun FxScene.timberShards(at: Float, x: Float, y: Float, count: Int, head
             ay = -700f; drag = .8f
             size0 = rand(4.5f, 8f); size1 = size0 * .8f; aspect = rand(.25f, .42f)
             rotation = rand(0f, 360f); spin = spread(1100f)
-            color0 = vary(if (chance(.6f)) NavalColors.RAW_WOOD else FxPalette.WOOD, .06f); fadeOut = .3f
+            color0 = vary(if (chance(.6f)) RAW_WOOD else FxPalette.WOOD, .06f); fadeOut = .3f
         }
     }
 }
@@ -715,6 +699,6 @@ private fun FxScene.timberDust(at: Float, x: Float, y: Float, puffs: Int) = repe
         this.x = x + spread(5f); this.y = y + spread(3f)
         vx = dir.x * 24f + spread(18f); vy = rand(20f, 36f); drag = 2.5f
         size0 = rand(8f, 11f); size1 = rand(20f, 28f)
-        color0 = vary(NavalColors.TIMBER_DUST, .05f); alpha = .65f; fadeIn = .06f; fadeOut = .7f
+        color0 = vary(TIMBER_DUST, .05f); alpha = .65f; fadeIn = .06f; fadeOut = .7f
     }
 }

@@ -2,13 +2,17 @@ package com.unciv.ui.screens.worldscreen.presentation.combat
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.math.MathUtils
-import com.unciv.logic.presentation.VisualAttackOutcome
 import kotlin.math.abs
 import kotlin.math.sqrt
 
 /*
  * Artillery and missiles: cannon, modern artillery, rocket salvos and guided missiles.
  */
+
+/** Pale stone dust, which shows against grass where plain masonry grey would not. */
+private val MASONRY_DUST = Color(FxPalette.STONE).lerp(FxPalette.GUN_SMOKE, .45f)
+/** Dry earth thrown up in a cloud: paler than settled dust, so a soft puff of it reads against olive grass. */
+private val THROWN_DUST = Color(FxPalette.DUST).lerp(FxPalette.GUN_SMOKE, .3f)
 
 /**
  * Black-powder guns: a flash and a rolling bank of white smoke, then an iron ball that ploughs into the ground at the
@@ -27,7 +31,7 @@ fun FxScene.cannon() {
         val side = when (gun) { 1 -> 13f; 2 -> -13f; else -> 0f }
         muzzleFlash(fire, along, side, scale = 1.25f)
         powderSmoke(fire + .008f, along, side, if (city) .85f else 1f, jets = if (city) 3 else 5)
-        val aimed = gun == 0 && outcome != VisualAttackOutcome.WITHDRAWN
+        val aimed = gun == 0 && !withdrawn
         // Round shot strikes the ground just short of the defender, at its feet: the unit is drawn over anything behind it.
         // A ship takes it in the side of the hull.
         val short = when { shells -> 0f; hullHit -> 4f; else -> 12f }
@@ -54,12 +58,12 @@ fun FxScene.artillery() {
     fireAt = fire
     repeat(shells) { index ->
         val at = fire + index * gap
-        val side = if (shells == 1) 0f else if (index == 0) -5f else 6f
+        val side = when { shells == 1 -> 0f; index == 0 -> -5f; else -> 6f }
         gunBlast(at, along, side, power, dusty = index == 0)
         // The first shell is on target; the next falls a little short or long of it.
         val miss = when {
             index > 0 -> (if (chance(.5f)) -1f else 1f) * rand(14f, 20f)
-            outcome == VisualAttackOutcome.WITHDRAWN -> spread(10f)
+            withdrawn -> spread(10f)
             else -> 0f
         }
         val toX = ox(miss) + spread(if (index == 0) 4f else 8f)
@@ -92,7 +96,7 @@ fun FxScene.rockets() {
             size0 = 16f; size1 = rand(38f, 46f); color0 = vary(FxPalette.GUN_SMOKE, .03f); alpha = .6f; fadeIn = .15f; fadeOut = .6f
         }
     }
-    val scatter = if (outcome == VisualAttackOutcome.WITHDRAWN) 1.4f else 1f
+    val scatter = if (withdrawn) 1.4f else 1f
     repeat(count) { index ->
         val launch = first + index * gap
         val side = (index % 3 - 1) * 4f
@@ -138,7 +142,7 @@ fun FxScene.missile() {
             size0 = 8f; size1 = rand(20f, 26f); color0 = vary(FxPalette.GUN_SMOKE, .03f); alpha = .55f; fadeIn = .08f; fadeOut = .7f
         }
     }
-    val toX = spread(if (outcome == VisualAttackOutcome.WITHDRAWN) 14f else 3f)
+    val toX = spread(if (withdrawn) 14f else 3f)
     val toY = spread(2f)
     val landing = guided(launch, travel, arc, 6f, 0f, toX, toY, FxEase.IN, puffs = trailPuffs(7f, 12, 40))
     warhead(landing, toX, toY, 1.55f)
@@ -197,7 +201,7 @@ private fun FxScene.cruiserSalvo() {
                 size0 = 8f; size1 = rand(16f, 20f); color0 = vary(FxPalette.GUN_SMOKE, .03f); alpha = .75f; fadeIn = .05f; fadeOut = .6f
             }
         }
-        val aimed = index == 0 && outcome != VisualAttackOutcome.WITHDRAWN
+        val aimed = index == 0 && !withdrawn
         val toX = spread(if (aimed) 4f else 12f)
         val toY = spread(if (aimed) 3f else 7f)
         val fromX = deckX; val fromY = deckY + rise
@@ -256,7 +260,7 @@ private fun FxScene.fireArrows() {
         }
     }
     val landings = ArrayList<Float>()
-    val scatter = if (outcome == VisualAttackOutcome.WITHDRAWN) 1.3f else 1f
+    val scatter = if (withdrawn) 1.3f else 1f
     repeat(count) { index ->
         val launch = first + index * .011f + spread(.004f)
         val side = (index % 4 - 1.5f) * 4f
@@ -288,29 +292,12 @@ private fun FxScene.fireArrows() {
 
 // Building blocks for the scripts above.
 
-/** What a blow throws up: masonry from a city, earth anywhere else. */
-private val FxScene.rubble: Color get() = if (targetCity) FxPalette.STONE else FxPalette.EARTH
-
 /** Whether the blow lands on a ship, rather than on open water or a ship that slipped away. */
-private val FxScene.hullHit: Boolean get() = defenderBody == BodyKind.SHIP && outcome != VisualAttackOutcome.WITHDRAWN
+private val FxScene.hullHit: Boolean get() = defenderBody == BodyKind.SHIP && !withdrawn
 
 /** The kit's blast, throwing up spray at sea and rubble ashore. */
 private fun FxScene.blast(at: Float, x: Float, y: Float, scale: Float, smoke: Boolean = false) =
-    explosion(at, x, y, scale, water = targetWater, smoke = smoke, debris = rubble)
-
-
-/** Pale stone dust, which shows against grass where plain masonry grey would not. */
-private val MASONRY_DUST = Color(FxPalette.STONE).lerp(FxPalette.GUN_SMOKE, .45f)
-
-/** Dry earth thrown up in a cloud: paler than settled dust, so a soft puff of it reads against olive grass. */
-private val THROWN_DUST = Color(FxPalette.DUST).lerp(FxPalette.GUN_SMOKE, .3f)
-
-/** Puffs enough for a trail to read as one line: about one every [spacing] pixels of the attack's distance. */
-private fun FxScene.trailPuffs(spacing: Float, fewest: Int, most: Int) = (length / spacing).toInt().coerceIn(fewest, most)
-
-/** How far toward the defender, and how far to its left, a tile offset lies. */
-private fun FxScene.alongOf(x: Float, y: Float) = x * dir.x + y * dir.y
-private fun FxScene.sideOf(x: Float, y: Float) = x * perp.x + y * perp.y
+    explosion(at, x, y, scale, water = targetWater, smoke = smoke, debris = soil)
 
 /**
  * Black-powder smoke: [jets] puffs blown hard out of the muzzle toward the defender, braking in the air into a white

@@ -3,7 +3,6 @@ package com.unciv.ui.screens.worldscreen.presentation.combat
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
-import com.unciv.logic.presentation.VisualAttackOutcome
 
 /*
  * Gunpowder and modern land weapons: musket lines, rifles, machine guns, tanks and the Giant Death Robot.
@@ -45,13 +44,15 @@ fun FxScene.muskets() {
         val (toX, toY) = bulletEnd(onBody = !charge && chance(.5f))
         val from = raised(16f, side, 2f)
         val travel = .05f + (distanceInTiles - 1).coerceAtLeast(0) * .03f
-        flying(shot + .005f, travel, FxFlight(from.x, from.y, toX, toY)) {
+        val launch = shot + .005f
+        val landing = launch + travel
+        flying(launch, travel, FxFlight(from.x, from.y, toX, toY)) {
             shape = FxShape.RECT; blend = FxBlend.ADD; layer = FxLayer.LIGHT
             size0 = 2f; size1 = 2f; aspect = .55f; stretch = .012f; alignToMotion = true
             color0 = FxPalette.STEEL; alpha = .6f; fadeIn = 0f; fadeOut = 0f
         }
-        bulletHit(shot + .005f + travel, toX, toY, 1.2f)
-        firstHit = minOf(firstHit, shot + .005f + travel)
+        bulletHit(landing, toX, toY, 1.2f)
+        firstHit = minOf(firstHit, landing)
     }
     if (charge) {
         bayonets(blow)
@@ -72,7 +73,7 @@ private fun FxScene.bayonets(blow: Float) {
         }
     }
     val hitX = ox(front + 3f); val hitY = oy(front + 3f) + 3f
-    if (outcome != VisualAttackOutcome.WITHDRAWN) {
+    if (!withdrawn) {
         particle(FxAnchor.TARGET, blow, .07f) {
             shape = FxShape.SOFT; blend = FxBlend.ADD; layer = FxLayer.LIGHT
             x = hitX; y = hitY; size0 = 20f; size1 = 5f; color0 = FxPalette.FLASH; fadeOut = .8f
@@ -156,7 +157,7 @@ fun FxScene.machineGun() {
         val u = index / (rounds - 1f)
         val along = MathUtils.lerp(-24f, 0f, (u * 2.2f).coerceAtMost(1f)) + spread(3f)
         val side = MathUtils.lerp(sweepFrom, sweepTo, u) + spread(2.5f)
-        val onBody = outcome != VisualAttackOutcome.WITHDRAWN && along > -6f && side in -7f..7f && chance(.55f)
+        val onBody = !withdrawn && along > -6f && side in -7f..7f && chance(.55f)
         val toX = ox(along, side); val toY = oy(along, side) + if (onBody) rand(-6f, 5f) else GROUND + spread(2.5f)
         tracer(shot, travel, muzzle.x, muzzle.y, toX, toY, color = if (gatling) GATLING_STREAK else FxPalette.TRACER,
             scale = 1.15f, glow = if (gatling) .3f else .45f)
@@ -237,14 +238,14 @@ private fun FxScene.shellBurst(at: Float, x: Float, y: Float) {
 fun FxScene.tank() {
     if (style.variant == "gun") return antiTankGun()
     val era = style.era
+    val landship = era <= 5
     val blow = .34f
     val travel = .05f
     val fire = blow - travel
-    val gun = when { style.heavy -> 1.35f; era <= 5 -> .85f; else -> 1.1f }
+    val gun = when { style.heavy -> 1.35f; landship -> .85f; else -> 1.1f }
     fireAt = fire
     // The engine coughs a plume of exhaust off the rear deck as the tank surges forward, left behind as it goes;
     // the first tanks far more of it.
-    val landship = era <= 5
     repeat(if (landship) 4 else 3) { index ->
         particle(FxAnchor.SOURCE, blow - .22f + index * .035f, rand(.42f, .55f)) {
             shape = FxShape.SOFT; layer = FxLayer.SMOKE
@@ -266,14 +267,14 @@ fun FxScene.tank() {
     val (toX, toY) = shellEnd(3f)
     tracer(fire, travel, from.x, from.y, toX, toY, color = FxPalette.FIRE_CORE, scale = 1.5f * gun.coerceAtMost(1.2f), glow = .55f)
     shellHit(blow, toX, toY, gun)
-    impact(blow, if (style.heavy) 2f else if (era <= 5) 1.2f else 1.5f)
+    impact(blow, when { style.heavy -> 2f; landship -> 1.2f; else -> 1.5f })
 
     // A coaxial machine gun rakes the target after the shell; a Landship's sponson guns do the same from the side.
     if (defenderKilled) return
     val burst = blow + .14f
     repeat(5) { index ->
         val shot = burst + index * .028f
-        val side = if (era <= 5) 9f else 2f
+        val side = if (landship) 9f else 2f
         val start = raised(14f + lunge(shot, blow), side, 3f)
         smallFlash(shot, 12f + lunge(shot, blow), side, 3f, .6f)
         val (endX, endY) = bulletEnd(onBody = chance(.5f))
@@ -377,7 +378,6 @@ fun FxScene.laser() {
     // The beam: a few short frames, each a white core in a red sheath, its far end sweeping across the target.
     val frames = 6
     val frame = (beamEnd - blow) / frames
-    val withdrawn = outcome == VisualAttackOutcome.WITHDRAWN
     val sweep = if (chance(.5f)) 1f else -1f
     val beam = Vector2()
     repeat(frames) { index ->
@@ -463,16 +463,8 @@ private fun FxScene.smallFlash(at: Float, along: Float, side: Float, up: Float, 
     }
 }
 
-
 /** A point [along] toward the defender, [side] to its left and [up] pixels higher on screen. */
 private fun FxScene.raised(along: Float, side: Float, up: Float) = Vector2(ox(along, side), oy(along, side) + up)
-
-/** The along and side that reach a screen offset, so the kit's gun-mouth helpers can sit above a tile's center. */
-private fun FxScene.alongOf(x: Float, y: Float) = x * dir.x + y * dir.y
-private fun FxScene.sideOf(x: Float, y: Float) = x * perp.x + y * perp.y
-
-/** What a hit throws up: masonry from a city, earth elsewhere. */
-private fun FxScene.soil() = if (targetCity) FxPalette.STONE else FxPalette.EARTH
 
 /** Whether a strike at height [y] lands on the defender rather than on the ground or water around it. */
 private fun FxScene.onBody(y: Float) = y > GROUND + 4f
@@ -486,7 +478,7 @@ private fun FxScene.hard(y: Float) = onBody(y) && (targetWater || defenderBody =
  */
 private fun FxScene.blast(at: Float, x: Float, y: Float, scale: Float) {
     val hull = targetWater && onBody(y)
-    explosion(at, x, y, scale, water = targetWater && !hull, debris = if (hull) FxPalette.DEBRIS else soil())
+    explosion(at, x, y, scale, water = targetWater && !hull, debris = if (hull) FxPalette.DEBRIS else soil)
     if (hull) particle(FxAnchor.TARGET, at + .05f, .45f) {
         shape = FxShape.RING; layer = FxLayer.GROUND
         this.x = x; this.y = GROUND; size0 = 14f * scale; size1 = 56f * scale; color0 = FxPalette.WATER; alpha = .45f; fadeOut = .8f
@@ -495,12 +487,12 @@ private fun FxScene.blast(at: Float, x: Float, y: Float, scale: Float) {
 
 /** Where a shell ends: in the defender's hull, or in the ground where it stood once it has slipped away. */
 private fun FxScene.shellEnd(top: Float): Pair<Float, Float> =
-    if (outcome == VisualAttackOutcome.WITHDRAWN) Pair(ox(-4f) + spread(4f), oy(-4f) + GROUND + 3f + spread(2f))
+    if (withdrawn) Pair(ox(-4f) + spread(4f), oy(-4f) + GROUND + 3f + spread(2f))
     else Pair(spread(4f), rand(-5f, top))
 
 /** Where a round ends: on the defender's body, or in the ground around its feet (always, once it has slipped away). */
 private fun FxScene.bulletEnd(onBody: Boolean, spreadX: Float = 12f): Pair<Float, Float> =
-    if (onBody && outcome != VisualAttackOutcome.WITHDRAWN) Pair(spread(6f), rand(-6f, 5f))
+    if (onBody && !withdrawn) Pair(spread(6f), rand(-6f, 5f))
     else Pair(spread(spreadX), GROUND + spread(3f))
 
 /** A bullet striking: a spurt of dirt or masonry thrown up, a jet of water at sea, or a spark off armor or a hull. */
@@ -513,7 +505,7 @@ private fun FxScene.bulletHit(at: Float, x: Float, y: Float, scale: Float = 1f) 
     val ground = !onBody(y)
     val dirt = if (targetCity) FxPalette.STONE else SPURT
     // A brief glint where each round strikes, so a burst reads as hits rather than drifting dust.
-    if (outcome != VisualAttackOutcome.WITHDRAWN) particle(FxAnchor.TARGET, at, .05f) {
+    if (!withdrawn) particle(FxAnchor.TARGET, at, .05f) {
         shape = FxShape.SOFT; blend = FxBlend.ADD; layer = FxLayer.LIGHT
         this.x = x; this.y = y + 1f; size0 = 9f * scale; size1 = 4f; color0 = FxPalette.FIRE_CORE; fadeOut = .8f
     }
@@ -564,7 +556,7 @@ private fun FxScene.waterJet(at: Float, x: Float, y: Float, scale: Float) {
 
 /** A round glancing off the ground: a hot streak skipping on along its line of fire and up. */
 private fun FxScene.ricochet(at: Float, x: Float, y: Float) {
-    val heading = angle + (if (dir.x >= 0f) 1f else -1f) * rand(15f, 40f)
+    val heading = angle + facing * rand(15f, 40f)
     val speed = rand(180f, 260f)
     particle(FxAnchor.TARGET, at, rand(.08f, .13f)) {
         shape = FxShape.RECT; blend = FxBlend.ADD; layer = FxLayer.LIGHT

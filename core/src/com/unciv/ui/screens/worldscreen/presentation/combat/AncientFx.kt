@@ -2,7 +2,6 @@ package com.unciv.ui.screens.worldscreen.presentation.combat
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.math.MathUtils
-import com.unciv.logic.presentation.VisualAttackOutcome
 import kotlin.math.abs
 
 /*
@@ -28,13 +27,12 @@ fun FxScene.arrows() {
     }
     val flat = variant == "bolts" || variant == "repeating"
     val arc = when (variant) { "bolts", "repeating" -> 6f + d * 3f; "javelins" -> 10f + d * 7f; "stones" -> 12f + d * 6f; else -> 18f + d * 9f }
-    val travel = (if (flat) .19f else if (variant == "stones") .24f else .28f) + d * (if (flat) .035f else .045f)
+    val travel = when { flat -> .19f; variant == "stones" -> .24f; else -> .28f } + d * (if (flat) .035f else .045f)
     val release = .08f
     val stagger = when (variant) { "repeating" -> .028f; "city" -> .022f; "javelins" -> .02f; else -> .026f }
     val shaft = when (variant) { "javelins" -> 18f; "bolts", "repeating" -> 10f; else -> 14f }
     val thickness = if (variant == "javelins" || flat) 2.3f else 2.1f
     val reach = if (length > 0f) length else 69f * d
-    val missed = outcome == VisualAttackOutcome.WITHDRAWN
     fireAt = release
 
     when (variant) {
@@ -53,7 +51,7 @@ fun FxScene.arrows() {
         val fromSide = if (variant == "city") spread(20f)
             else (index - (count - 1) / 2f) * when { flat -> 2.5f; variant == "javelins" -> 8f; else -> 4f }
         // The missiles that land the blows always strike, so the damage shows as one visibly hits; the rest are a coin flip.
-        val hit = !missed && (index == 0 || index == secondBlow || chance(if (variant == "city") .45f else .55f))
+        val hit = !withdrawn && (index == 0 || index == secondBlow || chance(if (variant == "city") .45f else .55f))
         val toX: Float; val toY: Float
         if (hit) { toX = spread(6f); toY = rand(-6f, 9f) }
         else { toX = spread(19f); toY = -15f + spread(6f) }
@@ -105,8 +103,9 @@ fun FxScene.arrows() {
             }
         }
         // The first fire bolts to strike catch; those falling short hiss out in the sea or smoulder where they stuck.
-        if (burning && index < 2) {
-            if (hit) fireHit(landing, toX, toY) else if (targetWater) steam(landing, toX, toY)
+        if (burning && index < 2) when {
+            hit -> fireHit(landing, toX, toY)
+            targetWater -> steam(landing, toX, toY)
         }
         if (burning && !hit && !targetWater) particle(FxAnchor.TARGET, landing, .3f) {
             shape = FxShape.SOFT; blend = FxBlend.ADD; layer = FxLayer.LIGHT
@@ -160,10 +159,10 @@ fun FxScene.catapult() {
 
     if (targetWater) {
         splash(landing, toX, toY, scale)
-        if (outcome != VisualAttackOutcome.WITHDRAWN) chunks(landing, toX, toY + 4f, 5, PALE_WOOD, speed = 160f * scale, size = 3.4f)
+        if (!withdrawn) chunks(landing, toX, toY + 4f, 5, PALE_WOOD, speed = 160f * scale, size = 3.4f)
         if (heavy) ripple(landing + .06f, toX + spread(8f), toY + spread(4f), 1.4f)
     } else {
-        val masonry = targetCity && outcome != VisualAttackOutcome.WITHDRAWN
+        val masonry = targetCity && !withdrawn
         val cloud = if (masonry) LIGHT_STONE else LIGHT_DUST
         // The first instant of the blow: a flash of the impact and a pale burst, then the cloud rolling out low
         // and a spout of earth thrown straight up.
@@ -182,7 +181,7 @@ fun FxScene.catapult() {
         chunks(landing, toX, toY, (10 * scale).toInt() + if (masonry) 3 else 0, if (masonry) FxPalette.STONE else FxPalette.EARTH,
             speed = 200f * scale, size = 3.8f * scale.coerceAtMost(1.3f))
         // The stone breaks up on the defender or the walls; on empty ground it bounces once and rolls on.
-        if (outcome == VisualAttackOutcome.WITHDRAWN) bounce(landing, toX, toY, size, LIGHT_STONE)
+        if (withdrawn) bounce(landing, toX, toY, size, LIGHT_STONE)
         else chunks(landing, toX, toY + 2f, 4, LIGHT_STONE, speed = 140f, size = 3.2f * scale)
         if (masonry) puffs(landing + .12f, toX, toY + 10f, if (heavy) 4 else 3, 1.2f * scale, LIGHT_STONE, alpha = .6f, pushY = -12f)
     }
@@ -194,7 +193,6 @@ private fun FxScene.ballista() {
     val release = .08f
     fireAt = release
     val d = distanceInTiles.coerceIn(1, 4)
-    val missed = outcome == VisualAttackOutcome.WITHDRAWN
     // The bow arms snap forward on either side of the slider.
     for (side in listOf(-1f, 1f)) swoosh(release - .03f, ox(4f, side * 9f), oy(4f, side * 9f) + 4f, 7f,
         angle + side * 100f, -side * 80f, 1.8f, .03f, FxAnchor.SOURCE, PALE_WOOD, .8f)
@@ -203,8 +201,8 @@ private fun FxScene.ballista() {
     val travel = .16f + d * .035f
     val arc = 4f + d * 3f
     // A bolt that finds no one flies on into the ground (or the sea) beyond where the defender stood.
-    val toX = ox(if (missed) 10f else -4f)
-    val toY = if (missed) oy(10f) - (if (targetWater) 10f else 14f) else oy(-4f) + 2f
+    val toX = ox(if (withdrawn) 10f else -4f)
+    val toY = if (withdrawn) oy(10f) - (if (targetWater) 10f else 14f) else oy(-4f) + 2f
     val flight = FxFlight(ox(12f), oy(12f) + 4f, toX, toY, arc)
     flying(release, travel, flight) {
         shape = FxShape.RECT; alignToMotion = true; size0 = 22f; size1 = 22f; aspect = .12f; color0 = PALE_WOOD; fadeIn = 0f; fadeOut = 0f
@@ -215,8 +213,8 @@ private fun FxScene.ballista() {
     }
     val landing = release + travel
     when {
-        missed && targetWater -> ripple(landing, toX, toY, 1.3f)
-        missed -> {
+        withdrawn && targetWater -> ripple(landing, toX, toY, 1.3f)
+        withdrawn -> {
             puffs(landing, toX, toY, 3, .6f)
             stuck(landing, toX, toY, 13f, angle - facing * 25f, 2.6f)
         }
@@ -247,7 +245,6 @@ fun FxScene.blades() {
     if (style.variant == "ram") return ram()
     val blow = .36f
     val era = style.era.coerceIn(0, 4)
-    val missed = outcome == VisualAttackOutcome.WITHDRAWN
     // Bronze and clubs flash warm; iron and steel flash white.
     val steel = if (era == 0) Color(1f, .9f, .7f, 1f) else FxPalette.STEEL
     // Footwork as the attacker closes in.
@@ -258,7 +255,7 @@ fun FxScene.blades() {
     swoosh(blow - .045f, ox(-27f), oy(-27f) + 5f, 19f, angle + facing * 80f, -facing * 160f, 4f, .05f, color = steel)
     val hx = ox(-11f); val hy = oy(-11f) + 3f
     val feetX = ox(-6f); val feetY = oy(-6f) - 16f
-    if (missed) {
+    if (withdrawn) {
         // The defender has slipped away: the blade bites into the ground where it stood.
         if (targetWater) ripple(blow, feetX, feetY, 1f) else {
             puffs(blow, feetX, feetY + 2f, 5, .85f)
@@ -292,8 +289,7 @@ fun FxScene.blades() {
 /** A battering ram: the iron-shod beam slams the wall, masonry and splinters burst out, and dust rolls down the stones. */
 private fun FxScene.ram() {
     val blow = .38f
-    val missed = outcome == VisualAttackOutcome.WITHDRAWN
-    val walls = targetCity && !missed
+    val walls = targetCity && !withdrawn
     // The ram rumbles forward on its wheels.
     if (!sourceWater) repeat(3) { index ->
         for (side in listOf(-8f, 8f)) {
@@ -307,7 +303,7 @@ private fun FxScene.ram() {
         impact(blow, .8f)
         return
     }
-    if (missed) {
+    if (withdrawn) {
         puffs(blow, hx, hy - 12f, 5, 1f)
         ring(blow, hx, hy - 12f, 44f, LIGHT_DUST, .6f)
         impact(blow, .8f)
@@ -348,7 +344,6 @@ private fun FxScene.ram() {
 fun FxScene.charge() {
     val blow = .38f
     val era = style.era.coerceIn(0, 5)
-    val missed = outcome == VisualAttackOutcome.WITHDRAWN
     val heavy = era >= 2
     val sabre = era >= 4
     val kick = if (heavy) 1.15f else 1f
@@ -385,7 +380,7 @@ fun FxScene.charge() {
     }
     val feetX = ox(-6f); val feetY = oy(-6f) - 16f
     val cloud = if (targetCity) LIGHT_STONE else LIGHT_DUST
-    if (missed) {
+    if (withdrawn) {
         if (targetWater) ripple(blow, feetX, feetY, 1f) else {
             puffs(blow, feetX, feetY, 5, 1.1f * kick, pushX = dir.x * 40f)
             ring(blow, feetX, feetY, 52f, LIGHT_DUST, .6f)
@@ -426,9 +421,6 @@ fun FxScene.charge() {
     }
 }
 
-/** +1 when the attack heads right on screen, -1 when it heads left: swings go over the top, whichever way the attack faces. */
-private val FxScene.facing: Float get() = if (dir.x >= 0f) 1f else -1f
-
 /**
  * A blade's sweep: a bright crescent of [radius] around (x, y), drawn from [from] degrees through [sweep] over [duration],
  * thickest mid-swing, with a faint glow so it carries on bright ground.
@@ -459,13 +451,13 @@ private fun FxScene.swoosh(at: Float, x: Float, y: Float, radius: Float, from: F
 }
 
 /** A four-pointed star of light where steel bites, over a short white flash. */
-private fun FxScene.glint(at: Float, x: Float, y: Float, size: Float = 16f, anchor: FxAnchor = FxAnchor.TARGET) {
-    particle(anchor, at, .09f) {
+private fun FxScene.glint(at: Float, x: Float, y: Float, size: Float = 16f) {
+    particle(FxAnchor.TARGET, at, .09f) {
         shape = FxShape.SOFT; blend = FxBlend.ADD; layer = FxLayer.LIGHT
         this.x = x; this.y = y; size0 = size * 1.3f; size1 = size * .5f; color0 = FxPalette.FLASH; alpha = .9f; fadeOut = .9f
     }
     val tilt = spread(15f)
-    for (rotation in listOf(45f + tilt, 135f + tilt)) particle(anchor, at, .08f) {
+    for (rotation in listOf(45f + tilt, 135f + tilt)) particle(FxAnchor.TARGET, at, .08f) {
         shape = FxShape.RECT; blend = FxBlend.ADD; layer = FxLayer.LIGHT
         this.x = x; this.y = y; size0 = size; size1 = size * .35f; aspect = .1f; this.rotation = rotation
         color0 = FxPalette.FLASH; fadeOut = .7f
@@ -594,13 +586,13 @@ private fun FxScene.steam(at: Float, x: Float, y: Float) {
     }
 }
 
-/** A missile that misses and stays where it fell, tail up, until the attack ends. */
-private fun FxScene.stuck(at: Float, x: Float, y: Float, length: Float, heading: Float, thickness: Float) {
+/** A missile that misses and stays where it fell, tail up, until the attack ends: a [shaft] px shaft, [thickness] px thick. */
+private fun FxScene.stuck(at: Float, x: Float, y: Float, shaft: Float, heading: Float, thickness: Float) {
     particle(FxAnchor.TARGET, at, end - at) {
         shape = FxShape.RECT; layer = FxLayer.BODY
         // Centered half a shaft back along the way it came, so the head is in the ground.
-        this.x = x - MathUtils.cosDeg(heading) * length / 2; this.y = y - MathUtils.sinDeg(heading) * length / 2
-        size0 = length; size1 = length; aspect = thickness / length; rotation = heading; color0 = PALE_WOOD; fadeOut = .25f
+        this.x = x - MathUtils.cosDeg(heading) * shaft / 2; this.y = y - MathUtils.sinDeg(heading) * shaft / 2
+        size0 = shaft; size1 = shaft; aspect = thickness / shaft; rotation = heading; color0 = PALE_WOOD; fadeOut = .25f
     }
 }
 
