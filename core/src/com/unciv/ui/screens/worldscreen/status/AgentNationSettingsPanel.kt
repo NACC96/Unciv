@@ -1,6 +1,7 @@
 package com.unciv.ui.screens.worldscreen.status
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.InputEvent
@@ -23,6 +24,7 @@ import com.unciv.ui.components.input.onChange
 import com.unciv.ui.components.input.onClick
 import com.unciv.ui.components.widgets.AutoScrollPane
 import com.unciv.ui.screens.basescreen.BaseScreen
+import com.unciv.ui.screens.worldscreen.HudWindow
 import com.unciv.ui.screens.worldscreen.WorldScreen
 import com.unciv.ui.screens.worldscreen.WorldScreenStyle
 
@@ -63,7 +65,7 @@ class AgentNationSettingsPanel(private val screen: WorldScreen, private val sess
     private var updating = false
     private var requesting = false
     private var disposed = false
-    private val window = com.unciv.ui.screens.worldscreen.HudWindow(this, "nation-settings", "Nation settings",
+    private val window = HudWindow(this, "nation-settings", "Nation settings",
         Vector2(320f, 320f), defaultBounds = ::defaultBounds,
         show = { if (!isVisible) toggle() }, hide = { hide() },
         onResized = { refresh() })
@@ -299,7 +301,7 @@ class AgentNationSettingsPanel(private val screen: WorldScreen, private val sess
         previousPending = pending
         // Controls are not mounted/laid out during hidden construction: place only once shown.
         if (isVisible) window.place()
-        else if (!isVisible) defaultBounds().let { setSize(it.width, it.height) }
+        else defaultBounds().let { setSize(it.width, it.height) }
         // Bound wrapped labels to the scroll pane; long identities must never drive its preferred width.
         val contentWidth = (width - 46f).coerceAtLeast(1f)
         form.cells.forEach { it.width(contentWidth) }
@@ -311,15 +313,15 @@ class AgentNationSettingsPanel(private val screen: WorldScreen, private val sess
     }
 
     /** Atlas: the right-side sheet below the header, like Messages. Elsewhere hanging below the controls. */
-    private fun defaultBounds(): com.badlogic.gdx.math.Rectangle {
+    private fun defaultBounds(): Rectangle {
         val w = minOf(480f, screen.stage.width - 16f).coerceAtLeast(1f)
         val anchorTop = controlsAnchor?.takeIf { it.stage != null }?.localToStageCoordinates(Vector2())?.y?.minus(8f)
         if (GameUiStyle.isAtlas && controlsAnchor == null)
             return AgentPanelLayout.rightSheet(screen.stage, w, 400f * UncivGame.Current.settings.fontSizeMultiplier, 650f)
         val h = minOf(650f, screen.stage.height - if (GameUiStyle.isAtlas) 24f else 130f, anchorTop?.minus(8f) ?: Float.MAX_VALUE).coerceAtLeast(1f)
-        val x = (screen.stage.width - w - 8f).coerceIn(0f, maxOf(0f, screen.stage.width - w))
+        val x = (screen.stage.width - w - 8f).coerceAtLeast(0f)
         val y = ((anchorTop ?: (screen.stage.height - 116f)) - h).coerceIn(0f, maxOf(0f, screen.stage.height - h))
-        return com.badlogic.gdx.math.Rectangle(x, y, w, h)
+        return Rectangle(x, y, w, h)
     }
     private fun updateController() {
         val selected = settings.firstOrNull { it.civId == selectedId }

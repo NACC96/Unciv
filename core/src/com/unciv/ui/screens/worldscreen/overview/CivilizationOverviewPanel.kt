@@ -2,6 +2,7 @@ package com.unciv.ui.screens.worldscreen.overview
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.InputListener
@@ -25,9 +26,11 @@ import com.unciv.ui.components.widgets.UncivTextField
 import com.unciv.ui.images.ImageGetter
 import com.unciv.ui.screens.basescreen.BaseScreen
 import com.unciv.ui.screens.overviewscreen.EmpireOverviewScreen
+import com.unciv.ui.screens.worldscreen.HudWindow
 import com.unciv.ui.screens.worldscreen.WorldScreen
 import com.unciv.ui.screens.worldscreen.WorldScreenStyle
 import com.unciv.ui.screens.worldscreen.status.AgentActivityAppearance
+import com.unciv.ui.screens.worldscreen.status.AgentPanelLayout
 import com.unciv.view.GameView
 
 /**
@@ -63,8 +66,8 @@ class CivilizationOverviewPanel(private val screen: WorldScreen) : Table(BaseScr
     private var selectedId: String? = null
     private var data: CivilizationOverviewData? = null
     private var viewerId: String? = null
-    private val window = com.unciv.ui.screens.worldscreen.HudWindow(this, "overview", "Civilizations",
-        com.badlogic.gdx.math.Vector2(300f, 260f), defaultBounds = ::defaultBounds,
+    private val window = HudWindow(this, "overview", "Civilizations",
+        Vector2(300f, 260f), defaultBounds = ::defaultBounds,
         show = { setShown(true) }, hide = { setShown(false) }, onResized = { compact = width < 520f; rebuild() })
     private var disposed = false
     private var compact = false
@@ -84,7 +87,7 @@ class CivilizationOverviewPanel(private val screen: WorldScreen) : Table(BaseScr
         val header = Table(skin).apply { touchable = Touchable.enabled }
         header.add("Civilizations".toLabel(WorldScreenStyle.ink, if (GameUiStyle.isAtlas) GameUiStyle.Type.label + 1 else 17)).left().expandX()
         header.add(window.controls())
-        val close = com.unciv.ui.screens.worldscreen.status.AgentPanelLayout.closeButton { setShown(false) }
+        val close = AgentPanelLayout.closeButton { setShown(false) }
         header.add(close).size(if (GameUiStyle.isAtlas) 28f else 26f).padLeft(GameUiStyle.Space.xs)
         window.attachHeader(header)
         add(header).growX().row()
@@ -123,9 +126,9 @@ class CivilizationOverviewPanel(private val screen: WorldScreen) : Table(BaseScr
 
     private fun setShown(shown: Boolean) {
         isVisible = shown
-        if (shown) window.onShown() else window.onHidden()
-        if (shown) { toFront(); refresh() }
+        if (shown) { window.onShown(); toFront(); refresh() }
         else {
+            window.onHidden()
             if (screen.stage.scrollFocus?.isDescendantOf(this) == true) screen.stage.scrollFocus = screen.mapHolder
             if (screen.stage.keyboardFocus?.isDescendantOf(this) == true) screen.stage.keyboardFocus = null
         }
@@ -157,14 +160,14 @@ class CivilizationOverviewPanel(private val screen: WorldScreen) : Table(BaseScr
     }
 
     /** At the right, below the world header (Atlas) or the legacy top bar. */
-    private fun defaultBounds(): com.badlogic.gdx.math.Rectangle {
+    private fun defaultBounds(): Rectangle {
         val panelWidth = minOf(660f, screen.stage.width * 0.68f).coerceAtLeast(300f).coerceAtMost(screen.stage.width - 16f)
         val panelHeight = minOf(620f, screen.stage.height - if (GameUiStyle.isAtlas) 24f else 140f).coerceAtLeast(260f).coerceAtMost(screen.stage.height - 16f)
-        val top = if (GameUiStyle.isAtlas) com.unciv.ui.screens.worldscreen.status.AgentPanelLayout.headerBottom(screen.stage) - 8f
+        val top = if (GameUiStyle.isAtlas) AgentPanelLayout.headerBottom(screen.stage) - 8f
             else screen.stage.height - 122f
-        val x = (screen.stage.width - panelWidth - 8f).coerceIn(8f, maxOf(8f, screen.stage.width - panelWidth - 8f))
+        val x = (screen.stage.width - panelWidth - 8f).coerceAtLeast(8f)
         val y = (top - panelHeight).coerceIn(8f, maxOf(8f, screen.stage.height - panelHeight - 8f))
-        return com.badlogic.gdx.math.Rectangle(x, y, panelWidth, panelHeight)
+        return Rectangle(x, y, panelWidth, panelHeight)
     }
 
     private fun filtered(): List<CivilizationSummary> {

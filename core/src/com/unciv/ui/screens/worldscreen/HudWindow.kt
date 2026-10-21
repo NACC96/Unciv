@@ -1,5 +1,6 @@
 package com.unciv.ui.screens.worldscreen
 
+import com.badlogic.gdx.Application
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Cursor
 import com.badlogic.gdx.math.Rectangle
@@ -27,6 +28,7 @@ import com.unciv.ui.components.input.onClick
 import com.unciv.ui.components.widgets.UncivSlider
 import com.unciv.ui.images.ImageGetter
 import com.unciv.ui.screens.basescreen.BaseScreen
+import com.unciv.ui.screens.worldscreen.status.AgentPanelLayout
 import kotlin.math.abs
 
 /** Makes a world-screen panel a floating window the user arranges; the arrangement is saved
@@ -93,13 +95,13 @@ class HudWindow(
     /** Where the panel sits: the user's arrangement fitted to the stage, else [defaultBounds].
      *  While the user drags or resizes, it is wherever the pointer put it. */
     fun bounds(): Rectangle {
-        if (isInteracting) return Rectangle(panel.x, panel.y, panel.width, panel.height)
-            .also { current -> panel.stage?.let { fit(current, it) } }
         val stage = panel.stage
+        if (isInteracting) return Rectangle(panel.x, panel.y, panel.width, panel.height)
+            .also { if (stage != null) fit(it, stage) }
         val layout = saved?.takeIf { it.placed }
         if (stage == null || layout == null) return defaultBounds()
-        val maxWidth = (stage.width - 2 * margin).coerceAtLeast(1f)
-        val maxHeight = (stage.height - 2 * margin).coerceAtLeast(1f)
+        val maxWidth = room(stage.width)
+        val maxHeight = room(stage.height)
         val width = layout.width.coerceIn(minOf(minSize.x, maxWidth), maxWidth)
         val height = layout.height.coerceIn(minOf(minSize.y, maxHeight), maxHeight)
         val x = if (layout.fromRight) stage.width - layout.x - width else layout.x
@@ -172,8 +174,7 @@ class HudWindow(
 
     /** The panel opened (by its own button or by restoring the pill). */
     fun onShown() {
-        isMinimized = false
-        saved?.minimized = false
+        clearMinimized()
         pill?.remove()
         place()
     }
@@ -213,11 +214,15 @@ class HudWindow(
     }
 
     fun restore() {
-        isMinimized = false
-        saved?.minimized = false
+        clearMinimized()
         settings.save()
         pill?.remove()
         show()
+    }
+
+    private fun clearMinimized() {
+        isMinimized = false
+        saved?.minimized = false
     }
 
     fun dispose() {
@@ -230,9 +235,7 @@ class HudWindow(
     private fun resetPosition() {
         saved?.placed = false
         settings.save()
-        val old = Vector2(panel.width, panel.height)
-        place()
-        if (old.x != panel.width || old.y != panel.height) onResized()
+        if (place()) onResized()
         onArranged()
         Gdx.graphics.requestRendering()
     }
@@ -263,7 +266,7 @@ class HudWindow(
         val xs = arrayListOf(margin, stage.width - margin)
         val ys = arrayListOf(margin, stage.height - margin)
         if (GameUiStyle.isAtlas) {
-            ys += com.unciv.ui.screens.worldscreen.status.AgentPanelLayout.headerBottom(stage) - WorldHudLayout.gap
+            ys += AgentPanelLayout.headerBottom(stage) - WorldHudLayout.gap
             listOf("AtlasMinimap", "AtlasTileInfo", "AtlasTurnAction")
                 .mapNotNull { stage.root.findActor<Actor>(it)?.takeIf { pane -> pane.isVisible } }
                 .minOfOrNull { it.x + AtlasWorldHud.halo }?.let { xs += it - WorldHudLayout.gap }
@@ -298,14 +301,14 @@ class HudWindow(
 
     /** Shrinks [bounds] to the stage if needed, then [clamp]s it. */
     private fun fit(bounds: Rectangle, stage: Stage) {
-        bounds.width = bounds.width.coerceAtMost((stage.width - 2 * margin).coerceAtLeast(1f))
-        bounds.height = bounds.height.coerceAtMost((stage.height - 2 * margin).coerceAtLeast(1f))
+        bounds.width = bounds.width.coerceAtMost(room(stage.width))
+        bounds.height = bounds.height.coerceAtMost(room(stage.height))
         clamp(bounds, stage)
     }
 
     private fun clamp(bounds: Rectangle, stage: Stage) {
-        bounds.x = bounds.x.coerceIn(margin, maxOf(margin, stage.width - bounds.width - margin))
-        bounds.y = bounds.y.coerceIn(margin, maxOf(margin, stage.height - bounds.height - margin))
+        bounds.x = inside(bounds.x, bounds.width, stage.width)
+        bounds.y = inside(bounds.y, bounds.height, stage.height)
     }
 
     //endregion
@@ -384,8 +387,8 @@ class HudWindow(
             var top = start.y + start.height
             // A default spot may already be smaller than the minimum (e.g. the docked feed on a small
             // stage): never require more than the window had, and keep every range non-empty.
-            val minWidth = minOf(minSize.x, start.width, stage.width - 2 * margin).coerceAtLeast(1f)
-            val minHeight = minOf(minSize.y, start.height, stage.height - 2 * margin).coerceAtLeast(1f)
+            val minWidth = minOf(minSize.x, start.width, room(stage.width)).coerceAtLeast(1f)
+            val minHeight = minOf(minSize.y, start.height, room(stage.height)).coerceAtLeast(1f)
             fun Float.within(low: Float, high: Float) = coerceIn(low, maxOf(low, high))
             if (zone and LEFT != 0) left = snapEdge(left + dx, xs).within(minOf(margin, left), right - minWidth)
             if (zone and RIGHT != 0) right = snapEdge(right + dx, xs).within(left + minWidth, maxOf(stage.width - margin, right))
@@ -399,7 +402,7 @@ class HudWindow(
     }
 
     private fun setCursor(zone: Int) {
-        if (Gdx.app?.type != com.badlogic.gdx.Application.ApplicationType.Desktop) return
+        if (Gdx.app?.type != Application.ApplicationType.Desktop) return
         val cursor = when (zone) {
             LEFT or TOP, RIGHT or BOTTOM -> Cursor.SystemCursor.NWSEResize
             RIGHT or TOP, LEFT or BOTTOM -> Cursor.SystemCursor.NESWResize
@@ -420,8 +423,7 @@ class HudWindow(
         pill.pack()
         val fromRight = window.x + window.width / 2f > stage.width / 2f
         val x = if (fromRight) window.x + window.width - pill.width else window.x
-        pill.setPosition(x.coerceIn(margin, maxOf(margin, stage.width - pill.width - margin)),
-            (window.y + window.height - pill.height).coerceIn(margin, maxOf(margin, stage.height - pill.height - margin)))
+        pill.setPositionInside(stage, x, window.y + window.height - pill.height)
         stage.addActor(pill)
         pill.toFront()
         Gdx.graphics.requestRendering()
@@ -437,7 +439,7 @@ class HudWindow(
         val restore = iconButton(ImageGetter.getImage("OtherIcons/Increase").apply { color = GameUiStyle.muted }, "Restore", 11f)
         restore.onClick { restore() }
         val close = iconButton(ImageGetter.getImage("OtherIcons/Close").apply { color = GameUiStyle.muted }, "Close", 10f)
-        close.onClick { isMinimized = false; saved?.minimized = false; settings.save(); remove() }
+        close.onClick { clearMinimized(); settings.save(); remove() }
         add(restore).size(controlSize)
         add(close).size(controlSize).padLeft(GameUiStyle.Space.xs)
         val pill = this
@@ -454,8 +456,7 @@ class HudWindow(
                 val stage = pill.stage ?: return
                 if (!dragged && pointerStart.dst(event.stageX, event.stageY) < dragSlop) return
                 dragged = true
-                pill.setPosition((start.x + event.stageX - pointerStart.x).coerceIn(margin, maxOf(margin, stage.width - pill.width - margin)),
-                    (start.y + event.stageY - pointerStart.y).coerceIn(margin, maxOf(margin, stage.height - pill.height - margin)))
+                pill.setPositionInside(stage, start.x + event.stageX - pointerStart.x, start.y + event.stageY - pointerStart.y)
                 Gdx.graphics.requestRendering()
             }
             override fun touchUp(event: InputEvent, x: Float, y: Float, pointer: Int, button: Int) {
@@ -502,8 +503,7 @@ class HudWindow(
         }
         content.pack()
         val corner = anchor.localToStageCoordinates(Vector2(anchor.width, 0f))
-        content.setPosition((corner.x - content.width).coerceIn(margin, maxOf(margin, stage.width - content.width - margin)),
-            (corner.y - content.height - GameUiStyle.Space.s).coerceIn(margin, maxOf(margin, stage.height - content.height - margin)))
+        content.setPositionInside(stage, corner.x - content.width, corner.y - content.height - GameUiStyle.Space.s)
         stage.addActor(content)
         content.toFront()
         menu = content
@@ -537,8 +537,9 @@ class HudWindow(
     }
 
     /** A minimize glyph: one short bar. */
-    private fun dash() = ImageGetter.getWhiteDot().apply { color = GameUiStyle.muted; setSize(11f, 1.75f) }
-        .let { Table().apply { add(it).size(11f, 1.75f).padTop(5f) } }
+    private fun dash() = Table().apply {
+        add(ImageGetter.getWhiteDot().apply { color = GameUiStyle.muted }).size(11f, 1.75f).padTop(5f)
+    }
 
     //endregion
 
@@ -556,6 +557,16 @@ class HudWindow(
         private const val TOP = 8
         private val windows = ArrayList<HudWindow>()
         private var currentCursor: Cursor.SystemCursor? = null
+
+        /** Room for a window along a stage [extent], inside the margins. */
+        private fun room(extent: Float) = (extent - 2 * margin).coerceAtLeast(1f)
+
+        /** [position] of something [size] long, kept inside the margins of a stage [extent]. */
+        private fun inside(position: Float, size: Float, extent: Float) =
+            position.coerceIn(margin, maxOf(margin, extent - size - margin))
+
+        private fun Actor.setPositionInside(stage: Stage, x: Float, y: Float) =
+            setPosition(inside(x, width, stage.width), inside(y, height, stage.height))
 
         /** Is [target] (up to [root]) a control with its own input, which must not start a drag? */
         private fun isControl(target: Actor?, root: Actor): Boolean {

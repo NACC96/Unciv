@@ -295,8 +295,7 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
         isVisible = atlasUserVisible && shown
         // A compact tab or a hidden HUD hides the pill and the window menu with the feed.
         window.setPillShown(shown)
-        if (!isVisible) window.closeMenu()
-        if (isVisible) refresh()
+        if (isVisible) refresh() else window.closeMenu()
     }
 
     fun show() = setShown(true)
@@ -494,18 +493,20 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
         text(value, color, size, width).apply { setText(plain(value)) }
 
     /** Markdown emphasis markers read as noise in a plain label. */
-    private fun plain(value: String) = value.replace(Regex("\\*\\*(.*?)\\*\\*"), "$1")
+    private fun plain(value: String) = value.replace(emphasis, "$1")
 
     /** Blank-line paragraphs, with "- " bullets drawn as "•". */
-    private fun paragraphs(body: String): List<String> = body.trim().split(Regex("\\n\\s*\\n"))
-        .map { paragraph -> paragraph.lines().joinToString("\n") { it.replace(Regex("^(\\s*)[-*] "), "$1• ") }.trim() }
+    private fun paragraphs(body: String): List<String> = body.trim().split(paragraphBreak)
+        .map { paragraph -> paragraph.lines().joinToString("\n") { it.replace(bullet, "$1• ") }.trim() }
         .filter { it.isNotEmpty() }
+
+    /** The text of a paragraph that is entirely **bold**, else null. */
+    private fun boldText(paragraph: String) = boldLine.matchEntire(paragraph.trim())?.groupValues?.get(1)
 
     /** A first paragraph that is entirely **bold** is the thought's headline. */
     private fun headline(paragraphs: List<String>): Pair<String?, List<String>> {
-        val first = paragraphs.firstOrNull() ?: return null to paragraphs
-        val match = Regex("^\\*\\*(.+?)\\*\\*$").matchEntire(first.trim()) ?: return null to paragraphs
-        return match.groupValues[1] to paragraphs.drop(1)
+        val title = paragraphs.firstOrNull()?.let(::boldText) ?: return null to paragraphs
+        return title to paragraphs.drop(1)
     }
 
     /** A message, error, turn boundary or different agent ends a run of tool calls. */
@@ -646,7 +647,7 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
         val inner = width - 2 * padX
         val paragraphs = paragraphs(body(entry)).ifEmpty { listOf("") }
         for ((index, paragraph) in paragraphs.withIndex()) {
-            val heading = Regex("^\\*\\*(.+?)\\*\\*$").matchEntire(paragraph)?.groupValues?.get(1)
+            val heading = boldText(paragraph)
             val label = if (heading != null) text(heading, ink, size(15), inner) else text(paragraph, ink, size(14), inner)
             card.add(label).width(inner).left().padTop(if (index == 0) 0f else 7f).row()
         }
@@ -671,8 +672,6 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
         if (foldable) {
             val toggle = (if (open) "Show less" else "Show more").toLabel(WorldScreenStyle.accent, size(11), hideIcons = true)
             block.add(toggle).left().padTop(4f).row()
-        }
-        if (foldable) {
             block.touchable = Touchable.enabled
             block.onClick {
                 holdPosition()
@@ -808,5 +807,9 @@ class AgentActivityFeed(private val screen: WorldScreen, private val session: Ag
     private companion object {
         /** Characters of a folded thought's first paragraph. */
         const val previewChars = 180
+        val emphasis = Regex("\\*\\*(.*?)\\*\\*")
+        val boldLine = Regex("^\\*\\*(.+?)\\*\\*$")
+        val paragraphBreak = Regex("\\n\\s*\\n")
+        val bullet = Regex("^(\\s*)[-*] ")
     }
 }

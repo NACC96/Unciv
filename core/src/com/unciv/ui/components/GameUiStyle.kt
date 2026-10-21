@@ -291,8 +291,8 @@ object GameUiStyle {
 
     /** The halo is generated for a [Radius.panel] footprint with its downward offset baked in.
      * Its corners exceed that radius by the margin it is drawn outside the panel, and its
-     * knocked-out interior leaves a translucent fill translucent. */
-    /** With frosted glass on (and a captured backdrop this frame) the fill is the blurred map
+     * knocked-out interior leaves a translucent fill translucent.
+     * With frosted glass on (and a captured backdrop this frame) the fill is the blurred map
      * under the card, tinted with the surface color; otherwise the translucent [fill]. */
     private class SurfaceDrawable(private val fill: RoundedPatch, private val rim: RoundedPatch,
         private val shadow: RoundedPatch?) : BaseDrawable() {

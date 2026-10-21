@@ -33,8 +33,16 @@ open class ReadingScrollPane(widget: Actor?, style: ScrollPaneStyle = ScrollPane
                 if (!vertical && !horizontal) return false
                 onUserScroll?.invoke()
                 // A sideways-only gesture still moves a vertical list, and vice versa.
-                val dy = if (vertical) (if (amountY == 0f && !horizontal) amountX else amountY) else 0f
-                val dx = if (horizontal) (if (amountX == 0f && !vertical) amountY else amountX) else 0f
+                val dy = when {
+                    !vertical -> 0f
+                    amountY == 0f && !horizontal -> amountX
+                    else -> amountY
+                }
+                val dx = when {
+                    !horizontal -> 0f
+                    amountX == 0f && !vertical -> amountY
+                    else -> amountX
+                }
                 val now = System.nanoTime()
                 val notch = classify(dy, now) or classify(dx, now)
                 val line = lineHeight()

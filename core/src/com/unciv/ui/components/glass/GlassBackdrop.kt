@@ -67,8 +67,8 @@ class GlassBackdrop : Disposable {
         // whatever the target is (the window's back buffer, or a capture buffer in render checks).
         val width = viewport[0] + viewport[2]
         val height = viewport[1] + viewport[3]
-        if (viewport[2] <= 0 || viewport[3] <= 0) { batch.begin(); content(); return }
-        val ready = try { ensureResources(width, height); true } catch (ex: RuntimeException) { fail(ex); false }
+        val ready = viewport[2] > 0 && viewport[3] > 0 &&
+            try { ensureResources(width, height); true } catch (ex: RuntimeException) { fail(ex); false }
         if (!ready) { batch.begin(); content(); return }
         try {
             scene!!.bind()

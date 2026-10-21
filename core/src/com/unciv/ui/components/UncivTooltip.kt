@@ -240,6 +240,8 @@ class UncivTooltip <T: Actor>(
         private const val atlasTipDelay = 0.35f
         /** Atlas text tips hang this far below their target. */
         private const val atlasTipGap = 6f
+        /** Widest wrapped Atlas tip text. */
+        private const val maxTipTextWidth = 280f
 
         private fun getOriginX(width: Float, align: Int) = when {
             (align and Align.left) != 0 -> 0f
@@ -370,7 +372,7 @@ class UncivTooltip <T: Actor>(
                 content.invalidateHierarchy(); content.pack(); content.pack()
                 return Vector2(content.width, content.height)
             }
-            val below = targetAlign == null && tipAlign == null && !badge
+            val defaultPlacement = targetAlign == null && tipAlign == null
             val refresher: (() -> Vector2)? = dynamicTextProvider?.let { provider -> {
                 val newText = provider()
                 if (hideIcons) label.setText(newText.tr())
@@ -381,9 +383,9 @@ class UncivTooltip <T: Actor>(
                 targetAlign = targetAlign ?: if (badge) Align.topRight else Align.bottom,
                 tipAlign = tipAlign ?: Align.top,
                 offset = when {
-                    below -> Vector2(0f, -atlasTipGap)
-                    badge && targetAlign == null && tipAlign == null -> Vector2(-4f, 6f)
-                    else -> Vector2.Zero
+                    !defaultPlacement -> Vector2.Zero
+                    badge -> Vector2(-4f, 6f)
+                    else -> Vector2(0f, -atlasTipGap)
                 },
                 forceContentSize = measure(),
                 contentRefresher = refresher,
@@ -391,9 +393,6 @@ class UncivTooltip <T: Actor>(
                 fadeOnly = true
             ))
         }
-
-        /** Widest wrapped Atlas tip text. */
-        private const val maxTipTextWidth = 280f
 
         /** Hide and remove all tooltips */
         fun Actor.removeTooltips() {

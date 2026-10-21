@@ -245,8 +245,8 @@ class AgentMessagesPanel(
     fun hide() = setShown(false)
     private fun setShown(shown: Boolean) {
         isVisible = shown
-        if (shown) window.onShown() else window.onHidden()
         if (shown) {
+            window.onShown()
             imagesHidden = false
             screen.hideCivilizationOverview()
             screen.stage.root.children.filterIsInstance<AgentNationSettingsPanel>().forEach { it.hide() }
@@ -256,6 +256,7 @@ class AgentMessagesPanel(
             if (historyGeneration == priorHistory) rebuildHistory()
         }
         else {
+            window.onHidden()
             pendingScrollAnchor = null
             imagesHidden = true; clipboardGeneration++
             if (clipboardPending) { clipboardPending = false; setStatus("") }
@@ -590,7 +591,7 @@ class AgentMessagesPanel(
         }
     }
 
-    private fun portrait(civId: String): com.badlogic.gdx.scenes.scene2d.Actor {
+    private fun portrait(civId: String): Actor {
         val civ = screen.gameInfo.civilizations.firstOrNull { it.civID == civId }
         return if (civ != null) ImageGetter.getNationPortrait(civ.nation, portraitSize)
             else ImageGetter.getCircle(AgentActivityAppearance.color(screen.gameInfo, civId), portraitSize)
@@ -609,19 +610,25 @@ class AgentMessagesPanel(
         WorldScreenStyle.control("WorldScreen/Messages/Outgoing", Color(WorldScreenStyle.surface).lerp(WorldScreenStyle.accent, 0.2f).apply { a = 0.92f })
         else WorldScreenStyle.control("WorldScreen/Messages/Incoming", Color(WorldScreenStyle.raised).apply { a = 0.82f })
 
+    private fun bubble(name: String, outgoing: Boolean) = Table(skin).apply {
+        this.name = name; top().left()
+        background = bubbleBackground(outgoing)
+        pad(bubblePadY, bubblePadX, bubblePadY, bubblePadX)
+    }
+
+    /** Message text as written (a plain Label, untranslated) at the reader's size. */
+    private fun messageText(text: String, size: Int) = Label(text, Label.LabelStyle(BaseScreen.skin.get(Label.LabelStyle::class.java))).apply {
+        setFontSize(AgentReadingText.size(size)); color = WorldScreenStyle.ink; wrap = true
+    }
+
     private fun dispatchBubble(message: Mail, outgoing: Boolean, bubbleWidth: Float, recentImages: Set<Pair<String, String>>): Table {
-        val card = Table(skin).apply { name = "MessageRow/${message.id}"; top().left() }
-        card.background = bubbleBackground(outgoing)
-        card.pad(bubblePadY, bubblePadX, bubblePadY, bubblePadX)
+        val card = bubble("MessageRow/${message.id}", outgoing)
         val inner = bubbleWidth - 2 * bubblePadX
         val sender = if (message.origin == "SPECTATOR") "Spectator" else message.sender
         val senderColor = AgentActivityAppearance.color(screen.gameInfo, message.sender)
         card.add("$sender → ${message.target}".toLabel(senderColor, AgentReadingText.size(12), hideIcons = true).apply { wrap = true })
             .width(inner).left().row()
-        val text = Label(message.text, Label.LabelStyle(BaseScreen.skin.get(Label.LabelStyle::class.java))).apply {
-            setFontSize(AgentReadingText.size(14)); color = WorldScreenStyle.ink; wrap = true
-        }
-        card.add(text).width(inner).left().padTop(4f).padBottom(6f).row()
+        card.add(messageText(message.text, 14)).width(inner).left().padTop(4f).padBottom(6f).row()
         for (attachment in message.images) addHistoryImage(message, attachment, inner,
             (message.id to attachment.id) in recentImages, card)
         val state = message.acknowledged?.let { "Acknowledged · turn $it" }
@@ -648,18 +655,12 @@ class AgentMessagesPanel(
 
     /** The recipient's saved acknowledgement, as its reply. */
     private fun acknowledgementBubble(message: Mail, bubbleWidth: Float): Table {
-        val card = Table(skin).apply { name = "MessageAck/${message.id}"; top().left() }
-        card.background = bubbleBackground(false)
-        card.pad(bubblePadY, bubblePadX, bubblePadY, bubblePadX)
+        val card = bubble("MessageAck/${message.id}", false)
         val inner = bubbleWidth - 2 * bubblePadX
         card.add("${message.target} acknowledged receipt".toLabel(
             AgentActivityAppearance.color(screen.gameInfo, message.target), AgentReadingText.size(11), hideIcons = true).apply { wrap = true })
             .width(inner).left().row()
-        val acknowledgement = Label(message.acknowledgementText.orEmpty(),
-            Label.LabelStyle(BaseScreen.skin.get(Label.LabelStyle::class.java))).apply {
-            setFontSize(AgentReadingText.size(13)); color = WorldScreenStyle.ink; wrap = true
-        }
-        card.add(acknowledgement).width(inner).left().padTop(4f).row()
+        card.add(messageText(message.acknowledgementText.orEmpty(), 13)).width(inner).left().padTop(4f).row()
         return card
     }
 
