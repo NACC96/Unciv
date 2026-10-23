@@ -200,7 +200,7 @@ function registerGameTools(mcp: McpServer, game: IGameService, actorCivId: strin
     if (entry) hooks.onAcknowledgement?.(entry);
   };
   mcp.registerTool("game.observe", {
-    description: "Permitted overview: revision, active-turn status, required decisions, recent visible events, your empire with military strength and score ranks, rivals with their strength, attitude and wars, mapSummary.vision, and private pendingTradeRequests with full recipient-perspective terms. Answer the first request per sender with diplomacy.respondTrade on your turn; re-observe for the next. Absent fields are null, false, zero or empty. diplomaticHistory (your 12 most recent private messages) is included only with includeHistory:true; the turn message already lists recent correspondence.",
+    description: "Permitted overview: revision, actual gameTurn (independent of turnSerial), enabled and available victory objectives with canonical milestones and command limitations, known original capitals with CURRENT/REVEALED/REMEMBERED/UNKNOWN provenance, exact own military composition and visibility-limited rival forces, strategicProgress with three completed own-turn summaries and incoming changes (incomplete history is explicit), active-turn status, required decisions, recent visible events, your empire with military strength and score ranks, rivals with their strength, attitude and wars, mapSummary.vision, and private pendingTradeRequests with full recipient-perspective terms. Answer the first request per sender with diplomacy.respondTrade on your turn; re-observe for the next. Victory and capital fields preserve explicit null (unknown), false and zero. Other absent fields are null, false, zero or empty. diplomaticHistory is included only with includeHistory:true; the turn message already lists recent correspondence.",
     inputSchema: { includeHistory: z.boolean().optional() },
   }, async ({ includeHistory }) => ok(compactObservation(await game.observe(), actorCivId, { includeHistory })));
 
@@ -389,7 +389,7 @@ function registerGameTools(mcp: McpServer, game: IGameService, actorCivId: strin
   }));
 
   mcp.registerTool("game.notes", {
-    description: "Read/replace the acting leader's private strategy notes with a notes revision.",
+    description: "Read/replace the acting leader's private notes with a notes revision. Keep the versioned strategy commitment (enabled victory, milestone, expected game round, assignments, next action and blocker/recheck condition) plus short memory below 16 KiB. Notes are beliefs, not authoritative facts; legacy text remains accepted.",
     inputSchema: {
       expectedNotesRevision: z.number().int().min(0),
       notes: z.string().max(16 * 1024).optional(),

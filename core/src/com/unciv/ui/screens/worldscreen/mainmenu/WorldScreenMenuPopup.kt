@@ -26,6 +26,8 @@ class WorldScreenMenuPopup(
     private val singleColumn: Boolean
     private fun <T: Actor?> Cell<T>.nextColumn() {
         if (GameUiStyle.isAtlas) {
+            // Filled rows without outlines, like a modern menu sheet.
+            (actor as? TextButton)?.let { GameUiStyle.apply(it, GameUiStyle.Emphasis.Quiet) }
             (actor as? TextButton)?.label?.wrap = true
             minWidth(0f).width(if (singleColumn) (maxPopupWidth - 56f).coerceAtMost(420f)
                 else ((maxPopupWidth - 72f) / 2f).coerceAtMost(280f)).minHeight(44f).growX().pad(4f)
@@ -38,7 +40,8 @@ class WorldScreenMenuPopup(
         worldScreen.autoPlay.stopAutoPlay()
         defaults().fillX()
         if (GameUiStyle.isAtlas) {
-            innerTable.background = GameUiStyle.panelBackground("WorldScreen/Menu", 1f)
+            // Frosted like the rest of the world HUD (a plain fill when glass is off).
+            innerTable.background = GameUiStyle.surface("WorldScreen/Menu", 0.97f)
             add(AtlasWidgets.header("Menu")).colspan(2).growX().row()
         }
 

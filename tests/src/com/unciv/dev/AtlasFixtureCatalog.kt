@@ -70,12 +70,18 @@ object AtlasFixtureCatalog {
     const val SEED = 20261012
     val nations = listOf("America", "Arabia", "Germany", "China", "Russia", "The Ottomans",
         "Persia", "England", "France", "Rome", "Korea", "Babylon", "Polynesia", "Mongolia", "Egypt")
-    private val registered = linkedSetOf("world", "world-selection", "world-activity", "world-map", "world-legacy", "world-fortified", "world-siege", "world-promote", "world-exhausted", "world-research", "world-notifications", "world-control", "world-map-roundtrip", "world-atlas-art", "world-idle", "activity", "messages", "overview", "nation-control",
+    private val registered = linkedSetOf("world", "world-selection", "world-activity", "world-map", "world-legacy", "world-fortified", "world-siege", "world-promote", "world-exhausted", "world-research", "world-notifications", "world-control", "world-map-roundtrip", "world-atlas-art", "world-idle", "world-windows", "activity", "messages", "overview", "nation-control",
         "terrain", "units", "city", "research", "policies", "religion", "promotions", "diplomacy",
         "setup", "menu", "supporting", "supporting-atlas", "supporting-atlas-end", "supporting-atlas-states")
     private val scopes = IdentityHashMap<BaseScreen, AtlasDataScope>()
 
-    init { registered.addAll(AtlasTurnFixtures.cases.map { "world-turn-$it" }) }
+    init {
+        registered.addAll(AtlasTurnFixtures.cases.map { "world-turn-$it" })
+        for (skin in listOf("messages", "messages-legacy")) {
+            registered.add(skin)
+            registered.addAll(listOf("expanded", "draft", "reopened").map { "$skin-$it" })
+        }
+    }
 
     fun ids(): Set<String> = registered.toSet()
     fun isolatedData(): AtlasDataScope = AtlasDataScope()
@@ -90,11 +96,12 @@ object AtlasFixtureCatalog {
         require(id in registered) { "Unknown Atlas fixture: $id" }
         require(width > 0 && height > 0 && fontScale > 0f)
         val scope = isolatedData()
+        val messageFixture = id == "messages" || id.startsWith("messages-")
         try {
             val fixture = scope.seedGame(large)
             val game = UncivGame.Current
             game.settings.apply {
-                skin = if ((id.startsWith("world") && id != "world-legacy") || id.startsWith("supporting-atlas") || id in setOf("activity", "messages", "overview", "nation-control")) "Atlas" else "Minimal"
+                skin = if ((id.startsWith("world") && id != "world-legacy") || id.startsWith("supporting-atlas") || (messageFixture && !id.startsWith("messages-legacy")) || id in setOf("activity", "overview", "nation-control")) "Atlas" else "Minimal"
                 fontSizeMultiplier = fontScale
                 showTutorials = false
                 enableEasterEggs = false
@@ -111,7 +118,7 @@ object AtlasFixtureCatalog {
             // A new JVM per matrix cell owns Fonts, atlases and this sole GL context.
             Fonts.fontImplementation = DesktopFont()
             ImageGetter.setNewRuleset(fixture.ruleset)
-            if ((id.startsWith("world") && id != "world-legacy") || id.startsWith("supporting-atlas") || id in setOf("activity", "messages", "overview", "nation-control")) {
+            if ((id.startsWith("world") && id != "world-legacy") || id.startsWith("supporting-atlas") || messageFixture || id in setOf("activity", "overview", "nation-control")) {
                 SkinCache.loadSkinConfigs()
                 BaseScreen.setSkin()
                 FontRulesetIcons.addRulesetImages(fixture.ruleset)
@@ -312,6 +319,30 @@ object AtlasFixtureCatalog {
                             check(screen.stage.root.atlasDescendants().any { it.name == "AtlasMinimapLayers" }) { "Layers menu did not open" }
                             check(minimap.buttons.all { button -> button.stage != null }) { "Layer toggles are not in the open menu" }
                         }
+                        if (id == "world-windows") {
+                            // Arranged windows: Activity moved, resized and faded, with its options menu open;
+                            // Messages minimized to its pill; the top bar's era tooltip showing.
+                            fun tap(actor: com.badlogic.gdx.scenes.scene2d.Actor) = actor.listeners
+                                .filterIsInstance<com.unciv.ui.components.input.ActivationListener>().single()
+                                .tap(com.badlogic.gdx.scenes.scene2d.InputEvent().apply { listenerActor = actor }, 1f, 1f, 1, 0)
+                            fun windowControls(panel: com.badlogic.gdx.scenes.scene2d.ui.Table) =
+                                (panel.children.first() as com.badlogic.gdx.scenes.scene2d.ui.Table).children
+                                    .filterIsInstance<com.badlogic.gdx.scenes.scene2d.ui.Table>().single { it !is com.badlogic.gdx.scenes.scene2d.ui.Button }
+                                    .children.filterIsInstance<com.badlogic.gdx.scenes.scene2d.ui.Button>()
+                            game.settings.hudWindows["activity"] = com.unciv.models.metadata.HudWindowLayout().apply {
+                                placed = true; x = 340f; y = 150f; this.width = 380f; this.height = 520f; opacity = 0.3f
+                            }
+                            val feed = screen.stage.root.children.filterIsInstance<AgentActivityFeed>().single()
+                            feed.show(); feed.refresh(); hud.layout()
+                            val messages = screen.stage.root.children.filterIsInstance<AgentMessagesPanel>().single()
+                            messages.toggle()
+                            tap(windowControls(messages)[1])
+                            check(screen.stage.root.children.any { it.name == "HudWindowPill/messages" }) { "Messages did not minimize" }
+                            tap(windowControls(feed)[0])
+                            check(screen.stage.root.children.any { it.name == "HudWindowMenu/activity" }) { "Window menu did not open" }
+                            val tipped = bar.atlasDescendants().first { actor -> actor.listeners.any { it is com.unciv.ui.components.UncivTooltip<*> } }
+                            tipped.listeners.filterIsInstance<com.unciv.ui.components.UncivTooltip<*>>().first().show(immediate = true)
+                        }
                         val section = when (id) { "world-selection", "world-fortified", "world-siege", "world-promote", "world-exhausted" -> "Selection"; "world-research" -> "Research"; "world-activity" -> "Activity"; "world-map", "world-map-roundtrip" -> "Map"; else -> null }
                         if (width < 960 && section != null) {
                             val tabs = screen.stage.root.atlasDescendants().first { it.name == "AtlasWorldTabs" }
@@ -320,23 +351,35 @@ object AtlasFixtureCatalog {
                                 com.badlogic.gdx.scenes.scene2d.InputEvent().apply { listenerActor = tab }, 1f, 1f, 1, 0)
                         }
                     }
-                    if (id in setOf("activity", "messages", "overview", "nation-control")) preparePanelFixture(scope)
+                    if (messageFixture || id in setOf("activity", "overview", "nation-control")) preparePanelFixture(scope)
                     val panel: Disposable? = when (id) {
                         "activity" -> AgentActivityFeed(facade, scope.session)
-                        "messages" -> AgentMessagesPanel(facade, scope.session, object : MessageImageClipboard {
+                        "messages", "messages-expanded", "messages-draft", "messages-reopened",
+                        "messages-legacy", "messages-legacy-expanded", "messages-legacy-draft", "messages-legacy-reopened" -> AgentMessagesPanel(facade, scope.session, object : MessageImageClipboard {
                             override fun hasImageContents() = true
                             override fun readImage(onComplete: (MessageImageDraft?, String?) -> Unit) {
                                 onComplete(MessageImageDraft(java.util.Base64.getDecoder().decode(
                                     "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVR4nGP4DwQACfsD/fteaysAAAAASUVORK5CYII="), "image/png", 1, 1), null)
                             }
                         }).also {
-                            it.toggle()
-                            val editor = it.atlasDescendants().filterIsInstance<com.badlogic.gdx.scenes.scene2d.ui.TextArea>().single()
-                            editor.text = "Let us keep the river peaceful while our cities grow."
-                            val paste = it.atlasDescendants().filterIsInstance<TextButton>().single { actor -> actor.name == "MessagePasteImage" }
-                            paste.listeners.filterIsInstance<com.unciv.ui.components.input.ActivationListener>().single().tap(
-                                com.badlogic.gdx.scenes.scene2d.InputEvent().apply { listenerActor = paste }, 1f, 1f, 1, 0)
-                            it.refresh()
+                            it.toggle(); it.validate()
+                            val reading = it.atlasDescendants().single { actor -> actor.name == "MessageReadingPane" }
+                            val collapsedHeight = reading.height
+                            check(it.atlasDescendants().single { actor -> actor.name == "MessageComposerPane" }.height == 0f)
+                            if (id.endsWith("expanded") || id.endsWith("draft") || id.endsWith("reopened")) {
+                                fun tap(actor: Actor) = actor.listeners.filterIsInstance<com.unciv.ui.components.input.ActivationListener>().single()
+                                    .tap(com.badlogic.gdx.scenes.scene2d.InputEvent().apply { listenerActor = actor }, 1f, 1f, 1, 0)
+                                val toggle = it.atlasDescendants().single { actor -> actor.name == "MessageComposerToggle" }
+                                tap(toggle); it.validate()
+                                check(reading.height < collapsedHeight - 60f) { "Composer did not release real history space" }
+                                val editor = it.atlasDescendants().filterIsInstance<com.badlogic.gdx.scenes.scene2d.ui.TextArea>().single()
+                                editor.text = "Let us keep the river peaceful while our cities grow."
+                                tap(it.atlasDescendants().single { actor -> actor.name == "MessagePasteImage" })
+                                it.refresh()
+                                if (id.endsWith("draft") || id.endsWith("reopened")) tap(toggle)
+                                if (id.endsWith("reopened")) tap(toggle)
+                                it.validate()
+                            }
                         }
                         "overview" -> CivilizationOverviewPanel(facade)
                         "nation-control" -> AgentNationSettingsPanel(facade, scope.session).also {

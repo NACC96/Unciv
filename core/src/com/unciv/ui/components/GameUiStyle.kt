@@ -16,6 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.List
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane
 import com.badlogic.gdx.scenes.scene2d.ui.SelectBox
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
+import com.badlogic.gdx.scenes.scene2d.ui.Slider
 import com.badlogic.gdx.scenes.scene2d.ui.TextField
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton
@@ -26,6 +27,7 @@ import com.unciv.ui.components.UncivTooltip.Companion.addTooltip
 import com.unciv.ui.components.extensions.setFontSize
 import com.unciv.ui.components.extensions.toTextButton
 import com.unciv.ui.components.fonts.Fonts
+import com.unciv.ui.components.glass.GlassSurface
 import com.unciv.ui.components.widgets.ExpanderTab
 import com.unciv.ui.images.ImageGetter
 import com.unciv.ui.screens.basescreen.BaseScreen
@@ -194,9 +196,24 @@ object GameUiStyle {
     fun surface(path: String, opacity: Float = 0.90f, elevated: Boolean = true): Drawable {
         if (!isAtlas) return panelBackground(path, opacity)
         val fill = rounded(path, "surface", surface.apply { a = opacity.coerceIn(0f, 1f) })
-        val rim = rounded("$path/Rim", "surface-rim", ink.apply { a = 0.09f })
+        val rim = rounded("$path/Rim", "surface-rim", ink.apply { a = 0.12f })
         val shadow = if (elevated) rounded("Atlas/Surface/Shadow", "surface-shadow", Color(0f, 0f, 0f, 0.35f)) else null
         return SurfaceDrawable(fill, rim, shadow).apply { inset(Space.m, Space.m, 2 * Radius.panel) }
+    }
+
+    /** Frosted glass mapping of a window's opacity (0..1, see HudWindowLayout.opacity). */
+    object Glass {
+        /** Opacity of world cards nobody has faded: mostly tint, with the map showing through. */
+        const val defaultOpacity = 0.55f
+        /** How much surface color covers the blurred map. */
+        fun tint(opacity: Float) = 0.3f + 0.7f * opacity.coerceIn(0f, 1f)
+        /** Fill alpha when glass is off or unavailable. */
+        fun fallbackAlpha(opacity: Float) = (0.45f + 0.85f * opacity.coerceIn(0f, 1f)).coerceAtMost(1f)
+    }
+
+    /** Sets the user's opacity on a [surface] drawable (other drawables are left as they are). */
+    fun setSurfaceOpacity(drawable: Drawable?, opacity: Float?) {
+        (drawable as? SurfaceDrawable)?.userOpacity = opacity
     }
 
     /** A fully rounded chip at any height, optionally with a hairline [rim]. */
@@ -213,6 +230,16 @@ object GameUiStyle {
         val fill = rounded(path, "control-r8", color)
         val drawable = if (rim == null) fill else Outlined(fill, rounded("$path/Rim", "control-r8-rim", rim))
         return drawable.apply { inset(Space.s, Space.s, 2 * Radius.control) }
+    }
+
+    /** A tooltip chip: an opaque raised fill, lighter than the panels it floats over, with a
+     * hairline rim. Its own path: the skin's "General/Tooltip" variant is the near-black panel
+     * that, under the dark base text color, drew tips as unreadable black bars. */
+    fun tooltipBackground(): Drawable {
+        if (!isAtlas) return background("Atlas/Tooltip", raised)
+        return Outlined(rounded("Atlas/Tooltip", "control-r8", raised.lerp(hover, 0.35f).apply { a = 1f }),
+            rounded("Atlas/Tooltip/Rim", "control-r8-rim", ink.apply { a = 0.18f }))
+            .apply { inset(Space.s, Space.xs, 2 * Radius.control) }
     }
 
     /** A round status mark, e.g. [info] running, [warning] paused, [error] failed, [muted] idle. */
@@ -264,9 +291,16 @@ object GameUiStyle {
 
     /** The halo is generated for a [Radius.panel] footprint with its downward offset baked in.
      * Its corners exceed that radius by the margin it is drawn outside the panel, and its
-     * knocked-out interior leaves a translucent fill translucent. */
+     * knocked-out interior leaves a translucent fill translucent.
+     * With frosted glass on (and a captured backdrop this frame) the fill is the blurred map
+     * under the card, tinted with the surface color; otherwise the translucent [fill]. */
     private class SurfaceDrawable(private val fill: RoundedPatch, private val rim: RoundedPatch,
         private val shadow: RoundedPatch?) : BaseDrawable() {
+        private val tint = Color(fill.patch.color).apply { a = 1f }
+        private val baseAlpha = fill.patch.color.a
+        /** A window's user opacity; null keeps the card defaults. */
+        var userOpacity: Float? = null
+
         override fun draw(batch: Batch, x: Float, y: Float, width: Float, height: Float) {
             if (width <= 0f || height <= 0f) return
             if (shadow != null) {
@@ -274,7 +308,11 @@ object GameUiStyle {
                 val margin = (shadow.patch.leftWidth - Radius.panel).coerceAtLeast(0f) * scale
                 shadow.draw(batch, x - margin, y - margin, width + 2 * margin, height + 2 * margin)
             }
-            fill.draw(batch, x, y, width, height)
+            val opacity = userOpacity
+            if (!GlassSurface.draw(batch, x, y, width, height, Radius.panel, tint, Glass.tint(opacity ?: Glass.defaultOpacity))) {
+                fill.patch.color.a = opacity?.let { Glass.fallbackAlpha(it) } ?: baseAlpha
+                fill.draw(batch, x, y, width, height)
+            }
             rim.draw(batch, x, y, width, height)
         }
     }
@@ -328,7 +366,9 @@ object GameUiStyle {
         TextButton.TextButtonStyle(source).apply {
             val primary = emphasis == Emphasis.Primary || emphasis == Emphasis.Accent
             font = Fonts.font
-            disabled = outlinedBackground("WorldScreen/Controls/Disabled", surface, if (isAtlas) muted else hover)
+            // Atlas: a faded fill with a faint rim; a bright outline made unavailable actions look like inputs.
+            disabled = if (isAtlas) control("WorldScreen/Controls/Disabled", surface.lerp(raised, 0.4f), ink.apply { a = 0.1f })
+                else outlinedBackground("WorldScreen/Controls/Disabled", surface, hover)
             disabledFontColor = muted
             if (primary) {
                 // A filled accent action, so the primary choice never reads as a pressed secondary.
@@ -445,6 +485,19 @@ object GameUiStyle {
         skin.add("default", selectStyle(skin.get(SelectBox.SelectBoxStyle::class.java)), SelectBox.SelectBoxStyle::class.java)
         skin.add("default", listStyle(skin.get(List.ListStyle::class.java)), List.ListStyle::class.java)
         skin.add("default", scrollStyle(skin.get(ScrollPane.ScrollPaneStyle::class.java)), ScrollPane.ScrollPaneStyle::class.java)
+        skin.add("default-horizontal", sliderStyle(), Slider.SliderStyle::class.java)
+    }
+
+    /** A thin rounded track filled in brass up to a round ink knob (brass while hovered or dragged). */
+    private fun sliderStyle() = Slider.SliderStyle().apply {
+        fun track(path: String, color: Color) = rounded(path, "control-r8", color).apply { minHeight = 4f; minWidth = 8f }
+        fun knob(color: Color, size: Float) = ImageGetter.getCircleDrawable().tint(color).apply { minWidth = size; minHeight = size }
+        background = track("Atlas/Slider/Track", raised.lerp(hover, 0.5f))
+        knobBefore = track("Atlas/Slider/Fill", accent)
+        knob = knob(ink, 14f)
+        knobOver = knob(accent, 16f)
+        knobDown = knobOver
+        disabledKnob = knob(muted, 14f)
     }
 
     private fun checkBoxStyle(source: CheckBox.CheckBoxStyle, preserveImages: Boolean = false) = CheckBox.CheckBoxStyle(source).apply {
@@ -470,11 +523,12 @@ object GameUiStyle {
         }
     }
 
+    /** Filled inputs with a hairline rim (a brass rim while focused), rather than bright outlines. */
     private fun fieldStyle(source: TextField.TextFieldStyle) = TextField.TextFieldStyle(source).apply {
         fontColor = ink; disabledFontColor = muted; messageFontColor = muted
-        background = outlinedBackground("Atlas/Field/Up", inset, muted)
-        focusedBackground = outlinedBackground("Atlas/Field/Focus", inset, accent)
-        disabledBackground = outlinedBackground("Atlas/Field/Disabled", surface, muted)
+        background = control("Atlas/Field/Up", inset.lerp(raised, 0.35f), ink.apply { a = 0.16f })
+        focusedBackground = control("Atlas/Field/Focus", inset.lerp(raised, 0.35f), accent)
+        disabledBackground = control("Atlas/Field/Disabled", surface, ink.apply { a = 0.08f })
         cursor = BaseScreen.skinStrings.getUiBackground("Atlas/Field/Cursor", tintColor = ink)
         selection = GameUiStyle.background("Atlas/Field/Selection", hover)
         for (drawable in listOf(background, focusedBackground, disabledBackground))
@@ -485,23 +539,43 @@ object GameUiStyle {
     }
 
     private fun listStyle(source: List.ListStyle) = List.ListStyle(source).apply {
-        fontColorSelected = ink; fontColorUnselected = ink
-        selection = outlinedBackground("Atlas/List/Selected", pressed, accent)
+        fontColorSelected = accent; fontColorUnselected = ink
+        selection = control("Atlas/List/Selected", surface.lerp(accent, 0.2f))
         background = panelBackground("Atlas/List/Background", 1f)
         (selection as? BaseDrawable)?.minHeight = standardControlHeight
     }
 
     private fun scrollStyle(source: ScrollPane.ScrollPaneStyle) = ScrollPane.ScrollPaneStyle(source).apply {
-        hScrollKnob = GameUiStyle.background("Atlas/Scroll/Horizontal", muted)
-        vScrollKnob = GameUiStyle.background("Atlas/Scroll/Vertical", muted)
+        val knob = muted.apply { a = 0.45f }
+        hScrollKnob = ScrollKnob(rounded("Atlas/Scroll/Horizontal", "control-r8", knob), vertical = false)
+        vScrollKnob = ScrollKnob(rounded("Atlas/Scroll/Vertical", "control-r8", knob), vertical = true)
+        hScroll = null; vScroll = null
+    }
+
+    /** A slim capsule centred in a narrow gutter, like overlay scrollbars: the rounded patch
+     * shrinks its corners to the bar's width. Long enough to grab even in very long histories. */
+    private class ScrollKnob(private val bar: Drawable, private val vertical: Boolean) : BaseDrawable() {
+        init {
+            if (vertical) { minWidth = gutter; minHeight = minLength } else { minWidth = minLength; minHeight = gutter }
+        }
+        override fun draw(batch: Batch, x: Float, y: Float, width: Float, height: Float) {
+            if (vertical) bar.draw(batch, x + (width - thickness) / 2f, y + inset, thickness, (height - 2 * inset).coerceAtLeast(thickness))
+            else bar.draw(batch, x + inset, y + (height - thickness) / 2f, (width - 2 * inset).coerceAtLeast(thickness), thickness)
+        }
+        companion object {
+            const val gutter = 10f
+            const val thickness = 4f
+            const val minLength = 28f
+            const val inset = 2f
+        }
     }
 
     private fun selectStyle(source: SelectBox.SelectBoxStyle) = SelectBox.SelectBoxStyle(source).apply {
         fontColor = ink; disabledFontColor = muted
-        background = outlinedBackground("Atlas/Select/Up", raised, muted)
-        backgroundOver = outlinedBackground("Atlas/Select/Over", hover, muted)
-        backgroundOpen = outlinedBackground("Atlas/Select/Open", inset, accent)
-        backgroundDisabled = outlinedBackground("Atlas/Select/Disabled", surface, muted)
+        background = control("Atlas/Select/Up", raised, ink.apply { a = 0.12f })
+        backgroundOver = control("Atlas/Select/Over", hover, ink.apply { a = 0.18f })
+        backgroundOpen = control("Atlas/Select/Open", inset, accent)
+        backgroundDisabled = control("Atlas/Select/Disabled", surface, ink.apply { a = 0.08f })
         for (drawable in listOf(background, backgroundOver, backgroundOpen, backgroundDisabled))
             if (drawable is BaseDrawable) {
                 drawable.minHeight = standardControlHeight

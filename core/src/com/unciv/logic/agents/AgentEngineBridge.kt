@@ -1,5 +1,7 @@
 package com.unciv.logic.agents
 
+import com.badlogic.gdx.utils.Json
+import com.badlogic.gdx.utils.JsonValue
 import com.unciv.json.json
 import com.unciv.logic.map.HexCoord
 import com.unciv.logic.trade.TradeOfferType
@@ -37,6 +39,30 @@ class AgentEngineBridge(val coordinator: MatchCoordinator) {
             ignoreUnknownFields = true
             setUsePrototypes(false)
             setTypeName(null)
+            // Gdx loses the String value type inside ArrayList<HashMap<String, String>>,
+            // wrapping option values as {value: ...}. Both observations and receipts must
+            // expose the same directly actionable string options. Persistence is separate.
+            setSerializer(PendingDecision::class.java, object : Json.Serializer<PendingDecision> {
+                override fun write(json: Json, decision: PendingDecision, knownType: Class<*>?) {
+                    json.writeObjectStart()
+                    json.writeValue("decisionId", decision.decisionId, String::class.java)
+                    json.writeValue("decisionType", decision.decisionType, String::class.java)
+                    json.writeValue("owningCivId", decision.owningCivId, String::class.java)
+                    json.writeValue("sourceRef", decision.sourceRef, String::class.java)
+                    json.writeValue("classification", decision.classification.name, String::class.java)
+                    json.writeArrayStart("options")
+                    for (option in decision.options) {
+                        json.writeObjectStart()
+                        for ((key, value) in option) json.writeValue(key, value, String::class.java)
+                        json.writeObjectEnd()
+                    }
+                    json.writeArrayEnd()
+                    json.writeObjectEnd()
+                }
+
+                override fun read(json: Json, data: JsonValue, type: Class<*>?): PendingDecision =
+                    throw UnsupportedOperationException("Wire decisions are output only")
+            })
         }
     }
 

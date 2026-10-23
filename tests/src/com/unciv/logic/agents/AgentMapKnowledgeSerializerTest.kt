@@ -27,6 +27,58 @@ class AgentMapKnowledgeSerializerTest {
     private fun encode(memory: AgentMapKnowledge) = json().apply { setUsePrototypes(false) }.toJson(memory)
     private fun decode(text: String) = json().fromJson(AgentMapKnowledge::class.java, text)
 
+    @Test fun city_capital_knowledge_keeps_true_false_and_unknown_separate_after_compact_roundtrip() {
+        val memory = AgentMapKnowledge()
+        for ((index, capital) in listOf(true, false, null).withIndex()) {
+            memory.put("Rome", sample().apply {
+                x = index
+                city!!.isOriginalCapital = capital
+                city!!.foundingCivId = if (capital == null) null else "Greece"
+            })
+        }
+        val encoded = encode(memory)
+        val restored = decode(encoded)
+        for (index in 0..2) {
+            val expected = memory.get("Rome", HexCoord(index, -2))!!
+            assertEquals(expected.toWire(), restored.get("Rome", HexCoord(index, -2))!!.toWire())
+        }
+        assertEquals(3, com.badlogic.gdx.utils.JsonReader().parse(encoded).get("facts").size)
+        assertEquals("Greece", restored.get("Rome", HexCoord(0, -2))!!.city!!.foundingCivId)
+        assertEquals(false, restored.get("Rome", HexCoord(1, -2))!!.city!!.isOriginalCapital)
+        assertNull(restored.get("Rome", HexCoord(2, -2))!!.city!!.isOriginalCapital)
+    }
+
+    @Test fun genuine_five_field_city_tuple_loads_with_unknown_capital_identity() {
+        val raw = com.badlogic.gdx.utils.JsonReader().parse(encode(AgentMapKnowledge().apply { put("Rome", sample()) }))
+        val city = raw.get("facts").get(0).get(6)
+        assertEquals(5, city.size)
+        assertFalse(raw.has("capitalFacts"))
+        val restored = decode(raw.toJson(JsonWriter.OutputType.json))
+        val observed = restored.get("Rome", HexCoord(3, -2))!!
+        assertEquals("Roma", observed.city!!.name)
+        assertNull(observed.city!!.isOriginalCapital)
+        assertNull(observed.city!!.foundingCivId)
+        assertEquals(observed.toWire(), decode(encode(restored)).get("Rome", HexCoord(3, -2))!!.toWire())
+    }
+
+    @Test fun capital_side_metadata_keeps_the_old_five_field_encoding_readable() {
+        val tile = sample().apply {
+            city!!.isOriginalCapital = true
+            city!!.foundingCivId = "Greece"
+        }
+        val raw = com.badlogic.gdx.utils.JsonReader().parse(encode(AgentMapKnowledge().apply { put("Rome", tile) }))
+        assertEquals(1, raw.getInt("encodingVersion"))
+        assertEquals(5, raw.get("facts").get(0).get(6).size)
+        assertEquals(1, raw.get("capitalFacts").size)
+        // The previous reader ignores unrecognized top-level fields. Its exact city tuple
+        // remains intact, and rewriting with that reader safely falls back to unknown.
+        raw.remove("capitalFacts")
+        val restored = decode(raw.toJson(JsonWriter.OutputType.json)).get("Rome", HexCoord(3, -2))!!
+        tile.city!!.isOriginalCapital = null
+        tile.city!!.foundingCivId = null
+        assertEquals(tile.toWire(), restored.toWire())
+    }
+
     @Test fun compact_roundtrip_preserves_all_facts_and_independent_provenance() {
         val memory = AgentMapKnowledge()
         memory.put("Rome", sample())

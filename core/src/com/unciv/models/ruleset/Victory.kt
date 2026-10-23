@@ -102,11 +102,11 @@ class Milestone(val uniqueDescription: String, private val parentVictory: Victor
     }
 
     @Readonly
-    private fun originalMajorCapitalsOwned(civInfo: Civilization): Int = civInfo.cities
+    internal fun originalMajorCapitalsOwned(civInfo: Civilization): Int = civInfo.cities
         .count { it.isOriginalCapital && it.foundingCivObject != null && it.foundingCivObject!!.isMajorCiv() }
 
     @Readonly
-    private fun civsWithPotentialCapitalsToOwn(gameInfo: GameInfo): Set<Civilization> {
+    internal fun civsWithPotentialCapitalsToOwn(gameInfo: GameInfo): Set<Civilization> {
         // Capitals that still exist, even if the civ is dead
         val civsWithCapitals = gameInfo.getCities().filter { it.isOriginalCapital }
             .map { it.foundingCivObject!! }

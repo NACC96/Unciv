@@ -35,7 +35,9 @@ export interface ObservedTile extends HexPosition {
   riverEdges: { bottomRight: boolean; bottom: boolean; bottomLeft: boolean } | null;
   resource: { name: string; amount: number; updatedTurn: number; updatedRevision: number; source: "SIGHTING" | "TECHNOLOGY" } | null;
   ownerCivId: string | null;
-  city: { cityId: string; name: string; ownerCivId: string; health: number; population: number } | null;
+  city: { cityId: string; name: string; ownerCivId: string; health: number; population: number;
+    /** Absent/null on legacy sightings; false is an observed non-original city. */
+    isOriginalCapital?: boolean | null; foundingCivId?: string | null } | null;
   improvement: string | null;
   improvementPillaged: boolean | null;
   road: string | null;
@@ -53,6 +55,60 @@ export interface MapPage {
   nextCursor: string | null;
 }
 export interface RulesQuery { section?: string; name?: string; limit?: number; cursor?: string }
+
+export interface ObservedVictoryMilestone {
+  description: string;
+  type: string | null;
+  completed: boolean | null;
+  current: number | null;
+  target: number | null;
+  /** Command capability only; an unsupported route can still be enabled in the saved game. */
+  status: "supported" | "unsupported";
+  unsupportedReason: string | null;
+  remainingSpaceshipParts: Record<string, number> | null;
+  partsTruncated: boolean;
+}
+export interface ObservedVictoryRoute {
+  name: string;
+  completed: boolean | null;
+  completedMilestones: number;
+  nextMilestone: number | null;
+  milestones: ObservedVictoryMilestone[];
+  milestonesTruncated: boolean;
+  /** Absent on older engines; the observed interval never reconstructs earlier match history. */
+  progress?: {
+    metric: "ORIGINAL_CAPITALS" | "COMPLETED_MILESTONES";
+    current: number;
+    target: number | null;
+    trackedSinceGameTurn: number;
+    unchangedSinceGameTurn: number;
+    lastChangedGameTurn: number | null;
+  } | null;
+}
+export interface ObservedOriginalCapital {
+  foundingCivId: string;
+  cityId: string | null;
+  name: string | null;
+  x: number | null;
+  y: number | null;
+  ownerCivId: string | null;
+  knowledge: "CURRENT" | "REVEALED" | "REMEMBERED" | "UNKNOWN";
+  lastSeenGameTurn: number | null;
+  lastSeenRevision: number | null;
+}
+export interface ObservedVictoryContext {
+  enabledVictoryTypes: string[];
+  available: ObservedVictoryRoute[];
+  /** Satisfied canonical objective; actual game awarding remains an engine turn operation. */
+  achieved: string | null;
+  domination: {
+    ownedOriginalCapitals: number;
+    requiredOriginalCapitals: number | null;
+    capitals: ObservedOriginalCapital[];
+    capitalsTruncated: boolean;
+  } | null;
+  availableTruncated: boolean;
+}
 export interface WorkerImprovementOption {
   name: string;
   kind: "IMPROVEMENT" | "ROAD" | "REMOVE_FEATURE" | "REMOVE_IMPROVEMENT";

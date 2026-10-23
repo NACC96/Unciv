@@ -621,7 +621,9 @@ class WorldScreenHudTest {
         val scroll = feed.descendants().filterIsInstance<AutoScrollPane>().single()
         val before = scroll.scrollY
         scroll.fire(InputEvent().apply { type = InputEvent.Type.scrolled; scrollAmountY = -1f })
-        assertEquals(24f, before - scroll.scrollY, 0.1f)
+        val notch = com.unciv.ui.components.widgets.ReadingScrollPane.step(1f, com.unciv.ui.components.widgets.ReadingScrollPane.baseLineHeight, notch = true)
+        assertEquals("One notch moves a few lines, however long the history", notch, before - scroll.scrollY, 0.1f)
+        assertTrue(notch <= 3 * com.unciv.ui.components.widgets.ReadingScrollPane.baseLineHeight)
         val afterWheel = scroll.scrollY
         feed.act(0.1f)
         assertEquals("Manual scrolling suspends Live", afterWheel, scroll.scrollY, 0.1f)
@@ -908,7 +910,8 @@ class WorldScreenHudTest {
             assertTrue(panel.x >= 0f && panel.y >= 0f)
             assertTrue(panel.x + panel.width <= width)
             assertTrue(panel.y + panel.height <= height)
-            val close = panel.descendants().filterIsInstance<Button>().first { it !is TextButton }
+            // The close button is the header's last icon button (after the window options and minimize).
+            val close = (panel.children.first() as com.badlogic.gdx.scenes.scene2d.ui.Table).children.filterIsInstance<Button>().last { it !is TextButton }
             val point = close.localToAscendantCoordinates(panel, Vector2())
             assertTrue(point.x + close.width <= panel.width)
             for (button in panel.descendants().filterIsInstance<TextButton>()) {

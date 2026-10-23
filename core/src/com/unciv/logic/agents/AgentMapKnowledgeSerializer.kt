@@ -24,7 +24,8 @@ class AgentMapKnowledgeSerializer : Json.Serializer<AgentMapKnowledge> {
         fun fact(tile: ObservedTile): List<Any?> = listOf(
             tile.detailsKnown, text(tile.terrain), tile.features?.map { text(it) }, text(tile.naturalWonder),
             tile.river, text(tile.ownerCivId), tile.city?.let {
-                listOf(text(it.cityId), text(it.name), text(it.ownerCivId), it.health, it.population)
+                listOf(text(it.cityId), text(it.name), text(it.ownerCivId), it.health, it.population,
+                    it.isOriginalCapital, text(it.foundingCivId))
             }, text(tile.improvement), tile.improvementPillaged, text(tile.road), tile.roadPillaged,
             tile.yields?.let { yields -> listOf(
                 if (yields.context == TileYieldContext.ACTOR_CITY) 1 else 0, text(yields.cityId),
@@ -54,14 +55,27 @@ class AgentMapKnowledgeSerializer : Json.Serializer<AgentMapKnowledge> {
             }
             civs.add(listOf(civ, rows))
         }
+        // Keep v1's five-field city tuple readable by installed older builds. Capital
+        // knowledge is optional side metadata. Interning includes it, so two viewers'
+        // otherwise identical facts cannot accidentally share different knowledge.
+        val capitalFacts = ArrayList<List<Any?>>()
+        val persistedFacts = facts.values.mapIndexed { factId, fact ->
+            val city = fact[6] as? List<*>
+            if (city == null) fact else {
+                if (city[5] != null || city[6] != -1)
+                    capitalFacts.add(listOf(factId, city[5], city[6]))
+                fact.toMutableList().apply { this[6] = city.take(5) }
+            }
+        }
         json.writeObjectStart()
         json.writeValue("encodingVersion", 1)
         json.writeArrayStart("strings"); for (value in strings.values) json.writeValue(value); json.writeArrayEnd()
         writeArray(json, "positions", positions.values.map { listOf(it.x, it.y) })
-        writeArray(json, "facts", facts.values)
+        writeArray(json, "facts", persistedFacts)
         writeArray(json, "timestamps", timestamps.values)
         writeArray(json, "resources", resources.values)
         writeArray(json, "civs", civs)
+        if (capitalFacts.isNotEmpty()) writeArray(json, "capitalFacts", capitalFacts)
         json.writeObjectEnd()
     }
 
@@ -171,6 +185,19 @@ class AgentMapKnowledgeSerializer : Json.Serializer<AgentMapKnowledge> {
         }
         // Parse shared fact payloads once; copy() isolates every mutable nested value per row.
         val factTemplates = facts.map { decodeFact(it, HexCoord()) }
+        data.get("capitalFacts")?.let { capitalFacts ->
+            require(capitalFacts.isArray) { "Invalid capital knowledge" }
+            val seen = HashSet<Int>()
+            for (entry in capitalFacts) {
+                requireArray(entry, 3)
+                val factId = integer(entry.get(0))
+                require(seen.add(factId)) { "Duplicate capital knowledge" }
+                val city = factTemplates.getOrNull(factId)?.city
+                    ?: throw IllegalArgumentException("Invalid capital knowledge fact reference")
+                city.isOriginalCapital = optionalBoolean(entry.get(1))
+                city.foundingCivId = text(entry.get(2))
+            }
+        }
         val result = AgentMapKnowledge()
         for (civ in array("civs")) {
             requireArray(civ, 2)
@@ -216,7 +243,7 @@ class AgentMapKnowledgeSerializer : Json.Serializer<AgentMapKnowledge> {
 
     /** Old v2 Gdx maps may have class tags; decode typed snapshots without recursive serializer calls. */
     private fun readLegacy(json: Json, data: JsonValue): AgentMapKnowledge {
-        require(listOf("strings", "positions", "facts", "timestamps", "resources", "civs").none { data.has(it) }) {
+        require(listOf("strings", "positions", "facts", "timestamps", "resources", "civs", "capitalFacts").none { data.has(it) }) {
             "Compact map knowledge is missing its encoding version"
         }
         val result = AgentMapKnowledge()

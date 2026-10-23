@@ -18,6 +18,22 @@ These are the defaults. Each leader resumes its own provider session every turn,
 
 Missing, malformed or out-of-range values fall back to the defaults. The file is read every turn, so changes apply without restarting the app.
 
+## Strategy updates in ongoing sessions
+
+Every turn prompt carries the current strategy policy (`victory-progress-v3`), including resumed OpenCode sessions whose earlier static prompt remains in history. Codex and Claude continue to receive the full game instructions through their existing developer/system instruction arguments. The supervisor supplies the current engine observation's `gameTurn`, victory routes and strategic progress to the prompt; old private notes remain beliefs that must be reconciled with these facts.
+
+Policy updates take effect at the next normal turn invocation after the updated runner is loaded. Applying the policy to an existing session does not require rotation, compaction changes or clearing saved notes and correspondence. Civilization and timeline identities persist with the game. The desktop currently keeps provider-session bindings in memory for the lifetime of the open match; restarting the app starts fresh provider sessions with the saved notes. It does not delete the old provider histories from disk.
+
+Each run's `meta.json` and lifecycle activity entries record `strategyPolicyVersion`, the match/timeline/civilization identity and the observed `gameTurn` separately from `turnSerial`. Older engines that omit `gameTurn` leave it absent in metadata; the runner never estimates it from turn serials. These fields persist when a turn is released and its provider finishes compacting in the background. The daemon's `run_started` event also reports the policy version. A completed invocation or compaction is not evidence of an engine victory.
+
+Source changes and prompt tests alone do not establish that an already-running desktop daemon uses the update. Verify the packaged runner and the first normal post-update run's policy metadata before treating an active match as updated.
+
+The [strategy/composer acceptance record](agent-victory-evaluation.md) separates adapter tests, isolated real-provider samples, packaged artifacts and installed-app verification. Its fresh-session/no-compaction evaluation settings are confined to the harness and do not change this production session policy.
+
+Copied-match evaluations can opt in to `sessionPolicy: {mode: "forked-persistent", forkFromSessionIds: {"civ-id": "source-session-id"}}`. Each leader's first turn uses native Codex history fork; later turns resume only the newly returned session ID. The driver and host reject original, changed and cross-civilization resume IDs. Live source sessions are never resumed by an evaluation. The default fixture mode remains fresh sessions without compaction.
+
+The persistent probe uses the production Supervisor, prompts, tools, map images and post-turn compaction, but waits for the entire provider process to exit naturally before admitting another turn. It disables early release and the existing tool-call cap for this probe, avoiding timed compaction cancellation. Budgets stop new admissions only. Invocation timing includes compaction and omits desktop overlap; time-to-commit is recorded separately. First-fork cumulative token usage is unknown when inherited from the source; later known deltas on the new session can be counted. Production daemon timeouts and session defaults are unchanged.
+
 ## Post-turn compaction
 
 Codex supports compaction after a turn (`model_post_turn_compact_threshold_percent`). When the desktop sends `compactAfterTurn`, the supervisor asks Codex to compact once the turn's closing message is written. The supervisor does not wait for it:
@@ -32,7 +48,7 @@ The run log keeps the turn's own duration as its run-end entry; the compaction i
 ## Fewer round trips, smaller context
 
 - **Opening observation in the prompt.** The supervisor already observes before each turn, so the turn prompt carries that observation (without the events, decisions and mail stated elsewhere in the prompt). Leaders observe again only for state their own actions changed.
-- **Compact results.** Model-facing reads omit null, false, zero and empty fields. `game.observe` returns `diplomaticHistory` only with `includeHistory:true`, because the turn prompt already lists recent correspondence; in the match above that history was 17% of all tool output.
+- **Compact results.** Model-facing entity reads omit redundant empty/default fields; ordinary numeric zero values remain, while zero tile yields and resource amounts are omitted. Original-capital false/null metadata stays explicit, and the victory, military and strategic-progress blocks remain intact. `game.observe` returns `diplomaticHistory` only with `includeHistory:true`, because the turn prompt already lists recent correspondence; in the match above that history was 17% of all tool output.
 - **Map pictures.** `game.map_image` and the turn-start picture (Codex) replace most `game.map` paging; see [map pictures](agent-map-tools.md#map-pictures).
 - **Long moves.** `unit.move` accepts any known destination and continues on later turns; in the match above 65% of moves stepped a unit one tile per call.
 - **Fewer per-unit checks.** `game.observe` flags units with attack targets, promotions or upgrades available, and attack targets carry the engine's battle preview, so leaders query `game.legal_actions` only for units that need it.

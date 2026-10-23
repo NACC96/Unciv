@@ -670,6 +670,7 @@ class WorldScreen(
         events.stopReceiving()
         statusButtons.dispose()
         civilizationOverview?.dispose()
+        mapHolder.glassBackdrop.dispose()
         super.dispose()
     }
 
@@ -1307,7 +1308,9 @@ class WorldScreen(
         }
 
         visualTimeline.advance(delta)
-        super.render(delta)
+        // Only surfaces drawn by this screen may sample its backdrop.
+        com.unciv.ui.components.glass.GlassBackdrop.active = mapHolder.glassBackdrop
+        try { super.render(delta) } finally { com.unciv.ui.components.glass.GlassBackdrop.active = null }
     }
 
 

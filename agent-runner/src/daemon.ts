@@ -14,6 +14,7 @@
 import { GAME_TOOL_ALLOWLIST, TOOL_TIMEOUT_SEC, codexSpawn, claudeSpawn, opencodeSpawn, type SpawnSpec } from "./provider-spawn.js";
 import { parseClaudeStream, parseCodexStream, parseOpencodeStream, type NormalizedRun } from "./provider-events.js";
 import { Supervisor, type SpawnExtras } from "./supervisor.js";
+import { STRATEGY_POLICY_VERSION } from "./strategy-policy.js";
 import { StdioEngineBackend } from "./stdio-engine.js";
 import { CANCELLED_DETAIL, parseInbound, encodeFrame, type RunTurnControl } from "./engine-protocol.js";
 import { mkdirSync, writeFileSync } from "node:fs";
@@ -36,6 +37,7 @@ export function buildSpawnForProvider(
         spec: codexSpawn({
           prompt,
           resumeId,
+          forkFromSessionId: config.forkFromSessionId,
           mcpUrl: serverUrl,
           bearerEnvVar: "GAME_MCP_BEARER",
           cwd: scratchCwd,
@@ -326,13 +328,14 @@ export async function main(): Promise<void> {
     const emit = (event: "run_started" | "session_bound" | "tool_activity" | "run_completed" | "run_failed", payload: Record<string, unknown>) => {
       process.stdout.write(encodeFrame({ protocol: 1, kind: "turn_event", runId: control.runId, event, payload }) + "\n");
     };
-    emit("run_started", { provider: control.provider, civ: control.binding.civId });
+    emit("run_started", { provider: control.provider, civ: control.binding.civId, strategyPolicyVersion: STRATEGY_POLICY_VERSION });
     const supervisor = new Supervisor(
       (prompt, resumeId, serverUrl, bearer, extras) => {
         const built = buildSpawnForProvider(control.provider, prompt, resumeId, serverUrl, bearer, control.providerConfig, scratch, extras);
         return { ...built, spec: { ...built.spec, context: { ...control.binding, turnSerial: control.context.turnSerial,
           provider: control.provider, model: control.providerConfig.model, reasoning: control.providerConfig.reasoning,
           resumed: Boolean(resumeId),
+          ...(control.providerConfig.forkFromSessionId ? { forkedFromSessionId: control.providerConfig.forkFromSessionId } : {}),
           ...(control.context.session ? { sessionArm: control.context.session.arm, sessionAge: control.context.session.age } : {}) } } };
       },
       parseForProvider(control.provider),

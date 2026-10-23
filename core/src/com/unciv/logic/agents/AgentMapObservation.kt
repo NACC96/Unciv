@@ -32,11 +32,14 @@ class ObservedResource(
 
 class ObservedPublicCity(
     var cityId: String = "", var name: String = "", var ownerCivId: String = "",
-    var health: Int = 0, var population: Int = 0
+    var health: Int = 0, var population: Int = 0,
+    /** Historical snapshots without this field are unknown, never known non-capitals. */
+    var isOriginalCapital: Boolean? = null, var foundingCivId: String? = null
 ) : IsPartOfGameInfoSerialization {
-    fun copy() = ObservedPublicCity(cityId, name, ownerCivId, health, population)
+    fun copy() = ObservedPublicCity(cityId, name, ownerCivId, health, population, isOriginalCapital, foundingCivId)
     fun toWire() = linkedMapOf<String, Any?>("cityId" to cityId, "name" to name,
-        "ownerCivId" to ownerCivId, "health" to health, "population" to population)
+        "ownerCivId" to ownerCivId, "health" to health, "population" to population,
+        "isOriginalCapital" to isOriginalCapital, "foundingCivId" to foundingCivId)
 }
 
 class ObservedTileYields(
@@ -134,7 +137,8 @@ internal fun exportVisibleTile(game: GameInfo, civ: Civilization, tile: Tile, re
         game.turns, revision, tile.baseTerrain, ArrayList(tile.terrainFeatures), tile.naturalWonder,
         tile.isAdjacentToRiver(), resource?.let { ObservedResource(it.name, tile.resourceAmount,
             game.turns, revision, ResourceKnowledgeSource.SIGHTING) }, tile.getOwner()?.civID,
-        publicCity?.let { ObservedPublicCity(it.id, it.name, it.civ.civID, it.health, it.population.population) },
+        publicCity?.let { ObservedPublicCity(it.id, it.name, it.civ.civID, it.health, it.population.population,
+            it.isOriginalCapital, it.foundingCivObject?.civID) },
         tile.improvement, tile.improvementIsPillaged, tile.roadStatus.name, tile.roadIsPillaged,
         ObservedTileYields(if (ownCity != null) TileYieldContext.ACTOR_CITY else TileYieldContext.ACTOR_GENERAL,
             ownCity?.id, LinkedHashMap<String, Float>().also { map ->

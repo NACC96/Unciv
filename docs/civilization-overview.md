@@ -6,7 +6,7 @@ Implemented October 10, 2026 as a local extension of the [world-screen HUD](worl
 
 Compare civilizations without leaving the live map: filter or sort the roster, select a nation, then inspect its details. The user selected a floating panel and full opponent statistics for spectators. Human games retain the viewer's own details and preserve opponent information limits.
 
-The panel inherits the HUD's translucent charcoal surface, off-white text, restrained teal control states and stable agent accents. The October 11 polish pass removes its map blur; existing rounded skin textures draw the fill and rim without framebuffer resources. `WorldScreenStyle.kt` delegates to the scoped `GameUiStyle.kt`; the global skin remains unchanged.
+The panel inherits the HUD's translucent charcoal surface, off-white text, restrained teal control states and stable agent accents. Since October 20 it is frosted glass like the other world windows (a translucent fill when glass is off). `WorldScreenStyle.kt` delegates to the scoped `GameUiStyle.kt`; the global skin remains unchanged.
 
 ## Typography
 
@@ -14,9 +14,9 @@ The panel title leads, followed by colored civilization names and a larger selec
 
 ## Layout
 
-The first viewport places a movable panel on the right, with comparison rows above a separate scrolling detail pane. Drag the header to move it; its geometry stays within the stage after dragging or resizing the window. Only the panel's rectangle captures input, leaving the map and match controls usable outside it.
+The first viewport places a movable panel on the right, with comparison rows above a separate scrolling detail pane. Drag the header to move it and its edges to resize it, or minimize it to a pill; its geometry stays within the stage after dragging or resizing the window, and the arrangement is remembered. Only the panel's rectangle captures input, leaving the map and match controls usable outside it.
 
-The active sort column is highlighted in its heading and values, with the sort arrow in a fixed slot; headings share the values' right edge. Wide layouts show score, cities, population, gold and science. Narrow layouts retain score and science, with the remaining available statistics in selected-nation details. The detail metrics change from three columns to two. Individual panel resizing is deferred.
+The active sort column is highlighted in its heading and values, with the sort arrow in a fixed slot; headings share the values' right edge. Wide layouts show score, cities, population, gold and science. Narrow layouts retain score and science, with the remaining available statistics in selected-nation details. The detail metrics change from three columns to two.
 
 ## Components
 

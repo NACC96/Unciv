@@ -80,7 +80,10 @@ class ObservedCity(
     var isPuppet: Boolean = false,
     var isBeingRazed: Boolean = false,
     /** Own cities only; always empty for foreign cities. */
-    var productionQueue: ArrayList<String> = ArrayList()
+    var productionQueue: ArrayList<String> = ArrayList(),
+    /** Null on older observations; false means an observed non-original city. */
+    var isOriginalCapital: Boolean? = null,
+    var foundingCivId: String? = null
 ) {
     @Suppress("unused")
     constructor() : this("", "", "", 0, 0, 0, 0, false, false, ArrayList())
@@ -231,7 +234,12 @@ class ObservationDto(
     var diplomaticHistory: ArrayList<DiplomaticMessage> = ArrayList(),
     /** Recipient-private, first pending request per sender in native queue order. */
     var pendingTradeRequests: ArrayList<ObservedTradeRequest> = ArrayList(),
-    var rivals: ArrayList<ObservedRival> = ArrayList()
+    var rivals: ArrayList<ObservedRival> = ArrayList(),
+    /** Actual engine round. turnSerial remains the independent invocation identity. */
+    var gameTurn: Int = 0,
+    var victory: ObservedVictoryContext? = null,
+    var military: ObservedMilitaryContext? = null,
+    var strategicProgress: ObservedStrategicProgress? = null
 ) {
     @Suppress("unused")
     constructor() : this(1, 0, "", "", 0, TurnPhase.READY_TO_START, "", false, 0,
@@ -362,7 +370,7 @@ private fun City.toObservedOwn(): ObservedCity {
         id, name, civ.civID,
         pos.x, pos.y, health, population.population,
         isPuppet, isBeingRazed,
-        ArrayList(cityConstructions.constructionQueue)
+        ArrayList(cityConstructions.constructionQueue), isOriginalCapital, foundingCivObject?.civID
     )
 }
 
@@ -371,7 +379,7 @@ private fun City.toObservedForeign(): ObservedCity {
     return ObservedCity(
         id, name, civ.civID,
         pos.x, pos.y, health, population.population,
-        isPuppet, isBeingRazed, ArrayList()
+        isPuppet, isBeingRazed, ArrayList(), isOriginalCapital, foundingCivObject?.civID
     )
 }
 
@@ -514,6 +522,9 @@ fun buildObservation(
     dto.matchId = match.matchId
     dto.timelineId = match.timelineId
     dto.turnSerial = match.turnSerial
+    dto.gameTurn = game.turns
+    dto.victory = buildVictoryObservation(game, match, civ)
+    dto.strategicProgress = buildStrategicProgress(game, match, actorCivId)
     dto.phase = match.turnPhase
     dto.activeCivId = game.currentPlayer
     dto.isMyTurn = match.turnPhase == TurnPhase.AWAITING_DECISIONS && game.currentPlayer == actorCivId
@@ -558,6 +569,7 @@ fun buildObservation(
     dto.empire.militaryStrength = civ.getStatForRanking(RankingType.Force)
     dto.empire.score = civ.getStatForRanking(RankingType.Score)
     dto.rivals = buildRivals(game, match, civ)
+    dto.military = buildMilitaryObservation(game, match, civ, dto.rivals)
     val majors = dto.rivals.filter { !it.cityState }
     dto.empire.militaryRank = 1 + majors.count { it.militaryStrength > dto.empire.militaryStrength }
     dto.empire.scoreRank = 1 + majors.count { it.score > dto.empire.score }

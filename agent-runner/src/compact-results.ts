@@ -23,6 +23,13 @@ export function dropEmpty<T extends Json>(value: T): Partial<T> {
   return Object.fromEntries(Object.entries(value).filter(([, field]) => !isEmpty(field))) as Partial<T>;
 }
 
+/** These additive fields distinguish a known non-capital from unknown legacy metadata. */
+function retainCapitalKnowledge(source: Json, target: Json): void {
+  for (const key of ["isOriginalCapital", "foundingCivId"]) {
+    if (key in source) target[key] = source[key];
+  }
+}
+
 /**
  * Tile: nonzero yields flatten into `yields` (with `yieldCity` naming the own
  * city whose bonuses apply), river edges become the list of edges carrying a
@@ -51,7 +58,9 @@ export function compactTile(tile: Json): Json {
       continue;
     }
     if (key === "city" && isObject(value)) {
-      out["city"] = dropEmpty(value);
+      const city = dropEmpty(value) as Json;
+      retainCapitalKnowledge(value, city);
+      out["city"] = city;
       continue;
     }
     if (key === "road" && value === "None") continue;
@@ -65,6 +74,7 @@ export function compactTile(tile: Json): Json {
 function compactEntity(entity: unknown, actorCivId: string): unknown {
   if (!isObject(entity)) return entity;
   const out = dropEmpty(entity) as Json;
+  retainCapitalKnowledge(entity, out);
   if (out["ownerCivId"] === actorCivId) delete out["ownerCivId"];
   if (isObject(out["tile"])) out["tile"] = compactTile(out["tile"]);
   return out;

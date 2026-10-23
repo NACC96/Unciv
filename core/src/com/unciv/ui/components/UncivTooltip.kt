@@ -9,11 +9,13 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.InputListener
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.Touchable
+import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.actions.TemporalAction
 import com.badlogic.gdx.scenes.scene2d.ui.Container
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.ui.Tooltip
+import com.badlogic.gdx.scenes.scene2d.ui.Value
 import com.badlogic.gdx.utils.Align
 import com.unciv.GUI
 import com.unciv.models.translations.tr
@@ -40,6 +42,8 @@ import com.unciv.ui.screens.basescreen.BaseScreen
  *                      - because Gdx auto layout reports wrong dimensions on scaled actors.
  * @param contentRefresher  Called just before showing the [content], to give the builder a chance to do last-minute updates.
  *                      Return value is used as new `forceContentSize`.
+ * @param delay         Seconds the pointer must rest on [target] before the tip appears.
+ * @param fadeOnly      Fade in place instead of growing from a point.
  */
 // region fields
 class UncivTooltip <T: Actor>(
@@ -50,7 +54,9 @@ class UncivTooltip <T: Actor>(
     private val offset: Vector2 = Vector2.Zero,
     private val animate: Boolean = true,
     forceContentSize: Vector2? = null,
-    private val contentRefresher: (() -> Vector2?)? = null
+    private val contentRefresher: (() -> Vector2?)? = null,
+    private val delay: Float = 0f,
+    private val fadeOnly: Boolean = false
 ) : InputListener() {
 
     private val container: Container<T> = Container(content)
@@ -95,23 +101,33 @@ class UncivTooltip <T: Actor>(
             contentHeight = forceContentSize?.y ?: content.height
         }
 
+        val stage = target.stage
         val pos = target.localToStageCoordinates(target.getEdgePoint(targetAlign)).add(offset)
         container.run {
             val originX = getOriginX(contentWidth, tipAlign)
             val originY = getOriginY(contentHeight, tipAlign)
             setOrigin(originX, originY)
-            setPosition(pos.x - originX, pos.y - originY)
+            var left = pos.x - originX
+            var bottom = pos.y - originY
+            // Keep the whole tip on screen: flip a tip hanging below its target above it, then clamp.
+            if (bottom < screenMargin) {
+                val targetTop = target.localToStageCoordinates(Vector2(0f, target.height)).y
+                if (targetTop + screenMargin + contentHeight <= stage.height) bottom = targetTop - offset.y.coerceAtMost(0f)
+            }
+            left = left.coerceIn(screenMargin, maxOf(screenMargin, stage.width - contentWidth - screenMargin))
+            bottom = bottom.coerceIn(screenMargin, maxOf(screenMargin, stage.height - contentHeight - screenMargin))
+            setPosition(left, bottom)
             if (useAnimation) {
-                isTransform = true
-                color.a = 0.1f
-                setScale(0.1f)
+                isTransform = !fadeOnly
+                color.a = if (fadeOnly || delay > 0f) 0f else 0.1f
+                setScale(if (fadeOnly) 1f else 0.1f)
             } else {
                 isTransform = false
                 color.a = 1f
                 setScale(1f)
             }
         }
-        target.stage.addActor(container)
+        stage.addActor(container)
 
         if (useAnimation) {
             startShowAction(TipState.Shown)
@@ -123,6 +139,13 @@ class UncivTooltip <T: Actor>(
     fun hide(immediate: Boolean = false) {
         val useAnimation = animate && !immediate
         if (state == TipState.Hidden || state == TipState.Hiding && useAnimation) return
+        // Still waiting out the delay: nothing was visible, so there is nothing to fade.
+        if (state == TipState.Showing && container.color.a <= 0f) {
+            container.clearActions()
+            container.remove()
+            state = TipState.Hidden
+            return
+        }
         if (state == TipState.Showing || state == TipState.Hiding) {
             container.clearActions()
             state = TipState.Shown  // edge case. may actually only be partially 'shown' - animate hide anyway
@@ -137,7 +160,9 @@ class UncivTooltip <T: Actor>(
 
     private fun startShowAction(endState: TipState) {
         container.clearActions()
-        container.addAction(ShowAction(endState))
+        val action = ShowAction(endState)
+        if (endState == TipState.Shown && delay > 0f) container.addAction(Actions.sequence(Actions.delay(delay), action))
+        else container.addAction(action)
     }
 
     private inner class ShowAction(
@@ -148,14 +173,15 @@ class UncivTooltip <T: Actor>(
         private val valueMul: Float
 
         init {
+            val start = if (fadeOnly) 0f else 0.1f
             if (endState == TipState.Shown) {
                 transitionState = TipState.Showing
-                valueAdd = 0.1f
-                valueMul = 0.9f
+                valueAdd = start
+                valueMul = 1f - start
             } else {
                 transitionState = TipState.Hiding
                 valueAdd = 1f
-                valueMul = -0.9f
+                valueMul = start - 1f
             }
             state = transitionState
         }
@@ -167,7 +193,7 @@ class UncivTooltip <T: Actor>(
             }
             val value = percent * valueMul + valueAdd
             target.color.a = value
-            target.setScale(value)
+            if (!fadeOnly) target.setScale(value)
         }
         override fun end() {
             if (state == transitionState) state = endState
@@ -208,6 +234,14 @@ class UncivTooltip <T: Actor>(
     companion object {
         /** Duration of the fade/zoom-in/out animations */
         private const val tipAnimationDuration = 0.2f
+        /** Tips never touch the window edge. */
+        private const val screenMargin = 4f
+        /** Atlas text tips wait this long, so passing over controls doesn't flash them. */
+        private const val atlasTipDelay = 0.35f
+        /** Atlas text tips hang this far below their target. */
+        private const val atlasTipGap = 6f
+        /** Widest wrapped Atlas tip text. */
+        private const val maxTipTextWidth = 280f
 
         private fun getOriginX(width: Float, align: Int) = when {
             (align and Align.left) != 0 -> 0f
@@ -243,14 +277,20 @@ class UncivTooltip <T: Actor>(
             text: String,
             size: Float = 26f,
             always: Boolean = false,
-            targetAlign: Int = Align.topRight,
-            tipAlign: Int = Align.top,
+            targetAlign: Int? = null,
+            tipAlign: Int? = null,
             hideIcons: Boolean = false,
             dynamicTextProvider: (() -> String)? = null
         ) {
             removeTooltips()
 
             if (!(always || GUI.keyboardAvailable) || text.isEmpty()) return
+            if (GameUiStyle.isAtlas) {
+                addAtlasTooltip(text, targetAlign, tipAlign, hideIcons, dynamicTextProvider)
+                return
+            }
+            val targetAlign = targetAlign ?: Align.topRight
+            val tipAlign = tipAlign ?: Align.top
 
             val labelColor = BaseScreen.skinStrings.skinConfig.baseColor
             val label = if (hideIcons) text.toLabel(labelColor, fontSize = 38, hideIcons = true)
@@ -303,6 +343,54 @@ class UncivTooltip <T: Actor>(
                 targetAlign = targetAlign,
                 tipAlign = tipAlign,
                 contentRefresher = contentRefresher
+            ))
+        }
+
+        /** Atlas: readable ink on a raised chip at its natural text size (no scaling). Text tips
+         *  hang centered below the target after a short rest, flipping above near the bottom edge;
+         *  one-character keyboard hints stay a badge on the target's top-right corner. Explicit
+         *  alignments keep their placement. */
+        private fun Actor.addAtlasTooltip(text: String, targetAlign: Int?, tipAlign: Int?, hideIcons: Boolean,
+                                          dynamicTextProvider: (() -> String)?) {
+            val badge = text.length <= 1
+            val ink = GameUiStyle.ink
+            val fontSize = if (badge) GameUiStyle.Type.caption else GameUiStyle.Type.small
+            val label = if (hideIcons) text.toLabel(ink, fontSize, hideIcons = true) else ColorMarkupLabel(text, ink, fontSize = fontSize)
+            label.setAlignment(Align.center)
+            val content = Container(label).apply {
+                background = GameUiStyle.tooltipBackground()
+                if (badge) pad(2f, 6f, 3f, 6f) else pad(5f, 9f, 6f, 9f)
+            }
+            fun measure(): Vector2 {
+                label.wrap = false
+                label.invalidate()
+                // Long tips wrap to a readable measure instead of spanning the screen.
+                label.wrap = label.prefWidth > maxTipTextWidth
+                if (label.wrap) content.width(maxTipTextWidth + content.padLeft + content.padRight)
+                else content.minWidth(Value.minWidth).prefWidth(Value.prefWidth).maxWidth(Value.zero)
+                // A wrapped label knows its height only once it has a width.
+                content.invalidateHierarchy(); content.pack(); content.pack()
+                return Vector2(content.width, content.height)
+            }
+            val defaultPlacement = targetAlign == null && tipAlign == null
+            val refresher: (() -> Vector2)? = dynamicTextProvider?.let { provider -> {
+                val newText = provider()
+                if (hideIcons) label.setText(newText.tr())
+                else label.setText(ColorMarkupLabel.prepareText(newText, ink, Color.WHITE))
+                measure()
+            } }
+            addListener(UncivTooltip(this, content,
+                targetAlign = targetAlign ?: if (badge) Align.topRight else Align.bottom,
+                tipAlign = tipAlign ?: Align.top,
+                offset = when {
+                    !defaultPlacement -> Vector2.Zero
+                    badge -> Vector2(-4f, 6f)
+                    else -> Vector2(0f, -atlasTipGap)
+                },
+                forceContentSize = measure(),
+                contentRefresher = refresher,
+                delay = if (badge) 0f else atlasTipDelay,
+                fadeOnly = true
             ))
         }
 

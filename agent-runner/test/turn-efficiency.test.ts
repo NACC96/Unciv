@@ -12,8 +12,10 @@ import { NodeRunner, Supervisor } from "../src/supervisor.js";
 import { MAX_IMAGE_TILES, renderCivMapImage } from "../src/map-overview.js";
 import { hexDistance } from "../src/map-image.js";
 import type { IGameService } from "../src/fake-game-mcp.js";
+import type { MilitaryContext } from "../src/strategy-types.js";
 import { buildTurnPrompt } from "../src/turn-prompt.js";
 import { parseCodexStream } from "../src/provider-events.js";
+import type { ObservedVictoryContext } from "../src/map-types.js";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(here, "..");
@@ -43,6 +45,14 @@ const fullTile = {
 };
 
 describe("model-facing result compaction", () => {
+  it("keeps explicit known-false capital metadata distinct from an unknown legacy sighting", () => {
+    const city = { cityId: "replacement", name: "Athens II", ownerCivId: "Greece", health: 100,
+      population: 4, isOriginalCapital: false, foundingCivId: "Greece" };
+    expect(compactTile({ ...fullTile, city })).toHaveProperty("city.isOriginalCapital", false);
+    const unknown = { ...city, isOriginalCapital: null, foundingCivId: null };
+    expect(compactTile({ ...fullTile, city: unknown })).toHaveProperty("city.isOriginalCapital", null);
+  });
+
   it("drops empty tile fields, flattens yields and lists river edges", () => {
     expect(compactTile(fullTile)).toEqual({
       x: 4, y: -2, visibility: "VISIBLE", detailsKnown: true, lastSeenTurn: 31, lastSeenRevision: 1091, terrain: "Plains",
@@ -82,6 +92,32 @@ describe("model-facing result compaction", () => {
 });
 
 describe("game tools", () => {
+  it("preserves exact round and victory unknown false zero and unsupported values through MCP", async () => {
+    const fake = new FakeGameService();
+    const legacyObservation = await fake.observe();
+    const victory: ObservedVictoryContext = { enabledVictoryTypes: ["Scientific"], achieved: null, available: [{
+      name: "Scientific", completed: false, completedMilestones: 0, nextMilestone: 0, milestonesTruncated: false,
+      milestones: [{ description: "Add all [spaceship parts] in capital", type: "AddedSSPartsInCapital",
+        completed: false, current: 0, target: 6, status: "unsupported", unsupportedReason: "No assembly command",
+        remainingSpaceshipParts: { "SS Booster": 3 }, partsTruncated: false }],
+    }], domination: null, availableTruncated: false };
+    const forces = { coverage: "COMPLETE" as const, knownMilitaryUnits: 0, totalMilitaryUnits: 0,
+      conventionalUnits: 0, nuclearWeapons: 0, captureCapableUnits: 0, rangedUnits: 0, siegeUnits: 0,
+      aircraft: 0, interceptors: 0, damagedUnits: 0, conventionalUnitForce: 0 };
+    const military: MilitaryContext = { own: forces, rivals: [{ civId: "Greece", forces: {
+      ...forces, coverage: "VISIBLE_ONLY", totalMilitaryUnits: null, conventionalUnitForce: null,
+    } }] };
+    fake.observe = async () => ({ ...legacyObservation, gameTurn: 104, turnSerial: 524, victory, military });
+    server = await startGameMcpServer(fake, { matchId: "m", timelineId: "t", civId: "Rome", runId: "r", authorityEpoch: 1 });
+    expect((await tool(server, "game.observe", {})).value).toMatchObject({ gameTurn: 104, turnSerial: 524, victory, military });
+    fake.observe = async () => legacyObservation;
+    const legacy = await tool(server, "game.observe", {});
+    expect(legacy.isError).toBe(false);
+    expect(legacy.value).not.toHaveProperty("victory");
+    expect(legacy.value).not.toHaveProperty("gameTurn");
+    expect(legacy.value).not.toHaveProperty("military");
+  });
+
   it("returns compact observations, opt-in history, city inspection and an end-turn signal", async () => {
     const fake = new FakeGameService();
     let turnsEnded = 0;
@@ -170,7 +206,7 @@ describe("turn prompt and provider spawn", () => {
       openingObservation: '{"revision":12,"ownUnits":[]}' });
     expect(prompt).toContain('Opening observation (game.observe at revision 12; absent fields are null, false, zero or empty):\n{"revision":12,"ownUnits":[]}');
     expect(prompt).toContain("Start from the opening observation above instead of calling game.observe");
-    expect(prompt).toContain("weigh the balance of power against your rivals");
+    expect(prompt).toContain("Reconcile your victory commitment with the strategic checkpoint and factual progress");
   });
 
   it("asks Codex to compact after the turn and attaches the map image without swallowing positionals", () => {
@@ -229,6 +265,8 @@ describe("post-turn compaction", () => {
 
   it("releases the turn at the closing message, revokes game tools and leaves the provider compacting", async () => {
     const engine = new FakeGameService();
+    const observe = engine.observe.bind(engine);
+    engine.observe = async () => ({ ...await observe(), gameTurn: 77 });
     const logRoot = mkdtempSync(join(tmpdir(), "compaction-logs-"));
     const report = join(logRoot, "report.json");
     const compactMs = 1500;
@@ -247,13 +285,20 @@ describe("post-turn compaction", () => {
     expect(outcome.run.finalText).toBe("Turn committed; the border holds.");
     expect(outcome.run.sessionId).toBe("compacting-session");
     expect(outcome.background).toBeDefined();
+    const runDir = readdirSync(logRoot).find(name => name.startsWith("run-"))!;
+    const releasedMeta = JSON.parse(readFileSync(join(logRoot, runDir, "meta.json"), "utf8"));
     await outcome.background!.done;
     expect(performance.now() - started - releasedAfter).toBeGreaterThan(compactMs - 500);
     expect(JSON.parse(readFileSync(report, "utf8"))).toEqual({ lateCall: "rejected" });
     // The released turn keeps its own run-end entry; the compaction is logged after it.
-    const runDir = readdirSync(logRoot).find(name => name.startsWith("run-"))!;
     const activity = readFileSync(join(logRoot, runDir, "activity.jsonl"), "utf8").trim().split("\n").map(line => JSON.parse(line));
     expect(activity.filter(entry => entry.id === "run-end")).toEqual([expect.objectContaining({ status: "completed_turn" })]);
     expect(activity.at(-1)).toMatchObject({ id: "session-compaction", title: expect.stringMatching(/^Session compacted in /) });
+    const identity = { strategyPolicyVersion: "victory-progress-v3", gameTurn: 77, turnSerial: 1,
+      matchId: "m", timelineId: "t", civId: "civ" };
+    expect(releasedMeta).toMatchObject({ ...identity, turnOutcome: "completed_turn", sessionId: "compacting-session" });
+    expect(JSON.parse(readFileSync(join(logRoot, runDir, "meta.json"), "utf8"))).toMatchObject(identity);
+    for (const entry of activity.filter(entry => ["run-start", "run-end", "session-compaction"].includes(entry.id)))
+      expect(JSON.parse(entry.text)).toMatchObject(identity);
   }, 30000);
 });

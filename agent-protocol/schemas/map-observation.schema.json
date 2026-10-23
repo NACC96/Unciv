@@ -61,7 +61,8 @@
         "visibility": {
           "enum": [
             "VISIBLE",
-            "REMEMBERED"
+            "REMEMBERED",
+            "REVEALED"
           ]
         },
         "detailsKnown": {
@@ -186,6 +187,13 @@
               "properties": {
                 "cityId": {
                   "type": "string"
+                },
+                "isOriginalCapital": {
+                  "type": ["boolean", "null"],
+                  "description": "Null or absent for legacy sightings with unknown capital identity; false is a known non-original city."
+                },
+                "foundingCivId": {
+                  "type": ["string", "null"]
                 },
                 "name": {
                   "type": "string"

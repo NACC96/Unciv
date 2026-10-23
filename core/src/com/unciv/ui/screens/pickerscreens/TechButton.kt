@@ -42,6 +42,8 @@ class TechButton(
     private val backgroundImage: Image  // Table.background is the border
     private val choiceStatus = "".toLabel(GameUiStyle.muted, GameUiStyle.Type.small)
     private val atlasNode = GameUiStyle.isAtlas && !isWorldScreen
+    /** The world screen's research card: a frosted card with a slim brass progress rail. */
+    private val atlasTracker = GameUiStyle.isAtlas && isWorldScreen
 
     init {
         touchable = Touchable.enabled
@@ -67,11 +69,19 @@ class TechButton(
 
             val percentComplete = (techCost - remainingTech) / techCost.toFloat()
             val percentWillBeComplete = (techCost - (remainingTech-techThisTurn)) / techCost.toFloat()
-            val progressBar = ImageGetter.ProgressBar(2f, 48f, true)
+            if (atlasTracker) {
+                val progressBar = ImageGetter.ProgressBar(3f, 44f, true)
+                    .setBackground(GameUiStyle.raised)
+                    .setSemiProgress(GameUiStyle.accent.apply { a = 0.45f }, percentWillBeComplete)
+                    .setProgress(GameUiStyle.accent, percentComplete)
+                add(progressBar).padLeft(2f).padRight(GameUiStyle.Space.m)
+            } else {
+                val progressBar = ImageGetter.ProgressBar(2f, 48f, true)
                     .setBackground(Color.WHITE)
                     .setSemiProgress(Color.BLUE.cpy().brighten(0.3f), percentWillBeComplete)
                     .setProgress(Color.BLUE.cpy().darken(0.5f), percentComplete)
-            add(progressBar.addBorder(1f, Color.GRAY.cpy())).padLeft(0f).padRight(5f)
+                add(progressBar.addBorder(1f, Color.GRAY.cpy())).padLeft(0f).padRight(5f)
+            }
         }
 
         val rightSide = object : Table() {
@@ -92,6 +102,13 @@ class TechButton(
                 GameUiStyle.muted, GameUiStyle.Type.small)).colspan(2).left().row()
             backgroundImage.isVisible = false
         }
+        if (atlasTracker) {
+            background = GameUiStyle.surface("Atlas/World/TechTracker")
+            backgroundImage.isVisible = false
+            pad(GameUiStyle.Space.m, GameUiStyle.Space.m, GameUiStyle.Space.m, GameUiStyle.Space.xs)
+            text.color = GameUiStyle.ink
+            turns.color = GameUiStyle.muted
+        }
 
         rightSide.centerY(this)
         add(rightSide).expandX().left()
@@ -109,7 +126,7 @@ class TechButton(
     }
 
     fun setButtonColor(color: Color) {
-        if (atlasNode) return
+        if (atlasNode || atlasTracker) return
         backgroundImage.color = color
         pack()
     }
@@ -140,7 +157,9 @@ class TechButton(
             BaseScreen.skinStrings.roundedEdgeRectangleSmallShape,
             tintColor = ImageGetter.CHARCOAL.cpy().apply { a = 0.7f }
         )
-        techEnabledIcons.pad(2f, 10f, 2f, 0f)
+        // The world research card is already a frosted card; a second dark plate inside it reads as a hole.
+        if (atlasTracker) techEnabledIcons.background = null
+        techEnabledIcons.pad(2f, if (atlasTracker) 0f else 10f, 2f, 0f)
         techEnabledIcons.defaults().padRight(5f)
 
         val civ = techManager.civInfo

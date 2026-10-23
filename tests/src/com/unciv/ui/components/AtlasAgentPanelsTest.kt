@@ -112,18 +112,56 @@ class AtlasAgentPanelsTest {
     }
 
     @Test fun allocationKeepsReadingComposerAndFooterBounded() {
-        val type = try { Class.forName("com.unciv.ui.screens.worldscreen.status.AgentPanelLayout") }
-            catch (_: ClassNotFoundException) { fail("Missing view-only AgentPanelLayout allocation"); return }
-        val layout = type.getField("INSTANCE").get(null)
-        val calculate = type.getMethod("calculate", Float::class.javaPrimitiveType, Float::class.javaPrimitiveType, Float::class.javaPrimitiveType)
-        for (size in listOf(480f to 480f, 388f to 260f, 1f to 1f)) for (scale in listOf(1f, 1.5f)) {
-            val regions = calculate.invoke(layout, size.first, size.second, scale)
-            val rectangles = listOf("Content", "Composer", "Footer").map { regions.javaClass.getMethod("get$it").invoke(regions) as Rectangle }
-            rectangles.forEach { assertTrue(it.x >= 0 && it.y >= 0 && it.width > 0 && it.height > 0); assertTrue(it.x + it.width <= size.first + .01f); assertTrue(it.y + it.height <= size.second + .01f) }
+        for (size in listOf(480f to 480f, 388f to 260f, 1f to 1f)) for (scale in listOf(1f, 1.5f)) for (expanded in listOf(false, true)) {
+            val regions = com.unciv.ui.screens.worldscreen.status.AgentPanelLayout.calculate(size.first, size.second, scale, expanded)
+            val rectangles = listOf(regions.content, regions.composer, regions.footer)
+            rectangles.forEach { assertTrue(it.x >= 0 && it.y >= 0 && it.width > 0 && it.height >= 0); assertTrue(it.x + it.width <= size.first + .01f); assertTrue(it.y + it.height <= size.second + .01f) }
             assertEquals(size.second, rectangles.sumOf { it.height.toDouble() }.toFloat(), .01f)
             assertTrue("The reading area must stay usable", rectangles[0].height >= size.second * .3f)
+            if (!expanded) {
+                assertEquals(0f, regions.composer.height, 0f); assertEquals(0f, regions.footer.height, 0f)
+                assertEquals(size.second, regions.content.height, 0f)
+            }
         }
     }
+
+    @Test fun bothSkinsCollapseComposerWithoutReservingSpaceAcrossWindowAndTextSizes() {
+        val f = Fixture()
+        Mockito.`when`(f.session.getMessages()).thenReturn(listOf(
+            DiplomaticMessage("reading", "Rome", "Greece", "The diplomatic history remains readable.", 1, 2)))
+        Mockito.`when`(f.session.getMessageContacts()).thenReturn(listOf(
+            MessageContact("Greece", "Athena the exceptionally long named diplomatic representative", true)))
+        for (skin in listOf("Atlas", "Minimal")) for ((w, h) in listOf(1440f to 900f, 1920f to 1080f, 960f to 720f, 800f to 500f, 420f to 600f)) {
+            Mockito.`when`(f.stage.width).thenReturn(w); Mockito.`when`(f.stage.height).thenReturn(h)
+            for (scale in listOf(1f, 1.5f)) {
+                UncivGame.Current.settings.skin = skin
+                UncivGame.Current.settings.fontSizeMultiplier = scale
+                Fonts.fontImplementation = com.unciv.app.desktop.DesktopFont()
+                BaseScreen.setSkin()
+                val panel = com.unciv.ui.screens.worldscreen.status.AgentMessagesPanel(f.screen, f.session)
+                try {
+                    panel.toggle(); panel.validate()
+                    val reading = panel.descendants().single { it.name == "MessageReadingPane" }
+                    val composer = panel.descendants().single { it.name == "MessageComposerPane" }
+                    val footer = panel.descendants().single { it.name == "MessageFooter" }
+                    val initialBounds = Rectangle(panel.x, panel.y, panel.width, panel.height)
+                    val collapsedHeight = reading.height
+                    assertEquals("$skin $w x $h @$scale: hidden composer must reserve zero height", 0f, composer.height, .01f)
+                    assertEquals("$skin $w x $h @$scale: hidden actions must reserve zero height", 0f, footer.height, .01f)
+                    val toggle = panel.descendants().singleOrNull { it.name == "MessageComposerToggle" }
+                    assertNotNull("The compact mailbox needs an obvious write control", toggle)
+                    toggle!!.press(); panel.validate()
+                    assertTrue("$skin $w x $h @$scale: the recovered space belongs to history", collapsedHeight > reading.height + 60f)
+                    assertTrue("$skin $w x $h @$scale: expanded reading remains usable", reading.height >= 80f)
+                    assertEquals(initialBounds, Rectangle(panel.x, panel.y, panel.width, panel.height))
+                    toggle.press(); panel.validate()
+                    assertEquals(collapsedHeight, reading.height, .5f)
+                    assertEquals(0f, composer.height, .01f)
+                } finally { panel.dispose() }
+            }
+        }
+    }
+
     @Test fun atlasComposerAndActionsRemainInsideTheirAllocatedPanels() {
         val f = Fixture()
         Mockito.`when`(f.session.getMessages()).thenReturn(listOf(
@@ -139,7 +177,9 @@ class AtlasAgentPanelsTest {
                 val panel = com.unciv.ui.screens.worldscreen.status.AgentMessagesPanel(f.screen, f.session)
                 val settings = com.unciv.ui.screens.worldscreen.status.AgentNationSettingsPanel(f.screen, f.session)
                 try {
-                    panel.toggle(); panel.validate()
+                    panel.toggle()
+                    panel.descendants().single { it.name == "MessageComposerToggle" }.press()
+                    panel.validate()
                     for (name in listOf("MessageReadingPane", "MessageComposerPane", "MessageFooter", "MessageSend")) {
                         val actor = panel.descendants().single { it.name == name }
                         val p = actor.localToAscendantCoordinates(panel, com.badlogic.gdx.math.Vector2())

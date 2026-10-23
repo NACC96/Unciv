@@ -21,6 +21,7 @@ import { CANCELLED_DETAIL } from "./engine-protocol.js";
 import type { IGameService } from "./fake-game-mcp.js";
 import { startGameMcpServer, type RunBinding } from "./game-mcp-server.js";
 import { buildTurnPrompt } from "./turn-prompt.js";
+import { STRATEGY_POLICY_VERSION } from "./strategy-policy.js";
 import { compactObservation } from "./compact-results.js";
 import { renderCivMapImage } from "./map-overview.js";
 import type { NormalizedRun } from "./provider-events.js";
@@ -379,6 +380,9 @@ export class Supervisor {
       protocolVersion: args.context.protocolVersion,
       civId: args.context.civId,
       turnSerial: args.context.turnSerial,
+      gameTurn: preFlight.gameTurn,
+      victory: preFlight.victory ?? undefined,
+      strategicProgress: preFlight.strategicProgress ?? undefined,
       stateRevision: revisionBefore,
       notes: storedNotes.notes,
       notesRevision: storedNotes.notesRevision,
@@ -419,7 +423,9 @@ export class Supervisor {
       const built = this.buildSpawn(prompt, args.resumeId, server.url, server.bearer, imagePath ? { imagePath } : {});
       // Invocation credentials must win over inherited or supplemental env.
       const child = this.runner.spawn({ ...built.spec, context: { ...built.spec.context,
-        matchId: args.binding.matchId, civId: args.binding.civId, turnSerial: args.context.turnSerial, runId: args.binding.runId } }, { ...process.env, ...args.extraEnv, ...built.env });
+        matchId: args.binding.matchId, timelineId: args.binding.timelineId, civId: args.binding.civId,
+        turnSerial: args.context.turnSerial, runId: args.binding.runId,
+        gameTurn: preFlight.gameTurn, strategyPolicyVersion: STRATEGY_POLICY_VERSION } }, { ...process.env, ...args.extraEnv, ...built.env });
       currentChild = child;
       const killOnCancel = () => child.kill();
       signal?.addEventListener("abort", killOnCancel, { once: true });

@@ -84,7 +84,7 @@ it.each([
   let observationCount = 0;
   engine.observe = async () => {
     if (++observationCount === 2 && fixture.commitEndTurn) await engine.endTurn();
-    return observe();
+    return { ...await observe(), gameTurn: 124 };
   };
   const supervisor = new Supervisor(() => ({ spec: { executable: process.execPath,
     argv: ["-e", `process.exit(${fixture.code})`], cwd: root }, env: {} }),
@@ -103,7 +103,13 @@ it.each([
     expect(final.title).toContain(fixture.title);
     expect(final.durationMs).toBeGreaterThanOrEqual(0);
     expect(final.summary).toContain(outcome.detail);
-    expect(JSON.parse(readFileSync(join(runDir, "meta.json"), "utf8"))).toMatchObject({ turnOutcome: fixture.outcome });
+    const identity = { matchId: "m", timelineId: "t", civId: "Rome", turnSerial: 3, gameTurn: 124,
+      strategyPolicyVersion: "victory-progress-v3" };
+    expect(JSON.parse(readFileSync(join(runDir, "meta.json"), "utf8"))).toMatchObject({ ...identity, turnOutcome: fixture.outcome });
+    expect(JSON.parse(final.text)).toMatchObject(identity);
+    const started = readFileSync(join(runDir, "activity.jsonl"), "utf8").trim().split("\n")
+      .map(line => JSON.parse(line)).find(entry => entry.id === "run-start");
+    expect(JSON.parse(started.text)).toMatchObject(identity);
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
 

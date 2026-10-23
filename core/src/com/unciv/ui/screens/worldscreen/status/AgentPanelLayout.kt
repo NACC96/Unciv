@@ -15,12 +15,12 @@ import com.unciv.ui.screens.worldscreen.WorldScreenStyle
 data class PanelRegions(val content: Rectangle, val composer: Rectangle, val footer: Rectangle)
 
 object AgentPanelLayout {
-    fun calculate(width: Float, height: Float, fontScale: Float): PanelRegions {
+    fun calculate(width: Float, height: Float, fontScale: Float, composerExpanded: Boolean = true): PanelRegions {
         require(width.isFinite() && height.isFinite() && fontScale.isFinite())
         require(width > 0f && height > 0f && fontScale > 0f)
         // Reading is the main job: the composer and its actions keep only what they need.
-        val footerHeight = minOf(76f * fontScale, height * .24f)
-        val composerHeight = minOf(150f * fontScale, height * .34f)
+        val footerHeight = if (composerExpanded) minOf(36f * fontScale, height * .16f) else 0f
+        val composerHeight = if (composerExpanded) minOf(150f * fontScale, height * .34f) else 0f
         return PanelRegions(
             Rectangle(0f, footerHeight + composerHeight, width, height - footerHeight - composerHeight),
             Rectangle(0f, footerHeight, width, composerHeight),

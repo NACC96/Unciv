@@ -1,6 +1,7 @@
 package com.unciv.ui.screens.worldscreen.status
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.InputEvent
@@ -23,6 +24,7 @@ import com.unciv.ui.components.input.onChange
 import com.unciv.ui.components.input.onClick
 import com.unciv.ui.components.widgets.AutoScrollPane
 import com.unciv.ui.screens.basescreen.BaseScreen
+import com.unciv.ui.screens.worldscreen.HudWindow
 import com.unciv.ui.screens.worldscreen.WorldScreen
 import com.unciv.ui.screens.worldscreen.WorldScreenStyle
 
@@ -63,8 +65,10 @@ class AgentNationSettingsPanel(private val screen: WorldScreen, private val sess
     private var updating = false
     private var requesting = false
     private var disposed = false
-    private var positioned = false
-    private var userDragged = false
+    private val window = HudWindow(this, "nation-settings", "Nation settings",
+        Vector2(320f, 320f), defaultBounds = ::defaultBounds,
+        show = { if (!isVisible) toggle() }, hide = { hide() },
+        onResized = { refresh() })
     private val task = object : Timer.Task() {
         override fun run() { if (disposed) cancel() else if (isVisible) refresh() }
     }
@@ -78,22 +82,10 @@ class AgentNationSettingsPanel(private val screen: WorldScreen, private val sess
         val close = if (GameUiStyle.isAtlas) AgentPanelLayout.closeButton { hide() }
             else WorldScreenStyle.button("Close").apply { onClick { hide() } }
         val header = Table(skin)
-        header.add("Nation settings".toLabel(WorldScreenStyle.ink, 17)).minWidth(0f).growX().left()
-        header.add(WorldScreenStyle.dragGrip()).padRight(8f)
-        if (GameUiStyle.isAtlas) header.add(close).size(28f) else header.add(close)
-        header.addListener(object : InputListener() {
-            val origin = Vector2(); val pointerOrigin = Vector2()
-            override fun touchDown(event: InputEvent, x: Float, y: Float, pointer: Int, button: Int): Boolean {
-                if (event.target.isDescendantOf(close)) return false
-                origin.set(this@AgentNationSettingsPanel.x, this@AgentNationSettingsPanel.y)
-                pointerOrigin.set(event.stageX, event.stageY); toFront(); return true
-            }
-            override fun touchDragged(event: InputEvent, x: Float, y: Float, pointer: Int) {
-                userDragged = true
-                setPosition(origin.x + event.stageX - pointerOrigin.x, origin.y + event.stageY - pointerOrigin.y)
-                clampPosition(); Gdx.graphics.requestRendering()
-            }
-        })
+        header.add("Nation settings".toLabel(WorldScreenStyle.ink, if (GameUiStyle.isAtlas) GameUiStyle.Type.label + 1 else 17)).minWidth(0f).growX().left()
+        header.add(window.controls())
+        if (GameUiStyle.isAtlas) header.add(close).size(28f).padLeft(GameUiStyle.Space.xs) else header.add(close)
+        window.attachHeader(header)
         add(header).growX().row()
         add(identity).growX().left().padTop(6f).padBottom(8f).row()
         val visionField = Table(skin).apply {
@@ -272,10 +264,12 @@ class AgentNationSettingsPanel(private val screen: WorldScreen, private val sess
     fun toggle() { if (isVisible) hide() else {
         isVisible = true; screen.hideCivilizationOverview()
         screen.stage.root.children.filterIsInstance<AgentMessagesPanel>().forEach { it.hide() }
+        window.onShown()
         refresh(); toFront(); Gdx.graphics.requestRendering()
     } }
     fun hide() {
         isVisible = false
+        window.onHidden()
         for (picker in listOf(vision, nation, provider, model, reasoning)) picker.hideScrollPane()
         if (screen.stage.scrollFocus?.isDescendantOf(this) == true) screen.stage.scrollFocus = null
         if (screen.stage.keyboardFocus?.isDescendantOf(this) == true) screen.stage.keyboardFocus = null
@@ -305,39 +299,35 @@ class AgentNationSettingsPanel(private val screen: WorldScreen, private val sess
         if (pending != null) { status.setText(pending); status.color = WorldScreenStyle.warning }
         else if (previousPending != null) { status.setText(""); status.color = WorldScreenStyle.muted }
         previousPending = pending
-        val w = minOf(480f, screen.stage.width - 16f).coerceAtLeast(1f)
-        val anchorTop = if (isVisible) controlsAnchor?.localToStageCoordinates(Vector2())?.y?.minus(8f) else null
-        // Atlas without an anchor: the same right-side sheet as Messages, below the header.
-        val sheet = if (GameUiStyle.isAtlas && controlsAnchor == null) AgentPanelLayout.rightSheet(screen.stage, w,
-            400f * UncivGame.Current.settings.fontSizeMultiplier, 650f) else null
-        val h = sheet?.height ?: minOf(650f, screen.stage.height - if (GameUiStyle.isAtlas) 24f else 130f, anchorTop?.minus(8f) ?: Float.MAX_VALUE).coerceAtLeast(1f)
-        setSize(w, h)
-        // Controls are not mounted/laid out during hidden construction. Follow their real stage
-        // bottom only after showing; an explicit drag preserves the user's placement on resize.
-        if (isVisible && sheet != null && !userDragged) {
-            setPosition(sheet.x, sheet.y)
-            positioned = true
-        } else if (isVisible && (!positioned || controlsAnchor != null && !userDragged)) {
-            setPosition(screen.stage.width - width - 8f, (anchorTop ?: (screen.stage.height - 116f)) - height)
-            positioned = true
-        }
+        // Controls are not mounted/laid out during hidden construction: place only once shown.
+        if (isVisible) window.place()
+        else defaultBounds().let { setSize(it.width, it.height) }
         // Bound wrapped labels to the scroll pane; long identities must never drive its preferred width.
-        val contentWidth = (w - 46f).coerceAtLeast(1f)
+        val contentWidth = (width - 46f).coerceAtLeast(1f)
         form.cells.forEach { it.width(contentWidth) }
         if (GameUiStyle.isAtlas) {
             // The form scrolls independently; the save action remains reachable at every size.
             getCell(actionFooter).height(48f * UncivGame.Current.settings.fontSizeMultiplier)
         }
-        clampPosition(); updateEnabled(); invalidateHierarchy(); Gdx.graphics.requestRendering()
+        updateEnabled(); invalidateHierarchy(); Gdx.graphics.requestRendering()
+    }
+
+    /** Atlas: the right-side sheet below the header, like Messages. Elsewhere hanging below the controls. */
+    private fun defaultBounds(): Rectangle {
+        val w = minOf(480f, screen.stage.width - 16f).coerceAtLeast(1f)
+        val anchorTop = controlsAnchor?.takeIf { it.stage != null }?.localToStageCoordinates(Vector2())?.y?.minus(8f)
+        if (GameUiStyle.isAtlas && controlsAnchor == null)
+            return AgentPanelLayout.rightSheet(screen.stage, w, 400f * UncivGame.Current.settings.fontSizeMultiplier, 650f)
+        val h = minOf(650f, screen.stage.height - if (GameUiStyle.isAtlas) 24f else 130f, anchorTop?.minus(8f) ?: Float.MAX_VALUE).coerceAtLeast(1f)
+        val x = (screen.stage.width - w - 8f).coerceAtLeast(0f)
+        val y = ((anchorTop ?: (screen.stage.height - 116f)) - h).coerceIn(0f, maxOf(0f, screen.stage.height - h))
+        return Rectangle(x, y, w, h)
     }
     private fun updateController() {
         val selected = settings.firstOrNull { it.civId == selectedId }
         controller.setText(selected?.let {
             "Controller: ${if (it.kind == ControllerKind.HUMAN) "Human" else "Agent"} · ${it.nationName}${if (it.isActive) " · Current turn" else ""}"
         } ?: "No nation selected")
-    }
-    private fun clampPosition() {
-        setPosition(x.coerceIn(0f, maxOf(0f, screen.stage.width - width)), y.coerceIn(0f, maxOf(0f, screen.stage.height - height)))
     }
     private fun updateEnabled() {
         val busy = requesting || session.getPendingNationChange() != null
@@ -384,5 +374,5 @@ class AgentNationSettingsPanel(private val screen: WorldScreen, private val sess
             }
         }
     }
-    override fun dispose() { if (disposed) return; disposed = true; task.cancel(); hide(); drafts.clear(); remove() }
+    override fun dispose() { if (disposed) return; disposed = true; task.cancel(); hide(); window.dispose(); drafts.clear(); remove() }
 }

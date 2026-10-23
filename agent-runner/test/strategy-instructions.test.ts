@@ -1,30 +1,144 @@
 import { expect, it } from "vitest";
 import { GAME_INSTRUCTIONS, STRATEGY_INSTRUCTIONS } from "../src/game-instructions.js";
 import { buildTurnPrompt } from "../src/turn-prompt.js";
+import type { ObservedVictoryContext } from "../src/map-types.js";
+import type { StrategicProgress } from "../src/strategy-types.js";
 
-it("teaches realpolitik: the balance of power, war as policy and agreements as instruments", () => {
-  for (const text of ["brutal realpolitik", "empire.militaryStrength, militaryRank, score and scoreRank", "rivals (militaryStrength",
-    "War is a normal instrument of policy", "diplomacy.declareWar", "do not leave large forces idle",
-    "Agreements are instruments, not obligations", "break them when breaking gains more than the lost trust costs"])
-    expect(STRATEGY_INSTRUCTIONS).toContain(text);
-  expect(GAME_INSTRUCTIONS).toContain(STRATEGY_INSTRUCTIONS);
+const victory: ObservedVictoryContext = {
+  enabledVictoryTypes: ["Domination"], achieved: null, availableTruncated: false, domination: null,
+  available: [{ name: "Domination", completed: false, completedMilestones: 0, nextMilestone: 0, milestonesTruncated: false,
+    milestones: [{ description: "Capture all original capitals", type: "CaptureAllCapitals", completed: false,
+      current: 1, target: 2, status: "supported", unsupportedReason: null, remainingSpaceshipParts: null, partsTruncated: false }] }],
+};
+const plan = { version: 1, victory: "Domination", milestone: "Stage artillery outside Athens", expectedGameTurn: 108,
+  readiness: "Two artillery and one healthy capture unit in range", assignedUnitIds: [5, 8, 9], assignedCityIds: [],
+  lastReviewedGameTurn: 104, lastProgress: "Artillery moved two tiles closer", nextAction: "Move artillery toward Athens",
+  reassessWhen: "The route closes or the deadline passes", blockers: [] };
+const base = { displayName: "Ada", personality: "", rulesetName: "Civ V", protocolVersion: 1, civId: "Rome",
+  turnSerial: 524, stateRevision: 4566, notes: "", recentEvents: [], pendingDecisions: [], guidance: [], includeStaticInstructions: false };
+function prompt(extra: Record<string, unknown> = {}) {
+  return buildTurnPrompt(Object.assign({}, base, { gameTurn: 104, victory, notes: JSON.stringify({ strategy: plan, memory: "Treaty until round 110" }) }, extra));
+}
+function checkpoint(extra: Record<string, unknown> = {}) {
+  const text = prompt(extra);
+  const line = text.split("\n").find(line => line.startsWith('Strategic checkpoint: '));
+  expect(line, "turn prompt needs structured objective reconciliation").toBeDefined();
+  return JSON.parse(line!.slice("Strategic checkpoint: ".length));
+}
+function progress(counts: Record<string, number> = {}): StrategicProgress {
+  const delta = { baselineAvailable: true, fromGameTurn: 103, toGameTurn: 104, eventCounts: counts, events: [], truncated: false };
+  return { historyComplete: true, trackedSinceGameTurn: 100, trackedSinceTurnSerial: 500, ownTurnOrdinal: 4,
+    current: { research: null, production: [], productionCount: 0, productionTruncated: false },
+    incoming: { ...delta, eventCounts: {} }, completedTurns: [1, 2, 3].map(ownTurnOrdinal => ({ ownTurnOrdinal,
+      gameTurn: 100 + ownTurnOrdinal, turnSerial: 500 + ownTurnOrdinal * 5, historyComplete: true,
+      changes: { ...delta }, appliedCommandCounts: { "diplomacy.message": 3, "unit.order": 5 } })) };
+}
+
+it("reconciles canonical enabled and available routes with legacy and incompatible private plans", () => {
+  expect(checkpoint()).toMatchObject({ policyVersion: "victory-progress-v3", gameTurn: 104, planState: "active", deadlineState: "future",
+    enabledVictoryTypes: ["Domination"], availableVictoryTypes: ["Domination"], reviewRequired: false });
+  expect(checkpoint({ notes: "Primary victory: Scientific. Build spaceship parts." })).toMatchObject({ planState: "legacy", reviewRequired: true });
+  expect(checkpoint({ notes: JSON.stringify({ strategy: { ...plan, victory: "Scientific" } }) })).toMatchObject({ planState: "route_unavailable", reviewRequired: true });
+  expect(prompt()).toContain("Replace a disabled or unavailable victory plan on this turn");
 });
 
-it("keeps settlers and scouts moving, with Unciv's automation as the settler fallback", () => {
-  for (const text of ["Never leave a settler idle", "legal_actions citySites", "two turns without founding, order AUTOMATE",
-    "EXPLORE toward unexplored and unclaimed land", "last only this turn, so repeat them each turn", "expansion continues by conquest"])
-    expect(STRATEGY_INSTRUCTIONS).toContain(text);
+it("carries durable victory age separately from productive preparation and rewritten deadlines", () => {
+  const observed = structuredClone(victory);
+  Object.assign(observed.available[0], { progress: { metric: "ORIGINAL_CAPITALS", current: 1, target: 3,
+    trackedSinceGameTurn: 139, unchangedSinceGameTurn: 139, lastChangedGameTurn: null } });
+  const result = checkpoint({ gameTurn: 145, victory: observed, strategicProgress: progress({ productionWorkChanged: 1 }),
+    notes: JSON.stringify({ strategy: { ...plan, expectedGameTurn: 170, lastReviewedGameTurn: 145 } }) });
+  expect(result).toMatchObject({ historyState: "changed", deadlineState: "future", victoryProgress: {
+    metric: "ORIGINAL_CAPITALS", current: 1, target: 3, trackedSinceGameTurn: 139,
+    unchangedSinceGameTurn: 139, lastChangedGameTurn: null, unchangedGameRounds: 6 } });
+  expect(checkpoint({ gameTurn: 139, victory: observed }).victoryProgress.unchangedGameRounds).toBe(0);
+  expect(checkpoint().victoryProgress).toBeNull();
 });
 
-it("explains each map vision level and that rules keep real sight", () => {
-  for (const text of ["mapSummary.vision", "FOG is normal fog of war", "marked REVEALED", "FULL shows every tile, unit and city live",
-    "Attacks and other game rules still need your units' real sight"])
-    expect(GAME_INSTRUCTIONS).toContain(text);
+it("makes peacetime readiness attainable and requires substantive blocker reassessment on resumed prompts", () => {
+  for (const text of [GAME_INSTRUCTIONS, prompt(), prompt({ includeStaticInstructions: true })]) {
+    expect(text).toContain("Current strategy policy victory-progress-v3");
+    expect(text).toContain("Peacetime legal attackTargets may be empty");
+    expect(text).toContain("do not require a legal battle preview before declaring war");
+    expect(text).toContain("readiness must be attainable under your own agreements");
+    expect(text).toContain("change the blocker, take a concrete step that removes it, or give evidence of current infeasibility");
+    expect(text).toContain("Extending a deadline or restating the same blocker is not reassessment");
+    expect(text).toContain("State the benefit and expiry of a standstill");
+    expect(text).toContain("Respect existing promises");
+    expect(text).toContain("Reassessment never forces war or blocks end-turn");
+    expect(text).toContain("Initiate a concrete proposal when it advances your strategy");
+  }
 });
 
-it("closes every turn prompt with the balance of power and moving settlers", () => {
-  const prompt = buildTurnPrompt({ displayName: "Ada", personality: "", rulesetName: "Civ V", protocolVersion: 1, civId: "Rome",
-    turnSerial: 1, stateRevision: 1, notes: "", recentEvents: [], pendingDecisions: [], guidance: [], includeStaticInstructions: false });
-  expect(prompt).toContain("weigh the balance of power against your rivals");
-  expect(prompt).toContain("keep every settler and scout acting");
+it("separates an enabled route with an unsupported action from a disabled route", () => {
+  const science = structuredClone(victory);
+  science.enabledVictoryTypes = ["Scientific"];
+  science.available[0].name = "Scientific";
+  science.available[0].milestones[0].status = "unsupported";
+  science.available[0].milestones[0].unsupportedReason = "Spaceship assembly has no agent command";
+  const result = checkpoint({ victory: science, notes: JSON.stringify({ strategy: { ...plan, victory: "Scientific" } }) });
+  expect(result).toMatchObject({ enabledVictoryTypes: ["Scientific"], planState: "route_unsupported", reviewRequired: true });
+  science.available[0].completed = true;
+  science.available[0].milestones[0].completed = true;
+  expect(checkpoint({ victory: science, notes: JSON.stringify({ strategy: { ...plan, victory: "Scientific" } }) }).planState).toBe("satisfied");
+});
+
+it("uses the actual round for deadlines, never the global turn serial", () => {
+  expect(checkpoint({ gameTurn: 107, turnSerial: 9000 }).deadlineState).toBe("future");
+  expect(checkpoint({ gameTurn: 108 }).deadlineState).toBe("due");
+  expect(checkpoint({ gameTurn: 109 })).toMatchObject({ deadlineState: "overdue", reviewRequired: true });
+  expect(checkpoint({ gameTurn: undefined })).toMatchObject({ gameTurn: null, deadlineState: "unknown" });
+});
+
+it("requests reassessment after three complete quiet own turns despite mail and repeated orders", () => {
+  expect(checkpoint({ strategicProgress: progress({ goldChanged: 1, storedCultureChanged: 1 }) }))
+    .toMatchObject({ historyState: "quiet_window", reviewRequired: true });
+});
+
+it.each(["unitMoved", "unitHealthChanged", "researchWorkChanged", "productionWorkChanged", "technologyGained", "unitGained"])(
+  "does not demand switching a progressing plan because of %s", kind => {
+    expect(checkpoint({ strategicProgress: progress({ [kind]: 1 }) })).toMatchObject({ historyState: "changed", reviewRequired: false });
+  });
+
+it("does not manufacture quiet turns from incomplete or truncated history", () => {
+  for (const mutate of [(p: StrategicProgress) => { p.historyComplete = false; },
+    (p: StrategicProgress) => { p.completedTurns.pop(); },
+    (p: StrategicProgress) => { p.completedTurns[0].changes.truncated = true; }]) {
+    const facts = progress(); mutate(facts);
+    expect(checkpoint({ strategicProgress: facts })).toMatchObject({ historyState: "incomplete", reviewRequired: false });
+  }
+});
+
+it("reviews incoming losses before acting even with a future deadline and a progressing prior window", () => {
+  const facts = progress({ researchWorkChanged: 1 });
+  facts.incoming.eventCounts = { originalCapitalLost: 1, unitLost: 2 };
+  expect(checkpoint({ strategicProgress: facts })).toMatchObject({ reviewRequired: true, reviewReasons: ["incoming_losses"] });
+});
+
+it.each(["", "{broken", JSON.stringify({ strategy: { ...plan, expectedGameTurn: "soon" } }), "x".repeat(16 * 1024)])(
+  "keeps absent, malformed, legacy and maximum-sized notes nonfatal (%#)", notes => {
+    expect(() => checkpoint({ notes })).not.toThrow();
+    expect(checkpoint({ notes }).reviewRequired).toBe(true);
+  });
+
+it("treats an older engine or truncated available routes as unknown, not disabled", () => {
+  expect(checkpoint({ victory: undefined })).toMatchObject({ planState: "context_unavailable", enabledVictoryTypes: null });
+  expect(checkpoint({ victory: { ...victory, available: [], availableTruncated: true } })).toMatchObject({ planState: "route_unconfirmed" });
+});
+
+it("removes activity mandates while preserving purposeful messages and changed-condition checks", () => {
+  for (const text of [GAME_INSTRUCTIONS, prompt(), prompt({ openingObservation: "{}" })]) {
+    expect(text).toContain("Actively seek useful diplomatic opportunities");
+    expect(text).toContain("Initiate a concrete proposal when it advances your strategy");
+    expect(text).not.toContain("use it every turn to improve your position");
+    expect(text).not.toContain("Never leave a settler idle");
+    expect(text).not.toContain("keep every settler and scout acting");
+    expect(text).toContain("Zero outgoing messages is valid");
+    expect(text).toContain("An unrelated revision change is not a recheck condition");
+  }
+  expect(STRATEGY_INSTRUCTIONS).toContain("battle previews");
+  expect(GAME_INSTRUCTIONS).toContain("MESSAGES_UNACKNOWLEDGED");
+  expect(GAME_INSTRUCTIONS).toContain("game.message_image");
+  expect(GAME_INSTRUCTIONS).toContain("mapSummary.vision");
+  expect(GAME_INSTRUCTIONS).toContain("Attacks and other game rules still need your units' real sight");
 });

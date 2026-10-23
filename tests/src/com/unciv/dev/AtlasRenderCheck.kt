@@ -53,6 +53,8 @@ object AtlasRenderCheck {
                     repeat(30) { screen.stage.root.act(1f / 60f) }
                     frame.begin()
                     try {
+                        // The first frame registers frosted surfaces; the second captures their backdrop.
+                        draw(screen, 0f)
                         draw(screen, 0f)
                         val pixels = Pixmap.createFromFrameBuffer(0, 0, width, height)
                         try {
