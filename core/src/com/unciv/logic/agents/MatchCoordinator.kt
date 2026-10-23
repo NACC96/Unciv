@@ -122,6 +122,7 @@ class MatchCoordinator(
         committedGame = deserializeGame(json.toJson(game))
         committedMatch = match.deepCopy()
         NationControl.initialize(committedGame, committedMatch)
+        captureVictoryProgress(committedGame, committedMatch)
         // Initial/load knowledge is populated once, never by a read tool.
         AgentMapSightings().apply {
             captureAll(committedGame, committedMatch)
@@ -3230,6 +3231,7 @@ class MatchCoordinator(
      * so game and metadata generations never diverge.
      */
     private fun commit(candidateGame: GameInfo?, candidateMatch: AgentMatchState) {
+        captureVictoryProgress(candidateGame ?: committedGame, candidateMatch)
         candidateGame?.agentMapSightings?.let { sightings ->
             sightings.captureAll(candidateGame, candidateMatch)
             sightings.flushInto(candidateMatch, candidateMatch.stateRevision)

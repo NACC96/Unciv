@@ -162,7 +162,9 @@ class AgentMatchState(
     /** Fog for saves made before this setting existed; new matches start with [MatchVision.FULL]. */
     var vision: MatchVision = MatchVision.FOG,
     /** Actor-scoped factual baselines and the last three completed own turns; absent in older saves. */
-    var strategicProgress: HashMap<String, AgentStrategicHistory> = HashMap()
+    var strategicProgress: HashMap<String, AgentStrategicHistory> = HashMap(),
+    /** Own canonical victory counters, bounded by civilization and available route counts. */
+    var victoryProgress: HashMap<String, AgentVictoryHistory> = HashMap()
 ) : IsPartOfGameInfoSerialization {
     @Suppress("unused") // used by json serialization
     constructor() : this(
@@ -197,6 +199,7 @@ class AgentMatchState(
         localViewingCivId,
         HashMap(retainedAgentProfiles.mapValues { it.value.copy() }),
         vision,
-        HashMap(strategicProgress.mapValues { it.value.detachedCopy() })
+        HashMap(strategicProgress.mapValues { it.value.detachedCopy() }),
+        HashMap(victoryProgress.mapValues { it.value.detachedCopy() })
     )
 }

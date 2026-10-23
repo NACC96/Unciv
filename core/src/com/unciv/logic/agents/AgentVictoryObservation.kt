@@ -31,7 +31,8 @@ class ObservedVictoryRoute(
     /** Zero-based index into the canonical ordered milestone definition; null when complete. */
     var nextMilestone: Int? = null,
     var milestones: ArrayList<ObservedVictoryMilestone> = ArrayList(),
-    var milestonesTruncated: Boolean = false
+    var milestonesTruncated: Boolean = false,
+    var progress: ObservedVictoryProgress? = null
 )
 
 class ObservedOriginalCapital(
@@ -91,7 +92,14 @@ fun buildVictoryObservation(game: GameInfo, match: AgentMatchState, civ: Civiliz
             milestones = milestones.take(VICTORY_DETAIL_LIMIT).mapIndexedTo(ArrayList()) { index, milestone ->
                 observeMilestone(civ, victory, milestone, states[index], hideCount)
             },
-            milestonesTruncated = milestones.size > VICTORY_DETAIL_LIMIT
+            milestonesTruncated = milestones.size > VICTORY_DETAIL_LIMIT,
+            progress = match.victoryProgress[civ.civID]?.routes?.get(victory.name)?.let { record ->
+                val capital = milestones.firstOrNull { it.type == MilestoneType.CaptureAllCapitals }
+                val target = if (capital == null) milestones.size
+                    else if (hideCount) null else capital.civsWithPotentialCapitalsToOwn(game).size
+                ObservedVictoryProgress(record.metric, record.current, target,
+                    record.trackedSinceGameTurn, record.unchangedSinceGameTurn, record.lastChangedGameTurn)
+            }
         ))
     }
     context.availableTruncated = available.size > VICTORY_DETAIL_LIMIT

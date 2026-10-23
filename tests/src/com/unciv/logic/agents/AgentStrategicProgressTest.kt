@@ -300,6 +300,8 @@ class AgentStrategicProgressTest {
         val state = savedMatch(f.coordinator)
         val before = AgentOrdinarySave.encode(state)
         val copy = state.deepCopy()
+        copy.victoryProgress.getValue(f.rome.civID).routes.getValue("Domination").unchangedSinceGameTurn = 0
+        copy.victoryProgress.getValue(f.greece.civID).routes.clear()
         val candidate = copy.strategicProgress.getValue(f.rome.civID)
         candidate.admission!!.units[0].health = -1
         candidate.previousEnd!!.cities[0].production["Monument"] = -1

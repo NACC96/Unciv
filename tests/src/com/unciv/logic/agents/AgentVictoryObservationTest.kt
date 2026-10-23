@@ -121,6 +121,9 @@ class AgentVictoryObservationTest {
         assertNull(domination["requiredOriginalCapitals"])
         assertEquals(listOf(f.rome.civID), domination.objectsAt("capitals").map { it["foundingCivId"] })
         assertNull(victory.objectsAt("available").single().objectsAt("milestones").single()["target"])
+        val progress = victory.objectsAt("available").single().objectAt("progress")
+        assertEquals(1, progress["current"])
+        assertNull(progress["target"])
     }
 
     @Test fun `capital ownership agrees with canonical victory through replacement defeat liberation and recapture`() {
