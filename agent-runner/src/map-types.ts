@@ -75,6 +75,15 @@ export interface ObservedVictoryRoute {
   nextMilestone: number | null;
   milestones: ObservedVictoryMilestone[];
   milestonesTruncated: boolean;
+  /** Absent on older engines; the observed interval never reconstructs earlier match history. */
+  progress?: {
+    metric: "ORIGINAL_CAPITALS" | "COMPLETED_MILESTONES";
+    current: number;
+    target: number | null;
+    trackedSinceGameTurn: number;
+    unchangedSinceGameTurn: number;
+    lastChangedGameTurn: number | null;
+  } | null;
 }
 export interface ObservedOriginalCapital {
   foundingCivId: string;

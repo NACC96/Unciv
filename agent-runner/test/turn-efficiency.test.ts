@@ -294,7 +294,7 @@ describe("post-turn compaction", () => {
     const activity = readFileSync(join(logRoot, runDir, "activity.jsonl"), "utf8").trim().split("\n").map(line => JSON.parse(line));
     expect(activity.filter(entry => entry.id === "run-end")).toEqual([expect.objectContaining({ status: "completed_turn" })]);
     expect(activity.at(-1)).toMatchObject({ id: "session-compaction", title: expect.stringMatching(/^Session compacted in /) });
-    const identity = { strategyPolicyVersion: "victory-progress-v2", gameTurn: 77, turnSerial: 1,
+    const identity = { strategyPolicyVersion: "victory-progress-v3", gameTurn: 77, turnSerial: 1,
       matchId: "m", timelineId: "t", civId: "civ" };
     expect(releasedMeta).toMatchObject({ ...identity, turnOutcome: "completed_turn", sessionId: "compacting-session" });
     expect(JSON.parse(readFileSync(join(logRoot, runDir, "meta.json"), "utf8"))).toMatchObject(identity);

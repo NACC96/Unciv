@@ -35,11 +35,39 @@ function progress(counts: Record<string, number> = {}): StrategicProgress {
 }
 
 it("reconciles canonical enabled and available routes with legacy and incompatible private plans", () => {
-  expect(checkpoint()).toMatchObject({ policyVersion: "victory-progress-v2", gameTurn: 104, planState: "active", deadlineState: "future",
+  expect(checkpoint()).toMatchObject({ policyVersion: "victory-progress-v3", gameTurn: 104, planState: "active", deadlineState: "future",
     enabledVictoryTypes: ["Domination"], availableVictoryTypes: ["Domination"], reviewRequired: false });
   expect(checkpoint({ notes: "Primary victory: Scientific. Build spaceship parts." })).toMatchObject({ planState: "legacy", reviewRequired: true });
   expect(checkpoint({ notes: JSON.stringify({ strategy: { ...plan, victory: "Scientific" } }) })).toMatchObject({ planState: "route_unavailable", reviewRequired: true });
   expect(prompt()).toContain("Replace a disabled or unavailable victory plan on this turn");
+});
+
+it("carries durable victory age separately from productive preparation and rewritten deadlines", () => {
+  const observed = structuredClone(victory);
+  Object.assign(observed.available[0], { progress: { metric: "ORIGINAL_CAPITALS", current: 1, target: 3,
+    trackedSinceGameTurn: 139, unchangedSinceGameTurn: 139, lastChangedGameTurn: null } });
+  const result = checkpoint({ gameTurn: 145, victory: observed, strategicProgress: progress({ productionWorkChanged: 1 }),
+    notes: JSON.stringify({ strategy: { ...plan, expectedGameTurn: 170, lastReviewedGameTurn: 145 } }) });
+  expect(result).toMatchObject({ historyState: "changed", deadlineState: "future", victoryProgress: {
+    metric: "ORIGINAL_CAPITALS", current: 1, target: 3, trackedSinceGameTurn: 139,
+    unchangedSinceGameTurn: 139, lastChangedGameTurn: null, unchangedGameRounds: 6 } });
+  expect(checkpoint({ gameTurn: 139, victory: observed }).victoryProgress.unchangedGameRounds).toBe(0);
+  expect(checkpoint().victoryProgress).toBeNull();
+});
+
+it("makes peacetime readiness attainable and requires substantive blocker reassessment on resumed prompts", () => {
+  for (const text of [GAME_INSTRUCTIONS, prompt(), prompt({ includeStaticInstructions: true })]) {
+    expect(text).toContain("Current strategy policy victory-progress-v3");
+    expect(text).toContain("Peacetime legal attackTargets may be empty");
+    expect(text).toContain("do not require a legal battle preview before declaring war");
+    expect(text).toContain("readiness must be attainable under your own agreements");
+    expect(text).toContain("change the blocker, take a concrete step that removes it, or give evidence of current infeasibility");
+    expect(text).toContain("Extending a deadline or restating the same blocker is not reassessment");
+    expect(text).toContain("State the benefit and expiry of a standstill");
+    expect(text).toContain("Respect existing promises");
+    expect(text).toContain("Reassessment never forces war or blocks end-turn");
+    expect(text).toContain("Initiate a concrete proposal when it advances your strategy");
+  }
 });
 
 it("separates an enabled route with an unsupported action from a disabled route", () => {

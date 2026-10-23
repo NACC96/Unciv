@@ -95,10 +95,10 @@ describe("supervisor turn loop with a scripted provider", () => {
       expect(promptSpy).toHaveBeenCalledWith(expect.objectContaining({
         gameTurn: 124, victory, strategicProgress, notes: engine.notes, turnSerial: 901,
       }));
-      expect(prompt).toContain("victory-progress-v2");
+      expect(prompt).toContain("victory-progress-v3");
       expect(prompt).toContain("Domination");
       expect(spawned?.context).toMatchObject({ matchId: "m", timelineId: "t", civId: "civ", runId: "policy-run",
-        turnSerial: 901, gameTurn: 124, strategyPolicyVersion: "victory-progress-v2", provider: "opencode",
+        turnSerial: 901, gameTurn: 124, strategyPolicyVersion: "victory-progress-v3", provider: "opencode",
         model: "selected-model", reasoning: "high", resumed: Boolean(resumeId), sessionArm: "resume", sessionAge: 8 });
     } finally { promptSpy.mockRestore(); }
   });
@@ -116,7 +116,7 @@ describe("supervisor turn loop with a scripted provider", () => {
     });
     await supervisor.runLeaderTurn({ engine, binding: binding("clock-run"), profile,
       context: { ...context, turnSerial: 901 }, guidance: [], cwd: repoRoot });
-    expect(spawned?.context).toMatchObject({ turnSerial: 901, strategyPolicyVersion: "victory-progress-v2" });
+    expect(spawned?.context).toMatchObject({ turnSerial: 901, strategyPolicyVersion: "victory-progress-v3" });
     expect(spawned?.context?.gameTurn).toBe(gameTurn);
   });
 
