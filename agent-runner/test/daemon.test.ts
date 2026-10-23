@@ -18,7 +18,8 @@ const evaluationDirectories: string[] = [];
 afterEach(() => { for (const directory of evaluationDirectories.splice(0)) rmSync(directory, { recursive: true, force: true }); });
 
 /** Harmless Codex-shaped process: real MCP, no model, and a held post-turn completion. */
-function evaluationFixture(controls: Record<string, unknown>[], emittedSession = "new-evaluation-session") {
+function evaluationFixture(controls: Record<string, unknown>[], emittedSession = "new-evaluation-session",
+  options: { sourceSessions?: Record<string, string>; emittedSessions?: string[] } = {}) {
   const directory = mkdtempSync(join(tmpdir(), "unciv-evaluation-driver-"));
   evaluationDirectories.push(directory);
   const fixture = join(directory, "codex-fixture.mjs");
@@ -29,7 +30,7 @@ function evaluationFixture(controls: Record<string, unknown>[], emittedSession =
   const clientModule = new URL("../node_modules/@modelcontextprotocol/sdk/dist/esm/client/index.js", import.meta.url).href;
   const transportModule = new URL("../node_modules/@modelcontextprotocol/sdk/dist/esm/client/streamableHttp.js", import.meta.url).href;
   writeFileSync(fixture, `#!/usr/bin/env node
-import { appendFileSync, existsSync, writeFileSync } from "node:fs";
+import { appendFileSync, existsSync, readFileSync, writeFileSync } from "node:fs";
 import { Client } from ${JSON.stringify(clientModule)};
 import { StreamableHTTPClientTransport } from ${JSON.stringify(transportModule)};
 const argv = process.argv.slice(2);
@@ -37,7 +38,9 @@ appendFileSync(process.env.FIXTURE_INVOCATIONS, JSON.stringify(argv) + "\\n");
 const mcp = argv.find(arg => arg.startsWith("mcp_servers.game="));
 const url = /url="([^"]+)"/.exec(mcp)[1];
 const resume = argv.indexOf("resume");
-const session = resume < 0 ? process.env.FIXTURE_SESSION : argv.slice(resume + 1).find(arg => !arg.startsWith("--image="));
+const invocation = readFileSync(process.env.FIXTURE_INVOCATIONS, "utf8").trim().split("\\n").length - 1;
+const emittedSessions = JSON.parse(process.env.FIXTURE_SESSION_SEQUENCE);
+const session = emittedSessions[invocation] ?? (resume < 0 ? process.env.FIXTURE_SESSION : argv.slice(resume + 1).find(arg => !arg.startsWith("--image=")));
 const emit = event => console.log(JSON.stringify(event));
 emit({type:"thread.started",thread_id:session});
 const transport = new StreamableHTTPClientTransport(new URL(url), {requestInit:{headers:{authorization:"Bearer " + process.env.GAME_MCP_BEARER}}});
@@ -55,13 +58,14 @@ await transport.close();
 `);
   chmodSync(fixture, 0o755);
   writeFileSync(configPath, JSON.stringify({ daemonJs, outputDirectory: directory,
-    sessionPolicy: { mode: "forked-persistent", forkFromSessionIds: { Rome: "live-source" } } }));
+    sessionPolicy: { mode: "forked-persistent", forkFromSessionIds: options.sourceSessions ?? { Rome: "live-source" } } }));
   const child = spawn(process.execPath, [join(repoRoot, "probes", "strategy-evaluation-driver.mjs")], {
     stdio: ["pipe", "pipe", "pipe"], env: { ...process.env, UNCIV_EVALUATION_CONFIG: configPath,
       UNCIV_CODEX_EXECUTABLE: fixture, UNCIV_AGENT_LOG_DIR: join(directory, "providers"),
-      FIXTURE_INVOCATIONS: invocationsPath, FIXTURE_SESSION: emittedSession, FIXTURE_HOLD: holdPath, FIXTURE_RELEASE: releasePath },
+      FIXTURE_INVOCATIONS: invocationsPath, FIXTURE_SESSION: emittedSession,
+      FIXTURE_SESSION_SEQUENCE: JSON.stringify(options.emittedSessions ?? []), FIXTURE_HOLD: holdPath, FIXTURE_RELEASE: releasePath },
   });
-  const engine = new FakeGameService();
+  const engines = new Map<string, FakeGameService>();
   const events: Record<string, unknown>[] = [];
   let buffer = "", stderr = "", next = 0, exited = false;
   const send = (control: Record<string, unknown>) => child.stdin.write(JSON.stringify(control) + "\n");
@@ -79,6 +83,9 @@ await transport.close();
       if (frame.kind === "ready") { send(controls[next++]); continue; }
       if (frame.kind === "engine_request") {
         const params = frame.params as Record<string, unknown>;
+        const civ = String(params.civId ?? params.actorCivId ?? "Rome");
+        let engine = engines.get(civ);
+        if (!engine) { engine = new FakeGameService(); engine.civId = civ; engines.set(civ, engine); }
         const result = frame.method === "observe" ? engine.observe()
           : frame.method === "notes_get" ? engine.readNotes()
           : frame.method === "map" ? engine.map(params)
@@ -106,11 +113,11 @@ await transport.close();
   };
 }
 
-function evaluationControl(runId: string, providerConfig: Record<string, unknown>) {
+function evaluationControl(runId: string, providerConfig: Record<string, unknown>, civId = "Rome") {
   return { protocol: 1, kind: "control", op: "run_turn", runId, provider: "codex", providerConfig: { compactAfterTurn: true, ...providerConfig },
-    binding: { matchId: "copied-match", timelineId: "copied-timeline", civId: "Rome", runId, authorityEpoch: 1 },
-    profile: { displayName: "Rome", personality: "", modelLabel: "fixture" },
-    context: { rulesetName: "Vanilla", protocolVersion: 1, civId: "Rome", turnSerial: 1, session: { arm: "persistent", age: 0 } }, guidance: [] };
+    binding: { matchId: "copied-match", timelineId: "copied-timeline", civId, runId, authorityEpoch: 1 },
+    profile: { displayName: civId, personality: "", modelLabel: "fixture" },
+    context: { rulesetName: "Vanilla", protocolVersion: 1, civId, turnSerial: 1, session: { arm: "persistent", age: 0 } }, guidance: [] };
 }
 
 describe("opt-in evaluation session driver", () => {
@@ -149,6 +156,35 @@ describe("opt-in evaluation session driver", () => {
     expect(fixture.invocations()).toHaveLength(1);
     expect(fixture.events.filter(event => event.event === "run_failed")).toHaveLength(2);
     expect(fixture.events.some(event => event.event === "session_bound")).toBe(false);
+  }, 30000);
+
+  it("rejects a changed emitted resume ID and refuses to spawn on its later reuse", async () => {
+    const fixture = evaluationFixture([evaluationControl("fork", { forkFromSessionId: "live-source" }),
+      evaluationControl("changed", { resumeId: "new-evaluation-session" }),
+      evaluationControl("reuse-invalid", { resumeId: "changed-evaluation-session" })], "new-evaluation-session",
+    { emittedSessions: ["new-evaluation-session", "changed-evaluation-session"] });
+    fixture.release();
+    await fixture.exit;
+    expect(fixture.invocations()).toHaveLength(2);
+    expect(fixture.events.filter(event => event.event === "session_bound").map(event => event.runId)).toEqual(["fork"]);
+    expect(fixture.events.filter(event => event.event === "run_failed").map(event => event.runId)).toEqual(["changed", "reuse-invalid"]);
+    expect(fixture.events.find(event => event.runId === "changed" && event.event === "run_failed")?.payload)
+      .toMatchObject({ reason: expect.stringMatching(/invalid or unowned evaluation session/) });
+  }, 30000);
+
+  it("rejects another civilization's emitted session ID and refuses its later resume", async () => {
+    const fixture = evaluationFixture([evaluationControl("rome-fork", { forkFromSessionId: "live-source" }),
+      evaluationControl("greece-collision", { forkFromSessionId: "greece-source" }, "Greece"),
+      evaluationControl("greece-reuse", { resumeId: "new-evaluation-session" }, "Greece")], "new-evaluation-session",
+    { sourceSessions: { Rome: "live-source", Greece: "greece-source" },
+      emittedSessions: ["new-evaluation-session", "new-evaluation-session"] });
+    fixture.release();
+    await fixture.exit;
+    expect(fixture.invocations()).toHaveLength(2);
+    expect(fixture.events.filter(event => event.event === "session_bound").map(event => event.runId)).toEqual(["rome-fork"]);
+    expect(fixture.events.filter(event => event.event === "run_failed").map(event => event.runId)).toEqual(["greece-collision", "greece-reuse"]);
+    expect(fixture.events.find(event => event.runId === "greece-collision" && event.event === "run_failed")?.payload)
+      .toMatchObject({ reason: expect.stringMatching(/invalid or unowned evaluation session/) });
   }, 30000);
 });
 
