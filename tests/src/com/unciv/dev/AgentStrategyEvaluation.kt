@@ -318,8 +318,6 @@ object AgentStrategyEvaluation {
                 if (stopReason.startsWith("provider-")) break
             }
         } finally {
-            // The persistent probe returns only after provider + compaction exit.
-            // Legacy fresh runs request no compaction. Neither has background work to kill.
             // The supervisor's normal shutdown drains and waits; it does not kill an active provider.
             supervisor?.shutdown()
         }

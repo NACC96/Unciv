@@ -70,7 +70,6 @@ async function runTurn(control) {
       engine: backend, binding: control.binding, profile: control.profile, context: control.context,
       guidance: control.guidance, resumeId: providerConfig.resumeId, cwd: scratch,
       includeStaticInstructions: false, attachMapImage: true,
-      // Compaction stays enabled in the spawn; only early release is disabled.
       releaseAfterEndTurn: false,
     });
     const sessionId = outcome.run.sessionId;
