@@ -12,6 +12,10 @@
  *   profile:{provider:"codex",model:"<exact model>",reasoning:"<effort>"} }
  * Optional: profiles keyed by civ ID, vision (FULL/FOG), maxAdmissionMinutes,
  * checkpointBundle + expectedCheckpointSha256, messageImagesDirectory, engineSourceCommit.
+ * Copied stalled matches opt in to sessionPolicy:{mode:"forked-persistent",
+ * forkFromSessionIds:{Russia:"<source-id>",America:"<source-id>",China:"<source-id>"}}.
+ * Their first turns use native Codex fork; later turns resume only the new IDs.
+ * Compaction stays on; the probe waits for full natural exit between turns.
  *
  * Prepare one fixture once; feed its initial.unciv-agent plus SHA to BOTH arms.
  * Distinct output directories and fresh sessions isolate copied match IDs/receipts.
@@ -26,6 +30,7 @@ import { createHash } from "node:crypto";
 import { execFileSync, spawn, spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, openSync, readFileSync, realpathSync, writeFileSync } from "node:fs";
 import { basename, dirname, isAbsolute, join, relative, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 
 const input = process.argv[2];
 if (!input || !isAbsolute(input)) throw new Error("Pass an absolute evaluation config JSON path");
@@ -35,6 +40,15 @@ for (const key of ["sourceRoot", "runtimeClasspathFile", "javaExecutable", "node
 for (const key of ["checkpointBundle", "messageImagesDirectory"])
   if (config[key] != null && !isAbsolute(config[key])) throw new Error(`${key} must be an absolute path`);
 if (!["prepare", "run", "scripted-smoke"].includes(config.mode)) throw new Error("Explicit mode required: prepare, run, or scripted-smoke");
+if (config.sessionPolicy != null) {
+  if (config.sessionPolicy.mode !== "forked-persistent") throw new Error("Unknown evaluation session policy");
+  if (!config.checkpointBundle || config.mode === "scripted-smoke") throw new Error("Forked sessions require a copied checkpoint and a prepare/run evaluation");
+  const sources = config.sessionPolicy.forkFromSessionIds;
+  if (!sources || typeof sources !== "object" || Array.isArray(sources) || !Object.keys(sources).length ||
+      Object.values(sources).some(id => typeof id !== "string" || !id.trim())) throw new Error("forkFromSessionIds must map civilizations to source session IDs");
+  config.evaluationDriverJs ??= fileURLToPath(new URL("./strategy-evaluation-driver.mjs", import.meta.url));
+  if (!isAbsolute(config.evaluationDriverJs) || !existsSync(config.evaluationDriverJs)) throw new Error("Existing absolute evaluationDriverJs is required");
+}
 const output = resolve(config.outputDirectory);
 if (existsSync(output)) throw new Error("Use a new outputDirectory for every evaluation; never overwrite evidence");
 if (config.checkpointBundle) {
@@ -56,7 +70,7 @@ const sourceRoot = realpathSync(config.sourceRoot);
 const cwd = join(sourceRoot, "android", "assets");
 const digest = (bytes) => createHash("sha256").update(bytes).digest("hex");
 const git = (args) => execFileSync("git", ["-C", sourceRoot, ...args], { maxBuffer: 64 * 1024 * 1024 });
-const sourceFiles = git(["ls-files", "-z", "--cached", "--others", "--exclude-standard", "core/src", "desktop/src", "agent-runner/src", "tests/src/com/unciv/dev/AgentStrategyEvaluation.kt", "tests/src/com/unciv/dev/AgentStrategyFixtures.kt"])
+const sourceFiles = git(["ls-files", "-z", "--cached", "--others", "--exclude-standard", "core/src", "desktop/src", "agent-runner/src", "agent-runner/probes/strategy-evaluation.mjs", "agent-runner/probes/strategy-evaluation-driver.mjs", "tests/src/com/unciv/dev/AgentStrategyEvaluation.kt", "tests/src/com/unciv/dev/AgentStrategyFixtures.kt"])
   .toString().split("\0").filter(Boolean).sort();
 const sourceHasher = createHash("sha256");
 for (const file of sourceFiles) {
@@ -76,6 +90,7 @@ config.sourceIdentity = {
   nodeVersion: execFileSync(config.nodeExecutable, ["--version"], { encoding: "utf8" }).trim(),
   // Provider subprocess metadata records the actual command/executable/session per invocation.
   providerExecutableOverride: process.env.UNCIV_CODEX_EXECUTABLE ?? null,
+  evaluationDriverSha256: config.evaluationDriverJs ? digest(readFileSync(config.evaluationDriverJs)) : null,
 };
 mkdirSync(output, { recursive: true });
 const frozenConfig = join(output, "evaluation-config.json");
@@ -83,7 +98,8 @@ writeFileSync(frozenConfig, JSON.stringify(config, null, 2) + "\n", { flag: "wx"
 const logPath = join(output, "jvm.log"), log = openSync(logPath, "wx");
 const argv = ["-Xmx3g", `-Dunciv.data.dir=${join(output, "runtime-data")}`, "-cp", classpath,
   "com.unciv.dev.AgentStrategyEvaluation", frozenConfig];
-const child = spawn(config.javaExecutable, argv, { cwd, detached: true, stdio: ["ignore", log, log] });
+const child = spawn(config.javaExecutable, argv, { cwd, detached: true, stdio: ["ignore", log, log],
+  env: { ...process.env, UNCIV_EVALUATION_CONFIG: frozenConfig } });
 const launch = { pid: child.pid, command: [config.javaExecutable, ...argv], cwd, logPath, configPath: frozenConfig,
   launchedAt: new Date().toISOString(), liveness: `ps -p ${child.pid} -o pid,ppid,etime,stat,command`,
   stopAdmissionFile: join(output, "stop-admission"), providerMetadata: join(output, "providers") };

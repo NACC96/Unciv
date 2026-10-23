@@ -65,6 +65,8 @@ export interface RunTurnControl {
     model?: string;
     reasoning?: string;
     resumeId?: string;
+    /** Opt-in Codex history fork: source is read, then only the newly emitted ID is resumed. */
+    forkFromSessionId?: string;
     /**
      * The desktop will resume this session next turn: compact it after the
      * closing message, in the background while other leaders play (Codex).

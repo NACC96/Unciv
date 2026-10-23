@@ -37,9 +37,18 @@ object AgentStrategyEvaluation {
         require(output.isDirectory || output.mkdirs()) { "Cannot create evaluation output" }
         val mode = string(config, "mode")
         require(mode in setOf("prepare", "run", "scripted-smoke")) { "Explicit evaluation mode required" }
+        val configuredSessions = map(config["sessionPolicy"])
+        val persistentSessions = configuredSessions["mode"] == "forked-persistent"
+        require(configuredSessions.isEmpty() || persistentSessions) { "Unknown evaluation session policy" }
+        val forkSources = map(configuredSessions["forkFromSessionIds"]).mapValues { (_, value) ->
+            (value as? String)?.takeIf { it.isNotBlank() } ?: error("A source session ID is required for every evaluated civilization")
+        }
+        require(!persistentSessions || forkSources.isNotEmpty() && mode != "scripted-smoke") { "Forked sessions require Codex source histories" }
+        val sourceSessionIds = forkSources.values.toSet()
         val node = absolute(config, "nodeExecutable")
         val daemon = absolute(config, "daemonJs")
-        require(node.canExecute() && daemon.isFile) { "Existing Node executable and built daemon are required" }
+        val supervisorEntrypoint = if (persistentSessions) absolute(config, "evaluationDriverJs") else daemon
+        require(node.canExecute() && daemon.isFile && supervisorEntrypoint.isFile) { "Existing Node executable, built daemon and selected driver are required" }
         val maxOwnTurns = positive(config, "maxOwnTurns")
         val maxRounds = positive(config, "maxGameRounds")
         val maxInvocations = positive(config, "maxAdmittedInvocations")
@@ -62,6 +71,7 @@ object AgentStrategyEvaluation {
         Gdx.files = HeadlessFiles()
         TestGame(baseRuleset = BaseRuleset.Civ_V_Vanilla) // silent Unciv settings/rulesets; never desktop userdata
         val inputFile = config["checkpointBundle"]?.let { absolute(config, "checkpointBundle").canonicalFile }
+        require(!persistentSessions || inputFile != null) { "Forked evaluation must start from a copied checkpoint" }
         if (inputFile != null) {
             require(inputFile.isFile) { "Checkpoint missing: $inputFile" }
             // In particular reject output beneath the source userdata/checkpoint tree, even via symlinks.
@@ -104,15 +114,20 @@ object AgentStrategyEvaluation {
             "fixtureId" to fixtureId, "seed" to seed, "inputSha256" to inputHash,
             "initialBundleSha256" to sha256(initial), "sourceCheckpoint" to inputFile?.absolutePath,
             "matchId" to coordinator.getMatchId(), "timelineId" to coordinator.getTimelineId(),
-            "identityPolicy" to "Internal IDs and receipts preserved; independent external directories and fresh sessions",
+            "identityPolicy" to if (persistentSessions) "Internal IDs and receipts preserved; independent external directories; native history forks followed by new-session resumes"
+                else "Internal IDs and receipts preserved; independent external directories and fresh sessions",
             "jvmPid" to ProcessHandle.current().pid(), "command" to ProcessHandle.current().info().commandLine().orElse("unknown"),
             "cwd" to File(".").canonicalPath, "jvmArguments" to ManagementFactory.getRuntimeMXBean().inputArguments,
             "javaVersion" to System.getProperty("java.version"), "config" to config, "configPath" to args[0],
             "runnerHashes" to runnerHashes, "runtimeClasspathHashes" to classpathHashes,
-            "sessionPolicy" to mapOf("resumeId" to null, "compactAfterTurn" to false, "arm" to "rotate-1", "age" to 0),
+            "evaluationDriver" to if (persistentSessions) mapOf("path" to supervisorEntrypoint.absolutePath, "sha256" to sha256(supervisorEntrypoint)) else null,
+            "sessionPolicy" to if (persistentSessions) mapOf("mode" to "forked-persistent", "forkFromSessionIds" to forkSources,
+                "compactAfterTurn" to true, "arm" to "persistent", "completion" to "natural provider and compaction exit before next admission")
+                else mapOf("resumeId" to null, "compactAfterTurn" to false, "arm" to "rotate-1", "age" to 0),
             "providerMetadata" to File(output, "providers").absolutePath,
             "limitations" to listOf("Map seed fixes the starting fixture, not all model/engine randomness. Share the serialized input between arms.",
-                "Fresh sessions and disabled compaction intentionally differ from installed default sessions.",
+                if (persistentSessions) "Compaction settings match production; serial natural completion removes compaction overlap. Invocation time includes compaction; timeToCommit is separate. First fork token usage may inherit history and is unknown."
+                else "Fresh sessions and disabled compaction intentionally differ from installed default sessions.",
                 "A budget-limited run without engine victory data is inconclusive for win rate.")
         )
         immutable(File(output, "manifest.json"), AgentJson.stringify(manifest))
@@ -173,6 +188,7 @@ object AgentStrategyEvaluation {
         var stopReason = "admission-budget"
         val ownTurns = HashMap<String, Int>()
         val continuity = HashMap<String, String>()
+        val sessions = HashMap<String, String>()
         try {
             var invocations = 0
             while (true) {
@@ -190,12 +206,16 @@ object AgentStrategyEvaluation {
                 val provider = if (mode == "scripted-smoke") "scripted" else selected.provider
                 require(provider in setOf("scripted", "codex", "claude", "opencode")) { "Unsupported provider $provider" }
                 require(provider == "scripted" || selected.modelId.isNotBlank()) { "An exact model is required for $actor" }
+                require(!persistentSessions || provider == "codex") { "Forked persistent evaluation requires Codex for $actor" }
+                val resumeId = sessions[actor]
+                val forkFromSessionId = if (persistentSessions && resumeId == null)
+                    forkSources[actor] ?: error("Missing source session for $actor") else null
                 val runId = "$runIdentity-${++invocations}"
                 val before = matchState().endTurnsCommitted
                 synchronized(lock) {
                     admittedActor = actor; admittedRunId = runId; admittedAtNs = System.nanoTime(); committedAtMs = null
                 }
-                if (supervisor == null) supervisor = SupervisorProcess(node, daemon, activityLogsDir = File(output, "providers"),
+                if (supervisor == null) supervisor = SupervisorProcess(node, supervisorEntrypoint, activityLogsDir = File(output, "providers"),
                     answerEngineRequest = { method, params -> synchronized(lock) {
                         val fixedActor = admittedActor ?: throw EngineCallException("AUTHORITY_REVOKED", "No invocation admitted")
                         val callId = (++callIndex).toString()
@@ -252,15 +272,21 @@ object AgentStrategyEvaluation {
                     } })
                 val control = mapOf("protocol" to 1, "kind" to "control", "op" to "run_turn", "runId" to runId,
                     "provider" to provider,
-                    "providerConfig" to mapOf("model" to selected.modelId, "reasoning" to selected.reasoning,
-                        "compactAfterTurn" to false, "extra" to if (provider == "scripted") mapOf("plan" to "observe,end") else emptyMap<String, Any>()),
+                    "providerConfig" to buildMap<String, Any?> {
+                        put("model", selected.modelId); put("reasoning", selected.reasoning)
+                        put("compactAfterTurn", persistentSessions)
+                        if (resumeId != null) put("resumeId", resumeId)
+                        if (forkFromSessionId != null) put("forkFromSessionId", forkFromSessionId)
+                        put("extra", if (provider == "scripted") mapOf("plan" to "observe,end") else emptyMap<String, Any>())
+                    },
                     "binding" to mapOf("matchId" to coordinator.getMatchId(), "timelineId" to coordinator.getTimelineId(),
                         "civId" to actor, "runId" to runId, "authorityEpoch" to 1),
                     "profile" to mapOf("displayName" to selected.displayName, "personality" to selected.personality, "modelLabel" to selected.modelId),
                     "context" to mapOf("rulesetName" to coordinator.getRulesetName(), "protocolVersion" to 1,
                         "civId" to actor, "turnSerial" to coordinator.getTurnSerial(), "gameRound" to coordinator.getGameTurns(),
                         "continuityNote" to continuity[actor],
-                        "session" to mapOf("arm" to "rotate-1", "age" to 0)),
+                        "session" to mapOf("arm" to if (persistentSessions) "persistent" else "rotate-1",
+                            "age" to if (persistentSessions) ownTurns[actor] ?: 0 else 0)),
                     "guidance" to coordinator.takeGuidanceForDelivery(actor))
                 emit("turn_started", mapOf("runId" to runId, "actor" to actor, "gameRound" to coordinator.getGameTurns(),
                     "turnSerial" to coordinator.getTurnSerial(), "control" to control,
@@ -277,6 +303,14 @@ object AgentStrategyEvaluation {
                     if (outcome.status != "completed_turn" || delta != 1) {
                         stopReason = "provider-${outcome.status}-commits-$delta"
                     } else {
+                        if (persistentSessions) {
+                            val sessionId = outcome.sessionId ?: error("Forked provider returned no new session ID")
+                            check(sessionId !in sourceSessionIds && (resumeId == null || sessionId == resumeId) &&
+                                sessions.none { (otherActor, id) -> otherActor != actor && id == sessionId }) {
+                                "Provider returned an original, changed or another civilization's session ID"
+                            }
+                            sessions[actor] = sessionId
+                        }
                         ownTurns[actor] = (ownTurns[actor] ?: 0) + 1
                         outcome.summary?.takeIf { it.isNotBlank() }?.let { continuity[actor] = it }
                     }
@@ -284,7 +318,8 @@ object AgentStrategyEvaluation {
                 if (stopReason.startsWith("provider-")) break
             }
         } finally {
-            // runTurn returns only after the invocation outcome. No compaction was requested.
+            // The persistent probe returns only after provider + compaction exit.
+            // Legacy fresh runs request no compaction. Neither has background work to kill.
             // The supervisor's normal shutdown drains and waits; it does not kill an active provider.
             supervisor?.shutdown()
         }

@@ -37,6 +37,7 @@ export function buildSpawnForProvider(
         spec: codexSpawn({
           prompt,
           resumeId,
+          forkFromSessionId: config.forkFromSessionId,
           mcpUrl: serverUrl,
           bearerEnvVar: "GAME_MCP_BEARER",
           cwd: scratchCwd,
@@ -334,6 +335,7 @@ export async function main(): Promise<void> {
         return { ...built, spec: { ...built.spec, context: { ...control.binding, turnSerial: control.context.turnSerial,
           provider: control.provider, model: control.providerConfig.model, reasoning: control.providerConfig.reasoning,
           resumed: Boolean(resumeId),
+          ...(control.providerConfig.forkFromSessionId ? { forkedFromSessionId: control.providerConfig.forkFromSessionId } : {}),
           ...(control.context.session ? { sessionArm: control.context.session.arm, sessionAge: control.context.session.age } : {}) } } };
       },
       parseForProvider(control.provider),

@@ -181,6 +181,19 @@ describe("strategy evaluation report", () => {
     expect(f.report().tokens.completedTurns).toMatchObject({ input: { total: 130, samples: 2 }, output: { total: 30, samples: 2 } });
   });
 
+  it("keeps inherited fork usage unknown and counts only later deltas on the new session", () => {
+    const f = fixture();
+    const meta = { provider: "codex", sessionId: "new-fork", turnOutcome: "completed_turn", endedAt: "2026-01-01T00:00:10Z" };
+    f.provider("fork", { ...meta, startedAt: "2026-01-01T00:00:00Z", resumed: false, forkedFromSessionId: "live-source" }, [
+      { type: "turn.completed", usage: { input_tokens: 900100, output_tokens: 10020 } },
+    ]);
+    expect(f.report().tokens.completedTurns).toMatchObject({ input: { total: null, samples: 0 }, output: { total: null, samples: 0 } });
+    f.provider("resume", { ...meta, startedAt: "2026-01-01T00:01:00Z", resumed: true }, [
+      { type: "turn.completed", usage: { input_tokens: 900150, output_tokens: 10030 } },
+    ]);
+    expect(f.report().tokens.completedTurns).toMatchObject({ input: { total: 50, samples: 1 }, output: { total: 10, samples: 1 } });
+  });
+
   it("marks absent evidence unknown and accepts only completed provider tool calls for legacy logs", () => {
     const f = fixture();
     const item = { id: "tool-1", type: "mcp_tool_call", tool: "game.act_batch", arguments: {}, result: { content: [

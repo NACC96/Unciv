@@ -107,6 +107,7 @@ function legacyCalls(attempts) {
 }
 
 function report(directory) {
+  const manifest = json(join(directory, "manifest.json"));
   const malformed = [], events = lines(join(directory, "host-events.jsonl"), malformed);
   const hostMalformed = malformed.length;
   const attempts = providers(directory, malformed);
@@ -126,7 +127,7 @@ function report(directory) {
     : legacyCompleted.map(({ meta, path }) => meta.runId ?? path));
   let completedTurnOutgoingMessages = 0;
   const result = {
-    directory, manifest: json(join(directory, "manifest.json")), evidenceSource: hostCalls.length ? "host" : "provider-completed-calls",
+    directory, manifest, evidenceSource: hostCalls.length ? "host" : "provider-completed-calls",
     method: "Unique completed engine calls; only applied receipts count as commands. Receipt IDs are scoped by timeline and actor. Original-capital ownership and victory come only from paired engine snapshots. Unchanged reads/orders require identical relevant returned state after excluding transport clocks/revisions.",
     turns: { completed: hostTurns.length ? completed.length : legacyCompleted.length, attempted: hostTurns.length ? turns.length : attempts.length,
       incompleteOrFailed: hostTurns.length ? turns.length - completed.length : attempts.length - legacyCompleted.length },
@@ -134,7 +135,9 @@ function report(directory) {
     repetition: { unchangedReads: 0, unchangedOrders: 0, unknownOrderState: 0, eligibleReads: 0, eligibleOrders: 0 },
     timing: { medianTimeToCommitMs: median(completed.map((e) => e.timeToCommitMs)),
       medianInvocationMs: median(turns.map((e) => e.durationMs)), providerMedianMs: median(attempts.map((a) => a.meta.durationMs)),
-      compaction: "disabled for harness runs; unknown when unrecorded in legacy logs" },
+      compaction: manifest?.sessionPolicy?.compactAfterTurn === true
+        ? "enabled; evaluation waits for natural provider and compaction exit, so invocation time includes compaction"
+        : manifest?.sessionPolicy?.compactAfterTurn === false ? "disabled" : "unknown when unrecorded" },
     tokens: { completedTurns: {} },
     outcome: { winner: null, victoryType: null, victoryTurn: null, winRateVerdict: "inconclusive", originalCapitalOwnershipChanges: [], snapshots: 0 },
     exclusions: { duplicateCalls: 0, replayedReceipts: 0, failedCalls: 0, nonAppliedReceipts: 0, unknownReceipts: 0, malformedLines: malformed },
@@ -143,6 +146,7 @@ function report(directory) {
         attempts.length > 0 && legacy.incompleteAttempts.length === 0 },
     countedEvents: { applied: [], unchangedReads: [], unchangedOrders: [], turns: completed.map((t) => t.runId) },
     limitations: ["Diplomacy counts distinguish new messages from required acknowledgements; useful coordination and milestone quality require human assessment.",
+      "First fork token usage is unknown when cumulative totals inherit source history; only later new-session deltas are counted.",
       "Repeated-state counts are conservative equality checks, not a judgment that an action was strategically unnecessary.",
       "Missing legacy state, time-to-commit, policy identity, complete receipts, or checkpoint victory facts are unknown, never zero or inferred from narration."],
   };
@@ -196,7 +200,9 @@ function report(directory) {
     const usage = meta.endedAt ? stream.findLast((e) => e.type === "turn.completed")?.usage : null;
     const previous = meta.sessionId ? sessionUsage.get(meta.sessionId) : null;
     for (const [key, wire] of Object.entries({ input: "input_tokens", output: "output_tokens", reasoning: "reasoning_output_tokens" })) {
-      const baseline = meta.resumed === false ? 0 : previous?.[wire], current = usage?.[wire];
+      // A fork can inherit its source's cumulative totals. Its first evaluation
+      // cost is unknown; its final total can baseline later resumes of the NEW ID.
+      const baseline = meta.resumed === false && !meta.forkedFromSessionId ? 0 : previous?.[wire], current = usage?.[wire];
       if (meta.turnOutcome === "completed_turn" && meta.endedAt && number(baseline) && number(current) && current >= baseline) {
         totals[key].total += current - baseline; totals[key].samples++;
       }

@@ -37,7 +37,7 @@ export interface SpawnSpec {
   cwd: string;
   context?: { matchId: string; civId: string; turnSerial: number; runId: string; provider?: string; model?: string; reasoning?: string;
     timelineId?: string; gameTurn?: number; strategyPolicyVersion?: string;
-    sessionArm?: string; sessionAge?: number; resumed?: boolean };
+    sessionArm?: string; sessionAge?: number; resumed?: boolean; forkedFromSessionId?: string };
 }
 
 type Provider = "codex" | "claude" | "opencode";
@@ -91,6 +91,8 @@ export function resolveProviderExecutable(
 export function codexSpawn(args: {
   prompt: string;
   resumeId?: string;
+  /** Start an independent session from this history; never write/resume the source. */
+  forkFromSessionId?: string;
   mcpUrl: string;
   bearerEnvVar: string;
   cwd: string;
@@ -106,6 +108,7 @@ export function codexSpawn(args: {
   // required on this platform (CP-010). Shell restriction for Codex comes
   // from the MCP allowlist + approvals, enforced and audited separately.
   if (!args.sandboxDangerous) throw new Error("codex loopback MCP requires danger-full-access on macOS");
+  if (args.resumeId && args.forkFromSessionId) throw new Error("Codex fork and resume are mutually exclusive");
   const argv = [
     "exec", "--json",
     "--ignore-user-config",
@@ -132,10 +135,12 @@ export function codexSpawn(args: {
     "-c",
     `mcp_servers.game={url="${args.mcpUrl}", bearer_token_env_var="${args.bearerEnvVar}", required=true, startup_timeout_sec=20, tool_timeout_sec=${TOOL_TIMEOUT_SEC}, default_tools_approval_mode="auto", enabled_tools=${JSON.stringify(GAME_TOOL_ALLOWLIST)}}`,
   );
-  if (args.resumeId) argv.push("resume");
+  if (args.forkFromSessionId) argv.push("fork");
+  else if (args.resumeId) argv.push("resume");
   // `--image=` keeps the multi-value option from swallowing the session ID or prompt.
   if (args.imagePath) argv.push(`--image=${args.imagePath}`);
-  if (args.resumeId) argv.push(args.resumeId);
+  if (args.forkFromSessionId) argv.push(args.forkFromSessionId);
+  else if (args.resumeId) argv.push(args.resumeId);
   argv.push(args.prompt);
   return { executable: resolveProviderExecutable("codex"), argv, cwd: args.cwd };
 }
