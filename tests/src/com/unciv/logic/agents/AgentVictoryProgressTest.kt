@@ -13,10 +13,12 @@ import org.junit.runner.RunWith
 
 @RunWith(BaseTestRunner::class)
 class AgentVictoryProgressTest {
-    private class Fixture(captureReady: Boolean = false) {
+    private class Fixture(captureReady: Boolean = false,
+        victoryTypes: List<String> = listOf("Domination", "Scientific"), timeLimit: Int = 500) {
         val game = TestGame(baseRuleset = BaseRuleset.Civ_V_Vanilla).apply {
             gameInfo.gameParameters.baseRuleset = BaseRuleset.Civ_V_Vanilla.fullName
-            gameInfo.gameParameters.victoryTypes = arrayListOf("Domination", "Scientific")
+            gameInfo.gameParameters.victoryTypes = ArrayList(victoryTypes)
+            gameInfo.gameParameters.maxTurns = timeLimit
             makeHexagonalMap(6)
         }
         val rome = game.addCiv(game.ruleset.nations.getValue("Rome"), isPlayer = true)
@@ -144,5 +146,27 @@ class AgentVictoryProgressTest {
         assertEquals(140, progress["trackedSinceGameTurn"])
         assertEquals(140, progress["unchangedSinceGameTurn"])
         assertNull(progress["lastChangedGameTurn"])
+    }
+
+    @Test fun `a committed peaceful milestone changes its canonical counter and retains its clocks on reload`() {
+        val f = Fixture(victoryTypes = listOf("Time"), timeLimit = 140)
+        for (civ in listOf(f.rome, f.greece)) assertEquals(0, progress(f.coordinator, civ.civID, "Time")["current"])
+        end(f.coordinator, f.rome.civID, "time-rome")
+        end(f.coordinator, f.greece.civID, "time-greece")
+        assertEquals(140, f.coordinator.getGameTurns())
+        val game = f.coordinator.deserializeForPublication(f.coordinator.serializeCommittedGameForPublication())
+        val winner = game.civilizations.maxByOrNull { it.calculateTotalScore() }!!
+        assertEquals("Time", winner.victoryManager.getVictoryTypeAchieved())
+        val changed = progress(f.coordinator, winner.civID, "Time")
+        assertEquals("COMPLETED_MILESTONES", changed["metric"])
+        assertEquals(1, changed["current"])
+        assertEquals(1, changed["target"])
+        assertEquals(139, changed["trackedSinceGameTurn"])
+        assertEquals(140, changed["unchangedSinceGameTurn"])
+        assertEquals(140, changed["lastChangedGameTurn"])
+        val saved = f.coordinator.saveToJson()
+        repeat(3) { assertEquals(changed, progress(f.coordinator, winner.civID, "Time")) }
+        assertEquals(saved, f.coordinator.saveToJson())
+        assertEquals(changed, progress(MatchCoordinator.loadFromJson(saved), winner.civID, "Time"))
     }
 }

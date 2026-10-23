@@ -96,6 +96,10 @@ class AgentVictoryObservationTest {
         f.game.ruleset.victories[humanOnly.name] = humanOnly
         f.game.ruleset.victories[unknown.name] = unknown
         f.game.gameInfo.gameParameters.victoryTypes = arrayListOf(humanOnly.name, unknown.name)
+        f.match.victoryProgress[f.egypt.civID] = AgentVictoryHistory(hashMapOf(
+            unknown.name to AgentVictoryProgressRecord("COMPLETED_MILESTONES", 99, 10, 10, 10)))
+        captureVictoryProgress(f.game.gameInfo, f.match)
+        assertFalse(f.match.victoryProgress.getValue(f.egypt.civID).routes.containsKey(unknown.name))
         // The ordinary bridge serializer also covers in-memory mod fixtures; the coordinator's
         // save loader deliberately reloads installed rules instead of this test's mutated clone.
         fun observe(civ: Civilization) = (serializer.toJsonMap(buildObservation(f.game.gameInfo, f.match, civ.civID))
@@ -106,6 +110,7 @@ class AgentVictoryObservationTest {
         assertEquals(listOf(unknown.name), ai.objectsAt("available").map { it["name"] })
         val route = ai.objectsAt("available").single()
         assertNull(route["completed"])
+        assertNull(route["progress"])
         assertNull(route.objectsAt("milestones").single()["completed"])
         assertEquals("unsupported", route.objectsAt("milestones").single()["status"])
         assertNull(ai["achieved"])
